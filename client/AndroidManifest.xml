@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="768"
-    android:versionName="0.4.768"
+    android:versionCode="777"
+    android:versionName="0.4.777"
     android:installLocation="auto"
     android:largeHeap="@bool/largeHeap">
 
@@ -52,6 +52,9 @@
         android:theme="@style/WarWorlds"
         android:hardwareAccelerated="true"
         android:allowBackup="true" >
+
+        <meta-data android:name="com.google.android.gms.version"
+           android:value="@integer/google_play_services_version" />
 
         <!-- Main activity -->
         <activity

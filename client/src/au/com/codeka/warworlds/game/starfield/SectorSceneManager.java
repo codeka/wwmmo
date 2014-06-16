@@ -31,7 +31,7 @@ import au.com.codeka.warworlds.model.SectorManager;
 public abstract class SectorSceneManager implements SectorManager.OnSectorListChangedListener,
                                                     IOnSceneTouchListener {
     private static final Logger log = LoggerFactory.getLogger(SectorSceneManager.class);
-    private Scene mScene;
+    private StarfieldScene mScene;
     private GestureDetector mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     protected BaseGlActivity mActivity;
@@ -126,7 +126,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     public abstract void onLoadResources();
     protected abstract void refreshHud(HUD hud);
-    protected abstract void refreshScene(Scene scene);
+    protected abstract void refreshScene(StarfieldScene scene);
 
     protected GestureDetector.OnGestureListener createGestureListener() {
         return new GestureListener();
@@ -137,20 +137,28 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     }
 
     public Scene createScene() {
-        mScene = new Scene();
-        mScene.setBackground(new Background(0.0f, 0.0f, 0.0f));
-        mScene.setOnSceneTouchListener(this);
+        StarfieldScene scene = new StarfieldScene(this);
+        scene.setBackground(new Background(0.0f, 0.0f, 0.0f));
+        scene.setOnSceneTouchListener(this);
 
-        refreshScene(mScene);
+        refreshScene(scene);
 
         HUD hud = new HUD();
         refreshHud(hud);
-        mActivity.getCamera().setHUD(hud);
 
         if (mSceneCreatedHandler != null) {
-            mSceneCreatedHandler.onSceneCreated(mScene);
+            mSceneCreatedHandler.onSceneCreated(scene);
         }
 
+        if (mScene != null) {
+            scene.copySelection(mScene);
+        }
+        mScene = scene;
+        mActivity.getCamera().setHUD(hud);
+        return mScene;
+    }
+
+    public StarfieldScene getScene() {
         return mScene;
     }
 

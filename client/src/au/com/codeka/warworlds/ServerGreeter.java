@@ -369,7 +369,7 @@ public class ServerGreeter {
                         for (HelloCompleteHandler handler : mHelloCompleteHandlers) {
                             handler.onHelloComplete(!mErrorOccured, mServerGreeting);
                         }
-                        mHelloCompleteHandlers = new ArrayList<HelloCompleteHandler>();
+                        mHelloCompleteHandlers.clear();
                     }
 
                     if (mServerGreeting.mIntent != null) {

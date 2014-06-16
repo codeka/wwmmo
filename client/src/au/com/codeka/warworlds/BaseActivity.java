@@ -1,6 +1,10 @@
 package au.com.codeka.warworlds;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -60,6 +64,13 @@ public class BaseActivity extends FragmentActivity {
     @Override
     public void onResume() {
         Util.loadProperties();
+
+        int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (result != ConnectionResult.SUCCESS) {
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(result, this, 0);
+            dialog.show();
+            finish();
+        }
 
         mForegroundStartTimeMs = System.currentTimeMillis();
         mSensorManager.registerListener(mBugReportShakeListener, mAccelerometer,

@@ -236,7 +236,7 @@ public class EmpireManager {
                     for (Empire empire : empires) {
                         String empireKey = empire.getKey();
 
-                        if (empireKey.equals(mEmpire.getKey())) {
+                        if (mEmpire != null && empireKey.equals(mEmpire.getKey())) {
                             mEmpire = (MyEmpire) empire;
                         } else {
                             mEmpireCache.put(empireKey, empire);

@@ -157,7 +157,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mStarfield.selectStar(mMarkerStar.getKey());
+                        mStarfield.getScene().selectStar(mMarkerStar.getKey());
                     }
                 });
             }

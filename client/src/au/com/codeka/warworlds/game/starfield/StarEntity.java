@@ -190,12 +190,13 @@ public class StarEntity extends SelectableEntity {
                 return false;
             }
 
+            StarfieldScene scene = mStarfield.getScene();
             if (sceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
-                mStarfield.setSelectingEntity(StarEntity.this);
+                scene.setSelectingEntity(StarEntity.this);
             } else if (sceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                SelectableEntity selectingEntity = mStarfield.getSelectingEntity();
+                SelectableEntity selectingEntity = scene.getSelectingEntity();
                 if (selectingEntity == StarEntity.this) {
-                    mStarfield.selectStar(StarEntity.this);
+                    scene.selectStar(StarEntity.this);
                     return true;
                 }
             }

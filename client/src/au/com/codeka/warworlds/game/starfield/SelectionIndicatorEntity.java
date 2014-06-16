@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import org.andengine.engine.Engine;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.Entity;
 import org.andengine.entity.primitive.Line;
+import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 /** The selection indicator is an entity which is attached to the currently-select star or fleet. */
 public class SelectionIndicatorEntity extends Entity {
@@ -12,7 +14,7 @@ public class SelectionIndicatorEntity extends Entity {
     private Entity mAntiClockwise;
     private SelectableEntity mSelectedEntity;
 
-    public SelectionIndicatorEntity(StarfieldSceneManager starfield) {
+    public SelectionIndicatorEntity(Engine engine, VertexBufferObjectManager vertexBufferObjectManager) {
         super(0.0f, 0.0f, 1.0f, 1.0f);
 
         mClockwise = new Entity();
@@ -24,14 +26,14 @@ public class SelectionIndicatorEntity extends Entity {
             Line line = new Line(
                         (float) Math.sin(n)*0.5f + 1.0f, (float) Math.cos(n)*0.5f + 1.0f,
                         (float) Math.sin(n1)*0.5f + 1.0f, (float) Math.cos(n1)*0.5f + 1.0f,
-                        1.0f, starfield.getActivity().getVertexBufferObjectManager()
+                        1.0f, vertexBufferObjectManager
                     );
             mClockwise.attachChild(line);
 
             line = new Line(
                     (float) Math.sin(n)*0.6f + 1.0f, (float) Math.cos(n)*0.6f + 1.0f,
                     (float) Math.sin(n1)*0.6f + 1.0f, (float) Math.cos(n1)*0.6f + 1.0f,
-                    1.0f, starfield.getActivity().getVertexBufferObjectManager()
+                    1.0f, vertexBufferObjectManager
                 );
             mAntiClockwise.attachChild(line);
         }
@@ -44,7 +46,7 @@ public class SelectionIndicatorEntity extends Entity {
         attachChild(mClockwise);
         attachChild(mAntiClockwise);
 
-        starfield.getActivity().getEngine().registerUpdateHandler(mUpdateHandler);
+        engine.registerUpdateHandler(mUpdateHandler);
     }
 
     public void setSelectedEntity(SelectableEntity entity) {

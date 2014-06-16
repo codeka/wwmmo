@@ -515,7 +515,7 @@ public class RequestManager {
             Connection conn = null;
             if (!forceCreate) {
                 synchronized (mFreeConnections) {
-                    while (!mFreeConnections.isEmpty()) {
+                    if (!mFreeConnections.isEmpty()) {
                         conn = mFreeConnections.pop();
 
                         if (sVerboseLog) {
@@ -547,7 +547,7 @@ public class RequestManager {
             synchronized (mBusyConnections) {
                 mBusyConnections.remove(conn);
             }
-            
+
             if (!conn.isOpen()) {
                 return;
             }
@@ -574,7 +574,7 @@ public class RequestManager {
         private Connection createConnection() throws UnknownHostException, IOException {
             Socket s = mSocketFactory.createSocket(mHost, mPort);
 
-            // Verify that the certicate hostname is for mail.google.com
+            // Verify that the certicate hostname is for war-worlds.com
             // This is due to lack of SNI support in the current SSLSocket.
             if (mHostnameVerifier != null) {
                 SSLSocket sslSocket = (SSLSocket) s;

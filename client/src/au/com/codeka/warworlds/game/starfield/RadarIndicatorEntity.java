@@ -6,6 +6,7 @@ import org.andengine.opengl.shader.ShaderProgram;
 import org.andengine.opengl.shader.constants.ShaderProgramConstants;
 import org.andengine.opengl.shader.exception.ShaderProgramLinkException;
 import org.andengine.opengl.util.GLState;
+import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.opengl.vbo.attribute.VertexBufferObjectAttributes;
 
 import android.opengl.GLES20;
@@ -22,7 +23,7 @@ public class RadarIndicatorEntity extends Entity {
         return sShaderProgram;
     }
 
-    public RadarIndicatorEntity(StarfieldSceneManager starfield) {
+    public RadarIndicatorEntity(VertexBufferObjectManager vertexBufferObjectManager) {
         super(0, 0, 1, 1);
 
         float[] vertexData = new float[TexturedMesh.VERTEX_SIZE * 4];
@@ -40,7 +41,7 @@ public class RadarIndicatorEntity extends Entity {
         vertexData[3 * TexturedMesh.VERTEX_SIZE + TexturedMesh.TEXTURECOORDINATES_INDEX_V] = 1.0f;
 
         mMesh = new TexturedMesh(0.0f, 0.0f, vertexData, 4, DrawMode.TRIANGLE_STRIP,
-                starfield.getActivity().getVertexBufferObjectManager());
+                vertexBufferObjectManager);
         mMesh.setShaderProgram(sShaderProgram);
         attachChild(mMesh);
     }

@@ -573,7 +573,7 @@ public class Notifications {
         public void clearNotifications() {
             Realm realm = RealmContext.i.getCurrentRealm();
 
-            SQLiteDatabase db = getReadableDatabase();
+            SQLiteDatabase db = getWritableDatabase();
             try {
                 db.execSQL("DELETE FROM notifications WHERE realm_id="+realm.getID());
             } finally {

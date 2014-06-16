@@ -204,12 +204,13 @@ public class FleetEntity extends SelectableEntity {
         public boolean onAreaTouched(final TouchEvent sceneTouchEvent,
                                      final float touchAreaLocalX,
                                      final float touchAreaLocalY) {
+            StarfieldScene scene = mStarfield.getScene();
             if (sceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
-                mStarfield.setSelectingEntity(FleetEntity.this);
+                scene.setSelectingEntity(FleetEntity.this);
             } else if (sceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                SelectableEntity selectingEntity = mStarfield.getSelectingEntity();
+                SelectableEntity selectingEntity = scene.getSelectingEntity();
                 if (selectingEntity == FleetEntity.this) {
-                    mStarfield.selectFleet(FleetEntity.this);
+                    scene.selectFleet(FleetEntity.this);
                     return true;
                 }
             }

@@ -1,10 +1,7 @@
 package au.com.codeka.warworlds.model;
 
-import jregex.MatchResult;
-import jregex.Pattern;
-import jregex.Replacer;
-import jregex.Substitution;
-import jregex.TextBuffer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -21,9 +18,9 @@ public class ChatMessage extends BaseChatMessage {
 
     {
         sChatDateFormat = DateTimeFormat.forPattern("hh:mm a");
-        sUrlPattern = new Pattern(
+        sUrlPattern = Pattern.compile(
                 "((http|https)://|www\\.)([a-zA-Z0-9_-]{2,}\\.)+[a-zA-Z0-9_-]{2,}(/[a-zA-Z0-9/_.%#-]+)?");
-        sMarkdownString = new Pattern(
+        sMarkdownString = Pattern.compile(
                 "(?<=(^|\\W))(\\*\\*|\\*|_|-)(.*?)\\1(?=($|\\W))");
     }
 
@@ -123,49 +120,43 @@ public class ChatMessage extends BaseChatMessage {
      * Converts some basic markdown formatting to HTML.
      */
     private static String markdown(String markdown) {
-        Replacer replacer = sMarkdownString.replacer(new Substitution() {
-            @Override
-            public void appendSubstitution(MatchResult match, TextBuffer dest) {
-                String kind = match.group(2);
-                String text = match.group(3);
-                if (kind.equals("**")) {
-                    dest.append("<b>");
-                    dest.append(text);
-                    dest.append("</b>");
-                } else if (kind.equals("*") || kind.equals("-") || kind.equals("_")) {
-                    dest.append("<i>");
-                    dest.append(text);
-                    dest.append("</i>");
-                } else {
-                    dest.append(text);
-                }
+        StringBuffer output = new StringBuffer();
+        Matcher matcher = sMarkdownString.matcher(markdown);
+        while (matcher.find()) {
+            String kind = matcher.group(2);
+            String text = matcher.group(3);
+            if (kind.equals("**")) {
+                matcher.appendReplacement(output, String.format("<b>%s</b>", text));
+            } else if (kind.equals("*") || kind.equals("-") || kind.equals("_")) {
+                matcher.appendReplacement(output, String.format("<i>%s</i>", text));
+            } else {
+                matcher.appendReplacement(output, text);
             }
-        });
+        }
+        matcher.appendTail(output);
 
-        return replacer.replace(markdown);
+        return output.toString();
     }
 
     /**
      * Converts URLs to <a href> links.
      */
     private static String linkify(String line) {
-        Replacer replacer = sUrlPattern.replacer(new Substitution() {
-            @Override
-            public void appendSubstitution(MatchResult match, TextBuffer dest) {
-                String url = match.group(0);
-                String display = url;
-                if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                    url = "http://"+url;
-                }
-                dest.append("<a href=\"");
-                dest.append(url);
-                dest.append("\">");
-                dest.append(display);
-                dest.append("</a>");
+        StringBuffer output = new StringBuffer();
+        Matcher matcher = sUrlPattern.matcher(line);
+        while (matcher.find()) {
+            String url = matcher.group(0);
+            String display = url;
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "http://"+url;
             }
-        });
 
-        return replacer.replace(line);
+            matcher.appendReplacement(output, String.format("<a href=\"%s\">%s</a>",
+                    url, display));
+        }
+        matcher.appendTail(output);
+
+        return output.toString();
     }
 
     @Override

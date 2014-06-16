@@ -84,6 +84,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
     private String mFetchingStarKey;
 
     private Star mStarToSelect;
+    private String mStarKeyToSelect;
     private Fleet mFleetToSelect;
 
     private boolean mDoNotNavigateToHomeStar;
@@ -246,15 +247,15 @@ public class StarfieldActivity extends BaseStarfieldActivity
                     return;
                 }
 
-                if (mStarToSelect != null) {
+                if (mStarToSelect != null && mStarfield.getScene() != null) {
                     mSelectedStar = mStarToSelect;
-                    mStarfield.selectStar(mStarToSelect.getKey());
+                    mStarfield.getScene().selectStar(mStarToSelect.getKey());
                     mStarfield.scrollTo(mStarToSelect);
                     mStarToSelect = null;
                 }
 
-                if (mFleetToSelect != null) {
-                    mStarfield.selectFleet(mFleetToSelect.getKey());
+                if (mFleetToSelect != null && mStarfield.getScene() != null) {
+                    mStarfield.getScene().selectFleet(mFleetToSelect.getKey());
                     mFleetToSelect = null;
                 }
 
@@ -532,9 +533,9 @@ public class StarfieldActivity extends BaseStarfieldActivity
         mStarfield.scrollTo(star.getSectorX(), star.getSectorY(), offsetX, Sector.SECTOR_SIZE - offsetY);
 
         if (fleet.getState() == Fleet.State.MOVING) {
-            mStarfield.selectFleet(fleet.getKey());
+            mStarfield.getScene().selectFleet(fleet.getKey());
         } else {
-            mStarfield.selectStar(star.getKey());
+            mStarfield.getScene().selectStar(star.getKey());
         }
     }
 
@@ -630,9 +631,11 @@ public class StarfieldActivity extends BaseStarfieldActivity
 
             if (wasSectorUpdated) {
                 SectorManager.getInstance().refreshSector(sectorX, sectorY);
-            } else if (starKey != null) {
+            } else if (starKey != null && mStarfield.getScene() != null) {
                 // make sure we re-select the star you had selected before.
-                mStarfield.selectStar(starKey);
+                mStarfield.getScene().selectStar(starKey);
+            } else if (starKey != null) {
+                mStarKeyToSelect = starKey;
             }
         } else if (requestCode == EMPIRE_REQUEST && intent != null) {
             EmpireActivity.EmpireActivityResult res = EmpireActivity.EmpireActivityResult.fromValue(

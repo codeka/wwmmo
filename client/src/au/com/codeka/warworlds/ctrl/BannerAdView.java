@@ -6,6 +6,10 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
@@ -26,9 +30,6 @@ import au.com.codeka.warworlds.model.billing.Inventory;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
 
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
 
 /**
  * This is our subclass of \c AdView that adds the "standard" properties automatically.
@@ -70,11 +71,12 @@ public class BannerAdView extends FrameLayout {
             return;
         }
 
-        AdRequest request = new AdRequest();
-        request.addTestDevice("14DEBC42826F8B1AA4D5EC50BB5812B7"); // Galaxy Nexus
-        request.addTestDevice("E3E9BC57830668448015E1753F83BB44"); // Nexus One
+        AdRequest request = new AdRequest.Builder()
+            .addTestDevice("14DEBC42826F8B1AA4D5EC50BB5812B7") // Galaxy Nexus
+            .addTestDevice("E3E9BC57830668448015E1753F83BB44") // Nexus One
+            .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+            .build();
 
-        request.addTestDevice(AdRequest.TEST_EMULATOR);
         mAdView.loadAd(request);
     }
 
@@ -118,7 +120,9 @@ public class BannerAdView extends FrameLayout {
     }
 
     private void setupAd() {
-        mAdView = new AdView((Activity) mContext, AdSize.BANNER, "a14f533fbb3e1bd");
+        mAdView = new AdView((Activity) mContext);
+        mAdView.setAdSize(AdSize.BANNER);
+        mAdView.setAdUnitId("a14f533fbb3e1bd");
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
                                                                    LayoutParams.WRAP_CONTENT);

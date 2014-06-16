@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -72,9 +71,6 @@ public class StarfieldSceneManager extends SectorSceneManager
     private Handler mHandler;
     private boolean mHasScrolled;
 
-    private SelectableEntity mSelectingEntity;
-    private SelectionIndicatorEntity mSelectionIndicator;
-    private RadarIndicatorEntity mRadarIndicator;
     private boolean mWasDragging;
 
     private Font mFont;
@@ -95,12 +91,6 @@ public class StarfieldSceneManager extends SectorSceneManager
     private ArrayList<Entity> mBackgroundEntities;
     private boolean mIsBackgroundVisible = true;;
     private float mBackgroundZoomAlpha = 1.0f;
-
-    private Map<String, StarEntity> mStars;
-    private Map<String, FleetEntity> mFleets;
-    private StarEntity mSelectedStarEntity;
-    private FleetEntity mSelectedFleetEntity;
-    private String mStarToSelect;
 
     private TacticalPointCloud mPointCloud;
     private TreeMap<String, TacticalControlField> mControlFields;
@@ -176,8 +166,6 @@ public class StarfieldSceneManager extends SectorSceneManager
                                    Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 16, true, Color.WHITE);
         mFont.load();
 
-        mSelectionIndicator = new SelectionIndicatorEntity(this);
-        mRadarIndicator = new RadarIndicatorEntity(this);
     }
 
     @Override
@@ -219,6 +207,13 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     public void setSpaceTapListener(OnSpaceTapListener listener) {
         mSpaceTapListener = listener;
+    }
+
+    public void fireSpaceTapListener(final long sectorX, final long sectorY, final int offsetX,
+            final int offsetY) {
+        if (mSpaceTapListener != null) {
+            mSpaceTapListener.onSpaceTap(sectorX, sectorY, offsetX, offsetY);
+        }
     }
 
     public void addSelectionChangedListener(OnSelectionChangedListener listener) {
@@ -271,7 +266,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
 
         // otherwise, refresh the scene (but only if it's one we're actually displaying...)
-        if (mControlFields.keySet().contains(empire.getKey())) {
+        if (mControlFields != null && mControlFields.keySet().contains(empire.getKey())) {
             refreshScene();
         }
     }
@@ -281,7 +276,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     @Override
-    protected void refreshScene(Scene scene) {
+    protected void refreshScene(StarfieldScene scene) {
         if (!mHasScrolled) {
             // if you haven't scrolled yet, then don't even think about refreshing the
             // scene... it's a waste of time!
@@ -290,24 +285,16 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
 
         if (mActivity.getEngine() == null) {
-            // if the engine hasn't been created yet, schedule a refresh for later...
-            mActivity.runOnUpdateThread(new Runnable() {
-                @Override
-                public void run() {
-                    refreshScene();
-                }
-            });
+            // if the engine hasn't been created yet, we can't really do anything.
             return;
         }
 
-        mFleets = new HashMap<String, FleetEntity>();
-        mStars = new HashMap<String, StarEntity>();
         final List<Pair<Long, Long>> missingSectors = drawScene(scene);
         if (missingSectors != null) {
             SectorManager.getInstance().requestSectors(missingSectors, false, null);
         }
 
-        refreshSelectionIndicator();
+        scene.refreshSelectionIndicator();
     }
 
     @Override
@@ -334,7 +321,8 @@ public class StarfieldSceneManager extends SectorSceneManager
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
-                    for (Entity entity : mBackgroundEntities) {
+                    ArrayList<Entity> backgroundEntities = mBackgroundEntities;
+                    for (Entity entity : backgroundEntities) {
                         entity.setVisible(mIsBackgroundVisible);
                     }
                 }
@@ -345,7 +333,8 @@ public class StarfieldSceneManager extends SectorSceneManager
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
-                    for (Entity entity : mBackgroundEntities) {
+                    ArrayList<Entity> backgroundEntities = mBackgroundEntities;
+                    for (Entity entity : backgroundEntities) {
                         entity.setVisible(mIsBackgroundVisible);
                     }
                 }
@@ -357,7 +346,8 @@ public class StarfieldSceneManager extends SectorSceneManager
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
-                    for (Entity entity : mBackgroundEntities) {
+                    ArrayList<Entity> backgroundEntities = mBackgroundEntities;
+                    for (Entity entity : backgroundEntities) {
                         entity.setAlpha(mBackgroundZoomAlpha);
                         entity.setColor(mBackgroundZoomAlpha, mBackgroundZoomAlpha, mBackgroundZoomAlpha);
                     }
@@ -404,13 +394,11 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
     }
 
-    private List<Pair<Long, Long>> drawScene(Scene scene) {
+    private List<Pair<Long, Long>> drawScene(StarfieldScene scene) {
         SectorManager sm = SectorManager.getInstance();
         List<Pair<Long, Long>> missingSectors = null;
 
-        mBackgroundEntities = new ArrayList<Entity>();
-        StarEntity oldSelection = mSelectedStarEntity;
-
+        ArrayList<Entity> newBackgroundEntities = new ArrayList<Entity>();
         for(int y = -mSectorRadius; y <= mSectorRadius; y++) {
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
                 long sX = mSectorX + x;
@@ -426,9 +414,10 @@ public class StarfieldSceneManager extends SectorSceneManager
 
                 int sx = (int)(x * Sector.SECTOR_SIZE);
                 int sy = -(int)(y * Sector.SECTOR_SIZE);
-                drawBackground(scene, sector, sx, sy);
+                drawBackground(scene, sector, sx, sy, newBackgroundEntities);
             }
         }
+        mBackgroundEntities = newBackgroundEntities;
 
         addTacticalView(scene);
 
@@ -448,19 +437,11 @@ public class StarfieldSceneManager extends SectorSceneManager
             }
         }
 
-        if (oldSelection != mSelectedStarEntity) {
-            // if we need to select a star and we did, then fire the handler
-            if (mSelectedStarEntity != null) {
-                fireSelectionChanged(mSelectedStarEntity.getStar());
-            } else {
-                fireSelectionChanged((Star) null);
-            }
-        }
-
         return missingSectors;
     }
 
-    private void drawBackground(Scene scene, Sector sector, int sx, int sy) {
+    private void drawBackground(Scene scene, Sector sector, int sx, int sy,
+            ArrayList<Entity> newBackgroundEntities) {
         Random r = new Random(sector.getX() ^ (long)(sector.getY() * 48647563));
         final int STAR_SIZE = 256;
         for (int y = 0; y < Sector.SECTOR_SIZE / STAR_SIZE; y++) {
@@ -473,7 +454,7 @@ public class StarfieldSceneManager extends SectorSceneManager
                         mActivity.getVertexBufferObjectManager());
                 setBackgroundEntityZoomFactor(bgSprite);
                 scene.attachChild(bgSprite);
-                mBackgroundEntities.add(bgSprite);
+                newBackgroundEntities.add(bgSprite);
             }
         }
 
@@ -490,7 +471,7 @@ public class StarfieldSceneManager extends SectorSceneManager
                     mActivity.getVertexBufferObjectManager());
             setBackgroundEntityZoomFactor(bgSprite);
             scene.attachChild(bgSprite);
-            mBackgroundEntities.add(bgSprite);
+            newBackgroundEntities.add(bgSprite);
         }
     }
 
@@ -508,7 +489,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     /**
      * Draws a sector, which is a 1024x1024 area of stars.
      */
-    private void addSector(Scene scene, int offsetX, int offsetY, Sector sector) {
+    private void addSector(StarfieldScene scene, int offsetX, int offsetY, Sector sector) {
         for(BaseStar star : sector.getStars()) {
             addStar(scene, (Star) star, offsetX, offsetY);
         }
@@ -525,7 +506,7 @@ public class StarfieldSceneManager extends SectorSceneManager
      * Draws a single star. Note that we draw all stars first, then the names of stars
      * after.
      */
-    private void addStar(Scene scene, Star star, int x, int y) {
+    private void addStar(StarfieldScene scene, Star star, int x, int y) {
         x += star.getOffsetX();
         y += Sector.SECTOR_SIZE - star.getOffsetY();
 
@@ -559,19 +540,6 @@ public class StarfieldSceneManager extends SectorSceneManager
                                                textureRegion, mActivity.getVertexBufferObjectManager());
         scene.registerTouchArea(starEntity.getTouchEntity());
         scene.attachChild(starEntity);
-        mStars.put(star.getKey(), starEntity);
-
-        if (mSelectedStarEntity != null && mSelectedStarEntity.getStar().getKey().equals(star.getKey())) {
-            // the selected star will have been refreshed from the server with full details (buildings, etc), whereas
-            // the one in the sector will just be a summary. We want to make sure the selection stays "full detail".
-            Star selectedStar = mSelectedStarEntity.getStar();
-            mSelectedStarEntity = starEntity;
-            mSelectedStarEntity.setStar(selectedStar);
-        }
-        if (mStarToSelect != null && mStarToSelect.equals(star.getKey())) {
-            mStarToSelect = null;
-            mSelectedStarEntity = starEntity;
-        }
     }
 
     /**
@@ -589,7 +557,7 @@ public class StarfieldSceneManager extends SectorSceneManager
      * Draw a moving fleet as a line between the source and destination stars, with an icon
      * representing the current location of the fleet.
      */
-    private void addMovingFleet(Scene scene, Fleet fleet, Star srcStar, int offsetX, int offsetY) {
+    private void addMovingFleet(StarfieldScene scene, Fleet fleet, Star srcStar, int offsetX, int offsetY) {
         // we'll need to find the destination star
         Star destStar = SectorManager.getInstance().findStar(fleet.getDestinationStarKey());
         if (destStar == null) {
@@ -611,15 +579,10 @@ public class StarfieldSceneManager extends SectorSceneManager
         FleetEntity fleetEntity = new FleetEntity(this, srcPoint, destPoint, fleet, mActivity.getVertexBufferObjectManager());
         scene.registerTouchArea(fleetEntity.getTouchEntity());
         scene.attachChild(fleetEntity);
-        mFleets.put(fleet.getKey(), fleetEntity);
-
-        if (mSelectedFleetEntity != null && mSelectedFleetEntity.getFleet().getKey().equals(fleet.getKey())) {
-            mSelectedFleetEntity = fleetEntity;
-        }
     }
 
     Collection<FleetEntity> getMovingFleets() {
-        return mFleets.values();
+        return this.getScene().getFleets().values();
     }
 
     private void addTacticalView(Scene scene) {
@@ -730,7 +693,7 @@ public class StarfieldSceneManager extends SectorSceneManager
                     offsetY -= Sector.SECTOR_SIZE;
                 }
 
-                selectNothing(sectorX, sectorY, offsetX, offsetY);
+                getScene().selectNothing(sectorX, sectorY, offsetX, offsetY);
                 handled = true;
             }
         }
@@ -756,7 +719,7 @@ public class StarfieldSceneManager extends SectorSceneManager
             super.onScroll(e1, e2, distanceX, distanceY);
 
             // because we've navigating the map, we're no longer in the process of selecting a sprite.
-            mSelectingEntity = null;
+            getScene().cancelSelect();
             mWasDragging = true;
             return true;
         }
@@ -769,133 +732,9 @@ public class StarfieldSceneManager extends SectorSceneManager
             super.onScale(detector);
 
             // because we've navigating the map, we're no longer in the process of selecting a sprite.
-            mSelectingEntity = null;
+            getScene().cancelSelect();
             mWasDragging = true;
             return true;
-        }
-    }
-
-    /** Gets the sprite we've marked as "being selected". That is, you've tapped down, but not yet tapped up. */
-    public SelectableEntity getSelectingEntity() {
-        return mSelectingEntity;
-    }
-
-    /** Sets the sprite that we've tapped down on, but not yet tapped up on. */
-    public void setSelectingEntity(SelectableEntity entity) {
-        mSelectingEntity = entity;
-    }
-
-    public void selectStar(final StarEntity selectedStarEntity) {
-        getActivity().runOnUpdateThread(new Runnable() {
-            @Override
-            public void run() {
-                mSelectedStarEntity = selectedStarEntity;
-                mSelectedFleetEntity = null;
-
-                refreshSelectionIndicator();
-                if (mSelectedStarEntity == null) {
-                    fireSelectionChanged((Star) null);
-                } else {
-                    fireSelectionChanged(mSelectedStarEntity.getStar());
-                }
-            }
-        });
-    }
-
-    public void selectStar(String starKey) {
-        if (mStars == null) {
-            // this can happen if we haven't refreshed the scene yet.
-            mStarToSelect = starKey;
-            return;
-        }
-
-        if (starKey == null) {
-            selectStar((StarEntity) null);
-            return;
-        }
-
-        if (!mStars.containsKey(starKey)) {
-            mStarToSelect = starKey;
-            return;
-        }
-
-        selectStar(mStars.get(starKey));
-    }
-
-    public void selectFleet(final FleetEntity fleet) {
-        getActivity().runOnUpdateThread(new Runnable() {
-            @Override
-            public void run() {
-                mSelectedStarEntity = null;
-                mSelectedFleetEntity = fleet;
-
-                refreshSelectionIndicator();
-                fireSelectionChanged(mSelectedFleetEntity == null ? null : mSelectedFleetEntity.getFleet());
-            }
-        });
-    }
-
-    public void selectFleet(String fleetKey) {
-        if (fleetKey == null) {
-            selectFleet((FleetEntity) null);
-            return;
-        }
-
-        if (mFleets == null) {
-            // TODO: handle this better
-            return;
-        }
-
-        selectFleet(mFleets.get(fleetKey));
-    }
-
-    /** Deselects the fleet or star you currently have selected. */
-    private void selectNothing(final long sectorX, final long sectorY, final int offsetX,
-            final int offsetY) {
-        getActivity().runOnUpdateThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mSelectedStarEntity != null) {
-                    mSelectedStarEntity = null;
-                    refreshSelectionIndicator();
-                    fireSelectionChanged((Star) null);
-                }
-
-                if (mSelectedFleetEntity != null) {
-                    mSelectedFleetEntity = null;
-                    refreshSelectionIndicator();
-                    fireSelectionChanged((Fleet) null);
-                }
-
-                if (mSpaceTapListener != null) {
-                    mSpaceTapListener.onSpaceTap(sectorX, sectorY, offsetX, offsetY);
-                }
-            }
-        });
-    }
-
-    private void refreshSelectionIndicator() {
-        if (mSelectionIndicator.getParent() != null) {
-            mSelectionIndicator.getParent().detachChild(mSelectionIndicator);
-        }
-        if (mRadarIndicator.getParent() != null) {
-            mRadarIndicator.getParent().detachChild(mRadarIndicator);
-        }
-
-        if (mSelectedStarEntity != null) {
-            mSelectionIndicator.setSelectedEntity(mSelectedStarEntity);
-            mSelectedStarEntity.attachChild(mSelectionIndicator);
-
-            // if the selected star has a radar, pick the one with the biggest radius to display
-            float radarRadius = mSelectedStarEntity.getStar().getRadarRange(EmpireManager.i.getEmpire().getKey());
-            if (radarRadius > 0.0f) {
-                mSelectedStarEntity.attachChild(mRadarIndicator);
-                mRadarIndicator.setScale(radarRadius * Sector.PIXELS_PER_PARSEC * 2.0f);
-            }
-        }
-        if (mSelectedFleetEntity != null) {
-            mSelectionIndicator.setSelectedEntity(mSelectedFleetEntity);
-            mSelectedFleetEntity.attachChild(mSelectionIndicator);
         }
     }
 
@@ -908,11 +747,9 @@ public class StarfieldSceneManager extends SectorSceneManager
         getActivity().runOnUpdateThread(new Runnable() {
             @Override
             public void run() {
-                // if it's the selected star, we'll want to update the selection
-                if (s != null && mSelectedStarEntity != null &&
-                        s.getKey().equals(mSelectedStarEntity.getStar().getKey())) {
-                    mSelectedStarEntity.setStar(s);
-                    refreshSelectionIndicator();
+                StarfieldScene scene = getScene();
+                if (scene != null) {
+                    scene.onStarFetched(s);
                 }
             }
         });

@@ -10,11 +10,28 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# Add any project specific keep options here:
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# keep source file line numbers at least (they're very useful!)
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
+
+# We need to keep all the protobuf stuff, or it craps out
+-keep public class * extends com.google.protobuf.GeneratedMessage { *; }
+
+# This references lots of classes for some reason.
+-dontwarn org.apache.commons.collections.BeanMap
+
+# The following are required by the Google Play Services library.
+-keep class * extends java.util.ListResourceBundle {
+    protected Object[][] getContents();
+}
+-keep public class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
+    public static final *** NULL;
+}
+-keepnames @com.google.android.gms.common.annotation.KeepName class *
+-keepclassmembernames class * {
+    @com.google.android.gms.common.annotation.KeepName *;
+}
+-keepnames class * implements android.os.Parcelable {
+    public static final ** CREATOR;
+}

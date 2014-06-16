@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.Map;
 import java.util.Random;
 
 import org.joda.time.DateTime;
@@ -123,8 +124,15 @@ public class ErrorReporter {
                         log.debug("Sending "+errorReportFiles.length+" error reports...");
                         Messages.ErrorReports.Builder error_reports_pb = Messages.ErrorReports.newBuilder();
                         for (String file : errorReportFiles) {
-                            FileInputStream ins = new FileInputStream(sReportPath + file);
-                            error_reports_pb.addReports(Messages.ErrorReport.parseFrom(ins));
+                            FileInputStream ins = null;
+                            try {
+                                ins = new FileInputStream(sReportPath + file);
+                                error_reports_pb.addReports(Messages.ErrorReport.parseFrom(ins));
+                            } finally {
+                                if (ins != null) {
+                                    try { ins.close(); } catch(IOException e) {}
+                                }
+                            }
                         }
 
                         ApiClient.postProtoBuf("error-reports", error_reports_pb.build());
@@ -199,6 +207,11 @@ public class ErrorReporter {
                 final PrintWriter printWriter = new PrintWriter(stringWriter);
                 throwable.printStackTrace(printWriter);
 
+                // write all the other stack traces as well
+                try {
+                    writeAllStackTraces(thread, printWriter);
+                } catch(Exception e) {} // ignore errors
+
                 Debug.getMemoryInfo(sMemoryInfo);
                 Messages.ErrorReport.Builder error_report_pb = Messages.ErrorReport.newBuilder()
                         .setAndroidVersion(sAndroidVersion)
@@ -237,6 +250,28 @@ public class ErrorReporter {
 
             if (mOldDefaultExceptionHandler != null) {
                 mOldDefaultExceptionHandler.uncaughtException(thread, throwable);
+            }
+        }
+
+        /** Writes stack traces for all threads not the current thread to the given PrintWriter. */
+        private void writeAllStackTraces(Thread currentThread, PrintWriter pw) {
+            try {
+                Map<Thread, StackTraceElement[]> allStackTraces = Thread.getAllStackTraces();
+                for (Map.Entry<Thread, StackTraceElement[]> entry : allStackTraces.entrySet()) {
+                    if (entry.getKey() == currentThread) {
+                        continue;
+                    }
+
+                    Thread thread = entry.getKey();
+                    pw.println();
+                    pw.println("---------- THREAD: " + thread.getName());
+                    for (StackTraceElement ste : entry.getValue()) {
+                        pw.print("   ");
+                        pw.println(ste);
+                    }
+                }
+            } catch (Exception e) {
+                // ignore
             }
         }
     }
