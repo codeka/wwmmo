@@ -325,6 +325,7 @@ public class FleetList extends FrameLayout
 
         EmpireShieldManager.i.addShieldUpdatedHandler(this);
         StarManager.getInstance().addStarUpdatedListener(null, this);
+        StarImageManager.getInstance().addSpriteGeneratedListener(mFleetListAdapter);
     }
 
     protected void onInitialize() {
@@ -335,6 +336,7 @@ public class FleetList extends FrameLayout
         super.onDetachedFromWindow();
         StarManager.getInstance().removeStarUpdatedListener(this);
         EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        StarImageManager.getInstance().removeSpriteGeneratedListener(mFleetListAdapter);
     }
 
     /**
@@ -609,7 +611,8 @@ public class FleetList extends FrameLayout
     /**
      * This adapter is used to populate the list of ship fleets that the current colony has.
      */
-    private class FleetListAdapter extends BaseAdapter {
+    private class FleetListAdapter extends BaseAdapter 
+            implements ImageManager.SpriteGeneratedListener {
         private ArrayList<Fleet> mFleets;
         private Map<String, Star> mStars;
         private ArrayList<ItemEntry> mEntries;
@@ -620,15 +623,11 @@ public class FleetList extends FrameLayout
 
         public FleetListAdapter() {
             mMyEmpire = EmpireManager.i.getEmpire();
+        }
 
-            // whenever a new star bitmap is generated, redraw the screen
-            StarImageManager.getInstance().addSpriteGeneratedListener(
-                    new ImageManager.SpriteGeneratedListener() {
-                @Override
-                public void onSpriteGenerated(String key, Sprite sprite) {
-                    notifyDataSetChanged();
-                }
-            });
+        @Override
+        public void onSpriteGenerated(String key, Sprite sprite) {
+            notifyDataSetChanged();
         }
 
         /**

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import au.com.codeka.BackgroundRunner;
@@ -73,10 +72,10 @@ public class BackgroundDetector {
         }
     }
 
-    private void fireBackgroundChangeHandlers(Context context) {
+    private void fireBackgroundChangeHandlers() {
         synchronized(mBackgroundChangeHandlers) {
             for (BackgroundChangeHandler handler : mBackgroundChangeHandlers) {
-                handler.onBackgroundChange(context, mIsInBackground);
+                handler.onBackgroundChange(mIsInBackground);
             }
         }
     }
@@ -89,7 +88,7 @@ public class BackgroundDetector {
         return mTotalForegroundTimeMs;
     }
 
-    public void onBackgroundStatusChange(final Activity activity) {
+    public void onBackgroundStatusChange() {
         if (!Util.isSetup() || RealmContext.i.getCurrentRealm() == null) {
             return;
         }
@@ -127,10 +126,10 @@ public class BackgroundDetector {
             }
         }.execute();
 
-        fireBackgroundChangeHandlers(activity);
+        fireBackgroundChangeHandlers();
     }
 
-    private void transitionToBackground(final Activity activity) {
+    private void transitionToBackground() {
         if (mIsTransitioningToBackground) {
             return;
         }
@@ -142,23 +141,23 @@ public class BackgroundDetector {
                 if (mIsTransitioningToBackground) {
                     mIsTransitioningToBackground = false;
                     mIsInBackground = true;
-                    onBackgroundStatusChange(activity);
+                    onBackgroundStatusChange();
                 }
             }
         }, 5000);
     }
 
-    private void transitionToForeground(Activity activity) {
+    private void transitionToForeground() {
         if (mIsTransitioningToBackground) {
             mIsTransitioningToBackground = false;
             return;
         }
 
         mIsInBackground = false;
-        onBackgroundStatusChange(activity);
+        onBackgroundStatusChange();
     }
 
-    public void onActivityPause(Activity activity, long activityRunTimeMs) {
+    public void onActivityPause(long activityRunTimeMs) {
         mTotalForegroundTimeMs += activityRunTimeMs;
 
         mNumActiveActivities --;
@@ -166,12 +165,12 @@ public class BackgroundDetector {
             if (mStartingActivityPackage != null &&
                 mStartingActivityPackage.startsWith("au.com.codeka.warworlds")) {
             } else {
-                transitionToBackground(activity);
+                transitionToBackground();
             }
         }
     }
 
-    public void onActivityResume(Activity activity) {
+    public void onActivityResume() {
         if (mStartTimeMs == 0) {
             mStartTimeMs = System.currentTimeMillis();
         }
@@ -181,7 +180,7 @@ public class BackgroundDetector {
             if (mStartingActivityPackage != null &&
                 mStartingActivityPackage.startsWith("au.com.codeka.warworlds")) {
             } else {
-                transitionToForeground(activity);
+                transitionToForeground();
             }
         }
     }
@@ -203,6 +202,6 @@ public class BackgroundDetector {
     }
 
     public interface BackgroundChangeHandler {
-        public void onBackgroundChange(Context context, boolean isInBackground);
+        public void onBackgroundChange(boolean isInBackground);
     }
 }

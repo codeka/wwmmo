@@ -452,7 +452,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     }
 
     @Override
-    public void onBackgroundChange(Context context, boolean isInBackground) {
+    public void onBackgroundChange(boolean isInBackground) {
         if (!isInBackground) {
             requestMessages(mMostRecentMsg);
         }

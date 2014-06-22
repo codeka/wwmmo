@@ -57,7 +57,7 @@ public class BaseActivity extends FragmentActivity {
             getWindowManager().removeView(mDebugView);
         }
 
-        BackgroundDetector.i.onActivityPause(this, System.currentTimeMillis() - mForegroundStartTimeMs);
+        BackgroundDetector.i.onActivityPause(System.currentTimeMillis() - mForegroundStartTimeMs);
         super.onPause();
     }
 
@@ -80,7 +80,7 @@ public class BaseActivity extends FragmentActivity {
             getWindowManager().addView(mDebugView, mDebugViewLayout);
         }
 
-        BackgroundDetector.i.onActivityResume(this);
+        BackgroundDetector.i.onActivityResume();
         super.onResume();
     }
 

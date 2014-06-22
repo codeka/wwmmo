@@ -140,7 +140,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
             getWindowManager().removeView(mDebugView);
         }
 
-        BackgroundDetector.i.onActivityPause(this, System.currentTimeMillis() - mForegroundStartTimeMs);
+        BackgroundDetector.i.onActivityPause(System.currentTimeMillis() - mForegroundStartTimeMs);
         super.onPause();
     }
 
@@ -156,7 +156,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
             getWindowManager().addView(mDebugView, mDebugViewLayout);
         }
 
-        BackgroundDetector.i.onActivityResume(this);
+        BackgroundDetector.i.onActivityResume();
         super.onResume();
     }
 
