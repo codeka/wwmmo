@@ -7,8 +7,6 @@ import java.util.Locale;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -60,7 +58,6 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 
 public class ChatActivity extends BaseActivity
                           implements ChatManager.ConversationsRefreshListener {
-    private static Logger log = LoggerFactory.getLogger(ChatActivity.class);
     private ChatPagerAdapter mChatPagerAdapter;
     private ViewPager mViewPager;
     private List<ChatConversation> mConversations;
@@ -365,7 +362,6 @@ public class ChatActivity extends BaseActivity
             mConversation.fetchOlderMessages(new ChatManager.MessagesFetchedListener() {
                 @Override
                 public void onMessagesFetched(List<ChatMessage> msgs) {
-                    log.info("msgs.size() = "+msgs.size());
                     if (msgs.size() == 0) {
                         mNoMoreChats = true;
                     }

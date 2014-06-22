@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -318,7 +315,6 @@ public class AllianceActivity extends TabFragmentActivity
                                          implements AllianceManager.AllianceUpdatedHandler,
                                                     EmpireShieldManager.ShieldUpdatedHandler,
                                                     TabManager.Reloadable {
-        private static final Logger log = LoggerFactory.getLogger(RequestsFragment.class);
         private View mView;
         private RequestListAdapter mRequestListAdapter;
         private Alliance mAlliance;
@@ -401,7 +397,6 @@ public class AllianceActivity extends TabFragmentActivity
         }
 
         private void fetchRequests(boolean clear) {
-            log.error("Fetching requests... ("+mFetching+")", new Exception());
             if (mFetching) {
                 return;
             }

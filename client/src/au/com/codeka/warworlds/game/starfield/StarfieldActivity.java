@@ -2,9 +2,6 @@ package au.com.codeka.warworlds.game.starfield;
 
 import java.util.Locale;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
@@ -66,7 +64,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
                                implements StarfieldSceneManager.OnSelectionChangedListener,
                                           StarManager.StarFetchedHandler,
                                           EmpireShieldManager.ShieldUpdatedHandler {
-    private static final Logger log = LoggerFactory.getLogger(StarfieldActivity.class);
+    private static final Log log = new Log("StarfieldActivity");
     private Context mContext = this;
     private PlanetListSimple mPlanetList;
     private FleetListSimple mFleetList;
@@ -589,7 +587,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
                         try {
                             purchase = PurchaseManager.i.getInventory().getPurchase("star_rename");
                         } catch (IabException e) {
-                            log.warn("Got an exception getting the purchase details.", e);
+                            log.warning("Got an exception getting the purchase details.", e);
                         }
                     }
 
@@ -599,7 +597,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
                         } catch(IllegalStateException e) {
                             // this can be called before the activity is resumed, so we just set a
                             // flag that'll cause us to pop up the dialog when the activity is resumed.
-                            log.warn("Got an error trying to show the popup, we'll try again in a second...");
+                            log.warning("Got an error trying to show the popup, we'll try again in a second...");
                             mStarRenamePurchase = purchase;
                         }
                     }

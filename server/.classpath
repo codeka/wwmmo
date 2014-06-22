@@ -53,5 +53,6 @@
 	<classpathentry kind="lib" path="libs/google-oauth-client-1.18.0-rc.jar"/>
 	<classpathentry kind="lib" path="libs/gson-2.1.jar"/>
 	<classpathentry kind="lib" path="libs/postgresql-9.3-1101.jdbc41.jar"/>
+	<classpathentry kind="lib" path="libs/proguard.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -6,9 +6,6 @@ import java.io.InputStream;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
@@ -146,7 +143,6 @@ public class Sprite {
      * Represents an image that contains (possibly) more than one \c Sprite.
      */
     public static class SpriteImage {
-        private static Logger log = LoggerFactory.getLogger(SpriteImage.class);
         private boolean mIsAsset;
         private String mFileName;
         private SoftReference<Bitmap> mSoftBitmap;
@@ -221,7 +217,6 @@ public class Sprite {
 
                 return BitmapFactory.decodeStream(ins, null, opts);
             } catch (IOException e) {
-                log.warn("Could not load image!", e);
                 return null;
             } finally {
                 if (ins != null) {

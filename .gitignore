@@ -22,4 +22,5 @@ planet-render-android/bin
 planet-render-android/gen
 website/.project
 website/.pydevproject
+google-play-services/bin
 

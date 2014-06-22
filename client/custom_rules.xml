@@ -2,6 +2,7 @@
 <project name="custom_rules">
   <xmlproperty file="AndroidManifest.xml" prefix="mymanifest" collapseAttributes="true"/>
   <property name="build.dir" value="bin/${mymanifest.manifest.android:versionName}/" />
+  <property name="deploy.location" value="../../deploy"/>
 
   <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 
@@ -57,7 +58,16 @@
                    flags="gm"
                    replace="debug=true" />
 
-  	<!-- delete the java-projects.jar file that was created. -->
-  	<delete file="libs/java-projects.jar" />
+    <!-- delete the java-projects.jar file that was created. -->
+    <delete file="libs/java-projects.jar" />
+
+    <!-- copy the proguard mapping.txt to the server's deploy folder, so that it can
+         be copied to the server (so the server can de-obfuscate stack traces) -->
+    <copy tofile="${deploy.location}/data/proguard/mapping-${build.number}.txt"
+          file="bin/proguard/mapping.txt" />
+    <copy tofile="../../apk/warworlds-${build.number}-mapping.txt"
+          file="bin/proguard/mapping.txt" />
+    <copy tofile="../../apk/warworlds-${build.number}.apk"
+          file="${out.final.file}" />
   </target>
 </project>

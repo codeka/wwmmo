@@ -1,14 +1,12 @@
 package au.com.codeka.warworlds.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.content.ContextWrapper;
 import android.os.Handler;
 import android.view.View;
+import au.com.codeka.common.Log;
 
 public class BaseManager {
-    private static final Logger log = LoggerFactory.getLogger(StarManager.class);
+    private static final Log log = new Log("StarManager");
 
     /**
      * Attempts to execute the given \c Runnable instance on whatever type \c context is. For
@@ -26,7 +24,7 @@ public class BaseManager {
                 handler.run();
             }
         } catch (Exception e) {
-            log.warn("Ignored exception in onStarFetched...", e);
+            log.warning("Ignored exception in onStarFetched...", e);
         }
     }
 }

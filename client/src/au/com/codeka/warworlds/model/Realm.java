@@ -10,23 +10,15 @@ public class Realm {
     private URI mBaseUrl;
     private String mDisplayName;
     private String mDescription;
-    private AuthenticationMethod mAuthenticationMethod;
     private boolean mIsAlpha;
     private Authenticator mAuthenticator;
 
-    public enum AuthenticationMethod {
-        Default,
-        AppEngine,
-        LocalAppEngine
-    }
-
     public Realm(int id, String baseUrl, String displayName, String description,
-                 AuthenticationMethod authMethod, boolean isAlpha) throws URISyntaxException {
+                 boolean isAlpha) throws URISyntaxException {
         mID = id;
         mBaseUrl = new URI(baseUrl);
         mDisplayName = displayName;
         mDescription = description;
-        mAuthenticationMethod = authMethod;
         mIsAlpha = isAlpha;
         mAuthenticator = new Authenticator();
     }
@@ -50,9 +42,6 @@ public class Realm {
     }
     public String getDescription() {
         return mDescription;
-    }
-    public AuthenticationMethod getAuthentciationMethod() {
-        return mAuthenticationMethod;
     }
 
     public Authenticator getAuthenticator() {

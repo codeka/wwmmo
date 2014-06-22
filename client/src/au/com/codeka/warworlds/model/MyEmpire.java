@@ -4,15 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.billing.Purchase;
@@ -25,7 +23,7 @@ import com.google.protobuf.ByteString;
  * and such that only the current user can perform.
  */
 public class MyEmpire extends Empire {
-    private static final Logger log = LoggerFactory.getLogger(MyEmpire.class);
+    private static final Log log = new Log("MyEmpire");
 
     public MyEmpire() {
     }
@@ -43,15 +41,14 @@ public class MyEmpire extends Empire {
      * operation completes (successfully or not).
      */
     public void colonize(final Planet planet, final ColonizeCompleteHandler callback) {
-        log.debug(String.format("Colonizing: Star=%s Planet=%d",
-                                planet.getStar().getKey(),
-                                planet.getIndex()));
+        log.debug("Colonizing: Star=%s Planet=%d",
+                planet.getStar().getKey(), planet.getIndex());
         new BackgroundRunner<Colony>() {
             @Override
             protected Colony doInBackground() {
                 try {
                     if (planet.getStar() == null) {
-                        log.warn("planet.getStarSummary() returned null!");
+                        log.warning("planet.getStarSummary() returned null!");
                         return null;
                     }
 
@@ -69,8 +66,7 @@ public class MyEmpire extends Empire {
                     colony.fromProtocolBuffer(pb);
                     return colony;
                 } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Error issuing colonize request.", e);
                     return null;
                 }
             }
@@ -107,8 +103,7 @@ public class MyEmpire extends Empire {
                     ApiClient.postProtoBuf(url, fleetOrder);
                     return true;
                 } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Error issuing update fleet stance request.", e);
                     return false;
                 }
             }
@@ -146,8 +141,7 @@ public class MyEmpire extends Empire {
                     }
                     return reports;
                 } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Error issuing fetch scout reports request.", e);
                     return null;
                 }
             }
@@ -175,8 +169,7 @@ public class MyEmpire extends Empire {
                     combatReport.fromProtocolBuffer(pb);
                     return combatReport;
                 } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Uh oh!", e);
                     return null;
                 }
             }
@@ -207,8 +200,7 @@ public class MyEmpire extends Empire {
                     star.fromProtocolBuffer(pb);
                     return star;
                 } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Uh oh!", e);
                     return null;
                 }
             }
@@ -246,8 +238,7 @@ public class MyEmpire extends Empire {
 
                     return stars;
                 } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Uh oh!", e);
                     return null;
                 }
             }
@@ -289,8 +280,7 @@ public class MyEmpire extends Empire {
                     Messages.Empire empire_pb = ApiClient.putProtoBuf(url, pb, Messages.Empire.class);
                     return empire_pb.getDisplayName();
                 } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Uh oh!", e);
                     return null;
                 }
             }
@@ -328,8 +318,7 @@ public class MyEmpire extends Empire {
                     Messages.Empire empire_pb = ApiClient.putProtoBuf(url, pb, Messages.Empire.class);
                     return new DateTime(empire_pb.getShieldImageLastUpdate() * 1000, DateTimeZone.UTC);
                 } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Uh oh!", e);
                     return null;
                 }
             }
@@ -364,8 +353,7 @@ public class MyEmpire extends Empire {
                     ApiClient.postProtoBuf(url, pbuilder.build(), null);
                     return true;
                 } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Uh oh!", e);
                     return false;
                 }
             }

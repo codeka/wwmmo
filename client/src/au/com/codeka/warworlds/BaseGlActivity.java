@@ -12,8 +12,6 @@ import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.ui.activity.SimpleLayoutGameActivity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -29,6 +27,7 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.Window;
 import android.view.WindowManager;
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.ctrl.DebugView;
 import au.com.codeka.warworlds.model.PurchaseManager;
 
@@ -38,7 +37,7 @@ import au.com.codeka.warworlds.model.PurchaseManager;
  */
 @SuppressLint("Registered") // it's a base class
 public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
-    private static Logger log = LoggerFactory.getLogger(BaseGlActivity.class);
+    private static final Log log = new Log("BaseGlActivity");
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private DebugView mDebugView;

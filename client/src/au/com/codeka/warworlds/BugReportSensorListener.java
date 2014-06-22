@@ -2,8 +2,6 @@ package au.com.codeka.warworlds;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,10 +12,11 @@ import android.hardware.SensorEventListener;
 import android.net.Uri;
 import android.provider.MediaStore.Images;
 import android.view.View;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.Vector3;
 
 public class BugReportSensorListener implements SensorEventListener {
-    private static Logger log = LoggerFactory.getLogger(BugReportSensorListener.class);
+    private static final Log log = new Log("BugReportSensorListener");
 
     private Vector3 mAcceleration;
     private Vector3 mPreviousAcceleration;
@@ -81,8 +80,7 @@ public class BugReportSensorListener implements SensorEventListener {
             }
             mLastShakeTime = now;
 
-            log.debug(String.format("shake distance: %.2f num shakes: %d",
-                    distance, mNumShakes));
+            log.debug("Shake distance: %.2f num shakes: %d", distance, mNumShakes);
         }
     }
 

@@ -3,9 +3,6 @@ package au.com.codeka.warworlds.game.solarsystem;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -17,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
@@ -30,7 +28,7 @@ import au.com.codeka.warworlds.model.StarManager;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class FocusDialog extends DialogFragment {
-    private static Logger log = LoggerFactory.getLogger(FocusDialog.class);
+    private static final Log log = new Log("FocusDialog");
     private Colony mColony;
     private Planet mPlanet;
     private List<SeekBar> mSeekBars;

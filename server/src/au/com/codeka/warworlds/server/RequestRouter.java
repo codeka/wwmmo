@@ -81,6 +81,7 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("admin/chat/sinbin$", AdminChatSinbinHandler.class));
         sRoutes.add(new Route("admin/debug/purchases$", AdminDebugPurchasesHandler.class, "admin/"));
         sRoutes.add(new Route("admin/debug/error-reports$", AdminDebugErrorReportsHandler.class, "admin/"));
+        sRoutes.add(new Route("admin/debug/retrace$", AdminDebugRetraceHandler.class, "admin/"));
         sRoutes.add(new Route("admin/empire/shields$", AdminEmpireShieldsHandler.class, "admin/"));
         sRoutes.add(new Route("admin/empire/alts$", AdminEmpireAltsHandler.class, "admin/"));
         sRoutes.add(new Route("admin/?({path}.*)", AdminGenericHandler.class, "admin/"));

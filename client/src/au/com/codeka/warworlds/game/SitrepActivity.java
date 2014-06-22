@@ -7,9 +7,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -35,6 +32,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
@@ -59,7 +57,7 @@ import au.com.codeka.warworlds.model.StarSummary;
 
 public class SitrepActivity extends BaseActivity
                             implements EmpireShieldManager.ShieldUpdatedHandler {
-    private static Logger log = LoggerFactory.getLogger(SitrepActivity.class);
+    private static final Log log = new Log("SitrepActivity");
     private Context mContext = this;
     private SituationReportAdapter mSituationReportAdapter;
     private String mStarKey;

@@ -14,13 +14,11 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.graphics.Bitmap;
 import android.os.Handler;
 import au.com.codeka.common.Colour;
 import au.com.codeka.common.Image;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.Vector3;
 import au.com.codeka.planetrender.PlanetRenderer;
 import au.com.codeka.planetrender.Template;
@@ -32,7 +30,7 @@ import au.com.codeka.warworlds.GlobalOptions;
  * This is the base class for the \c StarImageManagaer and \c PlanetImageManager.
  */
 public abstract class ImageManager {
-    private static Logger log = LoggerFactory.getLogger(ImageManager.class);
+    private static final Log log = new Log("ImageManager");
 
     private static final int MAX_GENERATE_QUEUE_SIZE = 50;
 
@@ -87,13 +85,13 @@ public abstract class ImageManager {
         final File cacheFile = new File(getCachePath(tmpl, cacheKey));
         if (cacheFile.exists()) {
             String fullPath = cacheFile.getAbsolutePath();
-            log.debug("Loading cached image: "+fullPath);
+            log.debug("Loading cached image: %s", fullPath);
             return SpriteManager.i.getSimpleSprite(fullPath, false);
         } else {
             long endTime = System.nanoTime();
-            log.debug(String.format("No cached image (after %.4fms), generating: %s",
+            log.debug("No cached image (after %.4fms), generating: %s",
                     (endTime - startTime) / 1000000.0,
-                    cacheFile.getAbsolutePath()));
+                    cacheFile.getAbsolutePath());
 
             addToGenerateQueue(new QueuedGenerate(tmpl, key, size, cacheKey,
                                                   cacheFile.getAbsolutePath(), extra));
@@ -165,9 +163,9 @@ public abstract class ImageManager {
                 ins = App.i.getAssets().open(fullPath);
                 tmpl = Template.parse(ins);
             } catch (IOException e) {
-                log.error("Error loading object definition: "+fullPath, e);
+                log.error("Error loading object definition: %s", fullPath, e);
             } catch (TemplateException e) {
-                log.error("Error parsing object definition: "+fullPath, e);
+                log.error("Error parsing object definition: %s", fullPath, e);
             } finally {
                 if (ins != null) {
                     try {
@@ -255,8 +253,8 @@ public abstract class ImageManager {
         long endTime = System.nanoTime();
 
         Vector3.pool.release(sunDirection);
-        log.debug(String.format("Rendered %dx%d image in %.4fms.",
-                imgSize, imgSize, (endTime - startTime) / 1000000.0));
+        log.debug("Rendered %dx%d image in %.4fms.",
+                imgSize, imgSize, (endTime - startTime) / 1000000.0);
 
         File outputFile = new File(item.outputPath);
         File outputDirectory = new File(outputFile.getParent());

@@ -28,8 +28,6 @@ import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -37,6 +35,7 @@ import android.os.Handler;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.PointCloud;
 import au.com.codeka.common.Triangle;
@@ -64,7 +63,7 @@ import au.com.codeka.warworlds.model.StarManager;
 public class StarfieldSceneManager extends SectorSceneManager
                                   implements StarManager.StarFetchedHandler,
                                              EmpireManager.EmpireFetchedHandler {
-    private static final Logger log = LoggerFactory.getLogger(StarfieldSceneManager.class);
+    private static final Log log = new Log("StarfieldSceneManager");
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
     private OnSpaceTapListener mSpaceTapListener;
     private BaseStar mHqStar;
@@ -99,8 +98,6 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     public StarfieldSceneManager(BaseStarfieldActivity activity) {
         super(activity);
-        log.info("Starfield initializing...");
-
         mSelectionChangedListeners = new ArrayList<OnSelectionChangedListener>();
         mHandler = new Handler();
     }
@@ -780,7 +777,6 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         public void addToScene(Scene scene, VertexBufferObjectManager vboManager, int colour) {
             for (Vector2 pt : mOwnedPoints) {
-                log.debug("Adding point: "+pt.x+","+pt.y);
                 List<Triangle> triangles = mVoronoi.getTrianglesForPoint(pt);
                 if (triangles == null) {
                     continue;

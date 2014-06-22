@@ -11,11 +11,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,9 +20,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.RealmContext;
+import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 
@@ -33,7 +32,7 @@ import au.com.codeka.warworlds.api.ApiException;
  * Manages stuff about your empire (e.g. colonising planets and what-not).
  */
 public class EmpireManager {
-    private static Logger log = LoggerFactory.getLogger(EmpireManager.class);
+    private static final Log log = new Log("EmpireManager");
     public static EmpireManager i = new EmpireManager();
 
     private Map<String, Empire> mEmpireCache = new HashMap<String, Empire>();
@@ -131,17 +130,21 @@ public class EmpireManager {
      * Removes the given \c EmpireFetchedHandler from receiving updates about refreshed empires.
      */
     public void removeEmpireUpdatedListener(EmpireFetchedHandler handler) {
+        boolean wasRemoved = false;
         synchronized(mEmpireUpdatedListeners) {
             for (Object o : IteratorUtils.toList(mEmpireUpdatedListeners.keySet().iterator())) {
                 String empireKey = (String) o;
 
                 List<EmpireFetchedHandler> listeners = mEmpireUpdatedListeners.get(empireKey);
-                listeners.remove(handler);
+                wasRemoved = listeners.remove(handler) || wasRemoved;
 
                 if (listeners.isEmpty()) {
                     mEmpireUpdatedListeners.remove(empireKey);
                 }
             }
+        }
+        if (!wasRemoved && Util.isDebug()) {
+            throw new RuntimeException("No handlers were removed by this operation!");
         }
     }
 
@@ -474,8 +477,7 @@ public class EmpireManager {
                         empires.add(empire);
                     }
                 } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Error fetching empires.", e);
                 }
 
                 return empires;
@@ -519,7 +521,7 @@ public class EmpireManager {
                     }
                 } catch(Exception e) {
                     // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Error fetching empires.", e);
                 }
 
                 return empires;

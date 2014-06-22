@@ -10,30 +10,20 @@ import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
-import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.App;
-import au.com.codeka.warworlds.Notifications;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 
 /**
  * This is the main "client" that accesses the War Worlds API.
  */
 public class ApiClient {
-    final static Logger log = LoggerFactory.getLogger(ApiClient.class);
-
     public static void impersonate(String user) {
         RequestManager.impersonate(user);
     }
@@ -231,38 +221,7 @@ public class ApiClient {
     public static <T> T parseResponseBody(HttpResponse resp, Class<T> protoBuffFactory) {
         HttpEntity entity = resp.getEntity();
         if (entity != null) {
-            T result = null;
-
-            boolean isNotificationWrapper = false;
-            Header notificationWrapperHeader = resp.getFirstHeader("X-Notification-Wrapper");
-            if (notificationWrapperHeader != null) {
-                isNotificationWrapper = notificationWrapperHeader.getValue().equals("1");
-            }
-
-            if (isNotificationWrapper) {
-                Messages.NotificationWrapper pb = extractBody(entity, Messages.NotificationWrapper.class);
-                for (Messages.Notification notification_pb : pb.getNotificationsList()) {
-                    log.info("got inline-notification: "+notification_pb.getName());
-
-                    final String name = notification_pb.getName();
-                    final String value = notification_pb.getValue();
-                    Handler handler = new Handler(App.i.getMainLooper());
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Notifications.handleNotfication(App.i, name, value);
-                        }
-                    });
-                }
-
-                if (protoBuffFactory != null) {
-                    result = extractBody(pb.getOriginalMessage(), protoBuffFactory);
-                }
-            } else if (protoBuffFactory != null) {
-                result = extractBody(entity, protoBuffFactory);
-            }
-
-            return result;
+            return extractBody(entity, protoBuffFactory);
         }
 
         return null;
@@ -276,19 +235,6 @@ public class ApiClient {
             result = (T) m.invoke(null, entity.getContent());
 
             entity.consumeContent();
-        } catch (Exception e) {
-            return null;
-        }
-        return result;
-    }
-
-
-    @SuppressWarnings({"unchecked"})
-    private static <T> T extractBody(ByteString bs, Class<T> protoBuffFactory) {
-        T result = null;
-        try {
-            Method m = protoBuffFactory.getDeclaredMethod("parseFrom", ByteString.class);
-            result = (T) m.invoke(null, bs);
         } catch (Exception e) {
             return null;
         }

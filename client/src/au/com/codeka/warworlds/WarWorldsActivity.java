@@ -16,8 +16,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -35,6 +33,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -45,7 +44,7 @@ import au.com.codeka.warworlds.model.MyEmpire;
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
  */
 public class WarWorldsActivity extends BaseActivity implements EmpireShieldManager.ShieldUpdatedHandler {
-    private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
+    private static final Log log = new Log("WarWorldsActivity");
     private Context mContext = this;
     private Button mStartGameButton;
     private TextView mConnectionStatus;
@@ -122,8 +121,6 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
     @Override
     public void onResume() {
         super.onResume();
-        log.debug("WarWorldsActivity.onResume...");
-
         SharedPreferences prefs = Util.getSharedPreferences();
         if (prefs.getBoolean("WarmWelcome",  false) == false) {
             // if we've never done the warm-welcome, do it now
@@ -230,8 +227,7 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
                             motd.append(formatter.format(date));
                             motd.append("</h1>");
                         } catch (ParseException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            // Shouldn't ever happen.
                         }
 
                         motd.append("<h2>"); motd.append(title); motd.append("</h2>");

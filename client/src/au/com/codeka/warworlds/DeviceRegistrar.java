@@ -1,13 +1,11 @@
 
 package au.com.codeka.warworlds;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings.Secure;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -17,7 +15,7 @@ import au.com.codeka.warworlds.api.ApiException;
  * RequestFactory.
  */
 public class DeviceRegistrar {
-    private static Logger log = LoggerFactory.getLogger(DeviceRegistrar.class);
+    private static final Log log = new Log("DeviceRegistrar");
 
     public static String register() throws ApiException {
         final SharedPreferences settings = Util.getSharedPreferences();
@@ -36,7 +34,7 @@ public class DeviceRegistrar {
             registration = ApiClient.postProtoBuf("devices", registration,
                     Messages.DeviceRegistration.class);
             registrationKey = registration.getKey();
-            log.info("Got registration key: "+registrationKey);
+            log.info("Got registration key: %s", registrationKey);
         } catch(ApiException ex) {
             log.error("Failure registring device.", ex);
             forgetDeviceRegistration();

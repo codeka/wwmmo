@@ -4,9 +4,6 @@ package au.com.codeka.warworlds;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
@@ -28,7 +25,6 @@ import android.widget.TextView;
  * Account selections activity - handles device registration and unregistration.
  */
 public class AccountsActivity extends BaseActivity {
-    final Logger log = LoggerFactory.getLogger(AccountsActivity.class);
     private int mAccountSelectedPosition = 0;
     private Context mContext = this;
 

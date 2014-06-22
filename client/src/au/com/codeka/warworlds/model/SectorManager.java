@@ -8,12 +8,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.support.v4.util.LruCache;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
@@ -31,7 +28,7 @@ import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
  * sectors (so you can smoothly scroll, of course).
  */
 public class SectorManager extends BaseManager {
-    private static Logger log = LoggerFactory.getLogger(SectorManager.class);
+    private static final Log log = new Log("SectorManager");
     private static SectorManager sInstance;
 
     public static SectorManager getInstance() {
@@ -183,7 +180,7 @@ public class SectorManager extends BaseManager {
                                 sectors.add(sector);
                             }
                         } catch(Exception e) {
-                            log.error(ExceptionUtils.getStackTrace(e));
+                            log.error("Uh Oh!", e);
                         }
 
                         return sectors;
@@ -197,7 +194,6 @@ public class SectorManager extends BaseManager {
                                 theseSectors = new TreeMap<Pair<Long, Long>, Sector>();
                             if (sectors != null) for(Sector s : sectors) {
                                 Pair<Long, Long> key = new Pair<Long, Long>(s.getX(), s.getY());
-                                log.debug(String.format("Fetched sector (%d, %d)", s.getX(), s.getY()));
 
                                 mSectors.put(key, s);
                                 if (callback != null) {

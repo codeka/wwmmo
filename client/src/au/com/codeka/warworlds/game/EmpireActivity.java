@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,6 +31,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
@@ -76,7 +75,7 @@ import au.com.codeka.warworlds.model.billing.SkuDetails;
  */
 public class EmpireActivity extends TabFragmentActivity
                             implements EmpireManager.EmpireFetchedHandler {
-    private static final Logger log = LoggerFactory.getLogger(EmpireActivity.class);
+    private static final Log log = new Log("EmpireActivity");
     private static MyEmpire sCurrentEmpire;
     private static Map<String, Star> sStars;
 
@@ -154,8 +153,8 @@ public class EmpireActivity extends TabFragmentActivity
 
     @Override
     public void onPause() {
-        super.onPause();
         EmpireManager.i.removeEmpireUpdatedListener(this);
+        super.onPause();
     }
 
     @Override

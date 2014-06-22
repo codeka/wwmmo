@@ -14,18 +14,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+import au.com.codeka.common.Log;
 
 /**
  * This class is similar to AsyncTask, except we get to control all the parameters.
  */
 public abstract class BackgroundRunner<Result> {
-    private static Logger log = LoggerFactory.getLogger(BackgroundRunner.class);
+    private static final Log log = new Log("BackgroundRunner");
     private String mCreatorStackTrace;
 
     private static boolean sThreadDebug = false;

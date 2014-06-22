@@ -1,8 +1,5 @@
 package au.com.codeka.warworlds;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -24,7 +22,7 @@ import au.com.codeka.warworlds.api.ApiException;
  * to give your Empire a name, race and what-not.
  */
 public class EmpireSetupActivity extends BaseActivity {
-    private static Logger log = LoggerFactory.getLogger(EmpireSetupActivity.class);
+    private static Log log = new Log("EmpireSetupActivity");
     private Context mContext = this;
 
     @Override

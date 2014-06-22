@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +23,7 @@ import android.os.Debug;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.GlobalOptions;
@@ -35,7 +34,7 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 
 public class ErrorReporter {
-    private static final Logger log = LoggerFactory.getLogger(ErrorReporter.class);
+    private static final Log log = new Log("ErrorReporter");
     private static String sVersionName;
     private static String sPackageName;
     private static String sReportPath;
@@ -121,7 +120,7 @@ public class ErrorReporter {
                 @Override
                 protected Boolean doInBackground() {
                     try {
-                        log.debug("Sending "+errorReportFiles.length+" error reports...");
+                        log.debug("Sending %d error reports...", errorReportFiles.length);
                         Messages.ErrorReports.Builder error_reports_pb = Messages.ErrorReports.newBuilder();
                         for (String file : errorReportFiles) {
                             FileInputStream ins = null;
@@ -200,7 +199,7 @@ public class ErrorReporter {
             OutputStream outs = null;
             try {
                 final String fullPath = sReportPath + fileName + ".pb";
-                log.debug("Writing unhandled exception to: " + fullPath);
+                log.debug("Writing unhandled exception to: %s", fullPath);
                 outs = new FileOutputStream(fullPath);
 
                 final StringWriter stringWriter = new StringWriter();

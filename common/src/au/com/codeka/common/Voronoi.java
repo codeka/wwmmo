@@ -6,16 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * This class represents a Voronoi diagram (and corresponds Delaunay triangulation) of a
  * \c PointCloud. It's used as the staring point of our texture generator, control field
  * generator and lots of other things.
  */
 public class Voronoi {
-    private static final Logger log = LoggerFactory.getLogger(Voronoi.class);
     protected PointCloud mPointCloud;
     protected ArrayList<Triangle> mTriangles;
 
@@ -199,7 +195,6 @@ public class Voronoi {
 
                 while (!unsorted.isEmpty()) {
                     if (nextEdge == null) {
-                        log.warn("nextEdge is null, but unsorted is not empty: unsorted.size() = "+unsorted.size());
                         break; // TODO: this is an error...
                     }
 

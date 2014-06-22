@@ -9,17 +9,15 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
@@ -36,7 +34,7 @@ public class StarManager extends BaseManager {
         return sInstance;
     }
 
-    private static final Logger log = LoggerFactory.getLogger(StarManager.class);
+    private static final Log log = new Log("StarManager");
     private TreeMap<String, WeakReference<Star>> mStars;
     private TreeMap<String, WeakReference<StarSummary>> mStarSummaries;
     private TreeMap<String, List<StarFetchedHandler>> mStarUpdatedListeners;
@@ -353,11 +351,6 @@ public class StarManager extends BaseManager {
         }
 
         Star star = doFetchStar(starKey);
-        if (star != null) {
-            log.debug(String.format("STAR[%s] has %d fleets.", star.getKey(),
-                      star.getFleets() == null ? 0 : star.getFleets().size()));
-        }
-
         if (star != null && !RealmContext.i.getCurrentRealm().isAlpha()) {
             // the alpha realm will have already simulated the star, but other realms
             // will need to simulate first.
@@ -434,7 +427,7 @@ public class StarManager extends BaseManager {
             star.fromProtocolBuffer(pb);
         } catch(Exception e) {
             // TODO: handle exceptions
-            log.error(ExceptionUtils.getStackTrace(e));
+            log.error("Uh Oh!", e);
         }
 
         if (star != null) {
@@ -535,7 +528,6 @@ public class StarManager extends BaseManager {
                             getWhereClause(starKey),
                             null, null, null, null);
                     if (!cursor.moveToFirst()) {
-                        log.debug("Star "+starKey+" realm "+RealmContext.i.getCurrentRealm().getDisplayName()+" not found in cache.");
                         cursor.close();
                         return null;
                     }

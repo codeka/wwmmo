@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -29,6 +26,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
 import android.util.Base64;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -54,7 +52,7 @@ import au.com.codeka.warworlds.model.StarSummary;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class Notifications {
-    private static Logger log = LoggerFactory.getLogger(Notifications.class);
+    private static final Log log = new Log("Notifications");
 
     private static NotificationLongPoller sLongPoller;
 
@@ -102,32 +100,32 @@ public class Notifications {
         // realm to this notification. So we switch this thread temporarily to whatever
         // realm this notification is for.
         Realm thisRealm = RealmManager.i.getRealmByName(pb.getRealm());
-        log.debug("Got realm: "+thisRealm.getDisplayName());
+        log.debug("Got realm: %s", thisRealm.getDisplayName());
         RealmContext.i.setThreadRealm(thisRealm);
         try {
             // refresh the star this situation report is for, obviously
             // something happened that we'll want to know about
             Star star = StarManager.getInstance().refreshStarSync(pb.getStarKey(), true);
-            log.debug("refreshed star: successful? "+(star == null ? "false" : "true"));
+            log.debug("Refreshed star: successful? %s", star == null ? "false" : "true");
             if (star == null) { // <-- only refresh the star if we have one cached
                 // if we didn't refresh the star, then at least refresh
                 // the sector it was in (could have been a moving
                 // fleet, say)
                 star = SectorManager.getInstance().findStar(pb.getStarKey());
                 if (star != null) {
-                    log.debug("star found from sector manager instead.");
+                    log.debug("Star found from sector manager instead.");
                     SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
                 }
             } else {
-                log.debug("firing star updated...");
+                log.debug("Firing star updated...");
                 StarManager.getInstance().fireStarUpdated(star);
             }
 
             // notify the build manager, in case it's a 'build complete' or something
-            log.debug("notifying build manager.");
+            log.debug("Notifying build manager.");
             BuildManager.getInstance().notifySituationReport(pb);
 
-            log.debug("displaying a notification...");
+            log.debug("Displaying a notification...");
             displayNotification(context, pb);
         } finally {
             RealmContext.i.setThreadRealm(null);
@@ -154,7 +152,7 @@ public class Notifications {
 
             if (conversation.isPrivateChat() && BackgroundDetector.i.isInBackground()) {
                 if (conversation.isMuted()) {
-                    log.debug("got notification, but conversation is muted.");
+                    log.debug("Got notification, but conversation is muted.");
                 } else {
                     // if it's a private chat, and we're currently in the background, show a notification
                     displayNotification(context, pb);
@@ -189,7 +187,8 @@ public class Notifications {
                 Float.MAX_VALUE // always prefer a cached version, no matter how old
             );
         if (starSummary == null) {
-            log.error("Could not get star summary for star "+starKey+", cannot display notification.");
+            log.error("Could not get star summary for star %s, cannot display notification.",
+                    starKey);
             return;
         }
 
@@ -216,7 +215,8 @@ public class Notifications {
             return;
         }
 
-        NotificationManager nm = (NotificationManager) App.i.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) App.i.getSystemService(
+                Context.NOTIFICATION_SERVICE);
         nm.notify(RealmContext.i.getCurrentRealm().getID(), notification);
     }
 
@@ -593,7 +593,7 @@ public class Notifications {
      * This class manages the long poll we do to the server to receive notifications.
      */
     private static class NotificationLongPoller implements Runnable {
-        private static Logger log = LoggerFactory.getLogger(NotificationLongPoller.class);
+        private static final Log log = new Log("NotificationLongPoller");
 
         private Thread mPollThread;
         private Handler mHandler;
@@ -610,17 +610,19 @@ public class Notifications {
         public void run() {
             while (true) {
                 try {
-                    Messages.Notifications notifications_pb = ApiClient.getProtoBuf("notifications", Messages.Notifications.class);
+                    Messages.Notifications notifications_pb = ApiClient.getProtoBuf(
+                            "notifications", Messages.Notifications.class);
                     if (notifications_pb == null) {
                         log.info("Long-poll timed out, re-requesting.");;
                         continue;
                     }
 
-                    log.info("Long-poll complete, got "+notifications_pb.getNotificationsCount()+" notifications.");
+                    log.info("Long-poll complete, got %d notifications.",
+                            notifications_pb.getNotificationsCount());
                     for (Messages.Notification pb : notifications_pb.getNotificationsList()) {
                         final String name = pb.getName();
                         final String value = pb.getValue();
-                        log.info("["+name+"]="+value);
+                        log.info("[%s] = %s", name, value);
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {

@@ -29,20 +29,16 @@ public class RealmManager {
                 mRealms.add(new Realm(DEBUG_REALM_ID, "http://192.168.1.4:8080/realms/beta/",
                                       "Debug",
                                       "The debug realm runs on my local dev box for testing.",
-                                      Realm.AuthenticationMethod.Default, false));
-                mRealms.add(new Realm(ALPHA_REALM_ID, "https://warworldsmmo.appspot.com/api/v1/",
-                                      "Alpha",
-                                      "The Alpha realm is officially deprecated and new players should join Beta.",
-                                      Realm.AuthenticationMethod.AppEngine, true));
+                                      false));
             }
             mRealms.add(new Realm(BETA_REALM_ID, "https://game.war-worlds.com/realms/beta/",
                                   "Beta",
                                   "If you're new to War Worlds, you should join this realm. eXplore, eXpand, eXploit, eXterminate!",
-                                  Realm.AuthenticationMethod.Default, false));
+                                  false));
             mRealms.add(new Realm(BLITZ_REALM_ID, "https://game.war-worlds.com/realms/blitz/",
                                   "Blitz",
                                   "The goal of Blitz is to build as big an empire as you can in 1 month. Each month, the universe is reset and the winner is the one with the highest total population.",
-                                  Realm.AuthenticationMethod.Default, false));
+                                  false));
         } catch(URISyntaxException e) {
             // should never happen
         }

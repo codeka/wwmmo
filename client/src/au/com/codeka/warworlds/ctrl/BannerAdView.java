@@ -1,14 +1,7 @@
 package au.com.codeka.warworlds.ctrl;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -30,12 +24,16 @@ import au.com.codeka.warworlds.model.billing.Inventory;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+
 
 /**
  * This is our subclass of \c AdView that adds the "standard" properties automatically.
  */
 public class BannerAdView extends FrameLayout {
-    private static final Logger log = LoggerFactory.getLogger(BannerAdView.class);
+    private static final Log log = new Log("BannerAdView");
     private AdView mAdView;
     private Button mRemoveAdsButton;
     private Context mContext;
@@ -216,7 +214,7 @@ public class BannerAdView extends FrameLayout {
                 try {
                     ApiClient.putProtoBuf(url, pb, null);
                 } catch(Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Error saving ads remove request!", e);
                 }
 
                 return true;

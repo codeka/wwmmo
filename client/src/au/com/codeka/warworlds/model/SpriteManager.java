@@ -10,14 +10,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import android.content.Context;
 import android.graphics.Rect;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.XmlIterator;
 import au.com.codeka.warworlds.model.Sprite.SpriteFrame;
 
@@ -26,7 +25,7 @@ import au.com.codeka.warworlds.model.Sprite.SpriteFrame;
  */
 public class SpriteManager {
     public static SpriteManager i = new SpriteManager();
-    private static Logger log = LoggerFactory.getLogger(SpriteManager.class);
+    private static final Log log = new Log("SpriteManager");
 
     private TreeMap<String, Sprite> mSprites;
     private SpriteImageManager mSpriteImageManager = new SpriteImageManager();
@@ -131,7 +130,7 @@ public class SpriteManager {
                 sprite.getUp().x = Float.parseFloat(up[0]);
                 sprite.getUp().y = -Float.parseFloat(up[1]);
             } else {
-                log.warn("Unknown element inside <sprite>: "+elem.getTagName());
+                log.warning("Unknown element inside <sprite>: %s", elem.getTagName());
             }
         }
 

@@ -11,17 +11,15 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.game.starfield.RadarIndicatorEntity;
-import au.com.codeka.warworlds.game.starfield.SectorSceneManager;
 import au.com.codeka.warworlds.model.Sector;
 
 public class WormholeSceneManager {
-    private static final Logger log = LoggerFactory.getLogger(SectorSceneManager.class);
+    private static final Log log = new Log("SectorSceneManager");
     private Scene mScene;
     private BaseGlActivity mActivity;
     private String mWormholeStarKey;
@@ -69,15 +67,6 @@ public class WormholeSceneManager {
     }
 
     public void onStart() {
-/*
-        mActivity.getEngine().setErrorHandler(new Engine.EngineErrorHandler() {
-            @Override
-            public void onRenderThreadException(Exception e) {
-                refreshScene();
-            }
-        });
-*/
-
         if (mWasStopped) {
             log.debug("We were stopped, refreshing the scene...");
             refreshScene();

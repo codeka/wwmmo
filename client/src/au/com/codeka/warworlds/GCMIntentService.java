@@ -1,12 +1,10 @@
 package au.com.codeka.warworlds;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 import com.google.android.gcm.GCMBaseIntentService;
@@ -16,7 +14,7 @@ import com.google.android.gcm.GCMRegistrar;
  * Receive a push message from the Google Cloud Messaging.
  */
 public class GCMIntentService extends GCMBaseIntentService {
-    private static Logger log = LoggerFactory.getLogger(GCMIntentService.class);
+    private static Log log = new Log("GCMIntentService");
 
     public static String PROJECT_ID = "990931198580";
 
@@ -34,7 +32,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
     public void onRegistered(Context context, String gcmRegistrationID) {
-        log.info("GCM device registration complete, gcmRegistrationID = "+gcmRegistrationID);
+        log.info("GCM device registration complete, gcmRegistrationID = %s", gcmRegistrationID);
         DeviceRegistrar.updateGcmRegistration(context, gcmRegistrationID);
     }
 
@@ -47,21 +45,19 @@ public class GCMIntentService extends GCMBaseIntentService {
     /** Called where there's a non-recoverable error.*/
     @Override
     public void onError(Context context, String errorId) {
-        log.error("An error has occured! Error={}", errorId);
+        log.error("An error has occured! Error: %s", errorId);
     }
 
     /** Called when there's a \i recoverable error. */
     @Override
     public boolean onRecoverableError(Context context, String errorId) {
-        log.error("A recoverable error has occured, trying again. Error={}", errorId);
+        log.error("A recoverable error has occured, trying again. Error: %s", errorId);
         return true;
     }
 
     /** Called when a cloud message has been received. */
     @Override
     public void onMessage(Context context, Intent intent) {
-        log.info("GCMIntentService.onMessage");
-
         // since this can be called when the application is not running, make sure we're
         // set to go still.
         Util.loadProperties();

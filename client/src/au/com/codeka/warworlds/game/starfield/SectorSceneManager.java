@@ -11,13 +11,12 @@ import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.input.touch.TouchEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseGlActivity;
@@ -30,7 +29,7 @@ import au.com.codeka.warworlds.model.SectorManager;
  */
 public abstract class SectorSceneManager implements SectorManager.OnSectorListChangedListener,
                                                     IOnSceneTouchListener {
-    private static final Logger log = LoggerFactory.getLogger(SectorSceneManager.class);
+    private static final Log log = new Log("SectorSceneManager");
     private StarfieldScene mScene;
     private GestureDetector mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
@@ -51,14 +50,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     protected void onStart() {
         SectorManager.getInstance().addSectorListChangedListener(this);
-/*
-        mActivity.getEngine().setErrorHandler(new Engine.EngineErrorHandler() {
-            @Override
-            public void onRenderThreadException(Exception e) {
-                refreshScene();
-            }
-        });
-*/
+
         if (mGestureDetector == null) {
             mGestureDetector = new GestureDetector(mActivity, createGestureListener());
 
@@ -96,12 +88,11 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         new BackgroundRunner<Scene>() {
             @Override
             protected Scene doInBackground() {
-                log.debug("Scene updated, refreshing...");
                 try {
                     return createScene();
                 } catch(Exception e) {
                     // the most common reason for this is when the activity is destroyed before we finish...
-                    log.warn("Error while refreshing scene.", e);
+                    log.warning("Error while refreshing scene.", e);
                     return null;
                 }
             }

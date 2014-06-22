@@ -2,9 +2,6 @@ package au.com.codeka.warworlds;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -16,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.ErrorReporter;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -35,7 +33,7 @@ import com.google.android.gcm.GCMRegistrar;
  * empire and stuff all set up.
  */
 public class ServerGreeter {
-    private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
+    private static Log log = new Log("ServerGreeter");
     private static ArrayList<HelloCompleteHandler> mHelloCompleteHandlers;
     private static ArrayList<HelloWatcher> mHelloWatchers;
     private static Handler mHandler;
@@ -111,6 +109,7 @@ public class ServerGreeter {
     }
 
     private static void sayHello(final Activity activity, final int retries) {
+        LogImpl.setup();
         log.debug("Saying 'hello'...");
         Util.setup(activity);
 

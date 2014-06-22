@@ -2,9 +2,6 @@ package au.com.codeka.warworlds;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,12 +14,13 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import au.com.codeka.common.Log;
 
 /**
  * Similar to \c AlertDialog, except with our own styling.
  */
 public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLayoutListener {
-    private Logger log = LoggerFactory.getLogger(StyledDialog.class);
+    private static final Log log = new Log("StyledDialog");
     private Builder mBuilder;
     private Context mContext;
     private boolean mButtonsVisible;
@@ -153,8 +151,8 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
             availableHeight = 1024;
         }
 
-        log.info(String.format("available height: %d; content height: %d; content height in dp: %d",
-                 availableHeight, contentHeight, (int)(contentHeight / pixelScale)));
+        log.info("available height: %d; content height: %d; content height in dp: %d",
+                 availableHeight, contentHeight, (int)(contentHeight / pixelScale));
 
         if (availableHeight < contentHeight) {
             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)

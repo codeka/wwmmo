@@ -36,9 +36,8 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.params.BasicHttpParams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
@@ -49,7 +48,7 @@ import au.com.codeka.warworlds.model.Realm;
  * Provides the low-level interface for making requests to the API.
  */
 public class RequestManager {
-    final static Logger log = LoggerFactory.getLogger(RequestManager.class);
+    private static final Log log = new Log("RequestManager");
     private static Map<Integer, ConnectionPool> sConnectionPools;
     private static List<ResponseReceivedHandler> sResponseReceivedHandlers =
             new ArrayList<ResponseReceivedHandler>();
@@ -89,7 +88,7 @@ public class RequestManager {
             ssl = true;
         } else if (!baseUrl.getScheme().equalsIgnoreCase("http")) {
             // should never happen
-            log.error("Invalid URI scheme \"{}\", assuming http.", baseUrl.getScheme());
+            log.error("Invalid URI scheme \"%s\", assuming http.", baseUrl.getScheme());
         }
 
         return new ConnectionPool(ssl, baseUrl.getHost(), baseUrl.getPort());
@@ -152,7 +151,7 @@ public class RequestManager {
 
         URI uri = realm.getBaseUrl().resolve(url);
         if (sVerboseLog) {
-            log.debug("Requesting: {}", uri);
+            log.debug("Requesting: %s", uri);
         }
 
         for(int numAttempts = 0; ; numAttempts++) {
@@ -176,7 +175,7 @@ public class RequestManager {
                     requestUrl += "on_behalf_of="+sImpersonateUser;
                 }
                 if (sVerboseLog) {
-                    log.debug(String.format("> %s %s", method, requestUrl));
+                    log.debug("> %s %s", method, requestUrl);
                 }
 
                 BasicHttpRequest request;
@@ -208,7 +207,9 @@ public class RequestManager {
                 }
                 if (realm != null && realm.getAuthenticator().isAuthenticated()) {
                     String cookie = realm.getAuthenticator().getAuthCookie();
-                    log.debug("Adding session cookie: "+cookie);
+                    if (sVerboseLog) {
+                        log.debug("Adding session cookie: %s", cookie);
+                    }
                     request.addHeader("Cookie", cookie);
                 }
                 if (body != null) {
@@ -220,7 +221,7 @@ public class RequestManager {
 
                 BasicHttpResponse response = conn.sendRequest(request, body);
                 if (sVerboseLog) {
-                    log.debug(String.format("< %s", response.getStatusLine()));
+                    log.debug("< %s", response.getStatusLine());
                 }
                 checkForAuthenticationError(request, response);
                 fireResponseReceivedHandlers(request, response);
@@ -229,7 +230,7 @@ public class RequestManager {
             } catch (Exception e) {
                 if (canRetry(e) && numAttempts == 0) {
                     if (sVerboseLog) {
-                        log.warn("Got retryable exception making request to "+url, e);
+                        log.warning("Got retryable exception making request to: %s", url, e);
                     }
 
                     // Note: the connection doesn't go back in the pool, and we'll close this
@@ -240,9 +241,10 @@ public class RequestManager {
                     }
                 } else {
                     if (numAttempts >= 5) {
-                        log.error("Got "+numAttempts+" retryable exceptions (giving up) making request to"+url, e);
+                        log.error("Got %d retryable exceptions (giving up) making request to: %s",
+                                numAttempts, url, e);
                     } else {
-                        log.error("Got non-retryable exception making request to "+uri, e);
+                        log.error("Got non-retryable exception making request to: ", uri, e);
                     }
 
                     throw new ApiException("Error performing "+method+" "+url, e);
@@ -454,7 +456,7 @@ public class RequestManager {
      * A pool of connections to the server. So we don't have to reconnect over-and-over.
      */
     private static class ConnectionPool {
-        private final static Logger log = LoggerFactory.getLogger(ConnectionPool.class);
+        private static final Log log = new Log("ConnectionPool");
         private Stack<Connection> mFreeConnections;
         private List<Connection> mBusyConnections;
         private SocketFactory mSocketFactory;
@@ -520,11 +522,11 @@ public class RequestManager {
 
                         if (sVerboseLog) {
                             HttpConnectionMetrics metrics = conn.getMetrics();
-                            log.debug(String.format("Got connection [%s] from free pool (%d requests," +
-                                                    " %d responses, %d bytes sent, %d bytes received).",
+                            log.debug("Got connection [%s] from free pool (%d requests," +
+                                          " %d responses, %d bytes sent, %d bytes received).",
                                       conn,
                                       metrics.getRequestCount(), metrics.getResponseCount(),
-                                      metrics.getSentBytesCount(), metrics.getReceivedBytesCount()));
+                                      metrics.getSentBytesCount(), metrics.getReceivedBytesCount());
                         }
                     }
                 }
@@ -557,11 +559,11 @@ public class RequestManager {
 
                 if (sVerboseLog) {
                     HttpConnectionMetrics metrics = conn.getMetrics();
-                    log.debug(String.format("Returned connection [%s] to free pool (%d requests," +
-                                            " %d responses, %d bytes sent, %d bytes received).",
+                    log.debug("Returned connection [%s] to free pool (%d requests," +
+                                  " %d responses, %d bytes sent, %d bytes received).",
                               conn,
                               metrics.getRequestCount(), metrics.getResponseCount(),
-                              metrics.getSentBytesCount(), metrics.getReceivedBytesCount()));
+                              metrics.getSentBytesCount(), metrics.getReceivedBytesCount());
                 }
             }
         }
@@ -590,8 +592,8 @@ public class RequestManager {
             conn.bind(s, params);
 
             if (sVerboseLog) {
-                log.debug(String.format("Connection [%s] to %s:%d created.",
-                                        conn, s.getInetAddress().toString(), mPort));
+                log.debug("Connection [%s] to %s:%d created.", conn, s.getInetAddress().toString(),
+                        mPort);
             }
             return new Connection(this, conn);
         }

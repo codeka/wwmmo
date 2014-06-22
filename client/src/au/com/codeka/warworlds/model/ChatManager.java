@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.os.Handler;
 import android.util.SparseArray;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
@@ -25,7 +24,7 @@ import au.com.codeka.warworlds.api.ApiException;
  */
 public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public static ChatManager i = new ChatManager();
-    private static Logger log = LoggerFactory.getLogger(ChatManager.class);
+    private static final Log log = new Log("ChatManager");
 
     private ArrayList<MessageAddedListener> mMessageAddedListeners;
     private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners;
@@ -329,7 +328,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public ChatConversation getConversationByID(int conversationID) {
         synchronized(mConversations) {
             if (mConversations.indexOfKey(conversationID) < 0) {
-                log.info("Conversation #"+conversationID+" hasn't been created yet, creating now.");
+                log.info("Conversation #%d hasn't been created yet, creating now.",
+                        conversationID);
                 mConversations.append(conversationID, new ChatConversation(conversationID));
 
                 // it's OK to call this, it won't do anything if a refresh is already happening
@@ -401,7 +401,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                     ApiClient.delete(url);
 
                     synchronized(mConversations) {
-                        log.info("Leaving conversation #"+conversation.getID()+".");
+                        log.info("Leaving conversation #%d.", conversation.getID());
                         mConversations.remove(conversation.getID());
                     }
                     return true;

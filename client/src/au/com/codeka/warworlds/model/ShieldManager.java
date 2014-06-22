@@ -17,8 +17,6 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegion
 import org.andengine.opengl.texture.atlas.bitmap.source.FileBitmapTextureAtlasSource;
 import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -26,6 +24,7 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.util.SparseArray;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.RealmContext;
@@ -36,7 +35,7 @@ import au.com.codeka.warworlds.api.ApiException;
  * This is the base class for the EmpireShieldManager and AllianceShieldManager.
  */
 public abstract class ShieldManager implements RealmManager.RealmChangedHandler {
-    private static final Logger log = LoggerFactory.getLogger(ShieldManager.class);
+    private static final Log log = new Log("ShieldManager");
 
     private SparseArray<SoftReference<Bitmap>> mShields;
     private SparseArray<ITextureRegion> mShieldTextures;
@@ -100,8 +99,8 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
         if (bmp == null) {
             bmp = loadCachedShieldImage(context, shieldInfo);
             if (bmp == null && shieldInfo.lastUpdate != null) {
-                log.info(String.format("Getting shield image for %s [id=%d last_update=%d]",
-                        shieldInfo.kind, shieldInfo.id, shieldInfo.lastUpdate));
+                log.info("Getting shield image for %s [id=%d last_update=%d]",
+                        shieldInfo.kind, shieldInfo.id, shieldInfo.lastUpdate);
                 queueFetchShieldImage(shieldInfo);
             }
             if (bmp == null) {
@@ -128,8 +127,8 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
             File f = new File(fullPath);
             if (!f.exists()) {
                 if (shieldInfo.lastUpdate != null) {
-                    log.info(String.format("Getting shield image for %s [id=%d last_update=%d]",
-                            shieldInfo.kind, shieldInfo.id, shieldInfo.lastUpdate));
+                    log.info("Getting shield image for %s [id=%d last_update=%d]",
+                            shieldInfo.kind, shieldInfo.id, shieldInfo.lastUpdate);
                     queueFetchShieldImage(shieldInfo);
                 }
 
@@ -155,7 +154,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
     protected abstract String getFetchUrl(ShieldInfo shieldInfo);
 
     private void queueFetchShieldImage(final ShieldInfo shieldInfo) {
-        log.debug("queuing up a request to fetch a new shield...");
+        log.debug("Queuing up a request to fetch a new shield...");
         synchronized(mFetchingShields) {
             if (mFetchingShields.contains(shieldInfo.id)) {
                 return;

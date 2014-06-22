@@ -2,15 +2,13 @@ package au.com.codeka.warworlds;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -43,7 +41,7 @@ public class BackgroundDetector {
         mBackgroundChangeHandlers = new ArrayList<BackgroundChangeHandler>();
         mHandler = new Handler();
     }
-    private static Logger log = LoggerFactory.getLogger(BackgroundDetector.class);
+    private static final Log log = new Log("BackgroundDetector");
 
     private int mNumActiveActivities;
     private String mStartingActivityPackage;

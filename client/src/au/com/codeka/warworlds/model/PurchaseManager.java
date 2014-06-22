@@ -3,12 +3,11 @@ package au.com.codeka.warworlds.model;
 import java.util.ArrayList;
 
 import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.billing.IabException;
@@ -18,7 +17,7 @@ import au.com.codeka.warworlds.model.billing.Inventory;
 import au.com.codeka.warworlds.model.billing.Purchase;
 
 public class PurchaseManager {
-    private static final Logger log = LoggerFactory.getLogger(PurchaseManager.class);
+    private static final Log log = new Log("PurchaseManager");
     public static PurchaseManager i = new PurchaseManager();
 
     private PurchaseManager() {
@@ -133,7 +132,7 @@ public class PurchaseManager {
         // check if we already own it
         Purchase purchase = mInventory.getPurchase(skuName);
         if (purchase != null) {
-            log.debug("Already purchased a '"+skuName+"', not purchasing again.");
+            log.debug("Already purchased a '%s', not purchasing again.", skuName);
             listener.onIabPurchaseFinished(new IabResult(IabHelper.BILLING_RESPONSE_RESULT_OK, null), purchase);
         } else {
             mHelper.launchPurchaseFlow(activity, skuName, REQUEST_CODE, listener);

@@ -10,20 +10,18 @@ import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.XmlIterator;
 
 /**
  * This is the base "manager" class that manages designs for ships and buildings.
  */
 public abstract class BaseDesignManager {
+    private static final Log log = new Log("BaseDesignManager");
     public static BaseDesignManager i;
-
-    private static Logger log = LoggerFactory.getLogger(BaseDesignManager.class);
 
     private SortedMap<DesignKind, SortedMap<String, Design>> mDesigns;
 
@@ -44,7 +42,7 @@ public abstract class BaseDesignManager {
                 DocumentBuilder builder = builderFactory.newDocumentBuilder();
                 xmldoc = builder.parse(ins);
             } catch (Exception e) {
-                log.error("Error loading "+designKind, e);
+                log.error("Error loading %s", designKind, e);
                 return;
             }
 
@@ -52,7 +50,7 @@ public abstract class BaseDesignManager {
             try {
                 designs = parseDesigns(designKind, xmldoc);
             } catch (ParseException e) {
-                log.error("Error loading "+designKind, e);
+                log.error("Error loading %s", designKind, e);
                 return;
             }
 

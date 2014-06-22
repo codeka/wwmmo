@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +16,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.GlobalOptions;
 
@@ -27,7 +25,7 @@ import au.com.codeka.warworlds.GlobalOptions;
  * \c SolarSystemSurfaceView.
  */
 public class StarfieldBackgroundRenderer {
-    private Logger log = LoggerFactory.getLogger(StarfieldBackgroundRenderer.class);
+    private static final Log log = new Log("StarfieldBackgroundRenderer");
     private float mPixelScale;
     private GlobalOptions.StarfieldDetail mStarfieldDetail;
     private long[] mSeeds;
@@ -179,7 +177,7 @@ public class StarfieldBackgroundRenderer {
 
             InputStream ins = null;
             try {
-                log.info("loading "+fullPath+"...");
+                log.info("Loading '%s'...", fullPath);
                 ins = assetMgr.open(fullPath);
 
                 BitmapFactory.Options opts = new BitmapFactory.Options();
@@ -187,7 +185,7 @@ public class StarfieldBackgroundRenderer {
                 opts.inInputShareable = true;
                 bitmaps.add(BitmapFactory.decodeStream(ins, null, opts));
             } catch (IOException e) {
-                log.error("Error loading image "+fullPath, e); //??
+                log.error("Error loading image :", fullPath, e);
             } finally {
                 if (ins != null) {
                     try {

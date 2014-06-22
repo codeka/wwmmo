@@ -2,9 +2,6 @@ package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.Locale;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
@@ -19,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
@@ -48,7 +46,7 @@ import au.com.codeka.warworlds.model.StarSummary;
 public class SolarSystemFragment extends Fragment
                                  implements StarManager.StarFetchedHandler,
                                             EmpireShieldManager.ShieldUpdatedHandler {
-    private static Logger log = LoggerFactory.getLogger(SolarSystemFragment.class);
+    private static final Log log = new Log("SolarSystemFragment");
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private ProgressBar mProgressBar;
     private StarSummary mStarSummary;
@@ -230,8 +228,6 @@ public class SolarSystemFragment extends Fragment
 
     @Override
     public void onStarFetched(Star star) {
-        log.debug("Star refreshed...");
-
         // if we don't have a star yet, we'll need to figure out which planet to select
         // initially from the intent that started us. Otherwise, we'll want to select
         // whatever planet we have currently
@@ -247,7 +243,7 @@ public class SolarSystemFragment extends Fragment
 
         mSolarSystemSurfaceView.setStar(star);
         if (selectedPlanetIndex >= 0) {
-            log.debug("Selecting planet #"+selectedPlanetIndex);
+            log.debug("Selecting planet #%d", selectedPlanetIndex);
             mSolarSystemSurfaceView.selectPlanet(selectedPlanetIndex);
         } else {
             log.debug("No planet selected");
@@ -370,8 +366,6 @@ public class SolarSystemFragment extends Fragment
     }
 
     private void refreshSelectedPlanet() {
-        log.debug("refreshing selected planet...");
-
         TextView planetNameTextView = (TextView) mView.findViewById(R.id.planet_name);
 
         if (mStarSummary != null && mPlanet == null) {

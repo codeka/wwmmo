@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,7 +22,6 @@ import au.com.codeka.warworlds.model.StarManager;
  * This activity is displayed when you're actually looking at a solar system (star + planets)
  */
 public class SolarSystemActivity extends BaseActivity implements StarManager.StarFetchedHandler {
-    private static Logger log = LoggerFactory.getLogger(SolarSystemActivity.class);
     private ViewPager mViewPager;
     private StarPagerAdapter mStarPagerAdapter;
     private int mInitialStarIndex = -1;
@@ -111,7 +107,6 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
 
     @Override
     public void onStarFetched(Star star) {
-        log.debug("Star refreshed...");
     }
 
     public class StarPagerAdapter extends FragmentStatePagerAdapter {

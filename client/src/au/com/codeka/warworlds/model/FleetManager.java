@@ -1,17 +1,14 @@
 package au.com.codeka.warworlds.model;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 
 public class FleetManager {
-    private static final Logger log = LoggerFactory.getLogger(FleetManager.class);
+    private static final Log log = new Log("FleetManager");
     public static FleetManager i = new FleetManager();
 
     private FleetManager() {
@@ -35,7 +32,7 @@ public class FleetManager {
 
                     return true;
                 } catch(Exception e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    log.error("Error updating notes.", e);
                     return null;
                 }
             }

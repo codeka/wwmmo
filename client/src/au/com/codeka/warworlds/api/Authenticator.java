@@ -1,7 +1,10 @@
 package au.com.codeka.warworlds.api;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import org.apache.http.HttpEntity;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -10,12 +13,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.Realm;
 
 public class Authenticator {
-    private Logger log = LoggerFactory.getLogger(Authenticator.class);
+    private static final Log log = new Log("Authenticator");
     private String mAuthCookie;
     private boolean mAuthenticating;
 
@@ -55,7 +59,7 @@ public class Authenticator {
         }
 
         AccountManager accountManager = AccountManager.get(activity == null ? App.i : activity);
-        log.info("(re-)authenticating \""+accountName+"\" to realm "+realm.getDisplayName()+"...");
+        log.info("(re-)authenticating \"%s\" to realm %s...", accountName, realm.getDisplayName());
         String cookie = null;
 
         try {
@@ -63,29 +67,13 @@ public class Authenticator {
             for (Account acct : accts) {
                 final Account account = acct;
                 if (account.name.equals(accountName)) {
-                    if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.Default) {
-                        log.info("Account found, fetching authentication token (authmethod = default)");
+                    log.info("Account found, fetching authentication token");
 
-                        final String scope = "oauth2:email";
-                        String authToken = getAuthToken(accountManager, account, activity, scope);
-                        accountManager.invalidateAuthToken(account.type, authToken);
-                        authToken = getAuthToken(accountManager, account, activity, scope);
-                        cookie = DefaultAuthenticator.authenticate(authToken, realm);
-                    } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.LocalAppEngine) {
-                        log.info("Account found, setting up with debug auth cookie.");
-                        // Use a fake cookie for the dev mode app engine server. The cookie has the
-                        // form email:isAdmin:userId (we set the userId to be the same as the email)
-                        cookie = "dev_appserver_login="+accountName+":false:"+accountName;
-                    } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.AppEngine) {
-                        log.info("Account found, fetching authentication token (authmethod = AppEngine)");
-    
-                        // Get the auth token from the AccountManager and convert it into a cookie 
-                        // that's usable by App Engine
-                        String authToken = getAuthToken(accountManager, account, activity, "ah");
-                        accountManager.invalidateAuthToken(account.type, authToken);
-                        authToken = getAuthToken(accountManager, account, activity, "ah");
-                        cookie = AppEngineAuthenticator.authenticate(authToken);
-                    }
+                    final String scope = "oauth2:email";
+                    String authToken = getAuthToken(accountManager, account, activity, scope);
+                    accountManager.invalidateAuthToken(account.type, authToken);
+                    authToken = getAuthToken(accountManager, account, activity, scope);
+                    cookie = getCookie(authToken, realm);
                 }
             }
         } finally {
@@ -142,4 +130,47 @@ public class Authenticator {
         }
     }
 
+    /**
+     * Makes a request to the server to get a cookie which we can send with each subsequent request.
+     */
+    public String getCookie(String authToken, Realm realm) throws ApiException {
+        String url = realm.getBaseUrl().resolve("login?authToken="+authToken).toString();
+
+        String impersonate = Util.getProperties().getProperty("user.on_behalf_of", null);
+        if (impersonate != null) {
+            url += "&impersonate="+impersonate;
+        }
+
+        RequestManager.ResultWrapper resp = null;
+        try {
+            resp = RequestManager.request("GET", url);
+            int statusCode = resp.getResponse().getStatusLine().getStatusCode();
+            if (statusCode != 200) {
+                log.warning("Authentication failure: %s", resp.getResponse().getStatusLine());
+                ApiException.checkResponse(resp.getResponse());
+            }
+
+            String cookie = null;
+            HttpEntity entity = resp.getResponse().getEntity();
+            if (entity != null) {
+                try {
+                    InputStream ins = entity.getContent();
+                    cookie = new BufferedReader(new InputStreamReader(ins, "utf-8")).readLine();
+                } catch (IllegalStateException e) {
+                } catch (Exception e) {
+                    log.warning("Authentication failure, could got get response body.");
+                    return null;
+                }
+            }
+
+            if (cookie == null) {
+                return null;
+            }
+            return "SESSION="+cookie;
+        } finally {
+            if (resp != null) {
+                resp.close();
+            }
+        }
+    }
 }

@@ -134,7 +134,7 @@
               $tr.hide();
             }
           });
-        })();
+        });
       </script> &bull;
       <a href="javascript:;" id="delete-{{loop.counter}}">Delete</a><script>
         $(function() {
@@ -152,6 +152,9 @@
     <tr style="display: none;" id="row-{{loop.counter}}">
       <td colspan="6">
         <div class="details-extra">
+          {% if error_report.app_version %}
+          <div style="text-align: right;"><a href="javascript:;" class="unobfuscate" data-id="row-{{loop.counter}}" data-version="{{error_report.app_version}}">Unobfuscate</a></div>
+          {% endif %}
           <dl>
             <dt>Heap size:
             <dd>{{error_report.heap_size|number}}
@@ -183,4 +186,23 @@
   {% endfor %}
   </table>
   <p><a href="?cursor={{cursor}}{% if curr_empire %}&empire={{curr_empire}}{% endif %}">Next Page &gt;&gt;</a></p>
+  <script>
+    $("div.details-extra a.unobfuscate").on("click", function() {
+      var appVersion = $(this).data("version");
+      var $stackTrace = $("#"+$(this).data("id")+" div.stack-trace");
+      $(this).hide();
+
+      var stackTrace = $stackTrace.html();
+      $stackTrace.html("");
+      $.ajax({
+        "url": "retrace?version=" + appVersion,
+        "contentType": "text/plain",
+        "data": stackTrace,
+        "type": "POST",
+        "success": function(data) {
+          $stackTrace.html(data);
+        }
+      });
+    });
+  </script>
 {% endblock %}
