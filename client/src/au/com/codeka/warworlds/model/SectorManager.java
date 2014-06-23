@@ -15,6 +15,7 @@ import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 
 /**
@@ -48,7 +49,22 @@ public class SectorManager extends BaseManager {
         mInTransitListeners = new TreeMap<Pair<Long, Long>, List<OnSectorsFetchedListener>>();
         mSectorListChangedListeners = new CopyOnWriteArrayList<OnSectorListChangedListener>();
         mSectorStars = new TreeMap<String, Star>();
+
+        StarManager.eventBus.register(eventHandler);
     }
+
+    private Object eventHandler = new Object() {
+        @EventHandler
+        public void onStarUpdated(Star star) {
+            Star ourStar = findStar(star.getKey());
+            if (ourStar != null) {
+                if (!ourStar.getName().equals(star.getName())) {
+                    ourStar.setName(star.getName());
+                    fireSectorListChanged();
+                }
+            }
+        }
+    };
 
     public void clearCache() {
         mSectorStars.clear();
@@ -99,20 +115,6 @@ public class SectorManager extends BaseManager {
                 @Override
                 public void run() { listener.onSectorListChanged(); }
             });
-        }
-    }
-
-    /**
-     * This is called by the StarManager when a star is updated. We care about certain changes to
-     * stars (e.g. when they're renamed), but not all...
-     */
-    public void onStarUpdate(Star star) {
-        Star ourStar = findStar(star.getKey());
-        if (ourStar != null) {
-            if (!ourStar.getName().equals(star.getName())) {
-                ourStar.setName(star.getName());
-                fireSectorListChanged();
-            }
         }
     }
 

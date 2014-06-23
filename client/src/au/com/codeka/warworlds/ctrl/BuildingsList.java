@@ -28,6 +28,7 @@ import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
@@ -41,8 +42,7 @@ import au.com.codeka.warworlds.model.StarManager;
 /**
  * This is a list of existing buildings, in-progress buildings and new designs available to build.
  */
-public class BuildingsList extends ListView
-                           implements StarManager.StarFetchedHandler {
+public class BuildingsList extends ListView {
     private Context mContext;
     private Star mStar;
     private Colony mColony;
@@ -65,7 +65,7 @@ public class BuildingsList extends ListView
         mAdapter.setColony(mStar, mColony);
 
         if (!mIsAttachedToWindow) {
-            StarManager.getInstance().addStarUpdatedListener(mStar.getKey(), this);
+            StarManager.eventBus.register(mEventHandler);
             mIsAttachedToWindow = true;
         }
     }
@@ -75,7 +75,7 @@ public class BuildingsList extends ListView
         super.onAttachedToWindow();
 
         if (!mIsAttachedToWindow && mStar != null) {
-            StarManager.getInstance().addStarUpdatedListener(mStar.getKey(), this);
+            StarManager.eventBus.register(mEventHandler);
             mIsAttachedToWindow = true;
         }
     }
@@ -84,7 +84,7 @@ public class BuildingsList extends ListView
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        StarManager.getInstance().removeStarUpdatedListener(this);
+        StarManager.eventBus.unregister(mEventHandler);
         mIsAttachedToWindow = false;
     }
 
@@ -92,18 +92,24 @@ public class BuildingsList extends ListView
         return (Entry) mAdapter.getItem(index);
     }
 
-    @Override
-    public void onStarFetched(Star s) {
-        if (mColony == null) {
-            return;
-        }
-
-        for (BaseColony baseColony : s.getColonies()) {
-            if (baseColony.getKey().equals(mColony.getKey())) {
-                setColony(s, (Colony) baseColony);
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onStarUpdated(Star star) {
+            if (mStar != null && !mStar.getKey().equals(star.getKey())) {
+                return;
             }
+            if (mColony == null) {
+                return;
+            }
+
+            for (BaseColony baseColony : star.getColonies()) {
+                if (baseColony.getKey().equals(mColony.getKey())) {
+                    setColony(star, (Colony) baseColony);
+                }
+            }
+
         }
-    }
+    };
 
     /** This adapter is used to populate a list of buildings in a list view. */
     private class BuildingListAdapter extends BaseAdapter {

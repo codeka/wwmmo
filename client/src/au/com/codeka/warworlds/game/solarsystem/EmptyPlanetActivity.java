@@ -14,6 +14,7 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -21,8 +22,7 @@ import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
-public class EmptyPlanetActivity extends BaseActivity
-                                 implements StarManager.StarFetchedHandler {
+public class EmptyPlanetActivity extends BaseActivity {
     private Star mStar;
     private Planet mPlanet;
 
@@ -56,24 +56,29 @@ public class EmptyPlanetActivity extends BaseActivity
                     startActivity(new Intent(EmptyPlanetActivity.this, WarWorldsActivity.class));
                 } else {
                     String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-                    StarManager.getInstance().requestStar(starKey, false, EmptyPlanetActivity.this);
-                    StarManager.getInstance().addStarUpdatedListener(starKey, EmptyPlanetActivity.this);
+                    StarManager.eventBus.register(mEventHandler);
+                    StarManager.getInstance().requestStar(starKey, false, null);
                 }
             }
         });
     }
 
-    @Override
-    public void onStarFetched(Star s) {
-        int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onStarFetched(Star s) {
+            if (mStar != null && !mStar.getKey().equals(s.getKey())) {
+                return;
+            }
 
-        mStar = s;
-        mPlanet = (Planet) s.getPlanets()[planetIndex - 1];
+            int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
 
-        PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
-        planetDetails.setup(mStar, mPlanet, null);
-    }
+            mStar = s;
+            mPlanet = (Planet) s.getPlanets()[planetIndex - 1];
 
+            PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
+            planetDetails.setup(mStar, mPlanet, null);
+        }
+    };
 
     private void onColonizeClick() {
         MyEmpire empire = EmpireManager.i.getEmpire();
