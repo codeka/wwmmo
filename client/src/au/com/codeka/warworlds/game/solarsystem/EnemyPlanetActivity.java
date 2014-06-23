@@ -102,10 +102,6 @@ public class EnemyPlanetActivity extends BaseActivity
         }
     }
 
-    private Object mEventHandler = new Object() {
-        @EventHandler
-        public void onStarFetched() {
-    }
     @Override
     public void onStarFetched(Star s) {
         int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");

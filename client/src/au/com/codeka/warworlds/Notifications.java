@@ -118,7 +118,7 @@ public class Notifications {
                 }
             } else {
                 log.debug("Firing star updated...");
-                StarManager.eventBus.publish(star);
+                StarManager.getInstance().fireStarUpdated(star);
             }
 
             // notify the build manager, in case it's a 'build complete' or something

@@ -35,7 +35,6 @@ import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.NotesDialog;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
@@ -51,7 +50,8 @@ import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 
-public class BuildQueueList extends FrameLayout {
+public class BuildQueueList extends FrameLayout
+                            implements StarManager.StarFetchedHandler {
     private Context mContext;
     private BuildQueueActionListener mActionListener;
     private BuildQueueListAdapter mBuildQueueListAdapter;
@@ -240,9 +240,28 @@ public class BuildQueueList extends FrameLayout {
     }
 
     @Override
+    public void onStarFetched(Star s) {
+        if (mStarKeys == null) {
+            return;
+        }
+
+        boolean ourStar = false;
+        for (String starKey : mStarKeys) {
+            if (starKey.equals(s.getKey())) {
+                ourStar = true;
+            }
+        }
+        if (!ourStar) {
+            return;
+        }
+
+        mBuildQueueListAdapter.onStarRefreshed(s);
+    }
+
+    @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        StarManager.eventBus.register(mEventHandler);
+        StarManager.getInstance().addStarUpdatedListener(null, this);
 
         mProgressUpdater = new ProgressUpdater();
         mHandler.postDelayed(mProgressUpdater, 5000);
@@ -251,32 +270,11 @@ public class BuildQueueList extends FrameLayout {
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        StarManager.eventBus.unregister(mEventHandler);
+        StarManager.getInstance().removeStarUpdatedListener(this);
 
         mHandler.removeCallbacks(mProgressUpdater);
         mProgressUpdater = null;
     }
-
-    private Object mEventHandler = new Object() {
-        @EventHandler
-        public void onStarFetcher(Star star) {
-            if (mStarKeys == null) {
-                return;
-            }
-
-            boolean ourStar = false;
-            for (String starKey : mStarKeys) {
-                if (starKey.equals(star.getKey())) {
-                    ourStar = true;
-                }
-            }
-            if (!ourStar) {
-                return;
-            }
-
-            mBuildQueueListAdapter.onStarRefreshed(star);
-        }
-    };
 
     /**
      * This adapter is used to populate the list of buildings that are currently in progress.

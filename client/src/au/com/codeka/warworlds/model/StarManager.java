@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -23,7 +24,6 @@ import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.eventbus.EventBus;
 import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
@@ -34,17 +34,19 @@ public class StarManager extends BaseManager {
         return sInstance;
     }
 
-    public static EventBus eventBus = new EventBus();
-
     private static final Log log = new Log("StarManager");
     private TreeMap<String, WeakReference<Star>> mStars;
     private TreeMap<String, WeakReference<StarSummary>> mStarSummaries;
+    private TreeMap<String, List<StarFetchedHandler>> mStarUpdatedListeners;
+    private List<StarFetchedHandler> mAllStarUpdatedListeners;
 
     public static float DEFAULT_MAX_CACHE_HOURS = 24.0f;
 
     private StarManager() {
         mStars = new TreeMap<String, WeakReference<Star>>();
         mStarSummaries = new TreeMap<String, WeakReference<StarSummary>>();
+        mStarUpdatedListeners = new TreeMap<String, List<StarFetchedHandler>>();
+        mAllStarUpdatedListeners = new ArrayList<StarFetchedHandler>();
     }
 
     public void clearCache() {
@@ -52,10 +54,76 @@ public class StarManager extends BaseManager {
         mStarSummaries.clear();
     }
 
+    /**
+     * Call this to register your interest in when a particular star is updated. Any time that
+     * star is re-fetched from the server, your \c StarFetchedHandler will be called.
+     */
+    public void addStarUpdatedListener(String starKey, StarFetchedHandler handler) {
+        if (starKey == null) {
+            mAllStarUpdatedListeners.add(handler);
+            return;
+        }
+
+        synchronized(mStarUpdatedListeners) {
+            List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(starKey);
+            if (listeners == null) {
+                listeners = new ArrayList<StarFetchedHandler>();
+                mStarUpdatedListeners.put(starKey, listeners);
+            }
+            listeners.add(handler);
+        }
+    }
+
+    /**
+     * Removes the given \c StarFetchedHandler from receiving updates about refreshed stars.
+     */
+    public void removeStarUpdatedListener(StarFetchedHandler handler) {
+        synchronized(mStarUpdatedListeners) {
+            for (Object o : IteratorUtils.toList(mStarUpdatedListeners.keySet().iterator())) {
+                String starKey = (String) o;
+
+                List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(starKey);
+                listeners.remove(handler);
+
+                if (listeners.isEmpty()) {
+                    mStarUpdatedListeners.remove(starKey);
+                }
+            }
+        }
+
+        mAllStarUpdatedListeners.remove(handler);
+    }
+
     public void updateStar(Star star) {
         mStarSummaries.remove(star.getKey());
         mStars.put(star.getKey(), new WeakReference<Star>(star));
-        eventBus.publish(star);
+        fireStarUpdated(star);
+    }
+
+    public void fireStarUpdated(final Star star) {
+        synchronized(mStarUpdatedListeners) {
+            List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(star.getKey());
+            if (listeners != null) {
+                for (final StarFetchedHandler handler : new ArrayList<StarFetchedHandler>(listeners)) {
+                    fireHandler(handler, new Runnable() {
+                        @Override
+                        public void run() { handler.onStarFetched(star); }
+                    });
+                }
+            }
+
+            // also anybody who's interested in ALL stars
+            for (final StarFetchedHandler handler : new ArrayList<StarFetchedHandler>(mAllStarUpdatedListeners)) {
+                fireHandler(handler, new Runnable() {
+                    @Override
+                    public void run() { handler.onStarFetched(star); }
+                });
+            }
+        }
+
+        // also let a couple of the other Managers know
+        SectorManager.getInstance().onStarUpdate(star);
+        BuildManager.getInstance().onStarUpdate(star);
     }
 
     public void refreshStar(Star s) {
@@ -248,11 +316,7 @@ public class StarManager extends BaseManager {
         if (refs != null && !force) {
             Star star = refs.get();
             if (star != null) {
-                if (callback != null) {
-                    callback.onStarFetched(star);
-                }
-                // Publish an event cause they may have been waiting anyway
-                eventBus.publish(star);
+                callback.onStarFetched(star);
                 return;
             }
         }

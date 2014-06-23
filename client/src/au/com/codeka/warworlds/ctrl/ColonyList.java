@@ -30,7 +30,6 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
@@ -89,31 +88,6 @@ public class ColonyList extends FrameLayout {
     public void setOnColonyActionListener(ColonyActionHandler listener) {
         mColonyActionListener = listener;
     }
-
-    @Override
-    public void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        StarImageManager.getInstance().addSpriteGeneratedListener(mSpriteGeneratedListener);
-        PlanetImageManager.getInstance().addSpriteGeneratedListener(mSpriteGeneratedListener);
-        StarManager.eventBus.register(mEventHandler);
-    }
-
-    @Override
-    public void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-
-        StarImageManager.getInstance().removeSpriteGeneratedListener(mSpriteGeneratedListener);
-        PlanetImageManager.getInstance().removeSpriteGeneratedListener(mSpriteGeneratedListener);
-        StarManager.eventBus.unregister(mEventHandler);
-    }
-
-    private ImageManager.SpriteGeneratedListener mSpriteGeneratedListener = new ImageManager.SpriteGeneratedListener() {
-        @Override
-        public void onSpriteGenerated(String key, Sprite sprite) {
-            mColonyListAdapter.notifyDataSetChanged();
-        }
-    };
 
     private void initialize() {
         if (mIsInitialized) {
@@ -273,20 +247,11 @@ public class ColonyList extends FrameLayout {
 
             @Override
             protected void onPostExecute(Star star) {
-                StarManager.eventBus.publish(star);
+                StarManager.getInstance().fireStarUpdated(star);
                 sSimulatingStars.remove(star.getKey());
             }
         }.execute();
     }
-
-    private Object mEventHandler = new Object() {
-        @EventHandler
-        public void onStarUpdated(Star star) {
-            // if a star is updated, we'll want to refresh our colony list because the
-            // colony inside it might've changed too...
-            mColonyListAdapter.onStarUpdated(star);
-        }
-    };
 
     /**
      * This adapter is used to populate the list of colonies that we're looking at.
@@ -295,26 +260,48 @@ public class ColonyList extends FrameLayout {
         private ArrayList<ItemEntry> mEntries;
         private Map<String, Star> mStars;
 
-        public void onStarUpdated(Star star) {
-            for (BaseColony starColony : star.getColonies()) {
-                for (int i = 0; i < mEntries.size(); i++) {
-                    ItemEntry entry = mEntries.get(i);
-                    if (entry.colony != null && entry.colony.getKey().equals(starColony.getKey())) {
-                        entry.colony = (Colony) starColony;
-                        break;
+        public ColonyListAdapter() {
+            // whenever a new star/planet bitmap is generated, redraw the list
+            StarImageManager.getInstance().addSpriteGeneratedListener(
+                    new ImageManager.SpriteGeneratedListener() {
+                @Override
+                public void onSpriteGenerated(String key, Sprite sprite) {
+                    notifyDataSetChanged();
+                }
+            });
+            PlanetImageManager.getInstance().addSpriteGeneratedListener(
+                    new ImageManager.SpriteGeneratedListener() {
+                @Override
+                public void onSpriteGenerated(String key, Sprite sprite) {
+                    notifyDataSetChanged();
+                }
+            });
+            StarManager.getInstance().addStarUpdatedListener(null, new StarManager.StarFetchedHandler() {
+                @Override
+                public void onStarFetched(Star s) {
+                    // if a star is updated, we'll want to refresh our colony list because the
+                    // colony inside it might've changed too...
+                    for (BaseColony starColony : s.getColonies()) {
+                        for (int i = 0; i < mEntries.size(); i++) {
+                            ItemEntry entry = mEntries.get(i);
+                            if (entry.colony != null && entry.colony.getKey().equals(starColony.getKey())) {
+                                entry.colony = (Colony) starColony;
+                                break;
+                            }
+                        }
                     }
-                }
-            }
 
-            for (int i = 0; i < mEntries.size(); i++) {
-                ItemEntry entry = mEntries.get(i);
-                if (entry.star != null && entry.star.getKey().equals(star.getKey())) {
-                    entry.star = star;
-                }
-            }
+                    for (int i = 0; i < mEntries.size(); i++) {
+                        ItemEntry entry = mEntries.get(i);
+                        if (entry.star != null && entry.star.getKey().equals(s.getKey())) {
+                            entry.star = s;
+                        }
+                    }
 
-            notifyDataSetChanged();
-            refreshSelectedColony();
+                    notifyDataSetChanged();
+                    refreshSelectedColony();
+                }
+            });
         }
 
         /**

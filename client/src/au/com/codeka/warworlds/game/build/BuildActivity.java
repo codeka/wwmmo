@@ -44,7 +44,6 @@ import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.BuildingsList;
 import au.com.codeka.warworlds.ctrl.FleetList;
-import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.NotesDialog;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
@@ -69,7 +68,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * When you click "Build" shows you the list of buildings/ships that are/can be built by your
  * colony. You can swipe left/right to switch between your colonies in this star.
  */
-public class BuildActivity extends BaseActivity {
+public class BuildActivity extends BaseActivity implements StarManager.StarFetchedHandler {
     private Star mStar;
     private List<Colony> mColonies;
     private ViewPager mViewPager;
@@ -103,7 +102,7 @@ public class BuildActivity extends BaseActivity {
             } catch (InvalidProtocolBufferException e) {
             }
 
-            updateStar(s);
+            onStarFetched(s);
         }
     }
 
@@ -123,8 +122,8 @@ public class BuildActivity extends BaseActivity {
                 } catch (InvalidProtocolBufferException e) {
                 }
 
-                StarManager.eventBus.register(mEventHandler);
-                StarManager.getInstance().requestStar(starKey, false, null);
+                StarManager.getInstance().requestStar(starKey, false, BuildActivity.this);
+                StarManager.getInstance().addStarUpdatedListener(starKey, BuildActivity.this);
             }
         });
     }
@@ -132,7 +131,7 @@ public class BuildActivity extends BaseActivity {
     @Override
     public void onPause() {
         super.onPause();
-        StarManager.eventBus.unregister(this);
+        StarManager.getInstance().removeStarUpdatedListener(this);
     }
 
     @Override
@@ -149,6 +148,48 @@ public class BuildActivity extends BaseActivity {
             Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
             currentColony.toProtocolBuffer(colony_pb);
             state.putByteArray("au.com.codeka.warworlds.CurrentColony", colony_pb.build().toByteArray());
+        }
+    }
+
+    /**
+     * Called when our star is refreshed/updated. We want to reload the current tab.
+     */
+    @Override
+    public void onStarFetched(Star s) {
+        if (mStar == null || mStar.getKey().equals(s.getKey())) {
+            boolean dataSetChanged = (mStar == null);
+
+            mStar = s;
+            mColonies = new ArrayList<Colony>();
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            for (BaseColony c : mStar.getColonies()) {
+                if (c.getEmpireKey() != null && c.getEmpireKey().equals(myEmpire.getKey())) {
+                    mColonies.add((Colony) c);
+                }
+            }
+            Collections.sort(mColonies, new Comparator<Colony>() {
+                @Override
+                public int compare(Colony lhs, Colony rhs) {
+                    return lhs.getPlanetIndex() - rhs.getPlanetIndex();
+                }
+            });
+
+            if (mInitialColony != null) {
+                int colonyIndex = 0;
+                for (Colony colony : mColonies) {
+                    if (colony.getKey().equals(mInitialColony.getKey())) {
+                        break;
+                    }
+                    colonyIndex ++;
+                }
+
+                mViewPager.setCurrentItem(colonyIndex);
+                mInitialColony = null;
+            }
+
+            if (dataSetChanged) {
+                mColonyPagerAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -173,51 +214,6 @@ public class BuildActivity extends BaseActivity {
             buildQueueDescription.setText("Build queue: idle");
         } else {
             buildQueueDescription.setText(String.format(Locale.ENGLISH, "Build queue: %d", buildQueueLength));
-        }
-    }
-
-    public Object mEventHandler = new Object() {
-        @EventHandler
-        public void onStarUpdated(Star star) {
-            if (mStar == null || mStar.getKey().equals(star.getKey())) {
-                updateStar(star);
-            }
-        }
-    };
-
-    private void updateStar(Star star) {
-        boolean dataSetChanged = (mStar == null);
-
-        mStar = star;
-        mColonies = new ArrayList<Colony>();
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        for (BaseColony c : mStar.getColonies()) {
-            if (c.getEmpireKey() != null && c.getEmpireKey().equals(myEmpire.getKey())) {
-                mColonies.add((Colony) c);
-            }
-        }
-        Collections.sort(mColonies, new Comparator<Colony>() {
-            @Override
-            public int compare(Colony lhs, Colony rhs) {
-                return lhs.getPlanetIndex() - rhs.getPlanetIndex();
-            }
-        });
-
-        if (mInitialColony != null) {
-            int colonyIndex = 0;
-            for (Colony colony : mColonies) {
-                if (colony.getKey().equals(mInitialColony.getKey())) {
-                    break;
-                }
-                colonyIndex ++;
-            }
-
-            mViewPager.setCurrentItem(colonyIndex);
-            mInitialColony = null;
-        }
-
-        if (dataSetChanged) {
-            mColonyPagerAdapter.notifyDataSetChanged();
         }
     }
 

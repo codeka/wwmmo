@@ -13,7 +13,6 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.eventbus.EventHandler;
 
 public class BuildManager {
     private static BuildManager sInstance = new BuildManager();
@@ -27,8 +26,6 @@ public class BuildManager {
     private BuildManager() {
         mBuildingDesignCounts = new TreeMap<String, Integer>();
         mBuildRequests = new ArrayList<BuildRequest>();
-
-        StarManager.eventBus.register(eventHandler);
     }
 
     public void setup(Messages.EmpireBuildingStatistics empire_building_statistics_pb,
@@ -95,6 +92,23 @@ public class BuildManager {
                 }
             }
         }
+    }
+
+    /**
+     * Called when a star is refreshed. We may need to update the build requests on that star.
+     */
+    public void onStarUpdate(Star star) {
+        ArrayList<BuildRequest> newBuildRequests = new ArrayList<BuildRequest>();
+        for (BuildRequest br : mBuildRequests) {
+            if (br.getStarKey().equals(star.getKey())) {
+                continue;
+            }
+            newBuildRequests.add(br);
+        }
+        for (BaseBuildRequest br : star.getBuildRequests()) {
+            newBuildRequests.add((BuildRequest) br);
+        }
+        mBuildRequests = newBuildRequests;
     }
 
     public void build(final Context context, final Colony colony,
@@ -180,21 +194,4 @@ public class BuildManager {
             }
         }.execute();
     }
-
-    private Object eventHandler = new Object() {
-        @EventHandler
-        public void onStarUpdated(Star star) {
-            ArrayList<BuildRequest> newBuildRequests = new ArrayList<BuildRequest>();
-            for (BuildRequest br : mBuildRequests) {
-                if (br.getStarKey().equals(star.getKey())) {
-                    continue;
-                }
-                newBuildRequests.add(br);
-            }
-            for (BaseBuildRequest br : star.getBuildRequests()) {
-                newBuildRequests.add((BuildRequest) br);
-            }
-            mBuildRequests = newBuildRequests;
-        }
-    };
 }
