@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="783"
-    android:versionName="0.4.783"
+    android:versionCode="784"
+    android:versionName="0.4.784"
     android:installLocation="auto"
     android:largeHeap="@bool/largeHeap">
 
