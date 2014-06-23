@@ -45,7 +45,6 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.controlfield.ControlField;
-import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -62,7 +61,8 @@ import au.com.codeka.warworlds.model.StarManager;
  * up their details and so on.
  */
 public class StarfieldSceneManager extends SectorSceneManager
-                                  implements EmpireManager.EmpireFetchedHandler {
+                                  implements StarManager.StarFetchedHandler,
+                                             EmpireManager.EmpireFetchedHandler {
     private static final Log log = new Log("StarfieldSceneManager");
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
     private OnSpaceTapListener mSpaceTapListener;
@@ -169,7 +169,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     protected void onStart() {
         super.onStart();
 
-        StarManager.eventBus.register(mEventHandler);
+        StarManager.getInstance().addStarUpdatedListener(null, this);
         EmpireManager.i.addEmpireUpdatedListener(null, this);
 
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
@@ -186,7 +186,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     protected void onStop() {
         super.onStop();
 
-        StarManager.eventBus.unregister(mEventHandler);
+        StarManager.getInstance().removeStarUpdatedListener(this);
         EmpireManager.i.removeEmpireUpdatedListener(this);
     }
 
@@ -735,24 +735,22 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
     }
 
-    private Object mEventHandler = new Object() {
-        /**
-         * When a star is updated, if it's one of ours, then we'll want to redraw to make sure we
-         * have the latest data (e.g. it might've been renamed)
-         */
-        @EventHandler
-        public void onStarFetched(final Star s) {
-            getActivity().runOnUpdateThread(new Runnable() {
-                @Override
-                public void run() {
-                    StarfieldScene scene = getScene();
-                    if (scene != null) {
-                        scene.onStarFetched(s);
-                    }
+    /**
+     * When a star is updated, if it's one of ours, then we'll want to redraw to make sure we
+     * have the latest data (e.g. it might've been renamed)
+     */
+    @Override
+    public void onStarFetched(final Star s) {
+        getActivity().runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                StarfieldScene scene = getScene();
+                if (scene != null) {
+                    scene.onStarFetched(s);
                 }
-            });
-        }
-    };
+            }
+        });
+    }
 
     /** Represents the PointCloud used by the tactical view. */
     private class TacticalPointCloud extends PointCloud {

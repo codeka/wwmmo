@@ -27,7 +27,6 @@ import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.ctrl.InfobarView;
 import au.com.codeka.warworlds.ctrl.PlanetListSimple;
-import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
@@ -63,6 +62,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
  */
 public class StarfieldActivity extends BaseStarfieldActivity
                                implements StarfieldSceneManager.OnSelectionChangedListener,
+                                          StarManager.StarFetchedHandler,
                                           EmpireShieldManager.ShieldUpdatedHandler {
     private static final Log log = new Log("StarfieldActivity");
     private Context mContext = this;
@@ -283,7 +283,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
     @Override
     public void onStart() {
         super.onStart();
-        StarManager.eventBus.register(mEventHandler);
+        StarManager.getInstance().addStarUpdatedListener(null, this);
         EmpireShieldManager.i.addShieldUpdatedHandler(this);
     }
 
@@ -300,7 +300,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
     @Override
     public void onStop() {
         super.onStop();
-        StarManager.eventBus.unregister(mEventHandler);
+        StarManager.getInstance().removeStarUpdatedListener(this);
         EmpireShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
@@ -699,26 +699,24 @@ public class StarfieldActivity extends BaseStarfieldActivity
         mSelectedFleet = null;
 
         showBottomPane();
-        StarManager.getInstance().requestStar(star.getKey(), true, null);
+        StarManager.getInstance().requestStar(star.getKey(), true, this);
     }
 
-    public Object mEventHandler = new Object() {
-        @EventHandler
-        public void onStarFetched(Star star) {
-            if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
-                // if it's the star we already have selected, then we may as well refresh
-                // whatever we've got.
-                mFetchingStarKey = mSelectedStar.getKey();
-            }
-            if (mFetchingStarKey == null ||
-                !mFetchingStarKey.equals(star.getKey())) {
-                return;
-            }
-
-            mSelectedStar = star;
-            updateStarSelection();
+    @Override
+    public void onStarFetched(Star star) {
+        if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
+            // if it's the star we already have selected, then we may as well refresh
+            // whatever we've got.
+            mFetchingStarKey = mSelectedStar.getKey();
         }
-    };
+        if (mFetchingStarKey == null ||
+            !mFetchingStarKey.equals(star.getKey())) {
+            return;
+        }
+
+        mSelectedStar = star;
+        updateStarSelection();
+    }
 
     private void updateStarSelection() {
         final View selectionLoadingContainer = findViewById(R.id.loading_container);
