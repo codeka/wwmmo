@@ -16,12 +16,11 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.model.Star;
-import au.com.codeka.warworlds.model.StarManager;
 
 /**
  * This activity is displayed when you're actually looking at a solar system (star + planets)
  */
-public class SolarSystemActivity extends BaseActivity implements StarManager.StarFetchedHandler {
+public class SolarSystemActivity extends BaseActivity {
     private ViewPager mViewPager;
     private StarPagerAdapter mStarPagerAdapter;
     private int mInitialStarIndex = -1;
@@ -102,11 +101,6 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     @Override
     public void onDestroy() {
         super.onDestroy();
-        StarManager.getInstance().removeStarUpdatedListener(this);
-    }
-
-    @Override
-    public void onStarFetched(Star star) {
     }
 
     public class StarPagerAdapter extends FragmentStatePagerAdapter {
