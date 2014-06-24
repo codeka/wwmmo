@@ -23,6 +23,7 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
@@ -38,8 +39,7 @@ import au.com.codeka.warworlds.model.StarManager;
  * could also be an ally or faction member).
  */
 public class EnemyPlanetActivity extends BaseActivity
-                                 implements StarManager.StarFetchedHandler,
-                                            EmpireShieldManager.ShieldUpdatedHandler {
+                                 implements EmpireShieldManager.ShieldUpdatedHandler {
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
@@ -87,8 +87,8 @@ public class EnemyPlanetActivity extends BaseActivity
                     startActivity(new Intent(EnemyPlanetActivity.this, WarWorldsActivity.class));
                 } else {
                     String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-                    StarManager.getInstance().requestStar(starKey, false, EnemyPlanetActivity.this);
-                    StarManager.getInstance().addStarUpdatedListener(starKey, EnemyPlanetActivity.this);
+                    StarManager.eventBus.register(mEventHandler);
+                    StarManager.getInstance().requestStar(starKey, false, null);
                 }
             }
         });
@@ -104,43 +104,45 @@ public class EnemyPlanetActivity extends BaseActivity
 
     private Object mEventHandler = new Object() {
         @EventHandler
-        public void onStarFetched() {
-    }
-    @Override
-    public void onStarFetched(Star s) {
-        int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
-
-        mStar = s;
-        mPlanet = (Planet) s.getPlanets()[planetIndex - 1];
-        for (BaseColony colony : s.getColonies()) {
-            if (colony.getPlanetIndex() == planetIndex) {
-                mColony = (Colony) colony;
+        public void onStarFetched(Star s) {
+            if (mStar != null && !mStar.getKey().equals(s.getKey())) {
+                return;
             }
-        }
 
-        final Button attackBtn = (Button) findViewById(R.id.attack_btn);
-        if (mColony != null) {
-            mColonyEmpire = EmpireManager.i.getEmpire(mColony.getEmpireKey());
-            if (mColonyEmpire == null) {
-                attackBtn.setEnabled(false);
-                EmpireManager.i.fetchEmpire(mColony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
-                    @Override
-                    public void onEmpireFetched(Empire empire) {
-                        mColonyEmpire = empire;
-                        attackBtn.setEnabled(true);
-                        refreshEmpireDetails();
-                    }
-                });
+            int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
+
+            mStar = s;
+            mPlanet = (Planet) s.getPlanets()[planetIndex - 1];
+            for (BaseColony colony : s.getColonies()) {
+                if (colony.getPlanetIndex() == planetIndex) {
+                    mColony = (Colony) colony;
+                }
+            }
+
+            final Button attackBtn = (Button) findViewById(R.id.attack_btn);
+            if (mColony != null) {
+                mColonyEmpire = EmpireManager.i.getEmpire(mColony.getEmpireKey());
+                if (mColonyEmpire == null) {
+                    attackBtn.setEnabled(false);
+                    EmpireManager.i.fetchEmpire(mColony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+                        @Override
+                        public void onEmpireFetched(Empire empire) {
+                            mColonyEmpire = empire;
+                            attackBtn.setEnabled(true);
+                            refreshEmpireDetails();
+                        }
+                    });
+                } else {
+                    refreshEmpireDetails();
+                }
             } else {
-                refreshEmpireDetails();
+                attackBtn.setVisibility(View.GONE);
             }
-        } else {
-            attackBtn.setVisibility(View.GONE);
-        }
 
-        PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
-        planetDetails.setup(mStar, mPlanet, mColony);
-    }
+            PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
+            planetDetails.setup(mStar, mPlanet, mColony);
+        }
+    };
 
     private void refreshEmpireDetails() {
         ImageView enemyIcon = (ImageView) findViewById(R.id.enemy_empire_icon);

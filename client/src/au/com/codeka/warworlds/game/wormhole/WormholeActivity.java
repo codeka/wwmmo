@@ -27,6 +27,7 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.ctrl.FleetListWormhole;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
@@ -36,8 +37,7 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
-public class WormholeActivity extends BaseGlActivity
-                              implements StarManager.StarFetchedHandler {
+public class WormholeActivity extends BaseGlActivity {
     private WormholeSceneManager mWormhole;
     private Star mStar;
     private Star mDestStar;
@@ -142,7 +142,7 @@ public class WormholeActivity extends BaseGlActivity
                 Bundle extras = getIntent().getExtras();
                 String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
 
-                StarManager.getInstance().requestStar(starKey, false, WormholeActivity.this);
+                StarManager.getInstance().requestStar(starKey, false, null);
 
                 FleetListWormhole fleetList = (FleetListWormhole) findViewById(R.id.fleet_list);
                 TreeMap<String, Star> stars = new TreeMap<String, Star>();
@@ -152,53 +152,55 @@ public class WormholeActivity extends BaseGlActivity
         });
     }
 
-    @Override
-    public void onStarFetched(Star s) {
-        Bundle extras = getIntent().getExtras();
-        String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onStarFetched(Star s) {
+            Bundle extras = getIntent().getExtras();
+            String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
 
-        TextView starName  = (TextView) findViewById(R.id.star_name);
-        TextView destinationName = (TextView) findViewById(R.id.destination_name);
-        FleetListWormhole fleetList = (FleetListWormhole) findViewById(R.id.fleet_list);
+            TextView starName  = (TextView) findViewById(R.id.star_name);
+            TextView destinationName = (TextView) findViewById(R.id.destination_name);
+            FleetListWormhole fleetList = (FleetListWormhole) findViewById(R.id.fleet_list);
 
-        if (!s.getKey().equals(starKey)) {
-            int starID = Integer.parseInt(s.getKey());
-            if (mStar != null && mStar.getWormholeExtra().getDestWormholeID() == starID) {
-                mDestStar = s;
+            if (!s.getKey().equals(starKey)) {
+                int starID = Integer.parseInt(s.getKey());
+                if (mStar != null && mStar.getWormholeExtra().getDestWormholeID() == starID) {
+                    mDestStar = s;
 
-                BaseStar.WormholeExtra wormholeExtra = mStar.getWormholeExtra();
-                if (wormholeExtra.getTuneCompleteTime() != null &&
-                        wormholeExtra.getTuneCompleteTime().isAfter(DateTime.now())) {
-                    mTuneCompleteTime = wormholeExtra.getTuneCompleteTime();
+                    BaseStar.WormholeExtra wormholeExtra = mStar.getWormholeExtra();
+                    if (wormholeExtra.getTuneCompleteTime() != null &&
+                            wormholeExtra.getTuneCompleteTime().isAfter(DateTime.now())) {
+                        mTuneCompleteTime = wormholeExtra.getTuneCompleteTime();
+                    }
+
+                    String str = String.format(Locale.ENGLISH, "→ %s", s.getName());
+                    if (mTuneCompleteTime != null) {
+                        str = "<font color=\"red\">" + str + "</font>";
+                    } else {
+                        findViewById(R.id.view_destination_btn).setEnabled(true);
+                    }
+                    destinationName.setText(Html.fromHtml(str));
                 }
 
-                String str = String.format(Locale.ENGLISH, "→ %s", s.getName());
-                if (mTuneCompleteTime != null) {
-                    str = "<font color=\"red\">" + str + "</font>";
-                } else {
-                    findViewById(R.id.view_destination_btn).setEnabled(true);
-                }
-                destinationName.setText(Html.fromHtml(str));
+                updateTuningProgress();
+                return;
             }
 
-            updateTuningProgress();
-            return;
-        }
+            mStar = s;
+            fleetList.setWormhole(mStar);
 
-        mStar = s;
-        fleetList.setWormhole(mStar);
+            if (mStar.getWormholeExtra().getDestWormholeID() != 0 && (
+                    mDestStar == null || !mDestStar.getKey().equals(Integer.toString(mStar.getWormholeExtra().getDestWormholeID())))) {
+                StarManager.getInstance().requestStar(Integer.toString(
+                        mStar.getWormholeExtra().getDestWormholeID()), false, null);
+            }
 
-        if (mStar.getWormholeExtra().getDestWormholeID() != 0 && (
-                mDestStar == null || !mDestStar.getKey().equals(Integer.toString(mStar.getWormholeExtra().getDestWormholeID())))) {
-            StarManager.getInstance().requestStar(Integer.toString(
-                    mStar.getWormholeExtra().getDestWormholeID()), false, this);
+            if (destinationName.getText().toString().equals("")) {
+                destinationName.setText(Html.fromHtml("→ <i>None</i>"));
+            }
+            starName.setText(mStar.getName());
         }
-
-        if (destinationName.getText().toString().equals("")) {
-            destinationName.setText(Html.fromHtml("→ <i>None</i>"));
-        }
-        starName.setText(mStar.getName());
-    }
+    };
 
     private void updateTuningProgress() {
         TextView tuningProgress = (TextView) findViewById(R.id.tuning_progress);
@@ -254,7 +256,7 @@ public class WormholeActivity extends BaseGlActivity
         super.onStart();
         mWormhole.onStart();
 
-        StarManager.getInstance().addStarUpdatedListener(null, this);
+        StarManager.eventBus.register(mEventHandler);
     }
 
     @Override
@@ -262,6 +264,6 @@ public class WormholeActivity extends BaseGlActivity
         super.onStop();
         mWormhole.onStop();
 
-        StarManager.getInstance().removeStarUpdatedListener(this);
+        StarManager.eventBus.unregister(mEventHandler);
     }
 }

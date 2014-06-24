@@ -26,6 +26,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.ctrl.SelectionView;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
@@ -44,8 +45,7 @@ import au.com.codeka.warworlds.model.StarSummary;
  * This is a fragment which displays details about a single solar system.
  */
 public class SolarSystemFragment extends Fragment
-                                 implements StarManager.StarFetchedHandler,
-                                            EmpireShieldManager.ShieldUpdatedHandler {
+                                 implements EmpireShieldManager.ShieldUpdatedHandler {
     private static final Log log = new Log("SolarSystemFragment");
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private ProgressBar mProgressBar;
@@ -172,12 +172,12 @@ public class SolarSystemFragment extends Fragment
         Bundle args = getArguments();
         long starID = args.getLong("au.com.codeka.warworlds.StarID");
         String starKey = Long.toString(starID);
-        StarManager.getInstance().addStarUpdatedListener(starKey, this);
+        StarManager.eventBus.register(mEventHandler);
         EmpireShieldManager.i.addShieldUpdatedHandler(this);
 
         // get as much details about the star as we can, until it gets refreshes anyway.
         mStarSummary = StarManager.getInstance().getStarSummaryNoFetch(starKey, Float.MAX_VALUE);
-        StarManager.getInstance().requestStar(starKey, false, this);
+        StarManager.getInstance().requestStar(starKey, false, null);
 
         refreshSelectedPlanet();
 
@@ -210,7 +210,7 @@ public class SolarSystemFragment extends Fragment
     @Override
     public void onStop() {
         super.onStop();
-        StarManager.getInstance().removeStarUpdatedListener(this);
+        StarManager.eventBus.unregister(mEventHandler);
         EmpireShieldManager.i.removeShieldUpdatedHandler(this);
 
         int sdk = android.os.Build.VERSION.SDK_INT;
@@ -226,8 +226,18 @@ public class SolarSystemFragment extends Fragment
         refreshSelectedPlanet();
     }
 
-    @Override
-    public void onStarFetched(Star star) {
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onStarUpdated(Star star) {
+            if (mStar != null && !mStar.getKey().equals(star.getKey())) {
+                return;
+            }
+
+            onStarFetched(star);
+        }
+    };
+
+    private void onStarFetched(Star star) {
         // if we don't have a star yet, we'll need to figure out which planet to select
         // initially from the intent that started us. Otherwise, we'll want to select
         // whatever planet we have currently
