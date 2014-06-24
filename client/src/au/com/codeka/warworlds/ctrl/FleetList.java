@@ -40,6 +40,7 @@ import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.NotesDialog;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
@@ -64,8 +65,7 @@ import au.com.codeka.warworlds.model.StarSummary;
  * them, move them around, etc).
  */
 public class FleetList extends FrameLayout
-                       implements StarManager.StarFetchedHandler,
-                                  EmpireShieldManager.ShieldUpdatedHandler {
+                       implements EmpireShieldManager.ShieldUpdatedHandler {
     private FleetListAdapter mFleetListAdapter;
     protected Fleet mSelectedFleet;
     private List<Fleet> mFleets;
@@ -324,7 +324,7 @@ public class FleetList extends FrameLayout
         onInitialize();
 
         EmpireShieldManager.i.addShieldUpdatedHandler(this);
-        StarManager.getInstance().addStarUpdatedListener(null, this);
+        StarManager.eventBus.register(mEventHandler);
         StarImageManager.getInstance().addSpriteGeneratedListener(mFleetListAdapter);
     }
 
@@ -334,37 +334,36 @@ public class FleetList extends FrameLayout
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        StarManager.getInstance().removeStarUpdatedListener(this);
+        StarManager.eventBus.unregister(mEventHandler);
         EmpireShieldManager.i.removeShieldUpdatedHandler(this);
         StarImageManager.getInstance().removeSpriteGeneratedListener(mFleetListAdapter);
     }
 
-    /**
-     * When a star is updated, we may need to refresh the list.
-     */
-    @Override
-    public void onStarFetched(Star s) {
-        for (String starKey : mStars.keySet()) {
-            if (starKey.equals(s.getKey())) {
-                mStars.put(s.getKey(), s);
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onStarUpdated(Star s) {
+            for (String starKey : mStars.keySet()) {
+                if (starKey.equals(s.getKey())) {
+                    mStars.put(s.getKey(), s);
 
-                Iterator<Fleet> it = mFleets.iterator();
-                while (it.hasNext()) {
-                    Fleet f = it.next();
-                    if (f.getStarKey().equals(starKey)) {
-                        it.remove();
+                    Iterator<Fleet> it = mFleets.iterator();
+                    while (it.hasNext()) {
+                        Fleet f = it.next();
+                        if (f.getStarKey().equals(starKey)) {
+                            it.remove();
+                        }
                     }
-                }
 
-                for (int j = 0; j < s.getFleets().size(); j++) {
-                    mFleets.add((Fleet) s.getFleets().get(j));
-                }
+                    for (int j = 0; j < s.getFleets().size(); j++) {
+                        mFleets.add((Fleet) s.getFleets().get(j));
+                    }
 
-                refresh(null, mStars);
-                break;
+                    refresh(null, mStars);
+                    break;
+                }
             }
         }
-    }
+    };
 
     /** If an empire's shield is updated, we'll want to refresh the list. */
     @Override

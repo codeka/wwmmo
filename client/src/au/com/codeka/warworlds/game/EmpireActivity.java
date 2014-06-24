@@ -40,6 +40,7 @@ import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.Util;

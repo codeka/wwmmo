@@ -247,7 +247,7 @@ public class MyEmpire extends Empire {
             protected void onComplete(List<Star> stars) {
                 if (stars != null) {
                     for (Star star : stars) {
-                        StarManager.getInstance().fireStarUpdated(star);
+                        StarManager.eventBus.publish(star);
                     }
                 }
 
