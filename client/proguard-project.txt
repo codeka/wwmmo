@@ -18,6 +18,11 @@
 # We need to keep all the protobuf stuff, or it craps out
 -keep public class * extends com.google.protobuf.GeneratedMessage { *; }
 
+# We need to keep methods annotated with @EventHandler, so that event handlers work.
+-keep class * {
+  @au.com.codeka.warworlds.eventbus.EventHandler *;
+}
+
 # This references lots of classes for some reason.
 -dontwarn org.apache.commons.collections.BeanMap
 
