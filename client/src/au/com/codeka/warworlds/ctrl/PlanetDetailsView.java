@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ImageManager;
@@ -51,15 +52,16 @@ public class PlanetDetailsView extends FrameLayout {
             return;
         }
 
-        PlanetImageManager.getInstance().addSpriteGeneratedListener(mPlanetSpriteGeneratedListener);
+        ImageManager.eventBus.register(mEventHandler);
         refresh();
     }
 
     @Override
     public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         mIsAttachedToWindow = false;
 
-        PlanetImageManager.getInstance().removeSpriteGeneratedListener(mPlanetSpriteGeneratedListener);
+        ImageManager.eventBus.unregister(mEventHandler);
     }
 
     private void refresh() {
@@ -112,9 +114,9 @@ public class PlanetDetailsView extends FrameLayout {
         }
     }
 
-    private ImageManager.SpriteGeneratedListener mPlanetSpriteGeneratedListener = new ImageManager.SpriteGeneratedListener() {
-        @Override
-        public void onSpriteGenerated(String key, Sprite sprite) {
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onSpriteGenerated(ImageManager.SpriteGeneratedEvent event) {
             refresh();
         }
     };

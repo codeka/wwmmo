@@ -94,8 +94,7 @@ public class ColonyList extends FrameLayout {
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        StarImageManager.getInstance().addSpriteGeneratedListener(mSpriteGeneratedListener);
-        PlanetImageManager.getInstance().addSpriteGeneratedListener(mSpriteGeneratedListener);
+        ImageManager.eventBus.register(mEventHandler);
         StarManager.eventBus.register(mEventHandler);
     }
 
@@ -103,17 +102,9 @@ public class ColonyList extends FrameLayout {
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        StarImageManager.getInstance().removeSpriteGeneratedListener(mSpriteGeneratedListener);
-        PlanetImageManager.getInstance().removeSpriteGeneratedListener(mSpriteGeneratedListener);
+        ImageManager.eventBus.unregister(mEventHandler);
         StarManager.eventBus.unregister(mEventHandler);
     }
-
-    private ImageManager.SpriteGeneratedListener mSpriteGeneratedListener = new ImageManager.SpriteGeneratedListener() {
-        @Override
-        public void onSpriteGenerated(String key, Sprite sprite) {
-            mColonyListAdapter.notifyDataSetChanged();
-        }
-    };
 
     private void initialize() {
         if (mIsInitialized) {
@@ -285,6 +276,11 @@ public class ColonyList extends FrameLayout {
             // if a star is updated, we'll want to refresh our colony list because the
             // colony inside it might've changed too...
             mColonyListAdapter.onStarUpdated(star);
+        }
+
+        @EventHandler
+        public void onSpriteGenerated(ImageManager.SpriteGeneratedEvent event) {
+            mColonyListAdapter.notifyDataSetChanged();
         }
     };
 

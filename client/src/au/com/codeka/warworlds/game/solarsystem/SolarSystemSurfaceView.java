@@ -25,6 +25,7 @@ import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.warworlds.ctrl.SelectionView;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Building;
@@ -55,7 +56,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
     private SelectionView mSelectionView;
     private CopyOnWriteArrayList<OnPlanetSelectedListener> mPlanetSelectedListeners;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
-    private ImageManager.SpriteGeneratedListener mSpriteGeneratedListener;
     private Matrix mMatrix;
 
     private Comparator<Building> mBuildingDesignComparator = new Comparator<Building>() {
@@ -78,10 +78,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
         mPlanetPaint.setARGB(255, 255, 255, 255);
         mPlanetPaint.setStyle(Style.STROKE);
         mMatrix = new Matrix();
-
-        mSpriteGeneratedListener = new SpriteGeneratedListener();
-        PlanetImageManager.getInstance().addSpriteGeneratedListener(mSpriteGeneratedListener);
-        StarImageManager.getInstance().addSpriteGeneratedListener(mSpriteGeneratedListener);
     }
 
     public void setSelectionView(SelectionView selectionView) {
@@ -240,13 +236,14 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         EmpireShieldManager.i.addShieldUpdatedHandler(this);
+        ImageManager.eventBus.register(mEventHandler);
     }
 
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        PlanetImageManager.getInstance().removeSpriteGeneratedListener(mSpriteGeneratedListener);
+        ImageManager.eventBus.unregister(mEventHandler);
         if (mBackgroundRenderer != null) {
             mBackgroundRenderer.close();
             mBackgroundRenderer = null;
@@ -380,6 +377,13 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
         }
     }
 
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onSpriteGenerated(ImageManager.SpriteGeneratedEvent event) {
+            redraw();
+        }
+    };
+
     /**
      * Implements the \c OnGestureListener methods that we use to respond to
      * various touch events.
@@ -434,17 +438,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
         public float distanceFromSun;
         public Colony colony;
         public ArrayList<Building> buildings;
-    }
-
-    /**
-     * Our implementation of \c PlanetImageManager.BitmapGeneratedListener just causes us to
-     * redraw the screen (with the new bitmap).
-     */
-    private class SpriteGeneratedListener implements ImageManager.SpriteGeneratedListener {
-        @Override
-        public void onSpriteGenerated(String planetKey, Sprite sprite) {
-            redraw();
-        }
     }
 
     /**

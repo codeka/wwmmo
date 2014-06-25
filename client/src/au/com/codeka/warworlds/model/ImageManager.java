@@ -5,9 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
@@ -15,7 +13,6 @@ import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import android.graphics.Bitmap;
-import android.os.Handler;
 import au.com.codeka.common.Colour;
 import au.com.codeka.common.Image;
 import au.com.codeka.common.Log;
@@ -25,6 +22,7 @@ import au.com.codeka.planetrender.Template;
 import au.com.codeka.planetrender.TemplateException;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.GlobalOptions;
+import au.com.codeka.warworlds.eventbus.EventBus;
 
 /**
  * This is the base class for the \c StarImageManagaer and \c PlanetImageManager.
@@ -34,12 +32,11 @@ public abstract class ImageManager {
 
     private static final int MAX_GENERATE_QUEUE_SIZE = 50;
 
+    public static EventBus eventBus = new EventBus();
+
     private Queue<QueuedGenerate> mGenerateQueue =
             new ArrayBlockingQueue<QueuedGenerate>(MAX_GENERATE_QUEUE_SIZE);
     private Thread mGenerateThread;
-    private Handler mHandler = new Handler();
-    private List<SpriteGeneratedListener> mSpriteGeneratedListeners =
-            new ArrayList<SpriteGeneratedListener>();
     private Map<String, Template> mTemplates = new HashMap<String, Template>();
     private Map<String, String[]> mFileLists = new HashMap<String, String[]>();
     private double mPixelScale;
@@ -103,29 +100,6 @@ public abstract class ImageManager {
 
     public void clearCaches() {
         mTemplates.clear();
-    }
-
-    public void addSpriteGeneratedListener(SpriteGeneratedListener listener) {
-        mSpriteGeneratedListeners.add(listener);
-    }
-
-    public void removeSpriteGeneratedListener(SpriteGeneratedListener listener) {
-        mSpriteGeneratedListeners.remove(listener);
-    }
-
-    protected void fireSpriteGeneratedListeners(final String key, final Sprite sprite) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                // make a copy, because sometimes they'll remove themselves in their own callback
-                ArrayList<SpriteGeneratedListener> listeners =
-                        new ArrayList<SpriteGeneratedListener>(mSpriteGeneratedListeners);
-
-                for (SpriteGeneratedListener listener : listeners) {
-                    listener.onSpriteGenerated(key, sprite);
-                }
-            }
-        });
     }
 
     /**
@@ -272,7 +246,7 @@ public abstract class ImageManager {
         bmp.recycle();
 
         Sprite sprite = SpriteManager.i.getSimpleSprite(outputFile.getAbsolutePath(), false);
-        fireSpriteGeneratedListeners(item.key, sprite);
+        eventBus.publish(new SpriteGeneratedEvent(item.key, sprite));
         return true;
     }
 
@@ -368,10 +342,13 @@ public abstract class ImageManager {
         }
     }
 
-    public interface SpriteGeneratedListener {
-        /**
-         * This is called when the bitmap for the given planet/star has been generated.
-         */
-        void onSpriteGenerated(String key, Sprite sprite);
+    public static class SpriteGeneratedEvent {
+        public String key;
+        public Sprite sprite;
+
+        public SpriteGeneratedEvent(String key, Sprite sprite) {
+            this.key = key;
+            this.sprite = sprite;
+        }
     }
 }

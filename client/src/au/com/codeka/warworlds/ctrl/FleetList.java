@@ -325,7 +325,7 @@ public class FleetList extends FrameLayout
 
         EmpireShieldManager.i.addShieldUpdatedHandler(this);
         StarManager.eventBus.register(mEventHandler);
-        StarImageManager.getInstance().addSpriteGeneratedListener(mFleetListAdapter);
+        ImageManager.eventBus.register(mEventHandler);
     }
 
     protected void onInitialize() {
@@ -336,7 +336,7 @@ public class FleetList extends FrameLayout
         super.onDetachedFromWindow();
         StarManager.eventBus.unregister(mEventHandler);
         EmpireShieldManager.i.removeShieldUpdatedHandler(this);
-        StarImageManager.getInstance().removeSpriteGeneratedListener(mFleetListAdapter);
+        ImageManager.eventBus.unregister(mEventHandler);
     }
 
     private Object mEventHandler = new Object() {
@@ -362,6 +362,11 @@ public class FleetList extends FrameLayout
                     break;
                 }
             }
+        }
+
+        @EventHandler
+        public void onSpriteGenerated(ImageManager.SpriteGeneratedEvent event) {
+            mFleetListAdapter.notifyDataSetChanged();
         }
     };
 
@@ -610,8 +615,7 @@ public class FleetList extends FrameLayout
     /**
      * This adapter is used to populate the list of ship fleets that the current colony has.
      */
-    private class FleetListAdapter extends BaseAdapter 
-            implements ImageManager.SpriteGeneratedListener {
+    private class FleetListAdapter extends BaseAdapter {
         private ArrayList<Fleet> mFleets;
         private Map<String, Star> mStars;
         private ArrayList<ItemEntry> mEntries;
@@ -622,11 +626,6 @@ public class FleetList extends FrameLayout
 
         public FleetListAdapter() {
             mMyEmpire = EmpireManager.i.getEmpire();
-        }
-
-        @Override
-        public void onSpriteGenerated(String key, Sprite sprite) {
-            notifyDataSetChanged();
         }
 
         /**
