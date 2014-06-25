@@ -290,6 +290,25 @@ div.input-button.disabled input {
 }
 
 /*
+ * Code for making videos fill the width of the screen, especially useful on mobile.
+ */
+div.video {
+  position: relative;
+  padding-bottom: 56.25%;
+  padding-top: 30px;
+  height: 0;
+  overflow: hidden;
+}
+ 
+div.video iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/*
  * autocomplete
  */
 .acResults {
