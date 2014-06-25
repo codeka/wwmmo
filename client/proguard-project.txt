@@ -19,8 +19,8 @@
 -keep public class * extends com.google.protobuf.GeneratedMessage { *; }
 
 # We need to keep methods annotated with @EventHandler, so that event handlers work.
--keep class * {
-  @au.com.codeka.warworlds.eventbus.EventHandler *;
+-keepclasseswithmembers class * {
+  @au.com.codeka.warworlds.eventbus.EventHandler <methods>;
 }
 
 # This references lots of classes for some reason.
