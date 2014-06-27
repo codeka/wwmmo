@@ -47,6 +47,7 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.Util;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.ChatConversation;
@@ -55,6 +56,7 @@ import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
+import au.com.codeka.warworlds.model.ShieldManager;
 
 public class ChatActivity extends BaseActivity
                           implements ChatManager.ConversationsRefreshListener {
@@ -245,8 +247,7 @@ public class ChatActivity extends BaseActivity
 
     public static class ChatFragment extends Fragment
                                      implements ChatManager.MessageAddedListener,
-                                                ChatManager.MessageUpdatedListener,
-                                                AllianceShieldManager.ShieldUpdatedHandler {
+                                                ChatManager.MessageUpdatedListener {
         private ChatConversation mConversation;
         private ChatAdapter mChatAdapter;
         private Handler mHandler;
@@ -339,7 +340,7 @@ public class ChatActivity extends BaseActivity
             mConversation.addMessageUpdatedListener(this);
             refreshMessages();
             if (mConversation.getID() < 0) {
-                AllianceShieldManager.i.addShieldUpdatedHandler(this);
+                ShieldManager.eventBus.register(mEventHandler);
             }
         }
 
@@ -347,7 +348,7 @@ public class ChatActivity extends BaseActivity
         public void onStop() {
             super.onStop();
             if (mConversation.getID() < 0) {
-                AllianceShieldManager.i.removeShieldUpdatedHandler(this);
+                ShieldManager.eventBus.unregister(mEventHandler);
             }
             mConversation.removeMessageAddedListener(this);
             mConversation.removeMessageUpdatedListener(this);
@@ -401,12 +402,14 @@ public class ChatActivity extends BaseActivity
             mChatAdapter.appendMessage(msg);
         }
 
-        @Override
-        public void onShieldUpdated(int id) {
-            if (mConversation.getID() < 0) {
-                setupAllianceChatHeader(mHeaderContent);
+        private Object mEventHandler = new Object() {
+            @EventHandler
+            public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+                if (mConversation.getID() < 0) {
+                    setupAllianceChatHeader(mHeaderContent);
+                }
             }
-        }
+        };
 
         private class ChatAdapter extends BaseAdapter {
             private ArrayList<ItemEntry> mEntries;

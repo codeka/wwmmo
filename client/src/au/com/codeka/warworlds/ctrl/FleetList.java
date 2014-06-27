@@ -52,6 +52,7 @@ import au.com.codeka.warworlds.model.FleetUpgrade.BoostFleetUpgrade;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SectorManager;
+import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
@@ -64,8 +65,7 @@ import au.com.codeka.warworlds.model.StarSummary;
  * This control displays a list of fleets along with controls you can use to manage them (split
  * them, move them around, etc).
  */
-public class FleetList extends FrameLayout
-                       implements EmpireShieldManager.ShieldUpdatedHandler {
+public class FleetList extends FrameLayout {
     private FleetListAdapter mFleetListAdapter;
     protected Fleet mSelectedFleet;
     private List<Fleet> mFleets;
@@ -323,9 +323,9 @@ public class FleetList extends FrameLayout
 
         onInitialize();
 
-        EmpireShieldManager.i.addShieldUpdatedHandler(this);
         StarManager.eventBus.register(mEventHandler);
         ImageManager.eventBus.register(mEventHandler);
+        ShieldManager.eventBus.register(mEventHandler);
     }
 
     protected void onInitialize() {
@@ -334,9 +334,9 @@ public class FleetList extends FrameLayout
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        StarManager.eventBus.unregister(mEventHandler);
-        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
         ImageManager.eventBus.unregister(mEventHandler);
+        StarManager.eventBus.unregister(mEventHandler);
     }
 
     private Object mEventHandler = new Object() {
@@ -368,13 +368,12 @@ public class FleetList extends FrameLayout
         public void onSpriteGenerated(ImageManager.SpriteGeneratedEvent event) {
             mFleetListAdapter.notifyDataSetChanged();
         }
-    };
 
-    /** If an empire's shield is updated, we'll want to refresh the list. */
-    @Override
-    public void onShieldUpdated(int empireID) {
-        mFleetListAdapter.notifyDataSetChanged();
-    }
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            mFleetListAdapter.notifyDataSetChanged();
+        }
+    };
 
     /**
      * Populates a solarsystem_fleet_row.xml view with details from the given fleet.

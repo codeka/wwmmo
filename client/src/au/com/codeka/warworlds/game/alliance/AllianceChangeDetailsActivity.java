@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
@@ -27,8 +28,7 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
-public class AllianceChangeDetailsActivity extends BaseActivity
-                                           implements ShieldManager.ShieldUpdatedHandler {
+public class AllianceChangeDetailsActivity extends BaseActivity {
     private ImagePickerHelper mImagePickerHelper = new ImagePickerHelper(this);
 
     @Override
@@ -89,13 +89,13 @@ public class AllianceChangeDetailsActivity extends BaseActivity
     @Override
     public void onStart() {
         super.onStart();
-        AllianceShieldManager.i.addShieldUpdatedHandler(this);
+        ShieldManager.eventBus.register(mEventHandler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        AllianceShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
     }
 
     private void fullRefresh() {
@@ -123,11 +123,6 @@ public class AllianceChangeDetailsActivity extends BaseActivity
         allianceIcon.setImageBitmap(shield);
 
         loadImage();
-    }
-
-    @Override
-    public void onShieldUpdated(int id) {
-        fullRefresh();
     }
 
     private void onChangeNameClick() {
@@ -179,4 +174,11 @@ public class AllianceChangeDetailsActivity extends BaseActivity
         // and now we can enable the 'Change' button
         ((Button) findViewById(R.id.change_image_btn)).setEnabled(true);;        
     }
+
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            fullRefresh();
+        }
+    };
 }

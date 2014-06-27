@@ -52,7 +52,7 @@ public class AllianceShieldManager extends ShieldManager {
     private ShieldInfo getShieldInfo(Alliance alliance) {
         int id = alliance.getID();
         Long lastUpdate = alliance.getDateImageUpdated() == null ? null : alliance.getDateImageUpdated().getMillis();
-        return new ShieldInfo("alliance", id, lastUpdate);
+        return new ShieldInfo(ShieldManager.AllianceShield, id, lastUpdate);
     }
 
     private void ensureDefaultImage(Context context) {

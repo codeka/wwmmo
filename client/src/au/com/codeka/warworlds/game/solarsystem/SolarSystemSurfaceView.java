@@ -37,6 +37,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
+import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
@@ -46,8 +47,7 @@ import au.com.codeka.warworlds.model.StarImageManager;
  * \c SurfaceView that displays a solar system. Star in the top-left, planets arrayed around,
  * and representations of the fleets, etc.
  */
-public class SolarSystemSurfaceView extends UniverseElementSurfaceView
-                                    implements EmpireShieldManager.ShieldUpdatedHandler {
+public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private Context mContext;
     private Star mStar;
     private PlanetInfo[] mPlanetInfos;
@@ -235,7 +235,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        EmpireShieldManager.i.addShieldUpdatedHandler(this);
+        ShieldManager.eventBus.register(mEventHandler);
         ImageManager.eventBus.register(mEventHandler);
     }
 
@@ -248,7 +248,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
             mBackgroundRenderer.close();
             mBackgroundRenderer = null;
         }
-        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
     }
 
     @Override
@@ -258,12 +258,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
             return;
         }
         placePlanets();
-    }
-
-    /** Called when an empire's shield is updated, we'll have to refresh the view. */
-    @Override
-    public void onShieldUpdated(int empireID) {
-        invalidate();
     }
 
     /**
@@ -381,6 +375,11 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
         @EventHandler
         public void onSpriteGenerated(ImageManager.SpriteGeneratedEvent event) {
             redraw();
+        }
+
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            invalidate();
         }
     };
 

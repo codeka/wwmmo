@@ -25,6 +25,7 @@ import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabManager;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.EnemyEmpireActivity;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
@@ -40,7 +41,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 public class AllianceDetailsFragment extends Fragment
                                      implements AllianceManager.AllianceUpdatedHandler,
                                                 EmpireManager.EmpireFetchedHandler,
-                                                ShieldManager.ShieldUpdatedHandler,
                                                 TabManager.Reloadable {
     private Handler mHandler;
     private Activity mActivity;
@@ -105,8 +105,7 @@ public class AllianceDetailsFragment extends Fragment
         super.onStart();
         AllianceManager.i.addAllianceUpdatedHandler(this);
         EmpireManager.i.addEmpireUpdatedListener(null, this);
-        AllianceShieldManager.i.addShieldUpdatedHandler(this);
-        EmpireShieldManager.i.addShieldUpdatedHandler(this);
+        ShieldManager.eventBus.register(mEventHandler);
     }
 
     @Override
@@ -114,8 +113,7 @@ public class AllianceDetailsFragment extends Fragment
         super.onStop();
         AllianceManager.i.removeAllianceUpdatedHandler(this);
         EmpireManager.i.removeEmpireUpdatedListener(this);
-        AllianceShieldManager.i.removeShieldUpdatedHandler(this);
-        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
     }
 
     @Override
@@ -134,11 +132,12 @@ public class AllianceDetailsFragment extends Fragment
         }
     }
 
-    /** Called when an empire's shield is updated, we'll have to refresh the list. */
-    @Override
-    public void onShieldUpdated(int empireID) {
-        refreshAlliance();
-    }
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            refreshAlliance();
+        }
+    };
 
     @Override
     public void reloadTab() {

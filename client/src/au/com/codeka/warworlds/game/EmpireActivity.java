@@ -48,6 +48,7 @@ import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.EmpireRankList;
 import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.build.BuildAccelerateDialog;
 import au.com.codeka.warworlds.game.build.BuildStopConfirmDialog;
 import au.com.codeka.warworlds.model.Alliance;
@@ -62,6 +63,7 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.FleetManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.PurchaseManager;
+import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.billing.IabException;
@@ -198,39 +200,37 @@ public class EmpireActivity extends TabFragmentActivity
         }
     }
 
-    public static class OverviewFragment extends BaseFragment
-                                         implements EmpireShieldManager.ShieldUpdatedHandler {
+    public static class OverviewFragment extends BaseFragment {
         private View mView;
         private EmpireRankList mEmpireList;
 
         @Override
         public void onStart() {
             super.onStart();
-            EmpireShieldManager.i.addShieldUpdatedHandler(this);
-            AllianceShieldManager.i.addShieldUpdatedHandler(this);
+            ShieldManager.eventBus.register(mEventHandler);
         }
 
         @Override
         public void onStop() {
             super.onStop();
-            EmpireShieldManager.i.removeShieldUpdatedHandler(this);
-            AllianceShieldManager.i.removeShieldUpdatedHandler(this);
+            ShieldManager.eventBus.unregister(mEventHandler);
         }
 
-        /** Called when an empire's shield is updated, we'll have to refresh the list. */
-        @Override
-        public void onShieldUpdated(int id) {
-            MyEmpire empire = EmpireManager.i.getEmpire();
+        private Object mEventHandler = new Object() {
+            @EventHandler
+            public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+                MyEmpire empire = EmpireManager.i.getEmpire();
 
-            ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
-            empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
+                ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
+                empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
 
-            ImageView allianceIcon = (ImageView) mView.findViewById(R.id.alliance_icon);
-            if (empire.getAlliance() != null) {
-                allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(getActivity(),
-                        (Alliance) empire.getAlliance()));
+                ImageView allianceIcon = (ImageView) mView.findViewById(R.id.alliance_icon);
+                if (empire.getAlliance() != null) {
+                    allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(getActivity(),
+                            (Alliance) empire.getAlliance()));
+                }
             }
-        }
+        };
 
         @Override
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
@@ -501,8 +501,7 @@ public class EmpireActivity extends TabFragmentActivity
         }
     }
 
-    public static class SettingsFragment extends BaseFragment
-                                         implements EmpireShieldManager.ShieldUpdatedHandler {
+    public static class SettingsFragment extends BaseFragment {
         private View mView;
         private ImagePickerHelper mImagePickerHelper;
 
@@ -510,28 +509,38 @@ public class EmpireActivity extends TabFragmentActivity
         public void onStart() {
             super.onStart();
             mImagePickerHelper = ((EmpireActivity) getActivity()).mImagePickerHelper;
-            EmpireShieldManager.i.addShieldUpdatedHandler(this);
+            ShieldManager.eventBus.register(mEventHandler);
         }
 
         @Override
         public void onStop() {
             super.onStop();
-            EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+            ShieldManager.eventBus.unregister(mEventHandler);
         }
 
         /** Called when an empire's shield is updated, we'll have to refresh the list. */
-        @Override
-        public void onShieldUpdated(int empireID) {
-            MyEmpire empire = EmpireManager.i.getEmpire();
-            if (Integer.parseInt(empire.getKey()) == empireID) {
-                ImageView currentShield = (ImageView) mView.findViewById(R.id.current_shield);
-                currentShield.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), EmpireManager.i.getEmpire()));
-                ImageView currentShieldSmall = (ImageView) mView.findViewById(R.id.current_shield_small);
-                currentShieldSmall.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), EmpireManager.i.getEmpire()));
-            }
-        }
+        private Object mEventHandler = new Object() {
+            @EventHandler
+            public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+                if (!event.kind.equals(ShieldManager.EmpireShield)) {
+                    return;
+                }
 
-        public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
+                MyEmpire empire = EmpireManager.i.getEmpire();
+                if (Integer.parseInt(empire.getKey()) == event.id) {
+                    ImageView currentShield = (ImageView) mView.findViewById(R.id.current_shield);
+                    currentShield.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(),
+                            EmpireManager.i.getEmpire()));
+                    ImageView currentShieldSmall = (ImageView) mView.findViewById(
+                            R.id.current_shield_small);
+                    currentShieldSmall.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(),
+                            EmpireManager.i.getEmpire()));
+                }
+            }
+        };
+
+        public View onCreateView(LayoutInflater inflator, ViewGroup container,
+                Bundle savedInstanceState) {
             if (sCurrentEmpire == null) {
                 return getLoadingView(inflator);
             }

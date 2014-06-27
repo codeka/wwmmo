@@ -31,6 +31,7 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -38,8 +39,7 @@ import au.com.codeka.warworlds.model.StarManager;
  * Activity for interacting with enemy planets (note it's not nessecarily an enemy, per se, it
  * could also be an ally or faction member).
  */
-public class EnemyPlanetActivity extends BaseActivity
-                                 implements EmpireShieldManager.ShieldUpdatedHandler {
+public class EnemyPlanetActivity extends BaseActivity {
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
@@ -67,13 +67,13 @@ public class EnemyPlanetActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
-        EmpireShieldManager.i.addShieldUpdatedHandler(this);
+        ShieldManager.eventBus.register(mEventHandler);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
     }
 
     @Override
@@ -92,14 +92,6 @@ public class EnemyPlanetActivity extends BaseActivity
                 }
             }
         });
-    }
-
-    /** Called when an empire's shield is updated, we'll have to refresh the list. */
-    @Override
-    public void onShieldUpdated(int empireID) {
-        if (mColonyEmpire != null && Integer.parseInt(mColonyEmpire.getKey()) == empireID) {
-            refreshEmpireDetails();
-        }
     }
 
     private Object mEventHandler = new Object() {
@@ -141,6 +133,15 @@ public class EnemyPlanetActivity extends BaseActivity
 
             PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
             planetDetails.setup(mStar, mPlanet, mColony);
+        }
+
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            if (mColonyEmpire != null
+                    && event.kind.equals(ShieldManager.EmpireShield)
+                    && Integer.parseInt(mColonyEmpire.getKey()) == event.id) {
+                refreshEmpireDetails();
+            }
         }
     };
 

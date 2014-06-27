@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.Empire;
@@ -28,8 +29,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
-public class EmpireRankList extends ListView
-                            implements ShieldManager.ShieldUpdatedHandler {
+public class EmpireRankList extends ListView {
     private RankListAdapter mRankListAdapter;
     private Context mContext;
 
@@ -50,8 +50,7 @@ public class EmpireRankList extends ListView
         if (isInEditMode()) {
             return;
         }
-        EmpireShieldManager.i.addShieldUpdatedHandler(this);
-        AllianceShieldManager.i.addShieldUpdatedHandler(this);
+        ShieldManager.eventBus.register(mEventHandler);
     }
 
     @Override
@@ -60,8 +59,7 @@ public class EmpireRankList extends ListView
         if (isInEditMode()) {
             return;
         }
-        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
-        AllianceShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
     }
 
     public void setEmpires(List<Empire> empires, boolean addGaps) {
@@ -80,11 +78,12 @@ public class EmpireRankList extends ListView
         return null;
     }
 
-    /** Called when an empire's shield is updated, we'll have to refresh the list. */
-    @Override
-    public void onShieldUpdated(int empireID) {
-        mRankListAdapter.notifyDataSetChanged();
-    }
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            mRankListAdapter.notifyDataSetChanged();
+        }
+    };
 
     private class RankListAdapter extends BaseAdapter {
         private ArrayList<ItemEntry> mEntries;

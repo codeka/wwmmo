@@ -35,15 +35,17 @@ import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.ShieldManager;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
  */
-public class WarWorldsActivity extends BaseActivity implements EmpireShieldManager.ShieldUpdatedHandler {
+public class WarWorldsActivity extends BaseActivity {
     private static final Log log = new Log("WarWorldsActivity");
     private Context mContext = this;
     private Button mStartGameButton;
@@ -152,6 +154,8 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
         mHelloWatcher = new HelloWatcher();
         ServerGreeter.addHelloWatcher(mHelloWatcher);
 
+        ShieldManager.eventBus.register(mEventHandler);
+
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeter.ServerGreeting greeting) {
@@ -247,20 +251,23 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
     }
 
     @Override
-    public void onShieldUpdated(int empireID) {
-        // if it's the same as our empire, we'll need to update the icon we're currently showing.
-        MyEmpire empire = EmpireManager.i.getEmpire();
-        if (empireID == Integer.parseInt(empire.getKey())) {
-            ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
-            empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
-        }
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         ServerGreeter.removeHelloWatcher(mHelloWatcher);
+        ShieldManager.eventBus.unregister(mEventHandler);
     }
+
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            // if it's the same as our empire, we'll need to update the icon we're currently showing.
+            MyEmpire empire = EmpireManager.i.getEmpire();
+            if (event.id == Integer.parseInt(empire.getKey())) {
+                ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
+                empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
+            }
+        }
+    };
 
     private class HelloWatcher implements ServerGreeter.HelloWatcher {
         private int mNumRetries = 0;

@@ -43,6 +43,7 @@ import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
+import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
@@ -62,8 +63,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * starfield where you scroll around and interact with stars, etc.
  */
 public class StarfieldActivity extends BaseStarfieldActivity
-                               implements StarfieldSceneManager.OnSelectionChangedListener,
-                                          EmpireShieldManager.ShieldUpdatedHandler {
+                               implements StarfieldSceneManager.OnSelectionChangedListener {
     private static final Log log = new Log("StarfieldActivity");
     private Context mContext = this;
     private PlanetListSimple mPlanetList;
@@ -284,7 +284,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
     public void onStart() {
         super.onStart();
         StarManager.eventBus.register(mEventHandler);
-        EmpireShieldManager.i.addShieldUpdatedHandler(this);
+        ShieldManager.eventBus.register(mEventHandler);
     }
 
     @Override
@@ -301,7 +301,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
     public void onStop() {
         super.onStop();
         StarManager.eventBus.unregister(mEventHandler);
-        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
     }
 
     @Override
@@ -317,17 +317,6 @@ public class StarfieldActivity extends BaseStarfieldActivity
             Messages.Fleet.Builder fleet_pb = Messages.Fleet.newBuilder();
             mSelectedFleet.toProtocolBuffer(fleet_pb);
             state.putByteArray("au.com.codeka.warworlds.SelectedFleet", fleet_pb.build().toByteArray());
-        }
-    }
-
-    /** Called when an empire's shield is updated, we'll have to refresh the list. */
-    @Override
-    public void onShieldUpdated(int empireID) {
-        EmpireShieldManager.i.clearTextureCache();
-
-        if (mSelectedFleet != null) {
-            // this will cause the selected fleet info to redraw and hence the shield
-            onFleetSelected(mSelectedFleet);
         }
     }
 
@@ -717,6 +706,16 @@ public class StarfieldActivity extends BaseStarfieldActivity
 
             mSelectedStar = star;
             updateStarSelection();
+        }
+
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            EmpireShieldManager.i.clearTextureCache();
+
+            if (mSelectedFleet != null) {
+                // this will cause the selected fleet info to redraw and hence the shield
+                onFleetSelected(mSelectedFleet);
+            }
         }
     };
 

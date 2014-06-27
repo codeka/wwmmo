@@ -33,6 +33,7 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.AllianceRequest;
@@ -105,8 +106,7 @@ public class AllianceActivity extends TabFragmentActivity
     }
 
     public static class AllianceListFragment extends BaseFragment
-                                             implements AllianceManager.AllianceUpdatedHandler,
-                                                        ShieldManager.ShieldUpdatedHandler {
+                                             implements AllianceManager.AllianceUpdatedHandler {
         private View mView;
         private RankListAdapter mRankListAdapter;
 
@@ -150,14 +150,14 @@ public class AllianceActivity extends TabFragmentActivity
         public void onAttach(Activity activity) {
             super.onAttach(activity);
             AllianceManager.i.addAllianceUpdatedHandler(this);
-            AllianceShieldManager.i.addShieldUpdatedHandler(this);
+            ShieldManager.eventBus.register(mEventHandler);
         }
 
         @Override
         public void onDetach() {
             super.onDetach();
             AllianceManager.i.removeAllianceUpdatedHandler(this);
-            AllianceShieldManager.i.removeShieldUpdatedHandler(this);
+            ShieldManager.eventBus.unregister(mEventHandler);
         }
 
         @Override
@@ -165,10 +165,12 @@ public class AllianceActivity extends TabFragmentActivity
             refresh();
         }
 
-        @Override
-        public void onShieldUpdated(int id) {
-            mRankListAdapter.notifyDataSetChanged();
-        }
+        private Object mEventHandler = new Object() {
+            @EventHandler
+            public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+                mRankListAdapter.notifyDataSetChanged();
+            }
+        };
 
         private void onAllianceCreate() {
             AllianceCreateDialog dialog = new AllianceCreateDialog();
@@ -313,7 +315,6 @@ public class AllianceActivity extends TabFragmentActivity
 
     public static class RequestsFragment extends BaseFragment
                                          implements AllianceManager.AllianceUpdatedHandler,
-                                                    EmpireShieldManager.ShieldUpdatedHandler,
                                                     TabManager.Reloadable {
         private View mView;
         private RequestListAdapter mRequestListAdapter;
@@ -334,14 +335,14 @@ public class AllianceActivity extends TabFragmentActivity
         public void onAttach(Activity activity) {
             super.onAttach(activity);
             AllianceManager.i.addAllianceUpdatedHandler(this);
-            EmpireShieldManager.i.addShieldUpdatedHandler(this);
+            ShieldManager.eventBus.register(mEventHandler);
         }
 
         @Override
         public void onDetach() {
             super.onDetach();
             AllianceManager.i.removeAllianceUpdatedHandler(this);
-            EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+            ShieldManager.eventBus.unregister(mEventHandler);
         }
 
         @Override
@@ -366,11 +367,12 @@ public class AllianceActivity extends TabFragmentActivity
             return mView;
         }
 
-        /** Called when an empire's shield is updated, we'll have to refresh the list. */
-        @Override
-        public void onShieldUpdated(int empireID) {
-            mRequestListAdapter.notifyDataSetChanged();
-        }
+        private Object mEventHandler = new Object() {
+            @EventHandler
+            public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+                mRequestListAdapter.notifyDataSetChanged();
+            }
+        };
 
         private void refresh() {
             final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);

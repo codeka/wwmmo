@@ -43,11 +43,13 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.RealmManager;
+import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.SituationReport;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
@@ -55,8 +57,7 @@ import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 
-public class SitrepActivity extends BaseActivity
-                            implements EmpireShieldManager.ShieldUpdatedHandler {
+public class SitrepActivity extends BaseActivity {
     private static final Log log = new Log("SitrepActivity");
     private Context mContext = this;
     private SituationReportAdapter mSituationReportAdapter;
@@ -184,20 +185,21 @@ public class SitrepActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
-        EmpireShieldManager.i.addShieldUpdatedHandler(this);
+        ShieldManager.eventBus.register(mEventHandler);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
     }
 
-    /** Called when an empire's shield is updated, we'll have to refresh the list. */
-    @Override
-    public void onShieldUpdated(int empireID) {
-        refreshTitle();
-    }
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onShieldUpdated(int empireID) {
+            refreshTitle();
+        }
+    };
 
     private void refreshTitle() {
         final TextView empireName = (TextView) findViewById(R.id.empire_name);

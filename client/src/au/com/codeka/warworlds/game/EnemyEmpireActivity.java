@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.alliance.KickRequestDialog;
 import au.com.codeka.warworlds.game.chat.ChatActivity;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
@@ -29,10 +30,10 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.ShieldManager;
 
 public class EnemyEmpireActivity extends BaseActivity
-                                 implements EmpireManager.EmpireFetchedHandler,
-                                            EmpireShieldManager.ShieldUpdatedHandler {
+                                 implements EmpireManager.EmpireFetchedHandler {
     private Context mContext = this;
     private Empire mEmpire;
 
@@ -88,23 +89,22 @@ public class EnemyEmpireActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
-        EmpireShieldManager.i.addShieldUpdatedHandler(this);
-        AllianceShieldManager.i.addShieldUpdatedHandler(this);
+        ShieldManager.eventBus.register(mEventHandler);
     }
 
     @Override
     protected void onStop() {
         super.onStart();
-        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
-        AllianceShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
     }
 
 
-    /** Called when an empire's shield is updated, we'll have to refresh the list. */
-    @Override
-    public void onShieldUpdated(int empireID) {
-        refresh();
-    }
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            refresh();
+        }
+    };
 
     @Override
     public void onEmpireFetched(Empire empire) {

@@ -21,6 +21,7 @@ import au.com.codeka.common.model.BaseAllianceRequestVote;
 import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.AllianceRequest;
@@ -30,8 +31,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 
 public class RequestVoteDialog extends DialogFragment
-                               implements EmpireManager.EmpireFetchedHandler,
-                                          ShieldManager.ShieldUpdatedHandler {
+                               implements EmpireManager.EmpireFetchedHandler {
     private View mView;
     private Alliance mAlliance;
     private AllianceRequest mRequest;
@@ -45,14 +45,14 @@ public class RequestVoteDialog extends DialogFragment
     public void onStart() {
         super.onStart();
         EmpireManager.i.addEmpireUpdatedListener(null, this);
-        EmpireShieldManager.i.addShieldUpdatedHandler(this);
+        ShieldManager.eventBus.register(mEventHandler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         EmpireManager.i.removeEmpireUpdatedListener(this);
-        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
     }
 
     @Override
@@ -199,8 +199,10 @@ public class RequestVoteDialog extends DialogFragment
         refresh();
     }
 
-    @Override
-    public void onShieldUpdated(int id) {
-        refresh();
-    }
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            refresh();
+        }
+    };
 }

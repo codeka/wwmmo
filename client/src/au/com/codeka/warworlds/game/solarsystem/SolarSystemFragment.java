@@ -37,6 +37,7 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
@@ -44,8 +45,7 @@ import au.com.codeka.warworlds.model.StarSummary;
 /**
  * This is a fragment which displays details about a single solar system.
  */
-public class SolarSystemFragment extends Fragment
-                                 implements EmpireShieldManager.ShieldUpdatedHandler {
+public class SolarSystemFragment extends Fragment {
     private static final Log log = new Log("SolarSystemFragment");
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private ProgressBar mProgressBar;
@@ -173,7 +173,7 @@ public class SolarSystemFragment extends Fragment
         long starID = args.getLong("au.com.codeka.warworlds.StarID");
         String starKey = Long.toString(starID);
         StarManager.eventBus.register(mEventHandler);
-        EmpireShieldManager.i.addShieldUpdatedHandler(this);
+        ShieldManager.eventBus.register(mEventHandler);
 
         // get as much details about the star as we can, until it gets refreshes anyway.
         mStarSummary = StarManager.getInstance().getStarSummaryNoFetch(starKey, Float.MAX_VALUE);
@@ -211,19 +211,13 @@ public class SolarSystemFragment extends Fragment
     public void onStop() {
         super.onStop();
         StarManager.eventBus.unregister(mEventHandler);
-        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        ShieldManager.eventBus.unregister(mEventHandler);
 
         int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk >= android.os.Build.VERSION_CODES.HONEYCOMB) {
             mSolarSystemSurfaceView.removeOnLayoutChangeListener(
                     (View.OnLayoutChangeListener) mSolarSystemSurfaceViewOnLayoutChangedListener);
         }
-    }
-
-    /** Called when an empire's shield is updated, we'll have to refresh the list. */
-    @Override
-    public void onShieldUpdated(int empireID) {
-        refreshSelectedPlanet();
     }
 
     private Object mEventHandler = new Object() {
@@ -234,6 +228,11 @@ public class SolarSystemFragment extends Fragment
             }
 
             onStarFetched(star);
+        }
+
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            refreshSelectedPlanet();
         }
     };
 

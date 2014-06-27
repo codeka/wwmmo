@@ -125,7 +125,7 @@ public class EmpireShieldManager extends ShieldManager {
     private ShieldInfo getShieldInfo(Empire empire) {
         int id = empire.getKey() == null ? 0 : Integer.parseInt(empire.getKey());
         Long lastUpdate = empire.getShieldLastUpdate() == null ? null : empire.getShieldLastUpdate().getMillis();
-        return new ShieldInfo("empire", id, lastUpdate);
+        return new ShieldInfo(ShieldManager.EmpireShield, id, lastUpdate);
     }
 
     private void ensureBaseImage(Context context) {

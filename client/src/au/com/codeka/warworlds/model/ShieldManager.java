@@ -5,9 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.andengine.opengl.texture.TextureOptions;
@@ -30,6 +28,7 @@ import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.eventbus.EventBus;
 
 /**
  * This is the base class for the EmpireShieldManager and AllianceShieldManager.
@@ -37,38 +36,21 @@ import au.com.codeka.warworlds.api.ApiException;
 public abstract class ShieldManager implements RealmManager.RealmChangedHandler {
     private static final Log log = new Log("ShieldManager");
 
+    public static final EventBus eventBus = new EventBus();
+
     private SparseArray<SoftReference<Bitmap>> mShields;
     private SparseArray<ITextureRegion> mShieldTextures;
-    private List<ShieldUpdatedHandler> mShieldUpdatedHandlers;
     private Set<Integer> mFetchingShields;
+
+    public static final String EmpireShield = "empire";
+    public static final String AllianceShield = "alliance";
 
     protected ShieldManager() {
         mShields = new SparseArray<SoftReference<Bitmap>>();
         mShieldTextures = new SparseArray<ITextureRegion>();
-        mShieldUpdatedHandlers = new ArrayList<ShieldUpdatedHandler>();
         mFetchingShields = new HashSet<Integer>();
 
         RealmManager.i.addRealmChangedHandler(this);
-    }
-
-    public void addShieldUpdatedHandler(ShieldUpdatedHandler handler) {
-        synchronized(mShieldUpdatedHandlers) {
-            mShieldUpdatedHandlers.add(handler);
-        }
-    }
-
-    public void removeShieldUpdatedHandler(ShieldUpdatedHandler handler) {
-        synchronized(mShieldUpdatedHandlers) {
-            mShieldUpdatedHandlers.remove(handler);
-        }
-    }
-
-    protected void fireShieldUpdatedHandler(int id) {
-        synchronized(mShieldUpdatedHandlers) {
-            for(ShieldUpdatedHandler handler : mShieldUpdatedHandlers) {
-                handler.onShieldUpdated(id);
-            }
-        }
     }
 
     public void flushCachedImage(int id) {
@@ -189,7 +171,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
                     return; // TODO: handle errors
                 }
 
-                fireShieldUpdatedHandler(shieldInfo.id);
+                eventBus.publish(new ShieldUpdatedEvent(shieldInfo.kind, shieldInfo.id));
             }
         }.execute();
     }
@@ -249,7 +231,15 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
         }
     }
 
-    public interface ShieldUpdatedHandler {
-        void onShieldUpdated(int id);
+    
+
+    public static class ShieldUpdatedEvent {
+        public String kind;
+        public int id;
+
+        public ShieldUpdatedEvent(String kind, int id) {
+            this.kind = kind;
+            this.id = id;
+        }
     }
 }
