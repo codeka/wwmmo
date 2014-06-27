@@ -25,14 +25,15 @@ public class EventBus {
 
     /** Subscribe the given object to the event bus. */
     public void register(Object subscriber) {
-        // Make sure it's not already subscribed. TODO: is this an error?
+        // Make sure it's not already subscribed. If it is, that's an error.
         for (EventHandlerInfo handler : mHandlers) {
             Object existingSubscriber = handler.getSubscriber();
             if (existingSubscriber != null && existingSubscriber == subscriber) {
-                return;
+                throw new AlreadyRegisteredException();
             }
         }
 
+        int numMethods = 0;
         for (Method method : subscriber.getClass().getDeclaredMethods()) {
             EventHandler eventHandlerAnnotation = method.getAnnotation(EventHandler.class);
             if (eventHandlerAnnotation == null) {
@@ -44,10 +45,21 @@ public class EventBus {
                 throw new IllegalArgumentException(
                         "EventHandler method must have exactly one parameter.");
             }
+            if (parameters[0].isPrimitive()) {
+                throw new IllegalArgumentException(
+                        "EventHandler method's parameter must not be a primitive type.");
+            }
 
             boolean callOnUiThread = (eventHandlerAnnotation.thread() == EventHandler.UI_THREAD);
 
+            numMethods ++;
             mHandlers.add(new EventHandlerInfo(parameters[0], method, subscriber, callOnUiThread));
+        }
+
+        if (numMethods == 0) {
+            // If you don't have any @EventHandler methods, then there's no point registering
+            // the object. Usually this means you made a programming error.
+            throw new NoEventHandlerMethods();
         }
     }
 
@@ -61,6 +73,7 @@ public class EventBus {
                 kill.add(handler);
             }
         }
+
         mHandlers.removeAll(kill);
     }
 
@@ -70,6 +83,18 @@ public class EventBus {
             if (handler.handles(event)) {
                 handler.call(event);
             }
+        }
+    }
+
+    public static class AlreadyRegisteredException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+    }
+
+    public static class NoEventHandlerMethods extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public NoEventHandlerMethods() {
+            super("Tried to register a class with no @EventHandler methods on EventBus.");
         }
     }
 }
