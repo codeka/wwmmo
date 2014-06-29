@@ -31,7 +31,7 @@ public class RequestException extends Exception {
     }
 
     public RequestException(Throwable innerException) {
-        super(getExceptionDescription(innerException));
+        super(getExceptionDescription(innerException), innerException);
 
         RequestException reqExc = findInnerException(innerException, RequestException.class);
         if (reqExc != null) {
