@@ -472,20 +472,17 @@ public class SolarSystemFragment extends Fragment {
             colonyDetailsContainer.setVisibility(View.GONE);
             enemyColonyDetailsContainer.setVisibility(View.GONE);
 
-            EmpireManager.i.fetchEmpire(mColony.getEmpireKey(),
-                new EmpireManager.EmpireFetchedHandler() {
-                    @Override
-                    public void onEmpireFetched(Empire empire) {
-                        Empire thisEmpire = EmpireManager.i.getEmpire();
-                        if (thisEmpire.getKey().equals(empire.getKey())) {
-                            colonyDetailsContainer.setVisibility(View.VISIBLE);
-                            refreshColonyDetails();
-                        } else {
-                            enemyColonyDetailsContainer.setVisibility(View.VISIBLE);
-                            refreshEnemyColonyDetails(empire);
-                        }
-                    }
-                });
+            Empire colonyEmpire = EmpireManager.i.getEmpire(mColony.getEmpireID());
+            if (colonyEmpire != null) {
+                Empire thisEmpire = EmpireManager.i.getEmpire();
+                if (thisEmpire.getKey().equals(colonyEmpire.getKey())) {
+                    colonyDetailsContainer.setVisibility(View.VISIBLE);
+                    refreshColonyDetails();
+                } else {
+                    enemyColonyDetailsContainer.setVisibility(View.VISIBLE);
+                    refreshEnemyColonyDetails(colonyEmpire);
+                }
+            }
         }
     }
 

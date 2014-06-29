@@ -32,9 +32,9 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
-public class EnemyEmpireActivity extends BaseActivity
-                                 implements EmpireManager.EmpireFetchedHandler {
+public class EnemyEmpireActivity extends BaseActivity {
     private Context mContext = this;
+    private int mEmpireID;
     private Empire mEmpire;
 
     @Override
@@ -79,8 +79,10 @@ public class EnemyEmpireActivity extends BaseActivity
                 if (!success) {
                     startActivity(new Intent(EnemyEmpireActivity.this, WarWorldsActivity.class));
                 } else {
-                    String empireKey = getIntent().getExtras().getString("au.com.codeka.warworlds.EmpireKey");
-                    EmpireManager.i.fetchEmpire(empireKey, EnemyEmpireActivity.this);
+                    mEmpireID = Integer.parseInt(
+                            getIntent().getExtras().getString("au.com.codeka.warworlds.EmpireKey"));
+                    mEmpire = EmpireManager.i.getEmpire(mEmpireID);
+                    refresh();
                 }
             }
         });
@@ -104,13 +106,15 @@ public class EnemyEmpireActivity extends BaseActivity
         public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
             refresh();
         }
-    };
 
-    @Override
-    public void onEmpireFetched(Empire empire) {
-        mEmpire = empire;
-        refresh();
-    }
+        @EventHandler
+        public void onEmpireFetched(Empire empire) {
+            if (mEmpireID == empire.getID()) {
+                mEmpire = empire;
+                refresh();
+            }
+        }
+    };
 
     private void refresh() {
         MyEmpire myEmpire = EmpireManager.i.getEmpire();

@@ -11,6 +11,7 @@ import au.com.codeka.Cash;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.api.RequestManager.RequestManagerState;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -20,8 +21,7 @@ import au.com.codeka.warworlds.model.MyEmpire;
  * and few other indicators that we want visible (almost) everywhere.
  */
 public class InfobarView extends FrameLayout
-                         implements EmpireManager.EmpireFetchedHandler,
-                                    RequestManager.RequestManagerStateChangedHandler {
+                         implements RequestManager.RequestManagerStateChangedHandler {
     private Handler mHandler;
     private View mView;
 
@@ -40,25 +40,6 @@ public class InfobarView extends FrameLayout
 
     public void hideEmpireName() {
         mView.findViewById(R.id.empire_name).setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onEmpireFetched(Empire empire) {
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire != null && myEmpire.getKey().equals(empire.getKey())) {
-            sRealCash = empire.getCash();
-            if (sCurrCash == 0.0f || sEmpireID != myEmpire.getID()) {
-                sCurrCash = sRealCash;
-                sEmpireID = myEmpire.getID();
-            } else if (sRealCash != sCurrCash) {
-                mHandler.post(mUpdateCashRunnable);
-            }
-            TextView cash = (TextView) mView.findViewById(R.id.cash);
-            cash.setText(Cash.format(sCurrCash));
-
-            TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
-            empireName.setText(empire.getDisplayName());
-        }
     }
 
     private Runnable mUpdateCashRunnable = new Runnable() {
@@ -110,10 +91,10 @@ public class InfobarView extends FrameLayout
         }
         mHandler = new Handler();
 
-        EmpireManager.i.addEmpireUpdatedListener(null, this);
+        EmpireManager.eventBus.register(mEventHandler);
         RequestManager.addRequestManagerStateChangedHandler(this);
 
-        refreshEmpire();
+        refreshEmpire(EmpireManager.i.getEmpire());
     }
 
     @Override
@@ -123,17 +104,35 @@ public class InfobarView extends FrameLayout
             return;
         }
 
-        EmpireManager.i.removeEmpireUpdatedListener(this);
+        EmpireManager.eventBus.unregister(mEventHandler);
         RequestManager.removeRequestManagerStateChangedHandler(this);
     }
 
-    private void refreshEmpire() {
-        MyEmpire empire = EmpireManager.i.getEmpire();
-        if (empire != null) {
-            onEmpireFetched(empire);
+    private void refreshEmpire(Empire empire) {
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        if (empire != null && myEmpire != null && myEmpire.getID() == empire.getID()) {
+            sRealCash = empire.getCash();
+            if (sCurrCash == 0.0f || sEmpireID != myEmpire.getID()) {
+                sCurrCash = sRealCash;
+                sEmpireID = myEmpire.getID();
+            } else if (sRealCash != sCurrCash) {
+                mHandler.post(mUpdateCashRunnable);
+            }
+            TextView cash = (TextView) mView.findViewById(R.id.cash);
+            cash.setText(Cash.format(sCurrCash));
+
+            TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
+            empireName.setText(empire.getDisplayName());
         }
 
         // set up the initial state
         onStateChanged();
     }
+
+    private Object mEventHandler = new Object() {
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onEmpireUpdated(Empire empire) {
+            refreshEmpire(empire);
+        }
+    };
 }

@@ -30,8 +30,7 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 
-public class RequestVoteDialog extends DialogFragment
-                               implements EmpireManager.EmpireFetchedHandler {
+public class RequestVoteDialog extends DialogFragment {
     private View mView;
     private Alliance mAlliance;
     private AllianceRequest mRequest;
@@ -44,14 +43,14 @@ public class RequestVoteDialog extends DialogFragment
     @Override
     public void onStart() {
         super.onStart();
-        EmpireManager.i.addEmpireUpdatedListener(null, this);
+        EmpireManager.eventBus.register(mEventHandler);
         ShieldManager.eventBus.register(mEventHandler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        EmpireManager.i.removeEmpireUpdatedListener(this);
+        EmpireManager.eventBus.unregister(mEventHandler);
         ShieldManager.eventBus.unregister(mEventHandler);
     }
 
@@ -106,9 +105,9 @@ public class RequestVoteDialog extends DialogFragment
 
         Empire empire;
         if (mRequest.getTargetEmpireID() != null) {
-            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.getTargetEmpireID()));
+            empire = EmpireManager.i.getEmpire(mRequest.getTargetEmpireID());
         } else {
-            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.getRequestEmpireID()));
+            empire = EmpireManager.i.getEmpire(mRequest.getRequestEmpireID());
         }
         if (empire != null) {
             // it should never be null, so we won't bother refreshing...
@@ -145,11 +144,12 @@ public class RequestVoteDialog extends DialogFragment
         requestRequiredVotes.setText(String.format(Locale.ENGLISH, "/ %d", requiredVotes));
 
         if (mRequest.getTargetEmpireID() != null) {
-            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.getRequestEmpireID()));
-
-            requestBy.setVisibility(View.VISIBLE);
-            requestBy.setText(String.format(Locale.ENGLISH, "by %s",
-                    empire.getDisplayName()));
+            empire = EmpireManager.i.getEmpire(mRequest.getRequestEmpireID());
+            if (empire != null) {
+                requestBy.setVisibility(View.VISIBLE);
+                requestBy.setText(String.format(Locale.ENGLISH, "by %s",
+                        empire.getDisplayName()));
+            }
         } else {
             requestBy.setVisibility(View.GONE);
         }
@@ -169,14 +169,12 @@ public class RequestVoteDialog extends DialogFragment
             mView.findViewById(R.id.curr_votes_none).setVisibility(View.GONE);
             for (BaseAllianceRequestVote vote : mRequest.getVotes()) {
                 View v = inflater.inflate(R.layout.alliance_request_vote_empire_row, currVoteContainer, false);
-                Empire voteEmpire = EmpireManager.i.getEmpire(Integer.toString(vote.getEmpireID()));
+                Empire voteEmpire = EmpireManager.i.getEmpire(vote.getEmpireID());
                 if (voteEmpire != null) {
                     empireIcon = (ImageView) v.findViewById(R.id.empire_icon);
                     empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), voteEmpire));
                     empireName = (TextView) v.findViewById(R.id.empire_name);
                     empireName.setText(voteEmpire.getDisplayName());
-                } else {
-                    EmpireManager.i.refreshEmpire(Integer.toString(vote.getEmpireID()));
                 }
                 TextView voteDate = (TextView) v.findViewById(R.id.vote_time);
                 voteDate.setText(TimeFormatter.create().format(vote.getDate()));
@@ -194,14 +192,14 @@ public class RequestVoteDialog extends DialogFragment
         }
     }
 
-    @Override
-    public void onEmpireFetched(Empire empire) {
-        refresh();
-    }
-
     private Object mEventHandler = new Object() {
         @EventHandler
         public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            refresh();
+        }
+
+        @EventHandler
+        public void onEmpireFetched(Empire empire) {
             refresh();
         }
     };

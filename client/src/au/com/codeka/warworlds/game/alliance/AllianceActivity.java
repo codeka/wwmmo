@@ -44,8 +44,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
-public class AllianceActivity extends TabFragmentActivity
-                              implements EmpireManager.EmpireFetchedHandler {
+public class AllianceActivity extends TabFragmentActivity {
     private Context mContext = this;
 
     @Override
@@ -85,22 +84,24 @@ public class AllianceActivity extends TabFragmentActivity
     @Override
     public void onStart() {
         super.onStart();
-        EmpireManager.i.addEmpireUpdatedListener(null, this);
+        EmpireManager.eventBus.register(mEventHandler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        EmpireManager.i.removeEmpireUpdatedListener(this);
+        EmpireManager.eventBus.unregister(mEventHandler);
     }
 
-    @Override
-    public void onEmpireFetched(Empire empire) {
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire.getKey().equals(empire.getKey())) {
-            getTabManager().reloadTab();
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onEmpireUpdated(Empire empire) {
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            if (myEmpire.getID() == empire.getID()) {
+                getTabManager().reloadTab();
+            }
         }
-    }
+    };
 
     public static class BaseFragment extends Fragment {
     }

@@ -165,7 +165,7 @@ public class Notifications {
         float newCash = Float.parseFloat(value);
         MyEmpire empire = EmpireManager.i.getEmpire();
         empire.updateCash(newCash);
-        EmpireManager.i.fireEmpireUpdated(empire);
+        EmpireManager.eventBus.publish(empire);
     }
 
     private static void displayNotification(final Context context,
@@ -347,7 +347,7 @@ public class Notifications {
         String empireName = "Chat";
 
         if (first) {
-            Empire empire = EmpireManager.i.getEmpire(msg.getEmpireKey(), true);
+            Empire empire = EmpireManager.i.getEmpire(Integer.parseInt(msg.getEmpireKey()), true);
             if (empire != null) {
                 empireName = empire.getDisplayName();
 

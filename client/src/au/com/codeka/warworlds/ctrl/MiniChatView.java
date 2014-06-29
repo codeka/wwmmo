@@ -15,18 +15,20 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.chat.ChatActivity;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
 
 /**
  * This control displays the mini chat window, which displays recent chat
  * messages on each screen.
  */
 public class MiniChatView extends RelativeLayout
-                          implements ChatManager.MessageAddedListener,
-                                     ChatManager.MessageUpdatedListener {
+                          implements ChatManager.MessageAddedListener {
     private Context mContext;
 
     private ScrollView mScrollView;
@@ -65,24 +67,26 @@ public class MiniChatView extends RelativeLayout
 
     @Override
     public void onAttachedToWindow() {
+        super.onAttachedToWindow();
         if (this.isInEditMode()) {
             return;
         }
 
         ChatManager.i.addMessageAddedListener(this);
-        ChatManager.i.addMessageUpdatedListener(this);
+        EmpireManager.eventBus.register(mEventHandler);
 
         refreshMessages();
     }
 
     @Override
     public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         if (this.isInEditMode()) {
             return;
         }
 
+        EmpireManager.eventBus.unregister(mEventHandler);
         ChatManager.i.removeMessageAddedListener(this);
-        ChatManager.i.removeMessageUpdatedListener(this);
     }
 
     private void refreshMessages() {
@@ -112,41 +116,12 @@ public class MiniChatView extends RelativeLayout
         }, 1);
     }
 
-    private void updateMessage(final ChatMessage msg) {
-        for (int i = 0; i < mMsgsContainer.getChildCount(); i++) {
-            TextView tv = (TextView) mMsgsContainer.getChildAt(i);
-            ChatMessage other = (ChatMessage) tv.getTag();
-            if (other == null || other.getDatePosted() == null) {
-                continue;
-            }
-
-            if (other.getEmpireKey() == null | msg.getEmpireKey() == null) {
-                continue;
-            }
-
-            if (other.getDatePosted().equals(msg.getDatePosted()) &&
-                other.getEmpireKey().equals(msg.getEmpireKey())) {
-                tv.setText(Html.fromHtml(msg.format(true, false, mAutoTranslate)));
-            }
-        }
-    }
-
     @Override
     public void onMessageAdded(final ChatMessage msg) {
         post(new Runnable() {
             @Override
             public void run() {
                 appendMessage(msg);
-            }
-        });
-    }
-
-    @Override
-    public void onMessageUpdated(final ChatMessage msg) {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                updateMessage(msg);
             }
         });
     }
@@ -216,5 +191,18 @@ public class MiniChatView extends RelativeLayout
             }
         });
     }
+
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onEmpireUpdated(Empire empire) {
+            for (int i = 0; i < mMsgsContainer.getChildCount(); i++) {
+                TextView tv = (TextView) mMsgsContainer.getChildAt(i);
+                ChatMessage msg = (ChatMessage) tv.getTag();
+                if (msg.getEmpireID() == empire.getID()) {
+                    tv.setText(Html.fromHtml(msg.format(true, false, mAutoTranslate)));
+                }
+            }
+        }
+    };
 }
 

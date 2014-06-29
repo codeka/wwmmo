@@ -18,12 +18,10 @@ import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.model.ChatManager.MessageAddedListener;
-import au.com.codeka.warworlds.model.ChatManager.MessageUpdatedListener;
 
 public class ChatConversation extends BaseChatConversation {
     protected LinkedList<ChatMessage> mMessages = new LinkedList<ChatMessage>();
     private ArrayList<MessageAddedListener> mMessageAddedListeners = new ArrayList<MessageAddedListener>();
-    private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
     private DateTime mMostRecentMsg;
     private boolean mNeedUpdate;
 
@@ -48,21 +46,6 @@ public class ChatConversation extends BaseChatConversation {
             listener.onMessageAdded(msg);
         }
         ChatManager.i.fireMessageAddedListeners(msg);
-    }
-
-    public void addMessageUpdatedListener(MessageUpdatedListener listener) {
-        if (!mMessageUpdatedListeners.contains(listener)) {
-            mMessageUpdatedListeners.add(listener);
-        }
-    }
-    public void removeMessageUpdatedListener(MessageUpdatedListener listener) {
-        mMessageUpdatedListeners.remove(listener);
-    }
-    private void fireMessageUpdatedListeners(ChatMessage msg) {
-        for(MessageUpdatedListener listener : mMessageUpdatedListeners) {
-            listener.onMessageUpdated(msg);
-        }
-        ChatManager.i.fireMessageUpdatedListeners(msg);
     }
 
     public void update(ChatConversation conversation) {
@@ -184,15 +167,6 @@ public class ChatConversation extends BaseChatConversation {
                     mMostRecentMsg = msg.getDatePosted();
                 }
             }
-
-            if (msg.getEmpire() == null && msg.getEmpireKey() != null) {
-                Empire emp = EmpireManager.i.getEmpire(msg.getEmpireKey());
-                if (emp != null) {
-                    msg.setEmpire(emp);
-                } else {
-                    ChatManager.i.queueRefreshEmpire(msg.getEmpireKey());
-                }
-            }
         }
         if (fireListeners) {
             fireMessageAddedListeners(msg);
@@ -221,18 +195,6 @@ public class ChatConversation extends BaseChatConversation {
     public void markAllRead() {
         new ChatStore().setLastReadDate(mID, mMostRecentMsg);
         ChatManager.i.fireUnreadMessageCountListeners();
-    }
-
-    public void onEmpireRefreshed(Empire empire) {
-        for (ChatMessage msg : mMessages) {
-            if (msg.getEmpireKey() == null) {
-                continue;
-            }
-            if (msg.getEmpireKey().equals(empire.getKey())) {
-                msg.setEmpire(empire);
-                fireMessageUpdatedListeners(msg);
-            }
-        }
     }
 
     @Override

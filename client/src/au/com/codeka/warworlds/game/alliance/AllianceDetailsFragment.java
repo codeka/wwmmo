@@ -40,7 +40,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class AllianceDetailsFragment extends Fragment
                                      implements AllianceManager.AllianceUpdatedHandler,
-                                                EmpireManager.EmpireFetchedHandler,
                                                 TabManager.Reloadable {
     private Handler mHandler;
     private Activity mActivity;
@@ -104,7 +103,7 @@ public class AllianceDetailsFragment extends Fragment
     public void onStart() {
         super.onStart();
         AllianceManager.i.addAllianceUpdatedHandler(this);
-        EmpireManager.i.addEmpireUpdatedListener(null, this);
+        EmpireManager.eventBus.register(mEventHandler);
         ShieldManager.eventBus.register(mEventHandler);
     }
 
@@ -112,7 +111,7 @@ public class AllianceDetailsFragment extends Fragment
     public void onStop() {
         super.onStop();
         AllianceManager.i.removeAllianceUpdatedHandler(this);
-        EmpireManager.i.removeEmpireUpdatedListener(this);
+        EmpireManager.eventBus.unregister(mEventHandler);
         ShieldManager.eventBus.unregister(mEventHandler);
     }
 
@@ -124,18 +123,31 @@ public class AllianceDetailsFragment extends Fragment
         }
     }
 
-    @Override
-    public void onEmpireFetched(Empire empire) {
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire.getKey().equals(empire.getKey())) {
-            fullRefresh();
-        }
-    }
-
     private Object mEventHandler = new Object() {
         @EventHandler
         public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
             refreshAlliance();
+        }
+
+        @EventHandler
+        public void onEmpireUpdated(Empire empire) {
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            if (myEmpire.getKey().equals(empire.getKey())) {
+                fullRefresh();
+            } else {
+                // because we send off a bunch of these at once, we can end up getting lots
+                // returning at the same time. So we delay the updating for a few milliseconds
+                // to ensure we don't refresh 100 times in a row...
+                if (!mRefreshPosted) {
+                    mRefreshPosted = true;
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshAlliance();
+                        }
+                    }, 250);
+                }
+            }
         }
     };
 
@@ -216,11 +228,11 @@ public class AllianceDetailsFragment extends Fragment
 
         if (mAlliance.getMembers() != null) {
             ArrayList<Empire> members = new ArrayList<Empire>();
-            ArrayList<String> missingMembers = new ArrayList<String>();
+            ArrayList<Integer> missingMembers = new ArrayList<Integer>();
             for (BaseAllianceMember am : mAlliance.getMembers()) {
-                Empire member = EmpireManager.i.getEmpire(am.getEmpireKey());
+                Empire member = EmpireManager.i.getEmpire(am.getEmpireID());
                 if (member == null) {
-                    missingMembers.add(am.getEmpireKey());
+                    missingMembers.add(am.getEmpireID());
                 } else {
                     members.add(member);
                 }
@@ -230,21 +242,7 @@ public class AllianceDetailsFragment extends Fragment
             populateEmpireList(membersList, members);
 
             if (missingMembers.size() > 0) {
-                EmpireManager.i.refreshEmpires(missingMembers, new EmpireManager.EmpireFetchedHandler() {
-                    @Override
-                    public void onEmpireFetched(Empire empire) {
-                        if (mRefreshPosted) {
-                            return;
-                        }
-                        mRefreshPosted = true;
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                refreshAlliance();
-                            }
-                        }, 250);
-                    }
-                });
+                EmpireManager.i.refreshEmpires(missingMembers);
             }
         }
     }

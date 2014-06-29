@@ -249,6 +249,12 @@ public class BaseCombatReport {
         public String getEmpireKey() {
             return mEmpireKey;
         }
+        public Integer getEmpireID() {
+            if (mEmpireKey == null) {
+                return null;
+            }
+            return Integer.parseInt(mEmpireKey);
+        }
         public String getDesignID() {
             return mDesignID;
         }

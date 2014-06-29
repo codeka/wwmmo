@@ -19,9 +19,11 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.EnemyEmpireActivity;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
+import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
@@ -95,33 +97,35 @@ public class PlanetListSimple extends LinearLayout {
 
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
 
-        HashSet<String> empires = new HashSet<String>();
+        HashSet<Integer> empires = new HashSet<Integer>();
         for (BaseFleet fleet : mStar.getFleets()) {
-            if (fleet.getEmpireKey() == null) {
+            Integer empireID = ((Fleet) fleet).getEmpireID();
+            if (empireID == null) {
                 continue;
             }
-            if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
+            if (empireID == myEmpire.getID()) {
                 continue;
             }
-            if (empires.contains(fleet.getEmpireKey())) {
+            if (empires.contains(empireID)) {
                 continue;
             }
-            empires.add(fleet.getEmpireKey());
+            empires.add(((Fleet) fleet).getEmpireID());
         }
         for (BaseColony colony : mStar.getColonies()) {
-            if (colony.getEmpireKey() == null) {
+            Integer empireID = ((Colony) colony).getEmpireID();
+            if (empireID == null) {
                 continue;
             }
-            if (colony.getEmpireKey().equals(myEmpire.getKey())) {
+            if (empireID == myEmpire.getID()) {
                 continue;
             }
-            if (empires.contains(colony.getEmpireKey())) {
+            if (empires.contains(empireID)) {
                 continue;
             }
-            empires.add(colony.getEmpireKey());
+            empires.add(empireID);
         }
-        for (String empireKey : empires) {
-            View rowView = getEmpireRowView(inflater, empireKey);
+        for (Integer empireID : empires) {
+            View rowView = getEmpireRowView(inflater, empireID);
             addView(rowView);
         }
         if (!empires.isEmpty()) {
@@ -152,23 +156,22 @@ public class PlanetListSimple extends LinearLayout {
         TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
         planetTypeTextView.setText(planet.getPlanetType().getDisplayName());
 
-        BaseColony colony = null;
+        Colony colony = null;
         for(BaseColony c : mStar.getColonies()) {
             if (c.getPlanetIndex() == planet.getIndex()) {
-                colony = c;
+                colony = (Colony) c;
                 break;
             }
         }
 
         final TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
         if (colony != null) {
-            colonyTextView.setText("Colonized");
-            EmpireManager.i.fetchEmpire(colony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
-                @Override
-                public void onEmpireFetched(Empire empire) {
-                    colonyTextView.setText(empire.getDisplayName());
-                }
-            });
+            Empire empire = EmpireManager.i.getEmpire(colony.getEmpireID());
+            if (empire != null) {
+                colonyTextView.setText(empire.getDisplayName());
+            } else {
+                colonyTextView.setText("Colonized");
+            }
         } else {
             colonyTextView.setText("");
         }
@@ -178,27 +181,25 @@ public class PlanetListSimple extends LinearLayout {
         return view;
     }
 
-    private View getEmpireRowView(LayoutInflater inflater, String empireKey) {
+    private View getEmpireRowView(LayoutInflater inflater, Integer empireID) {
         final View view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
         final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
         final TextView empireName = (TextView) view.findViewById(R.id.starfield_planet_type);
         final TextView allianceName = (TextView) view.findViewById(R.id.starfield_planet_colony);
 
-        EmpireManager.i.fetchEmpire(empireKey, new EmpireManager.EmpireFetchedHandler() {
-            @Override
-            public void onEmpireFetched(Empire empire) {
-                Bitmap bmp = EmpireShieldManager.i.getShield(mContext, empire);
-                icon.setImageBitmap(bmp);
+        Empire empire = EmpireManager.i.getEmpire(empireID);
+        if (empire != null) {
+            Bitmap bmp = EmpireShieldManager.i.getShield(mContext, empire);
+            icon.setImageBitmap(bmp);
 
-                empireName.setText(empire.getDisplayName());
-                if (empire.getAlliance() != null) {
-                    allianceName.setText(empire.getAlliance().getName());
-                }
+            empireName.setText(empire.getDisplayName());
+            if (empire.getAlliance() != null) {
+                allianceName.setText(empire.getAlliance().getName());
             }
-        });
+        }
 
         view.setOnClickListener(mOnClickListener);
-        view.setTag(empireKey);
+        view.setTag(empireID);
         return view;
     }
 

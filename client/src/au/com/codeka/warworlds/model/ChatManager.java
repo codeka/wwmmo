@@ -27,13 +27,10 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     private static final Log log = new Log("ChatManager");
 
     private ArrayList<MessageAddedListener> mMessageAddedListeners;
-    private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners;
     private ArrayList<ConversationsRefreshListener> mConversationsRefreshListeners;
     private ArrayList<UnreadMessageCountListener> mUnreadMessageCountListeners;
     private DateTime mMostRecentMsg;
     private boolean mRequesting;
-    private TreeSet<String> mEmpiresToRefresh;
-    private Handler mHandler;
     private SparseArray<ChatConversation> mConversations;
     private boolean mConversationsRefreshing = false;
     private boolean mIsSetup = false;
@@ -44,10 +41,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
     private ChatManager() {
         mMessageAddedListeners = new ArrayList<MessageAddedListener>();
-        mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
         mConversationsRefreshListeners = new ArrayList<ConversationsRefreshListener>();
         mUnreadMessageCountListeners = new ArrayList<UnreadMessageCountListener>();
-        mEmpiresToRefresh = new TreeSet<String>();
         mConversations = new SparseArray<ChatConversation>();
     }
 
@@ -58,7 +53,6 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public void setup(Context context) {
         BackgroundDetector.i.addBackgroundChangeHandler(this);
 
-        mHandler = new Handler();
         mConversations.clear();
         mConversations.append(GLOBAL_CONVERSATION_ID, new ChatConversation(GLOBAL_CONVERSATION_ID));
         if (EmpireManager.i.getEmpire().getAlliance() != null) {
@@ -102,20 +96,6 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }
     }
 
-    public void addMessageUpdatedListener(MessageUpdatedListener listener) {
-        if (!mMessageUpdatedListeners.contains(listener)) {
-            mMessageUpdatedListeners.add(listener);
-        }
-    }
-    public void removeMessageUpdatedListener(MessageUpdatedListener listener) {
-        mMessageUpdatedListeners.remove(listener);
-    }
-    public void fireMessageUpdatedListeners(ChatMessage msg) {
-        for(MessageUpdatedListener listener : mMessageUpdatedListeners) {
-            listener.onMessageUpdated(msg);
-        }
-    }
-
     public void addConversationsRefreshListener(ConversationsRefreshListener listener) {
         if (!mConversationsRefreshListeners.contains(listener)) {
             mConversationsRefreshListeners.add(listener);
@@ -134,7 +114,6 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         running or not. */
     public boolean hasConversationListeners() {
         return !mConversationsRefreshListeners.isEmpty() ||
-               !mMessageUpdatedListeners.isEmpty() ||
                !mUnreadMessageCountListeners.isEmpty() ||
                !mMessageAddedListeners.isEmpty();
     }
@@ -227,9 +206,9 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }
 
         // otherwise we'll have to query the server anyway.
-        EmpireManager.i.searchEmpires(context, empireName, new EmpireManager.EmpiresFetchedHandler() {
+        EmpireManager.i.searchEmpires(context, empireName, new EmpireManager.SearchCompleteHandler() {
             @Override
-            public void onEmpiresFetched(List<Empire> empires) {
+            public void onSearchComplete(List<Empire> empires) {
                 if (empires.isEmpty()) {
                     return;
                 }
@@ -267,24 +246,6 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 }
             }
         }.execute();
-    }
-
-    /** This is called by the conversation when a message is added an the empire needs to be refreshed. */
-    public void queueRefreshEmpire(String empireKey) {
-        synchronized(mEmpiresToRefresh) {
-            if (!mEmpiresToRefresh.contains(empireKey)) {
-                mEmpiresToRefresh.add(empireKey);
-                if (mEmpiresToRefresh.size() == 1) {
-                    // first one, so schedule the function to actually fetch them
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            refreshEmpires();
-                        }
-                    }, 100);
-                }
-            }
-        }
     }
 
     public ChatConversation getConversation(ChatMessage msg) {
@@ -432,25 +393,6 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         new GlobalOptions().muteConversation(conversation.getID(), false);
     }
 
-    private void refreshEmpires() {
-        List<String> empireKeys;
-        synchronized(mEmpiresToRefresh) {
-            empireKeys = new ArrayList<String>(mEmpiresToRefresh);
-            mEmpiresToRefresh.clear();
-        }
-
-        EmpireManager.i.fetchEmpires(empireKeys,
-                new EmpireManager.EmpireFetchedHandler() {
-                    @Override
-                    public void onEmpireFetched(Empire empire) {
-                        for (int i = 0; i < mConversations.size(); i++) {
-                            ChatConversation conversation = mConversations.valueAt(i);
-                            conversation.onEmpireRefreshed(empire);
-                        }
-                    }
-                });
-    }
-
     @Override
     public void onBackgroundChange(boolean isInBackground) {
         if (!isInBackground) {
@@ -586,9 +528,6 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
     public interface MessageAddedListener {
         void onMessageAdded(ChatMessage msg);
-    }
-    public interface MessageUpdatedListener {
-        void onMessageUpdated(ChatMessage msg);
     }
     public interface ConversationStartedListener {
         void onConversationStarted(ChatConversation conversation);

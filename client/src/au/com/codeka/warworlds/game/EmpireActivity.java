@@ -75,8 +75,7 @@ import au.com.codeka.warworlds.model.billing.SkuDetails;
 /**
  * This dialog shows the status of the empire. You can see all your colonies, all your fleets, etc.
  */
-public class EmpireActivity extends TabFragmentActivity
-                            implements EmpireManager.EmpireFetchedHandler {
+public class EmpireActivity extends TabFragmentActivity {
     private static final Log log = new Log("EmpireActivity");
     private static MyEmpire sCurrentEmpire;
     private static Map<String, Star> sStars;
@@ -147,7 +146,7 @@ public class EmpireActivity extends TabFragmentActivity
                 }
 
                 MyEmpire myEmpire = EmpireManager.i.getEmpire();
-                EmpireManager.i.addEmpireUpdatedListener(myEmpire.getKey(), EmpireActivity.this);
+                EmpireManager.eventBus.register(mEventHandler);
                 EmpireManager.i.refreshEmpire();
             }
         });
@@ -155,7 +154,7 @@ public class EmpireActivity extends TabFragmentActivity
 
     @Override
     public void onPause() {
-        EmpireManager.i.removeEmpireUpdatedListener(this);
+        EmpireManager.eventBus.unregister(mEventHandler);
         super.onPause();
     }
 
@@ -168,28 +167,30 @@ public class EmpireActivity extends TabFragmentActivity
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public void onEmpireFetched(Empire empire) {
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire.getKey().equals(empire.getKey())) {
-            sCurrentEmpire = (MyEmpire) empire;
-            getTabManager().reloadTab();
-            mFirstRefresh = false;
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onEmpireUpdated(Empire empire) {
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            if (myEmpire.getKey().equals(empire.getKey())) {
+                sCurrentEmpire = (MyEmpire) empire;
+                getTabManager().reloadTab();
+                mFirstRefresh = false;
 
-            sCurrentEmpire.requestStars(new MyEmpire.FetchStarsCompleteHandler() {
-                @Override
-                public void onComplete(List<Star> stars) {
-                    TreeMap<String, Star> starMap = new TreeMap<String, Star>();
-                    for (Star s : stars) {
-                        starMap.put(s.getKey(), s);
+                sCurrentEmpire.requestStars(new MyEmpire.FetchStarsCompleteHandler() {
+                    @Override
+                    public void onComplete(List<Star> stars) {
+                        TreeMap<String, Star> starMap = new TreeMap<String, Star>();
+                        for (Star s : stars) {
+                            starMap.put(s.getKey(), s);
+                        }
+                        sStars = starMap;
+                        getTabManager().reloadTab();
+                        mFirstStarsRefresh = false;
                     }
-                    sStars = starMap;
-                    getTabManager().reloadTab();
-                    mFirstStarsRefresh = false;
-                }
-            });
+                });
+            }
         }
-    }
+    };
 
     public static class BaseFragment extends Fragment {
         /**
@@ -285,10 +286,10 @@ public class EmpireActivity extends TabFragmentActivity
             if (minRank < 1) {
                 minRank = 1;
             }
-            EmpireManager.i.fetchEmpiresByRank(minRank, minRank + 4,
-                    new EmpireManager.EmpiresFetchedHandler() {
+            EmpireManager.i.searchEmpiresByRank(minRank, minRank + 4,
+                    new EmpireManager.SearchCompleteHandler() {
                         @Override
-                        public void onEmpiresFetched(List<Empire> empires) {
+                        public void onSearchComplete(List<Empire> empires) {
                             mEmpireList.setEmpires(empires, true);
                             mEmpireList.setVisibility(View.VISIBLE);
                             progress.setVisibility(View.GONE);
@@ -333,9 +334,9 @@ public class EmpireActivity extends TabFragmentActivity
 
             String nameSearch = empireSearch.getText().toString();
             EmpireManager.i.searchEmpires(getActivity(), nameSearch,
-                    new EmpireManager.EmpiresFetchedHandler() {
+                    new EmpireManager.SearchCompleteHandler() {
                         @Override
-                        public void onEmpiresFetched(List<Empire> empires) {
+                        public void onSearchComplete(List<Empire> empires) {
                             mEmpireList.setEmpires(empires, false);
                             rankList.setVisibility(View.VISIBLE);
                             progress.setVisibility(View.GONE);

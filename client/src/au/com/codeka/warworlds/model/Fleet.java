@@ -12,6 +12,13 @@ public class Fleet extends BaseFleet {
         return (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, mDesignID);
     }
 
+    public Integer getEmpireID() {
+        if (mEmpireKey == null) {
+            return null;
+        }
+        return Integer.parseInt(mEmpireKey);
+    }
+
     @Override
     protected BaseFleetUpgrade createUpgrade(Messages.FleetUpgrade pb) {
         FleetUpgrade fleetUpgrade;

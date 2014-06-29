@@ -2,13 +2,12 @@ package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,7 @@ import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.CombatReport;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
@@ -35,15 +35,15 @@ public class CombatReportDialog extends DialogFragment {
     private String mCombatReportKey;
     private View mView;
     private ReportAdapter mReportAdapter;
-    private TreeMap<String, Empire> mEmpires;
+    private SparseArray<Empire> mEmpires;
 
     public void loadCombatReport(Star star, String combatReportKey) {
         mStar = star;
         mCombatReportKey = combatReportKey;
 
         if (mEmpires == null) {
-            mEmpires = new TreeMap<String, Empire>();
-            mEmpires.put("", EmpireManager.i.getNativeEmpire());
+            mEmpires = new SparseArray<Empire>();
+            mEmpires.put(0, EmpireManager.i.getNativeEmpire());
         }
     }
 
@@ -70,29 +70,22 @@ public class CombatReportDialog extends DialogFragment {
                 progressBar.setVisibility(View.GONE);
                 reportItems.setVisibility(View.VISIBLE);
 
-                TreeSet<String> empireKeys = new TreeSet<String>();
                 for (CombatReport.CombatRound round : report.getCombatRounds()) {
                     for (CombatReport.FleetSummary fleet : round.getFleets()) {
-                        if (fleet.getEmpireKey() == null || fleet.getEmpireKey().length() == 0) {
+                        Integer empireID = fleet.getEmpireID();
+                        if (empireID == null) {
                             continue;
                         }
-                        if (mEmpires.containsKey(fleet.getEmpireKey())) {
+                        if (mEmpires.indexOfKey(empireID) >= 0) {
                             continue;
                         }
-                        if (!empireKeys.contains(fleet.getEmpireKey())) {
-                            empireKeys.add(fleet.getEmpireKey());
-                        }
+                        mEmpires.put(empireID, null);
                     }
                 }
-                for (String empireKey : empireKeys) {
-                    EmpireManager.i.fetchEmpire(empireKey,
-                            new EmpireManager.EmpireFetchedHandler() {
-                                @Override
-                                public void onEmpireFetched(Empire empire) {
-                                    mEmpires.put(empire.getKey(), empire);
-                                    mReportAdapter.notifyDataSetChanged();
-                                }
-                            });
+                for (int i = 0; i < mEmpires.size(); i++) {
+                    if (mEmpires.valueAt(i) == null) {
+                        mEmpires.setValueAt(i, EmpireManager.i.getEmpire(mEmpires.keyAt(i)));
+                    }
                 }
 
                 mReportAdapter.setReport(report);
@@ -105,6 +98,29 @@ public class CombatReportDialog extends DialogFragment {
 
         return b.create();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        EmpireManager.eventBus.register(mEventHandler);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EmpireManager.eventBus.unregister(mEventHandler);
+    }
+
+    private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onEmpireUpdated(Empire empire) {
+            int index = mEmpires.indexOfKey(empire.getID());
+            if (index >= 0) {
+                mEmpires.setValueAt(index, empire);
+                mReportAdapter.notifyDataSetChanged();
+            }
+        }
+    };
 
     private class ReportAdapter extends BaseAdapter {
         private CombatReport mCombatReport;
@@ -215,7 +231,7 @@ public class CombatReportDialog extends DialogFragment {
                 if (record.fleetJoinedRecord != null) {
                     CombatReport.FleetSummary fleet = record.fleetJoinedRecord.getFleet();
                     ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
-                    Empire empire = mEmpires.get(fleet.getEmpireKey());
+                    Empire empire = mEmpires.get(fleet.getEmpireID());
 
                     recordTitle.setText("Fleet Joined Battle");
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
@@ -231,8 +247,8 @@ public class CombatReportDialog extends DialogFragment {
                     CombatReport.FleetSummary target = record.fleetTargetRecord.getTarget();
                     ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
                     ShipDesign targetDesign = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, target.getDesignID());
-                    Empire empire = mEmpires.get(fleet.getEmpireKey());
-                    Empire targetEmpire = mEmpires.get(target.getEmpireKey());
+                    Empire empire = mEmpires.get(fleet.getEmpireID());
+                    Empire targetEmpire = mEmpires.get(target.getEmpireID());
 
                     recordTitle.setText("Fleet Targetted");
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
@@ -251,8 +267,8 @@ public class CombatReportDialog extends DialogFragment {
                     CombatReport.FleetSummary target = record.fleetAttackRecord.getTarget();
                     ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
                     ShipDesign targetDesign = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, target.getDesignID());
-                    Empire empire = mEmpires.get(fleet.getEmpireKey());
-                    Empire targetEmpire = mEmpires.get(target.getEmpireKey());
+                    Empire empire = mEmpires.get(fleet.getEmpireID());
+                    Empire targetEmpire = mEmpires.get(target.getEmpireID());
 
                     recordTitle.setText("Fleet Attacked");
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
@@ -270,7 +286,7 @@ public class CombatReportDialog extends DialogFragment {
                 } else if (record.fleetDamagedRecord != null) {
                     CombatReport.FleetSummary fleet = record.fleetDamagedRecord.getFleet();
                     ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
-                    Empire empire = mEmpires.get(fleet.getEmpireKey());
+                    Empire empire = mEmpires.get(fleet.getEmpireID());
 
                     recordTitle.setText("Fleet Damaged");
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));

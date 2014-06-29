@@ -141,16 +141,17 @@ public class AllianceManager {
                 try {
                     Messages.AllianceRequests pb = ApiClient.getProtoBuf(url, Messages.AllianceRequests.class);
                     ArrayList<AllianceRequest> requests = new ArrayList<AllianceRequest>();
-                    TreeSet<String> empireKeys = new TreeSet<String>();
+                    TreeSet<Integer> empireIDs = new TreeSet<Integer>();
                     for (Messages.AllianceRequest request_pb : pb.getRequestsList()) {
                         AllianceRequest request = new AllianceRequest();
                         request.fromProtocolBuffer(request_pb);
                         requests.add(request);
-                        if (!empireKeys.contains(Integer.toString(request_pb.getRequestEmpireId()))) {
-                            empireKeys.add(Integer.toString(request_pb.getRequestEmpireId()));
+                        if (!empireIDs.contains(request_pb.getRequestEmpireId())) {
+                            empireIDs.add(request_pb.getRequestEmpireId());
                         }
-                        if (request_pb.hasTargetEmpireId() && !empireKeys.contains(Integer.toString(request_pb.getTargetEmpireId()))) {
-                            empireKeys.add(Integer.toString(request_pb.getTargetEmpireId()));
+                        if (request_pb.hasTargetEmpireId() && !empireIDs.contains(
+                                request_pb.getTargetEmpireId())) {
+                            empireIDs.add(request_pb.getTargetEmpireId());
                         }
                     }
                     mCursor = pb.getCursor();
@@ -158,7 +159,7 @@ public class AllianceManager {
                         mCursor = null;
                     }
 
-                    List<Empire> empires = EmpireManager.i.fetchEmpiresSync(empireKeys);
+                    List<Empire> empires = EmpireManager.i.refreshEmpiresSync(empireIDs);
                     mEmpires = new TreeMap<Integer, Empire>();
                     for (Empire empire : empires) {
                         mEmpires.put(Integer.parseInt(empire.getKey()), empire);

@@ -88,17 +88,11 @@ public class FleetInfoView extends FrameLayout {
         empireIcon.setImageBitmap(null);
 
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
-        EmpireManager.i.fetchEmpire(fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
-            @Override
-            public void onEmpireFetched(Empire empire) {
-                if (mFleet == null || !mFleet.getKey().equals(fleet.getKey())) {
-                    // if it's  not the same fleet as the one we're displaying, ignore it...
-                    return;
-                }
-                empireName.setText(empire.getDisplayName());
-                empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
-            }
-        });
+        Empire empire = EmpireManager.i.getEmpire(fleet.getEmpireID());
+        if (empire != null) {
+            empireName.setText(empire.getDisplayName());
+            empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
+        }
 
         fleetDesign.removeAllViews();
         FleetList.populateFleetNameRow(mContext, fleetDesign, fleet, design, 18.0f);

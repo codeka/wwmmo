@@ -126,26 +126,23 @@ public class DestinationDialog extends DialogFragment {
         progressBar.setVisibility(View.GONE);
         wormholeItems.setVisibility(View.VISIBLE);
 
-        TreeSet<String> empireKeys = new TreeSet<String>();
+        TreeSet<Integer> empireKeys = new TreeSet<Integer>();
         for (Star wormhole : wormholes){
-            String empireKey = Integer.toString(wormhole.getWormholeExtra().getEmpireID());
-            if (!empireKeys.contains(empireKey)) {
-                empireKeys.add(empireKey);
+            int empireID = wormhole.getWormholeExtra().getEmpireID();
+            if (!empireKeys.contains(empireID)) {
+                empireKeys.add(empireID);
             }
         }
-        for (String empireKey : empireKeys) {
-            if (mEmpires.containsKey(empireKey)) {
+        for (Integer empireID : empireKeys) {
+            if (mEmpires.containsKey(empireID)) {
                 continue;
             }
 
-            EmpireManager.i.fetchEmpire(empireKey,
-                    new EmpireManager.EmpireFetchedHandler() {
-                        @Override
-                        public void onEmpireFetched(Empire empire) {
-                            mEmpires.put(empire.getKey(), empire);
-                            mWormholeAdapter.notifyDataSetChanged();
-                        }
-                    });
+            Empire empire = EmpireManager.i.getEmpire(empireID);
+            if (empire != null) {
+                mEmpires.put(empire.getKey(), empire);
+                mWormholeAdapter.notifyDataSetChanged();
+            }
         }
 
         mWormholeAdapter.setWormholes(wormholes);

@@ -51,6 +51,7 @@ public class EmpireRankList extends ListView {
             return;
         }
         ShieldManager.eventBus.register(mEventHandler);
+        EmpireManager.eventBus.register(mEventHandler);
     }
 
     @Override
@@ -60,6 +61,7 @@ public class EmpireRankList extends ListView {
             return;
         }
         ShieldManager.eventBus.unregister(mEventHandler);
+        EmpireManager.eventBus.unregister(mEventHandler);
     }
 
     public void setEmpires(List<Empire> empires, boolean addGaps) {
@@ -82,6 +84,11 @@ public class EmpireRankList extends ListView {
         @EventHandler
         public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
             mRankListAdapter.notifyDataSetChanged();
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onEmpireUpdated(Empire empire) {
+            mRankListAdapter.onEmpireUpdated(empire);
         }
     };
 
@@ -114,6 +121,23 @@ public class EmpireRankList extends ListView {
 
             setEntries(entries, addGaps);
 
+        }
+
+        public void onEmpireUpdated(Empire empire) {
+            boolean refreshedAll = true;
+            for (ItemEntry entry : mEntries) {
+                if (entry.rank.getEmpireKey().equals(empire.getKey())) {
+                    entry.empire = empire;
+                }
+                if (entry.empire == null) {
+                    refreshedAll = false;
+                }
+            }
+
+            // if we've fetched them all, then refresh the data set
+            if (refreshedAll) {
+                notifyDataSetChanged();
+            }
         }
 
         private void setEntries(List<ItemEntry> entries, boolean addGaps) {
@@ -293,30 +317,12 @@ public class EmpireRankList extends ListView {
 
                         @Override
                         protected void onComplete(final ArrayList<ItemEntry> toFetch) {
-                            ArrayList<String> empireKeys = new ArrayList<String>();
+                            ArrayList<Integer> empireIDs = new ArrayList<Integer>();
                             for (ItemEntry entry : toFetch) {
-                                empireKeys.add(entry.rank.getEmpireKey());
+                                empireIDs.add(entry.rank.getEmpireID());
                             }
 
-                            EmpireManager.i.fetchEmpires(empireKeys, new EmpireManager.EmpireFetchedHandler() {
-                                @Override
-                                public void onEmpireFetched(Empire empire) {
-                                    boolean refreshedAll = true;
-                                    for (ItemEntry entry : toFetch) {
-                                        if (entry.rank.getEmpireKey().equals(empire.getKey())) {
-                                            entry.empire = empire;
-                                        }
-                                        if (entry.empire == null) {
-                                            refreshedAll = false;
-                                        }
-                                    }
-
-                                    // if we've fetched them all, then refresh the data set
-                                    if (refreshedAll) {
-                                        notifyDataSetChanged();
-                                    }
-                                }
-                            });
+                            EmpireManager.i.refreshEmpires(empireIDs);
 
                             mEmpireFetcher = null;
                         }

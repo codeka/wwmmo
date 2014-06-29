@@ -2,9 +2,7 @@ package au.com.codeka.warworlds.game.starfield;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.Entity;
@@ -14,12 +12,15 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import android.util.SparseArray;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
+import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Star;
 
 /** An entity that represents a star. */
@@ -97,7 +98,7 @@ public class StarEntity extends SelectableEntity {
 
     private void addEmpireIcons() {
         List<BaseColony> colonies = mStar.getColonies();
-        Map<String, Integer[]> empires = new TreeMap<String, Integer[]>();
+        SparseArray<Integer[]> empires = new SparseArray<Integer[]>();
         if (colonies != null && !colonies.isEmpty()) {
             for (int i = 0; i < colonies.size(); i++) {
                 BaseColony colony = colonies.get(i);
@@ -105,12 +106,12 @@ public class StarEntity extends SelectableEntity {
                     continue;
                 }
 
-                Empire emp = EmpireManager.i.getEmpire(colony.getEmpireKey());
+                Empire emp = EmpireManager.i.getEmpire(((Colony) colony).getEmpireID());
                 if (emp != null) {
-                    Integer[] counts = empires.get(emp.getKey());
+                    Integer[] counts = empires.get(emp.getID());
                     if (counts == null) {
                         counts = new Integer[] { 0, 0, 0 };
-                        empires.put(emp.getKey(), counts);
+                        empires.put(emp.getID(), counts);
                     }
                     counts[0] += 1;
                 }
@@ -126,12 +127,12 @@ public class StarEntity extends SelectableEntity {
                     continue;
                 }
 
-                Empire emp = EmpireManager.i.getEmpire(f.getEmpireKey());
+                Empire emp = EmpireManager.i.getEmpire(((Fleet) f).getEmpireID());
                 if (emp != null) {
-                    Integer[] counts = empires.get(emp.getKey());
+                    Integer[] counts = empires.get(emp.getID());
                     if (counts == null) {
                         counts = new Integer[] { 0, 0, 0 };
-                        empires.put(emp.getKey(), counts);
+                        empires.put(emp.getID(), counts);
                     }
                     if (f.getDesignID().equals("fighter")) {
                         counts[1] += (int) Math.ceil(f.getNumShips());
@@ -142,14 +143,14 @@ public class StarEntity extends SelectableEntity {
             }
         }
 
-        int i = 1;
-        for (String empireKey : empires.keySet()) {
-            Integer[] counts = empires.get(empireKey);
-            Empire emp = EmpireManager.i.getEmpire(empireKey);
+        for (int i = 0; i < empires.size(); i++) {
+            int empireID = empires.keyAt(i);
+            Integer[] counts = empires.valueAt(i);
+            Empire emp = EmpireManager.i.getEmpire(empireID);
             ITextureRegion texture = EmpireShieldManager.i.getShieldTexture(mStarfield.getActivity(), emp);
 
             Vector2 pt = Vector2.pool.borrow().reset(0, 30.0f);
-            pt.rotate(-(float)(Math.PI / 4.0) * i);
+            pt.rotate(-(float)(Math.PI / 4.0) * (i + 1));
 
             Sprite shieldSprite = new Sprite(
                     (float) pt.x, (float) pt.y,
@@ -172,7 +173,6 @@ public class StarEntity extends SelectableEntity {
             attachChild(empireCounts);
 
             Vector2.pool.release(pt); pt = null;
-            i++;
         }
     }
 

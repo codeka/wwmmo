@@ -94,6 +94,8 @@ public class EnemyPlanetActivity extends BaseActivity {
         });
     }
 
+    
+
     private Object mEventHandler = new Object() {
         @EventHandler
         public void onStarFetched(Star s) {
@@ -113,17 +115,9 @@ public class EnemyPlanetActivity extends BaseActivity {
 
             final Button attackBtn = (Button) findViewById(R.id.attack_btn);
             if (mColony != null) {
-                mColonyEmpire = EmpireManager.i.getEmpire(mColony.getEmpireKey());
+                mColonyEmpire = EmpireManager.i.getEmpire(mColony.getEmpireID());
                 if (mColonyEmpire == null) {
                     attackBtn.setEnabled(false);
-                    EmpireManager.i.fetchEmpire(mColony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
-                        @Override
-                        public void onEmpireFetched(Empire empire) {
-                            mColonyEmpire = empire;
-                            attackBtn.setEnabled(true);
-                            refreshEmpireDetails();
-                        }
-                    });
                 } else {
                     refreshEmpireDetails();
                 }
@@ -140,6 +134,15 @@ public class EnemyPlanetActivity extends BaseActivity {
             if (mColonyEmpire != null
                     && event.kind.equals(ShieldManager.EmpireShield)
                     && Integer.parseInt(mColonyEmpire.getKey()) == event.id) {
+                refreshEmpireDetails();
+            }
+        }
+
+        @EventHandler
+        public void onEmpireUpdated(Empire empire) {
+            if (mColony != null && mColony.getEmpireID() == empire.getID()) {
+                mColonyEmpire = empire;
+                findViewById(R.id.attack_btn).setEnabled(true);
                 refreshEmpireDetails();
             }
         }

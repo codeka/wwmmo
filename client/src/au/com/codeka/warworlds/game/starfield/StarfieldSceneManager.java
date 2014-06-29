@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.andengine.engine.camera.hud.HUD;
@@ -32,6 +31,7 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Handler;
+import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -47,6 +47,7 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.controlfield.ControlField;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.BuildManager;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -61,8 +62,7 @@ import au.com.codeka.warworlds.model.StarManager;
  * \c SurfaceView that displays the starfield. You can scroll around, tap on stars to bring
  * up their details and so on.
  */
-public class StarfieldSceneManager extends SectorSceneManager
-                                  implements EmpireManager.EmpireFetchedHandler {
+public class StarfieldSceneManager extends SectorSceneManager {
     private static final Log log = new Log("StarfieldSceneManager");
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
     private OnSpaceTapListener mSpaceTapListener;
@@ -92,7 +92,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     private float mBackgroundZoomAlpha = 1.0f;
 
     private TacticalPointCloud mPointCloud;
-    private TreeMap<String, TacticalControlField> mControlFields;
+    private SparseArray<TacticalControlField> mControlFields;
     private boolean mIsTacticalVisible;
     private float mTacticalZoomAlpha;
 
@@ -170,7 +170,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         super.onStart();
 
         StarManager.eventBus.register(mEventHandler);
-        EmpireManager.i.addEmpireUpdatedListener(null, this);
+        EmpireManager.eventBus.register(mEventHandler);
 
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire != null) {
@@ -187,7 +187,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         super.onStop();
 
         StarManager.eventBus.unregister(mEventHandler);
-        EmpireManager.i.removeEmpireUpdatedListener(this);
+        EmpireManager.eventBus.unregister(mEventHandler);
     }
 
     public Font getFont() {
@@ -249,23 +249,6 @@ public class StarfieldSceneManager extends SectorSceneManager
             final float offsetX, final float offsetY) {
         mHasScrolled = true;
         super.scrollTo(sectorX, sectorY, offsetX, offsetY);
-    }
-
-    @Override
-    public void onEmpireFetched(Empire empire) {
-        // if the player's empire changes, it might mean that the location of their HQ has changed,
-        // so we'll want to make sure it's still correct.
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        if (empire.getKey().equals(myEmpire.getKey())) {
-            if (mHqStar != null) {
-                mHqStar = empire.getHomeStar();
-            }
-        }
-
-        // otherwise, refresh the scene (but only if it's one we're actually displaying...)
-        if (mControlFields != null && mControlFields.keySet().contains(empire.getKey())) {
-            refreshScene();
-        }
     }
 
     public Star getSelectedStar() {
@@ -360,8 +343,9 @@ public class StarfieldSceneManager extends SectorSceneManager
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
-                    for (TacticalControlField tcf : mControlFields.values()) {
-                        tcf.updateAlpha(mIsTacticalVisible, mTacticalZoomAlpha);
+                    for (int i = 0; i < mControlFields.size(); i++) {
+                        mControlFields.valueAt(i).updateAlpha(
+                            mIsTacticalVisible, mTacticalZoomAlpha);
                     }
                 }
             });
@@ -371,8 +355,9 @@ public class StarfieldSceneManager extends SectorSceneManager
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
-                    for (TacticalControlField tcf : mControlFields.values()) {
-                        tcf.updateAlpha(mIsTacticalVisible, mTacticalZoomAlpha);
+                    for (int i = 0; i < mControlFields.size(); i++) {
+                        mControlFields.valueAt(i).updateAlpha(
+                            mIsTacticalVisible, mTacticalZoomAlpha);
                     }
                 }
             });
@@ -383,8 +368,9 @@ public class StarfieldSceneManager extends SectorSceneManager
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
-                    for (TacticalControlField tcf : mControlFields.values()) {
-                        tcf.updateAlpha(mIsTacticalVisible, mTacticalZoomAlpha);
+                    for (int i = 0; i < mControlFields.size(); i++) {
+                        mControlFields.valueAt(i).updateAlpha(
+                            mIsTacticalVisible, mTacticalZoomAlpha);
                     }
                 }
             });
@@ -586,7 +572,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         SectorManager sm = SectorManager.getInstance();
 
         ArrayList<Vector2> points = new ArrayList<Vector2>();
-        TreeMap<String, List<Vector2>> empirePoints = new TreeMap<String, List<Vector2>>();
+        SparseArray<List<Vector2>> empirePoints = new SparseArray<List<Vector2>>();
 
         for(int y = -mSectorRadius; y <= mSectorRadius; y++) {
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
@@ -606,20 +592,20 @@ public class StarfieldSceneManager extends SectorSceneManager
                     int starY = sy + (Sector.SECTOR_SIZE - star.getOffsetY());
                     Vector2 pt = new Vector2((float) starX / Sector.SECTOR_SIZE, (float) starY / Sector.SECTOR_SIZE);
 
-                    TreeSet<String> doneEmpires = new TreeSet<String>();
+                    TreeSet<Integer> doneEmpires = new TreeSet<Integer>();
                     for (BaseColony c : star.getColonies()) {
-                        String empireKey = c.getEmpireKey();
-                        if (empireKey == null || empireKey.length() == 0) {
+                        Integer empireID = ((Colony) c).getEmpireID();
+                        if (empireID == null) {
                             continue;
                         }
-                        if (doneEmpires.contains(empireKey)) {
+                        if (doneEmpires.contains(empireID)) {
                             continue;
                         }
-                        doneEmpires.add(empireKey);
-                        List<Vector2> thisEmpirePoints = empirePoints.get(empireKey);
+                        doneEmpires.add(empireID);
+                        List<Vector2> thisEmpirePoints = empirePoints.get(empireID);
                         if (thisEmpirePoints == null) {
                             thisEmpirePoints = new ArrayList<Vector2>();
-                            empirePoints.put(empireKey, thisEmpirePoints);
+                            empirePoints.put(empireID, thisEmpirePoints);
                         }
                         thisEmpirePoints.add(pt);
                     }
@@ -628,33 +614,35 @@ public class StarfieldSceneManager extends SectorSceneManager
             }
         }
 
-        mControlFields = new TreeMap<String, TacticalControlField>();
+        mControlFields = new SparseArray<TacticalControlField>();
         mPointCloud = new TacticalPointCloud(points);
         TacticalVoronoi v = new TacticalVoronoi(mPointCloud);
 
-        for (String empireKey : empirePoints.keySet()) {
+        for (int i = 0; i < empirePoints.size(); i++) {
+            
             TacticalControlField cf = new TacticalControlField(mPointCloud, v);
 
-            List<Vector2> pts = empirePoints.get(empireKey);
+            List<Vector2> pts = empirePoints.valueAt(i);
             for (Vector2 pt : pts) {
                 cf.addPointToControlField(pt);
             }
 
             int colour = Color.RED;
-            Empire empire = EmpireManager.i.getEmpire(empireKey);
+            int empireID = empirePoints.keyAt(i);
+            Empire empire = EmpireManager.i.getEmpire(empireID);
             if (empire != null) {
                 colour = EmpireShieldManager.i.getShieldColour(empire);
             } else {
-                final String theEmpireKey = empireKey;
+                final int theEmpireID = empireID;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        EmpireManager.i.refreshEmpire(theEmpireKey);
+                        EmpireManager.i.refreshEmpire(theEmpireID);
                     }
                 });
             }
             cf.addToScene(scene, getActivity().getVertexBufferObjectManager(), colour);
-            mControlFields.put(empireKey, cf);
+            mControlFields.put(empireID, cf);
         }
     }
 
@@ -751,6 +739,23 @@ public class StarfieldSceneManager extends SectorSceneManager
                     }
                 }
             });
+        }
+
+        @EventHandler
+        public void onEmpireUpdate(Empire empire) {
+            // if the player's empire changes, it might mean that the location of their HQ has changed,
+            // so we'll want to make sure it's still correct.
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            if (empire.getKey().equals(myEmpire.getKey())) {
+                if (mHqStar != null) {
+                    mHqStar = empire.getHomeStar();
+                }
+            }
+
+            // otherwise, refresh the scene (but only if it's one we're actually displaying...)
+            if (mControlFields != null && mControlFields.indexOfKey(empire.getID()) >= 0) {
+                refreshScene();
+            }
         }
     };
 

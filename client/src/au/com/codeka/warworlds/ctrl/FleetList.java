@@ -365,6 +365,11 @@ public class FleetList extends FrameLayout {
         }
 
         @EventHandler
+        public void onEmpireUpdated(Empire empire) {
+            mFleetListAdapter.notifyDataSetChanged();
+        }
+
+        @EventHandler
         public void onSpriteGenerated(ImageManager.SpriteGeneratedEvent event) {
             mFleetListAdapter.notifyDataSetChanged();
         }
@@ -411,27 +416,24 @@ public class FleetList extends FrameLayout {
             row3.setVisibility(View.GONE);
 
             final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-            EmpireManager.i.fetchEmpire(fleet.getEmpireKey(),
-                    new EmpireManager.EmpireFetchedHandler() {
-                @Override
-                public void onEmpireFetched(Empire empire) {
-                    row3.setVisibility(View.VISIBLE);
-
-                    Bitmap shieldBmp = EmpireShieldManager.i.getShield(context, empire);
-                    if (shieldBmp != null) {
-                        addImageToRow(context, row3, shieldBmp, 0);
-                    }
-
-                    if (myEmpire.getKey().equals(empire.getKey())) {
-                        addTextToRow(context, row3, empire.getDisplayName(), 0);
-                    } else if (myEmpire.getAlliance() != null && empire.getAlliance() != null &&
-                            myEmpire.getAlliance().getKey().equals(empire.getAlliance().getKey())) {
-                        addTextToRow(context, row3, empire.getDisplayName(), 0);
-                    } else {
-                        addTextToRow(context, row3, Html.fromHtml("<font color=\"red\">"+empire.getDisplayName()+"</font>"), 0);
-                    }
+            Empire empire = EmpireManager.i.getEmpire(fleet.getEmpireID());
+            if (empire != null) {
+                row3.setVisibility(View.VISIBLE);
+    
+                Bitmap shieldBmp = EmpireShieldManager.i.getShield(context, empire);
+                if (shieldBmp != null) {
+                    addImageToRow(context, row3, shieldBmp, 0);
                 }
-            });
+    
+                if (myEmpire.getKey().equals(empire.getKey())) {
+                    addTextToRow(context, row3, empire.getDisplayName(), 0);
+                } else if (myEmpire.getAlliance() != null && empire.getAlliance() != null &&
+                        myEmpire.getAlliance().getKey().equals(empire.getAlliance().getKey())) {
+                    addTextToRow(context, row3, empire.getDisplayName(), 0);
+                } else {
+                    addTextToRow(context, row3, Html.fromHtml("<font color=\"red\">"+empire.getDisplayName()+"</font>"), 0);
+                }
+            }
         }
     }
 

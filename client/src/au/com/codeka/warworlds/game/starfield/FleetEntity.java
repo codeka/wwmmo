@@ -144,7 +144,7 @@ public class FleetEntity extends SelectableEntity {
         setPosition((float) location.x, (float) location.y);
         Vector2.pool.release(location);
 
-        Empire emp = EmpireManager.i.getEmpire(mFleet.getEmpireKey());
+        Empire emp = EmpireManager.i.getEmpire(mFleet.getEmpireID());
         if (emp != null) {
             ITextureRegion texture = EmpireShieldManager.i.getShieldTexture(mStarfield.getActivity(), emp);
             Vector2 pt = Vector2.pool.borrow().reset(30.0f, 0.0f);

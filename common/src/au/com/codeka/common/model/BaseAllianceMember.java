@@ -21,6 +21,9 @@ public class BaseAllianceMember {
     public String getEmpireKey() {
         return mEmpireKey;
     }
+    public Integer getEmpireID() {
+        return Integer.parseInt(mEmpireKey);
+    }
     public DateTime getTimeJoined() {
         return mTimeJoined;
     }

@@ -354,7 +354,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             }
 
             if (planetInfo.colony != null) {
-                Empire empire = EmpireManager.i.getEmpire(planetInfo.colony.getEmpireKey());
+                Empire empire = EmpireManager.i.getEmpire(planetInfo.colony.getEmpireID());
                 if (empire != null) {
                     Bitmap shield = EmpireShieldManager.i.getShield(mContext, empire);
                     if (shield != null) {

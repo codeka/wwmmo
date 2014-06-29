@@ -41,27 +41,23 @@ public class BaseChatMessage {
     public String getEmpireKey() {
         return mEmpireKey;
     }
-    public BaseEmpire getEmpire() {
-        return mEmpire;
-    }
-    public void setEmpire(BaseEmpire emp) {
-        mEmpire = emp;
-        if (emp != null) {
-            mEmpireKey = emp.getKey();
+    public Integer getEmpireID() {
+        if (mEmpireKey == null) {
+            return null;
         }
+        return Integer.parseInt(mEmpireKey);
     }
-    public void setAllianceChat(boolean isAllianceChat) {
-        if (isAllianceChat && mEmpire != null && mEmpire.getAlliance() != null) {
-            mAllianceKey = mEmpire.getAlliance().getKey();
-        } else {
-            mAllianceKey = null;
-        }
+    public void setEmpireID(int empireID) {
+        mEmpireKey = Integer.toString(empireID);
     }
     public DateTime getDatePosted() {
         return mDatePosted;
     }
     public String getAllianceKey() {
         return mAllianceKey;
+    }
+    public void setAllianceKey(String allianceKey) {
+        mAllianceKey = allianceKey;
     }
     public String getEnglishMessage() {
         return mMessageEn;

@@ -364,7 +364,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
 
                     // the empire needs to be updated, too, since we'll have subtracted
                     // the cost of this move from your cash
-                    EmpireManager.i.refreshEmpire(mFleet.getEmpireKey());
+                    EmpireManager.i.refreshEmpire(mFleet.getEmpireID());
 
                     finish();
                 }

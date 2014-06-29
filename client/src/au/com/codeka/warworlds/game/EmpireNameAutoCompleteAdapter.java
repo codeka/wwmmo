@@ -101,9 +101,10 @@ public class EmpireNameAutoCompleteAdapter extends BaseAdapter implements Filter
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    EmpireManager.i.searchEmpires(mContext, constraint, new EmpireManager.EmpiresFetchedHandler() {
+                    EmpireManager.i.searchEmpires(mContext, constraint,
+                            new EmpireManager.SearchCompleteHandler() {
                         @Override
-                        public void onEmpiresFetched(List<Empire> empires) {
+                        public void onSearchComplete(List<Empire> empires) {
                             mEmpires = empires;
                             notifyDataSetChanged();
 

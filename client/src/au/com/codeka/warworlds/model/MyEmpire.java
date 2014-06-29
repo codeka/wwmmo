@@ -115,7 +115,7 @@ public class MyEmpire extends Empire {
                 }
 
                 // make sure we record the fact that the star is updated as well
-                EmpireManager.i.refreshEmpire(getKey());
+                EmpireManager.i.refreshEmpire(getID());
                 StarManager.getInstance().refreshStar(star.getKey());
             }
         }.execute();
@@ -288,7 +288,7 @@ public class MyEmpire extends Empire {
             @Override
             protected void onComplete(String name) {
                 mDisplayName = name;
-                EmpireManager.i.fireEmpireUpdated(MyEmpire.this);
+                EmpireManager.eventBus.publish(MyEmpire.this);
             }
         }.execute();
     }
@@ -327,7 +327,7 @@ public class MyEmpire extends Empire {
             protected void onComplete(DateTime lastUpdateTime) {
                 if (lastUpdateTime != null) {
                     mShieldLastUpdate = lastUpdateTime;
-                    EmpireManager.i.fireEmpireUpdated(MyEmpire.this);
+                    EmpireManager.eventBus.publish(MyEmpire.this);
                 }
             }
         }.execute();
