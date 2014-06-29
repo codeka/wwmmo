@@ -183,7 +183,7 @@ public class ChatAbuseController {
         public int getNumVotesToday(int empireID) throws Exception {
             String sql = "SELECT COUNT(*) FROM chat_abuse_reports" +
                         " WHERE reporting_empire_id = ?" +
-                        " AND reported_date >= DATE_ADD(NOW(), INTERVAL -1 DAY)";
+                        " AND reported_date >= (NOW() - INTERVAL '1 DAY')";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireID);
                 return (int) (long) stmt.selectFirstValue(Long.class);
