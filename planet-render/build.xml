@@ -21,7 +21,8 @@
     <target name="build">
         <echo message="${ant.project.name}: ${ant.file}" />
         <mkdir dir="bin"/>
-        <javac debug="false" destdir="bin" includeantruntime="false" source="1.6" target="1.6">
+        <javac debug="true" debuglevel="lines,source" destdir="bin" includeantruntime="false"
+               source="1.6" target="1.6">
             <src path="src"/>
             <classpath refid="planet-render.classpath"/>
         </javac>

@@ -136,11 +136,15 @@ public class ChatAbuseController {
                         " WHERE empire_id = ?" +
                           " AND reported_date > ?" +
                           // reports from before they were sinbinned last time don't count:
-                          " AND reported_date > IFNULL((SELECT MAX(expiry) FROM chat_sinbin WHERE chat_sinbin.empire_id = chat_abuse_reports.empire_id), '2000-01-01')";
+                          " AND reported_date > COALESCE((SELECT MAX(expiry) FROM chat_sinbin WHERE chat_sinbin.empire_id = chat_abuse_reports.empire_id), DATE '2000-01-01')";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireID);
                 stmt.setDateTime(2, cutoff);
-                return (int) (long) stmt.selectFirstValue(Long.class);
+                Long count = stmt.selectFirstValue(Long.class);
+                if (count == null) {
+                    return 0;
+                }
+                return (int) (long) count;
             }
         }
 

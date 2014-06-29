@@ -30,7 +30,7 @@
     <target name="build">
         <mkdir dir="bin"/>
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="false" destdir="bin" includeantruntime="false"
+        <javac debug="true" debuglevel="source,lines" destdir="bin" includeantruntime="false"
                source="1.7" target="1.7">
             <src path="src"/>
             <classpath refid="server.classpath"/>
