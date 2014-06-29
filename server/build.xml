@@ -1,32 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- WARNING: Eclipse auto-generated file.
-              Any modifications will be overwritten.
-              To include a user specific buildfile here, simply create one in the same
-              directory with the processing instruction <?eclipse.ant.import?>
-              as the first entry and export the buildfile again. -->
-<project basedir="." default="build" name="server">
+<project basedir="." default="deploy" name="server">
     <property environment="env"/>
     <property name="common.location" value="../common"/>
-    <property name="ECLIPSE_HOME" value="../../../../eclipse"/>
-    <property name="debuglevel" value="source,lines,vars"/>
-    <property name="target" value="1.7"/>
-    <property name="source" value="1.7"/>
-    <import file="build-custom.xml"/>
+    <property name="output.location" value="../../deploy"/>
+    <property name="deploy.filename" value="../../server.zip" />
+    
     <path id="common.classpath">
         <pathelement location="${common.location}/bin"/>
-        <pathelement location="${common.location}/libs/commons-codec-1.4.jar"/>
-        <pathelement location="${common.location}/libs/commons-collections-3.2.1.jar"/>
-        <pathelement location="${common.location}/libs/commons-lang3-3.1.jar"/>
-        <pathelement location="${common.location}/libs/commons-io-2.1.jar"/>
-        <pathelement location="${common.location}/libs/httpclient-4.2.2.jar"/>
-        <pathelement location="${common.location}/libs/httpcore-4.2.2.jar"/>
-        <pathelement location="${common.location}/libs/protobuf-java-2.5.0.jar"/>
-        <pathelement location="${common.location}/libs/joda-convert-1.2.jar"/>
-        <pathelement location="${common.location}/libs/joda-time-2.1.jar"/>
-        <pathelement location="${common.location}/libs/slf4j-api-1.7.5.jar"/>
-        <pathelement location="${common.location}/libs/slf4j-jdk14-1.7.5.jar"/>
-        <pathelement location="${common.location}/libs/jregex1.2_01.jar"/>
+        <fileset dir="${common.location}/libs">
+            <include name="*.jar" />
+        </fileset>
     </path>
+
     <path id="server.classpath">
         <pathelement location="bin"/>
         <fileset dir="../jetty/lib">
@@ -37,53 +22,54 @@
         </fileset>
         <path refid="common.classpath"/>
     </path>
-    <target name="init">
-        <mkdir dir="bin"/>
-        <copy includeemptydirs="false" todir="bin">
-            <fileset dir="src">
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
-    </target>
+
     <target name="clean">
         <delete dir="bin"/>
     </target>
-    <target depends="clean" name="cleanall">
-        <ant antfile="build.xml" dir="${common.location}" inheritAll="false" target="clean"/>
-    </target>
-    <target depends="build-subprojects,build-project" name="build"/>
-    <target name="build-subprojects">
-        <ant antfile="build.xml" dir="${common.location}" inheritAll="false" target="build-project">
-            <propertyset>
-                <propertyref name="build.compiler"/>
-            </propertyset>
-        </ant>
-    </target>
-    <target depends="init" name="build-project">
+
+    <target name="build">
+        <mkdir dir="bin"/>
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+        <javac debug="false" destdir="bin" includeantruntime="false"
+               source="1.7" target="1.7">
             <src path="src"/>
             <classpath refid="server.classpath"/>
         </javac>
     </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
-        <copy todir="${ant.library.dir}">
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+
+    <!--
+      This target packages all of the server output into the wwmmo/deploy folder. JAR files go
+      in the bin directory, data in the data directory and so on.
+    -->
+    <target name="package" depends="build">
+        <jar destfile="${output.location}/bin/common.jar"
+             basedir="${common.location}/bin" />
+        <jar destfile="${output.location}/bin/server.jar"
+             basedir="bin" />
+        <copy todir="${output.location}/bin">
+          <fileset file="libs/*.jar" />
+          <fileset file="../jetty/lib/*.jar" />
+          <fileset file="${common.location}/libs/*.jar" />
         </copy>
-        <unzip dest="${ant.library.dir}">
-            <patternset includes="jdtCompilerAdapter.jar"/>
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </unzip>
+        <copy todir="${output.location}/data">
+          <fileset dir="data" />
+        </copy>
+        <copy todir="${output.location}">
+          <fileset dir="scripts" />
+        </copy>
     </target>
-    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
-        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
-        <antcall target="build"/>
+
+    <!--
+      Takes the contents of the package (which will be in the wwmmo/deploy folder) and pushes
+      it to GCE, in the "stage" directory, ready to be pushed live.
+    -->
+    <target name="deploy" depends="package">
+        <zip destfile="${deploy.filename}" basedir="${output.location}" />
+        <echo message="${ant.project.name}: copying ${deploy.filename}..."/>
+        <exec executable="scp">
+            <arg value="${deploy.filename}" />
+            <arg value="dean@game.war-worlds.com:/home/dean" />
+        </exec>
     </target>
-    <target name="Runner">
-        <java classname="au.com.codeka.warworlds.server.Runner" failonerror="true" fork="yes">
-            <jvmarg line="-Djava.util.logging.config.file=/home/dean/software/wwmmo/trunk/server/logging.properties"/>
-            <classpath refid="server.classpath"/>
-        </java>
-    </target>
+
 </project>
