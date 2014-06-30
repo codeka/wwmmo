@@ -127,18 +127,16 @@ public class ChatFragment extends Fragment
     public void onStart() {
         super.onStart();
         mConversation.addMessageAddedListener(this);
+        EmpireManager.eventBus.register(mEventHandler);
+        ShieldManager.eventBus.register(mEventHandler);
         refreshMessages();
-        if (mConversation.getID() < 0) {
-            ShieldManager.eventBus.register(mEventHandler);
-        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mConversation.getID() < 0) {
-            ShieldManager.eventBus.unregister(mEventHandler);
-        }
+        ShieldManager.eventBus.unregister(mEventHandler);
+        EmpireManager.eventBus.unregister(mEventHandler);
         mConversation.removeMessageAddedListener(this);
     }
 
@@ -196,6 +194,12 @@ public class ChatFragment extends Fragment
             if (mConversation.getID() < 0) {
                 setupAllianceChatHeader(mHeaderContent);
             }
+            mChatAdapter.notifyDataSetChanged();
+        }
+
+        @EventHandler
+        public void onEmpireUpdated(Empire empire) {
+            mChatAdapter.notifyDataSetChanged();
         }
     };
 

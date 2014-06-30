@@ -145,7 +145,6 @@ public class EmpireActivity extends TabFragmentActivity {
                     return;
                 }
 
-                MyEmpire myEmpire = EmpireManager.i.getEmpire();
                 EmpireManager.eventBus.register(mEventHandler);
                 EmpireManager.i.refreshEmpire();
             }

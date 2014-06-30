@@ -178,7 +178,6 @@ public class ChatActivity extends BaseActivity
                 }
             }
         });
-
     }
 
     public class ChatPagerAdapter extends FragmentStatePagerAdapter {

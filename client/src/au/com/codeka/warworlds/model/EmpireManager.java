@@ -4,14 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.apache.commons.collections.IteratorUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -20,13 +17,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.SparseArray;
+import android.support.v4.util.LruCache;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.RealmContext;
-import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.eventbus.EventBus;
@@ -40,7 +36,7 @@ public class EmpireManager {
 
     public static EventBus eventBus = new EventBus();
 
-    private SparseArray<Empire> mEmpireCache = new SparseArray<Empire>();
+    private LruCache<Integer, Empire> mEmpireCache = new LruCache<Integer, Empire>(64);
     private HashSet<Integer> mInProgress = new HashSet<Integer>();
     private MyEmpire mEmpire;
     private NativeEmpire mNativeEmpire = new NativeEmpire();
@@ -81,14 +77,6 @@ public class EmpireManager {
             return empire;
         }
 
-        Messages.Empire pb = new LocalEmpireStore().getEmpire(empireID, allowOld);
-        if (pb != null) {
-            empire = new Empire();
-            empire.fromProtocolBuffer(pb);
-            mEmpireCache.put(empireID, empire);
-            return empire;
-        }
-
         // Refresh the empire from the server, but just return null for now.
         refreshEmpire(empireID);
         return null;
@@ -118,15 +106,6 @@ public class EmpireManager {
 
             Empire empire = mEmpireCache.get(empireID);
             if (empire != null) {
-                empires.add(empire);
-                continue;
-            }
-
-            Messages.Empire pb = new LocalEmpireStore().getEmpire(empireID, allowOld);
-            if (pb != null) {
-                empire = new Empire();
-                empire.fromProtocolBuffer(pb);
-                mEmpireCache.put(empireID, empire);
                 empires.add(empire);
                 continue;
             }
@@ -232,14 +211,16 @@ public class EmpireManager {
      * any empires we have cached with the new data.
      */
     public void onAllianceUpdated(Alliance alliance) {
-        if (mEmpire != null && mEmpire.getAlliance() != null && mEmpire.getAlliance().getKey().equals(alliance.getKey())) {
+        if (mEmpire != null && mEmpire.getAlliance() != null
+                && mEmpire.getAlliance().getKey().equals(alliance.getKey())) {
             mEmpire.updateAlliance(alliance);
             eventBus.publish(mEmpire);
         }
 
-        for (int i = 0; i < mEmpireCache.size(); i++) {
-            Empire empire = mEmpireCache.valueAt(i);
-            if (empire.getAlliance() != null && empire.getAlliance().getKey().equals(alliance.getKey())) {
+        for (Map.Entry<Integer, Empire> entry : mEmpireCache.snapshot().entrySet()) {
+            Empire empire = entry.getValue();
+            if (empire != null && empire.getAlliance() != null
+                    && empire.getAlliance().getKey().equals(alliance.getKey())) {
                 empire.updateAlliance(alliance);
                 eventBus.publish(empire);
             }
@@ -260,6 +241,17 @@ public class EmpireManager {
             int num = 0;
             while (iter.hasNext()) {
                 Integer empireID = iter.next();
+
+                // If it's in the empire store, then we don't need to fetch from the server, yay!
+                Messages.Empire pb = new LocalEmpireStore().getEmpire(empireID, false);
+                if (pb != null) {
+                    Empire empire = new Empire();
+                    empire.fromProtocolBuffer(pb);
+                    mEmpireCache.put(empireID, empire);
+                    empires.add(empire);
+                    continue;
+                }
+
                 if (url == null) {
                     url = "empires/search?ids=";
                 } else {

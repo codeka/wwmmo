@@ -2,12 +2,10 @@ package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.SparseArray;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;

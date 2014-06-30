@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.SoftReference;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,7 +19,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
-import android.util.SparseArray;
+import android.os.Build;
+import android.support.v4.util.LruCache;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
@@ -38,18 +38,25 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
 
     public static final EventBus eventBus = new EventBus();
 
-    private SparseArray<SoftReference<Bitmap>> mShields;
-    private SparseArray<ITextureRegion> mShieldTextures;
-    private Set<Integer> mFetchingShields;
+    // make the bitmap LruCache 4MB maximum
+    private LruCache<Integer, Bitmap> mShields = new LruCache<Integer, Bitmap>(4 * 1024 * 1024) {
+        @Override
+        protected int sizeOf(Integer key, Bitmap value) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+                return value.getByteCount();
+            } else {
+                return value.getHeight() * value.getRowBytes();
+            }
+        }
+    };
+    private LruCache<Integer, ITextureRegion> mShieldTextures
+        = new LruCache<Integer, ITextureRegion>(32);
+    private Set<Integer> mFetchingShields = new HashSet<Integer>();
 
     public static final String EmpireShield = "empire";
     public static final String AllianceShield = "alliance";
 
     protected ShieldManager() {
-        mShields = new SparseArray<SoftReference<Bitmap>>();
-        mShieldTextures = new SparseArray<ITextureRegion>();
-        mFetchingShields = new HashSet<Integer>();
-
         RealmManager.i.addRealmChangedHandler(this);
     }
 
@@ -58,8 +65,8 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
     }
 
     public void clearCache() {
-        mShieldTextures.clear();
-        mShields.clear();
+        mShieldTextures.evictAll();
+        mShields.evictAll();
     }
 
     @Override
@@ -72,11 +79,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
      * Alliance's shield (i.e. their icon).
      */
     protected Bitmap getShield(Context context, ShieldInfo shieldInfo) {
-        Bitmap bmp = null;
-        SoftReference<Bitmap> bmpref = mShields.get(shieldInfo.id);
-        if (bmpref != null) {
-            bmp = bmpref.get();
-        }
+        Bitmap bmp = mShields.get(shieldInfo.id);
 
         if (bmp == null) {
             bmp = loadCachedShieldImage(context, shieldInfo);
@@ -91,14 +94,14 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
                 saveCachedShieldImage(context, shieldInfo, bmp);
             }
 
-            mShields.put(shieldInfo.id, new SoftReference<Bitmap>(bmp));
+            mShields.put(shieldInfo.id, bmp);
         }
 
         return bmp;
     }
 
     public void clearTextureCache() {
-        mShieldTextures.clear();
+        mShieldTextures.evictAll();
     }
 
     /** Gets (or creates) the empire's shield as an andengine texture. */
@@ -154,7 +157,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
 
                     // save the cached version
                     saveCachedShieldImage(App.i, shieldInfo, bmp);
-                    mShields.put(shieldInfo.id, new SoftReference<Bitmap>(bmp));
+                    mShields.put(shieldInfo.id, bmp);
 
                     // TODO: fix it
                     mShieldTextures.remove(shieldInfo.id);
