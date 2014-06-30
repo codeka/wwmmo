@@ -36,11 +36,6 @@ public class EmpireShieldManager extends ShieldManager {
     }
 
     @Override
-    protected Bitmap processShieldImage(Bitmap bmp) {
-        return combineShieldImage(App.i, bmp);
-    }
-
-    @Override
     protected Bitmap getDefaultShield(ShieldInfo shieldInfo) {
         int colour = getShieldColour(shieldInfo);
         return combineShieldColour(App.i, colour);
@@ -48,7 +43,7 @@ public class EmpireShieldManager extends ShieldManager {
 
     @Override
     protected String getFetchUrl(ShieldInfo shieldInfo) {
-        return "empires/" + shieldInfo.id + "/shield";
+        return "empires/" + shieldInfo.id + "/shield?final=1&size=64";
     }
 
     /**
@@ -65,30 +60,6 @@ public class EmpireShieldManager extends ShieldManager {
         for (int i = 0; i < pixels.length; i++) {
             if (pixels[i] == Color.MAGENTA) {
                 pixels[i] = colour;
-            }
-        }
-
-        return Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888);
-    }
-
-    /**
-     * Combines the given image with the base shield image.
-     */
-    public Bitmap combineShieldImage(Context context, Bitmap otherImage) {
-        ensureBaseImage(context);
-
-        int width = sBaseShield.getWidth();
-        int height = sBaseShield.getHeight();
-        int[] pixels = new int[width * height];
-        sBaseShield.getPixels(pixels, 0, width, 0, 0, width, height);
-
-        float sx = (float) otherImage.getWidth() / (float) width;
-        float sy = (float) otherImage.getHeight() / (float) height;
-        for (int i = 0; i < pixels.length; i++) {
-            if (pixels[i] == Color.MAGENTA) {
-                int y = i / width;
-                int x = i % width;
-                pixels[i] = otherImage.getPixel((int)(x * sx), (int)(y * sy));
             }
         }
 

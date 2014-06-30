@@ -165,7 +165,6 @@ public class EmpireManager {
         for (Integer empireID : empireIDs) {
             if (!mInProgress.contains(empireID)) {
                 toFetch.add(empireID);
-            } else {
                 mInProgress.add(empireID);
             }
         }

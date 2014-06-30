@@ -34,11 +34,6 @@ public class AllianceShieldManager extends ShieldManager {
     }
 
     @Override
-    protected Bitmap processShieldImage(Bitmap bmp) {
-        return bmp;
-    }
-
-    @Override
     protected Bitmap getDefaultShield(ShieldInfo shieldInfo) {
         ensureDefaultImage(App.i);
         return sDefaultShield;

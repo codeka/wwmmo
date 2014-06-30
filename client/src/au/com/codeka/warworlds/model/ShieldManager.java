@@ -38,8 +38,8 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
 
     public static final EventBus eventBus = new EventBus();
 
-    // make the bitmap LruCache 4MB maximum
-    private LruCache<Integer, Bitmap> mShields = new LruCache<Integer, Bitmap>(4 * 1024 * 1024) {
+    // make the bitmap LruCache 2MB maximum
+    private LruCache<Integer, Bitmap> mShields = new LruCache<Integer, Bitmap>(2 * 1024 * 1024) {
         @Override
         protected int sizeOf(Integer key, Bitmap value) {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
@@ -134,7 +134,6 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
         return textureRegion;
     }
 
-    protected abstract Bitmap processShieldImage(Bitmap bmp);
     protected abstract Bitmap getDefaultShield(ShieldInfo shieldInfo);
     protected abstract String getFetchUrl(ShieldInfo shieldInfo);
 
@@ -153,7 +152,6 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
                 String url = getFetchUrl(shieldInfo);
                 try {
                     Bitmap bmp = ApiClient.getImage(url);
-                    bmp = processShieldImage(bmp);
 
                     // save the cached version
                     saveCachedShieldImage(App.i, shieldInfo, bmp);
@@ -217,7 +215,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
 
         File cacheDir = context.getCacheDir();
         String fullPath = cacheDir.getAbsolutePath() + File.separator + shieldInfo.kind + "-shields" + File.separator;
-        fullPath += String.format("%d-v2-%d-%d.png", RealmContext.i.getCurrentRealm().getID(), shieldInfo.id, lastUpdate);
+        fullPath += String.format("%d-v3-%d-%d.png", RealmContext.i.getCurrentRealm().getID(), shieldInfo.id, lastUpdate);
         return fullPath;
     }
 
@@ -233,8 +231,6 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
             this.lastUpdate = lastUpdate;
         }
     }
-
-    
 
     public static class ShieldUpdatedEvent {
         public String kind;

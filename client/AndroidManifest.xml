@@ -95,7 +95,7 @@
                 android:value=".game.starfield.StarfieldActivity" />
         </activity>
 
-        <activity android:name="com.google.ads.AdActivity"
+        <activity android:name="com.google.android.gms.ads.AdActivity"
                   android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 
         <service android:name=".GCMIntentService" />

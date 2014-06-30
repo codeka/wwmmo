@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.game;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -11,7 +13,10 @@ import org.json.JSONException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -717,7 +722,7 @@ public class EmpireActivity extends TabFragmentActivity {
         private void loadShieldImage() {
             Bitmap bmp = mImagePickerHelper.getImage();
             if (bmp != null) {
-                bmp = EmpireShieldManager.i.combineShieldImage(getActivity(), bmp);
+                bmp = combineShieldImage(getActivity(), bmp);
 
                 ImageView currentShield = (ImageView) mView.findViewById(R.id.current_shield);
                 currentShield.setImageBitmap(bmp);
@@ -728,6 +733,48 @@ public class EmpireActivity extends TabFragmentActivity {
                 ((Button) mView.findViewById(R.id.save_btn)).setEnabled(true);;
             }
         }
+
+        /** Combines the given image with the base shield image. */
+        public Bitmap combineShieldImage(Context context, Bitmap otherImage) {
+            AssetManager assetManager = context.getAssets();
+            InputStream ins;
+            try {
+                ins = assetManager.open("img/shield.png");
+            } catch (IOException e) {
+                // should never happen!
+                return null;
+            }
+
+            Bitmap baseShield;
+            try {
+                BitmapFactory.Options opts = new BitmapFactory.Options();
+                opts.inPurgeable = true;
+                opts.inInputShareable = true;
+                baseShield = BitmapFactory.decodeStream(ins, null, opts);
+            } finally {
+                try {
+                    ins.close();
+                } catch (IOException e) {
+                }
+            }
+
+            int width = baseShield.getWidth();
+            int height = baseShield.getHeight();
+            int[] pixels = new int[width * height];
+            baseShield.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            float sx = (float) otherImage.getWidth() / (float) width;
+            float sy = (float) otherImage.getHeight() / (float) height;
+            for (int i = 0; i < pixels.length; i++) {
+                if (pixels[i] == Color.MAGENTA) {
+                    int y = i / width;
+                    int x = i % width;
+                    pixels[i] = otherImage.getPixel((int)(x * sx), (int)(y * sy));
+                }
+            }
+
+            return Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888);
+    }
 
         private void purchase(String sku, final PurchaseCompleteHandler onComplete) {
             if (Util.isDebug()) {
