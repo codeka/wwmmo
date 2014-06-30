@@ -46,8 +46,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 
 
-public class ChatFragment extends Fragment
-                          implements ChatManager.MessageAddedListener {
+public class ChatFragment extends Fragment {
     private ChatConversation mConversation;
     private ChatAdapter mChatAdapter;
     private Handler mHandler;
@@ -55,6 +54,7 @@ public class ChatFragment extends Fragment
     private ListView mChatOutput;
     private boolean mNoMoreChats;
     private View mHeaderContent;
+    private Button mUnreadCountBtn;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,6 +88,18 @@ public class ChatFragment extends Fragment
         mChatOutput = (ListView) v.findViewById(R.id.chat_output);
         mChatOutput.setAdapter(mChatAdapter);
 
+        mUnreadCountBtn = (Button) v.findViewById(R.id.unread_btn);
+        if (mUnreadCountBtn != null) {
+            refreshUnreadCountButton();
+            mUnreadCountBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // move to the first conversation with an unread message
+                    ((ChatActivity) getActivity()).moveToFirstUnreadConversation();
+                }
+            });
+        }
+
         mChatOutput.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -114,19 +126,9 @@ public class ChatFragment extends Fragment
     }
 
     @Override
-    public void onMessageAdded(final ChatMessage msg) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                appendMessage(msg);
-            }
-        });
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
-        mConversation.addMessageAddedListener(this);
+        ChatManager.eventBus.register(mEventHandler);
         EmpireManager.eventBus.register(mEventHandler);
         ShieldManager.eventBus.register(mEventHandler);
         refreshMessages();
@@ -137,7 +139,7 @@ public class ChatFragment extends Fragment
         super.onStop();
         ShieldManager.eventBus.unregister(mEventHandler);
         EmpireManager.eventBus.unregister(mEventHandler);
-        mConversation.removeMessageAddedListener(this);
+        ChatManager.eventBus.unregister(mEventHandler);
     }
 
     private void refreshMessages() {
@@ -189,7 +191,7 @@ public class ChatFragment extends Fragment
     }
 
     private Object mEventHandler = new Object() {
-        @EventHandler
+        @EventHandler(thread = EventHandler.UI_THREAD)
         public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
             if (mConversation.getID() < 0) {
                 setupAllianceChatHeader(mHeaderContent);
@@ -197,9 +199,22 @@ public class ChatFragment extends Fragment
             mChatAdapter.notifyDataSetChanged();
         }
 
-        @EventHandler
+        @EventHandler(thread = EventHandler.UI_THREAD)
         public void onEmpireUpdated(Empire empire) {
             mChatAdapter.notifyDataSetChanged();
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onMessageAdded(ChatManager.MessageAddedEvent event) {
+            if (event.conversation.getID() == mConversation.getID()) {
+                appendMessage(event.msg);
+                refreshUnreadCountButton();
+            }
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onUnreadMessageCountUpdated(ChatManager.UnreadMessageCountUpdatedEvent event) {
+            refreshUnreadCountButton();
         }
     };
 
@@ -421,11 +436,9 @@ public class ChatFragment extends Fragment
         newGroupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((ChatActivity) getActivity()).startConversation(null);
+                ChatManager.i.startConversation(null);
             }
         });
-
-        setupUnreadMessageCount(v);
     }
 
     private void setupAllianceChatHeader(View v) {
@@ -439,8 +452,6 @@ public class ChatFragment extends Fragment
 
         ImageView allianceIcon = (ImageView) v.findViewById(R.id.alliance_icon);
         allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(getActivity(), alliance));
-
-        setupUnreadMessageCount(v);
     }
 
     private void setupPrivateChatHeader(View v) {
@@ -505,50 +516,18 @@ public class ChatFragment extends Fragment
         return numUnread;
     }
 
-    private static void refreshUnreadCountButton(Button btn) {
+    private void refreshUnreadCountButton() {
+        if (mUnreadCountBtn == null) {
+            return;
+        }
+
         int numUnread = getTotalUnreadCount();
 
         if (numUnread > 0) {
-            btn.setVisibility(View.VISIBLE);
-            btn.setText(String.format("  %d  ", numUnread));
+            mUnreadCountBtn.setVisibility(View.VISIBLE);
+            mUnreadCountBtn.setText(String.format("  %d  ", numUnread));
         } else {
-            btn.setVisibility(View.GONE);
+            mUnreadCountBtn.setVisibility(View.GONE);
         }
-    }
-
-    private void setupUnreadMessageCount(View v) {
-        final Button btn = (Button) v.findViewById(R.id.unread_btn);
-        refreshUnreadCountButton(btn);
-
-        ChatManager.i.addMessageAddedListener(new ChatManager.MessageAddedListener() {
-            @Override
-            public void onMessageAdded(ChatMessage msg) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshUnreadCountButton(btn);
-                    }
-                });
-            }
-        });
-        ChatManager.i.addUnreadMessageCountListener(new ChatManager.UnreadMessageCountListener() {
-            @Override
-            public void onUnreadMessageCountChanged() {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshUnreadCountButton(btn);
-                    }
-                });
-            }
-        });
-
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // move to the first conversation with an unread message
-                ((ChatActivity) getActivity()).moveToFirstUnreadConversation();
-            }
-        });
     }
 }

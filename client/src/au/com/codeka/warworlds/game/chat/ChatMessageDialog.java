@@ -16,7 +16,6 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.EnemyEmpireActivity;
-import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.Empire;
@@ -83,13 +82,8 @@ public class ChatMessageDialog extends DialogFragment {
         privateMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChatManager.i.startConversation(mEmpire.getKey(), new ChatManager.ConversationStartedListener() {
-                    @Override
-                    public void onConversationStarted(ChatConversation conversation) {
-                        ((ChatActivity) getActivity()).startConversation(mEmpire.getKey());
-                        dismiss();
-                    }
-                });
+                ChatManager.i.startConversation(mEmpire.getKey());
+                dismiss();
             }
         });
 

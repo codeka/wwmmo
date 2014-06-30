@@ -16,6 +16,7 @@ import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.eventbus.EventBus;
 
 /**
  * This class keeps track of chats and what-not.
@@ -24,23 +25,19 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public static ChatManager i = new ChatManager();
     private static final Log log = new Log("ChatManager");
 
-    private ArrayList<MessageAddedListener> mMessageAddedListeners;
-    private ArrayList<ConversationsRefreshListener> mConversationsRefreshListeners;
-    private ArrayList<UnreadMessageCountListener> mUnreadMessageCountListeners;
+    public static EventBus eventBus = new EventBus();
+
     private DateTime mMostRecentMsg;
     private boolean mRequesting;
     private SparseArray<ChatConversation> mConversations;
     private boolean mConversationsRefreshing = false;
     private boolean mIsSetup = false;
+    private ChatRecentMessages mRecentMessages = new ChatRecentMessages();
 
     public static final int GLOBAL_CONVERSATION_ID = 0;
     public static final int ALLIANCE_CONVERSATION_ID = -1;
-    public static final int RECENT_CONVERSATION_ID = -2;
 
     private ChatManager() {
-        mMessageAddedListeners = new ArrayList<MessageAddedListener>();
-        mConversationsRefreshListeners = new ArrayList<ConversationsRefreshListener>();
-        mUnreadMessageCountListeners = new ArrayList<UnreadMessageCountListener>();
         mConversations = new SparseArray<ChatConversation>();
     }
 
@@ -56,7 +53,6 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         if (EmpireManager.i.getEmpire().getAlliance() != null) {
             mConversations.append(ALLIANCE_CONVERSATION_ID, new ChatConversation(ALLIANCE_CONVERSATION_ID));
         }
-        mConversations.append(RECENT_CONVERSATION_ID, new ChatRecentConversation(RECENT_CONVERSATION_ID));
         refreshConversations();
 
         mIsSetup = true;
@@ -64,56 +60,6 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         // fetch all chats from the last 24 hours -- todo: by day? or by number?
         mMostRecentMsg = (new DateTime()).minusDays(1);
         requestMessages(mMostRecentMsg);
-    }
-
-    public void addMessageAddedListener(MessageAddedListener listener) {
-        if (!mMessageAddedListeners.contains(listener)) {
-            mMessageAddedListeners.add(listener);
-        }
-    }
-    public void removeMessageAddedListener(MessageAddedListener listener) {
-        mMessageAddedListeners.remove(listener);
-    }
-    public void fireMessageAddedListeners(ChatMessage msg) {
-        for(MessageAddedListener listener : mMessageAddedListeners) {
-            listener.onMessageAdded(msg);
-        }
-    }
-
-    public void addUnreadMessageCountListener(UnreadMessageCountListener listener) {
-        if (!mUnreadMessageCountListeners.contains(listener)) {
-            mUnreadMessageCountListeners.add(listener);
-        }
-    }
-    public void removeUnreadMessageCountListener(UnreadMessageCountListener listener) {
-        mUnreadMessageCountListeners.remove(listener);
-    }
-    public void fireUnreadMessageCountListeners() {
-        for(UnreadMessageCountListener listener : mUnreadMessageCountListeners) {
-            listener.onUnreadMessageCountChanged();
-        }
-    }
-
-    public void addConversationsRefreshListener(ConversationsRefreshListener listener) {
-        if (!mConversationsRefreshListeners.contains(listener)) {
-            mConversationsRefreshListeners.add(listener);
-        }
-    }
-    public void removeConversationsRefreshListener(ConversationsRefreshListener listener) {
-        mConversationsRefreshListeners.remove(listener);
-    }
-    public void fireConversationsRefreshListeners() {
-        for(ConversationsRefreshListener listener : mConversationsRefreshListeners) {
-            listener.onConversationsRefreshed();
-        }
-    }
-
-    /** Returns true if any conversation listeners are attached, useful to know whether the game is currently
-        running or not. */
-    public boolean hasConversationListeners() {
-        return !mConversationsRefreshListeners.isEmpty() ||
-               !mUnreadMessageCountListeners.isEmpty() ||
-               !mMessageAddedListeners.isEmpty();
     }
 
     /** Posts a message from us to the server. */
@@ -143,11 +89,23 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 if (msg != null) {
                     ChatConversation conv = getConversation(msg);
                     if (conv != null) {
-                        conv.addMessage(msg);
+                        conv.addMessage(msg, true);
+                        eventBus.publish(new MessageAddedEvent(conv, msg));
+                        mRecentMessages.addMessage(msg);
                     }
                 }
             }
         }.execute();
+    }
+
+    public void addMessage(ChatConversation conv, ChatMessage msg) {
+        conv.addMessage(msg, true);
+        ChatManager.eventBus.publish(new ChatManager.MessageAddedEvent(conv, msg));
+        mRecentMessages.addMessage(msg);
+    }
+
+    public ChatRecentMessages getRecentMessages() {
+        return mRecentMessages;
     }
 
     public void reportMessageForAbuse(final Context context, final ChatMessage msg) {
@@ -241,6 +199,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                     // update our internal representation with the new empire
                     ChatConversation realConvo = getConversationByID(conversation.getID());
                     realConvo.getParticipants().add(new ChatConversationParticipant(Integer.parseInt(empire.getKey())));
+                    eventBus.publish(new ConversationsUpdatedEvent());
                 }
             }
         }.execute();
@@ -261,12 +220,14 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
         return getConversationByID(msg.getConversationID());
     }
+
     public ChatConversation getGlobalConversation() {
         if (!mIsSetup) {
             return null;
         }
         return mConversations.get(GLOBAL_CONVERSATION_ID);
     }
+
     public ChatConversation getAllianceConversation() {
         if (!mIsSetup) {
             return null;
@@ -299,7 +260,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     }
 
     /** Start a new conversation with the given empireID (can be null to start an empty conversation). */
-    public void startConversation(final String empireID, final ConversationStartedListener handler) {
+    public void startConversation(final String empireID) {
         // if we already have a conversation going with this guy, just reuse that one.
         if (empireID != null) {
             for (int index = 0; index < mConversations.size(); index++) {
@@ -310,7 +271,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 }
                 if (participants.get(0).getEmpireID() == Integer.parseInt(empireID) ||
                     participants.get(1).getEmpireID() == Integer.parseInt(empireID)) {
-                    handler.onConversationStarted(conversation);
+                    eventBus.publish(new ConversationStartedEvent(conversation));
                     return;
                 }
             }
@@ -345,7 +306,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             protected void onComplete(ChatConversation conversation) {
                 if (conversation != null) {
                     mConversations.put(conversation.getID(), conversation);
-                    handler.onConversationStarted(conversation);
+                    eventBus.publish(new ConversationStartedEvent(conversation));
                 }
             }
         }.execute();
@@ -372,7 +333,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
             @Override
             protected void onComplete(Boolean success) {
-                fireConversationsRefreshListeners();
+                eventBus.publish(new ConversationsUpdatedEvent());
             }
         }.execute();
     }
@@ -457,7 +418,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 if (needsUpdate) {
                     refreshConversations();
                 } else {
-                    fireConversationsRefreshListeners();
+                    eventBus.publish(new ConversationsUpdatedEvent());
                 }
             }
         }.execute();
@@ -469,7 +430,9 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             public void onMessagesFetched(List<ChatMessage> msgs) {
                 for (ChatMessage msg : msgs) {
                     ChatConversation conversation = getConversation(msg);
-                    conversation.addMessage(msg);
+                    conversation.addMessage(msg, true);
+                    eventBus.publish(new MessageAddedEvent(conversation, msg));
+                    mRecentMessages.addMessage(msg);
                 }
             }
         });
@@ -524,19 +487,37 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }.execute();
     }
 
-    public interface MessageAddedListener {
-        void onMessageAdded(ChatMessage msg);
+    public static class MessageAddedEvent {
+        public ChatConversation conversation;
+        public ChatMessage msg;
+
+        public MessageAddedEvent(ChatConversation conversation, ChatMessage msg) {
+            this.conversation = conversation;
+            this.msg = msg;
+        }
     }
-    public interface ConversationStartedListener {
-        void onConversationStarted(ChatConversation conversation);
+
+    public static class ConversationStartedEvent {
+        public ChatConversation conversation;
+
+        public ConversationStartedEvent(ChatConversation conversation) {
+            this.conversation = conversation;
+        }
     }
-    public interface ConversationsRefreshListener {
-        void onConversationsRefreshed();
+
+    /** Event fired when conversation list updates. */
+    public static class ConversationsUpdatedEvent {
     }
+
+    public static class UnreadMessageCountUpdatedEvent {
+        public int numUnread;
+
+        public UnreadMessageCountUpdatedEvent(int numUnread) {
+            this.numUnread = numUnread;
+        }
+    }
+
     public interface MessagesFetchedListener {
         void onMessagesFetched(List<ChatMessage> msgs);
-    }
-    public interface UnreadMessageCountListener {
-        void onUnreadMessageCountChanged();
     }
 }

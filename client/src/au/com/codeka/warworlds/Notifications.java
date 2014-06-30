@@ -148,7 +148,7 @@ public class Notifications {
 
         ChatConversation conversation = ChatManager.i.getConversation(msg);
         if (conversation != null) {
-            conversation.addMessage(msg);
+            ChatManager.i.addMessage(conversation, msg);
 
             if (conversation.isPrivateChat() && BackgroundDetector.i.isInBackground()) {
                 if (conversation.isMuted()) {

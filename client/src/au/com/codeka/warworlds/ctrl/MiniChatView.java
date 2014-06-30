@@ -27,12 +27,12 @@ import au.com.codeka.warworlds.model.EmpireManager;
  * This control displays the mini chat window, which displays recent chat
  * messages on each screen.
  */
-public class MiniChatView extends RelativeLayout
-                          implements ChatManager.MessageAddedListener {
+public class MiniChatView extends RelativeLayout {
     private Context mContext;
 
     private ScrollView mScrollView;
     private LinearLayout mMsgsContainer;
+    private Button mUnreadMsgCount;
     private boolean mAutoTranslate;
 
     private static final int MAX_ROWS = 10;
@@ -53,7 +53,8 @@ public class MiniChatView extends RelativeLayout
         mScrollView = (ScrollView) view.findViewById(R.id.scrollview);
         mMsgsContainer = (LinearLayout) view.findViewById(R.id.msgs_container);
         mAutoTranslate = new GlobalOptions().autoTranslateChatMessages();
-        setupUnreadMessageCount(view);
+        mUnreadMsgCount = (Button) view.findViewById(R.id.unread_btn);
+        refreshUnreadCountButton();
 
         mMsgsContainer.setOnClickListener(new OnClickListener() {
             @Override
@@ -62,7 +63,27 @@ public class MiniChatView extends RelativeLayout
                 mContext.startActivity(intent);
             }
         });
-        mMsgsContainer.setClickable(true);;
+        mMsgsContainer.setClickable(true);
+
+        mUnreadMsgCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // move to the first conversation with an unread message
+                Intent intent = new Intent(mContext, ChatActivity.class);
+
+                List<ChatConversation> conversations = ChatManager.i.getConversations();
+                for (int i = 0; i < conversations.size(); i++) {
+                    if (conversations.get(i).getUnreadCount() > 0) {
+                        intent.putExtra("au.com.codeka.warworlds.ConversationID",
+                                conversations.get(i).getID());
+                        break;
+                    }
+                }
+
+                mContext.startActivity(intent);
+            }
+        });
+
     }
 
     @Override
@@ -72,7 +93,7 @@ public class MiniChatView extends RelativeLayout
             return;
         }
 
-        ChatManager.i.addMessageAddedListener(this);
+        ChatManager.eventBus.register(mEventHandler);
         EmpireManager.eventBus.register(mEventHandler);
 
         refreshMessages();
@@ -86,13 +107,12 @@ public class MiniChatView extends RelativeLayout
         }
 
         EmpireManager.eventBus.unregister(mEventHandler);
-        ChatManager.i.removeMessageAddedListener(this);
+        ChatManager.eventBus.unregister(mEventHandler);
     }
 
     private void refreshMessages() {
         mMsgsContainer.removeAllViews();
-        ChatConversation conversation = ChatManager.i.getConversationByID(ChatManager.RECENT_CONVERSATION_ID);
-        for(ChatMessage msg : conversation.getAllMessages()) {
+        for(ChatMessage msg : ChatManager.i.getRecentMessages().getMessages()) {
             appendMessage(msg);
         }
     }
@@ -116,16 +136,6 @@ public class MiniChatView extends RelativeLayout
         }, 1);
     }
 
-    @Override
-    public void onMessageAdded(final ChatMessage msg) {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                appendMessage(msg);
-            }
-        });
-    }
-
     private static int getTotalUnreadCount() {
         int numUnread = 0;
         for (ChatConversation conversation : ChatManager.i.getConversations()) {
@@ -134,62 +144,15 @@ public class MiniChatView extends RelativeLayout
         return numUnread;
     }
 
-    private static void refreshUnreadCountButton(Button btn) {
+    private void refreshUnreadCountButton() {
         int numUnread = getTotalUnreadCount();
 
         if (numUnread > 0) {
-            btn.setVisibility(View.VISIBLE);
-            btn.setText(String.format("  %d  ", numUnread));
+            mUnreadMsgCount.setVisibility(View.VISIBLE);
+            mUnreadMsgCount.setText(String.format("  %d  ", numUnread));
         } else {
-            btn.setVisibility(View.GONE);
+            mUnreadMsgCount.setVisibility(View.GONE);
         }
-    }
-
-    private void setupUnreadMessageCount(View v) {
-        final Button btn = (Button) v.findViewById(R.id.unread_btn);
-        refreshUnreadCountButton(btn);
-
-        ChatManager.i.addMessageAddedListener(new ChatManager.MessageAddedListener() {
-            @Override
-            public void onMessageAdded(ChatMessage msg) {
-                post(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshUnreadCountButton(btn);
-                    }
-                });
-            }
-        });
-        ChatManager.i.addUnreadMessageCountListener(new ChatManager.UnreadMessageCountListener() {
-            @Override
-            public void onUnreadMessageCountChanged() {
-                post(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshUnreadCountButton(btn);
-                    }
-                });
-            }
-        });
-
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // move to the first conversation with an unread message
-                Intent intent = new Intent(mContext, ChatActivity.class);
-
-                List<ChatConversation> conversations = ChatManager.i.getConversations();
-                for (int i = 0; i < conversations.size(); i++) {
-                    if (conversations.get(i).getUnreadCount() > 0) {
-                        intent.putExtra("au.com.codeka.warworlds.ConversationID", conversations.get(i).getID());
-                        break;
-                    }
-                }
-
-
-                mContext.startActivity(intent);
-            }
-        });
     }
 
     private Object mEventHandler = new Object() {
@@ -202,6 +165,17 @@ public class MiniChatView extends RelativeLayout
                     tv.setText(Html.fromHtml(msg.format(true, false, mAutoTranslate)));
                 }
             }
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onMessageAdded(ChatManager.MessageAddedEvent event) {
+            appendMessage(event.msg);
+            refreshUnreadCountButton();
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onUnreadMessageCountUpdated(ChatManager.UnreadMessageCountUpdatedEvent event) {
+            refreshUnreadCountButton();
         }
     };
 }

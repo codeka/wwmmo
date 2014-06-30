@@ -17,11 +17,9 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.RealmContext;
-import au.com.codeka.warworlds.model.ChatManager.MessageAddedListener;
 
 public class ChatConversation extends BaseChatConversation {
     protected LinkedList<ChatMessage> mMessages = new LinkedList<ChatMessage>();
-    private ArrayList<MessageAddedListener> mMessageAddedListeners = new ArrayList<MessageAddedListener>();
     private DateTime mMostRecentMsg;
     private boolean mNeedUpdate;
 
@@ -31,21 +29,6 @@ public class ChatConversation extends BaseChatConversation {
         if (id > 0) {
             mParticipants = new ArrayList<BaseChatConversationParticipant>();
         }
-    }
-
-    public void addMessageAddedListener(MessageAddedListener listener) {
-        if (!mMessageAddedListeners.contains(listener)) {
-            mMessageAddedListeners.add(listener);
-        }
-    }
-    public void removeMessageAddedListener(MessageAddedListener listener) {
-        mMessageAddedListeners.remove(listener);
-    }
-    private void fireMessageAddedListeners(ChatMessage msg) {
-        for(MessageAddedListener listener : mMessageAddedListeners) {
-            listener.onMessageAdded(msg);
-        }
-        ChatManager.i.fireMessageAddedListeners(msg);
     }
 
     public void update(ChatConversation conversation) {
@@ -110,7 +93,7 @@ public class ChatConversation extends BaseChatConversation {
             @Override
             public void onMessagesFetched(List<ChatMessage> msgs) {
                 for (int i = msgs.size() - 1; i >= 0; i--) {
-                    addMessage(0, msgs.get(i), false);
+                    addMessage(0, msgs.get(i));
                 }
 
                 handler.onMessagesFetched(msgs);
@@ -127,12 +110,12 @@ public class ChatConversation extends BaseChatConversation {
     }
 
     /** Adds a new message to the chat list. */
-    public void addMessage(ChatMessage msg) {
-        addMessage(mMessages.size(), msg, true);
+    public void addMessage(ChatMessage msg, boolean blah) {
+        addMessage(mMessages.size(), msg);
     }
 
     /** Adds a new message to the chat list at the given index. */
-    public void addMessage(int index, ChatMessage msg, boolean fireListeners) {
+    public void addMessage(int index, ChatMessage msg) {
         synchronized(mMessages) {
             // make sure we don't have this chat already...
             for (ChatMessage existing : mMessages) {
@@ -142,20 +125,18 @@ public class ChatConversation extends BaseChatConversation {
             }
 
             // also make sure it's actually for us!
-            if (mID != ChatManager.RECENT_CONVERSATION_ID) {
-                if (msg.getConversationID() == null) {
-                    if (msg.getAllianceKey() == null) {
-                        if (mID != ChatManager.GLOBAL_CONVERSATION_ID) {
-                            return;
-                        }
-                    } else {
-                        if (mID != ChatManager.ALLIANCE_CONVERSATION_ID) {
-                            return;
-                        }
+            if (msg.getConversationID() == null) {
+                if (msg.getAllianceKey() == null) {
+                    if (mID != ChatManager.GLOBAL_CONVERSATION_ID) {
+                        return;
                     }
-                } else if (msg.getConversationID() != mID) {
-                    return;
+                } else {
+                    if (mID != ChatManager.ALLIANCE_CONVERSATION_ID) {
+                        return;
+                    }
                 }
+            } else if (msg.getConversationID() != mID) {
+                return;
             }
 
             mMessages.add(index, msg);
@@ -167,9 +148,6 @@ public class ChatConversation extends BaseChatConversation {
                     mMostRecentMsg = msg.getDatePosted();
                 }
             }
-        }
-        if (fireListeners) {
-            fireMessageAddedListeners(msg);
         }
     }
 
@@ -194,7 +172,7 @@ public class ChatConversation extends BaseChatConversation {
 
     public void markAllRead() {
         new ChatStore().setLastReadDate(mID, mMostRecentMsg);
-        ChatManager.i.fireUnreadMessageCountListeners();
+        ChatManager.eventBus.publish(new ChatManager.UnreadMessageCountUpdatedEvent(0));
     }
 
     @Override

@@ -27,13 +27,13 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.Util;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.EmpireManager;
 
-public class ChatActivity extends BaseActivity
-                          implements ChatManager.ConversationsRefreshListener {
+public class ChatActivity extends BaseActivity {
     private ChatPagerAdapter mChatPagerAdapter;
     private ViewPager mViewPager;
     private List<ChatConversation> mConversations;
@@ -80,8 +80,7 @@ public class ChatActivity extends BaseActivity
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
-
-                onConversationsRefreshed();
+                refreshConversations();
 
                 if (mFirstRefresh) {
                     mFirstRefresh = false;
@@ -112,7 +111,7 @@ public class ChatActivity extends BaseActivity
                             mHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    startConversation(empireKey);
+                                    ChatManager.i.startConversation(empireKey);
                                 }
                             });
                         }
@@ -125,13 +124,13 @@ public class ChatActivity extends BaseActivity
     @Override
     public void onStart() {
         super.onStart();
-        ChatManager.i.addConversationsRefreshListener(this);
+        ChatManager.eventBus.register(mEventHandler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        ChatManager.i.removeConversationsRefreshListener(this);
+        ChatManager.eventBus.unregister(mEventHandler);
     }
 
     public void moveToFirstUnreadConversation() {
@@ -143,8 +142,24 @@ public class ChatActivity extends BaseActivity
         }
     }
 
-    @Override
-    public void onConversationsRefreshed() {
+    private Object mEventHandler = new Object() {
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onConversationsRefreshed(ChatManager.ConversationsUpdatedEvent event) {
+            refreshConversations();
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onConversationsRefreshed(ChatManager.ConversationStartedEvent event) {
+            refreshConversations();
+
+            int index = mConversations.indexOf(event.conversation);
+            if (index >= 0) {
+                mViewPager.setCurrentItem(index);
+            }
+        }
+    };
+
+    private void refreshConversations() {
         mConversations = ChatManager.i.getConversations();
         // remove the recent conversation, we don't display it here
         Iterator<ChatConversation> it = mConversations.iterator();
@@ -163,21 +178,7 @@ public class ChatActivity extends BaseActivity
         }
 
         mChatPagerAdapter.refresh(mConversations);
-    }
 
-    /** Start a new conversation with the given empire (empireKey could be null for an empty chat) */
-    public void startConversation(String empireKey) {
-        ChatManager.i.startConversation(empireKey, new ChatManager.ConversationStartedListener() {
-            @Override
-            public void onConversationStarted(ChatConversation conversation) {
-                onConversationsRefreshed();
-
-                int index = mConversations.indexOf(conversation);
-                if (index >= 0) {
-                    mViewPager.setCurrentItem(index);
-                }
-            }
-        });
     }
 
     public class ChatPagerAdapter extends FragmentStatePagerAdapter {
