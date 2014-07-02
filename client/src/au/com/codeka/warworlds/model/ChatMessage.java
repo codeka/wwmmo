@@ -70,14 +70,17 @@ public class ChatMessage extends BaseChatMessage {
         boolean isEnemy = false;
         boolean isFriendly = false;
         boolean isServer = false;
-        if (mEmpireKey != null && mEmpire != null) {
+        if (mEmpireKey != null) {
             if (!mEmpireKey.equals(EmpireManager.i.getEmpire().getKey())) {
                 isEnemy = true;
             } else {
                 isFriendly = true;
             }
             if (!messageOnly) {
-                msg = mEmpire.getDisplayName() + " : " + msg;
+                Empire empire = EmpireManager.i.getEmpire(Integer.parseInt(mEmpireKey));
+                if (empire != null) {
+                    msg = empire.getDisplayName() + " : " + msg;
+                }
             }
         } else if (mEmpireKey == null && mDatePosted != null) {
             isServer = true;

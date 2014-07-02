@@ -196,7 +196,7 @@ public class SitrepActivity extends BaseActivity {
 
     private Object mEventHandler = new Object() {
         @EventHandler
-        public void onShieldUpdated(int empireID) {
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
             refreshTitle();
         }
     };

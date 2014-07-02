@@ -127,7 +127,10 @@ public class MiniChatView extends RelativeLayout {
         }
         mMsgsContainer.addView(tv);
 
-        // need to wait for it to settle before we scroll again
+        scrollToBottom();
+    }
+
+    private void scrollToBottom() {
         mScrollView.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -165,6 +168,7 @@ public class MiniChatView extends RelativeLayout {
                     tv.setText(Html.fromHtml(msg.format(true, false, mAutoTranslate)));
                 }
             }
+            scrollToBottom();
         }
 
         @EventHandler(thread = EventHandler.UI_THREAD)

@@ -11,7 +11,6 @@ public class BaseChatMessage {
     protected String mMessage;
     protected String mEmpireKey;
     protected String mAllianceKey;
-    protected BaseEmpire mEmpire;
     protected DateTime mDatePosted;
     protected String mMessageEn;
     protected Integer mConversationID;
