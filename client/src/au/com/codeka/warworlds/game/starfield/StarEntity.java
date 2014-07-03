@@ -147,7 +147,8 @@ public class StarEntity extends SelectableEntity {
             int empireID = empires.keyAt(i);
             Integer[] counts = empires.valueAt(i);
             Empire emp = EmpireManager.i.getEmpire(empireID);
-            ITextureRegion texture = EmpireShieldManager.i.getShieldTexture(mStarfield.getActivity(), emp);
+            ITextureRegion texture = EmpireShieldManager.i.getShieldTexture(
+                    mStarfield.getActivity(), emp);
 
             Vector2 pt = Vector2.pool.borrow().reset(0, 30.0f);
             pt.rotate(-(float)(Math.PI / 4.0) * (i + 1));
@@ -163,7 +164,8 @@ public class StarEntity extends SelectableEntity {
             } else if (counts[0] == 0) {
                 text = String.format(Locale.ENGLISH, "[%d, %d]", counts[1], counts[2]);
             } else {
-                text = String.format(Locale.ENGLISH, "%d ● [%d, %d]", counts[0], counts[1], counts[2]);
+                text = String.format(Locale.ENGLISH, "%d ● [%d, %d]",
+                        counts[0], counts[1], counts[2]);
             }
             Text empireCounts = new Text((float) pt.x, (float) pt.y, mStarfield.getFont(),
                     text, mStarfield.getActivity().getVertexBufferObjectManager());

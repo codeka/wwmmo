@@ -28,6 +28,7 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.starfield.BaseStarfieldActivity;
 import au.com.codeka.warworlds.game.starfield.SectorSceneManager;
 import au.com.codeka.warworlds.game.starfield.StarfieldSceneManager;
@@ -105,64 +106,6 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             }
         });
 
-        mStarfield.addSelectionChangedListener(new StarfieldSceneManager.OnSelectionChangedListener() {
-            @Override
-            public void onStarSelected(Star star) {
-                if (star == null) {
-                    mDestStar = null;
-                    refreshSelection();
-                    return;
-                }
-
-                if (star.getKey().equals(mSrcStar.getKey())) {
-                    // if src & dest are the same, just forget about it
-                    mDestStar = null;
-                } else {
-                    mDestStar = star;
-                }
-
-                refreshSelection();
-            }
-
-            @Override
-            public void onFleetSelected(Fleet fleet) {
-                // you can't select fleets
-            }
-        });
-
-        mStarfield.setSpaceTapListener(new StarfieldSceneManager.OnSpaceTapListener() {
-            @Override
-            public void onSpaceTap(long sectorX, long sectorY, int offsetX, int offsetY) {
-                // if the fleet you're moving has the 'empty space mover' effect, it means you can move it
-                // to regions of empty space.
-                if (!mFleet.getDesign().hasEffect("empty-space-mover")) {
-                    return;
-                }
-
-                // when moving to a region of empty space, we need to place a special "marker" star
-                // at the destination (since everything else we do assume you're moving to a star)
-                if (mMarkerStar != null) {
-                    Sector s = SectorManager.getInstance().getSector(mMarkerStar.getSectorX(), mMarkerStar.getSectorY());
-                    if (s != null) {
-                        s.getStars().remove(mMarkerStar);
-                    }
-                }
-                mMarkerStar = new Star(BaseStar.getStarType(Star.Type.Marker), "Marker", 20, sectorX, sectorY, offsetX, offsetY, null);
-                Sector s = SectorManager.getInstance().getSector(sectorX, sectorY);
-                if (s != null) {
-                    s.getStars().add(mMarkerStar);
-                }
-                SectorManager.getInstance().fireSectorListChanged();
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mStarfield.getScene().selectStar(mMarkerStar.getKey());
-                    }
-                });
-            }
-        });
-
         Button cancelBtn = (Button) findViewById(R.id.cancel_btn);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,8 +146,15 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        StarfieldSceneManager.eventBus.register(mEventHandler);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
+        StarfieldSceneManager.eventBus.unregister(mEventHandler);
 
         // if we have a marker star, make sure we remove it first
         if (mMarkerStar != null) {
@@ -214,6 +164,59 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             }
         }
     }
+
+    public Object mEventHandler = new Object() {
+
+        @EventHandler
+        public void onStarSelected(final StarfieldSceneManager.StarSelectedEvent event) {
+            if (event.star == null) {
+                mDestStar = null;
+                refreshSelection();
+                return;
+            }
+
+            if (event.star.getKey().equals(mSrcStar.getKey())) {
+                // if src & dest are the same, just forget about it
+                mDestStar = null;
+            } else {
+                mDestStar = event.star;
+            }
+
+            refreshSelection();
+        }
+
+        @EventHandler
+        public void onSpaceTap(final StarfieldSceneManager.SpaceTapEvent event) {
+            // if the fleet you're moving has the 'empty space mover' effect, it means you can move it
+            // to regions of empty space.
+            if (!mFleet.getDesign().hasEffect("empty-space-mover")) {
+                return;
+            }
+
+            // when moving to a region of empty space, we need to place a special "marker" star
+            // at the destination (since everything else we do assume you're moving to a star)
+            if (mMarkerStar != null) {
+                Sector s = SectorManager.getInstance().getSector(mMarkerStar.getSectorX(), mMarkerStar.getSectorY());
+                if (s != null) {
+                    s.getStars().remove(mMarkerStar);
+                }
+            }
+            mMarkerStar = new Star(BaseStar.getStarType(Star.Type.Marker), "Marker", 20,
+                    event.sectorX, event.sectorY, event.offsetX, event.offsetY, null);
+            Sector s = SectorManager.getInstance().getSector(event.sectorX, event.sectorY);
+            if (s != null) {
+                s.getStars().add(mMarkerStar);
+            }
+            SectorManager.getInstance().fireSectorListChanged();
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mStarfield.getScene().selectStar(mMarkerStar.getKey());
+                }
+            });
+        }
+    };
 
     @Override
     protected int getLayoutID() {

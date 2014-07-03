@@ -11,6 +11,7 @@ import org.joda.time.Duration;
 import org.joda.time.Interval;
 import org.joda.time.Seconds;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet.Stance;
 
 
@@ -22,11 +23,15 @@ public class Simulation {
     private LogHandler mLogHandler;
     private DateTime mNow;
 
+    private static boolean sDebug = false;
     private static int sNumSimulations;
     private static DateTime year2k = new DateTime(2000, 1, 1, 0, 0);
 
     public Simulation() {
         mNow = DateTime.now(DateTimeZone.UTC);
+        if (sDebug) {
+            mLogHandler = new BasicLogHandler();
+        }
     }
     public Simulation(LogHandler log) {
         mNow = DateTime.now(DateTimeZone.UTC);
@@ -61,8 +66,6 @@ public class Simulation {
                 empireKeys.add(colony.getEmpireKey());
             }
         }
-
-        // if there's any missing EmpirePresence objects, add them now
 
         // figure out the start time, which is the oldest last_simulation time
         DateTime startTime = getSimulateStartTime(star);
@@ -163,6 +166,29 @@ public class Simulation {
                 }
             }
         }
+
+        // if there's only native colonies, don't bother simulating from more than
+        // 24 hours ago. The native colonies will generally be in a steady state
+        DateTime oneDayAgo = DateTime.now().minusHours(24);
+        if (lastSimulation != null && lastSimulation.isBefore(oneDayAgo)) {
+            log("Last simulation more than on day ago, checking whether there are any non-native colonies.");
+            boolean onlyNativeColonies = true;
+            for (BaseColony baseColony : star.getColonies()) {
+                if (baseColony.getEmpireKey() != null) {
+                    onlyNativeColonies = false;
+                }
+            }
+            for (BaseFleet baseFleet : star.getFleets()) {
+                if (baseFleet.getEmpireKey() != null) {
+                    onlyNativeColonies = false;
+                }
+            }
+            if (onlyNativeColonies) {
+                log("No non-native colonies detected, simulating only 24 hours in the past.");
+                lastSimulation = oneDayAgo;
+            }
+        }
+
         return lastSimulation;
     }
 
@@ -803,5 +829,14 @@ public class Simulation {
      */
     public interface LogHandler {
         void log(String message);
+    }
+
+    private static class BasicLogHandler implements LogHandler {
+        private static final Log log = new Log("Simulation");
+
+        @Override
+        public void log(String message) {
+            log.info(message);
+        }
     }
 }

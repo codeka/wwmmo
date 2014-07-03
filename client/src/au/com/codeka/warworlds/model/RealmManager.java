@@ -28,17 +28,14 @@ public class RealmManager {
             if (Util.isDebug()) {
                 mRealms.add(new Realm(DEBUG_REALM_ID, "http://192.168.1.4:8080/realms/beta/",
                                       "Debug",
-                                      "The debug realm runs on my local dev box for testing.",
-                                      false));
+                                      "The debug realm runs on my local dev box for testing."));
             }
             mRealms.add(new Realm(BETA_REALM_ID, "https://game.war-worlds.com/realms/beta/",
                                   "Beta",
-                                  "If you're new to War Worlds, you should join this realm. eXplore, eXpand, eXploit, eXterminate!",
-                                  false));
+                                  "If you're new to War Worlds, you should join this realm. eXplore, eXpand, eXploit, eXterminate!"));
             mRealms.add(new Realm(BLITZ_REALM_ID, "https://game.war-worlds.com/realms/blitz/",
                                   "Blitz",
-                                  "The goal of Blitz is to build as big an empire as you can in 1 month. Each month, the universe is reset and the winner is the one with the highest total population.",
-                                  false));
+                                  "The goal of Blitz is to build as big an empire as you can in 1 month. Each month, the universe is reset and the winner is the one with the highest total population."));
         } catch(URISyntaxException e) {
             // should never happen
         }

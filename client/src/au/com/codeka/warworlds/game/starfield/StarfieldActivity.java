@@ -62,8 +62,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
-public class StarfieldActivity extends BaseStarfieldActivity
-                               implements StarfieldSceneManager.OnSelectionChangedListener {
+public class StarfieldActivity extends BaseStarfieldActivity {
     private static final Log log = new Log("StarfieldActivity");
     private Context mContext = this;
     private PlanetListSimple mPlanetList;
@@ -94,8 +93,6 @@ public class StarfieldActivity extends BaseStarfieldActivity
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mStarfield.addSelectionChangedListener(this);
 
         mPlanetList = (PlanetListSimple) findViewById(R.id.planet_list);
         mFleetList = (FleetListSimple) findViewById(R.id.fleet_list);
@@ -285,6 +282,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
         super.onStart();
         StarManager.eventBus.register(mEventHandler);
         ShieldManager.eventBus.register(mEventHandler);
+        StarfieldSceneManager.eventBus.register(mEventHandler);
     }
 
     @Override
@@ -300,6 +298,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
     @Override
     public void onStop() {
         super.onStop();
+        StarfieldSceneManager.eventBus.unregister(mEventHandler);
         StarManager.eventBus.unregister(mEventHandler);
         ShieldManager.eventBus.unregister(mEventHandler);
     }
@@ -664,7 +663,6 @@ public class StarfieldActivity extends BaseStarfieldActivity
         hideBottomPane(false);
     }
 
-    @Override
     public void onStarSelected(Star star) {
         if (star == null) {
             handleDeselect();
@@ -713,9 +711,40 @@ public class StarfieldActivity extends BaseStarfieldActivity
             EmpireShieldManager.i.clearTextureCache();
 
             if (mSelectedFleet != null) {
-                // this will cause the selected fleet info to redraw and hence the shield
-                onFleetSelected(mSelectedFleet);
+                StarfieldActivity.this.getEngine().runOnUpdateThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // this will cause the selected fleet info to redraw and hence the shield
+                        StarfieldActivity.this.onFleetSelected(mSelectedFleet);
+                    }
+                });
             }
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onStarSelected(final StarfieldSceneManager.StarSelectedEvent event) {
+            StarfieldActivity.this.onStarSelected(event.star);
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onFleetSelected(final StarfieldSceneManager.FleetSelectedEvent event) {
+            StarfieldActivity.this.onFleetSelected(event.fleet);
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onSceneUpdated(final StarfieldSceneManager.SceneUpdatedEvent event) {
+            if (mStarKeyToSelect != null) {
+                event.scene.selectStar(mStarKeyToSelect);
+            }
+            if (mStarToSelect != null) {
+                event.scene.selectStar(mStarToSelect.getKey());
+            }
+            if (mFleetToSelect != null) {
+                event.scene.selectFleet(mFleetToSelect.getKey());
+            }
+            mStarToSelect = null;
+            mFleetToSelect = null;
+            mStarKeyToSelect = null;
         }
     };
 
@@ -762,8 +791,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
         starIcon.setImageDrawable(new SpriteDrawable(starImage));
     }
 
-    @Override
-    public void onFleetSelected(final Fleet fleet) {
+    private void onFleetSelected(final Fleet fleet) {
         if (fleet == null) {
             handleDeselect();
             return;

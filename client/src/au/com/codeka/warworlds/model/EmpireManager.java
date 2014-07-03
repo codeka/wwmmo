@@ -242,13 +242,15 @@ public class EmpireManager {
                 Integer empireID = iter.next();
 
                 // If it's in the empire store, then we don't need to fetch from the server, yay!
-                Messages.Empire pb = new LocalEmpireStore().getEmpire(empireID, false);
-                if (pb != null) {
-                    Empire empire = new Empire();
-                    empire.fromProtocolBuffer(pb);
-                    mEmpireCache.put(empireID, empire);
-                    empires.add(empire);
-                    continue;
+                if (mEmpire != null && mEmpire.getID() != empireID) {
+                    Messages.Empire pb = new LocalEmpireStore().getEmpire(empireID, false);
+                    if (pb != null) {
+                        Empire empire = new Empire();
+                        empire.fromProtocolBuffer(pb);
+                        mEmpireCache.put(empireID, empire);
+                        empires.add(empire);
+                        continue;
+                    }
                 }
 
                 if (url == null) {

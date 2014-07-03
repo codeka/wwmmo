@@ -10,27 +10,17 @@ public class Realm {
     private URI mBaseUrl;
     private String mDisplayName;
     private String mDescription;
-    private boolean mIsAlpha;
     private Authenticator mAuthenticator;
 
-    public Realm(int id, String baseUrl, String displayName, String description,
-                 boolean isAlpha) throws URISyntaxException {
+    public Realm(int id, String baseUrl, String displayName, String description)
+            throws URISyntaxException {
         mID = id;
         mBaseUrl = new URI(baseUrl);
         mDisplayName = displayName;
         mDescription = description;
-        mIsAlpha = isAlpha;
         mAuthenticator = new Authenticator();
     }
 
-    /**
-     * A couple of places rely on knowing whether they're talking to the alpha realm or
-     * not to adjust various calculations.
-     * @return
-     */
-    public boolean isAlpha() {
-        return mIsAlpha;
-    }
     public int getID() {
         return mID;
     }

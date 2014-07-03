@@ -287,7 +287,7 @@ public class StarManager extends BaseManager {
         }
 
         Star star = doFetchStar(starKey);
-        if (star != null && !RealmContext.i.getCurrentRealm().isAlpha()) {
+        if (star != null) {
             // the alpha realm will have already simulated the star, but other realms
             // will need to simulate first.
             Simulation sim = new Simulation();

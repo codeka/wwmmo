@@ -30,7 +30,6 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.Handler;
 import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -45,6 +44,7 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.controlfield.ControlField;
+import au.com.codeka.warworlds.eventbus.EventBus;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.Colony;
@@ -64,10 +64,10 @@ import au.com.codeka.warworlds.model.StarManager;
  */
 public class StarfieldSceneManager extends SectorSceneManager {
     private static final Log log = new Log("StarfieldSceneManager");
-    private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
-    private OnSpaceTapListener mSpaceTapListener;
+
+    public static final EventBus eventBus = new EventBus();
+
     private BaseStar mHqStar;
-    private Handler mHandler;
     private boolean mHasScrolled;
 
     private boolean mWasDragging;
@@ -98,8 +98,6 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
     public StarfieldSceneManager(BaseStarfieldActivity activity) {
         super(activity);
-        mSelectionChangedListeners = new ArrayList<OnSelectionChangedListener>();
-        mHandler = new Handler();
     }
 
     @Override
@@ -202,48 +200,6 @@ public class StarfieldSceneManager extends SectorSceneManager {
         return mArrowIconTextureRegion;
     }
 
-    public void setSpaceTapListener(OnSpaceTapListener listener) {
-        mSpaceTapListener = listener;
-    }
-
-    public void fireSpaceTapListener(final long sectorX, final long sectorY, final int offsetX,
-            final int offsetY) {
-        if (mSpaceTapListener != null) {
-            mSpaceTapListener.onSpaceTap(sectorX, sectorY, offsetX, offsetY);
-        }
-    }
-
-    public void addSelectionChangedListener(OnSelectionChangedListener listener) {
-        if (!mSelectionChangedListeners.contains(listener)) {
-            mSelectionChangedListeners.add(listener);
-        }
-    }
-
-    public void removeSelectionChangedListener(OnSelectionChangedListener listener) {
-        mSelectionChangedListeners.remove(listener);
-    }
-
-    protected void fireSelectionChanged(final Star star) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                for(OnSelectionChangedListener listener : mSelectionChangedListeners) {
-                    listener.onStarSelected(star);
-                }
-            }
-        });
-    }
-    protected void fireSelectionChanged(final Fleet fleet) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                for(OnSelectionChangedListener listener : mSelectionChangedListeners) {
-                    listener.onFleetSelected(fleet);
-                }
-            }
-        });
-    }
-
     @Override
     public void scrollTo(final long sectorX, final long sectorY,
             final float offsetX, final float offsetY) {
@@ -275,6 +231,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
         }
 
         scene.refreshSelectionIndicator();
+        eventBus.publish(new SceneUpdatedEvent(scene));
     }
 
     @Override
@@ -816,12 +773,41 @@ public class StarfieldSceneManager extends SectorSceneManager {
         }
     }
 
-    public interface OnSpaceTapListener {
-        void onSpaceTap(long sectorX, long sectorY, int offsetX, int offsetY);
+    public static class SpaceTapEvent {
+        public long sectorX;
+        public long sectorY;
+        public int offsetX;
+        public int offsetY;
+
+        public SpaceTapEvent(long sectorX, long sectorY, int offsetX, int offsetY) {
+            this.sectorX = sectorX;
+            this.sectorY = sectorY;
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
+        }
     }
 
-    public interface OnSelectionChangedListener {
-        void onStarSelected(Star star);
-        void onFleetSelected(Fleet fleet);
+    public static class StarSelectedEvent {
+        public Star star;
+
+        public StarSelectedEvent(Star star) {
+            this.star = star;
+        }
+    }
+
+    public static class FleetSelectedEvent {
+        public Fleet fleet;
+
+        public FleetSelectedEvent(Fleet fleet) {
+            this.fleet = fleet;
+        }
+    }
+
+    public static class SceneUpdatedEvent {
+        public StarfieldScene scene;
+
+        public SceneUpdatedEvent(StarfieldScene scene) {
+            this.scene = scene;
+        }
     }
 }

@@ -5,12 +5,14 @@ import java.util.Map;
 
 import org.andengine.entity.scene.Scene;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.Star;
 
 public class StarfieldScene extends Scene {
+    private static final Log log = new Log("StarfieldScene");
     private StarfieldSceneManager mStarfield;
     private SelectableEntity mSelectingEntity;
     private SelectionIndicatorEntity mSelectionIndicator;
@@ -98,9 +100,12 @@ public class StarfieldScene extends Scene {
 
                 refreshSelectionIndicator();
                 if (mSelectedStarEntity == null) {
-                    mStarfield.fireSelectionChanged((Star) null);
+                    StarfieldSceneManager.eventBus.publish(
+                            new StarfieldSceneManager.StarSelectedEvent((Star) null));
                 } else {
-                    mStarfield.fireSelectionChanged(mSelectedStarEntity.getStar());
+                    StarfieldSceneManager.eventBus.publish(
+                            new StarfieldSceneManager.StarSelectedEvent(
+                                    mSelectedStarEntity.getStar()));
                 }
             }
         });
@@ -134,8 +139,8 @@ public class StarfieldScene extends Scene {
                 mSelectedFleetEntity = fleet;
 
                 refreshSelectionIndicator();
-                mStarfield.fireSelectionChanged(
-                        mSelectedFleetEntity == null ? null : mSelectedFleetEntity.getFleet());
+                StarfieldSceneManager.eventBus.publish(new StarfieldSceneManager.FleetSelectedEvent(
+                        mSelectedFleetEntity == null ? null : mSelectedFleetEntity.getFleet()));
             }
         });
     }
@@ -163,16 +168,19 @@ public class StarfieldScene extends Scene {
                 if (mSelectedStarEntity != null) {
                     mSelectedStarEntity = null;
                     refreshSelectionIndicator();
-                    mStarfield.fireSelectionChanged((Star) null);
+                    StarfieldSceneManager.eventBus.publish(
+                            new StarfieldSceneManager.StarSelectedEvent((Star) null));
                 }
 
                 if (mSelectedFleetEntity != null) {
                     mSelectedFleetEntity = null;
                     refreshSelectionIndicator();
-                    mStarfield.fireSelectionChanged((Fleet) null);
+                    StarfieldSceneManager.eventBus.publish(
+                            new StarfieldSceneManager.FleetSelectedEvent((Fleet) null));
                 }
 
-                mStarfield.fireSpaceTapListener(sectorX, sectorY, offsetX, offsetY);
+                StarfieldSceneManager.eventBus.publish(new StarfieldSceneManager.SpaceTapEvent(
+                        sectorX, sectorY, offsetX, offsetY));
             }
         });
     }

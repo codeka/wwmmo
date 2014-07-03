@@ -65,7 +65,7 @@ public class Log {
         } finally {
             formatter.close();
         }
-        if (args != null && args.length > 1 && args[args.length - 1] instanceof Throwable) {
+        if (args != null && args.length >= 1 && args[args.length - 1] instanceof Throwable) {
             Throwable throwable = (Throwable) args[args.length - 1];
             StringWriter writer = new StringWriter();
             throwable.printStackTrace(new PrintWriter(writer));
