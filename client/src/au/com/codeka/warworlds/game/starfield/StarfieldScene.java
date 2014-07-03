@@ -5,14 +5,12 @@ import java.util.Map;
 
 import org.andengine.entity.scene.Scene;
 
-import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.Star;
 
 public class StarfieldScene extends Scene {
-    private static final Log log = new Log("StarfieldScene");
     private StarfieldSceneManager mStarfield;
     private SelectableEntity mSelectingEntity;
     private SelectionIndicatorEntity mSelectionIndicator;

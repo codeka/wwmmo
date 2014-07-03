@@ -141,6 +141,7 @@ public class EmpireActivity extends TabFragmentActivity {
     @Override
     public void onResume() {
         super.onResume();
+        EmpireManager.eventBus.register(mEventHandler);
 
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
@@ -150,7 +151,6 @@ public class EmpireActivity extends TabFragmentActivity {
                     return;
                 }
 
-                EmpireManager.eventBus.register(mEventHandler);
                 EmpireManager.i.refreshEmpire();
             }
         });
@@ -172,10 +172,12 @@ public class EmpireActivity extends TabFragmentActivity {
     }
 
     private Object mEventHandler = new Object() {
-        @EventHandler
+        @EventHandler(thread = EventHandler.UI_THREAD)
         public void onEmpireUpdated(Empire empire) {
+            log.info("EMPIRE : event fired");
             MyEmpire myEmpire = EmpireManager.i.getEmpire();
             if (myEmpire.getKey().equals(empire.getKey())) {
+                log.info("EMPIRE : it was our empire");
                 sCurrentEmpire = (MyEmpire) empire;
                 getTabManager().reloadTab();
                 mFirstRefresh = false;

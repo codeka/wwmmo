@@ -31,7 +31,7 @@ class EventHandlerInfo {
     }
 
     public boolean handles(Object event) {
-        return event.getClass().equals(mEventClass);
+        return mEventClass.isInstance(event);
     }
 
     /** Gets the subscriber object, may be null. */
