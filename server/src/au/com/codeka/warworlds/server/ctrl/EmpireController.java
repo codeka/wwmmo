@@ -100,7 +100,7 @@ public class EmpireController {
         // TODO: remove the empire's stars from the "abandoned stars" list...
     }
 
-    public int[] getStarsForEmpire(int empireId) throws RequestException {
+    public ArrayList<Integer> getStarsForEmpire(int empireId) throws RequestException {
         try {
             return db.getStarsForEmpire(empireId);
         } catch (Exception e) {
@@ -549,7 +549,7 @@ public class EmpireController {
             }
         }
 
-        private int[] getStarsForEmpire(int empireId) throws Exception {
+        private ArrayList<Integer> getStarsForEmpire(int empireId) throws Exception {
             String sql = "SELECT star_id FROM fleets WHERE empire_id = ?" +
                         " UNION SELECT star_id FROM colonies WHERE empire_id = ?";
             try (SqlStmt stmt = prepare(sql)) {
@@ -562,11 +562,7 @@ public class EmpireController {
                     starIds.add(res.getInt(1));
                 }
 
-                int[] array = new int[starIds.size()];
-                for (int i = 0; i < array.length; i++) {
-                    array[i] = starIds.get(i);
-                }
-                return array;
+                return starIds;
             }
         }
     }

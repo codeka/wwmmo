@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,17 +71,9 @@ public class HelloHandler extends RequestHandler {
             }
 
             // make sure they still have some colonies...
-            int numColonies = 0;
-            int[] stars = new EmpireController().getStarsForEmpire(getSession().getEmpireID());
-            for (Star star : new StarController().getStars(stars)) {
-                for (BaseColony baseColony : star.getColonies()) {
-                    Colony colony = (Colony) baseColony;
-                    if (colony.getEmpireID() != null && empire.getID() == colony.getEmpireID()) {
-                        numColonies ++;
-                    }
-                }
-            }
-            if (numColonies == 0) {
+            ArrayList<Integer> starIDs = new EmpireController().getStarsForEmpire(
+                    getSession().getEmpireID());
+            if (!findColony(starIDs, getSession().getEmpireID())) {
                 log.info(String.format("Empire #%d [%s] has been wiped out, resetting.", empire.getID(), empire.getDisplayName()));
                 new EmpireController().createEmpire(empire);
                 hello_response_pb.setWasEmpireReset(true);
@@ -139,5 +134,38 @@ public class HelloHandler extends RequestHandler {
         }
 
         setResponseBody(hello_response_pb.build());
+    }
+
+    /** Goes through the given stars and looks for at least one colony. Returns true if one is
+        found. */
+    private boolean findColony(ArrayList<Integer> starIDs, int empireID) throws RequestException {
+        // do it in groups of 10 stars, since most of the time we'll find it in the first group
+        // and there's no point querying all, especially if they have a lot of stars.
+        for (int startIndex = 0; startIndex < starIDs.size(); startIndex++) {
+            int endIndex = startIndex + 10;
+            if (endIndex >= starIDs.size()) {
+                endIndex = starIDs.size() - 1;
+            }
+
+            List<Integer> sublist = starIDs.subList(startIndex, endIndex);
+            List<Star> stars = new StarController().getStars(sublist);
+            if (findColony(stars, empireID)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean findColony(List<Star> stars, int empireID) {
+        for (Star star : stars) {
+            for (BaseColony baseColony : star.getColonies()) {
+                Colony colony = (Colony) baseColony;
+                if (colony.getEmpireID() != null && empireID == colony.getEmpireID()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

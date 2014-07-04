@@ -35,7 +35,11 @@ public class LogFormatter extends Formatter {
             sb.append(record.getLoggerName());
         }
         sb.append(String.format(" [%d] ", record.getThreadID()));
-        sb.append(String.format(record.getMessage(), record.getParameters()));
+        try {
+            sb.append(String.format(record.getMessage(), record.getParameters()));
+        } catch (Exception e) {
+            sb.append("ERROR FORMATTING [" + record.getMessage() + "]");
+        }
         if (record.getThrown() != null) {
             sb.append("\n");
             sb.append(ExceptionUtils.getStackTrace(record.getThrown()));
