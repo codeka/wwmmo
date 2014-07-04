@@ -71,10 +71,10 @@ public class PlanetListSimple extends LinearLayout {
             mOnClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (v.getTag() instanceof String) {
-                        String empireKey = (String) v.getTag();
+                    if (v.getTag() instanceof Integer) {
+                        Integer empireID = (Integer) v.getTag();
                         Intent intent = new Intent(mContext, EnemyEmpireActivity.class);
-                        intent.putExtra("au.com.codeka.warworlds.EmpireKey", empireKey);
+                        intent.putExtra("au.com.codeka.warworlds.EmpireKey", empireID.toString());
                         mContext.startActivity(intent);
                     } else {
                         Planet planet = (Planet) v.getTag();
