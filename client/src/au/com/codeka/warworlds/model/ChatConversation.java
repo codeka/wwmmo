@@ -11,6 +11,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseChatConversation;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
@@ -19,6 +20,7 @@ import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.RealmContext;
 
 public class ChatConversation extends BaseChatConversation {
+    private static final Log log = new Log("ChatConversation");
     protected LinkedList<ChatMessage> mMessages = new LinkedList<ChatMessage>();
     private DateTime mMostRecentMsg;
     private boolean mNeedUpdate;

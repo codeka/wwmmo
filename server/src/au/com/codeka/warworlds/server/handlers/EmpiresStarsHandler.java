@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import au.com.codeka.common.protobuf.Messages;
@@ -18,7 +19,7 @@ public class EmpiresStarsHandler extends RequestHandler {
             throw new RequestException(403);
         }
 
-        int[] starIds = new EmpireController().getStarsForEmpire(empire.getID());
+        ArrayList<Integer> starIds = new EmpireController().getStarsForEmpire(empire.getID());
         List<Star> stars = new StarController().getStars(starIds);
 
         Messages.Stars.Builder pb = Messages.Stars.newBuilder();

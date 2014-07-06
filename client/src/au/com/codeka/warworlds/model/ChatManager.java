@@ -90,8 +90,9 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                     ChatConversation conv = getConversation(msg);
                     if (conv != null) {
                         conv.addMessage(msg, true);
-                        eventBus.publish(new MessageAddedEvent(conv, msg));
-                        mRecentMessages.addMessage(msg);
+                        if (mRecentMessages.addMessage(msg)) {
+                            eventBus.publish(new MessageAddedEvent(conv, msg));
+                        }
                     }
                 }
             }
@@ -100,8 +101,9 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
     public void addMessage(ChatConversation conv, ChatMessage msg) {
         conv.addMessage(msg, true);
-        ChatManager.eventBus.publish(new ChatManager.MessageAddedEvent(conv, msg));
-        mRecentMessages.addMessage(msg);
+        if (mRecentMessages.addMessage(msg)) {
+            ChatManager.eventBus.publish(new ChatManager.MessageAddedEvent(conv, msg));
+        }
     }
 
     public ChatRecentMessages getRecentMessages() {
@@ -431,8 +433,9 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 for (ChatMessage msg : msgs) {
                     ChatConversation conversation = getConversation(msg);
                     conversation.addMessage(msg, true);
-                    eventBus.publish(new MessageAddedEvent(conversation, msg));
-                    mRecentMessages.addMessage(msg);
+                    if (mRecentMessages.addMessage(msg)) {
+                        eventBus.publish(new MessageAddedEvent(conversation, msg));
+                    }
                 }
             }
         });

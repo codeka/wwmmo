@@ -8,14 +8,22 @@ public class ChatRecentMessages {
     public static final int MAX_MESSAGES = 10;
     private LinkedList<ChatMessage> mMessages = new LinkedList<ChatMessage>();
 
-    public void addMessage(ChatMessage msg) {
+    public boolean addMessage(ChatMessage msg) {
         synchronized(mMessages) {
+            // make sure we don't have this chat already...
+            for (ChatMessage existing : mMessages) {
+                if (existing.getID() == msg.getID()) {
+                    return false;
+                }
+            }
+
             while (mMessages.size() >= MAX_MESSAGES) {
                 mMessages.removeFirst();
             }
         }
 
         mMessages.addLast(msg);
+        return true;
     }
 
     public List<ChatMessage> getMessages() {

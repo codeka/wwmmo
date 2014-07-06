@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import au.com.codeka.common.model.BaseColony;
@@ -20,7 +21,7 @@ public class EmpiresResetHandler extends RequestHandler {
         int empireID = getSession().getEmpireID();
 
         // make sure they've purchased the right sku for the number of stars they have
-        int[] starIDs = new EmpireController().getStarsForEmpire(empireID);
+        ArrayList<Integer> starIDs = new EmpireController().getStarsForEmpire(empireID);
         List<Star> stars = new StarController().getStars(starIDs);
         int numStarsWithColonies = 0;
         for (Star star : stars) {
