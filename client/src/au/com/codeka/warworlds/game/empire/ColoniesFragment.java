@@ -5,6 +5,7 @@ import java.util.Locale;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.util.LruCache;
@@ -54,26 +55,32 @@ public class ColoniesFragment extends StarsFragment {
         ExpandableListView starsList = (ExpandableListView) v.findViewById(R.id.stars);
         mAdapter = new StarsListAdapter(inflater);
         starsList.setAdapter(mAdapter);
-/*
-        colonyList.setOnColonyActionListener(new ColonyList.ColonyActionHandler() {
+
+        starsList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public void onViewColony(Star star, Colony colony) {
-                BasePlanet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
+            public boolean onChildClick(ExpandableListView parent, View v,
+                    int groupPosition, int childPosition, long id) {
+                Star star = (Star) mAdapter.getGroup(groupPosition);
+                Colony colony = (Colony) mAdapter.getChild(groupPosition, childPosition);
+                Planet planet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
                 // end this activity, go back to the starfield and navigate to the given colony
 
                 Intent intent = new Intent();
-                intent.putExtra("au.com.codeka.warworlds.Result", EmpireActivityResult.NavigateToPlanet.getValue());
+                intent.putExtra("au.com.codeka.warworlds.Result",
+                        EmpireActivity.EmpireActivityResult.NavigateToPlanet.getValue());
                 intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
                 intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
                 intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.getOffsetX());
                 intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.getOffsetY());
                 intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
                 intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.getIndex());
-                getActivity().setResult(RESULT_OK, intent);
+                getActivity().setResult(EmpireActivity.RESULT_OK, intent);
                 getActivity().finish();
+
+                return false;
             }
         });
-*/
+
         return v;
     }
 
