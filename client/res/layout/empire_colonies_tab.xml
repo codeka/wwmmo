@@ -3,9 +3,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <au.com.codeka.warworlds.ctrl.ColonyList android:id="@+id/colony_list"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent"
-        />
+    <ExpandableListView
+        android:id="@+id/stars"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:groupIndicator="@null"
+        android:listSelector="@drawable/list_selector" />
 
 </RelativeLayout>

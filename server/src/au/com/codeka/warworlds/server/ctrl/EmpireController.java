@@ -100,9 +100,10 @@ public class EmpireController {
         // TODO: remove the empire's stars from the "abandoned stars" list...
     }
 
-    public ArrayList<Integer> getStarsForEmpire(int empireId) throws RequestException {
+    public ArrayList<Integer> getStarsForEmpire(int empireId, EmpireStarsFilter filter,
+            String search) throws RequestException {
         try {
-            return db.getStarsForEmpire(empireId);
+            return db.getStarsForEmpire(empireId, filter, search);
         } catch (Exception e) {
             throw new RequestException(e);
         }
@@ -549,12 +550,51 @@ public class EmpireController {
             }
         }
 
-        private ArrayList<Integer> getStarsForEmpire(int empireId) throws Exception {
-            String sql = "SELECT star_id FROM fleets WHERE empire_id = ?" +
-                        " UNION SELECT star_id FROM colonies WHERE empire_id = ?";
+        private ArrayList<Integer> getStarsForEmpire(int empireId, EmpireStarsFilter filter,
+                String search) throws Exception {
+            String sql;
+            int numEmpireIds = 1;
+            switch (filter) {
+            case Colonies:
+                sql = "SELECT id FROM stars WHERE id IN (" +
+                       " SELECT star_id FROM colonies WHERE empire_id = ?" +
+                      ")";
+                break;
+            case Fleets:
+                sql = "SELECT id FROM stars WHERE id IN (" +
+                        " SELECT star_id FROM fleets WHERE empire_id = ?" +
+                       ")";
+                break;
+            case Building:
+                sql = "SELECT id FROM beta.stars WHERE id IN (" +
+                       " SELECT star_id FROM beta.build_requests WHERE empire_id = ?" +
+                      ")";
+                break;
+            case NotBuilding:
+                sql = "SELECT id FROM beta.stars WHERE id NOT IN (" +
+                       " SELECT star_id FROM beta.build_requests WHERE empire_id = ?" +
+                      ") AND id IN (" +
+                       " SELECT star_id FROM beta.colonies WHERE empire_id = ?" +
+                      ")";
+                numEmpireIds = 2;
+                break;
+            default: // case Everything:
+                sql = "SELECT id FROM stars" +
+                      " INNER JOIN (" +
+                        " SELECT star_id FROM fleets WHERE empire_id = ?" +
+                        " UNION SELECT star_id FROM colonies WHERE empire_id = ?" +
+                       ") AS ids ON ids.star_id = stars.id";
+                numEmpireIds = 2;
+                break;
+            }
+            if (search != null) {
+                sql += " AND name LIKE $lufdyg$" + search + "%lufdyg$";
+            }
+            sql += " ORDER BY name";
             try (SqlStmt stmt = prepare(sql)) {
-                stmt.setInt(1, empireId);
-                stmt.setInt(2, empireId);
+                for (int i = 0; i < numEmpireIds; i++ ) {
+                    stmt.setInt(i + 1, empireId);
+                }
                 SqlResult res = stmt.select();
 
                 ArrayList<Integer> starIds = new ArrayList<Integer>();
@@ -565,5 +605,13 @@ public class EmpireController {
                 return starIds;
             }
         }
+    }
+
+    public enum EmpireStarsFilter {
+        Everything,
+        Colonies,
+        Fleets,
+        Building,
+        NotBuilding
     }
 }

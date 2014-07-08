@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.empire;
 
 import java.text.DecimalFormat;
 import java.util.Locale;

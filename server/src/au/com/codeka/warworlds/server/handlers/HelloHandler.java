@@ -70,9 +70,9 @@ public class HelloHandler extends RequestHandler {
                 new EmpireController().markActive(empire);
             }
 
-            // make sure they still have some colonies...
+            // TODO: remove this
             ArrayList<Integer> starIDs = new EmpireController().getStarsForEmpire(
-                    getSession().getEmpireID());
+                    getSession().getEmpireID(), EmpireController.EmpireStarsFilter.Everything, null);
             if (!findColony(starIDs, getSession().getEmpireID())) {
                 log.info(String.format("Empire #%d [%s] has been wiped out, resetting.", empire.getID(), empire.getDisplayName()));
                 new EmpireController().createEmpire(empire);

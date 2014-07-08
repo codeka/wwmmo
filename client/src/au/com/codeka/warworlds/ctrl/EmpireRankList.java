@@ -124,6 +124,10 @@ public class EmpireRankList extends ListView {
         }
 
         public void onEmpireUpdated(Empire empire) {
+            if (mEntries == null) {
+                return;
+            }
+
             boolean refreshedAll = true;
             for (ItemEntry entry : mEntries) {
                 if (entry.rank.getEmpireKey().equals(empire.getKey())) {

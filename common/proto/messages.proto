@@ -281,6 +281,23 @@ message EmpireAltAccounts
 
 
 //
+// An EmpireStar is an entry in a "virtual array" of stars that belong to the
+// empire, order by the name of the star.
+//
+message EmpireStar
+{
+    optional Star star = 1;
+    optional int32 index = 2;
+}
+
+
+message EmpireStars
+{
+    repeated EmpireStar stars = 1;
+    optional int32 total_stars = 2;
+}
+
+//
 // The "hello" request when you first join the game contains some info about yourself which we
 // record for posterity.
 //

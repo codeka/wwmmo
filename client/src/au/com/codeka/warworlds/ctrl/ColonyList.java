@@ -246,7 +246,7 @@ public class ColonyList extends FrameLayout {
         }
     }
 
-    private static void scheduleSimulate(final Star star) {
+    public static void scheduleSimulate(final Star star) {
         synchronized(sSimulatingStars) {
             if (sSimulatingStars.contains(star.getKey())) {
                 return;
