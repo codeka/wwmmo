@@ -12,29 +12,22 @@ import org.apache.commons.lang3.StringUtils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
@@ -72,6 +65,7 @@ public class FleetList extends FrameLayout {
     private Map<String, Star> mStars;
     private Context mContext;
     private boolean mIsInitialized;
+    private FleetSelectionPanel mFleetSelectionPanel;
     private OnFleetActionListener mFleetActionListener;
 
     public FleetList(Context context, AttributeSet attrs) {
@@ -92,6 +86,9 @@ public class FleetList extends FrameLayout {
 
     public void setOnFleetActionListener(OnFleetActionListener listener) {
         mFleetActionListener = listener;
+        if (mFleetSelectionPanel != null) {
+            mFleetSelectionPanel.setOnFleetActionListener(listener);
+        }
     }
 
     public void refresh(List<BaseFleet> fleets, Map<String, Star> stars) {
@@ -135,58 +132,18 @@ public class FleetList extends FrameLayout {
             }
         }
 
-        final Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
-        final Button moveBtn = (Button) findViewById(R.id.move_btn);
-        final Button viewBtn = (Button) findViewById(R.id.view_btn);
-        final Button splitBtn = (Button) findViewById(R.id.split_btn);
-        final Button mergeBtn = (Button) findViewById(R.id.merge_btn);
-
-        moveBtn.setText("Move");
-        if (mSelectedFleet != null) {
-            stanceSpinner.setEnabled(true);
-            if (viewBtn != null) {
-                viewBtn.setEnabled(true);
+        if (mSelectedFleet != null && recentre) {
+            int position = mFleetListAdapter.getItemPosition(mSelectedFleet);
+            if (position >= 0) {
+                final ListView fleetList = (ListView) findViewById(R.id.ship_list);
+                fleetList.setSelection(position);
             }
-
-            if (mSelectedFleet.getState() == State.IDLE) {
-                moveBtn.setEnabled(true);
-                splitBtn.setEnabled(true);
-                mergeBtn.setEnabled(true);
-            } else if (mSelectedFleet.getState() == State.MOVING) {
-                BoostFleetUpgrade boost = (BoostFleetUpgrade) mSelectedFleet.getUpgrade("boost");
-                if (boost != null) {
-                    moveBtn.setText("Boost");
-                    moveBtn.setEnabled(!boost.isBoosting());
-                } else {
-                    moveBtn.setEnabled(false);
-                }
-                splitBtn.setEnabled(false);
-                mergeBtn.setEnabled(false);
-            } else {
-                moveBtn.setEnabled(false);
-                splitBtn.setEnabled(false);
-                mergeBtn.setEnabled(false);
-            }
-
-            stanceSpinner.setSelection(mSelectedFleet.getStance().getValue() - 1);
-
-            if (recentre) {
-                int position = mFleetListAdapter.getItemPosition(mSelectedFleet);
-                if (position >= 0) {
-                    final ListView fleetList = (ListView) findViewById(R.id.ship_list);
-                    fleetList.setSelection(position);
-                }
-            }
-        } else {
-            stanceSpinner.setEnabled(false);
-            if (viewBtn != null) {
-                viewBtn.setEnabled(false);
-            }
-            moveBtn.setEnabled(false);
-            splitBtn.setEnabled(false);
-            mergeBtn.setEnabled(false);
         }
 
+        if (mSelectedFleet != null) {
+            mFleetSelectionPanel.setSelectedFleet(mStars.get(mSelectedFleet.getStarKey()),
+                    mSelectedFleet);
+        }
         mFleetListAdapter.notifyDataSetChanged();
     }
 
@@ -200,27 +157,8 @@ public class FleetList extends FrameLayout {
         final ListView fleetList = (ListView) findViewById(R.id.ship_list);
         fleetList.setAdapter(mFleetListAdapter);
 
-        final Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
-        stanceSpinner.setAdapter(new StanceAdapter());
-
-        stanceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Fleet.Stance stance = Fleet.Stance.values()[position];
-                if (mSelectedFleet == null) {
-                    return;
-                }
-
-                if (mSelectedFleet.getStance() != stance && mFleetActionListener != null) {
-                    mFleetActionListener.onFleetStanceModified(
-                            mStars.get(mSelectedFleet.getStarKey()),
-                            mSelectedFleet, stance);
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
+        mFleetSelectionPanel = (FleetSelectionPanel) findViewById(R.id.bottom_pane);
+        mFleetSelectionPanel.setOnFleetActionListener(mFleetActionListener);
 
         fleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -254,70 +192,6 @@ public class FleetList extends FrameLayout {
 
                 dialog.show(((BaseActivity) mContext).getSupportFragmentManager(), "");
                 return true;
-            }
-        });
-
-        final Button splitBtn = (Button) findViewById(R.id.split_btn);
-        splitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSelectedFleet == null) {
-                    return;
-                }
-
-                if (mFleetActionListener != null) {
-                    mFleetActionListener.onFleetSplit(mStars.get(mSelectedFleet.getStarKey()),
-                                                      mSelectedFleet);
-                }
-            }
-        });
-
-        final Button moveBtn = (Button) findViewById(R.id.move_btn);
-        moveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSelectedFleet == null) {
-                    return;
-                }
-
-                if (mFleetActionListener != null) {
-                    Star star = mStars.get(mSelectedFleet.getStarKey());
-                    if (mSelectedFleet.getState() == State.MOVING && mSelectedFleet.hasUpgrade("boost")) {
-                        mFleetActionListener.onFleetBoost(star, mSelectedFleet);
-                    } else if (mSelectedFleet.getState() == State.IDLE) {
-                        mFleetActionListener.onFleetMove(star, mSelectedFleet);
-                    }
-                }
-            }
-        });
-
-        final Button viewBtn = (Button) findViewById(R.id.view_btn);
-        if (viewBtn != null) viewBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSelectedFleet == null) {
-                    return;
-                }
-
-                if (mFleetActionListener != null) {
-                    mFleetActionListener.onFleetView(mStars.get(mSelectedFleet.getStarKey()),
-                                                     mSelectedFleet);
-                }
-            }
-        });
-
-        final Button mergeBtn = (Button) findViewById(R.id.merge_btn);
-        mergeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSelectedFleet == null) {
-                    return;
-                }
-
-                if (mFleetActionListener != null) {
-                    mFleetActionListener.onFleetMerge(mSelectedFleet,
-                                                      mFleets);
-                }
             }
         });
 
@@ -746,9 +620,9 @@ public class FleetList extends FrameLayout {
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
                 if (entry.type == STAR_ITEM_TYPE) {
-                    view = inflater.inflate(R.layout.fleet_list_star_row, null);
+                    view = inflater.inflate(R.layout.fleet_list_star_row, parent, false);
                 } else {
-                    view = inflater.inflate(R.layout.fleet_list_row, null);
+                    view = inflater.inflate(R.layout.fleet_list_row, parent, false);
                 }
             }
 
@@ -791,64 +665,6 @@ public class FleetList extends FrameLayout {
                 this.value = value;
                 this.drawable = null;
             }
-        }
-    }
-
-    public class StanceAdapter extends BaseAdapter implements SpinnerAdapter {
-        Fleet.Stance[] mValues;
-
-        public StanceAdapter() {
-            mValues = Fleet.Stance.values();
-        }
-
-        @Override
-        public int getCount() {
-            return mValues.length;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mValues[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return mValues[position].getValue();
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView view = getCommonView(position, convertView, parent);
-
-            view.setTextColor(Color.WHITE);
-            return view;
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            TextView view = getCommonView(position, convertView, parent);
-
-            ViewGroup.LayoutParams lp = new AbsListView.LayoutParams(LayoutParams.MATCH_PARENT,
-                                                                     LayoutParams.MATCH_PARENT);
-            lp.height = 80;
-            view.setLayoutParams(lp);
-            view.setTextColor(Color.WHITE);
-            view.setText("  "+view.getText().toString());
-            return view;
-        }
-
-        private TextView getCommonView(int position, View convertView, ViewGroup parent) {
-            TextView view;
-            if (convertView != null) {
-                view = (TextView) convertView;
-            } else {
-                view = new TextView(mContext);
-                view.setGravity(Gravity.CENTER_VERTICAL);
-            }
-
-            Fleet.Stance value = mValues[position];
-            view.setText(StringUtils.capitalize(value.toString().toLowerCase(Locale.ENGLISH)));
-            return view;
         }
     }
 

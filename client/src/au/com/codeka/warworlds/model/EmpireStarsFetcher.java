@@ -140,7 +140,11 @@ public class EmpireStarsFetcher {
             }
             lastIndex = index;
         }
-        url.append(Integer.toString(lastIndex + 5)); // fetch 5 more stars than we actually need
+        lastIndex += 5; // fetch 5 more stars than we actually need
+        if (lastIndex >= mNumStars) {
+            lastIndex = mNumStars - 1;
+        }
+        url.append(Integer.toString(lastIndex + 5));
         url.append("&filter=");
         url.append(mFilter.toString().toLowerCase());
         if (mSearch != null) {

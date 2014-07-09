@@ -99,7 +99,7 @@ public class EmpiresStarsHandler extends RequestHandler {
             int startIndex = Integer.parseInt(parts[0]);
             int endIndex = Integer.parseInt(parts[1]);
 
-            for (int i = startIndex; i <= endIndex; i++) {
+            for (int i = startIndex; i <= endIndex && i < starIds.size(); i++) {
                 ids.put(starIds.get(i), i);
             }
         }

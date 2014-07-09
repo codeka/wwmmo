@@ -200,7 +200,7 @@ public class ColoniesFragment extends StarsFragment {
                 ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                view = mInflater.inflate(R.layout.colony_list_star_row, null);
+                view = mInflater.inflate(R.layout.empire_colony_list_star_row, null);
             }
 
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
@@ -288,7 +288,7 @@ public class ColoniesFragment extends StarsFragment {
                 View convertView, ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                view = mInflater.inflate(R.layout.colony_list_colony_row, null);
+                view = mInflater.inflate(R.layout.empire_colony_list_colony_row, null);
             }
 
             ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);

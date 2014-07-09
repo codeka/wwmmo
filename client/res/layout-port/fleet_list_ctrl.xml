@@ -12,96 +12,9 @@
         android:layout_marginBottom="-4px"
         android:listSelector="@drawable/list_selector" />
 
-    <RelativeLayout
+    <au.com.codeka.warworlds.ctrl.FleetSelectionPanel
         android:id="@+id/bottom_pane"
-        style="@style/BottomPane"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-
-        <TextView
-            android:id="@+id/stance_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:text="Stance"
-            android:layout_alignTop="@+id/stance"
-            android:layout_alignBottom="@+id/stance"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <Spinner
-            android:id="@+id/stance"
-            style="@style/Spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="12dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_toRightOf="@id/stance_label" />
-
-        <View android:id="@+id/separator"
-              android:layout_width="1dp"
-              android:layout_height="1dp"
-              android:layout_centerHorizontal="true" />
-
-        <Button
-            android:id="@+id/move_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_below="@+id/stance"
-            android:layout_toRightOf="@id/separator"
-            android:layout_alignParentRight="true"
-            android:text="@string/fleet_move" />
-
-        <Button
-            android:id="@+id/view_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_below="@+id/stance"
-            android:layout_toLeftOf="@id/separator"
-            android:text="@string/fleet_view" />
-
-        <Button
-            android:id="@+id/split_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/move_btn"
-            android:layout_toRightOf="@id/separator"
-            android:text="@string/fleet_split" />
-
-        <Button
-            android:id="@+id/merge_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_below="@+id/move_btn"
-            android:layout_toLeftOf="@id/separator"
-            android:text="@string/fleet_merge" />
-
-        <au.com.codeka.warworlds.ctrl.InfobarView
-            android:id="@+id/infobar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/split_btn"/>
-
-    </RelativeLayout>
-
+        android:layout_alignParentBottom="true" />
 </RelativeLayout>
