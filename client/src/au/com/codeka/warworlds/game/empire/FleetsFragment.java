@@ -1,12 +1,15 @@
 package au.com.codeka.warworlds.game.empire;
 
+import java.util.List;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +17,20 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.common.model.BaseEmpirePresence;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.ctrl.FleetSelectionPanel;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.FleetMergeDialog;
+import au.com.codeka.warworlds.game.FleetMoveActivity;
+import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.EmpireStarsFetcher;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.FleetManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
@@ -40,46 +49,28 @@ public class FleetsFragment extends StarsFragment {
         fetcher.getStars(0, 20);
     }
 
-/*
     @Override
-    public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
-        if (sStars == null || sCurrentEmpire == null) {
-            return getLoadingView(inflator);
-        }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.empire_fleets_tab, container, false);
+        ExpandableListView starsList = (ExpandableListView) v.findViewById(R.id.stars);
+        adapter = new FleetsStarsListAdapter(inflater, fetcher);
+        starsList.setAdapter(adapter);
 
-        ArrayList<BaseFleet> fleets = new ArrayList<BaseFleet>();
-        for (Star s : sStars.values()) {
-            for (BaseFleet f : s.getFleets()) {
-                if (f.getEmpireKey() != null && f.getEmpireKey().equals(sCurrentEmpire.getKey())) {
-                    fleets.add(f);
-                }
-            }
-        }
-
-        View v = inflator.inflate(R.layout.empire_fleets_tab, null);
-        FleetList fleetList = (FleetList) v.findViewById(R.id.fleet_list);
-        fleetList.refresh(fleets, sStars);
-
-        EmpireActivity activity = (EmpireActivity) getActivity();
-        if (activity.mFirstStarsRefresh && activity.mExtras != null) {
-            String fleetKey = activity.mExtras.getString("au.com.codeka.warworlds.FleetKey");
-            if (fleetKey != null) {
-                fleetList.selectFleet(fleetKey, true);
-            }
-        }
-
-        fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
+        fleetSelectionPanel = (FleetSelectionPanel) v.findViewById(R.id.bottom_pane);
+        fleetSelectionPanel.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
             @Override
             public void onFleetView(Star star, Fleet fleet) {
                 Intent intent = new Intent();
-                intent.putExtra("au.com.codeka.warworlds.Result", EmpireActivityResult.NavigateToFleet.getValue());
+                intent.putExtra("au.com.codeka.warworlds.Result",
+                        EmpireActivity.EmpireActivityResult.NavigateToFleet.getValue());
                 intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
                 intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
                 intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.getOffsetX());
                 intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.getOffsetY());
                 intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
                 intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
-                getActivity().setResult(RESULT_OK, intent);
+                getActivity().setResult(EmpireActivity.RESULT_OK, intent);
                 getActivity().finish();
             }
 
@@ -120,20 +111,6 @@ public class FleetsFragment extends StarsFragment {
                 EmpireManager.i.getEmpire().updateFleetStance(star, fleet, newStance);
             }
         });
-
-        return v;
-    }
-*/
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.empire_fleets_tab, container, false);
-        ExpandableListView starsList = (ExpandableListView) v.findViewById(R.id.stars);
-        adapter = new FleetsStarsListAdapter(inflater, fetcher);
-        starsList.setAdapter(adapter);
-
-        fleetSelectionPanel = (FleetSelectionPanel) v.findViewById(R.id.bottom_pane);
 
         starsList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override

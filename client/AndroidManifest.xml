@@ -66,8 +66,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AccountsActivity"
-                  android:label="@string/app_name" />
+        <activity android:name=".AccountsActivity" />
         <activity android:name=".WarmWelcomeActivity" />
         <activity android:name=".GlobalOptionsActivity" />
         <activity android:name=".EmpireSetupActivity" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="WarWorlds" parent="@android:style/Theme">
+    <style name="WarWorlds" parent="@style/Theme.AppCompat">
         <item name="android:buttonStyle">@style/Button</item>
         <item name="android:imageButtonStyle">@style/ImageButton</item>
         <item name="android:spinnerStyle">@style/Spinner</item>

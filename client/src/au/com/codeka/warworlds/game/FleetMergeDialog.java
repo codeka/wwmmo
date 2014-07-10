@@ -236,8 +236,6 @@ public class FleetMergeDialog extends DialogFragment {
             View view = convertView;
 
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
-                        (Context.LAYOUT_INFLATER_SERVICE);
                 view = new FleetListRow(mContext);
             }
 
