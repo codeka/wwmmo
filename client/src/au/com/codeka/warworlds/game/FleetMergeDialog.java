@@ -24,7 +24,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -238,10 +238,10 @@ public class FleetMergeDialog extends DialogFragment {
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.fleet_list_row, null);
+                view = new FleetListRow(mContext);
             }
 
-            FleetList.populateFleetRow(mContext, null, view, fleet);
+            ((FleetListRow) view).setFleet(fleet);
 
             if (mSelectedFleet != null && mSelectedFleet.getKey().equals(fleet.getKey())) {
                 view.setBackgroundColor(0xff0c6476);

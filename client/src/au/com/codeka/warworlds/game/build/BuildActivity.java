@@ -43,7 +43,7 @@ import au.com.codeka.warworlds.TabFragmentFragment;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.BuildingsList;
-import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.NotesDialog;
 import au.com.codeka.warworlds.model.BuildManager;
@@ -545,7 +545,7 @@ public class BuildActivity extends BaseActivity {
                     }
 
                     row1.removeAllViews();
-                    FleetList.populateFleetNameRow(getActivity(), row1, fleet, design);
+                    FleetListRow.populateFleetNameRow(getActivity(), row1, fleet, design);
                     if (buildRequest != null) {
                         String verb = (fleet == null ? "Building" : "Upgrading");
                         row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
@@ -606,7 +606,7 @@ public class BuildActivity extends BaseActivity {
                     icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
                     row1.removeAllViews();
-                    FleetList.populateFleetNameRow(getActivity(), row1, null, design);
+                    FleetListRow.populateFleetNameRow(getActivity(), row1, null, design);
                     String requiredHtml = design.getDependenciesHtml(getColony());
                     row2.setText(Html.fromHtml(requiredHtml));
 

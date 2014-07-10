@@ -72,7 +72,12 @@ public class NotificationHandler extends RequestHandler {
             return;
         }
         log.info("Sending notification via NotificationHandler for "+mEmpireID);
-        mContinuation.setAttribute("notification", notification);
-        mContinuation.resume();
+        try {
+            mContinuation.setAttribute("notification", notification);
+            mContinuation.resume();
+        } catch (IllegalStateException e) {
+            // TODO: have to figure out why this happens
+            log.error("Got exception dispatching notification.", e);
+        }
     }
 }

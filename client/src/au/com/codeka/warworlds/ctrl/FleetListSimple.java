@@ -95,8 +95,8 @@ public class FleetListSimple extends LinearLayout {
         row1.removeAllViews();
         row2.removeAllViews();
 
-        FleetList.populateFleetNameRow(mContext, row1, fleet, design);
-        FleetList.populateFleetStanceRow(mContext, row2, fleet);
+        FleetListRow.populateFleetNameRow(mContext, row1, fleet, design);
+        FleetListRow.populateFleetStanceRow(mContext, row2, fleet);
 
         view.setOnClickListener(mOnClickListener);
         view.setTag(fleet);

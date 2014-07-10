@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Locale;
 
 import android.content.Context;
@@ -16,7 +18,7 @@ import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -27,6 +29,7 @@ import au.com.codeka.warworlds.model.FleetUpgrade;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
+import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 
 /** This view displays information about a fleet you've selected on the starfield view. */
@@ -95,15 +98,34 @@ public class FleetInfoView extends FrameLayout {
         }
 
         fleetDesign.removeAllViews();
-        FleetList.populateFleetNameRow(mContext, fleetDesign, fleet, design, 18.0f);
+        FleetListRow.populateFleetNameRow(mContext, fleetDesign, fleet, design, 18.0f);
         fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
         fleetDestination.removeAllViews();
-        FleetList.populateFleetDestinationRow(mContext, fleetDestination, fleet, false);
+        FleetListRow.populateFleetDestinationRow(mContext, fleetDestination, fleet, false);
 
-        FleetList.fetchSrcDestStar(fleet, null, new FleetList.SrcDestStarsFetchedHandler() {
+        ArrayList<String> starKeys = new ArrayList<String>();
+        starKeys.add(fleet.getStarKey());
+        starKeys.add(fleet.getDestinationStarKey());
+        StarManager.getInstance().requestStarSummaries(starKeys,
+                new StarManager.StarSummariesFetchedHandler() {
             @Override
-            public void onSrcDestStarsFetched(StarSummary srcStar, StarSummary destStar) {
+            public void onStarSummariesFetched(Collection<StarSummary> stars) {
+                StarSummary srcStar = null;
+                StarSummary destStar = null;
+                for (StarSummary star : stars) {
+                    if (star.getKey().equals(fleet.getStarKey())) {
+                        srcStar = star;
+                    } else if (star.getKey().equals(fleet.getDestinationStarKey())) {
+                        destStar = star;
+                    }
+                }
+
+                if (srcStar == null || destStar == null) {
+                    // TODO: ??
+                    return;
+                }
+
                 float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
                 float timeFromSourceInHours = fleet.getTimeFromSource();
                 float timeToDestinationInHours = fleet.getTimeToDestination();

@@ -14,7 +14,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -42,8 +42,8 @@ public class FleetSplitDialog extends DialogFragment {
         final TextView splitLeft = (TextView) mView.findViewById(R.id.split_left);
         final TextView splitRight = (TextView) mView.findViewById(R.id.split_right);
 
-        View fleetView = mView.findViewById(R.id.fleet);
-        FleetList.populateFleetRow(getActivity(), null, fleetView, mFleet);
+        FleetListRow fleetView = (FleetListRow) mView.findViewById(R.id.fleet);
+        fleetView.setFleet(mFleet);
 
         int numShips = (int) Math.ceil(mFleet.getNumShips());
         if (numShips >= 2) {

@@ -4,13 +4,12 @@
     android:layout_height="wrap_content"
     android:padding="10dp">
 
-    <include
+    <au.com.codeka.warworlds.ctrl.FleetListRow
         android:id="@+id/fleet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
-        layout="@layout/fleet_list_row" />
+        android:layout_marginTop="10dp" />
 
     <SeekBar
         android:id="@+id/split_ratio"

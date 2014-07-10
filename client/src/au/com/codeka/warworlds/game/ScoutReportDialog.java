@@ -28,7 +28,7 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.ColonyList;
-import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -282,7 +282,7 @@ public class ScoutReportDialog extends DialogFragment {
                 if (item.colony != null) {
                     view = inflater.inflate(R.layout.colony_list_colony_row, null);
                 } else {
-                    view = inflater.inflate(R.layout.fleet_list_row, null);
+                    view = new FleetListRow(getActivity());
                 }
             }
 
@@ -291,8 +291,7 @@ public class ScoutReportDialog extends DialogFragment {
 
                 ColonyList.populateColonyListRow(getActivity(), view, colony, mStar);
             } else {
-                Fleet fleet = item.fleet;
-                FleetList.populateFleetRow(getActivity(), null, view, fleet);
+                ((FleetListRow) view).setFleet(item.fleet);
             }
 
             return view;
