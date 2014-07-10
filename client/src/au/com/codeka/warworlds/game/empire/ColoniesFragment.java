@@ -8,11 +8,9 @@ import org.joda.time.DateTimeZone;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,29 +37,29 @@ import au.com.codeka.warworlds.model.StarSimulationQueue;
  * belong to those stars.
  */
 public class ColoniesFragment extends StarsFragment {
-    private StarsListAdapter mAdapter;
-    private EmpireStarsFetcher mFetcher;
+    private StarsListAdapter adapter;
+    private EmpireStarsFetcher fetcher;
 
     public ColoniesFragment() {
-        mFetcher = new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Colonies, null);
+        fetcher = new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Colonies, null);
         // fetch the first few stars
-        mFetcher.getStars(0, 20);
+        fetcher.getStars(0, 20);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.empire_colonies_tab, null);
+        View v = inflater.inflate(R.layout.empire_colonies_tab, container, false);
         ExpandableListView starsList = (ExpandableListView) v.findViewById(R.id.stars);
-        mAdapter = new StarsListAdapter(inflater);
-        starsList.setAdapter(mAdapter);
+        adapter = new ColonyStarsListAdapter(inflater, fetcher);
+        starsList.setAdapter(adapter);
 
         starsList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,
                     int groupPosition, int childPosition, long id) {
-                Star star = (Star) mAdapter.getGroup(groupPosition);
-                Colony colony = (Colony) mAdapter.getChild(groupPosition, childPosition);
+                Star star = (Star) adapter.getGroup(groupPosition);
+                Colony colony = (Colony) adapter.getChild(groupPosition, childPosition);
                 Planet planet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
                 // end this activity, go back to the starfield and navigate to the given colony
 
@@ -88,73 +86,44 @@ public class ColoniesFragment extends StarsFragment {
     public void onStart() {
         super.onStart();
         StarManager.eventBus.register(mEventHandler);
-        mFetcher.eventBus.register(mEventHandler);
+        fetcher.eventBus.register(mEventHandler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         StarManager.eventBus.unregister(mEventHandler);
-        mFetcher.eventBus.unregister(mEventHandler);
+        fetcher.eventBus.unregister(mEventHandler);
     }
 
     private Object mEventHandler = new Object() {
         @EventHandler(thread = EventHandler.UI_THREAD)
         public void onStarUpdated(Star star) {
-            mAdapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
         }
 
         @EventHandler(thread = EventHandler.UI_THREAD)
         public void onStarsFetched(EmpireStarsFetcher.StarsFetchedEvent event) {
-            mAdapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
         }
     };
 
-    public class StarsListAdapter extends BaseExpandableListAdapter {
-        private LayoutInflater mInflater;
+    public static class ColonyStarsListAdapter extends StarsListAdapter {
+        private LayoutInflater inflater;
+        private MyEmpire empire;
 
-        // should never have > 40 visible at once...
-        private LruCache<Integer, Star> mStarCache = new LruCache<Integer, Star>(40);
-        private MyEmpire mEmpire;
-
-        public StarsListAdapter(LayoutInflater inflater) {
-            mInflater = inflater;
-            mEmpire = EmpireManager.i.getEmpire();
-        }
-
-        // TODO: ?
-        @Override
-        public boolean hasStableIds() {
-            return false;
-        }
-     
-        @Override
-        public boolean isChildSelectable(int groupPosition, int childPosition) {
-            return true;
+        public ColonyStarsListAdapter(LayoutInflater inflater, EmpireStarsFetcher fetcher) {
+            super(fetcher);
+            this.inflater = inflater;
+            empire = EmpireManager.i.getEmpire();
         }
 
         @Override
-        public int getGroupCount() {
-            return mFetcher.getNumStars();
-        }
-
-        @Override
-        public Object getGroup(int groupPosition) {
-            return getStar(groupPosition);
-        }
-
-        @Override
-        public int getChildrenCount(int groupPosition) {
-            Star star = getStar(groupPosition);
-            if (star == null) {
-                return 0;
-            }
-
-            // TODO: cache?
+        public int getNumChildren(Star star) {
             int numColonies = 0;
             for (int i = 0; i < star.getColonies().size(); i++) {
                 Integer empireID = ((Colony) star.getColonies().get(i)).getEmpireID();
-                if (empireID != null && empireID == mEmpire.getID()) {
+                if (empireID != null && empireID == empire.getID()) {
                     numColonies ++;
                 }
             }
@@ -163,18 +132,12 @@ public class ColoniesFragment extends StarsFragment {
         }
 
         @Override
-        public Object getChild(int groupPosition, int childPosition) {
-            Star star = getStar(groupPosition);
-            if (star == null) {
-                return null;
-            }
-
-            // TODO: cache?
+        public Object getChild(Star star, int index) {
             int colonyIndex = 0;
             for (int i = 0; i < star.getColonies().size(); i++) {
                 Integer empireID = ((Colony) star.getColonies().get(i)).getEmpireID();
-                if (empireID != null && empireID == mEmpire.getID()) {
-                    if (colonyIndex == childPosition) {
+                if (empireID != null && empireID == empire.getID()) {
+                    if (colonyIndex == index) {
                         return star.getColonies().get(i);
                     }
                     colonyIndex ++;
@@ -186,21 +149,10 @@ public class ColoniesFragment extends StarsFragment {
         }
 
         @Override
-        public long getGroupId(int groupPosition) {
-            return groupPosition;
-        }
-
-        @Override
-        public long getChildId(int groupPosition, int childPosition) {
-            return childPosition;
-        }
-
-        @Override
-        public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
-                ViewGroup parent) {
+        public View getStarView(Star star, View convertView, ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                view = mInflater.inflate(R.layout.empire_colony_list_star_row, null);
+                view = inflater.inflate(R.layout.empire_colony_list_star_row, parent, false);
             }
 
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
@@ -211,7 +163,6 @@ public class ColoniesFragment extends StarsFragment {
             TextView starMineralsDelta = (TextView) view.findViewById(R.id.star_minerals_delta);
             TextView starMineralsTotal = (TextView) view.findViewById(R.id.star_minerals_total);
 
-            Star star = getStar(groupPosition);
             if (star == null) {
                 starIcon.setImageBitmap(null);
                 starName.setText("");
@@ -237,7 +188,8 @@ public class ColoniesFragment extends StarsFragment {
                     }
                 }
 
-                boolean needSimulation = star.getLastSimulation().compareTo(DateTime.now(DateTimeZone.UTC).minusMinutes(5)) < 0;
+                boolean needSimulation = star.getLastSimulation().compareTo(
+                        DateTime.now(DateTimeZone.UTC).minusMinutes(5)) < 0;
                 if (!needSimulation && empirePresence != null) {
                     if (empirePresence.getDeltaGoodsPerHour() == 0.0f
                             && empirePresence.getDeltaMineralsPerHour() == 0.0f) {
@@ -247,8 +199,8 @@ public class ColoniesFragment extends StarsFragment {
                 }
 
                 if (needSimulation || empirePresence == null) {
-                    // if the star hasn't been simulated for > 5 minutes, schedule a simulation now and
-                    // just display ??? for the various parameters
+                    // if the star hasn't been simulated for > 5 minutes, schedule a simulation
+                    // now and just display ??? for the various parameters
                     starGoodsDelta.setText("");
                     starGoodsTotal.setText("???");
                     starMineralsDelta.setText("");
@@ -284,11 +236,10 @@ public class ColoniesFragment extends StarsFragment {
         }
 
         @Override
-        public View getChildView(int groupPosition, final int childPosition, boolean isLastChild,
-                View convertView, ViewGroup parent) {
+        public View getChildView(Star star, int index, View convertView, ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                view = mInflater.inflate(R.layout.empire_colony_list_colony_row, null);
+                view = inflater.inflate(R.layout.empire_colony_list_colony_row, parent, false);
             }
 
             ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
@@ -299,38 +250,29 @@ public class ColoniesFragment extends StarsFragment {
             colonyName.setText("");
             colonySummary.setText("");
 
-            Star star = getStar(groupPosition);
             if (star != null) {
-                Colony colony = (Colony) getChild(groupPosition, childPosition);
+                Colony colony = (Colony) getChild(star, index);
                 Planet planet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
                 if (planet != null) {
                     Sprite sprite = PlanetImageManager.getInstance().getSprite(planet);
                     planetIcon.setImageDrawable(new SpriteDrawable(sprite));
 
-                    colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));
+                    colonyName.setText(String.format("%s %s", star.getName(),
+                            RomanNumeralFormatter.format(planet.getIndex())));
 
-                    if (star.getLastSimulation().compareTo(DateTime.now(DateTimeZone.UTC).minusMinutes(5)) < 0) {
-                        // if the star hasn't been simulated for > 5 minutes, just display ??? for the
-                        // various parameters (a simulation will be scheduled)
+                    if (star.getLastSimulation().compareTo(DateTime.now(DateTimeZone.UTC)
+                            .minusMinutes(5)) < 0) {
+                        // if the star hasn't been simulated for > 5 minutes, just display ???
+                        // for the various parameters (a simulation will be scheduled)
                         colonySummary.setText("Pop: ?");
                     } else {
-                        colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));
+                        colonySummary.setText(String.format("Pop: %d",
+                                (int) colony.getPopulation()));
                     }
                 }
             }
 
             return view;
-        }
-
-        private Star getStar(int index) {
-            Star star = mStarCache.get(index);
-            if (star == null) {
-                star = mFetcher.getStar(index);
-                if (star != null) {
-                    mStarCache.put(index, star);
-                }
-            }
-            return star;
         }
     }
 }
