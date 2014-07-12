@@ -1,6 +1,10 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+
+import org.andengine.entity.Entity;
 
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
@@ -19,6 +23,12 @@ import au.com.codeka.common.protobuf.Messages;
  * having to do a full round-trip.
  */
 public class StarSummary extends BaseStar {
+    private ArrayList<Entity> mAttachedEntities;
+
+    public int getID() {
+        return Integer.parseInt(mKey);
+    }
+
     @Override
     protected BasePlanet createPlanet(Messages.Planet pb) {
         Planet p = new Planet();
@@ -91,6 +101,16 @@ public class StarSummary extends BaseStar {
         Star clone = new Star();
         clone.fromProtocolBuffer(star_pb.build());
         return clone;
+    }
+
+    public List<Entity> getAttachedEntities() {
+        if (mAttachedEntities == null) {
+            mAttachedEntities = new ArrayList<Entity>();
+        }
+        return mAttachedEntities;
+    }
+    public boolean hasAttachedEntities() {
+        return mAttachedEntities != null && mAttachedEntities.size() > 0;
     }
 
     public String getCoordinateString() {

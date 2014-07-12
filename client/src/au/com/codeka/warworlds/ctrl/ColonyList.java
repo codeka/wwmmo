@@ -219,7 +219,7 @@ public class ColonyList extends FrameLayout {
             starMineralsDelta.setText("");
             starMineralsTotal.setText("???");
             scheduleSimulate(star);
-        } else {
+        } else if (empirePresence != null) {
             starGoodsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
                     empirePresence.getDeltaGoodsPerHour() < 0 ? "-" : "+",
                     Math.abs(Math.round(empirePresence.getDeltaGoodsPerHour()))));
@@ -403,9 +403,9 @@ public class ColonyList extends FrameLayout {
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
                 if (entry.star != null)
-                    view = inflater.inflate(R.layout.colony_list_star_row, null);
+                    view = inflater.inflate(R.layout.colony_list_star_row, parent, false);
                 else
-                    view = inflater.inflate(R.layout.colony_list_colony_row, null);
+                    view = inflater.inflate(R.layout.colony_list_colony_row, parent, false);
             }
 
             if (entry.star != null) {

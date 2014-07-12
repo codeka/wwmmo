@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 
@@ -24,6 +25,7 @@ public class SolarSystemActivity extends BaseActivity {
     private View drawer;
     private ActionBarDrawerToggle drawerToggle;
     private Integer starID;
+    private StarSummary star;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,6 +88,8 @@ public class SolarSystemActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
 
+        StarManager.eventBus.register(eventHandler);
+
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
@@ -99,22 +103,14 @@ public class SolarSystemActivity extends BaseActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle instanceState) {
-        super.onSaveInstanceState(instanceState);
-//        mInitialStarIndex = mViewPager.getCurrentItem();
-//        instanceState.putInt("au.com.codeka.warworlds.CurrentIndex", mViewPager.getCurrentItem());
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle instanceState) {
-        super.onRestoreInstanceState(instanceState);
-//        mInitialStarIndex = instanceState.getInt("au.com.codeka.warworlds.CurrentIndex");
+    public void onPause() {
+        super.onPause();
+        StarManager.eventBus.unregister(eventHandler);
     }
 
     @Override
     public void onBackPressed() {
-        StarSummary star = StarManager.getInstance().getStarSummaryNoFetch(
-                Integer.toString(starID), Float.MAX_VALUE);
+        StarSummary star = StarManager.i.getStarSummary(starID, Float.MAX_VALUE);
         Intent intent = new Intent();
         if (star != null) {
             intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
@@ -128,17 +124,32 @@ public class SolarSystemActivity extends BaseActivity {
 
     private void showStar(Integer starID) {
         this.starID = starID;
+        star = StarManager.i.getStarSummary(starID);
+        if (star != null) {
+            getSupportActionBar().setTitle(star.getName());
+        } else {
+            getSupportActionBar().setTitle("Star Name");
+        }
 
         Fragment fragment = new SolarSystemFragment();
         Bundle args = new Bundle();
         args.putLong("au.com.codeka.warworlds.StarID", starID);
         fragment.setArguments(args);
 
-        getSupportActionBar().setTitle("Star Name");
         getSupportFragmentManager().beginTransaction()
                                    .replace(R.id.content, fragment)
                                    .commit();
 
         drawerLayout.closeDrawer(drawer);
     }
+
+    private Object eventHandler = new Object() {
+        @EventHandler
+        public void onStarUpdated(StarSummary starSummary) {
+            if (starSummary.getID() == starID) {
+                star = starSummary;
+                getSupportActionBar().setTitle(starSummary.getName());
+            }
+        }
+    };
 }

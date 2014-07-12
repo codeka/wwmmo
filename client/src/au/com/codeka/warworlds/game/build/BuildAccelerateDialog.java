@@ -174,7 +174,7 @@ public class BuildAccelerateDialog extends DialogFragment {
             @Override
             protected void onComplete(BuildRequest buildRequest) {
                 // tell the StarManager that this star has been updated
-                StarManager.getInstance().refreshStar(mStar.getKey());
+                StarManager.i.refreshStar(Integer.parseInt(mStar.getKey()));
 
                 // tell the EmpireManager to update the empire (since our cash will have gone down)
                 EmpireManager.i.refreshEmpire();

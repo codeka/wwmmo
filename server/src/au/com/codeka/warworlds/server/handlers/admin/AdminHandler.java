@@ -97,7 +97,7 @@ public class AdminHandler extends RequestHandler {
         try {
             requestUrl = new URI(getRequestUrl());
         } catch (URISyntaxException e) {
-            // should never happen
+            throw new RuntimeException(e);
         }
 
         String finalUrl = requestUrl.getPath();

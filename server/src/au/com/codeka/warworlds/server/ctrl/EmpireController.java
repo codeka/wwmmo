@@ -164,7 +164,7 @@ public class EmpireController {
     public boolean adjustBalance(int empireId, float amount, Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
         Transaction t = db.getTransaction();
         boolean existingTransaction = (t != null);
-        if (!existingTransaction) {
+        if (t == null) {
             try {
                 t = DB.beginTransaction();
             } catch (SQLException e) {

@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.ctrl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -177,7 +176,7 @@ public class BuildQueueList extends FrameLayout {
                 starKeys.add(buildRequest.getStarKey());
             }
         }
-
+/*
         StarManager.getInstance().requestStarSummaries(starKeys, new StarManager.StarSummariesFetchedHandler() {
             @Override
             public void onStarSummariesFetched(Collection<StarSummary> stars) {
@@ -187,7 +186,7 @@ public class BuildQueueList extends FrameLayout {
                 }
                 refresh(summaries, buildRequests);
             }
-        });
+        });*/
     }
 
     public void refresh(final Map<String, StarSummary> stars,

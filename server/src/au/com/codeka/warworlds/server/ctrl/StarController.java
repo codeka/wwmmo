@@ -426,9 +426,7 @@ public class StarController {
 
                 Messages.Star.StarExtra.Builder star_extra_pb = null;
                 if (star.getWormholeExtra() != null) {
-                    if (star_extra_pb == null) {
-                        star_extra_pb = Messages.Star.StarExtra.newBuilder();
-                    }
+                    star_extra_pb = Messages.Star.StarExtra.newBuilder();
                     star.getWormholeExtra().toProtocolBuffer(star_extra_pb);
                 }
                 if (star_extra_pb == null) {
@@ -827,7 +825,9 @@ public class StarController {
                     }
 
                     BuildRequest buildRequest = new BuildRequest(star, res);
-                    star.getBuildRequests().add(buildRequest);
+                    if (star != null) {
+                        star.getBuildRequests().add(buildRequest);
+                    }
                 }
             }
         }

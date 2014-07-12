@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.ctrl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +10,7 @@ import android.graphics.Bitmap;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -136,28 +136,16 @@ public class FleetListRow extends RelativeLayout {
 
     public static void populateFleetDestinationRow(final Context context, final LinearLayout row,
             final Fleet fleet, final boolean includeEta) {
-        ArrayList<String> starKeys = new ArrayList<String>();
-        starKeys.add(fleet.getStarKey());
-        starKeys.add(fleet.getDestinationStarKey());
-        StarManager.getInstance().requestStarSummaries(starKeys,
-                new StarManager.StarSummariesFetchedHandler() {
-            @Override
-            public void onStarSummariesFetched(Collection<StarSummary> stars) {
-                StarSummary srcStar = null;
-                StarSummary destStar = null;
-                for (StarSummary star : stars) {
-                    if (star.getKey().equals(fleet.getStarKey())) {
-                        srcStar = star;
-                    } else if (star.getKey().equals(fleet.getDestinationStarKey())) {
-                        destStar = star;
-                    }
-                }
-
-                if (srcStar != null && destStar != null) {
-                    populateFleetDestinationRow(context, row, fleet, srcStar, destStar, includeEta);
-                }
-            }
-        });
+        ArrayList<Integer> starIDs = new ArrayList<Integer>();
+        starIDs.add(Integer.parseInt(fleet.getStarKey()));
+        starIDs.add(Integer.parseInt(fleet.getDestinationStarKey()));
+        SparseArray<StarSummary> starSummaries = StarManager.i.getStarSummaries(
+                starIDs, Float.MAX_VALUE);
+        StarSummary srcStar = starSummaries.get(Integer.parseInt(fleet.getStarKey()));
+        StarSummary destStar = starSummaries.get(Integer.parseInt(fleet.getDestinationStarKey()));
+        if (srcStar != null && destStar != null) {
+            populateFleetDestinationRow(context, row, fleet, srcStar, destStar, includeEta);
+        }
     }
 
     private static void populateFleetDestinationRow(Context context, LinearLayout row,

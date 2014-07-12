@@ -88,7 +88,10 @@ public class EnemyPlanetActivity extends BaseActivity {
                 } else {
                     String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
                     StarManager.eventBus.register(mEventHandler);
-                    StarManager.getInstance().requestStar(starKey, false, null);
+                    mStar = StarManager.i.getStar(Integer.parseInt(starKey));
+                    if (mStar != null) {
+                        refreshStarDetails();
+                    }
                 }
             }
         });
@@ -103,30 +106,8 @@ public class EnemyPlanetActivity extends BaseActivity {
                 return;
             }
 
-            int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
-
             mStar = s;
-            mPlanet = (Planet) s.getPlanets()[planetIndex - 1];
-            for (BaseColony colony : s.getColonies()) {
-                if (colony.getPlanetIndex() == planetIndex) {
-                    mColony = (Colony) colony;
-                }
-            }
-
-            final Button attackBtn = (Button) findViewById(R.id.attack_btn);
-            if (mColony != null) {
-                mColonyEmpire = EmpireManager.i.getEmpire(mColony.getEmpireID());
-                if (mColonyEmpire == null) {
-                    attackBtn.setEnabled(false);
-                } else {
-                    refreshEmpireDetails();
-                }
-            } else {
-                attackBtn.setVisibility(View.GONE);
-            }
-
-            PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
-            planetDetails.setup(mStar, mPlanet, mColony);
+            refreshStarDetails();
         }
 
         @EventHandler
@@ -147,6 +128,31 @@ public class EnemyPlanetActivity extends BaseActivity {
             }
         }
     };
+
+    private void refreshStarDetails() {
+        int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
+        mPlanet = (Planet) mStar.getPlanets()[planetIndex - 1];
+        for (BaseColony colony : mStar.getColonies()) {
+            if (colony.getPlanetIndex() == planetIndex) {
+                mColony = (Colony) colony;
+            }
+        }
+
+        final Button attackBtn = (Button) findViewById(R.id.attack_btn);
+        if (mColony != null) {
+            mColonyEmpire = EmpireManager.i.getEmpire(mColony.getEmpireID());
+            if (mColonyEmpire == null) {
+                attackBtn.setEnabled(false);
+            } else {
+                refreshEmpireDetails();
+            }
+        } else {
+            attackBtn.setVisibility(View.GONE);
+        }
+
+        PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
+        planetDetails.setup(mStar, mPlanet, mColony);
+    }
 
     private void refreshEmpireDetails() {
         ImageView enemyIcon = (ImageView) findViewById(R.id.enemy_empire_icon);

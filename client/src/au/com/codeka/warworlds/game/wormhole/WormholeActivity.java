@@ -142,7 +142,7 @@ public class WormholeActivity extends BaseGlActivity {
                 Bundle extras = getIntent().getExtras();
                 String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
 
-                StarManager.getInstance().requestStar(starKey, false, null);
+                StarManager.i.refreshStar(Integer.parseInt(starKey));
 
                 FleetListWormhole fleetList = (FleetListWormhole) findViewById(R.id.fleet_list);
                 TreeMap<String, Star> stars = new TreeMap<String, Star>();
@@ -191,8 +191,7 @@ public class WormholeActivity extends BaseGlActivity {
 
             if (mStar.getWormholeExtra().getDestWormholeID() != 0 && (
                     mDestStar == null || !mDestStar.getKey().equals(Integer.toString(mStar.getWormholeExtra().getDestWormholeID())))) {
-                StarManager.getInstance().requestStar(Integer.toString(
-                        mStar.getWormholeExtra().getDestWormholeID()), false, null);
+                StarManager.i.refreshStar(mStar.getWormholeExtra().getDestWormholeID());
             }
 
             if (destinationName.getText().toString().equals("")) {

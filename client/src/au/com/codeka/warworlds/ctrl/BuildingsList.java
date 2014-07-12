@@ -334,7 +334,7 @@ public class BuildingsList extends ListView {
                     row3.setVisibility(View.GONE);
                     progress.setVisibility(View.VISIBLE);
                     progress.setProgress((int) buildRequest.getPercentComplete());
-                } else {
+                } else if (building != null) {
                     if (numUpgrades < building.getLevel()) {
                         row2.setText("No more upgrades");
                         row3.setVisibility(View.GONE);

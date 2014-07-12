@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.model;
 
 import java.util.Locale;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -157,12 +158,14 @@ public class SituationReport {
         return msg;
     }
 
-    public String getDescription(StarSummary starSummary) {
+    public String getDescription(@Nullable StarSummary starSummary) {
         String msg = "";
+        String starName = (starSummary == null ? "star" : starSummary.getName());
 
         if (mMoveCompleteRecord != null) {
-            msg += getFleetLine(mMoveCompleteRecord.getFleetDesignID(), mMoveCompleteRecord.getNumShips());
-            msg += String.format(Locale.ENGLISH, " arrived at %s", starSummary.getName());
+            msg += getFleetLine(mMoveCompleteRecord.getFleetDesignID(),
+                    mMoveCompleteRecord.getNumShips());
+            msg += String.format(Locale.ENGLISH, " arrived at %s", starName);
         }
 
         if (mBuildCompleteRecord != null) {
@@ -174,7 +177,7 @@ public class SituationReport {
                 msg += design.getDisplayName();
             }
             msg += String.format(Locale.ENGLISH, " complete on %s %s",
-                    starSummary.getName(), RomanNumeralFormatter.format(mPlanetIndex));
+                    starName, RomanNumeralFormatter.format(mPlanetIndex));
         }
 
         if (mFleetUnderAttackRecord != null) {
@@ -183,8 +186,9 @@ public class SituationReport {
             } else if (mBuildCompleteRecord != null) {
                 msg += ", which is under attack";
             } else {
-                msg += getFleetLine(mFleetUnderAttackRecord.getFleetDesignID(), mFleetUnderAttackRecord.getNumShips());
-                msg += String.format(Locale.ENGLISH, " is under attack at %s", starSummary.getName());
+                msg += getFleetLine(mFleetUnderAttackRecord.getFleetDesignID(),
+                        mFleetUnderAttackRecord.getNumShips());
+                msg += String.format(Locale.ENGLISH, " is under attack at %s", starName);
             }
         }
 
@@ -193,31 +197,30 @@ public class SituationReport {
                 msg += " - it was DESTROYED!";
             } else {
                 msg += String.format(Locale.ENGLISH, "%s fleet destroyed on %s",
-                        getFleetLine(mFleetDestroyedRecord.getFleetDesignID(), 1),
-                        starSummary.getName());
+                        getFleetLine(mFleetDestroyedRecord.getFleetDesignID(), 1), starName);
             }
         }
 
         if (mFleetVictoriousRecord != null) {
             msg += String.format(Locale.ENGLISH, "%s fleet prevailed in battle on %s",
                     getFleetLine(mFleetVictoriousRecord.getFleetDesignID(), mFleetVictoriousRecord.getNumShips()),
-                    starSummary.getName());
+                    starName);
         }
 
         if (mColonyDestroyedRecord != null) {
             msg += String.format(Locale.ENGLISH, "Colony on %s %s destroyed",
-                    starSummary.getName(), RomanNumeralFormatter.format(mPlanetIndex));
+                    starName, RomanNumeralFormatter.format(mPlanetIndex));
         }
 
         if (mColonyAttackedRecord != null) {
             msg += String.format(Locale.ENGLISH, "Colony on %s %s attacked by %d ships",
-                    starSummary.getName(), RomanNumeralFormatter.format(mPlanetIndex),
+                    starName, RomanNumeralFormatter.format(mPlanetIndex),
                     (int) Math.ceil(mColonyAttackedRecord.getNumShips()));
         }
 
         if (mStarRunOutOfGoodsRecord != null) {
             msg += String.format(Locale.ENGLISH, "%s has run out of goods, beware population decline!",
-                                 starSummary.getName());
+                    starName);
         }
 
         if (msg.length() == 0) {

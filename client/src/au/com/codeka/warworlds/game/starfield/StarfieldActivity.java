@@ -490,18 +490,18 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     }
 
     public void navigateToFleet(final String starKey, final String fleetKey) {
-        Star star = SectorManager.getInstance().findStar(starKey);
+        StarSummary star = StarManager.i.getStarSummary(Integer.parseInt(starKey));
         if (star == null) {
-            StarManager.getInstance().requestStar(starKey, false,
-                new StarManager.StarFetchedHandler() {
-                    @Override
-                    public void onStarFetched(Star s) {
-                        BaseFleet fleet = s.findFleet(fleetKey);
-                        if (fleet != null) {
-                            navigateToFleet(s, fleet);
-                        }
+            StarManager.eventBus.register(new Object() {
+                @EventHandler
+                public void onStarUpdated(StarSummary star) {
+                    if (star.getKey().equals(starKey)) {
+                        navigateToFleet(star, star.findFleet(fleetKey));
+                        StarManager.eventBus.unregister(this);
                     }
-                });
+                }
+            });
+
         } else {
             BaseFleet fleet = star.findFleet(fleetKey);
             if (fleet != null) {
@@ -510,13 +510,12 @@ public class StarfieldActivity extends BaseStarfieldActivity {
         }
     }
 
-    public void navigateToFleet(Star star, BaseFleet fleet) {
+    public void navigateToFleet(StarSummary star, BaseFleet fleet) {
         int offsetX = star.getOffsetX();
         int offsetY = star.getOffsetY();
 
-        // todo: if the fleet is moving, scroll to it...
-
-        mStarfield.scrollTo(star.getSectorX(), star.getSectorY(), offsetX, Sector.SECTOR_SIZE - offsetY);
+        mStarfield.scrollTo(star.getSectorX(), star.getSectorY(), offsetX,
+                Sector.SECTOR_SIZE - offsetY);
 
         if (fleet.getState() == Fleet.State.MOVING) {
             mStarfield.getScene().selectFleet(fleet.getKey());
@@ -636,13 +635,22 @@ public class StarfieldActivity extends BaseStarfieldActivity {
             if (res == EmpireActivity.EmpireActivityResult.NavigateToPlanet) {
                 final int planetIndex = intent.getIntExtra("au.com.codeka.warworlds.PlanetIndex", 0);
 
-                StarManager.getInstance().requestStarSummary(starKey, new StarManager.StarSummaryFetchedHandler() {
-                    @Override
-                    public void onStarSummaryFetched(StarSummary s) {
-                        navigateToPlanet(s.getStarType(), sectorX, sectorY, starKey, starOffsetX, starOffsetY,
-                                planetIndex, true);
-                    }
-                });
+                StarSummary star = StarManager.i.getStarSummary(Integer.parseInt(starKey));
+                if (star == null) {
+                    StarManager.eventBus.register(new Object() {
+                        @EventHandler
+                        public void onStarUpdated(StarSummary star) {
+                            if (star.getKey().equals(starKey)) {
+                                navigateToPlanet(star.getStarType(), sectorX, sectorY,
+                                        starKey, starOffsetX, starOffsetY, planetIndex, true);
+                                StarManager.eventBus.unregister(this);
+                            }
+                        }
+                    });
+                } else {
+                    navigateToPlanet(star.getStarType(), sectorX, sectorY, starKey,
+                            starOffsetX, starOffsetY, planetIndex, true);
+                }
             } else if (res == EmpireActivity.EmpireActivityResult.NavigateToFleet) {
                 String fleetKey = intent.getStringExtra("au.com.codeka.warworlds.FleetKey");
 
@@ -686,7 +694,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
         mSelectedFleet = null;
 
         showBottomPane();
-        StarManager.getInstance().requestStar(star.getKey(), true, null);
+        StarManager.i.refreshStar(star.getID());
     }
 
     public Object mEventHandler = new Object() {

@@ -60,6 +60,6 @@ public class RenameDialog extends DialogFragment {
         EditText starNewName = (EditText) mView.findViewById(R.id.star_newname);
         final String newStarName = starNewName.getText().toString();
 
-        StarManager.getInstance().renameStar(null, mStar, newStarName);
+        StarManager.i.renameStar(null, mStar, newStarName);
     }
 }

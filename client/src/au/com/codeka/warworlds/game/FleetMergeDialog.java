@@ -182,7 +182,7 @@ public class FleetMergeDialog extends DialogFragment {
             @Override
             protected void onComplete(Boolean success) {
                 // the star this fleet is attached to needs to be refreshed...
-                StarManager.getInstance().refreshStar(mFleet.getStarKey());
+                StarManager.i.refreshStar(Integer.parseInt(mFleet.getStarKey()));
             }
 
         }.execute();

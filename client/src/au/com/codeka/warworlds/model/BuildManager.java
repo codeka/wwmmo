@@ -175,7 +175,7 @@ public class BuildManager {
                 } else if (buildRequest != null) {
                     mBuildRequests.add(buildRequest);
 
-                    StarManager.getInstance().refreshStar(build_request_pb.getStarKey());
+                    StarManager.i.refreshStar(Integer.parseInt(build_request_pb.getStarKey()));
                 }
             }
         }.execute();

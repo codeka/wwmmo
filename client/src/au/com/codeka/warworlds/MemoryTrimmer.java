@@ -17,6 +17,6 @@ public class MemoryTrimmer {
         StarImageManager.getInstance().clearCaches();
         PlanetImageManager.getInstance().clearCaches();
         SectorManager.getInstance().clearCache();
-        StarManager.getInstance().clearCache();
+        StarManager.i.clearCache();
     }
 }

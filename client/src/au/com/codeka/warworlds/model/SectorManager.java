@@ -198,7 +198,7 @@ public class SectorManager extends BaseManager {
                                 Pair<Long, Long> key = new Pair<Long, Long>(s.getX(), s.getY());
 
                                 mSectors.put(key, s);
-                                if (callback != null) {
+                                if (callback != null && theseSectors != null) {
                                     theseSectors.put(key, s);
                                 }
 

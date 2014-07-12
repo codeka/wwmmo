@@ -2,12 +2,12 @@ package au.com.codeka.warworlds.model;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.TreeMap;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -15,9 +15,10 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.util.LruCache;
+import android.util.SparseArray;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
-import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.RealmContext;
@@ -29,271 +30,208 @@ import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
 
 public class StarManager extends BaseManager {
-    private static StarManager sInstance = new StarManager();
-    public static StarManager getInstance() {
-        return sInstance;
-    }
+    public static final StarManager i = new StarManager();
 
     public static EventBus eventBus = new EventBus();
 
     private static final Log log = new Log("StarManager");
-    private TreeMap<String, WeakReference<Star>> mStars;
-    private TreeMap<String, WeakReference<StarSummary>> mStarSummaries;
+    private LruCache<Integer, StarOrSummary> stars = new LruCache<Integer, StarOrSummary>(100);
+    private HashSet<Integer> inProgress = new HashSet<Integer>();
 
     public static float DEFAULT_MAX_CACHE_HOURS = 24.0f;
 
-    private StarManager() {
-        mStars = new TreeMap<String, WeakReference<Star>>();
-        mStarSummaries = new TreeMap<String, WeakReference<StarSummary>>();
-    }
-
     public void clearCache() {
-        mStars.clear();
-        mStarSummaries.clear();
+        stars.evictAll();
     }
 
-    public void updateStar(Star star) {
-        mStarSummaries.remove(star.getKey());
-        mStars.put(star.getKey(), new WeakReference<Star>(star));
-        eventBus.publish(star);
+    @Nullable
+    public StarSummary getStarSummary(int starID) {
+        return getStarSummary(starID, DEFAULT_MAX_CACHE_HOURS);
     }
 
-    public void refreshStar(Star s) {
-        refreshStar(s.getKey());
-    }
-
-    public void refreshStar(String starKey) {
-        refreshStar(starKey, false);
-    }
-
-    public boolean refreshStar(String starKey, boolean onlyIfCached) {
-        if (onlyIfCached && !mStars.containsKey(starKey)) {
-            return false;
+    @Nullable
+    public StarSummary getStarSummary(int starID, float maxCacheAgeHours) {
+        StarOrSummary starOrSummary = stars.get(starID);
+        if (starOrSummary != null) {
+            return starOrSummary.getStarSummary();
         }
 
-        requestStar(starKey, true, new StarFetchedHandler() {
-            @Override
-            public void onStarFetched(Star s) {
-                // When a star is explicitly refreshed, it's usually because it's changed somehow.
-                // Generally that also means the sector has changed.
-                SectorManager.getInstance().refreshSector(s.getSectorX(), s.getSectorY());
-            }
-        });
-
-        return true;
+        refreshStarSummary(starID, maxCacheAgeHours);
+        return null;
     }
 
-    public Star refreshStarSync(String starKey, boolean onlyIfCached) {
-        if (onlyIfCached && !mStars.containsKey(starKey)) {
-            return null;
-        }
-
-        Star star = requestStarSync(starKey, true);
-        // When a star is explicitly refreshed, it's usually because it's changed somehow.
-        // Generally that also means the sector has changed.
-        try {
-            SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
-        } catch(Exception e) {
-            // this can happen if we're called from a background thread, but we're not too worried.
-        }
-        return star;
+    public SparseArray<StarSummary> getStarSummaries(Collection<Integer> starIDs) {
+        return getStarSummaries(starIDs, DEFAULT_MAX_CACHE_HOURS);
     }
 
-    public void requestStarSummary(final String starKey, final StarSummaryFetchedHandler callback) {
-        StarSummary ss = null;
-        WeakReference<StarSummary> refss = mStarSummaries.get(starKey);
-        if (refss != null) {
-            ss = refss.get();
-            if (ss != null) {
-                callback.onStarSummaryFetched(ss);
-                return;
-            }
-        }
+    public SparseArray<StarSummary> getStarSummaries(Collection<Integer> starIDs,
+            float maxCacheAgeHours) {
+        SparseArray<StarSummary> result = new SparseArray<StarSummary>();
 
-        WeakReference<Star> refs = mStars.get(starKey);
-        if (refs != null) {
-            ss = refs.get();
-            if (ss != null) {
-                callback.onStarSummaryFetched(ss);
-                return;
-            }
-        }
-
-        new BackgroundRunner<StarSummary>() {
-            @Override
-            protected StarSummary doInBackground() {
-                return requestStarSummarySync(starKey, DEFAULT_MAX_CACHE_HOURS);
-            }
-
-            @Override
-            protected void onComplete(StarSummary starSummary) {
-                if (starSummary != null) {
-                    callback.onStarSummaryFetched(starSummary);
+        ArrayList<Integer> toFetch = null;
+        for (Integer starID : starIDs) {
+            StarOrSummary starOrSummary = stars.get(starID);
+            if (starOrSummary != null) {
+                StarSummary starSummary = starOrSummary.getStarSummary();
+                result.put(starSummary.getID(), starSummary);
+            } else {
+                if (toFetch == null) {
+                    toFetch = new ArrayList<Integer>();
                 }
+                toFetch.add(starID);
             }
-        }.execute();
+        }
+
+        if (toFetch != null) {
+            refreshStarSummaries(starIDs, maxCacheAgeHours);
+        }
+        return result;
     }
 
-    public void requestStarSummaries(final Collection<String> starKeys, final StarSummariesFetchedHandler callback) {
-        final ArrayList<StarSummary> summaries = new ArrayList<StarSummary>();
-        final ArrayList<String> toFetch = new ArrayList<String>();
-
-        for (String starKey : starKeys) {
-            WeakReference<StarSummary> refss = mStarSummaries.get(starKey);
-            if (refss != null) {
-                StarSummary ss = refss.get();
-                if (ss != null) {
-                    summaries.add(ss);
-                    continue;
-                }
-            }
-
-            WeakReference<Star> refs = mStars.get(starKey);
-            if (refs != null) {
-                Star s = refs.get();
-                if (s != null) {
-                    summaries.add(s);
-                    continue;
-                }
-            }
-
-            toFetch.add(starKey);
-        }
-
-        if (toFetch.size() == 0) {
-            callback.onStarSummariesFetched(summaries);
-        } else {
-            new BackgroundRunner<List<StarSummary>>() {
-                @Override
-                protected List<StarSummary> doInBackground() {
-                    return requestStarSummariesSync(toFetch, DEFAULT_MAX_CACHE_HOURS);
-                }
-
-                @Override
-                protected void onComplete(List<StarSummary> stars) {
-                    if (stars != null) {
-                        for (StarSummary star : stars) {
-                            summaries.add(star);
-                        }
-                    }
-                    callback.onStarSummariesFetched(summaries);
-                }
-            }.execute();
-        }
-    }
-
-    /**
-     * Gets a StarSummary, but only if it's cached locally.
-     */
-    public StarSummary getStarSummaryNoFetch(String starKey, float maxCacheAgeHours) {
-        WeakReference<StarSummary> refss = mStarSummaries.get(starKey);
-        if (refss != null) {
-            StarSummary ss = refss.get();
-            if (ss != null) {
-                return ss;
+    @Nullable
+    public Star getStar(int starID) {
+        StarOrSummary starOrSummary = stars.get(starID);
+        if (starOrSummary != null) {
+            if (starOrSummary.star != null) {
+                return starOrSummary.star;
             }
         }
 
-        WeakReference<Star> refs = mStars.get(starKey);
-        if (refs != null) {
-            Star s = refs.get();
-            if (s != null) {
-                return s;
-            }
-        }
-
-        StarSummary ss = loadStarSummary(starKey, maxCacheAgeHours);
-        if (ss != null) {
-            mStarSummaries.put(starKey, new WeakReference<StarSummary>(ss));
-            return ss;
-        }
-
+        refreshStar(starID);
         return null;
     }
 
     /**
-     * Like \c requestStarSummary but runs synchronously. Useful if you're
-     * @param starKey
-     * @return
+     * This can be called when a star is updated outside the context of StarManager. It will
+     * notify the rest of the system that the star is updated.
      */
-    public StarSummary requestStarSummarySync(String starKey, float maxCacheAgeHours) {
-        StarSummary ss = getStarSummaryNoFetch(starKey, maxCacheAgeHours);
-        if (ss != null) {
-            return ss;
-        }
-
-        // no cache StarSummary, fetch the full star
-        return doFetchStar(starKey);
-    }
-
-    public List<StarSummary> requestStarSummariesSync(Collection<String> starKeys, float maxCacheAgeHours) {
-        ArrayList<StarSummary> starSummaries = new ArrayList<StarSummary>();
-        for (String starKey : starKeys) {
-            // TODO: this could be more efficient...
-            StarSummary ss = requestStarSummarySync(starKey, DEFAULT_MAX_CACHE_HOURS);
-            if (ss != null) {
-                starSummaries.add(ss);
-            }
-        }
-        return starSummaries;
+    public void notifyStarUpdated(Star star) {
+        stars.put(star.getID(), new StarOrSummary(star));
+        eventBus.publish(star);
     }
 
     /**
-     * Requests the details of a star from the server, and calls the given callback when it's
-     * received. The callback is called on the main thread.
+     * Refresh the star with the given from the server. An event will be posted to notify when the 
+     * star is updated.
      */
-    public void requestStar(final String starKey, final boolean force,
-                            final StarFetchedHandler callback) {
-        WeakReference<Star> refs = mStars.get(starKey);
-        if (refs != null && !force) {
-            Star star = refs.get();
-            if (star != null) {
-                if (callback != null) {
-                    callback.onStarFetched(star);
-                }
-                // Publish an event cause they may have been waiting anyway
-                eventBus.publish(star);
-                return;
+    public void refreshStar(int starID) {
+        refreshStar(starID, false);
+    }
+
+    /**
+     * Refresh the star with the given from the server. An event will be posted to notify when the 
+     * star is updated.
+     *
+     * @param onlyIfCached If true, we'll only refresh the star if we already have a cached version,
+     *     otherwise this will do nothing.
+     */
+    public boolean refreshStar(final int starID, boolean onlyIfCached) {
+        if (onlyIfCached && stars.get(starID) == null) {
+            return false;
+        }
+
+        synchronized(inProgress) {
+            if (inProgress.add(starID)) {
+                return true;
             }
         }
 
         new BackgroundRunner<Star>() {
             @Override
             protected Star doInBackground() {
-                return requestStarSync(starKey, force);
+                ArrayList<Integer> ids = new ArrayList<Integer>();
+                ids.add(starID);
+                for (Star star : requestStars(ids)) {
+                    return star;
+                }
+                return null; // shouldn't happen!
             }
 
             @Override
             protected void onComplete(Star star) {
-                if (star == null) {
-                    return; // BAD!
+                eventBus.publish(star);
+                inProgress.remove(starID);
+                stars.put(star.getID(), new StarOrSummary(star));
+            }
+        }.execute();
+
+        return true;
+    }
+
+    public void refreshStarSummary(final int starID) {
+        refreshStarSummary(starID, DEFAULT_MAX_CACHE_HOURS);
+    }
+
+    @SuppressWarnings("serial")
+    public void refreshStarSummary(final int starID, float maxCacheAgeHours) {
+        refreshStarSummaries(new ArrayList<Integer>() {{
+            add(starID);
+        }}, maxCacheAgeHours);
+    }
+
+    public void refreshStarSummaries(Collection<Integer> starIDs, final float maxCacheAgeHours) {
+        final ArrayList<Integer> notInProgress = new ArrayList<Integer>();
+        synchronized(inProgress) {
+            for (Integer starID : starIDs) {
+                if (!inProgress.add(starID)) {
+                    notInProgress.add(starID);
+                }
+            }
+        }
+
+        new BackgroundRunner<List<StarSummary>>() {
+            @Override
+            protected List<StarSummary> doInBackground() {
+                ArrayList<StarSummary> starSummaries = new ArrayList<StarSummary>();
+                ArrayList<Integer> notCached = null;
+                LocalStarsStore store = new LocalStarsStore();
+
+                for (Integer starID : notInProgress) {
+                    Messages.Star star_pb = store.getStar(
+                            Integer.toString(starID), maxCacheAgeHours);
+                    if (star_pb != null) {
+                        StarSummary starSummary = new StarSummary();
+                        starSummary.fromProtocolBuffer(star_pb);
+                        starSummaries.add(starSummary);
+                    } else {
+                        if (notCached == null) {
+                            notCached = new ArrayList<Integer>();
+                        }
+                        notCached.add(starID);
+                    }
                 }
 
-                if (callback != null) {
-                    callback.onStarFetched(star);
+                if (notCached != null) {
+                    for (Star star : requestStars(notCached)) {
+                        starSummaries.add(star);
+                    }
                 }
-                updateStar(star);
+
+                return starSummaries;
+            }
+
+            @Override
+            protected void onComplete(List<StarSummary> result) {
+                for (StarSummary starSummary : result) {
+                    eventBus.publish(starSummary);
+                    inProgress.remove(starSummary.getID());
+
+                    if (starSummary instanceof Star) {
+                        stars.put(starSummary.getID(), new StarOrSummary((Star) starSummary));
+                    } else {
+                        stars.put(starSummary.getID(), new StarOrSummary(starSummary));
+                    }
+                }
             }
         }.execute();
     }
 
-    public Star requestStarSync(final String starKey, boolean force) {
-        WeakReference<Star> refs = mStars.get(starKey);
-        if (refs != null && !force) {
-            Star s = refs.get();
-            if (s != null) {
-                return s;
-            }
+    private List<Star> requestStars(Collection<Integer> starIDs) {
+        ArrayList<Star> stars = new ArrayList<Star>();
+        for (Integer starID : starIDs) {
+            stars.add(requestStar(starID));
         }
-
-        Star star = doFetchStar(starKey);
-        if (star != null) {
-            // the alpha realm will have already simulated the star, but other realms
-            // will need to simulate first.
-            Simulation sim = new Simulation();
-            sim.simulate(star);
-        }
-        return star;
+        return stars;
     }
 
     public void renameStar(final Purchase purchase, final Star star, final String newName) {
@@ -333,7 +271,8 @@ public class StarManager extends BaseManager {
                     Star star = new Star();
                     star.fromProtocolBuffer(star_pb);
 
-                    updateStarSummary(star);
+                    new LocalStarsStore().addStar(star_pb);
+
                     return star;
                 } catch (ApiException e) {
                     log.error("Error renaming star!", e);
@@ -344,59 +283,37 @@ public class StarManager extends BaseManager {
             @Override
             protected void onComplete(Star star) {
                 if (star == null) {
-                    return; //TODO: bad!
+                    return;
                 }
 
-                updateStar(star);
+               notifyStarUpdated(star);
             }
         }.execute();
     }
 
-    private Star doFetchStar(final String starKey) {
+    //TODO: add support for fetching multiple stars in a single request
+    private Star requestStar(final Integer starID) {
         Star star = null;
 
         try {
-            String url = "stars/"+starKey;
+            String url = "stars/"+starID;
 
             Messages.Star pb = ApiClient.getProtoBuf(url, Messages.Star.class);
             star = new Star();
             star.fromProtocolBuffer(pb);
         } catch(Exception e) {
-            // TODO: handle exceptions
             log.error("Uh Oh!", e);
         }
 
         if (star != null) {
-            updateStarSummary(star);
+            Messages.Star.Builder starpb = Messages.Star.newBuilder();
+            star.toProtocolBuffer(starpb);
+            Messages.Star star_pb = starpb.build();
+
+            new LocalStarsStore().addStar(star_pb);
         }
 
         return star;
-    }
-
-    /**
-     * This is called when we fetch a new \c StarSummary, we'll want to cache it.
-     */
-    private static void updateStarSummary(StarSummary summary) {
-        Messages.Star.Builder starpb = Messages.Star.newBuilder();
-        summary.toProtocolBuffer(starpb);
-        Messages.Star star_pb = starpb.build();
-
-        new LocalStarsStore().addStar(star_pb);
-    }
-
-    /**
-     * Attempts to load a \c StarSummary back from the cache directory.
-     */
-    private static StarSummary loadStarSummary(String starKey, float maxCacheAgeHours) {
-        Messages.Star star_pb = new LocalStarsStore().getStar(starKey, maxCacheAgeHours); 
-        if (star_pb == null) {
-            return null;
-        }
-
-        StarSummary ss = new StarSummary();
-        ss.fromProtocolBuffer(star_pb);
-
-        return ss;
     }
 
     private static class LocalStarsStore extends SQLiteOpenHelper {
@@ -500,5 +417,24 @@ public class StarManager extends BaseManager {
     }
     public interface StarSummariesFetchedHandler {
         void onStarSummariesFetched(Collection<StarSummary> stars);
+    }
+
+    private static class StarOrSummary {
+        public Star star;
+        public StarSummary starSummary;
+
+        public StarOrSummary(Star star) {
+            this.star = star;
+        }
+        public StarOrSummary(StarSummary starSummary) {
+            this.starSummary = starSummary;
+        }
+
+        public StarSummary getStarSummary() {
+            if (starSummary != null) {
+                return starSummary;
+            }
+            return star;
+        }
     }
 }

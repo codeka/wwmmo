@@ -7,6 +7,7 @@ import java.util.Locale;
 import android.content.Context;
 import android.text.Html;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -104,42 +105,27 @@ public class FleetInfoView extends FrameLayout {
         fleetDestination.removeAllViews();
         FleetListRow.populateFleetDestinationRow(mContext, fleetDestination, fleet, false);
 
-        ArrayList<String> starKeys = new ArrayList<String>();
-        starKeys.add(fleet.getStarKey());
-        starKeys.add(fleet.getDestinationStarKey());
-        StarManager.getInstance().requestStarSummaries(starKeys,
-                new StarManager.StarSummariesFetchedHandler() {
-            @Override
-            public void onStarSummariesFetched(Collection<StarSummary> stars) {
-                StarSummary srcStar = null;
-                StarSummary destStar = null;
-                for (StarSummary star : stars) {
-                    if (star.getKey().equals(fleet.getStarKey())) {
-                        srcStar = star;
-                    } else if (star.getKey().equals(fleet.getDestinationStarKey())) {
-                        destStar = star;
-                    }
-                }
+        ArrayList<Integer> starIDs = new ArrayList<Integer>();
+        starIDs.add(Integer.parseInt(fleet.getStarKey()));
+        starIDs.add(Integer.parseInt(fleet.getDestinationStarKey()));
+        SparseArray<StarSummary> starSummaries = StarManager.i.getStarSummaries(
+                starIDs, Float.MAX_VALUE);
+        StarSummary srcStar = starSummaries.get(Integer.parseInt(fleet.getStarKey()));
+        StarSummary destStar = starSummaries.get(Integer.parseInt(fleet.getDestinationStarKey()));
+        if (srcStar != null && destStar != null) {
+            float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
+            float timeFromSourceInHours = fleet.getTimeFromSource();
+            float timeToDestinationInHours = fleet.getTimeToDestination();
 
-                if (srcStar == null || destStar == null) {
-                    // TODO: ??
-                    return;
-                }
+            float fractionRemaining = timeToDestinationInHours / (timeToDestinationInHours + timeFromSourceInHours);
+            progressBar.setMax(1000);
+            progressBar.setProgress(1000 - (int) (fractionRemaining * 1000.0f));
 
-                float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
-                float timeFromSourceInHours = fleet.getTimeFromSource();
-                float timeToDestinationInHours = fleet.getTimeToDestination();
-
-                float fractionRemaining = timeToDestinationInHours / (timeToDestinationInHours + timeFromSourceInHours);
-                progressBar.setMax(1000);
-                progressBar.setProgress(1000 - (int) (fractionRemaining * 1000.0f));
-
-                String eta = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
-                        distanceInParsecs * fractionRemaining,
-                        TimeFormatter.create().format(timeToDestinationInHours));
-                progressText.setText(Html.fromHtml(eta));
-            }
-        });
+            String eta = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
+                    distanceInParsecs * fractionRemaining,
+                    TimeFormatter.create().format(timeToDestinationInHours));
+            progressText.setText(Html.fromHtml(eta));
+        }
 
         FleetUpgrade.BoostFleetUpgrade fleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");
         if (fleetUpgrade != null && !fleetUpgrade.isBoosting()) {

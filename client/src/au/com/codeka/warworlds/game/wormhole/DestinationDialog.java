@@ -174,7 +174,7 @@ public class DestinationDialog extends DialogFragment {
             @Override
             protected void onComplete(Star star) {
                 if (star != null) {
-                    StarManager.getInstance().updateStar(star);
+                    StarManager.i.notifyStarUpdated(star);
                 }
             }
         }.execute();

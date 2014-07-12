@@ -2,10 +2,6 @@ package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import android.content.Context;
 import android.content.Intent;
@@ -62,7 +58,6 @@ public class SitrepActivity extends BaseActivity {
     private Context mContext = this;
     private SituationReportAdapter mSituationReportAdapter;
     private String mStarKey;
-    private Map<String, StarSummary> mStarSummaries;
     private Handler mHandler;
     private String mCursor;
     private Messages.SituationReportFilter mFilter;
@@ -75,7 +70,6 @@ public class SitrepActivity extends BaseActivity {
 
         setContentView(R.layout.sitrep);
 
-        mStarSummaries = new TreeMap<String, StarSummary>();
         mSituationReportAdapter = new SituationReportAdapter();
 
         mStarKey = getIntent().getStringExtra("au.com.codeka.warworlds.StarKey");
@@ -186,18 +180,28 @@ public class SitrepActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
         ShieldManager.eventBus.register(mEventHandler);
+        StarManager.eventBus.register(mEventHandler);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         ShieldManager.eventBus.unregister(mEventHandler);
+        StarManager.eventBus.unregister(mEventHandler);
     }
 
     private Object mEventHandler = new Object() {
         @EventHandler
         public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
             refreshTitle();
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onStarUpdated(StarSummary star) {
+            if (star.getID() == Integer.parseInt(mStarKey)) {
+                refreshTitle();
+            }
+            mSituationReportAdapter.notifyDataSetChanged();
         }
     };
 
@@ -217,14 +221,13 @@ public class SitrepActivity extends BaseActivity {
                 empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(this, empire));
             }
         } else {
-            StarManager.getInstance().requestStarSummary(mStarKey, new StarManager.StarSummaryFetchedHandler() {
-                @Override
-                public void onStarSummaryFetched(StarSummary s) {
-                    empireName.setText(s.getName());
-                    Sprite starSprite = StarImageManager.getInstance().getSprite(s, empireIcon.getWidth(), true);
-                    empireIcon.setImageDrawable(new SpriteDrawable(starSprite));
-                }
-            });
+            StarSummary starSummary = StarManager.i.getStarSummary(Integer.parseInt(mStarKey));
+            if (starSummary != null) {
+                empireName.setText(starSummary.getName());
+                Sprite starSprite = StarImageManager.getInstance().getSprite(
+                        starSummary, empireIcon.getWidth(), true);
+                empireIcon.setImageDrawable(new SpriteDrawable(starSprite));
+            }
         }
 
     }
@@ -243,7 +246,7 @@ public class SitrepActivity extends BaseActivity {
                 progressBar.setVisibility(View.GONE);
                 reportItems.setVisibility(View.VISIBLE);
 
-                mSituationReportAdapter.setItems(items, mStarSummaries, hasMore);
+                mSituationReportAdapter.setItems(items, hasMore);
             }
         });
     }
@@ -268,7 +271,7 @@ public class SitrepActivity extends BaseActivity {
                     mCursor = null;
                 }
 
-                mSituationReportAdapter.appendItems(items, mStarSummaries, hasMore);
+                mSituationReportAdapter.appendItems(items, hasMore);
             }
         });
     }
@@ -311,19 +314,9 @@ public class SitrepActivity extends BaseActivity {
                     Messages.SituationReports pb = ApiClient.getProtoBuf(
                             url, Messages.SituationReports.class);
 
-                    Set<String> missingStarSummaries = new TreeSet<String>();
                     ArrayList<SituationReport> items = new ArrayList<SituationReport>();
                     for(Messages.SituationReport srpb : pb.getSituationReportsList()) {
-                        SituationReport sitrep = SituationReport.fromProtocolBuffer(srpb);
-
-                        String starKey = sitrep.getStarKey();
-                        if (!mStarSummaries.containsKey(starKey)) {
-                            if (!missingStarSummaries.contains(starKey)) {
-                                missingStarSummaries.add(starKey);
-                            }
-                        }
-
-                        items.add(sitrep);
+                        items.add(SituationReport.fromProtocolBuffer(srpb));
                     }
 
                     // grab the cursor we'll need to fetch the next batch
@@ -332,17 +325,6 @@ public class SitrepActivity extends BaseActivity {
                         mCursor = pb.getCursor();
                     } else {
                         mCursor = null;
-                    }
-
-                    // here we want to fetch all of the star summaries for any
-                    // stars that are new and we don't currently have summaries
-                    // for.
-                    for (String starKey : missingStarSummaries) {
-                        StarSummary starSummary = StarManager.getInstance()
-                                .requestStarSummarySync(starKey,
-                                        Float.MAX_VALUE // always prefer a cached version, no matter how old
-                                    );
-                        mStarSummaries.put(starKey, starSummary);
                     }
 
                     return items;
@@ -401,7 +383,6 @@ public class SitrepActivity extends BaseActivity {
 
     private class SituationReportAdapter extends BaseAdapter {
         private List<SituationReport> mItems;
-        private Map<String, StarSummary> mStarSummaries;
         private boolean mHasMore;
 
         public SituationReportAdapter() {
@@ -412,8 +393,7 @@ public class SitrepActivity extends BaseActivity {
             return mItems.get(position);
         }
 
-        public void setItems(List<SituationReport> items,
-                             Map<String, StarSummary> starSummaries, boolean hasMore) {
+        public void setItems(List<SituationReport> items, boolean hasMore) {
             if (items == null) {
                 items = new ArrayList<SituationReport>();
             }
@@ -422,14 +402,12 @@ public class SitrepActivity extends BaseActivity {
                 throw new RuntimeException("Called from non-UI thread!");
             }
 
-            mStarSummaries = starSummaries;
             mItems = items;
             mHasMore = hasMore;
             notifyDataSetChanged();
         }
 
-        public void appendItems(List<SituationReport> items,
-                                Map<String, StarSummary> starSummaries, boolean hasMore) {
+        public void appendItems(List<SituationReport> items, boolean hasMore) {
             if (items == null) {
                 items = new ArrayList<SituationReport>();
             }
@@ -438,7 +416,6 @@ public class SitrepActivity extends BaseActivity {
                 throw new RuntimeException("Called from non-UI thread!");
             }
 
-            mStarSummaries = starSummaries;
             mItems.addAll(items);
             mHasMore = hasMore;
             notifyDataSetChanged();
@@ -496,9 +473,9 @@ public class SitrepActivity extends BaseActivity {
                 LayoutInflater inflater = (LayoutInflater) getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
                 if (position < mItems.size()) {
-                    view = inflater.inflate(R.layout.sitrep_row, null);
+                    view = inflater.inflate(R.layout.sitrep_row, parent, false);
                 } else {
-                    view = inflater.inflate(R.layout.sitrep_row_loading, null);
+                    view = inflater.inflate(R.layout.sitrep_row_loading, parent, false);
                 }
             }
 
@@ -515,7 +492,8 @@ public class SitrepActivity extends BaseActivity {
             }
 
             SituationReport sitrep = mItems.get(position);
-            StarSummary starSummary = mStarSummaries.get(sitrep.getStarKey());
+            StarSummary starSummary = StarManager.i.getStarSummary(
+                    Integer.parseInt(sitrep.getStarKey()));
             String msg = sitrep.getDescription(starSummary);
 
             TextView reportTitle = (TextView) view.findViewById(R.id.report_title);
@@ -524,9 +502,13 @@ public class SitrepActivity extends BaseActivity {
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
             ImageView overlayIcon = (ImageView) view.findViewById(R.id.overlay_icon);
 
-            int imageSize = (int)(starSummary.getSize() * starSummary.getStarType().getImageScale() * 2);
-            Sprite starSprite = StarImageManager.getInstance().getSprite(starSummary, imageSize, true);
-            starIcon.setImageDrawable(new SpriteDrawable(starSprite));
+            if (starSummary != null) {
+                int imageSize = (int)(starSummary.getSize() * starSummary.getStarType().getImageScale() * 2);
+                Sprite starSprite = StarImageManager.getInstance().getSprite(starSummary, imageSize, true);
+                starIcon.setImageDrawable(new SpriteDrawable(starSprite));
+            } else {
+                starIcon.setImageBitmap(null);
+            }
 
             reportTime.setText(TimeFormatter.create().format(sitrep.getReportTime()));
             reportContent.setText(msg);

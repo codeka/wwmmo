@@ -124,7 +124,7 @@ public class BuildActivity extends BaseActivity {
                 }
 
                 StarManager.eventBus.register(mEventHandler);
-                StarManager.getInstance().requestStar(starKey, false, null);
+                StarManager.i.refreshStar(Integer.parseInt(starKey));
             }
         });
     }
@@ -559,7 +559,7 @@ public class BuildActivity extends BaseActivity {
                     } else {
                         String upgrades = "";
                         for (ShipDesign.Upgrade upgrade : design.getUpgrades()) {
-                            if (!fleet.hasUpgrade(upgrade.getID())) {
+                            if (fleet != null && !fleet.hasUpgrade(upgrade.getID())) {
                                 if (upgrades.length() > 0) {
                                     upgrades += ", ";
                                 }

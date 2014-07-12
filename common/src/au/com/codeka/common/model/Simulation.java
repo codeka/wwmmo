@@ -549,7 +549,7 @@ public class Simulation {
             }
         }
 
-        if (attackStartTime.isBefore(now)) {
+        if (attackStartTime == null || attackStartTime.isBefore(now)) {
             attackStartTime = now;
         }
 

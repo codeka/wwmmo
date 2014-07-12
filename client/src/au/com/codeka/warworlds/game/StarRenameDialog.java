@@ -75,7 +75,7 @@ public class StarRenameDialog extends DialogFragment {
                     return;
                 }
 
-                StarManager.getInstance().renameStar(purchase, mStar, newStarName);
+                StarManager.i.renameStar(purchase, mStar, newStarName);
             }
         });
     }
