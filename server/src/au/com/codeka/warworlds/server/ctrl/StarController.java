@@ -142,9 +142,6 @@ public class StarController {
     public void sanitizeStar(Star star, int myEmpireID,
                              ArrayList<BuildingPosition> buildings,
                              ArrayList<Star> otherStars) {
-        log.debug(String.format("Sanitizing star %s (%d, %d) (%d, %d)",
-                star.getName(), star.getSectorX(), star.getSectorY(), star.getOffsetX(), star.getOffsetY()));
-
         // if the star is a wormhole, don't sanitize it -- a wormhole is basically fleets in
         // transit anyway
         if (star.getStarType().getType() == Star.Type.Wormhole) {
@@ -171,14 +168,10 @@ public class StarController {
             }
 
             if (radarRange > 0.0f) {
-                log.debug(String.format("Building position: (%d, %d) (%d, %d)",
-                        building.getSectorX(), building.getSectorY(), building.getOffsetX(), building.getOffsetY()));
                 float distanceToBuilding = Sector.distanceInParsecs(star,
                         building.getSectorX(), building.getSectorY(),
                         building.getOffsetX(), building.getOffsetY());
                 if (distanceToBuilding < radarRange) {
-                    log.debug(String.format("Distance to building (%.2f) > radar range (%.2f), keeping fleets.",
-                            distanceToBuilding, radarRange));
                     removeFleets = false;
                 }
 
@@ -200,7 +193,6 @@ public class StarController {
                         if (destinationStar != null) {
                             Vector2 dir = Sector.directionBetween(star, destinationStar);
                             float progress = fleet.getMovementProgress();
-                            log.debug(String.format("Fleet's distance to destination: %.2f, progress=%.2f", dir.length(), progress));
                             dir.scale(progress);
 
                             float distanceToFleet = Sector.distanceInParsecs(
@@ -213,11 +205,7 @@ public class StarController {
                                 if (fleetsToAddBack == null) {
                                     fleetsToAddBack = new ArrayList<Fleet>();
                                 }
-                                log.debug(String.format("Adding fleet %d (%s x %.2f) back.",
-                                        fleet.getID(), fleet.getDesignID(), fleet.getNumShips()));
                                 fleetsToAddBack.add(fleet);
-                            } else {
-                                log.debug(String.format("distance to fleet (%.2f) >= radar range (%.2f)", distanceToFleet, radarRange));
                             }
                         }
                     }

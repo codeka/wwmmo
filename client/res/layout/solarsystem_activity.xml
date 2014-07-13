@@ -15,6 +15,25 @@
         android:layout_marginRight="40dp"
         android:layout_gravity="start"
         android:background="#111">
+
+        <EditText android:id="@+id/search_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/search_button"
+            android:inputType="text"
+            android:imeOptions="actionSearch" />
+
+        <ImageButton android:id="@+id/search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/abc_ic_search" />
+
+        <ListView android:id="@+id/search_result"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/search_button" />
+
     </RelativeLayout>
 
 </android.support.v4.widget.DrawerLayout>

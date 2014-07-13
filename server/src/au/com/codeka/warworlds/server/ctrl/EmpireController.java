@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import org.joda.time.DateTime;
 
@@ -491,9 +492,9 @@ public class EmpireController {
         }
 
         public List<Empire> getEmpiresByName(String name, int limit) throws Exception {
-            String sql = getSelectEmpire("empires.name LIKE ? LIMIT ?", false);
+            String sql = getSelectEmpire("empires.name ~* ? LIMIT ?", false);
             try (SqlStmt stmt = prepare(sql)) {
-                stmt.setString(1, "%"+name+"%"); // TODO: escape?
+                stmt.setString(1, name);
                 stmt.setInt(2, limit);
                 SqlResult res = stmt.select();
 
@@ -588,12 +589,15 @@ public class EmpireController {
                 break;
             }
             if (search != null) {
-                sql += " AND name LIKE $lufdyg$" + search + "%lufdyg$";
+                sql += " AND name ~* ?";
             }
             sql += " ORDER BY name";
             try (SqlStmt stmt = prepare(sql)) {
                 for (int i = 0; i < numEmpireIds; i++ ) {
                     stmt.setInt(i + 1, empireId);
+                }
+                if (search != null) {
+                    stmt.setString(numEmpireIds + 1, search);
                 }
                 SqlResult res = stmt.select();
 
