@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.game.starfield;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Locale;
 
 import android.content.Context;

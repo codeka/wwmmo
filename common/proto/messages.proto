@@ -324,6 +324,10 @@ message HelloRequest
     // wrapped in a NotficationWrapper message. This way, we can get notifications without having
     // to wait for GCM.
     optional bool allow_inline_notfications = 6;
+
+    // If true, we'll NOT return the list of star_ids that you own. Newer clients don't need
+    // it anymore, and it just wastes time/resources returning it.
+    optional bool no_star_list = 7;
 }
 
 

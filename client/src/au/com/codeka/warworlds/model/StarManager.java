@@ -131,7 +131,7 @@ public class StarManager extends BaseManager {
         }
 
         synchronized(inProgress) {
-            if (inProgress.add(starID)) {
+            if (!inProgress.add(starID)) {
                 return true;
             }
         }

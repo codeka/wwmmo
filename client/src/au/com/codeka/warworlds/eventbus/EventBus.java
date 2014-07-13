@@ -79,6 +79,9 @@ public class EventBus {
 
     /** Publish the given event and call all subscribers. */
     public void publish(Object event) {
+        if (event == null) {
+            throw new IllegalArgumentException("Event cannot be null!");
+        }
         for (EventHandlerInfo handler : mHandlers) {
             if (handler.handles(event)) {
                 handler.call(event);

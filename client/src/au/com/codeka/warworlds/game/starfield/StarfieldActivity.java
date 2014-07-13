@@ -75,11 +75,6 @@ public class StarfieldActivity extends BaseStarfieldActivity {
 
     private Purchase mStarRenamePurchase;
 
-    // when fetching a star/fleet we set this to the one we're fetching. This
-    // way, if there's multiple in progress at once, on the last one to be
-    // initiated will actually do anything
-    private String mFetchingStarKey;
-
     private Star mStarToSelect;
     private String mStarKeyToSelect;
     private Fleet mFleetToSelect;
@@ -660,7 +655,6 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     }
 
     private void handleDeselect() {
-        mFetchingStarKey = null;
         mSelectedStar = null;
         mSelectedFleet = null;
 
@@ -671,47 +665,13 @@ public class StarfieldActivity extends BaseStarfieldActivity {
         hideBottomPane(false);
     }
 
-    public void onStarSelected(Star star) {
-        if (star == null) {
-            handleDeselect();
-            return;
-        }
-
-        if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
-            updateStarSelection();
-            return;
-        }
-
-        final View selectionLoadingContainer = findViewById(R.id.loading_container);
-        final View selectedStarContainer = findViewById(R.id.selected_star);
-        final View selectedFleetContainer = findViewById(R.id.selected_fleet);
-
-        // load the rest of the star's details as well
-        selectionLoadingContainer.setVisibility(View.VISIBLE);
-        selectedStarContainer.setVisibility(View.GONE);
-        selectedFleetContainer.setVisibility(View.GONE);
-        mFetchingStarKey = star.getKey();
-        mSelectedFleet = null;
-
-        showBottomPane();
-        StarManager.i.refreshStar(star.getID());
-    }
-
     public Object mEventHandler = new Object() {
         @EventHandler
         public void onStarFetched(Star star) {
-            if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
-                // if it's the star we already have selected, then we may as well refresh
-                // whatever we've got.
-                mFetchingStarKey = mSelectedStar.getKey();
+            if (mSelectedStar != null && mSelectedStar.getID() == star.getID()) {
+                mSelectedStar = star;
+                updateStarSelection();
             }
-            if (mFetchingStarKey == null ||
-                !mFetchingStarKey.equals(star.getKey())) {
-                return;
-            }
-
-            mSelectedStar = star;
-            updateStarSelection();
         }
 
         @EventHandler
@@ -755,6 +715,28 @@ public class StarfieldActivity extends BaseStarfieldActivity {
             mStarKeyToSelect = null;
         }
     };
+
+    private void onStarSelected(Star star) {
+        if (star == null) {
+            handleDeselect();
+            return;
+        }
+
+        if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
+            updateStarSelection();
+            return;
+        }
+        mSelectedStar = star;
+        mSelectedFleet = null;
+
+        findViewById(R.id.loading_container).setVisibility(View.VISIBLE);
+        findViewById(R.id.selected_star).setVisibility(View.GONE);
+        findViewById(R.id.selected_fleet).setVisibility(View.GONE);
+        showBottomPane();
+
+        // force the star to refresh itself
+        StarManager.i.refreshStar(star.getID());
+    }
 
     private void updateStarSelection() {
         final View selectionLoadingContainer = findViewById(R.id.loading_container);
@@ -805,7 +787,6 @@ public class StarfieldActivity extends BaseStarfieldActivity {
             return;
         }
 
-        mFetchingStarKey = null;
         mSelectedStar = null;
         mSelectedFleet = fleet;
 

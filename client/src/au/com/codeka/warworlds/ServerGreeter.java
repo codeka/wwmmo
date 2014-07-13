@@ -25,7 +25,6 @@ import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.BannerAdView;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatManager;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
@@ -155,8 +154,6 @@ public class ServerGreeter {
             private boolean mNeedsReAuthenticate;
             private boolean mWasEmpireReset;
             private String mResetReason;
-            private ArrayList<Colony> mColonies;
-            private ArrayList<Long> mStarIDs;
             private String mToastMessage;
 
             @Override
@@ -227,6 +224,7 @@ public class ServerGreeter {
                             .setDeviceVersion(android.os.Build.VERSION.RELEASE)
                             .setMemoryClass(memoryClass)
                             .setAllowInlineNotfications(false)
+                            .setNoStarList(true)
                             .build();
 
                     String url = "hello/"+deviceRegistrationKey;
@@ -255,21 +253,6 @@ public class ServerGreeter {
                         log.info("Re-registering for GCM...");
                         GCMIntentService.register(activity);
                         // we can keep going, though...
-                    }
-
-                    mColonies = new ArrayList<Colony>();
-                    for (Messages.Colony c : resp.getColoniesList()) {
-                        if (c.getPopulation() < 1.0) {
-                            continue;
-                        }
-                        Colony colony = new Colony();
-                        colony.fromProtocolBuffer(c);
-                        mColonies.add(colony);
-                    }
-
-                    mStarIDs = new ArrayList<Long>();
-                    for (Long id : resp.getStarIdsList()) {
-                        mStarIDs.add(id);
                     }
 
                     BuildManager.getInstance().setup(resp.getBuildingStatistics(), resp.getBuildRequestsList());
@@ -305,7 +288,6 @@ public class ServerGreeter {
             @Override
             protected void onComplete(String result) {
                 mServerGreeting.mIsConnected = true;
-                mServerGreeting.mStarIDs = mStarIDs;
 
                 if (mNeedsEmpireSetup) {
                     mServerGreeting.mIntent = new Intent(activity, EmpireSetupActivity.class);
@@ -319,7 +301,6 @@ public class ServerGreeter {
                     BackgroundDetector.i.onBackgroundStatusChange();
 
                     mServerGreeting.mMessageOfTheDay = result;
-                    mServerGreeting.mColonies = mColonies;
                     mHelloComplete = true;
                 } else /* mErrorOccured */ {
                     mServerGreeting.mIsConnected = false;
@@ -443,8 +424,6 @@ public class ServerGreeter {
         private boolean mIsConnected;
         private String mMessageOfTheDay;
         private Intent mIntent;
-        private ArrayList<Colony> mColonies;
-        private ArrayList<Long> mStarIDs;
 
         public boolean isConnected() {
             return mIsConnected;
@@ -456,14 +435,6 @@ public class ServerGreeter {
 
         public Intent getIntent() {
             return mIntent;
-        }
-
-        public ArrayList<Colony> getColonies() {
-            return mColonies;
-        }
-
-        public ArrayList<Long> getStarIDs() {
-            return mStarIDs;
         }
     }
 

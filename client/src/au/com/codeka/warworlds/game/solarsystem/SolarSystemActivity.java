@@ -36,19 +36,19 @@ public class SolarSystemActivity extends BaseActivity {
         drawer = findViewById(R.id.drawer);
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-                android.support.v7.appcompat.R.drawable.abc_ic_clear_search_api_holo_light,
+                android.support.v7.appcompat.R.drawable.abc_ic_menu_moreoverflow_normal_holo_dark,
                 R.string.drawer_open, R.string.drawer_close) {
 
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getSupportActionBar().setTitle("Star Name");
+                refreshTitle();
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("Star Search");
+                refreshTitle();
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
@@ -125,11 +125,7 @@ public class SolarSystemActivity extends BaseActivity {
     private void showStar(Integer starID) {
         this.starID = starID;
         star = StarManager.i.getStarSummary(starID);
-        if (star != null) {
-            getSupportActionBar().setTitle(star.getName());
-        } else {
-            getSupportActionBar().setTitle("Star Name");
-        }
+        refreshTitle();
 
         Fragment fragment = new SolarSystemFragment();
         Bundle args = new Bundle();
@@ -141,6 +137,16 @@ public class SolarSystemActivity extends BaseActivity {
                                    .commit();
 
         drawerLayout.closeDrawer(drawer);
+    }
+
+    private void refreshTitle() {
+        if (drawerLayout.isDrawerOpen(drawer)) {
+            getSupportActionBar().setTitle("Star Search");
+        } else if (star == null) {
+            getSupportActionBar().setTitle("Star Name");
+        } else {
+            getSupportActionBar().setTitle(star.getName());
+        }
     }
 
     private Object eventHandler = new Object() {
