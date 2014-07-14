@@ -255,7 +255,7 @@ public class ServerGreeter {
                         // we can keep going, though...
                     }
 
-                    BuildManager.getInstance().setup(resp.getBuildingStatistics(), resp.getBuildRequestsList());
+                    BuildManager.getInstance().setup(resp.getBuildingStatistics());
 
                     message = resp.getMotd().getMessage();
                     mErrorOccured = false;
