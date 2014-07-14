@@ -34,6 +34,10 @@ public class BuildRequest extends BaseBuildRequest {
         mNotes = notes;
     }
 
+    public int getEmpireID() {
+        return Integer.parseInt(mEmpireKey);
+    }
+
     public void setEndTime(DateTime dt) {
         mEndTime = dt;
     }

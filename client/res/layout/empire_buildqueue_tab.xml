@@ -3,10 +3,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <au.com.codeka.warworlds.ctrl.BuildQueueList
-        android:id="@+id/build_queue"
+    <ExpandableListView
+        android:id="@+id/stars"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true" />
-    
+        android:layout_alignParentTop="true"
+        android:groupIndicator="@null"
+        android:listSelector="@drawable/list_selector" />
+
 </RelativeLayout>
