@@ -1,7 +1,11 @@
 package au.com.codeka.warworlds.model;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.lang.ref.WeakReference;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.Simulation;
@@ -12,13 +16,21 @@ public class StarSimulationQueue {
     public static final StarSimulationQueue i = new StarSimulationQueue();
 
     private Thread mThread;
-    private BlockingQueue<SimulateTask> enqueuedTasks = new LinkedBlockingQueue<SimulateTask>();
+    private BlockingDeque<SimulateTask> enqueuedTasks = new LinkedBlockingDeque<SimulateTask>();
 
     /** Schedules the given star to be simulated. We'll notify the StarManager's eventBus when
         we finish. */
     public void simulate(Star star, boolean predict) {
         ensureThread();
-        enqueuedTasks.add(new SimulateTask(star, predict));
+
+        // do it so that the most recently-added star is the one we'll predict.
+        enqueuedTasks.addFirst(new SimulateTask(star, predict));
+    }
+
+    /** Determines whether the given star even needs a simulation. If it's been simulated in
+     *  the last 5 minutes, then it does not. */
+    public static boolean needsSimulation(Star star) {
+        return star.getLastSimulation().isBefore(DateTime.now(DateTimeZone.UTC).minusMinutes(5));
     }
 
     private void ensureThread() {
@@ -34,10 +46,19 @@ public class StarSimulationQueue {
             while (true) {
                 try {
                     SimulateTask task = enqueuedTasks.take();
-                    log.info("Simulating star %s...", task.star.getName());
-                    new Simulation(task.predict).simulate(task.star);
-                    StarManager.eventBus.publish(task.star);
-                    log.info("Simulation of %s complete.", task.star.getName());
+                    Star star = task.star.get();
+                    if (star == null) {
+                        continue;
+                    }
+
+                    if (!needsSimulation(star)) {
+                        continue;
+                    }
+
+                    log.info("Simulating star #%d %s...", star.getID(), star.getName());
+                    new Simulation(task.predict).simulate(star);
+                    StarManager.eventBus.publish(star);
+                    log.info("Simulation of %s complete.", star.getID(), star.getName());
                 } catch(Exception e) {
                     log.error("Exception caught simulating stars.", e);
                     return; // we'll get restarted when a new star needs to be simulated.
@@ -47,11 +68,11 @@ public class StarSimulationQueue {
     };
 
     private static class SimulateTask {
-        public Star star;
+        public WeakReference<Star> star;
         public boolean predict;
 
         public SimulateTask(Star star, boolean predict) {
-            this.star = star;
+            this.star = new WeakReference<Star>(star);
             this.predict = predict;
         }
     }

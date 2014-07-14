@@ -3,9 +3,6 @@ package au.com.codeka.warworlds.game.empire;
 import java.util.List;
 import java.util.Locale;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -37,6 +34,7 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSimulationQueue;
 
 public class FleetsFragment extends StarsFragment {
     private FleetsStarsListAdapter adapter;
@@ -232,17 +230,7 @@ public class FleetsFragment extends StarsFragment {
                     }
                 }
 
-                boolean needSimulation = star.getLastSimulation().compareTo(
-                        DateTime.now(DateTimeZone.UTC).minusMinutes(5)) < 0;
-                if (!needSimulation && empirePresence != null) {
-                    if (empirePresence.getDeltaGoodsPerHour() == 0.0f
-                            && empirePresence.getDeltaMineralsPerHour() == 0.0f) {
-                        // this is so unlikely, it's probably because we didn't simulate.
-                        needSimulation = true;
-                    }
-                }
-
-                if (needSimulation || empirePresence == null) {
+                if (StarSimulationQueue.needsSimulation(star) || empirePresence == null) {
                     // if the star hasn't been simulated for > 5 minutes, schedule a simulation
                     // now and just display ??? for the various parameters
                     starGoodsDelta.setText("");

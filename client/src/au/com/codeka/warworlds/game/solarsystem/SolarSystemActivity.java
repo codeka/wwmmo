@@ -3,9 +3,6 @@ package au.com.codeka.warworlds.game.solarsystem;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -372,17 +369,7 @@ public class SolarSystemActivity extends BaseActivity {
                     }
                 }
 
-                boolean needSimulation = star.getLastSimulation().compareTo(
-                        DateTime.now(DateTimeZone.UTC).minusMinutes(5)) < 0;
-                if (!needSimulation && empirePresence != null) {
-                    if (empirePresence.getDeltaGoodsPerHour() == 0.0f
-                            && empirePresence.getDeltaMineralsPerHour() == 0.0f) {
-                        // this is so unlikely, it's probably because we didn't simulate.
-                        needSimulation = true;
-                    }
-                }
-
-                if (needSimulation || empirePresence == null) {
+                if (StarSimulationQueue.needsSimulation(star) || empirePresence == null) {
                     // if the star hasn't been simulated for > 5 minutes, schedule a simulation
                     // now and just display ??? for the various parameters
                     starGoodsDelta.setText("");
