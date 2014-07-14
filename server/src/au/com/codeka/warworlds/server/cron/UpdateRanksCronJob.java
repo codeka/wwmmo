@@ -18,8 +18,6 @@ import au.com.codeka.warworlds.server.model.EmpireRank;
  * Updates the ranks of empires.
  */
 public class UpdateRanksCronJob extends CronJob {
-    private static final Logger log = LoggerFactory.getLogger(UpdateRanksCronJob.class);
-
     @Override
     public void run(String extra) throws Exception {
         TreeMap<Integer, EmpireRank> ranks = new TreeMap<Integer, EmpireRank>();
