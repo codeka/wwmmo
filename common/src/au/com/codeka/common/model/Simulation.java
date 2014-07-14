@@ -20,26 +20,30 @@ import au.com.codeka.common.model.BaseFleet.Stance;
  * on the server, and we go to great pains to keep them in sync.
  */
 public class Simulation {
-    private LogHandler mLogHandler;
-    private DateTime mNow;
+    private final LogHandler logHandler;
+    private final boolean predict;
+    private DateTime now;
 
     private static boolean sDebug = false;
     private static int sNumSimulations;
     private static DateTime year2k = new DateTime(2000, 1, 1, 0, 0);
 
     public Simulation() {
-        mNow = DateTime.now(DateTimeZone.UTC);
-        if (sDebug) {
-            mLogHandler = new BasicLogHandler();
-        }
+        this(DateTime.now(DateTimeZone.UTC), true, sDebug ? new BasicLogHandler() : null);
     }
     public Simulation(LogHandler log) {
-        mNow = DateTime.now(DateTimeZone.UTC);
-        mLogHandler = log;
+        this(DateTime.now(DateTimeZone.UTC), true, log);
+    }
+    public Simulation(boolean predict) {
+        this(DateTime.now(DateTimeZone.UTC), predict, sDebug ? new BasicLogHandler() : null);
     }
     public Simulation(DateTime now, LogHandler log) {
-        mNow = now;
-        mLogHandler = log;
+        this(now, true, log);
+    }
+    public Simulation(DateTime now, boolean predict, LogHandler logHandler) {
+        this.now = now;
+        this.predict = predict;
+        this.logHandler = logHandler;
     }
 
     public static int getNumRunningSimulations() {
@@ -47,8 +51,8 @@ public class Simulation {
     }
 
     protected void log(String message) {
-        if (mLogHandler != null) {
-            mLogHandler.log(message);
+        if (logHandler != null) {
+            logHandler.log(message);
         }
     }
 
@@ -74,7 +78,7 @@ public class Simulation {
             return;
         }
 
-        DateTime endTime = mNow;
+        DateTime endTime = now;
 
         // if we have less than a few seconds of time to simulate, we'll extend the end time
         // a little to ensure there's no rounding errors and such
@@ -95,12 +99,12 @@ public class Simulation {
             if (stepEndTime.compareTo(endTime) < 0) {
                 simulateStepForAllEmpires(dt, startTime, star, empireKeys);
                 startTime = stepEndTime;
-            } else if (stepEndTime.compareTo(predictionTime) < 0) {
+            } else if (predict && stepEndTime.compareTo(predictionTime) < 0) {
                 if (predictionStar == null) {
                     log("--------------------------------------------------");
                     log("Prediction phase beginning...");
                     log("--------------------------------------------------");
-                    mNow = endTime;
+                    now = endTime;
                     dt = new Interval(startTime, endTime).toDuration();
                     if (dt.getMillis() > 1000) {
                         // last little bit of the simulation
@@ -150,10 +154,9 @@ public class Simulation {
 
             // also, the prediction combat report (if any) is the one to use
             star.setCombatReport(predictionStar.getCombatReport());
-
-            star.setLastSimulation(endTime);
         }
 
+        star.setLastSimulation(endTime);
         sNumSimulations --;
     }
 
@@ -199,7 +202,7 @@ public class Simulation {
             simulateStep(dt, now, star, empireKey);
         }
 
-        // Don't forget to simulate combat for this step as well (TODO: what to do if combat continues
+        // Don't forget to simulate combat for this step as well (what to do if combat continues
         // after the prediction phase?)
         simulateCombat(star, now, dt);
     }

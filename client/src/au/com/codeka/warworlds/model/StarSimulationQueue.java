@@ -12,13 +12,13 @@ public class StarSimulationQueue {
     public static final StarSimulationQueue i = new StarSimulationQueue();
 
     private Thread mThread;
-    private BlockingQueue<Star> mEnqueuedStars = new LinkedBlockingQueue<Star>();
+    private BlockingQueue<SimulateTask> enqueuedTasks = new LinkedBlockingQueue<SimulateTask>();
 
     /** Schedules the given star to be simulated. We'll notify the StarManager's eventBus when
         we finish. */
-    public void simulate(Star star) {
+    public void simulate(Star star, boolean predict) {
         ensureThread();
-        mEnqueuedStars.add(star);
+        enqueuedTasks.add(new SimulateTask(star, predict));
     }
 
     private void ensureThread() {
@@ -33,11 +33,11 @@ public class StarSimulationQueue {
         public void run() {
             while (true) {
                 try {
-                    Star star = mEnqueuedStars.take();
-                    log.info("Simulating star %s...", star.getName());
-                    new Simulation().simulate(star);
-                    StarManager.eventBus.publish(star);
-                    log.info("Simulation of %s complete.", star.getName());
+                    SimulateTask task = enqueuedTasks.take();
+                    log.info("Simulating star %s...", task.star.getName());
+                    new Simulation(task.predict).simulate(task.star);
+                    StarManager.eventBus.publish(task.star);
+                    log.info("Simulation of %s complete.", task.star.getName());
                 } catch(Exception e) {
                     log.error("Exception caught simulating stars.", e);
                     return; // we'll get restarted when a new star needs to be simulated.
@@ -45,4 +45,14 @@ public class StarSimulationQueue {
             }
         }
     };
+
+    private static class SimulateTask {
+        public Star star;
+        public boolean predict;
+
+        public SimulateTask(Star star, boolean predict) {
+            this.star = star;
+            this.predict = predict;
+        }
+    }
 }

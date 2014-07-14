@@ -37,7 +37,6 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSimulationQueue;
 
 public class FleetsFragment extends StarsFragment {
     private FleetsStarsListAdapter adapter;
@@ -250,7 +249,6 @@ public class FleetsFragment extends StarsFragment {
                     starGoodsTotal.setText("???");
                     starMineralsDelta.setText("");
                     starMineralsTotal.setText("???");
-                    StarSimulationQueue.i.simulate(star);
                 } else {
                     starGoodsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
                             empirePresence.getDeltaGoodsPerHour() < 0 ? "-" : "+",

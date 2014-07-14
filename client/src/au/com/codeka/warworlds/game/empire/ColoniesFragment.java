@@ -205,7 +205,7 @@ public class ColoniesFragment extends StarsFragment {
                     starGoodsTotal.setText("???");
                     starMineralsDelta.setText("");
                     starMineralsTotal.setText("???");
-                    StarSimulationQueue.i.simulate(star);
+                    StarSimulationQueue.i.simulate(star, false);
                 } else {
                     starGoodsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
                             empirePresence.getDeltaGoodsPerHour() < 0 ? "-" : "+",

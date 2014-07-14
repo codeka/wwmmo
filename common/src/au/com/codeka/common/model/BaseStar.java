@@ -376,9 +376,7 @@ public abstract class BaseStar {
 
         Messages.Star.StarExtra.Builder star_extra_pb = null;
         if (mWormholeExtra != null) {
-            if (star_extra_pb == null) {
-                star_extra_pb = Messages.Star.StarExtra.newBuilder();
-            }
+            star_extra_pb = Messages.Star.StarExtra.newBuilder();
             mWormholeExtra.toProtocolBuffer(star_extra_pb);
         }
 

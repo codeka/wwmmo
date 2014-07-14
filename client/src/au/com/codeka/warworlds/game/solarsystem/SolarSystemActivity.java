@@ -389,7 +389,7 @@ public class SolarSystemActivity extends BaseActivity {
                     starGoodsTotal.setText("???");
                     starMineralsDelta.setText("");
                     starMineralsTotal.setText("???");
-                    StarSimulationQueue.i.simulate(star);
+                    StarSimulationQueue.i.simulate(star, false); // TODO: does it need to simulate?
                 } else {
                     starGoodsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
                             empirePresence.getDeltaGoodsPerHour() < 0 ? "-" : "+",
