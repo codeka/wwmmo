@@ -31,7 +31,6 @@ import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.game.SitrepActivity;
-import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -117,10 +116,6 @@ public class Notifications {
                     SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
                 }
             }
-
-            // notify the build manager, in case it's a 'build complete' or something
-            log.debug("Notifying build manager.");
-            BuildManager.getInstance().notifySituationReport(pb);
 
             log.debug("Displaying a notification...");
             displayNotification(context, pb);
