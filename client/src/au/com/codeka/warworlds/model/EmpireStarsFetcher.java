@@ -29,23 +29,23 @@ public class EmpireStarsFetcher {
 
     public final EventBus eventBus = new EventBus();
 
-    private SparseArray<WeakReference<Star>> mCache = new SparseArray<WeakReference<Star>>();
+    private SparseArray<WeakReference<Star>> cache = new SparseArray<WeakReference<Star>>();
 
-    private Handler mHandler = new Handler();
-    private ArrayList<Integer> mIndicesToFetch;
-    private Object mIndicesToFetchLock = new Object();
-    private Filter mFilter;
-    private String mSearch;
-    private int mNumStars;
+    private Handler handler = new Handler();
+    private ArrayList<Integer> indicesToFetch;
+    private Object indicesToFetchLock = new Object();
+    private Filter filter;
+    private String search;
+    private int numStars;
 
     public EmpireStarsFetcher(Filter filter, String search) {
-        mFilter = filter;
-        mSearch = search;
+        this.filter = filter;
+        this.search = search;
     }
 
     /** Gets the number of stars we own. */
     public int getNumStars() {
-        return mNumStars;
+        return numStars;
     }
 
     /**
@@ -53,32 +53,32 @@ public class EmpireStarsFetcher {
      * of milliseconds before fetching all the stars we've been asked for.
      */
     public Star getStar(int index) {
-        WeakReference<Star> ref = mCache.get(index);
+        WeakReference<Star> ref = cache.get(index);
         Star star = (ref != null ? ref.get() : null);
         if (star == null) {
-            synchronized(mIndicesToFetchLock) {
-                if (mIndicesToFetch == null) {
-                    mIndicesToFetch = new ArrayList<Integer>();
-                    mHandler.postDelayed(mStarFetchRunnable, 150);
+            synchronized(indicesToFetchLock) {
+                if (indicesToFetch == null) {
+                    indicesToFetch = new ArrayList<Integer>();
+                    handler.postDelayed(starFetchRunnable, 150);
                 }
-                mIndicesToFetch.add(index);
+                indicesToFetch.add(index);
             }
         }
 
         return star;
     }
 
-    private Runnable mStarFetchRunnable = new Runnable() {
+    private Runnable starFetchRunnable = new Runnable() {
         @Override
         public void run() {
             ArrayList<Integer> indices;
-            synchronized(mIndicesToFetchLock) {
-                if (mIndicesToFetch == null) {
+            synchronized(indicesToFetchLock) {
+                if (indicesToFetch == null) {
                     return;
                 }
 
-                indices = new ArrayList<Integer>(mIndicesToFetch);
-                mIndicesToFetch = null;
+                indices = new ArrayList<Integer>(indicesToFetch);
+                indicesToFetch = null;
             }
             Collections.sort(indices);
             fetchStars(indices);
@@ -99,7 +99,7 @@ public class EmpireStarsFetcher {
         ArrayList<Integer> missing = null;
         SparseArray<Star> stars = new SparseArray<Star>();
         for (int i = startIndex; i <= endIndex; i++) {
-            WeakReference<Star> ref = mCache.get(i);
+            WeakReference<Star> ref = cache.get(i);
             Star star = (ref != null ? ref.get() : null);
             if (star == null) {
                 if (missing == null) {
@@ -141,16 +141,16 @@ public class EmpireStarsFetcher {
             lastIndex = index;
         }
         lastIndex += 5; // fetch 5 more stars than we actually need
-        if (lastIndex >= mNumStars) {
-            lastIndex = mNumStars - 1;
+        if (lastIndex >= numStars) {
+            lastIndex = numStars - 1;
         }
         url.append(Integer.toString(lastIndex + 5));
         url.append("&filter=");
-        url.append(mFilter.toString().toLowerCase());
-        if (mSearch != null) {
+        url.append(filter.toString().toLowerCase());
+        if (search != null) {
             url.append("&search=");
             try {
-                url.append(URLEncoder.encode(mSearch, "utf-8"));
+                url.append(URLEncoder.encode(search, "utf-8"));
             } catch (UnsupportedEncodingException e) {
                 return;
             }
@@ -173,7 +173,7 @@ public class EmpireStarsFetcher {
                         stars.put(empire_star_pb.getIndex(), star);
                     }
     
-                    mNumStars = pb.getTotalStars();
+                    numStars = pb.getTotalStars();
 
                     return stars;
                 } catch (ApiException e) {
@@ -186,7 +186,7 @@ public class EmpireStarsFetcher {
             protected void onComplete(SparseArray<Star> result) {
                 if (result != null) {
                     for (int i = 0; i < result.size(); i++) {
-                        mCache.put(result.keyAt(i), new WeakReference<Star>(result.valueAt(i)));
+                        cache.put(result.keyAt(i), new WeakReference<Star>(result.valueAt(i)));
                     }
 
                     eventBus.publish(new StarsFetchedEvent(result));

@@ -30,7 +30,6 @@ public class StarImageManager extends ImageManager {
                 throw new RuntimeException("No such sprite: "+spriteName);
             }
 
-//            sprite = sprite.extractFrame(0);
             if (sprite.getNumFrames() > 1) {
                 int frameNo = new Random(star.hashCode()).nextInt(sprite.getNumFrames());
                 sprite = sprite.extractFrame(frameNo);

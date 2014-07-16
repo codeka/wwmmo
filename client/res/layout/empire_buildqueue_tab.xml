@@ -3,11 +3,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+    <CheckBox
+        android:id="@+id/show_idle_stars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="8dp"
+        android:text="Show only idle stars" />
+
     <ExpandableListView
         android:id="@+id/stars"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/show_idle_stars"
         android:groupIndicator="@null"
         android:listSelector="@drawable/list_selector" />
 

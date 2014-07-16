@@ -567,14 +567,14 @@ public class EmpireController {
                 break;
             case Building:
                 sql = "SELECT id FROM beta.stars WHERE id IN (" +
-                       " SELECT star_id FROM beta.build_requests WHERE empire_id = ?" +
+                       " SELECT star_id FROM build_requests WHERE empire_id = ?" +
                       ")";
                 break;
             case NotBuilding:
-                sql = "SELECT id FROM beta.stars WHERE id NOT IN (" +
-                       " SELECT star_id FROM beta.build_requests WHERE empire_id = ?" +
+                sql = "SELECT id FROM stars WHERE id NOT IN (" +
+                       " SELECT star_id FROM build_requests WHERE empire_id = ?" +
                       ") AND id IN (" +
-                       " SELECT star_id FROM beta.colonies WHERE empire_id = ?" +
+                       " SELECT star_id FROM colonies WHERE empire_id = ?" +
                       ")";
                 numEmpireIds = 2;
                 break;

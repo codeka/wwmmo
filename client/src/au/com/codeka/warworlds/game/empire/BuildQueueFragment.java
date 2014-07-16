@@ -12,6 +12,8 @@ import android.text.TextUtils.TruncateAt;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -53,24 +55,44 @@ public class BuildQueueFragment extends BaseFragment {
         adapter = new BuildQueueStarsListAdapter(inflater, fetcher);
         starsList.setAdapter(adapter);
 
+        final CheckBox showIdleStars = (CheckBox) v.findViewById(R.id.show_idle_stars);
+        showIdleStars.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchFetcher(showIdleStars.isChecked()
+                        ? EmpireStarsFetcher.Filter.NotBuilding
+                        : EmpireStarsFetcher.Filter.Building);
+            }
+        });
+
         return v;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        StarManager.eventBus.register(mEventHandler);
-        fetcher.eventBus.register(mEventHandler);
+        StarManager.eventBus.register(eventHandler);
+        fetcher.eventBus.register(eventHandler);
+    }
+
+    private void switchFetcher(EmpireStarsFetcher.Filter filter) {
+        if (fetcher != null) {
+            fetcher.eventBus.unregister(eventHandler);
+        }
+        fetcher = new EmpireStarsFetcher(filter, null);
+        fetcher.eventBus.register(eventHandler);
+        fetcher.getStars(0, 20);
+        adapter.updateFetcher(fetcher);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        StarManager.eventBus.unregister(mEventHandler);
-        fetcher.eventBus.unregister(mEventHandler);
+        StarManager.eventBus.unregister(eventHandler);
+        fetcher.eventBus.unregister(eventHandler);
     }
 
-    private Object mEventHandler = new Object() {
+    private Object eventHandler = new Object() {
         @EventHandler(thread = EventHandler.UI_THREAD)
         public void onStarUpdated(Star star) {
             adapter.notifyDataSetChanged();

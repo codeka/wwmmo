@@ -18,13 +18,18 @@ public class StarsFragment extends BaseFragment {
         private EmpireStarsFetcher fetcher;
 
         // should never have > 40 visible at once...
-        private LruCache<Integer, Star> mStarCache = new LruCache<Integer, Star>(40);
+        private LruCache<Integer, Star> starCache = new LruCache<Integer, Star>(40);
 
         public StarsListAdapter(EmpireStarsFetcher fetcher) {
             this.fetcher = fetcher;
         }
 
-        // TODO: ?
+        public void updateFetcher(EmpireStarsFetcher fetcher) {
+            this.fetcher = fetcher;
+            starCache.evictAll();
+            notifyDataSetChanged();
+        }
+
         @Override
         public boolean hasStableIds() {
             return false;
@@ -96,11 +101,11 @@ public class StarsFragment extends BaseFragment {
         }
 
         private Star getStar(int index) {
-            Star star = mStarCache.get(index);
+            Star star = starCache.get(index);
             if (star == null) {
                 star = fetcher.getStar(index);
                 if (star != null) {
-                    mStarCache.put(index, star);
+                    starCache.put(index, star);
                 }
             }
             return star;
