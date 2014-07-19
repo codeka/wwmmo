@@ -155,7 +155,7 @@ public class EmpireStarsFetcher {
                 return;
             }
         }
-        log.info("Fetching: %s", url);
+        log.debug("Fetching: %s", url);
 
         new BackgroundRunner<SparseArray<Star>>() {
             @Override
@@ -186,7 +186,11 @@ public class EmpireStarsFetcher {
             protected void onComplete(SparseArray<Star> result) {
                 if (result != null) {
                     for (int i = 0; i < result.size(); i++) {
-                        cache.put(result.keyAt(i), new WeakReference<Star>(result.valueAt(i)));
+                        Star star = result.valueAt(i);
+                        // notify the StarManager as well, in case someone else is interested in
+                        // this star.
+                        StarManager.i.notifyStarUpdated(star);
+                        cache.put(result.keyAt(i), new WeakReference<Star>(star));
                     }
 
                     eventBus.publish(new StarsFetchedEvent(result));

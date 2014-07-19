@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
@@ -13,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,6 +26,7 @@ import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.empire.StarsFragment.StarsListAdapter;
+import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -54,6 +55,22 @@ public class BuildQueueFragment extends BaseFragment {
         ExpandableListView starsList = (ExpandableListView) v.findViewById(R.id.stars);
         adapter = new BuildQueueStarsListAdapter(inflater, fetcher);
         starsList.setAdapter(adapter);
+
+        starsList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v,
+                    int groupPosition, long id) {
+                // if it doesn't have any builds, go to the star view
+                if (adapter.getChildrenCount(groupPosition) == 0) {
+                    Star star = (Star) adapter.getGroup(groupPosition);
+
+                    Intent intent = new Intent(getActivity(), SolarSystemActivity.class);
+                    intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+                    startActivity(intent);
+                }
+                return false;
+            }
+        });
 
         final CheckBox showIdleStars = (CheckBox) v.findViewById(R.id.show_idle_stars);
         showIdleStars.setOnClickListener(new View.OnClickListener() {

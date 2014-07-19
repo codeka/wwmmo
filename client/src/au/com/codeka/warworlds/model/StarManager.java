@@ -169,16 +169,8 @@ public class StarManager extends BaseManager {
         }}, maxCacheAgeHours);
     }
 
-    public void refreshStarSummaries(Collection<Integer> starIDs, final float maxCacheAgeHours) {
-        final ArrayList<Integer> notInProgress = new ArrayList<Integer>();
-        synchronized(inProgress) {
-            for (Integer starID : starIDs) {
-                if (!inProgress.add(starID)) {
-                    notInProgress.add(starID);
-                }
-            }
-        }
-
+    public void refreshStarSummaries(final Collection<Integer> starIDs,
+            final float maxCacheAgeHours) {
         new BackgroundRunner<List<StarSummary>>() {
             @Override
             protected List<StarSummary> doInBackground() {
@@ -186,7 +178,7 @@ public class StarManager extends BaseManager {
                 ArrayList<Integer> notCached = null;
                 LocalStarsStore store = new LocalStarsStore();
 
-                for (Integer starID : notInProgress) {
+                for (Integer starID : starIDs) {
                     Messages.Star star_pb = store.getStar(
                             Integer.toString(starID), maxCacheAgeHours);
                     if (star_pb != null) {
@@ -202,7 +194,16 @@ public class StarManager extends BaseManager {
                 }
 
                 if (notCached != null) {
-                    for (Star star : requestStars(notCached)) {
+                    final ArrayList<Integer> notInProgress = new ArrayList<Integer>();
+                    synchronized(inProgress) {
+                        for (Integer starID : starIDs) {
+                            if (inProgress.add(starID)) {
+                                notInProgress.add(starID);
+                            }
+                        }
+                    }
+
+                    for (Star star : requestStars(notInProgress)) {
                         starSummaries.add(star);
                     }
                 }
@@ -229,7 +230,10 @@ public class StarManager extends BaseManager {
     private List<Star> requestStars(Collection<Integer> starIDs) {
         ArrayList<Star> stars = new ArrayList<Star>();
         for (Integer starID : starIDs) {
-            stars.add(requestStar(starID));
+            Star star = requestStar(starID);
+            if (star != null) {
+                stars.add(star);
+            }
         }
         return stars;
     }

@@ -53,6 +53,7 @@ public class SolarSystemFragment extends Fragment {
     private Colony mColony;
     private boolean mIsFirstRefresh;
     private View mView;
+    private int starID;
 
     // needs to be Object so we can do a version check before instantiating the class
     Object mSolarSystemSurfaceViewOnLayoutChangedListener;
@@ -168,7 +169,7 @@ public class SolarSystemFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Bundle args = getArguments();
-        int starID = (int) args.getLong("au.com.codeka.warworlds.StarID");
+        starID = (int) args.getLong("au.com.codeka.warworlds.StarID");
         StarManager.eventBus.register(mEventHandler);
         ShieldManager.eventBus.register(mEventHandler);
 
@@ -219,11 +220,9 @@ public class SolarSystemFragment extends Fragment {
     private Object mEventHandler = new Object() {
         @EventHandler
         public void onStarUpdated(Star star) {
-            if (mStar != null && !mStar.getKey().equals(star.getKey())) {
-                return;
+            if (starID == star.getID()) {
+                onStarFetched(star);
             }
-
-            onStarFetched(star);
         }
 
         @EventHandler
