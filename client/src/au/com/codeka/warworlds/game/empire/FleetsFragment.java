@@ -23,6 +23,7 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.EmpireStarsFetcher;
@@ -277,6 +278,17 @@ public class FleetsFragment extends StarsFragment {
                 Fleet fleet = (Fleet) getChild(star, index);
                 if (fleet != null) {
                     ((FleetListRow) view).setFleet(fleet);
+
+                    /*
+            BuildRequest selectedBuildRequest = buildSelectionPanel.getBuildRequest();
+            if (selectedBuildRequest != null
+                    && selectedBuildRequest.getKey().equals(buildRequest.getKey())) {
+                view.setBackgroundColor(0xff0c6476);
+            } else {
+                view.setBackgroundColor(0xff000000);
+            }
+
+                     */
                 }
             }
 

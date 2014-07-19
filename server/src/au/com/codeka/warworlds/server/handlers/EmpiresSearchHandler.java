@@ -102,7 +102,8 @@ public class EmpiresSearchHandler extends RequestHandler {
         Messages.Empires.Builder pb = Messages.Empires.newBuilder();
         for (Empire empire : empires) {
             Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
-            empire.toProtocolBuffer(empire_pb);
+            boolean isTrusted = getSession().isAdmin() || getSession().getEmpireID() == empire.getID();
+            empire.toProtocolBuffer(empire_pb, isTrusted);
             if (getSessionNoError() == null ||
                     empire.getID() != getSession().getEmpireID() && !getSession().isAdmin()) {
                 // if it's not our empire....
@@ -119,5 +120,4 @@ public class EmpiresSearchHandler extends RequestHandler {
         }
         setResponseBody(pb.build());
     }
-
 }

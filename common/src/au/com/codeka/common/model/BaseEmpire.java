@@ -90,11 +90,15 @@ public abstract class BaseEmpire {
         }
     }
 
-    public void toProtocolBuffer(Messages.Empire.Builder pb) {
+    public void toProtocolBuffer(Messages.Empire.Builder pb, boolean isTrusted) {
         pb.setKey(mKey);
         pb.setDisplayName(mDisplayName);
         pb.setCash(mCash);
-        pb.setEmail(mEmailAddr);
+        if (isTrusted) {
+            pb.setEmail(mEmailAddr);
+        } else {
+            pb.setEmail("");
+        }
         if (mState == State.ABANDONED) {
             pb.setState(Messages.Empire.EmpireState.valueOf(State.ACTIVE.getValue()));
         } else {

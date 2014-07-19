@@ -85,7 +85,7 @@ public class HelloHandler extends RequestHandler {
             }
 
             Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
-            empire.toProtocolBuffer(empire_pb);
+            empire.toProtocolBuffer(empire_pb, true);
             hello_response_pb.setEmpire(empire_pb);
 
             // set up the initial building statistics

@@ -124,7 +124,10 @@ public class BuildActivity extends BaseActivity {
                 }
 
                 StarManager.eventBus.register(mEventHandler);
-                StarManager.i.refreshStar(Integer.parseInt(starKey));
+                Star star = StarManager.i.getStar(Integer.parseInt(starKey));
+                if (star != null) {
+                    updateStar(star);
+                }
             }
         });
     }

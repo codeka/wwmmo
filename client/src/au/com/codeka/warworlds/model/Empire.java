@@ -40,14 +40,9 @@ public class Empire extends BaseEmpire {
         return a;
     }
 
-    @Override
-    public void toProtocolBuffer(Messages.Empire.Builder pb) {
-        super.toProtocolBuffer(pb);
-    }
-
     public Messages.Empire toProtocolBuffer() {
         Messages.Empire.Builder pb = Messages.Empire.newBuilder();
-        toProtocolBuffer(pb);
+        toProtocolBuffer(pb, true);
         return pb.build();
     }
 }

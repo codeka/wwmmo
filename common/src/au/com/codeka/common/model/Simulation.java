@@ -24,7 +24,7 @@ public class Simulation {
     private final boolean predict;
     private DateTime now;
 
-    private static boolean sDebug = false;
+    private static boolean sDebug = true;
     private static int sNumSimulations;
     private static DateTime year2k = new DateTime(2000, 1, 1, 0, 0);
 
@@ -347,7 +347,7 @@ public class Simulation {
                     // So the build time the design specifies is the time to build the structure with
                     // 100 workers available. Double the workers and you halve the build time. Halve
                     // the workers and you double the build time.
-                    float totalBuildTimeInHours = br.getCount() * buildCost.getTimeInSeconds() / 3600.0f;
+                    float totalBuildTimeInHours = (float)(br.getCount() * (double) buildCost.getTimeInSeconds() / 3600.0);
                     totalBuildTimeInHours *= (100.0 / workersPerBuildRequest);
 
                     // the number of hours of work required, assuming we have all the minerals we need
@@ -371,6 +371,7 @@ public class Simulation {
                     // what is the current amount of time we have now as a percentage of the total build
                     // time?
                     float progressThisTurn = dtUsed / totalBuildTimeInHours;
+                    log(String.format("Progress this turn: %f", progressThisTurn));
                     if (progressThisTurn <= 0) {
                         DateTime endTime;
                         timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
@@ -382,11 +383,13 @@ public class Simulation {
                         if (br.getEndTime().compareTo(endTime) > 0) {
                             br.setEndTime(endTime);
                         }
+                        log("    Finished this turn.");
                         continue;
                     }
 
                     // work out how many minerals we require for this turn
                     float mineralsRequired = br.getCount() * buildCost.getCostInMinerals() * progressThisTurn;
+                    log(String.format("Cost in minerals: %f", mineralsRequired));
                     if (mineralsRequired > mineralsPerBuildRequest) {
                         // if we don't have enough minerals, we'll just do a percentage of the work
                         // this turn

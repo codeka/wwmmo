@@ -35,6 +35,14 @@ public class BuildQueueController {
 
         Design design = DesignManager.i.getDesign(buildRequest.getDesignKind(), buildRequest.getDesignID());
 
+        if (buildRequest.getCount() <= 0) {
+            throw new RequestException(400, "Cannot build negative count.");
+        }
+        if (buildRequest.getCount() > 100000) {
+            // cap the count at 100k
+            buildRequest.setCount(100000);
+        }
+
         // check dependencies
         for (Design.Dependency dependency : design.getDependencies()) {
             if (!dependency.isMet(colony)) {

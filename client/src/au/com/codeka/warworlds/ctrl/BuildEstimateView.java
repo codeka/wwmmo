@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.R;
@@ -17,6 +18,7 @@ import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.Star;
 
 public class BuildEstimateView extends FrameLayout {
+    private static final Log log = new Log("BuildEstimateView");
     private View mView;
     private boolean mRefreshRunning = false;
     private boolean mNeedRefresh = false;
@@ -76,6 +78,7 @@ public class BuildEstimateView extends FrameLayout {
                     starCopy.getBuildRequests().add(buildRequest);
                     sim.simulate(starCopy);
                 } catch (Exception e) {
+                    log.error("Error simulating star.", e);
                     // if we can't simulate, it's some kind of error...
                     return false;
                 }

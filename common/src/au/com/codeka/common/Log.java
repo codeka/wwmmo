@@ -62,6 +62,8 @@ public class Log {
         Formatter formatter = new Formatter(sb, Locale.ENGLISH);
         try {
             formatter.format(fmt, args);
+        } catch(Exception e) {
+            return fmt; // ??
         } finally {
             formatter.close();
         }

@@ -29,8 +29,7 @@ public class EmpiresDisplayNameHandler extends RequestHandler {
         new EmpireController().update(empire);
 
         Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
-        empire.toProtocolBuffer(empire_pb);
+        empire.toProtocolBuffer(empire_pb, true);
         setResponseBody(empire_pb.build());
     }
-
 }
