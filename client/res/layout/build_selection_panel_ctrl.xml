@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView
+        android:id="@+id/building_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/building_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/building_icon"
+        android:layout_toRightOf="@+id/building_icon"
+        android:layout_toLeftOf="@+id/accelerate_btn"
+        android:text="Building Name"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/progress_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/building_name"
+        android:layout_toRightOf="@+id/building_icon"
+        android:layout_toLeftOf="@+id/accelerate_btn"
+        android:text="Progress..."
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ProgressBar
+        android:id="@+id/building_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_below="@+id/progress_text"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="100dp"
+        android:layout_toRightOf="@+id/building_icon" />
+
+    <Button android:id="@+id/accelerate_btn"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="4dp"
+            android:text="Accelerate" />
+
+    <Button android:id="@+id/stop_btn"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/accelerate_btn"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="4dp"
+            android:text="Stop" />
+
+    <au.com.codeka.warworlds.ctrl.InfobarView
+        android:id="@+id/infobar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
+</merge>

@@ -12,11 +12,19 @@
         android:layout_margin="8dp"
         android:text="Show only idle stars" />
 
+    <au.com.codeka.warworlds.ctrl.BuildSelectionPanel
+        style="@style/BottomPane"
+        android:id="@+id/build_selection"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="100dp" />
+
     <ExpandableListView
         android:id="@+id/stars"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/show_idle_stars"
+        android:layout_above="@id/build_selection"
         android:groupIndicator="@null"
         android:listSelector="@drawable/list_selector" />
 

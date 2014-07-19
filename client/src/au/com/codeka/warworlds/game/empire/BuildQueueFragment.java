@@ -24,7 +24,10 @@ import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ctrl.BuildSelectionPanel;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.build.BuildAccelerateDialog;
+import au.com.codeka.warworlds.game.build.BuildStopConfirmDialog;
 import au.com.codeka.warworlds.game.empire.StarsFragment.StarsListAdapter;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.BuildRequest;
@@ -39,11 +42,13 @@ import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 
 public class BuildQueueFragment extends BaseFragment {
     private BuildQueueStarsListAdapter adapter;
     private EmpireStarsFetcher fetcher;
+    private BuildSelectionPanel buildSelectionPanel;
 
     public BuildQueueFragment() {
         fetcher = new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Building, null);
@@ -55,6 +60,24 @@ public class BuildQueueFragment extends BaseFragment {
         ExpandableListView starsList = (ExpandableListView) v.findViewById(R.id.stars);
         adapter = new BuildQueueStarsListAdapter(inflater, fetcher);
         starsList.setAdapter(adapter);
+
+        buildSelectionPanel = (BuildSelectionPanel) v.findViewById(R.id.build_selection);
+        buildSelectionPanel.setBuildQueueActionListener(
+                new BuildSelectionPanel.BuildQueueActionListener() {
+            @Override
+            public void onAccelerateClick(StarSummary star, BuildRequest buildRequest) {
+                BuildAccelerateDialog dialog = new BuildAccelerateDialog();
+                dialog.setBuildRequest(star, buildRequest);
+                dialog.show(getActivity().getSupportFragmentManager(), "");
+            }
+
+            @Override
+            public void onStopClick(StarSummary star, BuildRequest buildRequest) {
+                BuildStopConfirmDialog dialog = new BuildStopConfirmDialog();
+                dialog.setBuildRequest(star, buildRequest);
+                dialog.show(getActivity().getSupportFragmentManager(), "");
+            }
+        });
 
         starsList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
@@ -69,6 +92,17 @@ public class BuildQueueFragment extends BaseFragment {
                     startActivity(intent);
                 }
                 return false;
+            }
+        });
+        starsList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                    int groupPosition, int childPosition, long id) {
+                Star star = (Star) adapter.getGroup(groupPosition);
+                BuildRequest buildRequest = (BuildRequest) adapter.getChild(star, childPosition);
+                buildSelectionPanel.setBuildRequest(star, buildRequest);
+                adapter.notifyDataSetChanged();
+                return true;
             }
         });
 
@@ -121,7 +155,7 @@ public class BuildQueueFragment extends BaseFragment {
         }
     };
 
-    public static class BuildQueueStarsListAdapter extends StarsListAdapter {
+    public class BuildQueueStarsListAdapter extends StarsListAdapter {
         private LayoutInflater inflater;
         private MyEmpire empire;
 
@@ -280,13 +314,15 @@ public class BuildQueueFragment extends BaseFragment {
                 notes.setText("");
                 notes.setVisibility(View.GONE);
             }
-/*
-            if (mSelectedBuildRequest != null && mSelectedBuildRequest.getKey().equals(entry.buildRequest.getKey())) {
+
+            BuildRequest selectedBuildRequest = buildSelectionPanel.getBuildRequest();
+            if (selectedBuildRequest != null
+                    && selectedBuildRequest.getKey().equals(buildRequest.getKey())) {
                 view.setBackgroundColor(0xff0c6476);
             } else {
                 view.setBackgroundColor(0xff000000);
             }
-*/
+
             refreshEntryProgress(buildRequest, progressBar, progressText);
 
             return view;
