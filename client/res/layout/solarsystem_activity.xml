@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:layout_marginRight="40dp"
         android:layout_gravity="start"
-        android:background="#111">
+        android:background="@drawable/left_pane_bg">
 
         <EditText android:id="@+id/search_text"
             android:layout_width="match_parent"
