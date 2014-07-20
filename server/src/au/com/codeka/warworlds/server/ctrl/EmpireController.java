@@ -162,6 +162,13 @@ public class EmpireController {
     }
 
     public boolean adjustBalance(int empireId, float amount, Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
+        if (Float.isNaN(amount)) {
+            throw new RequestException(500, "Amount is NaN!");
+        }
+        if (Float.isInfinite(amount)) {
+            throw new RequestException(500, "Amount is Infinite!");
+        }
+
         Transaction t = db.getTransaction();
         boolean existingTransaction = (t != null);
         if (t == null) {

@@ -180,6 +180,28 @@ public class PbFormatter extends AbstractCharBasedFormatter {
         }
     }
 
+    private boolean isNaN(Object value, FieldDescriptor.Type fieldType) {
+        switch(fieldType) {
+        case FLOAT:
+            return Float.isNaN((Float) value);
+        case DOUBLE:
+            return Double.isNaN((Double) value);
+        default:
+            return false;
+        }
+    }
+
+    private boolean isInfinity(Object value, FieldDescriptor.Type fieldType) {
+        switch(fieldType) {
+        case FLOAT:
+            return Float.isInfinite((Float) value);
+        case DOUBLE:
+            return Double.isInfinite((Double) value);
+        default:
+            return false;
+        }
+    }
+
     private void printFieldValue(FieldDescriptor field, Object value, JsonGenerator generator) throws IOException {
         switch (field.getType()) {
             case INT32:
@@ -191,8 +213,14 @@ public class PbFormatter extends AbstractCharBasedFormatter {
             case FLOAT:
             case DOUBLE:
             case BOOL:
-                // Good old toString() does what we want for these types.
-                generator.print(value.toString());
+                if (isNaN(value, field.getType())) {
+                    generator.print("\"NaN\"");
+                } else if (isInfinity(value, field.getType())) {
+                    generator.print("\"Inf\"");
+                } else {
+                    // Good old toString() does what we want for these types.
+                    generator.print(value.toString());
+                }
                 break;
 
             case UINT32:

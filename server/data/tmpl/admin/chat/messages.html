@@ -43,6 +43,10 @@
     section#messages span.profanity-mild {
       color: #cc0;
     }
+    section#messages div.msg-content {
+      padding: 1em;
+      padding-top: 0;
+    }
   </style>
 {% endblock %}
 
@@ -71,30 +75,57 @@
       $val.val("").focus();
     });
 
-    var is_sorted = false;
     var original_page_title = document.title;
+    var alliances = {};
+    var msgs = [];
+    var num_unread = 0;
 
-    function appendMessage(msg) {
+    $.ajax({
+      "url": "/realms/"+window.realm+"/alliances",
+      "dataType": "json",
+      "success": function(data) {
+        for (var i = 0; i < data.alliances.length; i++) {
+          alliances[data.alliances[i].key] = data.alliances[i].name;
+        }
+        refreshMessages();
+      }
+    });
+
+    function appendMessage(msg, refresh) {
+      msgs.push(msg);
+
+      num_unread++;
+      document.title = "("+num_unread+") "+original_page_title;
+
+      if (refresh) {
+        refreshMessages();
+      }
+    }
+
+    function refreshMessages() {
+      $("section#messages").empty();
+      for (var i = 0; i < msgs.length; i++) {
+        var div = formatMessage(msgs[i]);
+        $("section#messages").append(div);
+      }
+    }
+
+    function formatMessage(msg) {
       if (typeof msg.empire == "undefined") {
         if (msg.empire_key) {
+          console.log("fetching empire");
           empireStore.getEmpire(msg.empire_key, function(empire) {
+            console.log("fetched empire, refresing messages again.");
             msg.empire = empire;
-            appendMessage(msg);
+            refreshMessages();
           });
+          return $("<div></div>");
         } else {
           msg.empire = "[SERVER]";
-          appendMessage(msg);
         }
-        if (is_sorted) {
-          // if it's already sorted, make sure it stays that way
-          sortMessages();
-
-          num_unread ++;
-          document.title = "("+num_unread+") "+original_page_title;
-        }
-        return;
       }
 
+      console.log("msg has an empire.");
       var dt = new Date();
       dt.setTime(msg.date_posted * 1000);
 
@@ -102,17 +133,37 @@
         var padded = "0000000000"+str;
         return padded.substr(padded.length - n);
       }
+      var ampm = "am";
       var dtstr = dt.getFullYear()+"-"+zeroPad(dt.getMonth() + 1, 2)+"-"+zeroPad(dt.getDate(), 2);
-      dtstr += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2);
+      if (dt.getHours() == 12) {
+        dtstr += " 12";
+        ampm = "pm";
+      } else if (dt.getHours() == 0) {
+        dtstr += " 12";
+        ampm = "am";
+      } else if (dt.getHours() > 12) {
+        dtstr += " "+zeroPad(dt.getHours() - 12, 2);
+        ampm = "pm";
+      } else {
+        dtstr += " "+zeroPad(dt.getHours(), 2);
+      }
+      dtstr += ":"+zeroPad(dt.getMinutes(), 2)+" "+ampm;
       var msgstr = dtstr;
 
+      var style = "";
+
       if (msg.alliance_key) {
-        msgstr += " : <em>Alliance</em>";
+        style += "background: #ccc;";
+        if (typeof alliances[msg.alliance_key] != "undefined") {
+          msgstr += " : <em>" + alliances[msg.alliance_key] + "</em>";
+        } else {
+          msgstr += " : <em>Alliance</em>";
+        }
       } else {
         msgstr += " : <em>Global</em>";
       }
 
-      msgstr += " : "+msg.empire+" : ";
+      msgstr += " : <b>"+msg.empire+"</b></div><div class=\"msg-content\" style=\""+style+"\">";
       if (msg.message_en) {
         msgstr += "<span class=\"translated\">"+msg.message_en+"</span>";
       } else {
@@ -124,18 +175,9 @@
         msgstr = "<span class=\"profanity-strong\">"+msgstr+"</span>";
       }
 
-      var div = $("<div>"+msgstr+"</div>");
+      var div = $("<div class=\"msg-header\" style=\""+style+"\">"+msgstr+"</div>");
       div.data("dt", msg.date_posted);
-      $("section#messages").append(div);
-    }
-
-    function sortMessages() {
-      var items = $("section#messages").children().detach().sort(function(lhs, rhs) {
-        var n = $(rhs).data("dt") - $(lhs).data("dt");
-        return -(n < 0 ? -1 : (n > 0 ? 1 : 0));
-      });
-      $("section#messages").append(items);
-      is_sorted = true;
+      return div;
     }
 
     function sendMessage(msg) {
@@ -170,17 +212,12 @@
             return;
           }
 
-          for (var i = 0; i < data.messages.length; i++) {
+          for (var i = data.messages.length - 1; i >= 0; i--) {
             var msg = data.messages[i];
             appendMessage(msg);
           }
 
-          if (!is_sorted) {
-            var $section = $("section#messages");
-            $section.scrollTop($section[0].scrollHeight);
-          }
-
-          sortMessages();
+          refreshMessages();
         }
       });
     }

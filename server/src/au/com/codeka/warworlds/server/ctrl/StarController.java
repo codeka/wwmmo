@@ -555,6 +555,11 @@ public class StarController {
                         " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 for (BaseFleet baseFleet : star.getFleets()) {
+                    if (baseFleet.getNumShips() < 0) {
+                        throw new RequestException(500,
+                                "Cannot have < 0 ships in a fleet. StarID=" + star.getID());
+                    }
+
                     if (baseFleet.getKey() == null) {
                         needInsert = true;
                         continue;

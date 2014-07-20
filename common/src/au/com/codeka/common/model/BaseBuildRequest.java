@@ -94,6 +94,16 @@ public abstract class BaseBuildRequest  {
         long numerator = new Interval(mRefreshTime, now).toDurationMillis();
         long denominator = new Interval(mRefreshTime, mEndTime).toDurationMillis();
         float percentRemaining = (float) numerator / (float) denominator;
+        if (percentRemaining < 0) {
+            percentRemaining = 0.0f;
+        }
+        if (percentRemaining > 1) {
+            percentRemaining = 1.0f;
+        }
+        if (Float.isNaN(percentRemaining)) {
+            // shouldn't get here...
+            percentRemaining = 0.0f;
+        }
 
         return mProgress + ((1.0f - mProgress) * percentRemaining);
     }

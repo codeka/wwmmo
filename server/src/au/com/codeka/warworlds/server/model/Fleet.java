@@ -36,6 +36,9 @@ public class Fleet extends BaseFleet {
         }
         mAllianceID = res.getInt("alliance_id");
         mNumShips = res.getFloat("num_ships");
+        if (mNumShips < 0) {
+            mNumShips = 1;
+        }
         mStance = Stance.fromNumber(res.getInt("stance"));
         mState = State.fromNumber(res.getInt("state"));
         mStateStartTime = res.getDateTime("state_start_time");
