@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -64,6 +65,10 @@ public class SolarSystemActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null) {
+            starID = savedInstanceState.getInt("au.com.codeka.warworlds.StarID");
+        }
+
         setContentView(R.layout.solarsystem_activity);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer = findViewById(R.id.drawer);
@@ -71,6 +76,16 @@ public class SolarSystemActivity extends BaseActivity {
         ListView searchList = (ListView) findViewById(R.id.search_result);
         searchListAdapter = new SearchListAdapter(getLayoutInflater());
         searchList.setAdapter(searchListAdapter);
+
+        searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                StarSummary star = (StarSummary) searchListAdapter.getItem(position);
+                if (star != null) {
+                    showStar(star.getID());
+                }
+            }
+        });
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
                 android.support.v7.appcompat.R.drawable.abc_ic_menu_moreoverflow_normal_holo_dark,
@@ -151,13 +166,24 @@ public class SolarSystemActivity extends BaseActivity {
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
-                Bundle extras = getIntent().getExtras();
-                String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-                if (starKey != null) {
-                    showStar(Integer.parseInt(starKey));
+                if (starID == null) {
+                    Bundle extras = getIntent().getExtras();
+                    String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+                    if (starKey != null) {
+                        showStar(Integer.parseInt(starKey));
+                    }
+                } else {
+                    showStar(starID);
                 }
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+
+        state.putInt("au.com.codeka.warworlds.StarID", starID);
     }
 
     @Override
@@ -212,6 +238,7 @@ public class SolarSystemActivity extends BaseActivity {
                 lastStars.remove(lastStars.size() - 1);
             }
         }
+        searchListAdapter.notifyDataSetChanged();
     }
 
     private void refreshTitle() {

@@ -24,7 +24,7 @@ public class Simulation {
     private final boolean predict;
     private DateTime now;
 
-    private static boolean sDebug = true;
+    private static boolean sDebug = false;
     private static int sNumSimulations;
     private static DateTime year2k = new DateTime(2000, 1, 1, 0, 0);
 
