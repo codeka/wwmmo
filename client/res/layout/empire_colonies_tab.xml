@@ -3,11 +3,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+    <ImageButton android:id="@+id/search_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/abc_ic_search" />
+
+    <EditText android:id="@+id/search_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/search_button"
+        android:layout_alignBottom="@id/search_button"
+        android:inputType="text"
+        android:hint="Search"
+        android:imeOptions="actionSearch" />
+
     <ExpandableListView
         android:id="@+id/stars"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/search_button"
         android:groupIndicator="@null"
         android:listSelector="@drawable/list_selector" />
 

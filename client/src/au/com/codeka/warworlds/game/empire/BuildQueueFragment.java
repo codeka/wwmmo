@@ -111,9 +111,9 @@ public class BuildQueueFragment extends BaseFragment {
         showIdleStars.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchFetcher(showIdleStars.isChecked()
+                adapter.updateFetcher(new EmpireStarsFetcher(showIdleStars.isChecked()
                         ? EmpireStarsFetcher.Filter.NotBuilding
-                        : EmpireStarsFetcher.Filter.Building);
+                        : EmpireStarsFetcher.Filter.Building, null));
             }
         });
 
@@ -124,24 +124,12 @@ public class BuildQueueFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
         StarManager.eventBus.register(eventHandler);
-        fetcher.eventBus.register(eventHandler);
-    }
-
-    private void switchFetcher(EmpireStarsFetcher.Filter filter) {
-        if (fetcher != null) {
-            fetcher.eventBus.unregister(eventHandler);
-        }
-        fetcher = new EmpireStarsFetcher(filter, null);
-        fetcher.eventBus.register(eventHandler);
-        fetcher.getStars(0, 20);
-        adapter.updateFetcher(fetcher);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         StarManager.eventBus.unregister(eventHandler);
-        fetcher.eventBus.unregister(eventHandler);
     }
 
     private Object eventHandler = new Object() {
@@ -150,11 +138,6 @@ public class BuildQueueFragment extends BaseFragment {
             if (fetcher.onStarUpdated(star)) {
                 adapter.notifyDataSetChanged();
             }
-        }
-
-        @EventHandler(thread = EventHandler.UI_THREAD)
-        public void onStarsFetched(EmpireStarsFetcher.StarsFetchedEvent event) {
-            adapter.notifyDataSetChanged();
         }
     };
 

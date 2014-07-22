@@ -91,13 +91,14 @@ public class SolarSystemActivity extends BaseActivity {
                 android.support.v7.appcompat.R.drawable.abc_ic_menu_moreoverflow_normal_holo_dark,
                 R.string.drawer_open, R.string.drawer_close) {
 
+            @Override
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 refreshTitle();
                 invalidateOptionsMenu();
             }
 
-            /** Called when a drawer has settled in a completely open state. */
+            @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 refreshTitle();

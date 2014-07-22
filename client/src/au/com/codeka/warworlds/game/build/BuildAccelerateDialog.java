@@ -1,7 +1,7 @@
     package au.com.codeka.warworlds.game.build;
 
 import java.util.Locale;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -25,7 +25,6 @@ import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class BuildAccelerateDialog extends DialogFragment {
@@ -77,6 +76,7 @@ public class BuildAccelerateDialog extends DialogFragment {
         }
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Activity activity = getActivity();

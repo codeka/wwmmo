@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.game.empire;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.EmpireStarsFetcher;
 import au.com.codeka.warworlds.model.Star;
 
@@ -18,12 +19,25 @@ public class StarsFragment extends BaseFragment {
 
         public StarsListAdapter(EmpireStarsFetcher fetcher) {
             this.fetcher = fetcher;
+            this.fetcher.eventBus.register(eventHandler);
         }
 
         public void updateFetcher(EmpireStarsFetcher fetcher) {
+            if (this.fetcher != null) {
+                this.fetcher.eventBus.unregister(eventHandler);
+            }
             this.fetcher = fetcher;
+            this.fetcher.eventBus.register(eventHandler);
+            this.fetcher.getStars(0, 20);
             notifyDataSetChanged();
         }
+
+        private Object eventHandler = new Object() {
+            @EventHandler(thread = EventHandler.UI_THREAD)
+            public void onStarsFetched(EmpireStarsFetcher.StarsFetchedEvent event) {
+                notifyDataSetChanged();
+            }
+        };
 
         @Override
         public boolean hasStableIds() {

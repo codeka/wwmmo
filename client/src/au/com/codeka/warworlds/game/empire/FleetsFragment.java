@@ -127,14 +127,12 @@ public class FleetsFragment extends StarsFragment {
     public void onStart() {
         super.onStart();
         StarManager.eventBus.register(mEventHandler);
-        fetcher.eventBus.register(mEventHandler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         StarManager.eventBus.unregister(mEventHandler);
-        fetcher.eventBus.unregister(mEventHandler);
     }
 
     private Object mEventHandler = new Object() {
@@ -143,11 +141,6 @@ public class FleetsFragment extends StarsFragment {
             if (fetcher.onStarUpdated(star)) {
                 adapter.notifyDataSetChanged();
             }
-        }
-
-        @EventHandler(thread = EventHandler.UI_THREAD)
-        public void onStarsFetched(EmpireStarsFetcher.StarsFetchedEvent event) {
-            adapter.notifyDataSetChanged();
         }
     };
 

@@ -8,12 +8,17 @@ import org.joda.time.DateTimeZone;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.warworlds.R;
@@ -79,31 +84,49 @@ public class ColoniesFragment extends StarsFragment {
             }
         });
 
+        final EditText searchBox = (EditText) v.findViewById(R.id.search_text);
+        searchBox.setOnEditorActionListener(new OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    performSearch(searchBox.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        ImageButton searchBtn = (ImageButton) v.findViewById(R.id.search_button);
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performSearch(searchBox.getText().toString());
+            }
+        });
+
         return v;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        StarManager.eventBus.register(mEventHandler);
-        fetcher.eventBus.register(mEventHandler);
+        StarManager.eventBus.register(eventHandler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        StarManager.eventBus.unregister(mEventHandler);
-        fetcher.eventBus.unregister(mEventHandler);
+        StarManager.eventBus.unregister(eventHandler);
     }
 
-    private Object mEventHandler = new Object() {
+    private void performSearch(String search) {
+        fetcher = new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Colonies, search);
+        adapter.updateFetcher(fetcher);
+    }
+
+    private Object eventHandler = new Object() {
         @EventHandler(thread = EventHandler.UI_THREAD)
         public void onStarUpdated(Star star) {
-            adapter.notifyDataSetChanged();
-        }
-
-        @EventHandler(thread = EventHandler.UI_THREAD)
-        public void onStarsFetched(EmpireStarsFetcher.StarsFetchedEvent event) {
             adapter.notifyDataSetChanged();
         }
     };
