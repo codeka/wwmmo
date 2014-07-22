@@ -18,21 +18,14 @@ public class LogImpl {
     };
 
     private static class LogImplImpl implements Log.LogImpl {
-        private static String fixTag(String tag) {
-            if (tag.length() > 20) {
-                return tag.substring(20);
-            }
-            return tag;
-        }
-
         @Override
         public boolean isLoggable(String tag, int level) {
-            return android.util.Log.isLoggable(fixTag(tag), LevelMap[level]);
+            return android.util.Log.isLoggable("wwmmo", LevelMap[level]);
         }
 
         @Override
         public void write(String tag, int level, String msg) {
-            android.util.Log.println(LevelMap[level], fixTag(tag), msg);
+            android.util.Log.println(LevelMap[level], "wwmmo", tag + ": " + msg);
         }
     }
 }

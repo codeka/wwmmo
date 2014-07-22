@@ -68,6 +68,22 @@ public class EmpireStarsFetcher {
         return star;
     }
 
+    /** You can call this if you get notified about a star update, we'll update our copy as well. */
+    public boolean onStarUpdated(Star star) {
+        synchronized(cache) {
+            for (int i = 0; i < cache.size(); i++) {
+                WeakReference<Star> ref = cache.valueAt(i);
+                Star thisStar = ref.get();
+                if (thisStar != null && thisStar.getID() == star.getID()) {
+                    cache.setValueAt(i, new WeakReference<Star>(star));
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private Runnable starFetchRunnable = new Runnable() {
         @Override
         public void run() {
@@ -185,12 +201,14 @@ public class EmpireStarsFetcher {
             @Override
             protected void onComplete(SparseArray<Star> result) {
                 if (result != null) {
-                    for (int i = 0; i < result.size(); i++) {
-                        Star star = result.valueAt(i);
-                        // notify the StarManager as well, in case someone else is interested in
-                        // this star.
-                        StarManager.i.notifyStarUpdated(star);
-                        cache.put(result.keyAt(i), new WeakReference<Star>(star));
+                    synchronized(cache) {
+                        for (int i = 0; i < result.size(); i++) {
+                            Star star = result.valueAt(i);
+                            // notify the StarManager as well, in case someone else is interested in
+                            // this star.
+                            StarManager.i.notifyStarUpdated(star);
+                            cache.put(result.keyAt(i), new WeakReference<Star>(star));
+                        }
                     }
 
                     eventBus.publish(new StarsFetchedEvent(result));

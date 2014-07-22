@@ -127,11 +127,13 @@ public class StarManager extends BaseManager {
      */
     public boolean refreshStar(final int starID, boolean onlyIfCached) {
         if (onlyIfCached && stars.get(starID) == null) {
+            log.debug("Not updating star,  onlyIfCached = true and star is not cached.");
             return false;
         }
 
         synchronized(inProgress) {
             if (!inProgress.add(starID)) {
+                log.debug("Star is already being refreshed, not calling again.");
                 return true;
             }
         }
@@ -149,6 +151,7 @@ public class StarManager extends BaseManager {
 
             @Override
             protected void onComplete(Star star) {
+                log.debug("Star refreshed, publishing event...");
                 eventBus.publish(star);
                 inProgress.remove(starID);
                 stars.put(star.getID(), new StarOrSummary(star));

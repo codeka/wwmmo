@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
@@ -28,26 +29,27 @@ import au.com.codeka.warworlds.model.StarSummary;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class BuildAccelerateDialog extends DialogFragment {
-    private BuildRequest mBuildRequest;
-    private StarSummary mStar;
-    private View mView;
+    private static final Log log = new Log("BuildAccelerateDialog");
+    private BuildRequest buildRequest;
+    private StarSummary star;
+    private View view;
 
     public void setBuildRequest(StarSummary star, BuildRequest buildRequest) {
-        mBuildRequest = buildRequest;
-        mStar = star;
+        this.buildRequest = buildRequest;
+        this.star = star;
     }
 
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        if (mBuildRequest != null) {
+        if (buildRequest != null) {
             Messages.BuildRequest.Builder build_request_pb = Messages.BuildRequest.newBuilder();
-            mBuildRequest.toProtocolBuffer(build_request_pb);
+            buildRequest.toProtocolBuffer(build_request_pb);
             state.putByteArray("au.com.codeka.warworlds.BuildRequest", build_request_pb.build().toByteArray());
         }
-        if (mStar != null) {
+        if (star != null) {
             Messages.Star.Builder star_pb = Messages.Star.newBuilder();
-            mStar.toProtocolBuffer(star_pb);
+            star.toProtocolBuffer(star_pb);
             state.putByteArray("au.com.codeka.warworlds.Star", star_pb.build().toByteArray());
         }
     }
@@ -58,8 +60,8 @@ public class BuildAccelerateDialog extends DialogFragment {
             try {
                 Messages.Star star_pb;
                 star_pb = Messages.Star.parseFrom(bytes);
-                mStar = new StarSummary();
-                mStar.fromProtocolBuffer(star_pb);
+                star = new StarSummary();
+                star.fromProtocolBuffer(star_pb);
             } catch (InvalidProtocolBufferException e) {
             }
         }
@@ -68,8 +70,8 @@ public class BuildAccelerateDialog extends DialogFragment {
         if (bytes != null) {
             try {
                 Messages.BuildRequest build_request_pb = Messages.BuildRequest.parseFrom(bytes);
-                mBuildRequest = new BuildRequest();
-                mBuildRequest.fromProtocolBuffer(build_request_pb);
+                buildRequest = new BuildRequest();
+                buildRequest.fromProtocolBuffer(build_request_pb);
             } catch (InvalidProtocolBufferException e) {
             }
         }
@@ -79,13 +81,13 @@ public class BuildAccelerateDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Activity activity = getActivity();
         LayoutInflater inflater = activity.getLayoutInflater();
-        mView = inflater.inflate(R.layout.build_accelerate_dlg, null);
+        view = inflater.inflate(R.layout.build_accelerate_dlg, null);
 
         if (savedInstanceState != null) {
             restoreSavedInstanceState(savedInstanceState);
         }
 
-        SeekBar accelerateAmount = (SeekBar) mView.findViewById(R.id.accelerate_amount);
+        SeekBar accelerateAmount = (SeekBar) view.findViewById(R.id.accelerate_amount);
         accelerateAmount.setMax(50);
         accelerateAmount.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -100,15 +102,15 @@ public class BuildAccelerateDialog extends DialogFragment {
         updatePercentAndCost();
 
         return new StyledDialog.Builder(getActivity())
-                           .setView(mView)
-                           .setPositiveButton("Accelerate", new DialogInterface.OnClickListener() {
-                               @Override
-                               public void onClick(DialogInterface dialog, int which) {
-                                   accelerateBuild();
-                               }
-                           })
-                           .setNegativeButton("Cancel", null)
-                           .create();
+               .setView(view)
+               .setPositiveButton("Accelerate", new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       accelerateBuild();
+                   }
+               })
+               .setNegativeButton("Cancel", null)
+               .create();
     }
 
     /**
@@ -118,17 +120,17 @@ public class BuildAccelerateDialog extends DialogFragment {
     private void updatePercentAndCost() {
         double accelerateAmount = getAccelerateAmount();
 
-        TextView acceleratePct = (TextView) mView.findViewById(R.id.accelerate_pct);
+        TextView acceleratePct = (TextView) view.findViewById(R.id.accelerate_pct);
         acceleratePct.setText(String.format(Locale.ENGLISH, "%d %%", (int)(accelerateAmount * 100)));
 
-        double remainingProgress = 1.0 - mBuildRequest.getProgress(true);
+        double remainingProgress = 1.0 - buildRequest.getProgress(true);
         double progressToComplete = remainingProgress * accelerateAmount;
 
-        Design design = DesignManager.i.getDesign(mBuildRequest.getDesignKind(), mBuildRequest.getDesignID());
+        Design design = DesignManager.i.getDesign(buildRequest.getDesignKind(), buildRequest.getDesignID());
         double mineralsToUse = design.getBuildCost().getCostInMinerals() * progressToComplete;
-        double cost = mineralsToUse * mBuildRequest.getCount();
+        double cost = mineralsToUse * buildRequest.getCount();
 
-        TextView accelerateCost = (TextView) mView.findViewById(R.id.accelerate_cost);
+        TextView accelerateCost = (TextView) view.findViewById(R.id.accelerate_cost);
         if (cost < EmpireManager.i.getEmpire().getCash()) {
             accelerateCost.setText(String.format(Locale.ENGLISH, "$%d", (int) cost));
         } else {
@@ -138,7 +140,7 @@ public class BuildAccelerateDialog extends DialogFragment {
     }
 
     private double getAccelerateAmount() {
-        SeekBar seekBar = (SeekBar) mView.findViewById(R.id.accelerate_amount);
+        SeekBar seekBar = (SeekBar) view.findViewById(R.id.accelerate_amount);
         return ((double) seekBar.getProgress() + 50.0) / 100.0;
     }
 
@@ -151,7 +153,7 @@ public class BuildAccelerateDialog extends DialogFragment {
 
             @Override
             protected BuildRequest doInBackground() {
-                String url = "stars/"+mStar.getKey()+"/build/"+mBuildRequest.getKey()+"/accelerate";
+                String url = "stars/"+star.getKey()+"/build/"+buildRequest.getKey()+"/accelerate";
                 url += "?amount="+getAccelerateAmount();
 
                 try {
@@ -171,13 +173,15 @@ public class BuildAccelerateDialog extends DialogFragment {
 
                 return null;
             }
+
             @Override
             protected void onComplete(BuildRequest buildRequest) {
-                // tell the StarManager that this star has been updated
-                StarManager.i.refreshStar(Integer.parseInt(mStar.getKey()));
+                log.debug("Accelerate complete, notifying StarManager to refresh star.");
+                // Tell the StarManager that this star has been updated.
+                StarManager.i.refreshStar(Integer.parseInt(star.getKey()));
 
                 // tell the EmpireManager to update the empire (since our cash will have gone down)
-                EmpireManager.i.refreshEmpire();
+                //EmpireManager.i.refreshEmpire();
 
                 if (mErrorMsg != null) {
                     new StyledDialog.Builder(activity.getApplicationContext())

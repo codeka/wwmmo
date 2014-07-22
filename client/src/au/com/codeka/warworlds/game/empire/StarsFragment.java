@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.game.empire;
 
-import android.support.v4.util.LruCache;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -17,16 +16,12 @@ public class StarsFragment extends BaseFragment {
     public static abstract class StarsListAdapter extends BaseExpandableListAdapter {
         private EmpireStarsFetcher fetcher;
 
-        // should never have > 40 visible at once...
-        private LruCache<Integer, Star> starCache = new LruCache<Integer, Star>(40);
-
         public StarsListAdapter(EmpireStarsFetcher fetcher) {
             this.fetcher = fetcher;
         }
 
         public void updateFetcher(EmpireStarsFetcher fetcher) {
             this.fetcher = fetcher;
-            starCache.evictAll();
             notifyDataSetChanged();
         }
 
@@ -101,14 +96,7 @@ public class StarsFragment extends BaseFragment {
         }
 
         private Star getStar(int index) {
-            Star star = starCache.get(index);
-            if (star == null) {
-                star = fetcher.getStar(index);
-                if (star != null) {
-                    starCache.put(index, star);
-                }
-            }
-            return star;
+            return fetcher.getStar(index);
         }
     }
 }
