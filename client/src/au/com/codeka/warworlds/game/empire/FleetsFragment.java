@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -13,7 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import au.com.codeka.common.model.BaseEmpirePresence;
+import au.com.codeka.NumberFormatter;
+import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.FleetList;
@@ -23,9 +23,7 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
-import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.EmpireStarsFetcher;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.FleetManager;
@@ -35,7 +33,6 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSimulationQueue;
 
 public class FleetsFragment extends StarsFragment {
     private FleetsStarsListAdapter adapter;
@@ -118,6 +115,7 @@ public class FleetsFragment extends StarsFragment {
                 Fleet fleet = (Fleet) adapter.getChild(groupPosition, childPosition);
 
                 fleetSelectionPanel.setSelectedFleet(star, fleet);
+                adapter.notifyDataSetChanged();
                 return false;
             }
         });
@@ -142,7 +140,9 @@ public class FleetsFragment extends StarsFragment {
     private Object mEventHandler = new Object() {
         @EventHandler(thread = EventHandler.UI_THREAD)
         public void onStarUpdated(Star star) {
-            adapter.notifyDataSetChanged();
+            if (fetcher.onStarUpdated(star)) {
+                adapter.notifyDataSetChanged();
+            }
         }
 
         @EventHandler(thread = EventHandler.UI_THREAD)
@@ -151,7 +151,7 @@ public class FleetsFragment extends StarsFragment {
         }
     };
 
-    public static class FleetsStarsListAdapter extends StarsListAdapter {
+    public class FleetsStarsListAdapter extends StarsListAdapter {
         private LayoutInflater inflater;
         private MyEmpire empire;
 
@@ -195,25 +195,21 @@ public class FleetsFragment extends StarsFragment {
         public View getStarView(Star star, View convertView, ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                view = inflater.inflate(R.layout.empire_colony_list_star_row, parent, false);
+                view = inflater.inflate(R.layout.empire_fleet_list_star_row, parent, false);
             }
 
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
             TextView starName = (TextView) view.findViewById(R.id.star_name);
             TextView starType = (TextView) view.findViewById(R.id.star_type);
-            TextView starGoodsDelta = (TextView) view.findViewById(R.id.star_goods_delta);
-            TextView starGoodsTotal = (TextView) view.findViewById(R.id.star_goods_total);
-            TextView starMineralsDelta = (TextView) view.findViewById(R.id.star_minerals_delta);
-            TextView starMineralsTotal = (TextView) view.findViewById(R.id.star_minerals_total);
+            TextView fightersTotal = (TextView) view.findViewById(R.id.fighters_total);
+            TextView nonFightersTotal = (TextView) view.findViewById(R.id.nonfighters_total);
 
             if (star == null) {
                 starIcon.setImageBitmap(null);
                 starName.setText("");
                 starType.setText("");
-                starGoodsDelta.setText("");
-                starGoodsTotal.setText("???");
-                starMineralsDelta.setText("");
-                starMineralsTotal.setText("???");
+                fightersTotal.setText("...");
+                nonFightersTotal.setText("...");
             } else {
                 int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
                 Sprite sprite = StarImageManager.getInstance().getSprite(star, imageSize, true);
@@ -223,46 +219,26 @@ public class FleetsFragment extends StarsFragment {
                 starType.setText(star.getStarType().getDisplayName());
 
                 MyEmpire myEmpire = EmpireManager.i.getEmpire();
-                EmpirePresence empirePresence = null;
-                for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
-                    if (baseEmpirePresence.getEmpireKey().equals(myEmpire.getKey())) {
-                        empirePresence = (EmpirePresence) baseEmpirePresence;
-                        break;
+                float numFighters = 0.0f;
+                float numNonFighters = 0.0f;
+
+                for (BaseFleet fleet : star.getFleets()) {
+                    if (fleet.getEmpireKey() == null
+                            || !fleet.getEmpireKey().equals(myEmpire.getKey())) {
+                        continue;
+                    }
+
+                    if (fleet.getDesignID().equals("fighter")) {
+                        numFighters += fleet.getNumShips();
+                    } else {
+                        numNonFighters += fleet.getNumShips();
                     }
                 }
 
-                if (StarSimulationQueue.needsSimulation(star) || empirePresence == null) {
-                    // if the star hasn't been simulated for > 5 minutes, schedule a simulation
-                    // now and just display ??? for the various parameters
-                    starGoodsDelta.setText("");
-                    starGoodsTotal.setText("???");
-                    starMineralsDelta.setText("");
-                    starMineralsTotal.setText("???");
-                } else {
-                    starGoodsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
-                            empirePresence.getDeltaGoodsPerHour() < 0 ? "-" : "+",
-                            Math.abs(Math.round(empirePresence.getDeltaGoodsPerHour()))));
-                    if (empirePresence.getDeltaGoodsPerHour() < 0) {
-                        starGoodsDelta.setTextColor(Color.RED);
-                    } else {
-                        starGoodsDelta.setTextColor(Color.GREEN);
-                    }
-                    starGoodsTotal.setText(String.format(Locale.ENGLISH, "%d / %d",
-                            Math.round(empirePresence.getTotalGoods()),
-                            Math.round(empirePresence.getMaxGoods())));
-    
-                    starMineralsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
-                            empirePresence.getDeltaMineralsPerHour() < 0 ? "-" : "+",
-                            Math.abs(Math.round(empirePresence.getDeltaMineralsPerHour()))));
-                    if (empirePresence.getDeltaMineralsPerHour() < 0) {
-                        starMineralsDelta.setTextColor(Color.RED);
-                    } else {
-                        starMineralsDelta.setTextColor(Color.GREEN);
-                    }
-                    starMineralsTotal.setText(String.format(Locale.ENGLISH, "%d / %d",
-                            Math.round(empirePresence.getTotalMinerals()),
-                            Math.round(empirePresence.getMaxMinerals())));
-                }
+                fightersTotal.setText(String.format(Locale.ENGLISH, "%s",
+                        NumberFormatter.format(numFighters)));
+                nonFightersTotal.setText(String.format(Locale.ENGLISH, "%s",
+                        NumberFormatter.format(numNonFighters)));
             }
             return view;
         }
@@ -279,16 +255,13 @@ public class FleetsFragment extends StarsFragment {
                 if (fleet != null) {
                     ((FleetListRow) view).setFleet(fleet);
 
-                    /*
-            BuildRequest selectedBuildRequest = buildSelectionPanel.getBuildRequest();
-            if (selectedBuildRequest != null
-                    && selectedBuildRequest.getKey().equals(buildRequest.getKey())) {
-                view.setBackgroundColor(0xff0c6476);
-            } else {
-                view.setBackgroundColor(0xff000000);
-            }
-
-                     */
+                    Fleet selectedFleet = fleetSelectionPanel.getFleet();
+                    if (selectedFleet != null
+                            && selectedFleet.getKey().equals(fleet.getKey())) {
+                        view.setBackgroundColor(0xff0c6476);
+                    } else {
+                        view.setBackgroundColor(0xff000000);
+                    }
                 }
             }
 

@@ -95,7 +95,10 @@ public class FleetSelectionPanel extends FrameLayout {
             splitBtn.setEnabled(false);
             mergeBtn.setEnabled(false);
         }
+    }
 
+    public Fleet getFleet() {
+        return mFleet;
     }
 
     private void initialize(Context context) {
@@ -186,6 +189,8 @@ public class FleetSelectionPanel extends FrameLayout {
                 }
             }
         });
+
+        setSelectedFleet(null, null);
     }
 
     public class StanceAdapter extends BaseAdapter implements SpinnerAdapter {

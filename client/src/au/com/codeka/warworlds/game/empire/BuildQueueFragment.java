@@ -19,9 +19,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import au.com.codeka.common.Log;
+import au.com.codeka.NumberFormatter;
 import au.com.codeka.common.TimeFormatter;
-import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
@@ -48,7 +47,6 @@ import au.com.codeka.warworlds.model.StarSummary;
 
 
 public class BuildQueueFragment extends BaseFragment {
-    private static final Log log = new Log("BuildQueueFragment");
     private BuildQueueStarsListAdapter adapter;
     private EmpireStarsFetcher fetcher;
     private BuildSelectionPanel buildSelectionPanel;
@@ -258,8 +256,10 @@ public class BuildQueueFragment extends BaseFragment {
                     }
                 }
     
-                buildingCount.setText(String.format(Locale.ENGLISH, "%d buildings", numBuildings));
-                shipCount.setText(String.format(Locale.ENGLISH, "%d ships", numShips));
+                buildingCount.setText(String.format(Locale.ENGLISH, "%s",
+                        NumberFormatter.format(numBuildings)));
+                shipCount.setText(String.format(Locale.ENGLISH, "%s",
+                        NumberFormatter.format(numShips)));
                 if (queueEmptyTime == null) {
                     queueEmpty.setText("Queue Empty");
                 } else {
