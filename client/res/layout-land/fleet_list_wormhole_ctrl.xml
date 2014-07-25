@@ -3,19 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <View android:id="@+id/separator_1"
+          android:layout_width="1dp"
+          android:layout_height="match_parent"
+          android:layout_centerHorizontal="true" />
+
     <ListView
         android:id="@+id/ship_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/bottom_pane"
+        android:layout_toLeftOf="@+id/separator_1"
         android:layout_marginRight="-4px"
         android:listSelector="@drawable/list_selector" />
 
-    <au.com.codeka.warworlds.ctrl.FleetSelectionPanel
+    <au.com.codeka.warworlds.ctrl.FleetWormholeSelectionPanel
         android:id="@+id/bottom_pane"
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"/>
-
+    
 </RelativeLayout>

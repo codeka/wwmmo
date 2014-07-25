@@ -30,18 +30,23 @@ import au.com.codeka.warworlds.model.FleetUpgrade.BoostFleetUpgrade;
 /** Control displayed below a fleet list with controls to interact with the selected fleet. */
 public class FleetSelectionPanel extends FrameLayout {
     private Context mContext;
-    private Star mStar;
-    private Fleet mFleet;
+    protected Star mStar;
+    protected Fleet mFleet;
     private FleetList.OnFleetActionListener mFleetActionListener;
 
     public FleetSelectionPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialize(context);
+        initialize(context, R.layout.fleet_selection_panel_ctrl);
     }
 
     public FleetSelectionPanel(Context context) {
         super(context);
-        initialize(context);
+        initialize(context, R.layout.fleet_selection_panel_ctrl);
+    }
+
+    protected FleetSelectionPanel(Context context, AttributeSet attrs, int layoutID) {
+        super(context, attrs);
+        initialize(context, layoutID);
     }
 
     public void setOnFleetActionListener(OnFleetActionListener listener) {
@@ -101,9 +106,9 @@ public class FleetSelectionPanel extends FrameLayout {
         return mFleet;
     }
 
-    private void initialize(Context context) {
+    private void initialize(Context context, int layoutID) {
         mContext = context;
-        inflate(context, R.layout.fleet_selection_panel_ctrl, this);
+        inflate(context, layoutID, this);
 
         final Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
         stanceSpinner.setAdapter(new StanceAdapter());
