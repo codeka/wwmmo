@@ -10,6 +10,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -19,8 +20,7 @@ import au.com.codeka.warworlds.model.Star;
  * This is the base class for StarfieldSurfaceView and TacticalMapView, it contains the common code
  * for scrolling through sectors of stars, etc.
  */
-public class SectorView extends UniverseElementSurfaceView 
-                        implements SectorManager.OnSectorListChangedListener {
+public class SectorView extends UniverseElementSurfaceView {
     protected boolean mScrollToCentre = false;
 
     protected int mSectorRadius = 1;
@@ -42,19 +42,26 @@ public class SectorView extends UniverseElementSurfaceView
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        SectorManager.getInstance().addSectorListChangedListener(this);
+        SectorManager.eventBus.register(eventHandler);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        SectorManager.getInstance().removeSectorListChangedListener(this);
+        SectorManager.eventBus.unregister(eventHandler);
     }
 
-    @Override
-    public void onSectorListChanged() {
-        redraw();
-    }
+    private final Object eventHandler = new Object() {
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onSectorUpdated(Sector sector) {
+            redraw();
+        }
+
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onSectorListUpdated(SectorManager.SectorListChangedEvent event) {
+            redraw();
+        }
+    };
 
     /**
      * Scroll to the given sector (x,y) and offset into the sector.
@@ -81,7 +88,7 @@ public class SectorView extends UniverseElementSurfaceView
         for(sectorY = mSectorY - mSectorRadius; sectorY <= mSectorY + mSectorRadius; sectorY++) {
             for(sectorX = mSectorX - mSectorRadius; sectorX <= mSectorX + mSectorRadius; sectorX++) {
                 Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
-                Sector s = SectorManager.getInstance().getSector(sectorX, sectorY);
+                Sector s = SectorManager.i.getSector(sectorX, sectorY);
                 if (s == null) {
                     missingSectors.add(key);
                 }
@@ -89,7 +96,7 @@ public class SectorView extends UniverseElementSurfaceView
         }
 
         if (!missingSectors.isEmpty()) {
-            SectorManager.getInstance().requestSectors(missingSectors, false, null);
+            SectorManager.i.refreshSectors(missingSectors, false);
         }
 
         redraw();
@@ -162,7 +169,7 @@ public class SectorView extends UniverseElementSurfaceView
             sectorY ++;
         }
 
-        Sector sector = SectorManager.getInstance().getSector(sectorX, sectorY);
+        Sector sector = SectorManager.i.getSector(sectorX, sectorY);
         if (sector == null) {
             // if it's not loaded yet, you can't have tapped on anything...
             return null;

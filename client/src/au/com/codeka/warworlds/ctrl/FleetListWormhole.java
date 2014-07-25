@@ -1,21 +1,12 @@
 package au.com.codeka.warworlds.ctrl;
 
-import org.joda.time.DateTime;
-
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.Button;
-import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.FleetManager;
 import au.com.codeka.warworlds.model.Star;
 
 /** This subclass of the fleet list control adds specific stuff for wormholes. */
 public class FleetListWormhole extends FleetList {
-    private Star mWormhole;
-
     public FleetListWormhole(Context context, AttributeSet attrs) {
         super(context, attrs, R.layout.fleet_list_wormhole_ctrl);
     }
@@ -25,7 +16,7 @@ public class FleetListWormhole extends FleetList {
     }
 
     public void setWormhole(Star wormhole) {
-        mWormhole = wormhole;
+        //mWormhole = wormhole;
     }
 
     @Override

@@ -20,6 +20,7 @@ import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseGlActivity;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 
@@ -27,8 +28,7 @@ import au.com.codeka.warworlds.model.SectorManager;
  * This is the base class for StarfieldSurfaceView and TacticalMapView, it contains the common code
  * for scrolling through sectors of stars, etc.
  */
-public abstract class SectorSceneManager implements SectorManager.OnSectorListChangedListener,
-                                                    IOnSceneTouchListener {
+public abstract class SectorSceneManager implements IOnSceneTouchListener {
     private static final Log log = new Log("SectorSceneManager");
     private StarfieldScene mScene;
     private GestureDetector mGestureDetector;
@@ -49,7 +49,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     }
 
     protected void onStart() {
-        SectorManager.getInstance().addSectorListChangedListener(this);
+        SectorManager.eventBus.register(eventHandler);
 
         if (mGestureDetector == null) {
             mGestureDetector = new GestureDetector(mActivity, createGestureListener());
@@ -67,7 +67,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     }
 
     protected void onStop() {
-        SectorManager.getInstance().removeSectorListChangedListener(this);
+        SectorManager.eventBus.unregister(eventHandler);
         mWasStopped = true;
     }
 
@@ -79,12 +79,19 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         return mActivity;
     }
 
-    @Override
-    public void onSectorListChanged() {
-        refreshScene();
-    }
+    private final Object eventHandler = new Object() {
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onSectorUpdated(Sector sector) {
+            refreshScene();
+        }
 
-    protected void refreshScene() {
+        @EventHandler(thread = EventHandler.UI_THREAD)
+        public void onSectorListUpdated(SectorManager.SectorListChangedEvent event) {
+            refreshScene();
+        }
+    };
+
+    public void refreshScene() {
         new BackgroundRunner<Scene>() {
             @Override
             protected Scene doInBackground() {
@@ -180,7 +187,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
                 for(long sy = mSectorY - mSectorRadius; sy <= mSectorY + mSectorRadius; sy++) {
                     for(long sx = mSectorX - mSectorRadius; sx <= mSectorX + mSectorRadius; sx++) {
                         Pair<Long, Long> key = new Pair<Long, Long>(sx, sy);
-                        Sector s = SectorManager.getInstance().getSector(sx, sy);
+                        Sector s = SectorManager.i.getSector(sx, sy);
                         if (s == null) {
                             if (missingSectors == null) {
                                 missingSectors = new ArrayList<Pair<Long, Long>>();
@@ -202,7 +209,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
                 }
 
                 if (missingSectors != null) {
-                    SectorManager.getInstance().requestSectors(missingSectors, false, null);
+                    SectorManager.i.refreshSectors(missingSectors, false);
                 } else if (dx != 0 || dy != 0) {
                     refreshScene();
                 }

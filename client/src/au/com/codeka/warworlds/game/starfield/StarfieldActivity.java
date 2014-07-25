@@ -605,7 +605,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
             String starKey = intent.getStringExtra("au.com.codeka.warworlds.StarKey");
 
             if (wasSectorUpdated) {
-                SectorManager.getInstance().refreshSector(sectorX, sectorY);
+                SectorManager.i.refreshSector(sectorX, sectorY);
             } else if (starKey != null && mStarfield.getScene() != null) {
                 // make sure we re-select the star you had selected before.
                 mStarfield.getScene().selectStar(starKey);

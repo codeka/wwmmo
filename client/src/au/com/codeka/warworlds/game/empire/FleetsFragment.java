@@ -134,9 +134,10 @@ public class FleetsFragment extends StarsFragment {
     private Object eventHandler = new Object() {
         @EventHandler(thread = EventHandler.UI_THREAD)
         public void onStarUpdated(Star star) {
-            if (fetcher.onStarUpdated(star)) {
-                adapter.notifyDataSetChanged();
-            }
+            fetcher.onStarUpdated(star);
+            // Note: we always want to update the list, even if the star isn't in the fetcher,
+            // because it might be a destination of a fleet move.
+            adapter.notifyDataSetChanged();
         }
     };
 

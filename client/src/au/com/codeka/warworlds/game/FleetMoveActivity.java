@@ -153,7 +153,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
 
         // if we have a marker star, make sure we remove it first
         if (markerStar != null) {
-            Sector s = SectorManager.getInstance().getSector(markerStar.getSectorX(), markerStar.getSectorY());
+            Sector s = SectorManager.i.getSector(markerStar.getSectorX(), markerStar.getSectorY());
             if (s != null) {
                 s.getStars().remove(markerStar);
             }
@@ -200,18 +200,18 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             // when moving to a region of empty space, we need to place a special "marker" star
             // at the destination (since everything else we do assume you're moving to a star)
             if (markerStar != null) {
-                Sector s = SectorManager.getInstance().getSector(markerStar.getSectorX(), markerStar.getSectorY());
+                Sector s = SectorManager.i.getSector(markerStar.getSectorX(), markerStar.getSectorY());
                 if (s != null) {
                     s.getStars().remove(markerStar);
                 }
             }
             markerStar = new Star(BaseStar.getStarType(Star.Type.Marker), "Marker", 20,
                     event.sectorX, event.sectorY, event.offsetX, event.offsetY, null);
-            Sector s = SectorManager.getInstance().getSector(event.sectorX, event.sectorY);
+            Sector s = SectorManager.i.getSector(event.sectorX, event.sectorY);
             if (s != null) {
                 s.getStars().add(markerStar);
             }
-            SectorManager.getInstance().fireSectorListChanged();
+            SectorManager.eventBus.publish(s);
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -296,7 +296,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                         }
                         if (!markerStar.getAttachedEntities().contains(tooCloseIndicatorEntity)) {
                             markerStar.getAttachedEntities().add(tooCloseIndicatorEntity);
-                            mStarfield.onSectorListChanged();
+                            mStarfield.refreshScene();
                         }
                     }
                 }
@@ -307,7 +307,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
     /** Searches for, and returns the distance to, the clostest star to the given star. */
     private float findClosestStar(StarSummary toStar) {
         float minDistance = -1.0f;
-        for (Star star : SectorManager.getInstance().getAllVisibleStars()) {
+        for (Star star : SectorManager.i.getAllVisibleStars()) {
             if (star == toStar || star.getKey().equals(toStar.getKey())) {
                 continue;
             }

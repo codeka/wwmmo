@@ -110,10 +110,10 @@ public class Notifications {
                 // if we didn't refresh the star, then at least refresh
                 // the sector it was in (could have been a moving
                 // fleet, say)
-                Star star = SectorManager.getInstance().findStar(pb.getStarKey());
+                Star star = SectorManager.i.findStar(pb.getStarKey());
                 if (star != null) {
                     log.debug("Star found from sector manager instead.");
-                    SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+                    SectorManager.i.refreshSector(star.getSectorX(), star.getSectorY());
                 }
             }
 

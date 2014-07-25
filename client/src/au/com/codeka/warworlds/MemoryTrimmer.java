@@ -16,7 +16,7 @@ public class MemoryTrimmer {
         AllianceShieldManager.i.clearCache();
         StarImageManager.getInstance().clearCaches();
         PlanetImageManager.getInstance().clearCaches();
-        SectorManager.getInstance().clearCache();
+        SectorManager.i.clearCache();
         StarManager.i.clearCache();
     }
 }
