@@ -86,7 +86,6 @@
         <activity android:name=".game.alliance.AllianceChangeDetailsActivity"
                   android:windowSoftInputMode="stateUnchanged" />
         <activity android:name=".game.alliance.AllianceDetailsActivity" />
-        <activity android:name=".game.wormhole.WormholeActivity" />
         <activity android:name=".game.chat.ChatActivity" />
         <activity android:name=".game.SitrepActivity">
             <meta-data

@@ -34,7 +34,7 @@ import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
 import au.com.codeka.warworlds.game.empire.EmpireActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
-import au.com.codeka.warworlds.game.wormhole.WormholeActivity;
+import au.com.codeka.warworlds.game.wormhole.WormholeFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -154,12 +154,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
                     return;
                 }
 
-                Intent intent;
-                if (mSelectedStar.getStarType().getType() == Star.Type.Wormhole) {
-                    intent = new Intent(mContext, WormholeActivity.class);
-                } else {
-                    intent = new Intent(mContext, SolarSystemActivity.class);
-                }
+                Intent intent = new Intent(mContext, SolarSystemActivity.class);
                 intent.putExtra("au.com.codeka.warworlds.StarKey", mSelectedStar.getKey());
                 startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
             }
@@ -476,7 +471,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
 
         Intent intent;
         if (starType.getType() == Star.Type.Wormhole) {
-            intent = new Intent(mContext, WormholeActivity.class);
+            intent = new Intent(mContext, WormholeFragment.class);
         } else {
             intent = new Intent(mContext, SolarSystemActivity.class);
         }        intent.putExtra("au.com.codeka.warworlds.StarKey", starKey);

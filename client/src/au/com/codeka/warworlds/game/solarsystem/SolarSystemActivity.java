@@ -27,11 +27,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.common.model.BaseEmpirePresence;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.wormhole.WormholeFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.EmpireStarsFetcher;
@@ -54,6 +56,7 @@ public class SolarSystemActivity extends BaseActivity {
     private Integer starID;
     private StarSummary star;
     private SearchListAdapter searchListAdapter;
+    private boolean waitingForStarToShow;
 
     // We keep the last 5 stars you've visited in an LRU cache so we can display them at the top
     // of the search list (note we actually keep 6 but ignore the most recent one, which is always
@@ -212,12 +215,22 @@ public class SolarSystemActivity extends BaseActivity {
                 EmpireStarsFetcher.Filter.Everything, search));
     }
 
-    private void showStar(Integer starID) {
+    public void showStar(Integer starID) {
         this.starID = starID;
         star = StarManager.i.getStarSummary(starID);
+        if (star == null) {
+            // we need the star summary in order to know whether it's a wormhole or normal star.
+            waitingForStarToShow = true;
+            return;
+        }
         refreshTitle();
 
-        Fragment fragment = new SolarSystemFragment();
+        Fragment fragment;
+        if (star.getStarType().getType() == BaseStar.Type.Wormhole) {
+            fragment = new WormholeFragment();
+        } else {
+            fragment = new SolarSystemFragment();
+        }
         Bundle args = new Bundle();
         args.putLong("au.com.codeka.warworlds.StarID", starID);
         fragment.setArguments(args);
@@ -257,7 +270,12 @@ public class SolarSystemActivity extends BaseActivity {
         public void onStarUpdated(StarSummary starSummary) {
             if (starSummary.getID() == starID) {
                 star = starSummary;
-                getSupportActionBar().setTitle(starSummary.getName());
+                if (waitingForStarToShow) {
+                    waitingForStarToShow = false;
+                    showStar(starID);
+                } else {
+                    getSupportActionBar().setTitle(starSummary.getName());
+                }
             }
         }
     };

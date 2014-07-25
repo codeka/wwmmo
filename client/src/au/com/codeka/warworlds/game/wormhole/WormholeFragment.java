@@ -10,18 +10,18 @@ import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.scene.Scene;
 import org.joda.time.DateTime;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.warworlds.BaseGlActivity;
+import au.com.codeka.warworlds.BaseGlFragment;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
@@ -31,53 +31,61 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
-public class WormholeActivity extends BaseGlActivity {
+/** This fragment is used in place of SolarSystemFragment in the SolarSystemActivity for
+    wormholes. */
+public class WormholeFragment extends BaseGlFragment {
     private WormholeSceneManager mWormhole;
     private Star mStar;
     private Star mDestStar;
     private DateTime mTuneCompleteTime;
     private Handler mHandler;
+    private View contentView;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
         mHandler = new Handler();
 
         EmpireShieldManager.i.clearTextureCache();
 
-        Bundle extras = getIntent().getExtras();
-        String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-        mWormhole = new WormholeSceneManager(WormholeActivity.this, starKey);
+        Bundle extras = getArguments();
+        int starID = extras.getInt("au.com.codeka.warworlds.StarID");
+        mWormhole = new WormholeSceneManager(WormholeFragment.this, starID);
+    }
 
-        Button renameBtn = (Button) findViewById(R.id.rename_btn);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        contentView = super.onCreateView(inflater, container, savedInstanceState);
+
+        Button renameBtn = (Button) contentView.findViewById(R.id.rename_btn);
         renameBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 RenameDialog dialog = new RenameDialog();
                 dialog.setWormhole(mStar);
-                dialog.show(getSupportFragmentManager(), "");
+                dialog.show(getFragmentManager(), "");
             }
         });
 
-        Button destinationBtn = (Button) findViewById(R.id.destination_btn);
+        Button destinationBtn = (Button) contentView.findViewById(R.id.destination_btn);
         destinationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DestinationDialog dialog = new DestinationDialog();
                 dialog.loadWormholes(mStar);
-                dialog.show(getSupportFragmentManager(), "");
+                dialog.show(getActivity().getSupportFragmentManager(), "");
             }
         });
 
-        Button viewDestinationBtn = (Button) findViewById(R.id.view_destination_btn);
+        Button viewDestinationBtn = (Button) contentView.findViewById(R.id.view_destination_btn);
         viewDestinationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,14 +93,13 @@ public class WormholeActivity extends BaseGlActivity {
                     return;
                 }
 
-                Intent intent = new Intent(WormholeActivity.this, WormholeActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.StarKey", mDestStar.getKey());
-                startActivity(intent);
+                // This cast isn't great...
+                ((SolarSystemActivity) getActivity()).showStar(mDestStar.getID());
             }
         });
         viewDestinationBtn.setEnabled(false);
 
-        FleetListWormhole fleetList = (FleetListWormhole) findViewById(R.id.fleet_list);
+        FleetListWormhole fleetList = (FleetListWormhole) contentView.findViewById(R.id.fleet_list);
         fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
             @Override
             public void onFleetView(Star star, Fleet fleet) {
@@ -101,7 +108,7 @@ public class WormholeActivity extends BaseGlActivity {
 
             @Override
             public void onFleetSplit(Star star, Fleet fleet) {
-                FragmentManager fm = getSupportFragmentManager();
+                FragmentManager fm = getActivity().getSupportFragmentManager();
                 FleetSplitDialog dialog = new FleetSplitDialog();
                 dialog.setFleet(fleet);
                 dialog.show(fm, "");
@@ -114,12 +121,12 @@ public class WormholeActivity extends BaseGlActivity {
 
             @Override
             public void onFleetMove(Star star, Fleet fleet) {
-                FleetMoveActivity.show(WormholeActivity.this, fleet);;
+                FleetMoveActivity.show(getActivity(), fleet);;
             }
 
             @Override
             public void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets) {
-                FragmentManager fm = getSupportFragmentManager();
+                FragmentManager fm = getActivity().getSupportFragmentManager();
                 FleetMergeDialog dialog = new FleetMergeDialog();
                 dialog.setup(fleet, potentialFleets);
                 dialog.show(fm, "");
@@ -130,24 +137,27 @@ public class WormholeActivity extends BaseGlActivity {
                 EmpireManager.i.getEmpire().updateFleetStance(star, fleet, newStance);
             }
         });
+
+        return contentView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+        ServerGreeter.waitForHello(getActivity(), new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
-                Bundle extras = getIntent().getExtras();
-                String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+                Bundle extras = getArguments();
+                int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
 
-                StarManager.i.refreshStar(Integer.parseInt(starKey));
-
-                FleetListWormhole fleetList = (FleetListWormhole) findViewById(R.id.fleet_list);
-                TreeMap<String, Star> stars = new TreeMap<String, Star>();
-                stars.put(mStar.getKey(), mStar);
-                fleetList.refresh(mStar.getFleets(), stars);
+                mStar = StarManager.i.getStar(starID);
+                if (mStar != null) {
+                    FleetListWormhole fleetList = (FleetListWormhole) contentView.findViewById(R.id.fleet_list);
+                    TreeMap<String, Star> stars = new TreeMap<String, Star>();
+                    stars.put(mStar.getKey(), mStar);
+                    fleetList.refresh(mStar.getFleets(), stars);
+                }
             }
         });
     }
@@ -155,15 +165,14 @@ public class WormholeActivity extends BaseGlActivity {
     private Object mEventHandler = new Object() {
         @EventHandler
         public void onStarFetched(Star s) {
-            Bundle extras = getIntent().getExtras();
-            String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+            Bundle extras = getArguments();
+            int starID = extras.getInt("au.com.codeka.warworlds.StarID");
 
-            TextView starName  = (TextView) findViewById(R.id.star_name);
-            TextView destinationName = (TextView) findViewById(R.id.destination_name);
-            FleetListWormhole fleetList = (FleetListWormhole) findViewById(R.id.fleet_list);
+            TextView starName  = (TextView) contentView.findViewById(R.id.star_name);
+            TextView destinationName = (TextView) contentView.findViewById(R.id.destination_name);
+            FleetListWormhole fleetList = (FleetListWormhole) contentView.findViewById(R.id.fleet_list);
 
-            if (!s.getKey().equals(starKey)) {
-                int starID = Integer.parseInt(s.getKey());
+            if (s.getID() != starID) {
                 if (mStar != null && mStar.getWormholeExtra().getDestWormholeID() == starID) {
                     mDestStar = s;
 
@@ -177,7 +186,7 @@ public class WormholeActivity extends BaseGlActivity {
                     if (mTuneCompleteTime != null) {
                         str = "<font color=\"red\">" + str + "</font>";
                     } else {
-                        findViewById(R.id.view_destination_btn).setEnabled(true);
+                        contentView.findViewById(R.id.view_destination_btn).setEnabled(true);
                     }
                     destinationName.setText(Html.fromHtml(str));
                 }
@@ -202,12 +211,12 @@ public class WormholeActivity extends BaseGlActivity {
     };
 
     private void updateTuningProgress() {
-        TextView tuningProgress = (TextView) findViewById(R.id.tuning_progress);
+        TextView tuningProgress = (TextView) contentView.findViewById(R.id.tuning_progress);
         if (mTuneCompleteTime == null) {
             tuningProgress.setText("");
 
             String str = String.format(Locale.ENGLISH, "→ %s", mDestStar.getName());
-            TextView destinationName = (TextView) findViewById(R.id.destination_name);
+            TextView destinationName = (TextView) contentView.findViewById(R.id.destination_name);
             destinationName.setText(Html.fromHtml(str));
         } else {
             tuningProgress.setText(String.format(Locale.ENGLISH, "%s left",

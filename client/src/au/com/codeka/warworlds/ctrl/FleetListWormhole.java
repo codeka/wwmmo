@@ -31,7 +31,7 @@ public class FleetListWormhole extends FleetList {
     @Override
     public void selectFleet(String fleetKey, boolean recentre) {
         super.selectFleet(fleetKey, recentre);
-
+/*
         final Button enterBtn = (Button) findViewById(R.id.enter_btn);
 
         boolean tuned = false;
@@ -47,13 +47,13 @@ public class FleetListWormhole extends FleetList {
             enterBtn.setEnabled(true);
         } else {
             enterBtn.setEnabled(false);
-        }
+        }*/
     }
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
-
+/*
         final Button enterBtn = (Button) findViewById(R.id.enter_btn);
         enterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,6 +69,6 @@ public class FleetListWormhole extends FleetList {
                     }
                 });
             }
-        });
+        });*/
     }
 }
