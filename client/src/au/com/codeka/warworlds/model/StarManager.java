@@ -151,7 +151,7 @@ public class StarManager extends BaseManager {
 
             @Override
             protected void onComplete(Star star) {
-                log.debug("Star refreshed, publishing event...");
+                log.debug("Star %s refreshed, publishing event...", star.getName());
                 eventBus.publish(star);
                 inProgress.remove(starID);
                 stars.put(star.getID(), new StarOrSummary(star));

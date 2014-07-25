@@ -120,22 +120,18 @@ public class FleetsFragment extends StarsFragment {
             }
         });
 
+        StarManager.eventBus.register(eventHandler);
+
         return v;
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        StarManager.eventBus.register(mEventHandler);
+    public void onDestroy() {
+        super.onDestroy();
+        StarManager.eventBus.unregister(eventHandler);
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        StarManager.eventBus.unregister(mEventHandler);
-    }
-
-    private Object mEventHandler = new Object() {
+    private Object eventHandler = new Object() {
         @EventHandler(thread = EventHandler.UI_THREAD)
         public void onStarUpdated(Star star) {
             if (fetcher.onStarUpdated(star)) {

@@ -12,6 +12,7 @@ import android.support.v4.util.LruCache;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
+import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -58,13 +59,45 @@ public class SectorManager extends BaseManager {
         public void onStarUpdated(Star star) {
             Star ourStar = findStar(star.getKey());
             if (ourStar != null) {
-                if (!ourStar.getName().equals(star.getName())) {
-                    ourStar.setName(star.getName());
+                if (!areStarsSame(ourStar, star)) {
+                    mSectorStars.put(star.getKey(), star);
                     fireSectorListChanged();
                 }
             }
         }
     };
+
+    /**
+     * Determines whether the two stars are the "same" for our purposes. They're only different
+     * if they have a new name, or if a fleet has gone from moving->idle or idle->moving.
+     */
+    private boolean areStarsSame(Star lhs, Star rhs) {
+        if (!lhs.getName().equals(rhs.getName())) {
+            return false;
+        }
+
+        for (BaseFleet lhsBaseFleet : lhs.getFleets()) {
+            Fleet lhsFleet = (Fleet) lhsBaseFleet;
+            Fleet rhsFleet = (Fleet) rhs.getFleet(Integer.parseInt(lhsFleet.getKey()));
+            if (rhsFleet == null) {
+                return false;
+            }
+
+            if (lhsFleet.getState() != rhsFleet.getState()) {
+                return false;
+            }
+        }
+
+        for (BaseFleet rhsBaseFleet : rhs.getFleets()) {
+            Fleet rhsFleet = (Fleet) rhsBaseFleet;
+            Fleet lhsFleet = (Fleet) lhs.getFleet(Integer.parseInt(rhsFleet.getKey()));
+            if (lhsFleet == null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     public void clearCache() {
         mSectorStars.clear();
