@@ -33,7 +33,7 @@ var empireStore = (function() {
               empire_names[data.key] = data.display_name;
               window.localStorage.setItem("empires", JSON.stringify(empire_names));
               for (var i = 0; i < callbacks[empireKey].length; i++) {
-                callbacks[i](data.display_name);
+                callbacks[empireKey][i](data.display_name);
               }
             }
           });

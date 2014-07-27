@@ -239,3 +239,35 @@ button, a.button, input[type=submit], input[type=button] {
       -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
     }
 }
+
+.tabs {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: solid 1px #aaa;
+    height: 31pt;
+}
+
+.tabs li {
+    float: left;
+    border-top: solid 1px #aaa;
+    border-right: solid 1px #aaa;
+    border-bottom: solid 1px #efefef;
+    border-radius: 4px 4px 0 0;
+}
+
+.tabs li:nth-child(1) {
+    border-left: solid 1px #aaa;
+}
+
+.tabs a {
+    display: block;
+    padding: 0 1em;
+    line-height: 30pt;
+    height: 30pt;
+}
+
+.tabs a.selected {
+    background: #aaa;
+}
+
