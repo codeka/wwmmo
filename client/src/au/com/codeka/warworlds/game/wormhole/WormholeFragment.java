@@ -42,22 +42,23 @@ import au.com.codeka.warworlds.model.StarManager;
     wormholes. */
 public class WormholeFragment extends BaseGlFragment {
     private WormholeSceneManager mWormhole;
-    private Star mStar;
-    private Star mDestStar;
-    private DateTime mTuneCompleteTime;
-    private Handler mHandler;
+    private Star star;
+    private Star destStar;
+    private DateTime tuneCompleteTime;
+    private Handler handler;
     private View contentView;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mHandler = new Handler();
+        handler = new Handler();
 
         EmpireShieldManager.i.clearTextureCache();
+        StarManager.eventBus.register(eventHandler);
 
         Bundle extras = getArguments();
-        int starID = extras.getInt("au.com.codeka.warworlds.StarID");
+        int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
         mWormhole = new WormholeSceneManager(WormholeFragment.this, starID);
     }
 
@@ -70,7 +71,7 @@ public class WormholeFragment extends BaseGlFragment {
             @Override
             public void onClick(View v) {
                 RenameDialog dialog = new RenameDialog();
-                dialog.setWormhole(mStar);
+                dialog.setWormhole(star);
                 dialog.show(getFragmentManager(), "");
             }
         });
@@ -80,7 +81,7 @@ public class WormholeFragment extends BaseGlFragment {
             @Override
             public void onClick(View v) {
                 DestinationDialog dialog = new DestinationDialog();
-                dialog.loadWormholes(mStar);
+                dialog.loadWormholes(star);
                 dialog.show(getActivity().getSupportFragmentManager(), "");
             }
         });
@@ -89,12 +90,12 @@ public class WormholeFragment extends BaseGlFragment {
         viewDestinationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mDestStar == null) {
+                if (destStar == null) {
                     return;
                 }
 
                 // This cast isn't great...
-                ((SolarSystemActivity) getActivity()).showStar(mDestStar.getID());
+                ((SolarSystemActivity) getActivity()).showStar(destStar.getID());
             }
         });
         viewDestinationBtn.setEnabled(false);
@@ -151,39 +152,40 @@ public class WormholeFragment extends BaseGlFragment {
                 Bundle extras = getArguments();
                 int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
 
-                mStar = StarManager.i.getStar(starID);
-                if (mStar != null) {
-                    FleetListWormhole fleetList = (FleetListWormhole) contentView.findViewById(R.id.fleet_list);
-                    TreeMap<String, Star> stars = new TreeMap<String, Star>();
-                    stars.put(mStar.getKey(), mStar);
-                    fleetList.refresh(mStar.getFleets(), stars);
+                star = StarManager.i.getStar(starID);
+                if (star != null) {
+                    refreshStar(star);
                 }
             }
         });
     }
 
-    private Object mEventHandler = new Object() {
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        StarManager.eventBus.unregister(eventHandler);
+    }
+
+    private Object eventHandler = new Object() {
         @EventHandler
         public void onStarFetched(Star s) {
             Bundle extras = getArguments();
-            int starID = extras.getInt("au.com.codeka.warworlds.StarID");
+            int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
 
-            TextView starName  = (TextView) contentView.findViewById(R.id.star_name);
-            TextView destinationName = (TextView) contentView.findViewById(R.id.destination_name);
-            FleetListWormhole fleetList = (FleetListWormhole) contentView.findViewById(R.id.fleet_list);
+            if (s.getID() == starID) {
+                star = s;
+                refreshStar(s);
+            } else if (star != null && star.getWormholeExtra().getDestWormholeID() == starID) {
+                destStar = s;
 
-            if (s.getID() != starID) {
-                if (mStar != null && mStar.getWormholeExtra().getDestWormholeID() == starID) {
-                    mDestStar = s;
-
-                    BaseStar.WormholeExtra wormholeExtra = mStar.getWormholeExtra();
+                    BaseStar.WormholeExtra wormholeExtra = star.getWormholeExtra();
                     if (wormholeExtra.getTuneCompleteTime() != null &&
                             wormholeExtra.getTuneCompleteTime().isAfter(DateTime.now())) {
-                        mTuneCompleteTime = wormholeExtra.getTuneCompleteTime();
+                        tuneCompleteTime = wormholeExtra.getTuneCompleteTime();
                     }
 
                     String str = String.format(Locale.ENGLISH, "→ %s", s.getName());
-                    if (mTuneCompleteTime != null) {
+                    if (tuneCompleteTime != null) {
                         str = "<font color=\"red\">" + str + "</font>";
                     } else {
                         contentView.findViewById(R.id.view_destination_btn).setEnabled(true);
@@ -195,34 +197,45 @@ public class WormholeFragment extends BaseGlFragment {
                 return;
             }
 
-            mStar = s;
-            fleetList.setWormhole(mStar);
-
-            if (mStar.getWormholeExtra().getDestWormholeID() != 0 && (
-                    mDestStar == null || !mDestStar.getKey().equals(Integer.toString(mStar.getWormholeExtra().getDestWormholeID())))) {
-                StarManager.i.refreshStar(mStar.getWormholeExtra().getDestWormholeID());
-            }
-
-            if (destinationName.getText().toString().equals("")) {
-                destinationName.setText(Html.fromHtml("→ <i>None</i>"));
-            }
-            starName.setText(mStar.getName());
+            star = s;
+            fleetList.setWormhole(star);
         }
     };
 
+    private void refreshStar() {
+        if (star.getWormholeExtra().getDestWormholeID() != 0 && (
+                destStar == null || !destStar.getKey().equals(Integer.toString(star.getWormholeExtra().getDestWormholeID())))) {
+            StarManager.i.refreshStar(star.getWormholeExtra().getDestWormholeID());
+        }
+
+        TextView starName  = (TextView) contentView.findViewById(R.id.star_name);
+        TextView destinationName = (TextView) contentView.findViewById(R.id.destination_name);
+        FleetListWormhole fleetList = (FleetListWormhole) contentView.findViewById(R.id.fleet_list);
+
+        if (destinationName.getText().toString().equals("")) {
+            destinationName.setText(Html.fromHtml("→ <i>None</i>"));
+        }
+        starName.setText(star.getName());
+
+        TreeMap<String, Star> stars = new TreeMap<String, Star>();
+        stars.put(star.getKey(), star);
+        fleetList.refresh(star.getFleets(), stars);
+
+    }
+
     private void updateTuningProgress() {
         TextView tuningProgress = (TextView) contentView.findViewById(R.id.tuning_progress);
-        if (mTuneCompleteTime == null) {
+        if (tuneCompleteTime == null && destStar != null) {
             tuningProgress.setText("");
 
-            String str = String.format(Locale.ENGLISH, "→ %s", mDestStar.getName());
+            String str = String.format(Locale.ENGLISH, "→ %s", destStar.getName());
             TextView destinationName = (TextView) contentView.findViewById(R.id.destination_name);
             destinationName.setText(Html.fromHtml(str));
-        } else {
+        } else if (tuneCompleteTime != null) {
             tuningProgress.setText(String.format(Locale.ENGLISH, "%s left",
-                    TimeFormatter.create().format(DateTime.now(), mTuneCompleteTime)));
+                    TimeFormatter.create().format(DateTime.now(), tuneCompleteTime)));
 
-            mHandler.postDelayed(new Runnable() {
+            handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     updateTuningProgress();
@@ -263,15 +276,11 @@ public class WormholeFragment extends BaseGlFragment {
     public void onStart() {
         super.onStart();
         mWormhole.onStart();
-
-        StarManager.eventBus.register(mEventHandler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         mWormhole.onStop();
-
-        StarManager.eventBus.unregister(mEventHandler);
     }
 }
