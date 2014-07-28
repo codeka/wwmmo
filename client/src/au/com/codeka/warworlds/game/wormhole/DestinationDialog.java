@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -48,6 +49,7 @@ public class DestinationDialog extends DialogFragment {
         mSrcWormhole = srcWormhole;
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Activity activity = getActivity();
@@ -226,7 +228,7 @@ public class DestinationDialog extends DialogFragment {
             View view = convertView;
             if (view == null) {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
-                view = inflater.inflate(R.layout.wormhole_destination_entry_row, null);
+                view = inflater.inflate(R.layout.wormhole_destination_entry_row, parent, false);
             }
 
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);

@@ -51,6 +51,10 @@ public class AllianceController {
     }
 
     public boolean isSameAlliance(int empireID1, int empireID2) throws RequestException {
+        if (empireID1 == empireID2) {
+            return true;
+        }
+
         try {
             return db.isSameAlliance(empireID1, empireID2);
         } catch (Exception e) {
@@ -59,6 +63,10 @@ public class AllianceController {
     }
 
     public boolean isSameAlliance(Empire empire1, Empire empire2) {
+        if (empire1.getID() == empire2.getID()) {
+            return true;
+        }
+
         if (empire1.getAlliance() == null || empire2.getAlliance() == null) {
             return false;
         }
@@ -204,17 +212,22 @@ public class AllianceController {
                 stmt.setInt(2, empireID2);
                 SqlResult res = stmt.select();
 
-                int allianceID = -1;
+                Integer allianceID1 = -1;
+                Integer allianceID2 = -1;
                 while (res.next()) {
-                    if (allianceID < 0) {
-                        allianceID = res.getInt(1);
-                    } else if (allianceID > 0) {
-                        return res.getInt(1) == allianceID;
+                    if (allianceID1 != null && allianceID1 < 0) {
+                        allianceID1 = res.getInt(1);
+                    } else {
+                        allianceID2 = res.getInt(1);
                     }
                 }
-            }
 
-            return false;
+                if (allianceID1 == null || allianceID2 == null) {
+                    return false;
+                } else {
+                    return allianceID1 == allianceID2;
+                }
+            }
         }
 
         public List<Alliance> getAlliances() throws Exception {

@@ -241,8 +241,11 @@ public class StarManager extends BaseManager {
         return stars;
     }
 
-    public void renameStar(final Purchase purchase, final Star star, final String newName) {
+    public void renameStar(final Purchase purchase, final Star star, final String newName,
+            final StarRenameCompleteHandler onCompleteHandler) {
         new BackgroundRunner<Star>() {
+            private String errorMessage;
+
             @Override
             protected Star doInBackground() {
                 String url = "stars/"+star.getKey();
@@ -283,6 +286,7 @@ public class StarManager extends BaseManager {
                     return star;
                 } catch (ApiException e) {
                     log.error("Error renaming star!", e);
+                    errorMessage = e.getServerErrorMessage();
                     return null;
                 }
             }
@@ -290,10 +294,15 @@ public class StarManager extends BaseManager {
             @Override
             protected void onComplete(Star star) {
                 if (star == null) {
-                    return;
+                    if (onCompleteHandler != null) {
+                        onCompleteHandler.onStarRename(null, false, errorMessage);
+                    }
+                } else {
+                    notifyStarUpdated(star);
+                    if (onCompleteHandler != null) {
+                        onCompleteHandler.onStarRename(star, true, null);
+                    }
                 }
-
-               notifyStarUpdated(star);
             }
         }.execute();
     }
@@ -424,6 +433,9 @@ public class StarManager extends BaseManager {
     }
     public interface StarSummariesFetchedHandler {
         void onStarSummariesFetched(Collection<StarSummary> stars);
+    }
+    public interface StarRenameCompleteHandler {
+        void onStarRename(Star star, boolean successful, String errorMessage);
     }
 
     private static class StarOrSummary {

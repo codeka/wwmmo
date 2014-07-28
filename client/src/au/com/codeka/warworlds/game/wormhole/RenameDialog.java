@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.game.wormhole;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -26,6 +28,7 @@ public class RenameDialog extends DialogFragment {
         mStar = star;
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -57,9 +60,18 @@ public class RenameDialog extends DialogFragment {
     }
 
     public void onRenameClicked() {
+        final Activity activity = getActivity();
         EditText starNewName = (EditText) mView.findViewById(R.id.star_newname);
         final String newStarName = starNewName.getText().toString();
 
-        StarManager.i.renameStar(null, mStar, newStarName);
+        StarManager.i.renameStar(null, mStar, newStarName,
+                new StarManager.StarRenameCompleteHandler() {
+            @Override
+            public void onStarRename(Star star, boolean successful, String errorMessage) {
+                if (!successful) {
+                    StyledDialog.showErrorMessage(activity, errorMessage);
+                }
+            }
+        });
     }
 }

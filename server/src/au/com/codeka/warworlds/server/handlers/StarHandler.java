@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.ctrl.AllianceController;
 import au.com.codeka.warworlds.server.ctrl.BuildingController;
 import au.com.codeka.warworlds.server.ctrl.PurchaseController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
@@ -49,6 +50,21 @@ public class StarHandler extends RequestHandler {
 
         if (star_rename_request_pb.getNewName().trim().equals("")) {
             throw new RequestException(400);
+        }
+
+        if (!star_rename_request_pb.hasPurchaseInfo()) {
+            // if there's no purchase info then you must be renaming a wormhole, and it must be
+            // one belonging to your alliance.
+            Star star = new StarController().getStar(starID);
+            if (star.getWormholeExtra() == null) {
+                throw new RequestException(400, "You are you allowed to rename this star.");
+            }
+
+            Star.WormholeExtra wormhole = star.getWormholeExtra();
+            if (!new AllianceController().isSameAlliance(
+                    wormhole.getEmpireID(), getSession().getEmpireID())) {
+                throw new RequestException(400, "You cannot rename wormholes that do not belong to you.");
+            }
         }
 
         String sql = "UPDATE stars SET name = ? WHERE id = ?";

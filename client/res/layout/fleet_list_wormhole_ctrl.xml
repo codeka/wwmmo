@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View android:id="@+id/center"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:layout_centerHorizontal="true" />
+
+    <ListView
+        android:id="@+id/ship_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/center"
+        android:listSelector="@drawable/list_selector" />
+
+    <au.com.codeka.warworlds.ctrl.FleetWormholeSelectionPanel
+        android:id="@+id/bottom_pane"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@+id/center"
+        android:layout_alignParentRight="true"/>
+
+</RelativeLayout>

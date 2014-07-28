@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ public class StarRenameDialog extends DialogFragment {
         mStar = star;
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -75,7 +77,7 @@ public class StarRenameDialog extends DialogFragment {
                     return;
                 }
 
-                StarManager.i.renameStar(purchase, mStar, newStarName);
+                StarManager.i.renameStar(purchase, mStar, newStarName, null);
             }
         });
     }
