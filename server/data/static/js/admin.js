@@ -51,3 +51,8 @@ $(function() {
             }, "fast");
     });
 });
+
+// helper to format a number with comma thousand separators.
+function formatNumber(n) {
+  return (1 * n).toLocaleString({"useGrouping": true});
+}

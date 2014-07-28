@@ -28,7 +28,12 @@
     #member-list {
       width: 100%;
     }
-    
+    #audit-list {
+      width: 100%;
+    }
+    td.notes {
+      color: #aaa;
+    }
   </style>
 {% endblock %}
 
@@ -41,8 +46,8 @@
           <th></th>
           <th></th>
           <th>Name</th>
-          <th>Members</th>
-          <th>Bank</th>
+          <th style="text-align: right;">Members</th>
+          <th style="text-align: right;">Bank</th>
         </tr>
       </thead>
       <tbody>
@@ -54,10 +59,11 @@
     <div class="spinner"></div>
   </div>
   <div id="alliance-details" class="right-column" style="display: none;">
+    <div id="alliance-header"></div>
     <ul class="tabs">
       <li><a href="javascript:;" data-tab="alliance-members" class="selected">Members</a>
       <li><a href="javascript:;" data-tab="alliance-requests">Requests</a>
-      <li><a href="javascript:;" data-tab="alliance-audit">Audit</a>
+      <li><a href="javascript:;" data-tab="alliance-audit">Bank Audit</a>
     </ul>
     <div id="alliance-members">
       <table id="member-list">
@@ -78,7 +84,18 @@
       <p>Requests</p>
     </div>
     <div id="alliance-audit">
-      <p>Audit</p>
+      <table id="audit-list">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Empire</th>
+            <th>Date</th>
+            <th>Before</th>
+            <th>After</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
 
@@ -87,8 +104,31 @@
       <td><%= key %></td>
       <td><img src="/realms/{{realm}}/alliances/<%= key %>/shield?size=32" width="32" height="32" /></td>
       <td><a href="javascript:;" class="alliance-name" data-id=<%= key %>><%= name %></a></td>
-      <td><%= num_members %></td>
-      <td>$<%= bank_balance %></td>
+      <td style="text-align: right;"><%= num_members %></td>
+      <td style="text-align: right;">$<%= formatNumber(bank_balance) %></td>
+    </tr>
+  </script>
+
+  <script type="text/html" id="alliance-header-tmpl">
+    <h2>
+      <img src="/realms/{{realm}}/alliances/<%= key %>/shield?size=32" width="32" height="32" />
+      <%= name %>
+    </h2>
+  </script>
+
+  <script type="text/html" id="alliance-audit-tmpl">
+    <tr>
+      <td><%= alliance_request_id %></td>
+      <td>
+        <img src="/realms/{{realm}}/empires/<%= empire_id %>/shield?final=1&size=32" width="32" height="32" />
+        <a href="/realms/{{realm}}/admin/empire/search#id=<%= empire_id %>" class="empire-name"></a>
+      </td>
+      <td><time timestamp="<%= date / 1000 %>"><%= date %></time></td>
+      <td>$<%= formatNumber(amount_before) %></td>
+      <td>$<%= formatNumber(amount_after) %></td>
+    </tr>
+    <tr>
+      <td class="notes" colspan="5"><%= message %></td>
     </tr>
   </script>
 
@@ -103,6 +143,8 @@
   </script>
 
   <script>
+    var alliances = {};
+
     $(function() {
       var url = "/realms/{{realm}}/alliances";
       $.ajax({
@@ -114,6 +156,7 @@
           allianceList.empty();
           var tmpl = $("#alliance-tmpl");
           for (var i = 0; i < data.alliances.length; i++) {
+            alliances[data.alliances[i].key] = data.alliances[i];
             allianceList.append(tmpl.applyTemplate(data.alliances[i]));
           }
         },
@@ -127,15 +170,26 @@
       $("#alliance-details-spinner").show();
       $("#alliance-details").hide();
 
-      var tmpl = $("#member-tmpl");
+      var memberTmpl = $("#member-tmpl");
       function appendMember(membersList, member) {
-        var html = $(tmpl.applyTemplate(member));
+        var html = $(memberTmpl.applyTemplate(member));
         empireStore.getEmpire(member.empire_key, function(empireName) {
           html.find(".empire-name").html(empireName);
         });
         membersList.append(html);
       }
 
+      var auditTmpl = $("#alliance-audit-tmpl");
+      function appendAudit(auditList, audit) {
+        var html = $(auditTmpl.applyTemplate(audit));
+        empireStore.getEmpire(audit.empire_id, function(empireName) {
+          html.find(".empire-name").html(empireName);
+        });
+        auditList.append(html);
+      }
+
+      $("#alliance-header").html($("#alliance-header-tmpl").applyTemplate(
+              alliances[$(this).data("id")]));
       var url = "/realms/{{realm}}/alliances/" + $(this).data("id");
       $.ajax({
         url: url,
@@ -156,6 +210,23 @@
           alert("An error occured, check server logs: " + xhr.status);
         }
       });
+
+      $.ajax({
+        url: "/realms/{{realm}}/admin/alliance/" + $(this).data("id") + "/details?section=audit",
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          var auditList = $("#audit-list tbody");
+          auditList.empty();
+          for (var i = 0; i < data.length; i++) {
+            appendAudit(auditList, data[i]);
+          }
+          fix_times();
+        },
+        error: function(xhr, status, err) {
+          alert("An error occured, check server logs: " + xhr.status);
+        }
+      })
     });
   </script>
 {% endblock %}

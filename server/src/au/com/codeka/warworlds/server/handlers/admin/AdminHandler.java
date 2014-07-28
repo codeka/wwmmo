@@ -22,6 +22,9 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.Session;
@@ -87,6 +90,16 @@ public class AdminHandler extends RequestHandler {
         getResponse().setHeader("Content-Type", "text/plain; charset=utf-8");
         try {
             getResponse().getWriter().write(text);;
+        } catch (IOException e) {
+            log.error("Error writing output!", e);
+        }
+    }
+
+    protected void writeJson(JsonElement json) {
+        getResponse().setContentType("text/json");
+        getResponse().setHeader("Content-Type", "text/json; charset=utf-8");
+        try {
+            getResponse().getWriter().write(json.toString());
         } catch (IOException e) {
             log.error("Error writing output!", e);
         }
