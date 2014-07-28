@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game.wormhole;
 
 import java.util.Random;
 
+import org.andengine.engine.Engine;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
@@ -94,12 +95,15 @@ public class WormholeSceneManager {
                     return;
                 }
 
-                mFragment.getEngine().runOnUpdateThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mFragment.getEngine().setScene(scene);
-                    }
-                });
+                final Engine engine = mFragment.getEngine();
+                if (engine != null) {
+                    engine.runOnUpdateThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            engine.setScene(scene);
+                        }
+                    });
+                }
             }
         }.execute();
     }
