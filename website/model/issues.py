@@ -51,6 +51,7 @@ class Issue(db.Model):
   resolution = db.StringProperty()
   priority = db.IntegerProperty()
   type = db.StringProperty()
+  duplicate_of = db.SelfReferenceProperty()
 
 
 class IssueUpdate(db.Model):
@@ -62,4 +63,5 @@ class IssueUpdate(db.Model):
   action = db.StringProperty()
   new_priority = db.IntegerProperty()
   new_type = db.StringProperty()
+  duplicate_of = db.ReferenceProperty(Issue)
 

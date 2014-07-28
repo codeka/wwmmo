@@ -62,6 +62,11 @@ class IssuesViewPage(IssuesPage):
     if self.request.POST.get("update-comment"):
       update.comment = ctrl.sanitizeHtml(self.request.POST.get("update-comment"))
     update.action = model.issues.Action.fromString(self.request.POST.get('update-action'))
+    if update.action == model.issues.Action.CloseDupe:
+      update.duplicate_of, _ = ctrl.issues.getIssue(int(self.request.POST.get("update-duplicate-of")))
+      if not update.duplicate_of:
+        self.error(400)
+        return
     new_type = model.issues.Type.fromString(self.request.POST.get('update-type'))
     if new_type != issue.type:
       update.new_type = new_type

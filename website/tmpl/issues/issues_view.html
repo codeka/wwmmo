@@ -66,7 +66,7 @@
         {% if update.action == 'Leave' %}
         {%- elif update.action == 'Open' %}→ Opened
         {%- elif update.action == 'CloseFixed' %}→ Fixed
-        {%- elif update.action == 'CloseDupe' %}→ Duplicate
+        {%- elif update.action == 'CloseDupe' %}→ Duplicate {% if update.duplicate_of %}of &ldquo;<a href="/issues/{{update.duplicate_of.key().id()}}">{{ update.duplicate_of.summary }}</a>&rdquo;{% endif %}
         {%- elif update.action == 'CloseWorksForMe' %}→ Works for me
         {%- elif update.action == 'CloseReject' %}→ Rejected
         {%- endif %}
@@ -85,13 +85,15 @@
         <header class="update-issue-header">
           Update Issue
         </header>
-        <div class="issue-field select">
+        <div class="issue-field select update-action">
           <label for="update-action">Action:</label>
           <select name="update-action" id="update-action">
           {%- for action in actions %}
             <option value={{action[0]}}>{{action[1]}}</option>
           {%- endfor %}
           </select>
+          <input type="text" pattern="[0-9]+" id="update-duplicate-of" name="update-duplicate-of" placeholder="Issue #"
+                 oninvalid="setCustomValidity('Issue # should be numerical.')" onchange="try { setCustomValidity(''); } catch(e) {}" />
         </div>
         <div class="issue-field issue-field-half select">
           <label for="update-type">Type:</label>
@@ -147,6 +149,18 @@
             return "You have unsaved changes.";
           }
         });
+
+        function showHideDuplicateOf() {
+          if ($("#update-action").val() == "CloseDupe") {
+            $("#update-duplicate-of").show();
+          } else {
+            $("#update-duplicate-of").hide();
+          }
+        }
+        $("#update-action").change(function() {
+          showHideDuplicateOf();
+        });
+        showHideDuplicateOf();
       });
     </script>
   </section>

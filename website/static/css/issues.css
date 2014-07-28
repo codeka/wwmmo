@@ -95,6 +95,16 @@ div.issue-field.select select {
   width: auto;
 }
 
+div.issue-field.update-action select {
+  width: 95pt;
+}
+
+div.issue-field.update-action input {
+  position: absolute;
+  left: 175pt;
+  width: 100pt;
+}
+
 div.issue-field p {
   line-height: 20pt;
 }

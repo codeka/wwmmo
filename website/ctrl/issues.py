@@ -31,6 +31,8 @@ def createIssue(summary, type, priority, description, user):
 def getIssue(id):
   key = db.Key.from_path(model.issues.Issue.__name__, id)
   issue = model.issues.Issue.get(key)
+  if not issue:
+    return None, None
 
   query = model.issues.IssueUpdate.all().ancestor(issue).order("posted")
   updates = []
@@ -82,6 +84,11 @@ def saveUpdate(issue, updates, update):
   elif update.action == model.issues.Action.CloseReject:
     issue.state = model.issues.State.Closed
     issue.resolution = model.issues.Resolution.Rejected
+    issue_updated = True
+  elif update.action == model.issues.Action.CloseDupe:
+    issue.duplicate_of = update.duplicate_of
+    issue.state = model.issues.State.Closed
+    issue.resolution = model.issues.Resolution.Duplicate
     issue_updated = True
 
   if update.new_priority:
