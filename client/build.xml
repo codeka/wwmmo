@@ -60,37 +60,46 @@
                                flags="g"
                                replace="android:versionName=&quot;0.4.${build.number}&quot;" />
             </then>
+            <else>
+                <!-- put debug back to 'true' -->
+                <replaceregexp file="assets/warworlds.properties"
+                               match="^debug=.*$"
+                               flags="gm"
+                               replace="debug=true" />
+            </else>
         </if>
     </target>
 
     <target name="-pre-compile">
+        <echo message="Before: ${toString:project.all.jars.path}" />
         <path id="project.all.jars.path">
             <path path="${toString:project.all.jars.path}"/>
-            <pathelement path="../common/bin/common.jar" />
-            <pathelement path="../planet-render/bin/planet-render.jar" />
-            <pathelement path="../control-field/bin/control-field.jar" />
+            <pathelement path="../common/out/common.jar" />
+            <pathelement path="../planet-render/out/planet-render.jar" />
+            <pathelement path="../control-field/out/control-field.jar" />
             <pathelement path="../../andengine/bin/classes.jar" />
+            <pathelement path="../../appcompat/libs/android-support-v7-appcompat.jar" />
             <pathelement path="../google-play-services/libs/google-play-services.jar" />
             <fileset dir="libs">
                 <include name="*.jar" />
             </fileset>
         </path>
+        <echo message="After: ${toString:project.all.jars.path}" />
     </target>
 
     <target name="-post-build">
-        <!-- put debug back to 'true' -->
-        <replaceregexp file="assets/warworlds.properties"
-                       match="^debug=.*$"
-                       flags="gm"
-                       replace="debug=true" />
-
-        <!-- copy the proguard mapping.txt to the server's deploy folder, so that it can
-             be copied to the server (so the server can de-obfuscate stack traces) -->
-        <copy tofile="${deploy.location}/data/proguard/mapping-${build.number}.txt"
-              file="bin/proguard/mapping.txt" />
-        <copy tofile="../../apk/warworlds-${build.number}-mapping.txt"
-              file="bin/proguard/mapping.txt" />
-        <copy tofile="../../apk/warworlds-${build.number}.apk"
-              file="${out.final.file}" />
+       <if>
+            <condition><equals arg1="${build.target}" arg2="release" /></condition>
+            <then>
+                <!-- copy the proguard mapping.txt to the server's deploy folder, so that it can
+                     be copied to the server (so the server can de-obfuscate stack traces) -->
+                <copy tofile="${deploy.location}/data/proguard/mapping-${build.number}.txt"
+                      file="bin/proguard/mapping.txt" />
+                <copy tofile="../../apk/warworlds-${build.number}-mapping.txt"
+                      file="bin/proguard/mapping.txt" />
+                <copy tofile="../../apk/warworlds-${build.number}.apk"
+                      file="${out.final.file}" />
+             </then>
+        </if>
     </target>
 </project>

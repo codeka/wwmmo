@@ -154,7 +154,7 @@ public class WormholeFragment extends BaseGlFragment {
 
                 star = StarManager.i.getStar(starID);
                 if (star != null) {
-                    refreshStar(star);
+                    refreshStar();
                 }
             }
         });
@@ -174,38 +174,18 @@ public class WormholeFragment extends BaseGlFragment {
 
             if (s.getID() == starID) {
                 star = s;
-                refreshStar(s);
-            } else if (star != null && star.getWormholeExtra().getDestWormholeID() == starID) {
+                refreshStar();
+            } else if (star != null && star.getWormholeExtra().getDestWormholeID() == s.getID()) {
                 destStar = s;
-
-                    BaseStar.WormholeExtra wormholeExtra = star.getWormholeExtra();
-                    if (wormholeExtra.getTuneCompleteTime() != null &&
-                            wormholeExtra.getTuneCompleteTime().isAfter(DateTime.now())) {
-                        tuneCompleteTime = wormholeExtra.getTuneCompleteTime();
-                    }
-
-                    String str = String.format(Locale.ENGLISH, "→ %s", s.getName());
-                    if (tuneCompleteTime != null) {
-                        str = "<font color=\"red\">" + str + "</font>";
-                    } else {
-                        contentView.findViewById(R.id.view_destination_btn).setEnabled(true);
-                    }
-                    destinationName.setText(Html.fromHtml(str));
-                }
-
-                updateTuningProgress();
-                return;
+                refreshStar();
             }
-
-            star = s;
-            fleetList.setWormhole(star);
         }
     };
 
     private void refreshStar() {
         if (star.getWormholeExtra().getDestWormholeID() != 0 && (
                 destStar == null || !destStar.getKey().equals(Integer.toString(star.getWormholeExtra().getDestWormholeID())))) {
-            StarManager.i.refreshStar(star.getWormholeExtra().getDestWormholeID());
+            destStar = StarManager.i.getStar(star.getWormholeExtra().getDestWormholeID());
         }
 
         TextView starName  = (TextView) contentView.findViewById(R.id.star_name);
@@ -221,6 +201,23 @@ public class WormholeFragment extends BaseGlFragment {
         stars.put(star.getKey(), star);
         fleetList.refresh(star.getFleets(), stars);
 
+        if (destStar != null) {
+            BaseStar.WormholeExtra wormholeExtra = star.getWormholeExtra();
+            if (wormholeExtra.getTuneCompleteTime() != null &&
+                    wormholeExtra.getTuneCompleteTime().isAfter(DateTime.now())) {
+                tuneCompleteTime = wormholeExtra.getTuneCompleteTime();
+            }
+
+            String str = String.format(Locale.ENGLISH, "→ %s", destStar.getName());
+            if (tuneCompleteTime != null) {
+                str = "<font color=\"red\">" + str + "</font>";
+            } else {
+                contentView.findViewById(R.id.view_destination_btn).setEnabled(true);
+            }
+            destinationName.setText(Html.fromHtml(str));
+
+            updateTuningProgress();
+        }
     }
 
     private void updateTuningProgress() {
