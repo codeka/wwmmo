@@ -21,14 +21,14 @@
     <import file="${sdk.dir}/tools/ant/build.xml" />
 
     <target name="-pre-build">
-        <propertyfile file="version.properties" comment="Version info">
-            <entry key="build.number" default="0" type="int" operation="+" value="1" />
-        </propertyfile>
-        <loadproperties srcFile="version.properties" />
-
         <if>
             <condition><equals arg1="${build.target}" arg2="release" /></condition>
             <then>
+               <propertyfile file="version.properties" comment="Version info">
+                   <entry key="build.number" default="0" type="int" operation="+" value="1" />
+               </propertyfile>
+               <loadproperties srcFile="version.properties" />
+
                 <!-- make sure on_behalf_of is commented out -->
                 <replaceregexp file="assets/warworlds.properties"
                                match="^#?user.on_behalf_of=.*$" flags="gm"
@@ -61,6 +61,8 @@
                                replace="android:versionName=&quot;0.4.${build.number}&quot;" />
             </then>
             <else>
+               <loadproperties srcFile="version.properties" />
+
                 <!-- put debug back to 'true' -->
                 <replaceregexp file="assets/warworlds.properties"
                                match="^debug=.*$"

@@ -45,6 +45,21 @@ public class EmpiresStarsHandler extends RequestHandler {
             return;
         }
 
+        // if they're doing a query to see what index into the array their star appears, then just
+        // return that as a single integer.
+        if (getRequest().getParameter("indexof") != null) {
+            int starID = Integer.parseInt(getRequest().getParameter("indexof"));
+            for (int i = 0; i < starIds.size(); i++) {
+                if (starIds.get(i) == starID) {
+                    setResponseText(Integer.toString(i));
+                    return;
+                }
+            }
+            // we couldn't find it... standard return value is -1...
+            setResponseText("-1");
+            return;
+        }
+
         List<Star> stars = new StarController().getStars(starIds);
 
         Messages.Stars.Builder pb = Messages.Stars.newBuilder();

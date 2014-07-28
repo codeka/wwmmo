@@ -54,19 +54,33 @@ public class EmpireActivity extends TabFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Integer fleetID = null;
+        mExtras = getIntent().getExtras();
+        if (mExtras != null) {
+            fleetID = mExtras.getInt("au.com.codeka.warworlds.FleetID");
+            if (fleetID == 0) {
+                fleetID = null;
+            }
+        }
+
         TabManager tabManager = getTabManager();
         tabManager.addTab(mContext, new TabInfo(this, "Overview", OverviewFragment.class, null));
         tabManager.addTab(mContext, new TabInfo(this, "Colonies", ColoniesFragment.class, null));
         tabManager.addTab(mContext, new TabInfo(this, "Build", BuildQueueFragment.class, null));
-        tabManager.addTab(mContext, new TabInfo(this, "Fleets", FleetsFragment.class, null));
+
+        Bundle args = null;
+        if (fleetID != null) {
+            args = new Bundle();
+            args.putInt("au.com.codeka.warworlds.FleetID", fleetID);
+            args.putInt("au.com.codeka.warworlds.StarID",
+                    mExtras.getInt("au.com.codeka.warworlds.StarID"));
+        }
+        tabManager.addTab(mContext, new TabInfo(this, "Fleets", FleetsFragment.class, args));
+
         tabManager.addTab(mContext, new TabInfo(this, "Settings", SettingsFragment.class, null));
 
-        mExtras = getIntent().getExtras();
-        if (mExtras != null) {
-            String fleetKey = mExtras.getString("au.com.codeka.warworlds.FleetKey");
-            if (fleetKey != null) {
-                getTabHost().setCurrentTabByTag("Fleets");
-            }
+        if (fleetID != null) {
+            getTabHost().setCurrentTabByTag("Fleets");
         }
     }
 

@@ -311,8 +311,8 @@ public class StarfieldActivity extends BaseStarfieldActivity {
 
     public void openEmpireActivityAtFleet(Star star, Fleet fleet) {
         Intent intent = new Intent(mContext, EmpireActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-        intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
+        intent.putExtra("au.com.codeka.warworlds.StarID", star.getID());
+        intent.putExtra("au.com.codeka.warworlds.FleetID", Integer.parseInt(fleet.getKey()));
         startActivityForResult(intent, EMPIRE_REQUEST);
     }
 

@@ -162,6 +162,15 @@ public class RequestHandler {
         return false;
     }
 
+    protected void setResponseText(String text) {
+        mResponse.setContentType("text/plain");
+        mResponse.setCharacterEncoding("utf-8");
+        try {
+            mResponse.getWriter().write(text);
+        } catch (IOException e) {
+        }
+    }
+
     protected void setResponseJson(Map<String, Object> data) {
         mResponse.setContentType("application/json");
         mResponse.setCharacterEncoding("utf-8");

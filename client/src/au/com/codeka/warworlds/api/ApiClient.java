@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
@@ -26,6 +27,28 @@ import com.google.protobuf.Message;
 public class ApiClient {
     public static void impersonate(String user) {
         RequestManager.impersonate(user);
+    }
+
+    /**
+     * Fetches a simple string from the given URL.
+     */
+    public static String getString(String url) throws ApiException {
+        Map<String, List<String>> headers = getHeaders();
+        headers.get("Accept").add("text/plain");
+
+        RequestManager.ResultWrapper res = RequestManager.request("GET", url, headers);
+
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setValidating(false);
+
+        try {
+            InputStream ins = res.getResponse().getEntity().getContent();
+            return IOUtils.toString(ins, "utf-8");
+        } catch (Exception e) {
+            throw new ApiException(e);
+        } finally {
+            res.close();
+        }
     }
 
     /**

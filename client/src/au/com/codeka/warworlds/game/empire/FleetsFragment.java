@@ -3,6 +3,8 @@ package au.com.codeka.warworlds.game.empire;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -13,6 +15,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.NumberFormatter;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
@@ -35,9 +38,14 @@ import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class FleetsFragment extends StarsFragment {
+    private static final Log log = new Log("FleetsFragment");
+    private ExpandableListView starsList;
     private FleetsStarsListAdapter adapter;
     private EmpireStarsFetcher fetcher;
     private FleetSelectionPanel fleetSelectionPanel;
+    private Integer starOfFleetToSelect;
+    private Integer indexOfStarOfFleetToSelect;
+    private Integer fleetToSelect;
 
     public FleetsFragment() {
         fetcher = new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Fleets, null);
@@ -48,7 +56,7 @@ public class FleetsFragment extends StarsFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.empire_fleets_tab, container, false);
-        ExpandableListView starsList = (ExpandableListView) v.findViewById(R.id.stars);
+        starsList = (ExpandableListView) v.findViewById(R.id.stars);
         adapter = new FleetsStarsListAdapter(inflater, fetcher);
         starsList.setAdapter(adapter);
 
@@ -120,8 +128,14 @@ public class FleetsFragment extends StarsFragment {
             }
         });
 
-        StarManager.eventBus.register(eventHandler);
+        int fleetID = getArguments().getInt("au.com.codeka.warworlds.FleetID");
+        if (fleetID > 0) {
+            fleetToSelect = fleetID;
+            starOfFleetToSelect = getArguments().getInt("au.com.codeka.warworlds.StarID");
+            attemptToSelectFleet();
+        }
 
+        StarManager.eventBus.register(eventHandler);
         return v;
     }
 
@@ -138,8 +152,44 @@ public class FleetsFragment extends StarsFragment {
             // Note: we always want to update the list, even if the star isn't in the fetcher,
             // because it might be a destination of a fleet move.
             adapter.notifyDataSetChanged();
+
+            if (indexOfStarOfFleetToSelect != null && starOfFleetToSelect != null
+                    && starOfFleetToSelect == star.getID()) {
+                log.info("Expanding: index=%d, star=%d, fleet=%d", indexOfStarOfFleetToSelect,
+                        starOfFleetToSelect, fleetToSelect);
+                starsList.expandGroup(indexOfStarOfFleetToSelect);
+
+                for (int indexOfFleetToSelect = 0; indexOfFleetToSelect < star.getFleets().size();
+                        indexOfFleetToSelect++) {
+                    Fleet fleet = (Fleet) star.getFleets().get(indexOfFleetToSelect);
+                    if (Integer.parseInt(fleet.getKey()) == fleetToSelect) {
+                        starsList.setSelectedChild(indexOfStarOfFleetToSelect, indexOfFleetToSelect, true);
+                        fleetSelectionPanel.setSelectedFleet(star, fleet);
+                    }
+                }
+                indexOfStarOfFleetToSelect = null;
+                starOfFleetToSelect = null;
+                fleetToSelect = null;
+            }
         }
     };
+
+    /**
+     * Tries to select the fleetIDToSelect fleet, if possible, otherwise we might have to load it
+     * first. If we do select it, then reset fleetIDToSelect to null so that don't try to select it
+     * again later.
+     */
+    private void attemptToSelectFleet() {
+        fetcher.indexOf(starOfFleetToSelect, new EmpireStarsFetcher.IndexOfCompleteHandler() {
+            @Override
+            public void onIndexOfComplete(@Nullable Integer index) {
+                if (index != null) {
+                    indexOfStarOfFleetToSelect = index;
+                    starsList.smoothScrollToPosition(index);
+                }
+            }
+        });
+    }
 
     public class FleetsStarsListAdapter extends StarsListAdapter {
         private LayoutInflater inflater;

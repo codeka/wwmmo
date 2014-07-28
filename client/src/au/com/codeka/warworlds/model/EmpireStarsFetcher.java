@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 import android.os.Handler;
 import android.util.SparseArray;
 import au.com.codeka.BackgroundRunner;
@@ -134,6 +136,39 @@ public class EmpireStarsFetcher {
         return stars;
     }
 
+    public void indexOf(int starID, final IndexOfCompleteHandler onCompleteHandler) {
+        final StringBuilder url = new StringBuilder();
+        url.append("empires/");
+        url.append(Integer.toString(EmpireManager.i.getEmpire().getID()));
+        url.append("/stars?indexof=");
+        url.append(starID);
+        appendFilterAndSearch(url);
+        log.debug("Fetching: %s", url);
+
+        new BackgroundRunner<Integer>() {
+            @Override
+            protected Integer doInBackground() {
+                try {
+                    String s = ApiClient.getString(url.toString());
+                    return Integer.parseInt(s);
+                } catch (ApiException e) {
+                    log.error("Error fetching stars!", e);
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onComplete(Integer index) {
+                if (index < 0) {
+                    index = null;
+                }
+
+                onCompleteHandler.onIndexOfComplete(index);
+            }
+        }.execute();
+
+    }
+
     /** Sends a request to the server to fetch the given stars. We assume the collection is
         sorted. */
     private void fetchStars(Collection<Integer> indices) {
@@ -161,16 +196,7 @@ public class EmpireStarsFetcher {
             lastIndex = numStars - 1;
         }
         url.append(Integer.toString(lastIndex + 5));
-        url.append("&filter=");
-        url.append(filter.toString().toLowerCase());
-        if (search != null) {
-            url.append("&search=");
-            try {
-                url.append(URLEncoder.encode(search, "utf-8"));
-            } catch (UnsupportedEncodingException e) {
-                return;
-            }
-        }
+        appendFilterAndSearch(url);
         log.debug("Fetching: %s", url);
 
         new BackgroundRunner<SparseArray<Star>>() {
@@ -217,12 +243,29 @@ public class EmpireStarsFetcher {
         }.execute();
     }
 
+    private void appendFilterAndSearch(StringBuilder url) {
+        url.append("&filter=");
+        url.append(filter.toString().toLowerCase());
+        if (search != null) {
+            url.append("&search=");
+            try {
+                url.append(URLEncoder.encode(search, "utf-8"));
+            } catch (UnsupportedEncodingException e) {
+                return;
+            }
+        }
+    }
+
     public static class StarsFetchedEvent {
         public SparseArray<Star> stars;
 
         public StarsFetchedEvent(SparseArray<Star> stars) {
             this.stars = stars;
         }
+    }
+
+    public interface IndexOfCompleteHandler {
+        public void onIndexOfComplete(@Nullable Integer index);
     }
 
     public enum Filter {
