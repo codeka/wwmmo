@@ -22,9 +22,20 @@
     </section>
 
     <nav class="issue-controls">
-      <ul>
+      <ul class="left">
         <li><a href="/issues/new" class="button">Report Issue</a>
       </ul>
+      <form>
+        <ul class="right">
+          <li><div class="input-button"><input type="submit" value="Search" /></div>
+          <li>
+            <select name="filter">
+              <option value="open">Open Issues
+              <option value="closed">Closed Issues
+            </select>
+          <li>Search:</li>
+        </ul>
+      </form>
     </nav>
 
     <table class="issue-list">

@@ -9,8 +9,12 @@ nav.issue-controls ul {
   margin: 0 0 0 10pt; padding: 0;
 }
 
-nav.issue-controls ul li {
+nav.issue-controls ul.left li {
   float: left;
+}
+
+nav.issue-controls ul.right li {
+  float: right;
 }
 
 fieldset.no-border {
