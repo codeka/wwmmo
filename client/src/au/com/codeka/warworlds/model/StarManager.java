@@ -19,6 +19,7 @@ import android.support.v4.util.LruCache;
 import android.util.SparseArray;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
+import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.RealmContext;
@@ -317,6 +318,8 @@ public class StarManager extends BaseManager {
             Messages.Star pb = ApiClient.getProtoBuf(url, Messages.Star.class);
             star = new Star();
             star.fromProtocolBuffer(pb);
+
+            new Simulation().simulate(star);
         } catch(Exception e) {
             log.error("Uh Oh!", e);
         }

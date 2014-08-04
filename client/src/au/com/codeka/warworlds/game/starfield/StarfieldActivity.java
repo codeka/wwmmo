@@ -483,7 +483,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
         StarSummary star = StarManager.i.getStarSummary(Integer.parseInt(starKey));
         if (star == null) {
             StarManager.eventBus.register(new Object() {
-                @EventHandler
+                @EventHandler(thread = EventHandler.UI_THREAD)
                 public void onStarUpdated(StarSummary star) {
                     if (star.getKey().equals(starKey)) {
                         navigateToFleet(star, star.findFleet(fleetKey));
@@ -628,7 +628,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
                 StarSummary star = StarManager.i.getStarSummary(Integer.parseInt(starKey));
                 if (star == null) {
                     StarManager.eventBus.register(new Object() {
-                        @EventHandler
+                        @EventHandler(thread = EventHandler.UI_THREAD)
                         public void onStarUpdated(StarSummary star) {
                             if (star.getKey().equals(starKey)) {
                                 navigateToPlanet(star.getStarType(), sectorX, sectorY,

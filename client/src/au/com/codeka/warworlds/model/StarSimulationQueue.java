@@ -30,6 +30,10 @@ public class StarSimulationQueue {
     /** Determines whether the given star even needs a simulation. If it's been simulated in
      *  the last 5 minutes, then it does not. */
     public static boolean needsSimulation(Star star) {
+        if (star.getEmpirePresences() == null
+                || star.getEmpirePresences().size() == 0) {
+            return false;
+        }
         return star.getLastSimulation().isBefore(DateTime.now(DateTimeZone.UTC).minusMinutes(5));
     }
 

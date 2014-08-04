@@ -50,6 +50,19 @@ public class EmpireStarsFetcher {
         return numStars;
     }
 
+    public boolean hasStarID(int starID) {
+        synchronized (cache) {
+            for (int i = 0; i < cache.size(); i++) {
+                WeakReference<Star> starref = cache.valueAt(i);
+                Star star = starref.get();
+                if (star != null && star.getID() == starID) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Gets the star at the given index. If we don't have the star cached, we'll wait a couple
      * of milliseconds before fetching all the stars we've been asked for.

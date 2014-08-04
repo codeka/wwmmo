@@ -40,6 +40,7 @@ import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSimulationQueue;
 
 /**
  * This is a fragment which displays details about a single solar system.
@@ -232,6 +233,10 @@ public class SolarSystemFragment extends Fragment {
     };
 
     private void onStarFetched(Star star) {
+        if (StarSimulationQueue.needsSimulation(star)) {
+            StarSimulationQueue.i.simulate(star, true);
+        }
+
         // if we don't have a star yet, we'll need to figure out which planet to select
         // initially from the intent that started us. Otherwise, we'll want to select
         // whatever planet we have currently

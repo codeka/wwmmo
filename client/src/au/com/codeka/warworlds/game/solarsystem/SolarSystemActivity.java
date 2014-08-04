@@ -266,7 +266,7 @@ public class SolarSystemActivity extends BaseActivity {
     }
 
     private Object eventHandler = new Object() {
-        @EventHandler
+        @EventHandler(thread = EventHandler.UI_THREAD)
         public void onStarUpdated(StarSummary starSummary) {
             if (starSummary.getID() == starID) {
                 star = starSummary;
@@ -276,6 +276,10 @@ public class SolarSystemActivity extends BaseActivity {
                 } else {
                     getSupportActionBar().setTitle(starSummary.getName());
                 }
+            }
+
+            if (searchListAdapter.getStarsFetcher().hasStarID(starSummary.getID())) {
+                searchListAdapter.notifyDataSetChanged();
             }
         }
     };
@@ -304,6 +308,10 @@ public class SolarSystemActivity extends BaseActivity {
             this.fetcher.eventBus.register(eventHandler);
             this.fetcher.getStars(0, 20);
             notifyDataSetChanged();
+        }
+
+        public EmpireStarsFetcher getStarsFetcher() {
+            return fetcher;
         }
 
         @Override
@@ -377,7 +385,7 @@ public class SolarSystemActivity extends BaseActivity {
                 return view;
             }
 
-            Star star = (Star) getItem(position);
+            StarSummary star = (StarSummary) getItem(position);
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
             TextView starName = (TextView) view.findViewById(R.id.star_name);
             TextView starType = (TextView) view.findViewById(R.id.star_type);
@@ -415,15 +423,17 @@ public class SolarSystemActivity extends BaseActivity {
                     }
                 }
 
-                if (StarSimulationQueue.needsSimulation(star) || empirePresence == null) {
+                if (star instanceof Star
+                        && (StarSimulationQueue.needsSimulation((Star) star)
+                                || empirePresence == null)) {
                     // if the star hasn't been simulated for > 5 minutes, schedule a simulation
                     // now and just display ??? for the various parameters
                     starGoodsDelta.setText("");
                     starGoodsTotal.setText("???");
                     starMineralsDelta.setText("");
                     starMineralsTotal.setText("???");
-                    StarSimulationQueue.i.simulate(star, false); // TODO: does it need to simulate?
-                } else {
+                    StarSimulationQueue.i.simulate((Star) star, false);
+                } else if (empirePresence != null) {
                     starGoodsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
                             empirePresence.getDeltaGoodsPerHour() < 0 ? "-" : "+",
                             Math.abs(Math.round(empirePresence.getDeltaGoodsPerHour()))));
