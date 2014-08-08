@@ -106,7 +106,7 @@ public class SituationReportController {
 
         public List<Messages.SituationReport> fetch(Integer empireID, Integer starID, DateTime before,
                 DateTime after, Messages.SituationReportFilter filter, int limit) throws Exception {
-            String sql = "SELECT report" +
+            String sql = "SELECT report, report_time" +
                         " FROM situation_reports" +
                         " WHERE report_time < ?" +
                         (after == null ? "" : " AND report_time > ?") +

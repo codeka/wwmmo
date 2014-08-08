@@ -19,6 +19,7 @@ public class Runner {
             basePath = AdminGenericHandler.class.getClassLoader().getResource("").getPath();
         }
 
+        LogImpl.setup();
         ErrorReportingLoggingHandler.setup();
         DesignManager.setup(basePath);
         NameGenerator.setup(basePath);

@@ -323,7 +323,8 @@ public class SitrepActivity extends BaseActivity {
                     // grab the cursor we'll need to fetch the next batch
                     mHasMore = pb.hasCursor() && pb.getCursor() != null && !pb.getCursor().equals("");
                     if (mHasMore) {
-                        log.debug("Fetched %d items, cursor=%s", pb.getSituationReportsCount(), pb.getCursor());
+                        log.debug("Fetched %d items, cursor=%s", pb.getSituationReportsCount(),
+                                pb.getCursor());
                         mCursor = pb.getCursor();
                     } else {
                         log.debug("Fetched %d items, cursor=<null>", pb.getSituationReportsCount());

@@ -50,20 +50,21 @@ public class SitReportsHandler extends RequestHandler {
         List<Messages.SituationReport> sitreps = new SituationReportController().fetch(
                 empireID, starID, before, after, filter, 50);
 
-        after = null;
+        DateTime first = null;
+        if (!sitreps.isEmpty()) {
+            first = new DateTime(sitreps.get(sitreps.size() - 1).getReportTime() * 1000,
+                    DateTimeZone.UTC);
+        }
+
         Messages.SituationReports.Builder sitreps_pb = Messages.SituationReports.newBuilder();
         for (Messages.SituationReport sitrep : sitreps) {
             sitreps_pb.addSituationReports(sitrep);
-            DateTime thisSitRep = new DateTime(sitrep.getReportTime() * 1000, DateTimeZone.UTC);
-            if (after == null || thisSitRep.isBefore(after)) {
-                after = thisSitRep;
-            }
         }
 
-        if (after == null) {
+        if (first == null) {
             cursor = "";
         } else {
-            cursor = Long.toString(after.getMillis());
+            cursor = Long.toString(first.getMillis());
         }
         sitreps_pb.setCursor(cursor);
         setResponseBody(sitreps_pb.build());

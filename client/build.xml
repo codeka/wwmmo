@@ -58,7 +58,7 @@
                 <replaceregexp file="AndroidManifest.xml"
                                match="android:versionName=&quot;(.*)&quot;"
                                flags="g"
-                               replace="android:versionName=&quot;0.4.${build.number}&quot;" />
+                               replace="android:versionName=&quot;0.5.${build.number}&quot;" />
             </then>
             <else>
                <loadproperties srcFile="version.properties" />
