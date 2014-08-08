@@ -198,7 +198,7 @@ public class SitrepActivity extends BaseActivity {
 
         @EventHandler(thread = EventHandler.UI_THREAD)
         public void onStarUpdated(StarSummary star) {
-            if (star.getID() == Integer.parseInt(mStarKey)) {
+            if (mStarKey != null && star.getID() == Integer.parseInt(mStarKey)) {
                 refreshTitle();
             }
             mSituationReportAdapter.notifyDataSetChanged();
@@ -309,6 +309,7 @@ public class SitrepActivity extends BaseActivity {
                     url += "show-old-items=1";
                     hasQuery = true;
                 }
+                log.debug("Fetching: %s", url);
 
                 try {
                     Messages.SituationReports pb = ApiClient.getProtoBuf(
@@ -322,8 +323,10 @@ public class SitrepActivity extends BaseActivity {
                     // grab the cursor we'll need to fetch the next batch
                     mHasMore = pb.hasCursor() && pb.getCursor() != null && !pb.getCursor().equals("");
                     if (mHasMore) {
+                        log.debug("Fetched %d items, cursor=%s", pb.getSituationReportsCount(), pb.getCursor());
                         mCursor = pb.getCursor();
                     } else {
+                        log.debug("Fetched %d items, cursor=<null>", pb.getSituationReportsCount());
                         mCursor = null;
                     }
 
@@ -480,7 +483,8 @@ public class SitrepActivity extends BaseActivity {
             }
 
             if (position >= mItems.size()) {
-                // note: once this view comes into... view, we'll want to load the next lot of reports
+                // note: once this view comes into... view, we'll want to load the next lot of
+                // reports
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {

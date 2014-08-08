@@ -27,8 +27,13 @@ public class WormholeGeneratorShipEffect extends ShipEffect {
             return;
         }
 
+        String name = "Wormhole";
+        if (fleet.getNotes() != null && fleet.getNotes().length() > 0) {
+            name = fleet.getNotes().replace("\n", " ").replace("\r", "");
+        }
+
         star.setStarType(Star.getStarType(Star.Type.Wormhole));
-        star.setName("Wormhole");
+        star.setName(name);
         star.setWormholeExtra(new Star.WormholeExtra(fleet.getEmpireID()));
 
         // TODO: probably not the best place for this to go...

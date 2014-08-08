@@ -47,7 +47,8 @@ public class BuildQueueController {
         if (buildRequest.getCount() <= 0) {
             throw new RequestException(400, "Cannot build negative count.");
         }
-        if (buildRequest.getCount() > design.getBuildCost().getMaxCount()
+        if (buildRequest.getDesignKind() == DesignKind.SHIP
+                && buildRequest.getCount() > design.getBuildCost().getMaxCount()
                 && buildRequest.getExistingFleetID() == null) {
             buildRequest.setCount(design.getBuildCost().getMaxCount());
         }

@@ -38,9 +38,9 @@
       and out of enemy starsystems and reporting back what they found.</p>
     ]]></description>
     <dependencies>
-      <requires building="shipyard" level="1" maxCount="10000" />
+      <requires building="shipyard" level="1" />
     </dependencies>
-    <cost minerals="50" time="0.1667" />
+    <cost minerals="50" time="0.1667" maxCount="10000" />
     <fuel costPerParsec="0.1" />
     <stats speed="23" baseAttack="1" baseDefence="1" combatPriority="100" />
     <effects>
@@ -68,9 +68,9 @@
       fuel-efficient, allowing you to overwhealm your enemy with numbers.</p>
     ]]></description>
     <dependencies>
-      <requires building="shipyard" level="1" maxCount="50000" />
+      <requires building="shipyard" level="1" />
     </dependencies>
-    <cost minerals="45" time="0.15" />
+    <cost minerals="45" time="0.15" maxCount="50000" />
     <fuel costPerParsec="0.2" />
     <stats speed="10" baseAttack="5" baseDefence="15" combatPriority="10"  />
     <effects>

@@ -50,6 +50,7 @@ public class SitReportsHandler extends RequestHandler {
         List<Messages.SituationReport> sitreps = new SituationReportController().fetch(
                 empireID, starID, before, after, filter, 50);
 
+        after = null;
         Messages.SituationReports.Builder sitreps_pb = Messages.SituationReports.newBuilder();
         for (Messages.SituationReport sitrep : sitreps) {
             sitreps_pb.addSituationReports(sitrep);

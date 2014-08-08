@@ -260,6 +260,8 @@ public abstract class Design {
         private int mMaxCount;
 
         public BuildCost(Element costElement) {
+            mMaxCount = 5000;
+
             String value = costElement.getAttribute("time");
             if (!value.equals("")) {
                 double timeInHours = Double.parseDouble(value);
