@@ -153,7 +153,7 @@ public class SqlStmt implements AutoCloseable {
             }
             return null;
         } finally {
-            rs.close();
+            if (rs != null) rs.close();
         }
     }
 
@@ -176,13 +176,9 @@ public class SqlStmt implements AutoCloseable {
 
         do {
             SqlResult res = new SqlResult(mStmt.getResultSet());
-            if (res != null) {
-                mResults.add(res);
-                return res;
-            }
+            mResults.add(res);
+            return res;
         } while (mStmt.getMoreResults());
-
-        return null;
     }
 
     private void logStatement() {

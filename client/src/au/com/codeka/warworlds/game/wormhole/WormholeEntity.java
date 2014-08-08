@@ -16,8 +16,8 @@ public class WormholeEntity extends Entity {
         super(0.0f, 0.0f, 1.0f, 1.0f);
         mSceneManager = sceneManager;
 
-        int activityWidth = sceneManager.getActivity().getWidth();
-        int activityHeight = sceneManager.getActivity().getHeight();
+        int activityWidth = sceneManager.getFragment().getWidth();
+        int activityHeight = sceneManager.getFragment().getHeight();
         int activitySize = Math.min(activityWidth, activityHeight);
         float size = activitySize * 0.999f;
 
@@ -28,7 +28,7 @@ public class WormholeEntity extends Entity {
         mWormholeSprite.animate(1000);
         attachChild(mWormholeSprite);
 
-        mSceneManager.getActivity().getEngine().registerUpdateHandler(mWormholeUpdateHandler);
+        mSceneManager.getFragment().getEngine().registerUpdateHandler(mWormholeUpdateHandler);
     }
 
     private IUpdateHandler mWormholeUpdateHandler = new IUpdateHandler() {

@@ -8,7 +8,8 @@
     </path>
 
     <target name="clean">
-        <delete dir="bin"/>
+        <delete dir="bin" />
+        <delete dir="out" />
     </target>
 
     <target name="build">
@@ -19,6 +20,7 @@
             <src path="src"/>
             <classpath refid="common.classpath"/>
         </javac>
-        <jar destfile="bin/${ant.project.name}.jar" basedir="bin" />
+        <mkdir dir="out"/>
+        <jar destfile="out/${ant.project.name}.jar" basedir="bin" />
     </target>
 </project>

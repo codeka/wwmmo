@@ -40,7 +40,7 @@ import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
+import au.com.codeka.warworlds.model.StarSimulationQueue;
 
 /**
  * This is a fragment which displays details about a single solar system.
@@ -49,12 +49,12 @@ public class SolarSystemFragment extends Fragment {
     private static final Log log = new Log("SolarSystemFragment");
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private ProgressBar mProgressBar;
-    private StarSummary mStarSummary;
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
     private boolean mIsFirstRefresh;
     private View mView;
+    private int starID;
 
     // needs to be Object so we can do a version check before instantiating the class
     Object mSolarSystemSurfaceViewOnLayoutChangedListener;
@@ -170,16 +170,14 @@ public class SolarSystemFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Bundle args = getArguments();
-        long starID = args.getLong("au.com.codeka.warworlds.StarID");
-        String starKey = Long.toString(starID);
+        starID = (int) args.getLong("au.com.codeka.warworlds.StarID");
         StarManager.eventBus.register(mEventHandler);
         ShieldManager.eventBus.register(mEventHandler);
 
-        // get as much details about the star as we can, until it gets refreshes anyway.
-        mStarSummary = StarManager.getInstance().getStarSummaryNoFetch(starKey, Float.MAX_VALUE);
-        StarManager.getInstance().requestStar(starKey, false, null);
-
-        refreshSelectedPlanet();
+        mStar = StarManager.i.getStar(starID);
+        if (mStar != null) {
+            onStarFetched(mStar);
+        }
 
         // this will, on HONEYCOMB+ re-centre the progress back over the solarsystem. It looks
         // better...
@@ -223,11 +221,9 @@ public class SolarSystemFragment extends Fragment {
     private Object mEventHandler = new Object() {
         @EventHandler
         public void onStarUpdated(Star star) {
-            if (mStar != null && !mStar.getKey().equals(star.getKey())) {
-                return;
+            if (starID == star.getID()) {
+                onStarFetched(star);
             }
-
-            onStarFetched(star);
         }
 
         @EventHandler
@@ -237,6 +233,10 @@ public class SolarSystemFragment extends Fragment {
     };
 
     private void onStarFetched(Star star) {
+        if (StarSimulationQueue.needsSimulation(star)) {
+            StarSimulationQueue.i.simulate(star, true);
+        }
+
         // if we don't have a star yet, we'll need to figure out which planet to select
         // initially from the intent that started us. Otherwise, we'll want to select
         // whatever planet we have currently
@@ -269,7 +269,7 @@ public class SolarSystemFragment extends Fragment {
             }
         }
 
-        mStarSummary = mStar = star;
+        mStar = star;
         mPlanet = (Planet) planet;
         mProgressBar.setVisibility(View.GONE);
 
@@ -377,10 +377,6 @@ public class SolarSystemFragment extends Fragment {
     private void refreshSelectedPlanet() {
         TextView planetNameTextView = (TextView) mView.findViewById(R.id.planet_name);
 
-        if (mStarSummary != null && mPlanet == null) {
-            planetNameTextView.setText(mStarSummary.getName());
-            return;
-        }
         if (mStar == null || mPlanet == null) {
             return;
         }

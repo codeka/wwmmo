@@ -42,6 +42,10 @@ public class BuildAccelerateHandler extends RequestHandler {
                     throw new RequestException(403);
                 }
 
+                if (buildRequest.getCount() < 1) {
+                    throw new RequestException(500, "Shouldn't be able to see " + buildRequest.getCount() + " ships?");
+                }
+
                 if (new BuildQueueController().accelerate(star, buildRequest, accelerateAmount)) {
                     // if it's complete, trigger the build complete event now, without going through
                     // the event processor (saves a bit of time)

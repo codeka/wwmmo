@@ -205,7 +205,7 @@ public class RequestManager {
                         }
                     }
                 }
-                if (realm != null && realm.getAuthenticator().isAuthenticated()) {
+                if (realm.getAuthenticator().isAuthenticated()) {
                     String cookie = realm.getAuthenticator().getAuthCookie();
                     if (sVerboseLog) {
                         log.debug("Adding session cookie: %s", cookie);

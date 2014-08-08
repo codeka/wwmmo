@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
@@ -128,19 +129,25 @@ public class FindAbandonedEmpiresCronJob extends CronJob {
         }
 
         double distanceToCentre = Math.sqrt((star.getSectorX() * star.getSectorX()) + (star.getSectorY() * star.getSectorY()));
-/*TODO
-        sql = "WITH new_values (star_id, empire_id, distance_to_centre, distance_to_non_abandoned_empire) AS" +
-                " (VALUES (?, ?, ?, ?))," +
-              " WITH upsert AS (UPDATE abandoned_stars SET distance_to_non_abandoned_empire = ? WHERE star_id = ?)" +
-              " INSERT INTO abandoned_stars (star_id, empire_id, distance_to_centre, distance_to_non_abandoned_empire)" +
-              " VALUES (?, ?, ?, ?) WHERE NOT EXISTS (SELECT 1 FROM upsert WHERE  ON DUPLICATE KEY UPDATE" +
-              " distance_to_non_abandoned_empire = ?";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, star.getID());
-            stmt.setInt(2, empireID);
-            stmt.setDouble(3, distanceToCentre);
-            stmt.setDouble(4, distanceToNonAbandonedEmpire);
-            stmt.update();
-        }*/
+
+        try (Transaction t = DB.beginTransaction()) {
+            sql = "DELETE FROM abandoned_stars WHERE star_id = ?";
+            try (SqlStmt stmt = t.prepare(sql)) {
+                stmt.setInt(1, star.getID());
+                stmt.update();
+            }
+
+            sql = "INSERT INTO abandoned_stars (star_id, empire_id, distance_to_centre," +
+                    " distance_to_non_abandoned_empire) VALUES (?, ?, ?, ?)";
+            try (SqlStmt stmt = t.prepare(sql)) {
+                stmt.setInt(1, star.getID());
+                stmt.setInt(2, empireID);
+                stmt.setDouble(3, distanceToCentre);
+                stmt.setDouble(4, distanceToNonAbandonedEmpire);
+                stmt.update();
+            }
+
+            t.commit();
+        }
     }
 }

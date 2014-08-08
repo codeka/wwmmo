@@ -70,9 +70,9 @@ public class HelloHandler extends RequestHandler {
                 new EmpireController().markActive(empire);
             }
 
-            // make sure they still have some colonies...
+            // TODO: remove this
             ArrayList<Integer> starIDs = new EmpireController().getStarsForEmpire(
-                    getSession().getEmpireID());
+                    getSession().getEmpireID(), EmpireController.EmpireStarsFilter.Everything, null);
             if (!findColony(starIDs, getSession().getEmpireID())) {
                 log.info(String.format("Empire #%d [%s] has been wiped out, resetting.", empire.getID(), empire.getDisplayName()));
                 new EmpireController().createEmpire(empire);
@@ -85,7 +85,7 @@ public class HelloHandler extends RequestHandler {
             }
 
             Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
-            empire.toProtocolBuffer(empire_pb);
+            empire.toProtocolBuffer(empire_pb, true);
             hello_response_pb.setEmpire(empire_pb);
 
             // set up the initial building statistics
@@ -112,24 +112,26 @@ public class HelloHandler extends RequestHandler {
             // if we're set to force ignore ads, make sure we pass that along
             hello_response_pb.setForceRemoveAds(empire.getForceRemoveAds());
 
-            // grab all of the empire's stars (except markers and wormholes) and send across the identifiers
-            sql = "SELECT id, name" +
-                 " FROM stars" +
-                 " INNER JOIN (SELECT DISTINCT star_id FROM colonies WHERE empire_id = ?" +
-                             " UNION SELECT DISTINCT star_id FROM fleets WHERE empire_id = ?) as s" +
-                   " ON s.star_id = stars.id" +
-                 " WHERE star_type NOT IN (" + Star.Type.Marker.ordinal() + ", " + Star.Type.Wormhole.ordinal() + ")" +
-                 " ORDER BY name ASC";
-            try (SqlStmt stmt = DB.prepare(sql)) {
-                stmt.setInt(1, empire.getID());
-                stmt.setInt(2, empire.getID());
-                SqlResult res = stmt.select();
-
-                while (res.next()) {
-                    hello_response_pb.addStarIds(res.getLong(1));
+            if (!hello_request_pb.hasNoStarList() || !hello_request_pb.getNoStarList()) {
+                // grab all of the empire's stars (except markers and wormholes) and send across the identifiers
+                sql = "SELECT id, name" +
+                     " FROM stars" +
+                     " INNER JOIN (SELECT DISTINCT star_id FROM colonies WHERE empire_id = ?" +
+                                 " UNION SELECT DISTINCT star_id FROM fleets WHERE empire_id = ?) as s" +
+                       " ON s.star_id = stars.id" +
+                     " WHERE star_type NOT IN (" + Star.Type.Marker.ordinal() + ", " + Star.Type.Wormhole.ordinal() + ")" +
+                     " ORDER BY name ASC";
+                try (SqlStmt stmt = DB.prepare(sql)) {
+                    stmt.setInt(1, empire.getID());
+                    stmt.setInt(2, empire.getID());
+                    SqlResult res = stmt.select();
+    
+                    while (res.next()) {
+                        hello_response_pb.addStarIds(res.getLong(1));
+                    }
+                } catch (Exception e) {
+                    throw new RequestException(e);
                 }
-            } catch (Exception e) {
-                throw new RequestException(e);
             }
         }
 

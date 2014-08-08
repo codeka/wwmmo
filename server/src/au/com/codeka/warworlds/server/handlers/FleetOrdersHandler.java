@@ -7,6 +7,7 @@ import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
@@ -156,6 +157,15 @@ public class FleetOrdersHandler extends RequestHandler {
                 if (!otherFleet.getDesignID().equals(fleet.getDesignID())) {
                     throw new RequestException(400, Messages.GenericError.ErrorCode.CannotMergeFleetDifferentDesign,
                             "Cannot merge two fleets of a different design.");
+                }
+
+                for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
+                    if (baseBuildRequest.getExistingFleetID() != null
+                            && (baseBuildRequest.getExistingFleetID() == fleet.getID()
+                                    || baseBuildRequest.getExistingFleetID() == otherFleet.getID())) {
+                        throw new RequestException(400, Messages.GenericError.ErrorCode.CannotMergeFleetDifferentDesign,
+                                "Cannot merge a fleet while it is being upgraded.");
+                    }
                 }
 
                 String notes = fleet.getNotes();

@@ -57,7 +57,10 @@ public class EmptyPlanetActivity extends BaseActivity {
                 } else {
                     String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
                     StarManager.eventBus.register(mEventHandler);
-                    StarManager.getInstance().requestStar(starKey, false, null);
+                    Star star = StarManager.i.getStar(Integer.parseInt(starKey));
+                    if (star != null) {
+                        refresh(star);
+                    }
                 }
             }
         });
@@ -70,15 +73,19 @@ public class EmptyPlanetActivity extends BaseActivity {
                 return;
             }
 
-            int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
-
-            mStar = s;
-            mPlanet = (Planet) s.getPlanets()[planetIndex - 1];
-
-            PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
-            planetDetails.setup(mStar, mPlanet, null);
+            refresh(s);
         }
     };
+
+    private void refresh(Star star) {
+        int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
+
+        mStar = star;
+        mPlanet = (Planet) star.getPlanets()[planetIndex - 1];
+
+        PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
+        planetDetails.setup(mStar, mPlanet, null);
+    }
 
     private void onColonizeClick() {
         MyEmpire empire = EmpireManager.i.getEmpire();

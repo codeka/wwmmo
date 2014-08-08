@@ -1,0 +1,232 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Alliances{% endblock %}
+{% block head %}
+  <script src="/realms/{{realm}}/js/tmpl.js"></script>
+  <script src="/realms/{{realm}}/js/time.js"></script>
+  <script src="/realms/{{realm}}/js/empirestore.js"></script>
+  <script src="/realms/{{realm}}/js/tabs.js"></script>
+  <style>
+    div.left-column {
+      position: absolute;
+      left: 0; top: 90px; bottom: 0;
+      width: 49%;
+      padding-right: 10px;
+      overflow-y: scroll;
+    }
+    div.right-column {
+      position: absolute;
+      right: 0; top: 90px; bottom: 0;
+      width: 49%;
+      overflow-y: scroll;
+    }
+    div.spinner {
+      margin: 2em auto;
+    }
+    #alliance-list {
+      width: 100%;
+    }
+    #member-list {
+      width: 100%;
+    }
+    #audit-list {
+      width: 100%;
+    }
+    td.notes {
+      color: #aaa;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Alliances</h1>
+  <div class="left-column">
+    <table id="alliance-list">
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          <th>Name</th>
+          <th style="text-align: right;">Members</th>
+          <th style="text-align: right;">Bank</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="4"><div class="spinner"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="alliance-details-spinner" class="right-column" style="display: none;">
+    <div class="spinner"></div>
+  </div>
+  <div id="alliance-details" class="right-column" style="display: none;">
+    <div id="alliance-header"></div>
+    <ul class="tabs">
+      <li><a href="javascript:;" data-tab="alliance-members" class="selected">Members</a>
+      <li><a href="javascript:;" data-tab="alliance-requests">Requests</a>
+      <li><a href="javascript:;" data-tab="alliance-audit">Bank Audit</a>
+    </ul>
+    <div id="alliance-members">
+      <table id="member-list">
+        <thead>
+          <tr>
+            <th></th>
+            <th></th>
+            <th>Name</th>
+            <th>Rank</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+    <div id="alliance-requests">
+      <p>Requests</p>
+    </div>
+    <div id="alliance-audit">
+      <table id="audit-list">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Empire</th>
+            <th>Date</th>
+            <th>Before</th>
+            <th>After</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="text/html" id="alliance-tmpl">
+    <tr>
+      <td><%= key %></td>
+      <td><img src="/realms/{{realm}}/alliances/<%= key %>/shield?size=32" width="32" height="32" /></td>
+      <td><a href="javascript:;" class="alliance-name" data-id=<%= key %>><%= name %></a></td>
+      <td style="text-align: right;"><%= num_members %></td>
+      <td style="text-align: right;">$<%= formatNumber(bank_balance) %></td>
+    </tr>
+  </script>
+
+  <script type="text/html" id="alliance-header-tmpl">
+    <h2>
+      <img src="/realms/{{realm}}/alliances/<%= key %>/shield?size=32" width="32" height="32" />
+      <%= name %>
+    </h2>
+  </script>
+
+  <script type="text/html" id="alliance-audit-tmpl">
+    <tr>
+      <td><%= alliance_request_id %></td>
+      <td>
+        <img src="/realms/{{realm}}/empires/<%= empire_id %>/shield?final=1&size=32" width="32" height="32" />
+        <a href="/realms/{{realm}}/admin/empire/search#id=<%= empire_id %>" class="empire-name"></a>
+      </td>
+      <td><time timestamp="<%= date / 1000 %>"><%= date %></time></td>
+      <td>$<%= formatNumber(amount_before) %></td>
+      <td>$<%= formatNumber(amount_after) %></td>
+    </tr>
+    <tr>
+      <td class="notes" colspan="5"><%= message %></td>
+    </tr>
+  </script>
+
+  <script type="text/html" id="member-tmpl">
+    <tr>
+      <td><%= empire_key %></td>
+      <td><img src="/realms/{{realm}}/empires/<%= empire_key %>/shield?final=1&size=32" width="32" height="32" /></td>
+      <td><span class="empire-name"></span></td>
+      <td><%= rank %></td>
+      <td><time timestamp="<%= time_joined %>"><%= time_joined %></time></td>
+    </tr>
+  </script>
+
+  <script>
+    var alliances = {};
+
+    $(function() {
+      var url = "/realms/{{realm}}/alliances";
+      $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          var allianceList = $("#alliance-list tbody");
+          allianceList.empty();
+          var tmpl = $("#alliance-tmpl");
+          for (var i = 0; i < data.alliances.length; i++) {
+            alliances[data.alliances[i].key] = data.alliances[i];
+            allianceList.append(tmpl.applyTemplate(data.alliances[i]));
+          }
+        },
+        error: function(xhr, status, err) {
+          alert("An error occured, check server logs: " + xhr.status);
+        }
+      });
+    });
+
+    $("#alliance-list").on("click", "a.alliance-name", function() {
+      $("#alliance-details-spinner").show();
+      $("#alliance-details").hide();
+
+      var memberTmpl = $("#member-tmpl");
+      function appendMember(membersList, member) {
+        var html = $(memberTmpl.applyTemplate(member));
+        empireStore.getEmpire(member.empire_key, function(empireName) {
+          html.find(".empire-name").html(empireName);
+        });
+        membersList.append(html);
+      }
+
+      var auditTmpl = $("#alliance-audit-tmpl");
+      function appendAudit(auditList, audit) {
+        var html = $(auditTmpl.applyTemplate(audit));
+        empireStore.getEmpire(audit.empire_id, function(empireName) {
+          html.find(".empire-name").html(empireName);
+        });
+        auditList.append(html);
+      }
+
+      $("#alliance-header").html($("#alliance-header-tmpl").applyTemplate(
+              alliances[$(this).data("id")]));
+      var url = "/realms/{{realm}}/alliances/" + $(this).data("id");
+      $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          var membersList = $("#member-list tbody");
+          membersList.empty();
+          for (var i = 0; i < data.members.length; i++) {
+            appendMember(membersList, data.members[i]);
+          }
+          fix_times();
+
+          $("#alliance-details-spinner").hide();
+          $("#alliance-details").show();
+        },
+        error: function(xhr, status, err) {
+          alert("An error occured, check server logs: " + xhr.status);
+        }
+      });
+
+      $.ajax({
+        url: "/realms/{{realm}}/admin/alliance/" + $(this).data("id") + "/details?section=audit",
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          var auditList = $("#audit-list tbody");
+          auditList.empty();
+          for (var i = 0; i < data.length; i++) {
+            appendAudit(auditList, data[i]);
+          }
+          fix_times();
+        },
+        error: function(xhr, status, err) {
+          alert("An error occured, check server logs: " + xhr.status);
+        }
+      })
+    });
+  </script>
+{% endblock %}

@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game.wormhole;
 
 import java.util.Random;
 
+import org.andengine.engine.Engine;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
@@ -14,14 +15,14 @@ import org.andengine.opengl.texture.region.TiledTextureRegion;
 
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
-import au.com.codeka.warworlds.BaseGlActivity;
+import au.com.codeka.warworlds.BaseGlFragment;
 import au.com.codeka.warworlds.game.starfield.RadarIndicatorEntity;
 import au.com.codeka.warworlds.model.Sector;
 
 public class WormholeSceneManager {
     private static final Log log = new Log("SectorSceneManager");
     private Scene mScene;
-    private BaseGlActivity mActivity;
+    private BaseGlFragment mFragment;
     private String mWormholeStarKey;
     private boolean mWasStopped;
 
@@ -33,37 +34,37 @@ public class WormholeSceneManager {
     private BitmapTextureAtlas mBackgroundStarsTextureAtlas;
     private TiledTextureRegion mBackgroundStarsTextureRegion;
 
-    public WormholeSceneManager(BaseGlActivity activity, String starKey) {
-        mActivity = activity;
-        mWormholeStarKey = starKey;
+    public WormholeSceneManager(BaseGlFragment fragment, int starID) {
+        mFragment = fragment;
+        mWormholeStarKey = Integer.toString(starID);
     }
 
-    public BaseGlActivity getActivity() {
-        return mActivity;
+    public BaseGlFragment getFragment() {
+        return mFragment;
     }
 
     public void onLoadResources() {
-        mWormholeTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        mWormholeTextureAtlas = new BitmapTextureAtlas(mFragment.getTextureManager(), 512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         mWormholeTextureAtlas.setTextureAtlasStateListener(new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
 
-        mWormholeTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mWormholeTextureAtlas, mActivity,
-                "stars/wormhole_big.png", 0, 0, 2, 2);
+        mWormholeTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(
+                mWormholeTextureAtlas, mFragment.getActivity(), "stars/wormhole_big.png", 0, 0, 2, 2);
 
-        mBackgroundGasTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 512, 512,
+        mBackgroundGasTextureAtlas = new BitmapTextureAtlas(mFragment.getTextureManager(), 512, 512,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         mBackgroundGasTextureAtlas.setTextureAtlasStateListener(new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
 
-        mBackgroundGasTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBackgroundGasTextureAtlas,
-                mActivity, "decoration/gas.png", 0, 0, 4, 4);
-        mBackgroundStarsTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 512, 512,
+        mBackgroundGasTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(
+                mBackgroundGasTextureAtlas, mFragment.getActivity(), "decoration/gas.png", 0, 0, 4, 4);
+        mBackgroundStarsTextureAtlas = new BitmapTextureAtlas(mFragment.getTextureManager(), 512, 512,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-        mBackgroundStarsTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBackgroundStarsTextureAtlas,
-                mActivity, "decoration/starfield.png", 0, 0, 4, 4);
+        mBackgroundStarsTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(
+                mBackgroundStarsTextureAtlas, mFragment.getActivity(), "decoration/starfield.png", 0, 0, 4, 4);
 
-        mActivity.getShaderProgramManager().loadShaderProgram(RadarIndicatorEntity.getShaderProgram());
-        mActivity.getTextureManager().loadTexture(mWormholeTextureAtlas);
-        mActivity.getTextureManager().loadTexture(mBackgroundGasTextureAtlas);
-        mActivity.getTextureManager().loadTexture(mBackgroundStarsTextureAtlas);
+        mFragment.getShaderProgramManager().loadShaderProgram(RadarIndicatorEntity.getShaderProgram());
+        mFragment.getTextureManager().loadTexture(mWormholeTextureAtlas);
+        mFragment.getTextureManager().loadTexture(mBackgroundGasTextureAtlas);
+        mFragment.getTextureManager().loadTexture(mBackgroundStarsTextureAtlas);
     }
 
     public void onStart() {
@@ -94,21 +95,24 @@ public class WormholeSceneManager {
                     return;
                 }
 
-                mActivity.getEngine().runOnUpdateThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mActivity.getEngine().setScene(scene);
-                    }
-                });
+                final Engine engine = mFragment.getEngine();
+                if (engine != null) {
+                    engine.runOnUpdateThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            engine.setScene(scene);
+                        }
+                    });
+                }
             }
         }.execute();
     }
 
 
     public Scene createScene() {
-        if (mActivity.getEngine() == null) {
+        if (mFragment.getEngine() == null) {
             // if the engine hasn't been created yet, schedule a refresh for later...
-            mActivity.runOnUpdateThread(new Runnable() {
+            mFragment.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
                     refreshScene();
@@ -122,7 +126,7 @@ public class WormholeSceneManager {
 
         drawBackground(mScene);
 
-        WormholeEntity entity = new WormholeEntity(this, mWormholeTextureRegion, mActivity.getVertexBufferObjectManager());
+        WormholeEntity entity = new WormholeEntity(this, mWormholeTextureRegion, mFragment.getVertexBufferObjectManager());
         mScene.attachChild(entity);
 
         return mScene;
@@ -136,7 +140,7 @@ public class WormholeSceneManager {
                 Sprite bgSprite = new Sprite(
                         (float) x * STAR_SIZE, (float) y * STAR_SIZE, STAR_SIZE, STAR_SIZE,
                         mBackgroundStarsTextureRegion.getTextureRegion(r.nextInt(16)),
-                        mActivity.getVertexBufferObjectManager());
+                        mFragment.getVertexBufferObjectManager());
                 scene.attachChild(bgSprite);
             }
         }
@@ -149,7 +153,7 @@ public class WormholeSceneManager {
             Sprite bgSprite = new Sprite(
                     x - (GAS_SIZE / 2.0f), y - (GAS_SIZE / 2.0f), GAS_SIZE, GAS_SIZE,
                     mBackgroundGasTextureRegion.getTextureRegion(r.nextInt(14)),
-                    mActivity.getVertexBufferObjectManager());
+                    mFragment.getVertexBufferObjectManager());
             scene.attachChild(bgSprite);
         }
     }

@@ -72,7 +72,7 @@ public class FleetManager {
             protected void onComplete(Boolean success) {
                 if (success) {
                     // the star this fleet is attached to needs to be refreshed...
-                    StarManager.getInstance().refreshStar(fleet.getStarKey());
+                    StarManager.i.refreshStar(Integer.parseInt(fleet.getStarKey()));
 
                     if (handler != null) {
                         handler.onFleetBoosted(fleet);
@@ -109,8 +109,11 @@ public class FleetManager {
             @Override
             protected void onComplete(Boolean success) {
                 if (success) {
-                    // the star this fleet is attached to needs to be refreshed...
-                    StarManager.getInstance().refreshStar(fleet.getStarKey());
+                    // we need to refresh both this star and the destination star
+                    if (star.getWormholeExtra() != null) {
+                        StarManager.i.refreshStar(star.getWormholeExtra().getDestWormholeID());
+                    }
+                    StarManager.i.refreshStar(star.getID());
 
                     if (handler != null) {
                         handler.onFleetEnteredWormhole(fleet);

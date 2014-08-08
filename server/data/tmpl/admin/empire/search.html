@@ -106,7 +106,7 @@
       <td align="center"><%=key%></td>
       <td align="center"><img src="/realms/{{realm}}/empires/<%=key%>/shield?final=1&size=32" width="32" height="32" /></td>
       <td><a href="javascript:;" class="empire-name" data-id="<%=key%>"><%=display_name%></a><br/><span style="color: #aaa;"><%=email%></span></td>
-      <td align="center"><%=rank.rank%></td>
+      <td align="center"><% if (rank) { %><%=rank.rank%><% } %></td>
     </tr>
   </script>
   <script>

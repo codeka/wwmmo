@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.server.handlers.admin;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,6 @@ public class AdminChatHandler extends AdminGenericHandler {
                     " INNER JOIN empires ON chat_sinbin.empire_id = empires.id" +
                     " WHERE expiry > NOW()";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setDateTime(1, DateTime.now().minusHours(24));
             SqlResult res = stmt.select();
             ArrayList<TreeMap<String, Object>> sinbin = new ArrayList<TreeMap<String, Object>>();
             while (res.next()) {

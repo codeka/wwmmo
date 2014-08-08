@@ -120,7 +120,7 @@ public class AllianceShieldHandler extends RequestHandler {
 
         Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
         Empire empire = new EmpireController().getEmpire(empireID);
-        empire.toProtocolBuffer(empire_pb);
+        empire.toProtocolBuffer(empire_pb, true);
         setResponseBody(empire_pb.build());
     }
 }

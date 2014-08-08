@@ -5,16 +5,19 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.TreeSet;
 
 import android.support.v4.util.LruCache;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
+import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.eventbus.EventBus;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 
@@ -30,92 +33,70 @@ import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
  */
 public class SectorManager extends BaseManager {
     private static final Log log = new Log("SectorManager");
-    private static SectorManager sInstance;
+    public static SectorManager i = new SectorManager();
 
-    public static SectorManager getInstance() {
-        if (sInstance == null) {
-            sInstance = new SectorManager();
-        }
-        return sInstance;
-    }
+    public static EventBus eventBus = new EventBus();
 
-    private SectorCache mSectors;
-    private Map<Pair<Long, Long>, List<OnSectorsFetchedListener>> mInTransitListeners;
-    private CopyOnWriteArrayList<OnSectorListChangedListener> mSectorListChangedListeners;
-    private Map<String, Star> mSectorStars;
+    private final SectorCache sectors = new SectorCache();
+    private final Set<Pair<Long, Long>> pendingSectors = new TreeSet<Pair<Long, Long>>();
+    private final Map<String, Star> sectorStars = new TreeMap<String, Star>();
 
     private SectorManager() {
-        mSectors = new SectorCache();
-        mInTransitListeners = new TreeMap<Pair<Long, Long>, List<OnSectorsFetchedListener>>();
-        mSectorListChangedListeners = new CopyOnWriteArrayList<OnSectorListChangedListener>();
-        mSectorStars = new TreeMap<String, Star>();
-
         StarManager.eventBus.register(eventHandler);
     }
 
-    private Object eventHandler = new Object() {
+    private final Object eventHandler = new Object() {
         @EventHandler
         public void onStarUpdated(Star star) {
             Star ourStar = findStar(star.getKey());
             if (ourStar != null) {
-                if (!ourStar.getName().equals(star.getName())) {
-                    ourStar.setName(star.getName());
-                    fireSectorListChanged();
+                if (!areStarsSame(ourStar, star)) {
+                    sectorStars.put(star.getKey(), star);
+                    Pair<Long, Long> coord = new Pair<Long, Long>(
+                            star.getSectorX(), star.getSectorY());
+                    Sector sector = sectors.get(coord);
+                    if (sector != null) {
+                        for (int i = 0; i < sector.getStars().size(); i++) {
+                            if (sector.getStars().get(i).getKey().equals(star.getKey())) {
+                                sector.getStars().set(i, star);
+                                eventBus.publish(sector);
+                            }
+                        }
+                    }
                 }
             }
         }
     };
 
     public void clearCache() {
-        mSectorStars.clear();
-        mSectors.clear();
+        sectorStars.clear();
+        sectors.clear();
     }
 
     public Sector getSector(long sectorX, long sectorY) {
         Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
-        return mSectors.get(key);
+        return sectors.get(key);
     }
 
     public StarfieldBackgroundRenderer getBackgroundRenderer(Sector s) {
         Pair<Long, Long> coords = new Pair<Long, Long>(s.getX(), s.getY());
-        return mSectors.getBackgroundRenderer(coords);
+        return sectors.getBackgroundRenderer(coords);
     }
 
     public Collection<Sector> getSectors() {
-        return mSectors.getAllSectors();
+        return sectors.getAllSectors();
     }
 
     /**
      * Finds the star with the given key.
      */
     public Star findStar(String starKey) {
-        return mSectorStars.get(starKey);
+        return sectorStars.get(starKey);
     }
 
     /** Gets a collection of all visible stars. This is "pretty" big... */
     public Collection<Star> getAllVisibleStars() {
-        return mSectorStars.values();
-    }
-
-    public void addSectorListChangedListener(OnSectorListChangedListener onSectorListChanged) {
-        if (mSectorListChangedListeners.contains(onSectorListChanged))
-            return;
-        mSectorListChangedListeners.add(onSectorListChanged);
-    }
-
-    public void removeSectorListChangedListener(OnSectorListChangedListener onSectorListChanged) {
-        if (!mSectorListChangedListeners.contains(onSectorListChanged))
-            return;
-        mSectorListChangedListeners.remove(onSectorListChanged);
-    }
-
-    public void fireSectorListChanged() {
-        for(final OnSectorListChangedListener listener : mSectorListChangedListeners) {
-            fireHandler(listener, new Runnable() {
-                @Override
-                public void run() { listener.onSectorListChanged(); }
-            });
-        }
+        return sectorStars.values();
     }
 
     /**
@@ -125,41 +106,27 @@ public class SectorManager extends BaseManager {
     public void refreshSector(long sectorX, long sectorY) {
         ArrayList<Pair<Long, Long>> coords = new ArrayList<Pair<Long, Long>>();
         coords.add(new Pair<Long, Long>(sectorX, sectorY));
-        requestSectors(coords, true, null);
+        refreshSectors(coords, true);
     }
 
     /**
      * Fetches the details of a bunch of sectors from the server.
      */
-    public void requestSectors(final List<Pair<Long, Long>> coords,
-                               boolean force, final OnSectorsFetchedListener callback) {
+    public void refreshSectors(final List<Pair<Long, Long>> coords, boolean force) {
         Map<Pair<Long, Long>, Sector> existingSectors = new TreeMap<Pair<Long, Long>, Sector>();
         final List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
         synchronized(this) {
             for (Pair<Long, Long> coord : coords) {
-                Sector s = mSectors.get(coord);
+                Sector s = sectors.get(coord);
                 if (s != null && !force) {
                     existingSectors.put(coord, s);
-                } else if (mInTransitListeners.containsKey(coord)) {
-                    if (callback != null) {
-                        List<OnSectorsFetchedListener> listeners = mInTransitListeners.get(coord);
-                        listeners.add(callback);
-                    }
-                } else {
+                } else if (!pendingSectors.contains(coord)) {
+                    pendingSectors.add(coord);
                     missingSectors.add(coord);
                 }
             }
 
-            if (!existingSectors.isEmpty() && callback != null) {
-                callback.onSectorsFetched(existingSectors);
-            }
-
             if (!missingSectors.isEmpty()) {
-                // record the fact that we've now got these sectors in transit
-                for (Pair<Long, Long> coord : missingSectors) {
-                    mInTransitListeners.put(coord, new ArrayList<OnSectorsFetchedListener>());
-                }
-
                 new BackgroundRunner<List<Sector>>() {
                     @Override
                     protected List<Sector> doInBackground() {
@@ -190,51 +157,59 @@ public class SectorManager extends BaseManager {
 
                     @Override
                     protected void onComplete(List<Sector> sectors) {
-                        Map<Pair<Long, Long>, Sector> theseSectors = null;
-                        synchronized(this) {
-                            if (callback != null)
-                                theseSectors = new TreeMap<Pair<Long, Long>, Sector>();
-                            if (sectors != null) for(Sector s : sectors) {
-                                Pair<Long, Long> key = new Pair<Long, Long>(s.getX(), s.getY());
+                        if (sectors != null) for(Sector s : sectors) {
+                            Pair<Long, Long> key = new Pair<Long, Long>(s.getX(), s.getY());
 
-                                mSectors.put(key, s);
-                                if (callback != null) {
-                                    theseSectors.put(key, s);
-                                }
+                            SectorManager.this.sectors.put(key, s);
 
-                                for (BaseStar star : s.getStars()) {
-                                    mSectorStars.put(star.getKey(), (Star) star);
-                                }
-
-                                Map<Pair<Long, Long>, Sector> thisSector = null;
-                                List<OnSectorsFetchedListener> listeners = mInTransitListeners.get(key);
-                                if (listeners != null) {
-                                    for (OnSectorsFetchedListener listener : listeners) {
-                                        if (listener != null) {
-                                            if (thisSector == null) {
-                                                thisSector = new TreeMap<Pair<Long, Long>, Sector>();
-                                                thisSector.put(key, s);
-                                            }
-
-                                            listener.onSectorsFetched(thisSector);
-                                        }
-                                    }
-                                }
+                            for (BaseStar star : s.getStars()) {
+                                sectorStars.put(star.getKey(), (Star) star);
                             }
 
-                            for (Pair<Long, Long> coord : missingSectors) {
-                                mInTransitListeners.remove(coord);
-                            }
+                            eventBus.publish(s);
                         }
 
-                        if (callback != null) {
-                            callback.onSectorsFetched(theseSectors);
+                        for (Pair<Long, Long> coord : missingSectors) {
+                            pendingSectors.remove(coord);
                         }
-                        fireSectorListChanged();
+
+                        eventBus.publish(new SectorListChangedEvent());
                     }
                 }.execute();
             }
         }
+    }
+
+    /**
+     * Determines whether the two stars are the "same" for our purposes. They're only different
+     * if they have a new name, or if a fleet has gone from moving->idle or idle->moving.
+     */
+    private boolean areStarsSame(Star lhs, Star rhs) {
+        if (!lhs.getName().equals(rhs.getName())) {
+            return false;
+        }
+
+        for (BaseFleet lhsBaseFleet : lhs.getFleets()) {
+            Fleet lhsFleet = (Fleet) lhsBaseFleet;
+            Fleet rhsFleet = (Fleet) rhs.getFleet(Integer.parseInt(lhsFleet.getKey()));
+            if (rhsFleet == null) {
+                return false;
+            }
+
+            if (lhsFleet.getState() != rhsFleet.getState()) {
+                return false;
+            }
+        }
+
+        for (BaseFleet rhsBaseFleet : rhs.getFleets()) {
+            Fleet rhsFleet = (Fleet) rhsBaseFleet;
+            Fleet lhsFleet = (Fleet) lhs.getFleet(Integer.parseInt(rhsFleet.getKey()));
+            if (lhsFleet == null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static class SectorCache implements RealmManager.RealmChangedHandler {
@@ -314,11 +289,6 @@ public class SectorManager extends BaseManager {
         }
     }
 
-    public interface OnSectorListChangedListener {
-        void onSectorListChanged();
-    }
-
-    public interface OnSectorsFetchedListener {
-        void onSectorsFetched(Map<Pair<Long, Long>, Sector> sectors);
+    public static class SectorListChangedEvent {
     }
 }

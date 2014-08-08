@@ -257,8 +257,11 @@ public abstract class Design {
     public static class BuildCost {
         private int mTimeInSeconds;
         private float mCostInMinerals;
+        private int mMaxCount;
 
         public BuildCost(Element costElement) {
+            mMaxCount = 5000;
+
             String value = costElement.getAttribute("time");
             if (!value.equals("")) {
                 double timeInHours = Double.parseDouble(value);
@@ -270,6 +273,10 @@ public abstract class Design {
                 mCostInMinerals = Float.parseFloat(value);
             }
 
+            value = costElement.getAttribute("maxCount");
+            if (!value.equals("")) {
+                mMaxCount = Integer.parseInt(value);
+            }
         }
 
         public int getTimeInSeconds() {
@@ -277,6 +284,9 @@ public abstract class Design {
         }
         public float getCostInMinerals() {
             return mCostInMinerals;
+        }
+        public int getMaxCount() {
+            return mMaxCount;
         }
     }
 }

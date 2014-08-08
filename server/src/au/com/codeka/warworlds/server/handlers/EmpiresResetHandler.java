@@ -21,7 +21,8 @@ public class EmpiresResetHandler extends RequestHandler {
         int empireID = getSession().getEmpireID();
 
         // make sure they've purchased the right sku for the number of stars they have
-        ArrayList<Integer> starIDs = new EmpireController().getStarsForEmpire(empireID);
+        ArrayList<Integer> starIDs = new EmpireController().getStarsForEmpire(empireID,
+                EmpireController.EmpireStarsFilter.Everything, null);
         List<Star> stars = new StarController().getStars(starIDs);
         int numStarsWithColonies = 0;
         for (Star star : stars) {

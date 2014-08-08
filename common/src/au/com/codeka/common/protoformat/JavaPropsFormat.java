@@ -916,7 +916,7 @@ public class JavaPropsFormat extends AbstractCharBasedFormatter {
 
     if (field.isRepeated()) {
       int collectionCount = builder.getRepeatedFieldCount(field) - 1;
-      if (collectionCount < collectionIndex) {
+      if (collectionIndex == null || collectionCount < collectionIndex) {
         // Need to initialize the list.  Apparently setRepeatedField does not initialize it :(
         builder.addRepeatedField(field, value);
       } else {

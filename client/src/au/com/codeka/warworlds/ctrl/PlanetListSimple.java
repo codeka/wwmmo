@@ -18,7 +18,7 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.game.EnemyEmpireActivity;
+import au.com.codeka.warworlds.game.empire.EnemyEmpireActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;

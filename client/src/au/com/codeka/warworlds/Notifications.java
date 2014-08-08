@@ -31,7 +31,6 @@ import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.game.SitrepActivity;
-import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -105,25 +104,18 @@ public class Notifications {
         try {
             // refresh the star this situation report is for, obviously
             // something happened that we'll want to know about
-            Star star = StarManager.getInstance().refreshStarSync(pb.getStarKey(), true);
-            log.debug("Refreshed star: successful? %s", star == null ? "false" : "true");
-            if (star == null) { // <-- only refresh the star if we have one cached
+            boolean refreshed = StarManager.i.refreshStar(Integer.parseInt(pb.getStarKey()), true);
+            log.debug("Refreshed star: successful? %s", refreshed ? "false" : "true");
+            if (!refreshed) { // <-- only refresh the star if we have one cached
                 // if we didn't refresh the star, then at least refresh
                 // the sector it was in (could have been a moving
                 // fleet, say)
-                star = SectorManager.getInstance().findStar(pb.getStarKey());
+                Star star = SectorManager.i.findStar(pb.getStarKey());
                 if (star != null) {
                     log.debug("Star found from sector manager instead.");
-                    SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+                    SectorManager.i.refreshSector(star.getSectorX(), star.getSectorY());
                 }
-            } else {
-                log.debug("Firing star updated...");
-                StarManager.eventBus.publish(star);
             }
-
-            // notify the build manager, in case it's a 'build complete' or something
-            log.debug("Notifying build manager.");
-            BuildManager.getInstance().notifySituationReport(pb);
 
             log.debug("Displaying a notification...");
             displayNotification(context, pb);
@@ -183,7 +175,7 @@ public class Notifications {
     private static void displayNotification(final Context context,
                                             final Messages.SituationReport sitrep) {
         String starKey = sitrep.getStarKey();
-        StarSummary starSummary = StarManager.getInstance().getStarSummaryNoFetch(starKey,
+        StarSummary starSummary = StarManager.i.getStarSummary(Integer.parseInt(starKey),
                 Float.MAX_VALUE // always prefer a cached version, no matter how old
             );
         if (starSummary == null) {
@@ -259,7 +251,7 @@ public class Notifications {
             num++;
         }
 
-        if (num == 0) {
+        if (num == 0 || options == null) {
             return null;
         }
 

@@ -1,10 +1,12 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Context;
 import android.text.Html;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -16,7 +18,7 @@ import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -27,6 +29,7 @@ import au.com.codeka.warworlds.model.FleetUpgrade;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
+import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 
 /** This view displays information about a fleet you've selected on the starfield view. */
@@ -95,29 +98,33 @@ public class FleetInfoView extends FrameLayout {
         }
 
         fleetDesign.removeAllViews();
-        FleetList.populateFleetNameRow(mContext, fleetDesign, fleet, design, 18.0f);
+        FleetListRow.populateFleetNameRow(mContext, fleetDesign, fleet, design, 18.0f);
         fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
         fleetDestination.removeAllViews();
-        FleetList.populateFleetDestinationRow(mContext, fleetDestination, fleet, false);
+        FleetListRow.populateFleetDestinationRow(mContext, fleetDestination, fleet, false);
 
-        FleetList.fetchSrcDestStar(fleet, null, new FleetList.SrcDestStarsFetchedHandler() {
-            @Override
-            public void onSrcDestStarsFetched(StarSummary srcStar, StarSummary destStar) {
-                float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
-                float timeFromSourceInHours = fleet.getTimeFromSource();
-                float timeToDestinationInHours = fleet.getTimeToDestination();
+        ArrayList<Integer> starIDs = new ArrayList<Integer>();
+        starIDs.add(Integer.parseInt(fleet.getStarKey()));
+        starIDs.add(Integer.parseInt(fleet.getDestinationStarKey()));
+        SparseArray<StarSummary> starSummaries = StarManager.i.getStarSummaries(
+                starIDs, Float.MAX_VALUE);
+        StarSummary srcStar = starSummaries.get(Integer.parseInt(fleet.getStarKey()));
+        StarSummary destStar = starSummaries.get(Integer.parseInt(fleet.getDestinationStarKey()));
+        if (srcStar != null && destStar != null) {
+            float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
+            float timeFromSourceInHours = fleet.getTimeFromSource();
+            float timeToDestinationInHours = fleet.getTimeToDestination();
 
-                float fractionRemaining = timeToDestinationInHours / (timeToDestinationInHours + timeFromSourceInHours);
-                progressBar.setMax(1000);
-                progressBar.setProgress(1000 - (int) (fractionRemaining * 1000.0f));
+            float fractionRemaining = timeToDestinationInHours / (timeToDestinationInHours + timeFromSourceInHours);
+            progressBar.setMax(1000);
+            progressBar.setProgress(1000 - (int) (fractionRemaining * 1000.0f));
 
-                String eta = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
-                        distanceInParsecs * fractionRemaining,
-                        TimeFormatter.create().format(timeToDestinationInHours));
-                progressText.setText(Html.fromHtml(eta));
-            }
-        });
+            String eta = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
+                    distanceInParsecs * fractionRemaining,
+                    TimeFormatter.create().format(timeToDestinationInHours));
+            progressText.setText(Html.fromHtml(eta));
+        }
 
         FleetUpgrade.BoostFleetUpgrade fleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");
         if (fleetUpgrade != null && !fleetUpgrade.isBoosting()) {

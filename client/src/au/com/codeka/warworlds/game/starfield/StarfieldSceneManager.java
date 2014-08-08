@@ -227,7 +227,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
         final List<Pair<Long, Long>> missingSectors = drawScene(scene);
         if (missingSectors != null) {
-            SectorManager.getInstance().requestSectors(missingSectors, false, null);
+            SectorManager.i.refreshSectors(missingSectors, false);
         }
 
         scene.refreshSelectionIndicator();
@@ -335,7 +335,6 @@ public class StarfieldSceneManager extends SectorSceneManager {
     }
 
     private List<Pair<Long, Long>> drawScene(StarfieldScene scene) {
-        SectorManager sm = SectorManager.getInstance();
         List<Pair<Long, Long>> missingSectors = null;
 
         ArrayList<Entity> newBackgroundEntities = new ArrayList<Entity>();
@@ -343,7 +342,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
                 long sX = mSectorX + x;
                 long sY = mSectorY + y;
-                Sector sector = sm.getSector(sX, sY);
+                Sector sector = SectorManager.i.getSector(sX, sY);
                 if (sector == null) {
                     if (missingSectors == null) {
                         missingSectors = new ArrayList<Pair<Long, Long>>();
@@ -366,7 +365,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
                 long sX = mSectorX + x;
                 long sY = mSectorY + y;
 
-                Sector sector = sm.getSector(sX, sY);
+                Sector sector = SectorManager.i.getSector(sX, sY);
                 if (sector == null) {
                     continue;
                 }
@@ -499,7 +498,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
      */
     private void addMovingFleet(StarfieldScene scene, Fleet fleet, Star srcStar, int offsetX, int offsetY) {
         // we'll need to find the destination star
-        Star destStar = SectorManager.getInstance().findStar(fleet.getDestinationStarKey());
+        Star destStar = SectorManager.i.findStar(fleet.getDestinationStarKey());
         if (destStar == null) {
             // the destination star isn't in one of the sectors we have in memory, we'll
             // just ignore this fleet (it's probably flying off the edge of the sector and our
@@ -526,8 +525,6 @@ public class StarfieldSceneManager extends SectorSceneManager {
     }
 
     private void addTacticalView(Scene scene) {
-        SectorManager sm = SectorManager.getInstance();
-
         ArrayList<Vector2> points = new ArrayList<Vector2>();
         SparseArray<List<Vector2>> empirePoints = new SparseArray<List<Vector2>>();
 
@@ -536,7 +533,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
                 long sX = mSectorX + x;
                 long sY = mSectorY + y;
 
-                Sector sector = sm.getSector(sX, sY);
+                Sector sector = SectorManager.i.getSector(sX, sY);
                 if (sector == null) {
                     continue;
                 }

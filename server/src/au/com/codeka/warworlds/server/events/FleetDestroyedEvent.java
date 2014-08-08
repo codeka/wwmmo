@@ -114,6 +114,7 @@ public class FleetDestroyedEvent extends Event {
                 }
 
                 if (onlyOneOtherEmpire && numDestroyedFleetEmpireFleets == 1 &&
+                        victoriousFleetSummary != null &&
                         victoriousFleetSummary.getEmpireKey() != null &&
                         !victoriousFleetSummary.getEmpireKey().isEmpty()) {
                     // if there's only one other empire, and only one fleet from the empire

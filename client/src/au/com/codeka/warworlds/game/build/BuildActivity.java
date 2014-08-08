@@ -43,7 +43,7 @@ import au.com.codeka.warworlds.TabFragmentFragment;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.BuildingsList;
-import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.NotesDialog;
 import au.com.codeka.warworlds.model.BuildManager;
@@ -124,7 +124,10 @@ public class BuildActivity extends BaseActivity {
                 }
 
                 StarManager.eventBus.register(mEventHandler);
-                StarManager.getInstance().requestStar(starKey, false, null);
+                Star star = StarManager.i.getStar(Integer.parseInt(starKey));
+                if (star != null) {
+                    updateStar(star);
+                }
             }
         });
     }
@@ -132,7 +135,7 @@ public class BuildActivity extends BaseActivity {
     @Override
     public void onPause() {
         super.onPause();
-        StarManager.eventBus.unregister(this);
+        StarManager.eventBus.unregister(mEventHandler);
     }
 
     @Override
@@ -545,7 +548,7 @@ public class BuildActivity extends BaseActivity {
                     }
 
                     row1.removeAllViews();
-                    FleetList.populateFleetNameRow(getActivity(), row1, fleet, design);
+                    FleetListRow.populateFleetNameRow(getActivity(), row1, fleet, design);
                     if (buildRequest != null) {
                         String verb = (fleet == null ? "Building" : "Upgrading");
                         row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
@@ -559,7 +562,7 @@ public class BuildActivity extends BaseActivity {
                     } else {
                         String upgrades = "";
                         for (ShipDesign.Upgrade upgrade : design.getUpgrades()) {
-                            if (!fleet.hasUpgrade(upgrade.getID())) {
+                            if (fleet != null && !fleet.hasUpgrade(upgrade.getID())) {
                                 if (upgrades.length() > 0) {
                                     upgrades += ", ";
                                 }
@@ -606,7 +609,7 @@ public class BuildActivity extends BaseActivity {
                     icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
                     row1.removeAllViews();
-                    FleetList.populateFleetNameRow(getActivity(), row1, null, design);
+                    FleetListRow.populateFleetNameRow(getActivity(), row1, null, design);
                     String requiredHtml = design.getDependenciesHtml(getColony());
                     row2.setText(Html.fromHtml(requiredHtml));
 

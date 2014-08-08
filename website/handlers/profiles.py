@@ -102,8 +102,9 @@ class EmpireAssociatePage(BasePage):
   """This page is used to add an associate between an empire in the game and a profile."""
   def get(self, cookie):
     """If we have a cookie, we'll look up the association request and, well, honour it!"""
-    
-  def post(self):
+    pass
+
+  def post(self, cookie):
     empire_id = self.request.POST.get("empire_id")
     realm_name, empire_id = empire_id.split(":")
     empire_id = int(empire_id)

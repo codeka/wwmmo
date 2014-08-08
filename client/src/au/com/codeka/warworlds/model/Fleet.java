@@ -30,9 +30,7 @@ public class Fleet extends BaseFleet {
             fleetUpgrade = new FleetUpgrade();
         }
 
-        if (pb != null) {
-            fleetUpgrade.fromProtocolBuffer(this, pb);
-        }
+        fleetUpgrade.fromProtocolBuffer(this, pb);
         return fleetUpgrade;
     }
 

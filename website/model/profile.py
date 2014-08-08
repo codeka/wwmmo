@@ -83,9 +83,10 @@ class Alliance(db.Model):
     alliance_mdl = Alliance.get(alliance_key)
     if not alliance_mdl:
       alliance_mdl = Alliance(key=alliance_key, realm_name=realm_name, alliance_id=int(alliance["key"]),
-                              name=alliance["name"].strip(), alliance_json=json.dumps(alliance))
+                              name=alliance["name"].strip().replace('\n', ' ').replace('\r', ' '),
+                              alliance_json=json.dumps(alliance))
     else:
-      alliance_mdl.name = alliance["name"]
+      alliance_mdl.name = alliance["name"].strip().replace('\n', ' ').replace('\r', ' ')
       alliance_mdl.alliance_json = json.dumps(alliance)
     alliance_mdl.put()
 

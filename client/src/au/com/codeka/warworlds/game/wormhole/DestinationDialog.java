@@ -3,9 +3,9 @@ package au.com.codeka.warworlds.game.wormhole;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -26,6 +26,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -43,16 +44,12 @@ public class DestinationDialog extends DialogFragment {
     private Star mDestWormhole;
     private View mView;
     private WormholeAdapter mWormholeAdapter;
-    private TreeMap<String, Empire> mEmpires;
 
     public void loadWormholes(Star srcWormhole) {
         mSrcWormhole = srcWormhole;
-
-        if (mEmpires == null) {
-            mEmpires = new TreeMap<String, Empire>();
-        }
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Activity activity = getActivity();
@@ -119,6 +116,18 @@ public class DestinationDialog extends DialogFragment {
         return dialog;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EmpireManager.eventBus.register(eventHandler);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EmpireManager.eventBus.unregister(eventHandler);
+    }
+
     private void onWormholesFetched(List<Star> wormholes) {
         final View progressBar = mView.findViewById(R.id.progress_bar);
         final ListView wormholeItems = (ListView) mView.findViewById(R.id.wormholes);
@@ -126,21 +135,16 @@ public class DestinationDialog extends DialogFragment {
         progressBar.setVisibility(View.GONE);
         wormholeItems.setVisibility(View.VISIBLE);
 
-        TreeSet<Integer> empireKeys = new TreeSet<Integer>();
+        TreeSet<Integer> empireIDs = new TreeSet<Integer>();
         for (Star wormhole : wormholes){
             int empireID = wormhole.getWormholeExtra().getEmpireID();
-            if (!empireKeys.contains(empireID)) {
-                empireKeys.add(empireID);
+            if (!empireIDs.contains(empireID)) {
+                empireIDs.add(empireID);
             }
         }
-        for (Integer empireID : empireKeys) {
-            if (mEmpires.containsKey(empireID)) {
-                continue;
-            }
-
+        for (Integer empireID : empireIDs) {
             Empire empire = EmpireManager.i.getEmpire(empireID);
             if (empire != null) {
-                mEmpires.put(empire.getKey(), empire);
                 mWormholeAdapter.notifyDataSetChanged();
             }
         }
@@ -174,12 +178,18 @@ public class DestinationDialog extends DialogFragment {
             @Override
             protected void onComplete(Star star) {
                 if (star != null) {
-                    StarManager.getInstance().updateStar(star);
+                    StarManager.i.notifyStarUpdated(star);
                 }
             }
         }.execute();
-
     }
+
+    private final Object eventHandler = new Object() {
+        @EventHandler
+        public void onEmpireUpdated(Empire empire) {
+            mWormholeAdapter.notifyDataSetChanged();
+        }
+    };
 
     private class WormholeAdapter extends BaseAdapter {
         private List<Star> mWormholes;
@@ -218,7 +228,7 @@ public class DestinationDialog extends DialogFragment {
             View view = convertView;
             if (view == null) {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
-                view = inflater.inflate(R.layout.wormhole_destination_entry_row, null);
+                view = inflater.inflate(R.layout.wormhole_destination_entry_row, parent, false);
             }
 
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
@@ -227,7 +237,7 @@ public class DestinationDialog extends DialogFragment {
             TextView empireName = (TextView) view.findViewById(R.id.empire_name);
             TextView distance = (TextView) view.findViewById(R.id.distance);
 
-            Empire empire = mEmpires.get(Integer.toString(wormhole.getWormholeExtra().getEmpireID()));
+            Empire empire = EmpireManager.i.getEmpire(wormhole.getWormholeExtra().getEmpireID());
             if (empire == null) {
                 empireIcon.setImageBitmap(null);
                 empireName.setText("");

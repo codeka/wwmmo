@@ -82,7 +82,7 @@ public class ChatController {
             msg.setEnglishMessage(msg_en);
         }
 
-        if (isInPenaltyBox(msg)) {
+        if (msg.getEmpireID() != null && isInPenaltyBox(msg)) {
             throw new RequestException(400, "You cannot post while in penalty.");
         }
 

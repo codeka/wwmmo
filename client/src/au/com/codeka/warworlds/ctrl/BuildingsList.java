@@ -187,11 +187,8 @@ public class BuildingsList extends ListView {
                 }
                 if (bd.getMaxPerEmpire() > 0) {
                     int numExisting = BuildManager.getInstance().getTotalBuildingsInEmpire(bd.getID());
-                    for (BuildRequest br : BuildManager.getInstance().getBuildRequests()) {
-                        if (br.getDesignID().equals(bd.getID())) {
-                            numExisting ++;
-                        }
-                    }
+                    // If you're building one, we'll still think it's OK to build again, but it's
+                    // actually going to be blocked by the server.
                     if (numExisting >= bd.getMaxPerEmpire()) {
                         continue;
                     }
@@ -334,7 +331,7 @@ public class BuildingsList extends ListView {
                     row3.setVisibility(View.GONE);
                     progress.setVisibility(View.VISIBLE);
                     progress.setProgress((int) buildRequest.getPercentComplete());
-                } else {
+                } else if (building != null) {
                     if (numUpgrades < building.getLevel()) {
                         row2.setText("No more upgrades");
                         row3.setVisibility(View.GONE);

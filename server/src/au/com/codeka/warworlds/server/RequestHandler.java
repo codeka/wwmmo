@@ -120,9 +120,11 @@ public class RequestHandler {
         }
 
         // if we get here, it's because we exceeded the number of retries.
-        log.error("Too many retries: "+request.getRequestURI(), lastException);
-        lastException.populate(mResponse);
-        handleException(lastException);
+        if (lastException != null) {
+            log.error("Too many retries: "+request.getRequestURI(), lastException);
+            lastException.populate(mResponse);
+            handleException(lastException);
+        }
     }
 
     protected void handleException(RequestException e) {
@@ -158,6 +160,15 @@ public class RequestHandler {
      */
     protected boolean supportsRetryOnDeadlock() {
         return false;
+    }
+
+    protected void setResponseText(String text) {
+        mResponse.setContentType("text/plain");
+        mResponse.setCharacterEncoding("utf-8");
+        try {
+            mResponse.getWriter().write(text);
+        } catch (IOException e) {
+        }
     }
 
     protected void setResponseJson(Map<String, Object> data) {

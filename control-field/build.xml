@@ -16,16 +16,18 @@
 
     <target name="clean">
         <delete dir="bin" />
+        <delete dir="out" />
     </target>
 
     <target name="build">
         <echo message="${ant.project.name}: ${ant.file}" />
-        <mkdir dir="bin"/>
+        <mkdir dir="bin" />
         <javac debug="true" debuglevel="lines,source" destdir="bin" includeantruntime="false"
                source="1.6" target="1.6">
             <src path="src"/>
             <classpath refid="control-field.classpath"/>
         </javac>
-        <jar destfile="bin/${ant.project.name}.jar" basedir="bin" />
+        <mkdir dir="out" />
+        <jar destfile="out/${ant.project.name}.jar" basedir="bin" />
     </target>
 </project>

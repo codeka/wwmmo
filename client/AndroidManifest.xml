@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="802"
-    android:versionName="0.4.802"
+    android:versionCode="830"
+    android:versionName="0.5.830"
     android:installLocation="auto"
     android:largeHeap="@bool/largeHeap">
 
-    <!-- Android SDK version 2.2 (API level 8) is the minimum we can viably support, since
-         that's what GCM required. We'd prefer ICS+ though... -->
-    <uses-sdk android:minSdkVersion="8"
-              android:targetSdkVersion="17" />
+    <!-- Android SDK version 2.3 (API level 9) is the minimum we can viably support, since
+         that's what Google Play Services requires. We'd prefer ICS+ though... -->
+    <uses-sdk android:minSdkVersion="9"
+              android:targetSdkVersion="19" />
 
     <!-- We use OpenGL ES 2.0 -->
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
@@ -66,28 +66,26 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AccountsActivity"
-                  android:label="@string/app_name" />
+        <activity android:name=".AccountsActivity" />
         <activity android:name=".WarmWelcomeActivity" />
         <activity android:name=".GlobalOptionsActivity" />
         <activity android:name=".EmpireSetupActivity" />
         <activity android:name=".RealmSelectActivity" />
         <activity android:name=".EmpireResetActivity" />
         <activity android:name=".BlitzResetActivity" />
-        <activity android:name=".game.EmpireActivity" />
-        <activity android:name=".game.EnemyEmpireActivity" />
         <activity android:name=".game.build.BuildActivity" />
+        <activity android:name=".game.empire.EmpireActivity" />
+        <activity android:name=".game.empire.EnemyEmpireActivity" />
         <activity android:name=".game.FleetMoveActivity" />
-        <activity android:name=".game.starfield.StarfieldActivity" />
         <activity android:name=".game.solarsystem.SolarSystemActivity" />
         <activity android:name=".game.solarsystem.EnemyPlanetActivity" />
         <activity android:name=".game.solarsystem.EmptyPlanetActivity" />
         <activity android:name=".game.solarsystem.FleetActivity" />
+        <activity android:name=".game.starfield.StarfieldActivity" />
         <activity android:name=".game.alliance.AllianceActivity" />
         <activity android:name=".game.alliance.AllianceChangeDetailsActivity"
                   android:windowSoftInputMode="stateUnchanged" />
         <activity android:name=".game.alliance.AllianceDetailsActivity" />
-        <activity android:name=".game.wormhole.WormholeActivity" />
         <activity android:name=".game.chat.ChatActivity" />
         <activity android:name=".game.SitrepActivity">
             <meta-data
@@ -96,7 +94,8 @@
         </activity>
 
         <activity android:name="com.google.android.gms.ads.AdActivity"
-                  android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+                  android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+                  android:theme="@android:style/Theme.Translucent" />
 
         <service android:name=".GCMIntentService" />
         <receiver android:name="com.google.android.gcm.GCMBroadcastReceiver"

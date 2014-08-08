@@ -323,7 +323,7 @@ public class FocusDialog extends DialogFragment {
             @Override
             protected void onComplete(Void unused) {
                 // notify the StarManager that this star has been updated
-                StarManager.getInstance().refreshStar(mColony.getStarKey());
+                StarManager.i.refreshStar(Integer.parseInt(mColony.getStarKey()));
             }
         }.execute();
     }

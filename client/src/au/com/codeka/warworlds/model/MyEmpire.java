@@ -82,7 +82,7 @@ public class MyEmpire extends Empire {
                 }
 
                 // make sure we record the fact that the star is updated as well
-                StarManager.getInstance().refreshStar(colony.getStarKey());
+                StarManager.i.refreshStar(Integer.parseInt(colony.getStarKey()));
             }
         }.execute();
     }
@@ -116,7 +116,7 @@ public class MyEmpire extends Empire {
 
                 // make sure we record the fact that the star is updated as well
                 EmpireManager.i.refreshEmpire(getID());
-                StarManager.getInstance().refreshStar(star.getKey());
+                StarManager.i.refreshStar(star.getID());
             }
         }.execute();
 
@@ -208,7 +208,7 @@ public class MyEmpire extends Empire {
             @Override
             protected void onComplete(Star star) {
                 if (star != null) {
-                    StarManager.getInstance().refreshStar(star.getKey());
+                    StarManager.i.refreshStar(star.getID());
                 }
 
                 if (callback != null) {

@@ -41,6 +41,7 @@ class EventHandlerInfo {
 
     /** Calls the subscriber's method with the given event object, on the UI thread if needed. */
     public void call(final Object event) {
+        final Exception callLocation = new Exception("Location of EventHandlerInfo.call()");
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -52,6 +53,7 @@ class EventHandlerInfo {
                     mMethod.invoke(subscriber, event);
                 } catch (Exception e) {
                     log.error("Exception caught handling event.", e);
+                    log.error("Call location.", callLocation);
                 }
             }
         };
