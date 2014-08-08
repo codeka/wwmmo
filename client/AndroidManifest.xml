@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="809"
-    android:versionName="0.4.809"
+    android:versionCode="829"
+    android:versionName="0.4.829"
     android:installLocation="auto"
     android:largeHeap="@bool/largeHeap">
 
-    <!-- Android SDK version 2.2 (API level 8) is the minimum we can viably support, since
-         that's what GCM required. We'd prefer ICS+ though... -->
-    <uses-sdk android:minSdkVersion="8"
+    <!-- Android SDK version 2.3 (API level 9) is the minimum we can viably support, since
+         that's what Google Play Services requires. We'd prefer ICS+ though... -->
+    <uses-sdk android:minSdkVersion="9"
               android:targetSdkVersion="19" />
 
     <!-- We use OpenGL ES 2.0 -->

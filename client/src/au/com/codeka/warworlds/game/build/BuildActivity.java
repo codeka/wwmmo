@@ -135,7 +135,7 @@ public class BuildActivity extends BaseActivity {
     @Override
     public void onPause() {
         super.onPause();
-        StarManager.eventBus.unregister(this);
+        StarManager.eventBus.unregister(mEventHandler);
     }
 
     @Override

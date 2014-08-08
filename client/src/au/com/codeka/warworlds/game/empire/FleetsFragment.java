@@ -128,11 +128,14 @@ public class FleetsFragment extends StarsFragment {
             }
         });
 
-        int fleetID = getArguments().getInt("au.com.codeka.warworlds.FleetID");
-        if (fleetID > 0) {
-            fleetToSelect = fleetID;
-            starOfFleetToSelect = getArguments().getInt("au.com.codeka.warworlds.StarID");
-            attemptToSelectFleet();
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            int fleetID = arguments.getInt("au.com.codeka.warworlds.FleetID");
+            if (fleetID > 0) {
+                fleetToSelect = fleetID;
+                starOfFleetToSelect = getArguments().getInt("au.com.codeka.warworlds.StarID");
+                attemptToSelectFleet();
+            }
         }
 
         StarManager.eventBus.register(eventHandler);

@@ -11,7 +11,7 @@
     <dependencies>
       <requires building="shipyard" level="1" />
     </dependencies>
-    <cost minerals="1000" time="4.0" />
+    <cost minerals="1000" time="4.0" maxCount="100" />
     <fuel costPerParsec="35" />
     <stats speed="1" baseAttack="1" baseDefence="1" combatPriority="100" />
     <effects>
@@ -38,7 +38,7 @@
       and out of enemy starsystems and reporting back what they found.</p>
     ]]></description>
     <dependencies>
-      <requires building="shipyard" level="1" />
+      <requires building="shipyard" level="1" maxCount="10000" />
     </dependencies>
     <cost minerals="50" time="0.1667" />
     <fuel costPerParsec="0.1" />
@@ -68,7 +68,7 @@
       fuel-efficient, allowing you to overwhealm your enemy with numbers.</p>
     ]]></description>
     <dependencies>
-      <requires building="shipyard" level="1" />
+      <requires building="shipyard" level="1" maxCount="50000" />
     </dependencies>
     <cost minerals="45" time="0.15" />
     <fuel costPerParsec="0.2" />
@@ -97,7 +97,7 @@
     <dependencies>
       <requires building="shipyard" level="1" />
     </dependencies>
-    <cost minerals="50" time="0.17" />
+    <cost minerals="50" time="0.17" maxCount="50000" />
     <fuel costPerParsec="0.2" />
     <stats speed="10" baseAttack="1" baseDefence="1" combatPriority="50"  />
     <effects>
@@ -116,7 +116,7 @@
     <dependencies>
       <requires building="shipyard" level="2" />
     </dependencies>
-    <cost minerals="98000" time="128.0" />
+    <cost minerals="98000" time="128.0" maxCount="5" />
     <fuel costPerParsec="3096.2" />
     <stats speed="0.6" baseAttack="1" baseDefence="1" combatPriority="99"  />
     <effects>
