@@ -13,6 +13,8 @@
 
 .gitignore
 
+keystore.jks
+
 local.properties
 
 client/bin
