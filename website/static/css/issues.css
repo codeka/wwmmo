@@ -15,6 +15,8 @@ nav.issue-controls ul.left li {
 
 nav.issue-controls ul.right li {
   float: right;
+  margin-right: 10px;
+  line-height: 24px;
 }
 
 fieldset.no-border {
