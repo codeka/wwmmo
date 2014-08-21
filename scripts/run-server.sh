@@ -11,5 +11,6 @@ popd
 [ $RETVAL -ne 0 ] && exit
 
 pushd deploy
+chmod +x ./run-debug.sh
 ./run-debug.sh $*
 popd
