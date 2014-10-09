@@ -155,6 +155,11 @@ class PlayStorePage(handlers.BaseHandler):
     self.redirect("https://play.google.com/store/apps/details?id=au.com.codeka.warworlds")
 
 
+class DonateThanksPage(handlers.BaseHandler):
+  def get(self):
+    self.render("donate-thanks.html", {})
+
+
 app = webapp.WSGIApplication([("/", HomePage),
                               ("/privacy-policy", PrivacyPolicyPage),
                               ("/blob/upload-url", BlobUploadUrlPage),
@@ -164,5 +169,6 @@ app = webapp.WSGIApplication([("/", HomePage),
                               ("/blob/([^/]+)/info", BlobInfoPage),
                               ("/status/?", StatusPage),
                               ("/play-store", PlayStorePage),
+                              ("/donate-thanks", DonateThanksPage),
                               ("/sitemap.xml", SitemapPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

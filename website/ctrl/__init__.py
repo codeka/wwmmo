@@ -60,7 +60,7 @@ def isDevelopmentServer():
 
 DEFAULT_ALLOWED_TAGS = {
   'strong': [], 'em': [], 'h1': [], 'h2': [], 'h3': [], 'h4': [], 'h5': [], 'h6': [],
-  'p': ['style'], 'br': [], 'ol': [], 'ul': [], 'li': [], 'br': [], 'blockquote': [],
+  'p': ['style'], 'div': [], 'ol': [], 'ul': [], 'li': [], 'br': [], 'blockquote': [],
   'a': ['href', 'title', 'alt', 'class'], 'pre': [], 'code': [],
   'img': ['src', 'class']
 }

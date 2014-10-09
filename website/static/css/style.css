@@ -117,24 +117,32 @@ header#page-header nav.userinfo a {
   color: #99f;
 }
 
+header#page-header div.donate-btn {
+  position: absolute;
+  top: -10px;
+  left: auto;
+  right: 16px;
+  width: 100px;
+}
+
 header a.gplus-btn img {
   display: block;
   position: absolute;
-  right: 16px;
+  right: 126px;
   top: 24px;
 }
 
 header a.twitter-btn img {
   display: block;
   position: absolute;
-  right: 56px;
+  right: 166px;
   top: 24px;
 }
 
 header a.rss-btn img {
   display: block;
   position: absolute;
-  right: 96px;
+  right: 206px;
   top: 26px;
 }
 
