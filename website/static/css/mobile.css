@@ -5,7 +5,7 @@ body {
 
 header#page-header {
   width: 100%;
-  height: 90px;
+  height: 145px;
 }
 
 header#page-header div {
@@ -27,6 +27,12 @@ header#page-header h1 span.war-worlds {
 
 header#page-header h1 span.extra {
   display: none;
+}
+
+header#page-header div.donate-btn {
+  top: 95px;
+  right: auto;
+  left: 8px;
 }
 
 header#page-header .twitter-btn img {
@@ -51,7 +57,7 @@ header#page-header .rss-btn img {
 }
 
 header#page-header ul.main-nav {
-  margin-bottom: 1em;
+  margin-bottom: 60px;
 }
 
 header#page-header ul.main-nav li {
