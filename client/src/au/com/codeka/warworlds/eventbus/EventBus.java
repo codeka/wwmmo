@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.Util;
+
 /**
  * An implementation of the "event bus" pattern.
  *
@@ -21,6 +24,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * 3. The implementation handles all the details of handling multiple callbacks and so on.
  */
 public class EventBus {
+    private static Log log = new Log("EventBus");
+
     private final List<EventHandlerInfo> mHandlers = new CopyOnWriteArrayList<EventHandlerInfo>();
 
     /** Subscribe the given object to the event bus. */
@@ -29,7 +34,11 @@ public class EventBus {
         for (EventHandlerInfo handler : mHandlers) {
             Object existingSubscriber = handler.getSubscriber();
             if (existingSubscriber != null && existingSubscriber == subscriber) {
-                throw new AlreadyRegisteredException();
+                if (Util.isDebug()) {
+                    throw new AlreadyRegisteredException();
+                } else {
+                    log.error("EventBus.register() called twice on the same object, ignoring second call.");
+                }
             }
         }
 

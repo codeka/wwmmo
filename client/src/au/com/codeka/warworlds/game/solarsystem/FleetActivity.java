@@ -35,8 +35,9 @@ public class FleetActivity extends BaseActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
         mFleetList = new FleetList(this);
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                                                                   FrameLayout.LayoutParams.MATCH_PARENT);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT);
         addContentView(mFleetList, lp);
 
         mFleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
@@ -108,7 +109,7 @@ public class FleetActivity extends BaseActivity {
         StarManager.eventBus.unregister(mEventHandler);
     }
 
-    private Object mEventHandler = new Object() {
+    private final Object mEventHandler = new Object() {
         @EventHandler
         public void onStarUpdated(Star star) {
             if (mStar != null && !mStar.getKey().equals(star.getKey())) {
