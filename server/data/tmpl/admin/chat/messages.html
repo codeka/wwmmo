@@ -113,19 +113,15 @@
     function formatMessage(msg) {
       if (typeof msg.empire == "undefined") {
         if (msg.empire_key) {
-          console.log("fetching empire");
+          msg.empire = "Loading...";
           empireStore.getEmpire(msg.empire_key, function(empire) {
-            console.log("fetched empire, refresing messages again.");
             msg.empire = empire;
-            refreshMessages();
           });
-          return $("<div></div>");
         } else {
           msg.empire = "[SERVER]";
         }
       }
 
-      console.log("msg has an empire.");
       var dt = new Date();
       dt.setTime(msg.date_posted * 1000);
 
@@ -214,7 +210,7 @@
 
           for (var i = data.messages.length - 1; i >= 0; i--) {
             var msg = data.messages[i];
-            appendMessage(msg);
+            appendMessage(msg, false);
           }
 
           refreshMessages();

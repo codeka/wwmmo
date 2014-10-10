@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -187,9 +188,11 @@ public class RequestHandler {
 
         if (getSessionNoError() != null && getSessionNoError().allowInlineNotifications()) {
             int empireID = getSessionNoError().getEmpireID();
-            List<Map<String, String>> notifications = new NotificationController().getRecentNotifications(empireID);
+            List<Map<String, String>> notifications = new NotificationController()
+                    .getRecentNotifications(empireID);
             if (notifications.size() > 0) {
-                Messages.NotificationWrapper.Builder notification_wrapper_pb = Messages.NotificationWrapper.newBuilder();
+                Messages.NotificationWrapper.Builder notification_wrapper_pb =
+                        Messages.NotificationWrapper.newBuilder();
                 for (Map<String, String> notification : notifications) {
                     for (String key : notification.keySet()) {
                         String value = notification.get(key);
@@ -338,13 +341,28 @@ public class RequestHandler {
     }
 
     /**
-     * Gets a file representing the "base" path where everything in installed into (e.g. the "data" directory
-     * is relative to this path.
+     * Gets a file representing the "base" path where everything in installed into (e.g. the "data"
+     * directory is relative to this path.
      */
     protected static File getBasePath() {
         String path = System.getProperty("au.com.codeka.warworlds.server.basePath");
         if (path == null) {
-            path = AdminGenericHandler.class.getClassLoader().getResource("").getPath();
+            URL url = AdminGenericHandler.class.getClassLoader().getResource("");
+            if (url == null) {
+                try {
+                    URI uri = AdminGenericHandler.class.getProtectionDomain().getCodeSource()
+                            .getLocation().toURI();
+                    if (uri != null) { // dafuk is dis?
+                        url = new URL(uri.getPath());
+                    }
+                } catch (Exception e) {}
+            }
+            if (url != null) {
+                path = url.getPath();
+            }
+        }
+        if (path == null) {
+            return new File(".");
         }
         return new File(path+"../").getAbsoluteFile();
     }

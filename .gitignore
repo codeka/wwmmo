@@ -16,6 +16,7 @@ keystore.jks
 
 local.properties
 
+common/out
 client/bin
 client/bin.bak
 client/gen

@@ -3,15 +3,13 @@ package au.com.codeka.warworlds.server.handlers.admin;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import proguard.obfuscate.MappingProcessor;
 import proguard.obfuscate.MappingReader;
@@ -19,8 +17,6 @@ import au.com.codeka.warworlds.server.RequestException;
 
 /** Handler for de-obfuscating stack traces. */
 public class AdminDebugRetraceHandler extends AdminHandler {
-    private final Logger log = LoggerFactory.getLogger(AdminDebugRetraceHandler.class);
-
     @Override
     protected void post() throws RequestException {
         if (!isAdmin()) {
@@ -35,29 +31,34 @@ public class AdminDebugRetraceHandler extends AdminHandler {
         String version = getRequest().getParameter("version");
         version = version.substring(version.lastIndexOf('.') + 1);
 
+        try {
+            unobfuscateStackTrace(version, getRequest().getInputStream(),
+                    getResponse().getOutputStream());
+        } catch (IOException e) {
+            throw new RequestException(e);
+        }
+    }
+
+    /**
+     * Reads the stack trace from the given {@code InputStream}, unbfuscates it and writes the
+     * unobfuscated version to the given {@code OutputStream}.
+     */
+    private static void unobfuscateStackTrace(String version, InputStream ins, OutputStream outs)
+            throws IOException, RequestException {
         File mappingFile = new File(getBasePath(), "data/proguard/mapping-" + version + ".txt");
         if (!mappingFile.isFile()) {
-            try {
-                IOUtils.copy(getRequest().getInputStream(), getResponse().getOutputStream());
-            } catch (Exception e) {
-                throw new RequestException(e);
-            }
-            return;
+            throw new RequestException(404, "Error loading: " + mappingFile.getAbsolutePath());
         }
 
         StackTrace stackTrace = new StackTrace();
-        try {
-            stackTrace.read(new BufferedReader(new InputStreamReader(
-                    getRequest().getInputStream())));
+        stackTrace.read(new BufferedReader(new InputStreamReader(ins)));
 
-            MappingReader mappingReader = new MappingReader(mappingFile);
-            mappingReader.pump(stackTrace);
+        MappingReader mappingReader = new MappingReader(mappingFile);
+        mappingReader.pump(stackTrace);
 
-            stackTrace.write(getResponse().getWriter());
-        } catch(Exception e) {
-            log.error("Uh oh!", e);
-            throw new RequestException(e);
-        }
+        PrintWriter pw = new PrintWriter(outs);
+        stackTrace.write(pw);
+        pw.flush();
     }
 
     private static class StackTrace implements MappingProcessor {
@@ -113,20 +114,28 @@ public class AdminDebugRetraceHandler extends AdminHandler {
         private ArrayList<String> mUnobfuscatedMethodNames = new ArrayList<String>();
 
         // matches any valid java identifier (see http://stackoverflow.com/questions/5205339)
-        private static Pattern sPattern = Pattern.compile("([\\p{L}_$][\\p{L}\\p{N}_$]*\\.)+[\\p{L}_$][\\p{L}\\p{N}_$]*");
+        private static Pattern sPattern = Pattern.compile(
+                "([\\p{L}_$][\\p{L}\\p{N}_$]*\\.)+[\\p{L}_$][\\p{L}\\p{N}_$]*");
 
         public StackTraceLine(String line) {
             mLine = line;
 
             Matcher matcher = sPattern.matcher(line);
-            while (matcher.matches()) {
-                String fullMethodName = matcher.group();
-                String className = fullMethodName.substring(0, fullMethodName.indexOf('.'));
-                String methodName = fullMethodName.substring(fullMethodName.indexOf('.') + 1);
-                if (mObfuscatedClassName == null
-                        || className.length() > mObfuscatedClassName.length()) {
-                    mObfuscatedClassName = className;
-                    mObfuscatedMethodName = methodName;
+            if (matcher.find()) {
+                String javaIdentifier = matcher.group();
+                int nextCharIndex = line.indexOf(javaIdentifier) + javaIdentifier.length();
+                if (line.length() > nextCharIndex && line.charAt(nextCharIndex) == '(') {
+                    // it's a method if it has an open bracket after it.
+                    String className = javaIdentifier.substring(0, javaIdentifier.lastIndexOf('.'));
+                    String methodName = javaIdentifier.substring(javaIdentifier.lastIndexOf('.') + 1);
+                    if (mObfuscatedClassName == null
+                            || className.length() > mObfuscatedClassName.length()) {
+                        mObfuscatedClassName = className;
+                        mObfuscatedMethodName = methodName;
+                    }
+                } else {
+                    // it's a class, not a method
+                    mObfuscatedClassName = javaIdentifier;
                 }
             }
         }
@@ -135,21 +144,30 @@ public class AdminDebugRetraceHandler extends AdminHandler {
         public String toString() {
             String line = mLine;
             if (mObfuscatedClassName != null) {
-                String originalName = mObfuscatedClassName + "." + mObfuscatedMethodName;
-                String realName = mUnobfuscatedClassName + ".";
-                if (mUnobfuscatedMethodNames.size() == 1) {
-                    realName += mUnobfuscatedMethodNames.get(0);
-                } else {
-                    realName += "(";
-                    for (int i = 0; i < mUnobfuscatedMethodNames.size(); i++) {
-                        if (i > 0) {
-                            realName += "|";
+                String originalName = null;
+                String realName = null;
+                if (mObfuscatedMethodName == null) {
+                    originalName = mObfuscatedClassName;
+                    realName = mUnobfuscatedClassName;
+                } else if (mUnobfuscatedClassName != null) {
+                    originalName = mObfuscatedClassName + "." + mObfuscatedMethodName;
+                    realName = mUnobfuscatedClassName + ".";
+                    if (mUnobfuscatedMethodNames.size() == 1) {
+                        realName += mUnobfuscatedMethodNames.get(0);
+                    } else {
+                        realName += "[";
+                        for (int i = 0; i < mUnobfuscatedMethodNames.size(); i++) {
+                            if (i > 0) {
+                                realName += "|";
+                            }
+                            realName += mUnobfuscatedMethodNames.get(i);
                         }
-                        realName += mUnobfuscatedMethodNames.get(i);
+                        realName += "]";
                     }
-                    realName += ")";
                 }
-                line = line.replace(originalName, realName);
+                if (originalName != null && realName != null) {
+                    line = line.replace(originalName, realName);
+                }
             }
 
             return line;
@@ -179,7 +197,7 @@ public class AdminDebugRetraceHandler extends AdminHandler {
         public void processMethodMapping(String unobfuscatedClassName, int firstLine, int lastLine,
                 String returnType, String unobfuscatedMethodName, String unobfuscatedMethodArgs,
                 String obfuscatedMethodName) {
-            if (mUnobfuscatedClassName == null) {
+            if (mUnobfuscatedClassName == null || mObfuscatedMethodName == null) {
                 return;
             }
 

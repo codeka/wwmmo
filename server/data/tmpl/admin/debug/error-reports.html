@@ -201,6 +201,9 @@
         "type": "POST",
         "success": function(data) {
           $stackTrace.html(data);
+        }, "error": function(xhr) {
+          $stackTrace.html(stackTrace);
+          alert("Error unobfuscating, maybe no mapping.txt on the server for this version?");
         }
       });
     });
