@@ -65,6 +65,9 @@ public class FleetEntity extends SelectableEntity {
 
         mSelectionLine.setPosition((float) mSrcPoint.x - x, (float) mSrcPoint.y - y,
                                    (float) mDestPoint.x - x, (float) mDestPoint.y - y);
+        if (mSelectionLine.getParent() != null) {
+            detachChild(mSelectionLine);
+        }
         attachChild(mSelectionLine);
         sortChildren();
     }
