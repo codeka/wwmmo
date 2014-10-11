@@ -71,7 +71,7 @@ public class Log {
             Throwable throwable = (Throwable) args[args.length - 1];
             StringWriter writer = new StringWriter();
             throwable.printStackTrace(new PrintWriter(writer));
-            sb.append(System.lineSeparator());
+            sb.append("\n");
             sb.append(writer.toString());
         }
         return sb.toString();
