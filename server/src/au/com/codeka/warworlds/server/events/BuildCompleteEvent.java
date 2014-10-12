@@ -3,9 +3,8 @@ package au.com.codeka.warworlds.server.events;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.Simulation;
@@ -28,7 +27,7 @@ import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildCompleteEvent extends Event {
-    private final Logger log = LoggerFactory.getLogger(BuildCompleteEvent.class);
+    private final Log log = new Log("BuildCompleteEvent");
 
     @Override
     public String getNextEventTimeSql() {
@@ -42,7 +41,7 @@ public class BuildCompleteEvent extends Event {
                            " existing_fleet_id, upgrade_id, design_kind, design_id, count, notes, disable_notification" +
                     " FROM build_requests" +
                     " WHERE end_time < ? AND processing = 0" +
-                    " LIMIT 10"; // just do ten at a time, which will allow us to interleve other events
+                    " LIMIT 10"; // just do ten at a time, which will allow us to interleave other events
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, DateTime.now().plusSeconds(10)); // anything in the next 10 seconds is a candidate
             SqlResult res = stmt.select();

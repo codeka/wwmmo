@@ -2,7 +2,7 @@ package au.com.codeka.warworlds.server.model;
 
 import java.sql.SQLException;
 
-import org.json.simple.JSONObject;
+import com.google.gson.JsonObject;
 
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
@@ -77,10 +77,9 @@ public class FleetUpgrade extends BaseFleetUpgrade {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public String getExtra() {
-            JSONObject json = new JSONObject();
-            json.put("is_boosting", new Boolean(mIsBoosting));
+            JsonObject json = new JsonObject();
+            json.addProperty("is_boosting", mIsBoosting);
             return json.toString();
         }
 
@@ -91,9 +90,9 @@ public class FleetUpgrade extends BaseFleetUpgrade {
         }
 
         private void parseExtra() {
-            JSONObject extra = getExtraJson();
-            if (extra != null && extra.containsKey("is_boosting")) {
-                mIsBoosting = (Boolean) extra.get("is_boosting");
+            JsonObject extra = getExtraJson();
+            if (extra != null && extra.has("is_boosting")) {
+                mIsBoosting = extra.get("is_boosting").getAsBoolean();
             }
         }
     }

@@ -3,16 +3,15 @@ package au.com.codeka.warworlds.server.handlers.admin;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class AdminChatHandler extends AdminGenericHandler {
-    private final Logger log = LoggerFactory.getLogger(AdminChatHandler.class);
+    private static final Log log = new Log("AdminChatHandler");
+
     @Override
     protected void get() throws RequestException {
         if (!isAdmin()) {

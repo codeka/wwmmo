@@ -5,10 +5,7 @@
 	<classpathentry kind="lib" path="libs/protobuf-java-2.5.0.jar"/>
 	<classpathentry kind="lib" path="libs/joda-convert-1.2.jar"/>
 	<classpathentry kind="lib" path="libs/joda-time-2.1.jar"/>
-	<classpathentry kind="lib" path="libs/commons-codec-1.4.jar"/>
-	<classpathentry kind="lib" path="libs/commons-collections-3.2.1.jar"/>
-	<classpathentry kind="lib" path="libs/commons-io-2.1.jar"/>
-	<classpathentry kind="lib" path="libs/commons-lang3-3.1.jar"/>
-	<classpathentry kind="lib" path="libs/json_simple-1.1.jar"/>
+	<classpathentry kind="lib" path="libs/gson-2.1.jar"/>
+	<classpathentry kind="lib" path="libs/guava-18.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -3,9 +3,8 @@ package au.com.codeka.warworlds.server.events;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.Simulation;
@@ -24,7 +23,7 @@ import au.com.codeka.warworlds.server.model.EmpirePresence;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class EmpireStarGoodsReachedZeroEvent extends Event {
-    private final Logger log = LoggerFactory.getLogger(BuildCompleteEvent.class);
+    private final Log log = new Log("BuildCompleteEvent");
 
     @Override
     public String getNextEventTimeSql() {

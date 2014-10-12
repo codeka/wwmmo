@@ -1,12 +1,10 @@
 package au.com.codeka.warworlds.server.ctrl;
 
 import java.security.SecureRandom;
-import java.util.Locale;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
@@ -16,7 +14,7 @@ import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class LoginController {
-    private final Logger log = LoggerFactory.getLogger(LoginController.class);
+    private final Log log = new Log("LoginController");
 
     private static char[] SESSION_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
 
@@ -24,11 +22,10 @@ public class LoginController {
 
     // list of users that are allowed to impersonate others
     private static String[] IMPERSONATE_USERS = {"dean@codeka.com.au", "warworldstest1@gmail.com",
-                                                 "warworldstest2@gmail.com", "warworldstest3@gmail.com",
-                                                 "warworldstest4@gmail.com"};
+            "warworldstest2@gmail.com", "warworldstest3@gmail.com", "warworldstest4@gmail.com"};
 
     /**
-     * Generates a cookie, assuming we've just finihed authenticating as the given email.
+     * Generates a cookie, assuming we've just finished authenticating as the given email.
      */
     public String generateCookie(String emailAddr, boolean doAdminTest, String impersonateUser)
                                  throws RequestException {
@@ -87,14 +84,15 @@ public class LoginController {
         }
 
         if (banned) {
-            throw new RequestException(403, Messages.GenericError.ErrorCode.EmpireBanned, "You have been banned for misconduct.");
+            throw new RequestException(403, Messages.GenericError.ErrorCode.EmpireBanned,
+                    "You have been banned for misconduct.");
         }
 
         Session session = new Session(cookie.toString(), emailAddr, DateTime.now(),
                 empireID, allianceID, isAdmin);
         new SessionController().saveSession(session);
 
-        log.info(String.format(Locale.ENGLISH, "Authenticated: email=%s cookie=%s", emailAddr, cookie));
+        log.info("Authenticated: email=%s cookie=%s", emailAddr, cookie);
         return cookie.toString();
     }
 

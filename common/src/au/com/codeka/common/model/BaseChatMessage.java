@@ -1,8 +1,9 @@
 package au.com.codeka.common.model;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+
+import com.google.common.html.HtmlEscapers;
 
 import au.com.codeka.common.protobuf.Messages;
 
@@ -102,7 +103,7 @@ public class BaseChatMessage {
     public void toProtocolBuffer(Messages.ChatMessage.Builder pb, boolean encodeHtml) {
         pb.setId(mID);
         if (encodeHtml) {
-            pb.setMessage(StringEscapeUtils.escapeHtml4(mMessage));
+            pb.setMessage(HtmlEscapers.htmlEscaper().escape(mMessage));
         } else {
             pb.setMessage(mMessage);
         }

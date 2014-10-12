@@ -13,10 +13,10 @@ public class BuildStopHandler extends RequestHandler {
     @Override
     protected void post() throws RequestException {
         Simulation sim = new Simulation();
-        Star star = new StarController().getStar(Integer.parseInt(getUrlParameter("star_id")));
+        Star star = new StarController().getStar(Integer.parseInt(getUrlParameter("starid")));
         sim.simulate(star);
 
-        int buildRequestID = Integer.parseInt(getUrlParameter("build_id"));
+        int buildRequestID = Integer.parseInt(getUrlParameter("buildid"));
         int myEmpireID = getSession().getEmpireID();
 
         for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {

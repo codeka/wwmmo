@@ -5,9 +5,8 @@ import java.util.Collections;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
@@ -16,7 +15,7 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 
 
 public class AdminDebugErrorReportsHandler extends AdminHandler {
-    private final Logger log = LoggerFactory.getLogger(AdminDebugErrorReportsHandler.class);
+    private final Log log = new Log("AdminDebugErrorReportsHandler");
 
     @Override
     protected void get() throws RequestException {

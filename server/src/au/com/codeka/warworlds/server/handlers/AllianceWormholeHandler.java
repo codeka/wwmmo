@@ -11,7 +11,7 @@ import au.com.codeka.warworlds.server.model.Star;
 public class AllianceWormholeHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
-        int allianceID = Integer.parseInt(getUrlParameter("alliance_id"));
+        int allianceID = Integer.parseInt(getUrlParameter("allianceid"));
 
         // only admins and people in this alliance can view the list of wormholes
         if (!getSession().isAdmin() && getSession().getAllianceID() != allianceID) {

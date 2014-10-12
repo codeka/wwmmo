@@ -7,14 +7,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.gson.GsonBuilder;
+
+import au.com.codeka.common.Log;
 
 public class TranslateController {
-    private final Logger log = LoggerFactory.getLogger(TranslateController.class);
+    private final Log log = new Log("TranslateController");
 
     private static String TRANSLATE_API_KEY = "AIzaSyANXsZc4CaLMXDBJDClO9uAnzuYysQJ0zw";
     private static String TRANSLATE_BASE_URL = "https://www.googleapis.com/language/translate/v2?key="+TRANSLATE_API_KEY;
@@ -42,7 +40,7 @@ public class TranslateController {
         }
         log.info("Translate URL: "+url);
 
-        JSONObject json;
+        TranslationResponse response;
         try {
             URLConnection conn = new URL(url).openConnection();
             InputStream ins = conn.getInputStream();
@@ -51,18 +49,16 @@ public class TranslateController {
                 encoding = "utf-8";
             }
             InputStreamReader isr = new InputStreamReader(ins, encoding);
-            json = (JSONObject) JSONValue.parse(isr);
+
+            response = new GsonBuilder().disableHtmlEscaping()
+                    .create().fromJson(isr, TranslationResponse.class);
         } catch (Exception e) {
             log.error("Error posting traslate request.", e);
             return null;
         }
 
         try {
-            JSONObject data = (JSONObject) json.get("data");
-            JSONArray translations = (JSONArray) data.get("translations");
-            JSONObject translation = (JSONObject) translations.get(0);
-            String text = (String) translation.get("translatedText");
-            return text.replace("&quot;", "\"");
+            return response.data.translations[0].translatedText;
         } catch (Exception e) {
             log.error("Error decoding traslate response.", e);
             return null;
@@ -80,5 +76,17 @@ public class TranslateController {
             }
         }
         return true;
+    }
+
+    private static class TranslationResponse {
+        public TranslationResponseData data;
+    }
+
+    private static class TranslationResponseData {
+        public Translation[] translations;
+    }
+
+    private static class Translation {
+        public String translatedText;
     }
 }

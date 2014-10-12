@@ -2,12 +2,9 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
@@ -22,18 +19,18 @@ import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
 /** Find a star which is suitable for a new empire.
- *
+ * <p>
  * When a new player joins the game, we want to find a star for their initial
  * colony. We need to choose a star that's close to other players, but not TOO
  * close as to make them an easy target.
- * 
+ * <p>
  * Before looking for a brand new star, we'll first look through the abandoned stars
  * for an approprite one.
  * 
- * @return A \see NewEmpireStarDetails with details of the new star.
+ * @return A {@link NewEmpireStarDetails} with details of the new star.
  */
 public class NewEmpireStarFinder {
-    private final Logger log = LoggerFactory.getLogger(NewEmpireStarFinder.class);
+    private final Log log = new Log("NewEmpireStarFinder");
     private int mStarID;
     private int mPlanetIndex;
 
@@ -243,11 +240,10 @@ public class NewEmpireStarFinder {
         double score = (distanceToCentreScore * planetScore * congenialityScore *
                         distanceToOtherColonyScore);
 
-        log.info(String.format(Locale.ENGLISH,
-                "Star[%s] score=%.2f distance_to_centre_score=%.2f planet_score=%.2f num_terran_planets=%.0f congeniality_score=%.2f distance_to_colony_score=%.2f distance_to_nearest_colony=%.2f",
+        log.info("Star[%s] score=%.2f distance_to_centre_score=%.2f planet_score=%.2f num_terran_planets=%.0f congeniality_score=%.2f distance_to_colony_score=%.2f distance_to_nearest_colony=%.2f",
                 star.getName(), score, distanceToCentreScore,
                 planetScore, numTerranPlanets, congenialityScore, distanceToOtherColonyScore,
-                distanceToOtherColony));
+                distanceToOtherColony);
 
         return score;
     }

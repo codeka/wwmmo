@@ -15,8 +15,8 @@ import au.com.codeka.warworlds.server.model.ChatMessage;
 public class ChatConversationParticipantHandler extends RequestHandler {
     @Override
     protected void delete() throws RequestException {
-        int conversationID = Integer.parseInt(getUrlParameter("conversation_id"));
-        int empireID = Integer.parseInt(getUrlParameter("empire_id"));
+        int conversationID = Integer.parseInt(getUrlParameter("conversationid"));
+        int empireID = Integer.parseInt(getUrlParameter("empireid"));
 
         if (empireID != getSession().getEmpireID()) {
             throw new RequestException(403); // you can only remove yourself...

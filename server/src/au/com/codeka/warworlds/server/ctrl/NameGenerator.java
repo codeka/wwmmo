@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.apache.commons.lang3.text.WordUtils;
+import com.google.common.base.CaseFormat;
 
 public class NameGenerator {
     private static ArrayList<Vocabulary> sVocabularies;
@@ -61,7 +61,9 @@ public class NameGenerator {
             return generate(rand);
         }
 
-        return WordUtils.capitalize(word.toString().toLowerCase());
+        // It's gauranteed to be only one word anyway, so this is a little hacky maybe...
+        String name = word.toString().toLowerCase();
+        return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name);
     }
 
     private static Vocabulary parseVocabularyFile(String path) {

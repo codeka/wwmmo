@@ -14,8 +14,8 @@ public class ColonyHandler extends RequestHandler {
 
     @Override
     protected void put() throws RequestException {
-        int starID = Integer.parseInt(getUrlParameter("star_id"));
-        int colonyID = Integer.parseInt(getUrlParameter("colony_id"));
+        int starID = Integer.parseInt(getUrlParameter("starid"));
+        int colonyID = Integer.parseInt(getUrlParameter("colonyid"));
         Simulation sim = new Simulation();
 
         Session session = getSession();

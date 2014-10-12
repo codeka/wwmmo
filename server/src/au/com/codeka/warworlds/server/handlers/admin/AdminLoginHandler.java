@@ -9,10 +9,7 @@ import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.LoginController;
 
@@ -21,9 +18,13 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class AdminLoginHandler extends AdminHandler {
-    private final static String CLIENT_ID = "1021675369049-sumlr2cihs72j4okvfl8hl72keognhsa.apps.googleusercontent.com";
+    private static final Log log = new Log("AdminLoginHandler");
+
+    private static final String CLIENT_ID = "1021675369049-sumlr2cihs72j4okvfl8hl72keognhsa.apps.googleusercontent.com";
 
     @Override
     protected void get() throws RequestException {
@@ -37,8 +38,8 @@ public class AdminLoginHandler extends AdminHandler {
         String emailAddr = null;
         try {
             String authResult = getRequest().getParameter("auth-result");
-            JSONObject json = (JSONObject) new JSONParser().parse(authResult);
-            String idToken = (String) json.get("id_token");
+            JsonObject json = new JsonParser().parse(authResult).getAsJsonObject();
+            String idToken = json.get("id_token").getAsString();
 
             TokenParser parser = new TokenParser(new String[] { CLIENT_ID }, CLIENT_ID);
             GoogleIdToken.Payload payload = parser.parse(idToken);
@@ -59,11 +60,12 @@ public class AdminLoginHandler extends AdminHandler {
                 entries += "\r\n" + authResult;
                 throw new RequestException(500, "No email address: "+entries);
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             throw new RequestException(e);
         }
 
         String cookieValue = new LoginController().generateCookie(emailAddr, true, null);
+        log.info("Got cookie: %s", cookieValue);
 
         Cookie cookie = new Cookie("SESSION", cookieValue);
         cookie.setHttpOnly(true);
@@ -74,6 +76,7 @@ public class AdminLoginHandler extends AdminHandler {
             continueUrl = "/realms/"+getRealm()+"/admin";
         }
 
+        log.info("Continuing to: %s", continueUrl);
         getResponse().addCookie(cookie);
         getResponse().setStatus(302);
         getResponse().setHeader("Location", continueUrl);

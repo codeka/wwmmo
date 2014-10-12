@@ -18,16 +18,13 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/planet-render"/>
 	<classpathentry exported="true" kind="lib" path="libs/android-support-v4.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/validation-api-1.0.0.GA.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/commons-codec-1.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/commons-io-2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/commons-lang3-3.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/json_simple-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/joda-time-2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/commons-collections-3.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/gcm.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/protobuf-java-2.5.0.jar"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="libs/joda-convert-1.2.jar"/>
 	<classpathentry kind="lib" path="libs/org.eclipse.jdt.annotation_1.1.0.v20130513-1648.jar"/>
+	<classpathentry kind="lib" path="libs/gson-2.1.jar"/>
+	<classpathentry kind="lib" path="libs/guava-18.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

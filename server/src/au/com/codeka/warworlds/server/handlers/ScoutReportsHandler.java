@@ -11,7 +11,7 @@ import au.com.codeka.warworlds.server.model.ScoutReport;
 public class ScoutReportsHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
-        int starID = Integer.parseInt(getUrlParameter("star_id"));
+        int starID = Integer.parseInt(getUrlParameter("starid"));
         List<ScoutReport> reports = new ScoutReportController().getScoutReports(starID, getSession().getEmpireID());
 
         Messages.ScoutReports.Builder scout_reports_pb = Messages.ScoutReports.newBuilder();

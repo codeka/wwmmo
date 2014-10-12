@@ -1,11 +1,9 @@
 package au.com.codeka.warworlds.ctrl;
 
 import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import org.apache.commons.io.IOUtils;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -14,6 +12,8 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.webkit.WebView;
+
+import com.google.common.io.CharStreams;
 
 /**
  * A \c WebView with a transparent background. It's a little tricky and the method
@@ -49,17 +49,12 @@ public class TransparentWebView extends WebView {
         loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
     }
 
-    /**
-     * Loads a template HTML file from within your assets folder.
-     */
+    /** Loads a template HTML file from within your assets folder. */
     public static String getHtmlFile(Context context, String fileName) {
         try {
             AssetManager assetManager = context.getAssets();
             InputStream is = assetManager.open(fileName);
-
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(is, writer);
-            return writer.toString();
+            return CharStreams.toString(new InputStreamReader(is, "utf-8"));
         } catch (Exception e) {
             // any errors (shouldn't be...) and we'll return a "blank" template.
             return "";

@@ -17,7 +17,7 @@ public class StarSimulateHandler extends RequestHandler {
         if (getRequest().getParameter("dolog") != null) {
             dolog = getRequest().getParameter("dolog").equals("1");
         }
-        simulate(Integer.parseInt(getUrlParameter("star_id")), false, dolog);
+        simulate(Integer.parseInt(getUrlParameter("starid")), false, dolog);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class StarSimulateHandler extends RequestHandler {
         if (getRequest().getParameter("dolog") != null) {
             dolog = getRequest().getParameter("dolog").equals("1");
         }
-        simulate(Integer.parseInt(getUrlParameter("star_id")), update, dolog);
+        simulate(Integer.parseInt(getUrlParameter("starid")), update, dolog);
     }
 
     private void simulate(int starID, boolean update, boolean dolog) throws RequestException {

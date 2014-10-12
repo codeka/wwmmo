@@ -53,6 +53,10 @@ public class Log {
         mImpl.write(mTag, DEBUG, formatMsg(fmt, args));
     }
 
+    public boolean isDebugEnabled() {
+        return mImpl != null && mImpl.isLoggable(mTag, DEBUG);
+    }
+
     /**
      * Formats the given message. If the last argument is an exception, we'll append
      * the exception to the end of the message.

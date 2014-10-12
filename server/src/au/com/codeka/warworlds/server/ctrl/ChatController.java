@@ -6,11 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.BackgroundRunner;
 import au.com.codeka.warworlds.server.RequestException;
@@ -21,8 +19,10 @@ import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.ChatConversation;
 import au.com.codeka.warworlds.server.model.ChatMessage;
 
+import com.google.common.io.BaseEncoding;
+
 public class ChatController {
-    private final Logger log = LoggerFactory.getLogger(ChatController.class);
+    private final Log log = new Log("ChatController");
     private DataBase db;
 
     public ChatController() {
@@ -177,7 +177,7 @@ public class ChatController {
         Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
         msg.toProtocolBuffer(chat_msg_pb, true);
 
-        return Base64.encodeBase64String(chat_msg_pb.build().toByteArray());
+        return BaseEncoding.base64().encode(chat_msg_pb.build().toByteArray());
     }
 
     /**

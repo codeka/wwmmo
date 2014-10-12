@@ -40,8 +40,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.codec.binary.Base64;
-
+import com.google.common.io.BaseEncoding;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.ExtensionRegistry;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -1093,7 +1092,7 @@ public class PbFormatter extends AbstractCharBasedFormatter {
      * sequences.
      */
     static String escapeBytes(ByteString input) {
-        return Base64.encodeBase64String(input.toByteArray()).replace("\r\n", "");
+        return BaseEncoding.base64().encode(input.toByteArray());
     }
 
     /**
@@ -1102,7 +1101,7 @@ public class PbFormatter extends AbstractCharBasedFormatter {
      * "\x") are also recognized.
      */
     static ByteString unescapeBytes(CharSequence input) {
-        return ByteString.copyFrom(Base64.decodeBase64(input.toString()));
+        return ByteString.copyFrom(BaseEncoding.base64().decode(input.toString()));
     }
 
     /**

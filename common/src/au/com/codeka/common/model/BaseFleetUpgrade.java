@@ -1,7 +1,7 @@
 package au.com.codeka.common.model;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import au.com.codeka.common.protobuf.Messages;
 
@@ -23,13 +23,13 @@ public class BaseFleetUpgrade {
     public String getExtra() {
         return mExtra;
     }
-    public JSONObject getExtraJson() {
+    public JsonObject getExtraJson() {
         if (mExtra == null) {
             return null;
         }
 
         try {
-            return (JSONObject) new JSONParser().parse(mExtra);
+            return new JsonParser().parse(mExtra).getAsJsonObject();
         } catch (Exception e) {
             return null;
         }

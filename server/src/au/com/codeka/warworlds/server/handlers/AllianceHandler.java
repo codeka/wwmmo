@@ -9,7 +9,7 @@ import au.com.codeka.warworlds.server.model.Alliance;
 public class AllianceHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
-        int allianceID = Integer.parseInt(getUrlParameter("alliance_id"));
+        int allianceID = Integer.parseInt(getUrlParameter("allianceid"));
         Alliance alliance = new AllianceController().getAlliance(allianceID);
 
         Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();

@@ -3,9 +3,7 @@ package au.com.codeka.warworlds.server.cron;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -16,26 +14,26 @@ import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
 /**
- * An abandoned empire is one where the user hasn't logged in for a while, and they only have one star under
- * their control.
+ * An abandoned empire is one where the user hasn't logged in for a while, and they only have one
+ * star under their control.
  * 
  * Abandoned empires have two things happen to them:
  *  1. their star becomes available for new signups and
  *  2. their empire name becomes available for new signups.
  *
- * If they later log in and their star has been taken, they'll get a standard "empire reset" message with help
- * text explaing that their empire expired. If they log in again and their name has been changed, they'll be
- * required to choose another.
+ * If they later log in and their star has been taken, they'll get a standard "empire reset"
+ * message with help text explaining that their empire expired. If they log in again and their
+ * name has been changed, they'll be required to choose another.
  */
 public class FindAbandonedEmpiresCronJob extends CronJob {
-    private static final Logger log = LoggerFactory.getLogger(FindAbandonedEmpiresCronJob.class);
+    private static final Log log = new Log("FindAbandonedEmpiresCronJob");
 
     @Override
     public void run(String extra) throws Exception {
         ArrayList<Integer> abandonedEmpires = new ArrayList<Integer>();
 
-        // first, find all empires not already marked "abandoned" that only have one star and haven't logged
-        // in for two weeks
+        // first, find all empires not already marked "abandoned" that only have one star and
+        // haven't logged in for two weeks
         String sql = "SELECT id, name" +
                      " FROM empires" +
                      " INNER JOIN (" +
@@ -118,7 +116,8 @@ public class FindAbandonedEmpiresCronJob extends CronJob {
                 int offsetY = res.getInt(4);
 
                 float distance = Sector.distanceInParsecs(star, sectorX, sectorY, offsetX, offsetY);
-                if (distanceToNonAbandonedEmpire < 0.001f || distance < distanceToNonAbandonedEmpire) {
+                if (distanceToNonAbandonedEmpire < 0.001f
+                        || distance < distanceToNonAbandonedEmpire) {
                     distanceToNonAbandonedEmpire = distance;
                 }
             }
@@ -128,7 +127,8 @@ public class FindAbandonedEmpiresCronJob extends CronJob {
             distanceToNonAbandonedEmpire = 9999.0f;
         }
 
-        double distanceToCentre = Math.sqrt((star.getSectorX() * star.getSectorX()) + (star.getSectorY() * star.getSectorY()));
+        double distanceToCentre = Math.sqrt((star.getSectorX() * star.getSectorX())
+                + (star.getSectorY() * star.getSectorY()));
 
         try (Transaction t = DB.beginTransaction()) {
             sql = "DELETE FROM abandoned_stars WHERE star_id = ?";

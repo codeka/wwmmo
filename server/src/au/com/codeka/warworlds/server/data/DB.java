@@ -6,56 +6,58 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.postgresql.util.PSQLException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.jolbox.bonecp.BoneCP;
-import com.jolbox.bonecp.BoneCPConfig;
-import com.jolbox.bonecp.ConnectionHandle;
-import com.jolbox.bonecp.hooks.AbstractConnectionHook;
-import com.jolbox.bonecp.hooks.ConnectionHook;
+import au.com.codeka.common.Log;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.IConnectionCustomizer;
 
 /**
  * This is a wrapper class that helps us with connecting to the database.
  */
 public class DB {
-    private static final Logger log = LoggerFactory.getLogger(DB.class);
-    private static String sJdbcUrl;
+    private static final Log log = new Log("DB");
+    private static String sDbName;
     private static String sUsername;
     private static String sPassword;
     private static String sSchema;
     private static Strategy sStrategy;
 
     static {
-        String dbName = System.getProperty("au.com.codeka.warworlds.server.dbName");
-        if (dbName == null) {
-            dbName = "wwmmo";
-        }
-        sJdbcUrl = String.format("jdbc:postgresql://localhost:5432/%s", dbName);
-
-        sSchema = System.getProperty("au.com.codeka.warworlds.server.dbSchema");
-        if (sSchema == null) {
-            sSchema = "beta";
-        }
-
-        sUsername = System.getProperty("au.com.codeka.warworlds.server.dbUser");
-        if (sUsername == null) {
-            sUsername = "wwmmo_user";
-        }
-
-        sPassword = System.getProperty("au.com.codeka.warworlds.server.dbPass");
-        if (sPassword == null) {
-            sPassword = "H98765gf!s876#Hdf2%7f";
-        }
-
         try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            // TODO: should never happen!
-        }
+            sDbName = System.getProperty("au.com.codeka.warworlds.server.dbName");
+            if (sDbName == null) {
+                sDbName = "wwmmo";
+            }
 
-        sStrategy = new BoneCPStrategy();
-        //sStrategy = new NoConnectionPoolStrategy();
+            sSchema = System.getProperty("au.com.codeka.warworlds.server.dbSchema");
+            if (sSchema == null) {
+                sSchema = "beta";
+            }
+
+            sUsername = System.getProperty("au.com.codeka.warworlds.server.dbUser");
+            if (sUsername == null) {
+                sUsername = "wwmmo_user";
+            }
+
+            sPassword = System.getProperty("au.com.codeka.warworlds.server.dbPass");
+            if (sPassword == null) {
+                sPassword = "H98765gf!s876#Hdf2%7f";
+            }
+
+            try {
+                Class.forName("org.postgresql.Driver");
+            } catch (ClassNotFoundException e) {
+                log.error("Error loading PostgreSQL driver.", e);
+                throw new RuntimeException("Error loading PostgreSQL driver.", e);
+            }
+
+            sStrategy = new HikariStrategy();
+            //sStrategy = new NoConnectionPoolStrategy();
+        } catch (Throwable e) {
+            log.error("Some exception", e);
+        }
     }
 
     public static SqlStmt prepare(String sql) throws SQLException {
@@ -92,51 +94,44 @@ public class DB {
     }
 
     //@SuppressWarnings("unused")
-    private static class BoneCPStrategy implements Strategy {
-        private BoneCP mConnPool;
+    private static class HikariStrategy implements Strategy {
+        private final HikariDataSource dataSource;
 
-        public BoneCPStrategy() {
-            BoneCPConfig config = new BoneCPConfig();
-            config.setJdbcUrl(sJdbcUrl);
+        public HikariStrategy() {
+            HikariConfig config = new HikariConfig();
+            config.setMaximumPoolSize(40);
+            config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
             config.setUsername(sUsername);
             config.setPassword(sPassword);
-            config.setPartitionCount(4);
-            config.setMaxConnectionsPerPartition(50);
-            config.setConnectionTimeoutInMs(10000);
-            config.setReleaseHelperThreads(0);
-            config.setStatementReleaseHelperThreads(0);
-            config.setConnectionHook(mConnectionHook);
-            try {
-                mConnPool = new BoneCP(config);
-            } catch (SQLException e) {
-                log.error("Could not create connection pool!", e);
-            }
+            config.addDataSourceProperty("serverName", "localhost");
+            config.addDataSourceProperty("portNumber", "5432");
+            config.addDataSourceProperty("databaseName", sDbName);
+            config.setConnectionCustomizer(connectionCustomizer);
+            dataSource = new HikariDataSource(config);
         }
 
         @Override
         public SqlStmt prepare(String sql) throws SQLException {
-            Connection conn = mConnPool.getConnection();
+            Connection conn = dataSource.getConnection();
             return new SqlStmt(conn, sql, conn.prepareStatement(sql), true);
         }
 
         @Override
         public SqlStmt prepare(String sql, int autoGenerateKeys) throws SQLException {
-            Connection conn = mConnPool.getConnection();
+            Connection conn = dataSource.getConnection();
             return new SqlStmt(conn, sql, conn.prepareStatement(sql, autoGenerateKeys), true);
         }
 
         @Override
         public Transaction beginTransaction() throws SQLException {
-            return new Transaction(mConnPool.getConnection());
+            return new Transaction(dataSource.getConnection());
         }
 
-        private ConnectionHook mConnectionHook = new AbstractConnectionHook() {
+        private IConnectionCustomizer connectionCustomizer = new IConnectionCustomizer() {
             @Override
-            public void onAcquire(ConnectionHandle connection) {
+            public void customize(Connection connection) throws SQLException {
                 try {
-                    connection.getInternalConnection().setAutoCommit(true);
-
-                    CallableStatement stmt = connection.getInternalConnection().prepareCall(
+                    CallableStatement stmt = connection.prepareCall(
                             String.format("SET search_path TO '%s'", sSchema));
                     stmt.execute();
                 } catch (SQLException e) {
@@ -148,21 +143,27 @@ public class DB {
 
     @SuppressWarnings("unused") // we're using BoneCP now
     private static class NoConnectionPoolStrategy implements Strategy {
+        private static String jdbcUrl;
+
+        static {
+            jdbcUrl = String.format("jdbc:postgresql://localhost:5432/%s", sDbName);
+        }
+
         @Override
         public SqlStmt prepare(String sql) throws SQLException {
-            Connection conn = DriverManager.getConnection(sJdbcUrl, sUsername, sPassword);
+            Connection conn = DriverManager.getConnection(jdbcUrl, sUsername, sPassword);
             return new SqlStmt(conn, sql, conn.prepareStatement(sql), true);
         }
 
         @Override
         public SqlStmt prepare(String sql, int autoGenerateKeys) throws SQLException {
-            Connection conn = DriverManager.getConnection(sJdbcUrl, sUsername, sPassword);
+            Connection conn = DriverManager.getConnection(jdbcUrl, sUsername, sPassword);
             return new SqlStmt(conn, sql, conn.prepareStatement(sql, autoGenerateKeys), true);
         }
 
         @Override
         public Transaction beginTransaction() throws SQLException {
-            return new Transaction(DriverManager.getConnection(sJdbcUrl, sUsername, sPassword));
+            return new Transaction(DriverManager.getConnection(jdbcUrl, sUsername, sPassword));
         }
     }
 }

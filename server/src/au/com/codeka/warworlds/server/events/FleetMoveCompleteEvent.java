@@ -3,9 +3,8 @@ package au.com.codeka.warworlds.server.events;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseCombatReport;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
@@ -30,7 +29,7 @@ import au.com.codeka.warworlds.server.model.ScoutReport;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class FleetMoveCompleteEvent extends Event {
-    private final static Logger log = LoggerFactory.getLogger(FleetMoveCompleteEvent.class);
+    private final static Log log = new Log("FleetMoveCompleteEvent");
 
     @Override
     public String getNextEventTimeSql() {

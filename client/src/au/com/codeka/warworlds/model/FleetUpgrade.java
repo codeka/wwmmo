@@ -1,10 +1,10 @@
 package au.com.codeka.warworlds.model;
 
-import org.json.simple.JSONObject;
-
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.protobuf.Messages;
+
+import com.google.gson.JsonObject;
 
 public class FleetUpgrade extends BaseFleetUpgrade {
 
@@ -20,9 +20,9 @@ public class FleetUpgrade extends BaseFleetUpgrade {
         public void fromProtocolBuffer(BaseFleet fleet, Messages.FleetUpgrade pb) {
             super.fromProtocolBuffer(fleet, pb);
 
-            JSONObject extra = getExtraJson();
-            if (extra != null && extra.containsKey("is_boosting")) {
-                mIsBoosting = (Boolean) extra.get("is_boosting");
+            JsonObject extra = getExtraJson();
+            if (extra != null && extra.has("is_boosting")) {
+                mIsBoosting = extra.get("is_boosting").getAsBoolean();
             }
         }
     }

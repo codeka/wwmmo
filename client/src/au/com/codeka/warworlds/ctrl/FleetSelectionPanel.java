@@ -2,9 +2,6 @@ package au.com.codeka.warworlds.ctrl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-
-import org.apache.commons.lang3.StringUtils;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -24,8 +21,10 @@ import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.FleetList.OnFleetActionListener;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.FleetUpgrade.BoostFleetUpgrade;
+import au.com.codeka.warworlds.model.Star;
+
+import com.google.common.base.CaseFormat;
 
 /** Control displayed below a fleet list with controls to interact with the selected fleet. */
 public class FleetSelectionPanel extends FrameLayout {
@@ -251,7 +250,7 @@ public class FleetSelectionPanel extends FrameLayout {
             }
 
             Fleet.Stance value = mValues[position];
-            view.setText(StringUtils.capitalize(value.toString().toLowerCase(Locale.ENGLISH)));
+            view.setText(CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, value.toString()));
             return view;
         }
     }

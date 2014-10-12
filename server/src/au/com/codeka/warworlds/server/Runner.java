@@ -1,17 +1,17 @@
 package au.com.codeka.warworlds.server;
 
 import org.eclipse.jetty.server.Server;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.cron.CronJobRegistry;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
 import au.com.codeka.warworlds.server.handlers.admin.AdminGenericHandler;
 import au.com.codeka.warworlds.server.model.DesignManager;
 
+/** Main entry-point for the server. */
 public class Runner {
-    private static final Logger log = LoggerFactory.getLogger(Runner.class);
+    private static final Log log = new Log("Runner");
 
     public static void main(String[] args) throws Exception {
         String basePath = System.getProperty("au.com.codeka.warworlds.server.basePath");
@@ -24,25 +24,25 @@ public class Runner {
         DesignManager.setup(basePath);
         NameGenerator.setup(basePath);
 
-        if (args.length >= 2 && args[0].equals("cron")) {
-            String extra = null;
-            if (args.length >= 3) {
-                extra = args[2];
+        try {
+            if (args.length >= 2 && args[0].equals("cron")) {
+                String extra = null;
+                if (args.length >= 3) {
+                    extra = args[2];
+                }
+                cronMain(args[1], extra);
+            } else {
+                gameMain();
             }
-            cronMain(args[1], extra);
-        } else {
-            gameMain();
+        } catch(Exception e) {
+            log.error("Exception on main thread, aborting.", e);
         }
     }
 
-    private static void cronMain(String method, String extra) {
-        try {
-            CronJob job = CronJobRegistry.getJob(method);
-            if (job != null) {
-                job.run(extra);
-            }
-        } catch(Exception e) {
-            log.error("Error running CRON", e);
+    private static void cronMain(String method, String extra) throws Exception {
+        CronJob job = CronJobRegistry.getJob(method);
+        if (job != null) {
+            job.run(extra);
         }
     }
 
@@ -66,6 +66,7 @@ public class Runner {
         Server server = new Server(port);
         server.setHandler(new RequestRouter());
         server.start();
+        log.info("Server started on http://localhost:%d/", port);
         server.join();
 
         if (starSimulatorThread != null) {

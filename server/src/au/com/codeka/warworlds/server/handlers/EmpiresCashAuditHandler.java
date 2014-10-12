@@ -10,7 +10,7 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 public class EmpiresCashAuditHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
-        int empireID = Integer.parseInt(getUrlParameter("empire_id"));
+        int empireID = Integer.parseInt(getUrlParameter("empireid"));
         if (!getSession().isAdmin()) {
             throw new RequestException(403); // TODO: allow you to get your own...
         }

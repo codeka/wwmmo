@@ -3,7 +3,7 @@ package au.com.codeka.warworlds.server.handlers.admin;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -14,8 +14,10 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
+
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
 
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -71,7 +73,8 @@ public class AdminEmpireShieldsHandler extends AdminHandler {
 
         int empireID;
         try {
-            String s = IOUtils.toString(getRequest().getPart("empire_id").getInputStream());
+            String s = CharStreams.toString(new InputStreamReader(
+                    getRequest().getPart("empire_id").getInputStream()));
             empireID = Integer.parseInt(s);
         } catch(IOException | ServletException e) {
             throw new RequestException(e);
@@ -80,8 +83,7 @@ public class AdminEmpireShieldsHandler extends AdminHandler {
         byte[] pngImage;
         try {
             Part part = getRequest().getPart("shield_file");
-            InputStream shield = part.getInputStream();
-            pngImage = IOUtils.toByteArray(shield);
+            pngImage = ByteStreams.toByteArray(part.getInputStream());
         } catch (IOException | ServletException e) {
             throw new RequestException(e);
         }

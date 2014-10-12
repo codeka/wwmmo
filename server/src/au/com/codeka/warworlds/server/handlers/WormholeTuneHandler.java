@@ -13,7 +13,7 @@ import au.com.codeka.warworlds.server.model.Star;
 public class WormholeTuneHandler extends RequestHandler {
     @Override
     protected void post() throws RequestException {
-        int starID = Integer.parseInt(getUrlParameter("star_id"));
+        int starID = Integer.parseInt(getUrlParameter("starid"));
 
         Star srcWormhole = new StarController().getStar(starID);
         if (srcWormhole.getStarType().getType() != Star.Type.Wormhole) {

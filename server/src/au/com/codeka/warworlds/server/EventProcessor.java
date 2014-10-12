@@ -4,9 +4,8 @@ import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.events.*;
 
 /**
@@ -15,7 +14,7 @@ import au.com.codeka.warworlds.server.events.*;
  * scheduled to occur.
  */
 public class EventProcessor {
-    private final Logger log = LoggerFactory.getLogger(EventProcessor.class);
+    private final Log log = new Log("EventProcessor");
     public static EventProcessor i = new EventProcessor();
 
     private static ArrayList<Class<?>> sEventClasses;

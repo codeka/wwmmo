@@ -11,9 +11,8 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.imaging.ImageFormat;
 import org.apache.commons.imaging.Imaging;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protobuf.Messages.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
@@ -27,11 +26,11 @@ import au.com.codeka.warworlds.server.model.Empire;
  * This handler handles the alliance/[id]/shield request when users fetch shields for alliances.
  */
 public class AllianceShieldHandler extends RequestHandler {
-    private static final Logger log = LoggerFactory.getLogger(EmpiresShieldHandler.class);
+    private static final Log log = new Log("EmpiresShieldHandler");
 
     @Override
     protected void get() throws RequestException {
-        int allianceID = Integer.parseInt(getUrlParameter("alliance_id"));
+        int allianceID = Integer.parseInt(getUrlParameter("allianceid"));
 
         Integer shieldID = null;
         if (getRequest().getParameter("id") != null) {

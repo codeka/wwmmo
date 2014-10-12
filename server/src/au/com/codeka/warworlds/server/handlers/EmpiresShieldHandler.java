@@ -23,9 +23,8 @@ import javax.imageio.ImageIO;
 import org.apache.commons.imaging.ImageFormat;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protobuf.Messages.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
@@ -38,11 +37,11 @@ import au.com.codeka.warworlds.server.model.Empire;
  * This handler handles the empires/[key]/shield request when users update their shield image.
  */
 public class EmpiresShieldHandler extends RequestHandler {
-    private static final Logger log = LoggerFactory.getLogger(EmpiresShieldHandler.class);
+    private static final Log log = new Log("EmpiresShieldHandler");
 
     @Override
     protected void get() throws RequestException {
-        int empireID = Integer.parseInt(getUrlParameter("empire_id"));
+        int empireID = Integer.parseInt(getUrlParameter("empireid"));
 
         Integer shieldID = null;
         if (getRequest().getParameter("id") != null) {

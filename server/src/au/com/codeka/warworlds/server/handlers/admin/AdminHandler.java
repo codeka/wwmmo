@@ -17,20 +17,18 @@ import net.asfun.jangod.lib.Filter;
 import net.asfun.jangod.lib.FilterLibrary;
 import net.asfun.jangod.template.TemplateEngine;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.Session;
 
+import com.google.common.base.Throwables;
+import com.google.gson.JsonElement;
+
 public class AdminHandler extends RequestHandler {
-    private final Logger log = LoggerFactory.getLogger(AdminHandler.class);
+    private final Log log = new Log("AdminHandler");
 
     private static TemplateEngine sTemplateEngine;
     static {
@@ -62,7 +60,7 @@ public class AdminHandler extends RequestHandler {
         try {
             TreeMap<String, Object> data = new TreeMap<String, Object>();
             data.put("exception", e);
-            data.put("stack_trace", ExceptionUtils.getStackTrace(e));
+            data.put("stack_trace", Throwables.getStackTraceAsString(e));
             render("exception.html", data);
         } catch(Exception e2) {
             setResponseBody(e.getGenericError());

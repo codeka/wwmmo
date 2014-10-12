@@ -10,7 +10,6 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-
 # keep source file line numbers at least (they're very useful!)
 -renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable
@@ -23,8 +22,11 @@
   @au.com.codeka.warworlds.eventbus.EventHandler <methods>;
 }
 
-# This references lots of classes for some reason.
--dontwarn org.apache.commons.collections.BeanMap
+# The following are required for guava
+-dontwarn javax.annotation.**
+-dontwarn javax.inject.**
+-dontwarn sun.misc.Unsafe
+#-dontwarn com.google.common.collect.MinMaxPriorityQueue
 
 # The following are required by the Google Play Services library.
 -keep class * extends java.util.ListResourceBundle {

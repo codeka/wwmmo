@@ -28,7 +28,7 @@ public class ColoniesHandler extends RequestHandler {
 
         try (Transaction t = DB.beginTransaction()) {
             // fetch the star, simulate & update it
-            Star star = new StarController(t).getStar(Integer.parseInt(getUrlParameter("star_id")));
+            Star star = new StarController(t).getStar(Integer.parseInt(getUrlParameter("starid")));
             Simulation sim = new Simulation();
             sim.simulate(star);
             new StarController(t).update(star);

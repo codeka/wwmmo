@@ -2,9 +2,7 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.util.HashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -13,7 +11,7 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
  * of that string, 0 = not at all profane, 1 = somewhat profane, 2 = strong profanity.
  */
 public class ProfanityFilter {
-    private static final Logger log = LoggerFactory.getLogger(ProfanityFilter.class);
+    private static final Log log = new Log("ProfanityFilter");
     private static HashMap<String, Integer> sProfaneWords = new HashMap<String, Integer>();
 
     /**

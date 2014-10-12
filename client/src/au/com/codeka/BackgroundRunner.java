@@ -13,12 +13,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 import au.com.codeka.common.Log;
+
+import com.google.common.base.Throwables;
 
 /**
  * This class is similar to AsyncTask, except we get to control all the parameters.
@@ -55,7 +55,7 @@ public abstract class BackgroundRunner<Result> {
 
     public BackgroundRunner() {
         if (sThreadDebug) {
-            mCreatorStackTrace = ExceptionUtils.getStackTrace(new Throwable());
+            mCreatorStackTrace = Throwables.getStackTraceAsString(new Throwable());
         }
 
         mWorker = new Callable<Result>() {

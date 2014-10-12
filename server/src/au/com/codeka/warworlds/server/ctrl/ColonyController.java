@@ -4,9 +4,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.protobuf.Messages;
@@ -21,7 +20,7 @@ import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class ColonyController {
-    private final Logger log = LoggerFactory.getLogger(ColonyController.class);
+    private final Log log = new Log("ColonyController");
     private DataBase db;
 
     public ColonyController() {
@@ -37,8 +36,8 @@ public class ColonyController {
      * 
      * Attacking colonies is actually quite simple, at least compared with
      * attacking fleets. The number of ships you have with the "troop carrier"
-     * effect represents your attack score. The defence score of the colony is
-     * 0.25 * it's population * it's defence boost.
+     * effect represents your attack score. The defense score of the colony is
+     * 0.25 * it's population * it's defense boost.
      *
      * The number of ships remaining after an attack is:
      * num_ships - (population * 0.25 * defence_bonus)
@@ -128,8 +127,8 @@ public class ColonyController {
                 sitrep_pb.setColonyDestroyedRecord(colony_destroyed_pb);
             }
         } else {
-            log.info(String.format("Fleets destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
-                    remainingPopulation, remainingShips));
+            log.info("Fleets destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
+                    remainingPopulation, remainingShips);
             colony.setPopulation(remainingPopulation);
             for (Fleet fleet : troopCarriers) {
                 new FleetController(db.getTransaction()).removeShips(star, fleet, fleet.getNumShips());

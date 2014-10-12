@@ -3,15 +3,13 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class StarExportController {
-    private static final Logger log = LoggerFactory.getLogger(StarExportController.class);
+    private static final Log log = new Log("StarExportController");
     private DataBase db;
 
     public StarExportController() {

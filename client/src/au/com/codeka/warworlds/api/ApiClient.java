@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.api;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,6 @@ import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
@@ -19,6 +19,7 @@ import org.w3c.dom.Document;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.google.common.io.CharStreams;
 import com.google.protobuf.Message;
 
 /**
@@ -42,8 +43,8 @@ public class ApiClient {
         builderFactory.setValidating(false);
 
         try {
-            InputStream ins = res.getResponse().getEntity().getContent();
-            return IOUtils.toString(ins, "utf-8");
+            return CharStreams.toString(new InputStreamReader(
+                    res.getResponse().getEntity().getContent(), "utf-8"));
         } catch (Exception e) {
             throw new ApiException(e);
         } finally {

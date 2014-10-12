@@ -13,18 +13,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jregex.Matcher;
-
-import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.ctrl.NotificationController;
@@ -32,6 +28,7 @@ import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.handlers.admin.AdminGenericHandler;
 
+import com.google.gson.JsonObject;
 import com.google.protobuf.Message;
 
 /**
@@ -39,7 +36,7 @@ import com.google.protobuf.Message;
  * extracting protocol buffers from the request body, and so on.
  */
 public class RequestHandler {
-    private final Logger log = LoggerFactory.getLogger(RequestHandler.class);
+    private final Log log = new Log("RequestHandler");
     private HttpServletRequest mRequest;
     private HttpServletResponse mResponse;
     private Matcher mRouteMatcher;
@@ -47,13 +44,7 @@ public class RequestHandler {
     private String mExtraOption;
 
     protected String getUrlParameter(String name) {
-        try {
-            if (mRouteMatcher.isCaptured(name)) {
-                return mRouteMatcher.group(name);
-            }
-        } catch(IllegalArgumentException e) {
-        }
-        return null;
+        return mRouteMatcher.group(name);
     }
 
     protected String getRealm() {
@@ -101,19 +92,19 @@ public class RequestHandler {
                         Thread.sleep(50 + new Random().nextInt(100));
                     } catch (InterruptedException e1) {
                     }
-                    log.warn("Retrying deadlock.", e);
+                    log.warning("Retrying deadlock.", e);
                     lastException = e;
                     continue;
                 }
                 if (e.getHttpErrorCode() < 500) {
-                    log.warn("Unhandled error in URL: "+request.getRequestURI(), e);
+                    log.warning("Unhandled error in URL: "+request.getRequestURI(), e);
                 } else {
                     log.error("Unhandled error in URL: "+request.getRequestURI(), e);
                 }
                 e.populate(mResponse);
                 setResponseBody(e.getGenericError());
                 return;
-            } catch(Exception e) {
+            } catch(Throwable e) {
                 log.error("Unhandled error!", e);
                 mResponse.setStatus(500);
                 return;
@@ -172,11 +163,11 @@ public class RequestHandler {
         }
     }
 
-    protected void setResponseJson(Map<String, Object> data) {
+    protected void setResponseJson(JsonObject json) {
         mResponse.setContentType("application/json");
         mResponse.setCharacterEncoding("utf-8");
         try {
-            mResponse.getWriter().write(JSONObject.toJSONString(data));
+            mResponse.getWriter().write(json.toString());
         } catch (IOException e) {
         }
     }

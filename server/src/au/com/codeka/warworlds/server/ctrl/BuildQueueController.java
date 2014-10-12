@@ -4,9 +4,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseFleet;
@@ -27,7 +26,7 @@ import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildQueueController {
-    private static final Logger log = LoggerFactory.getLogger(BuildQueueController.class);
+    private static final Log log = new Log("BuildQueueController");
     private DataBase db;
 
     public BuildQueueController() {

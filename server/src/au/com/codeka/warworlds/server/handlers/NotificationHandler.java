@@ -2,9 +2,8 @@ package au.com.codeka.warworlds.server.handlers;
 
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -16,7 +15,7 @@ import au.com.codeka.warworlds.server.ctrl.NotificationController;
  * clients.
  */
 public class NotificationHandler extends RequestHandler {
-    private static Logger log = LoggerFactory.getLogger(NotificationHandler.class);
+    private static Log log = new Log("NotificationHandler");
     private Continuation mContinuation;
     private int mEmpireID;
     private int mAllianceID;

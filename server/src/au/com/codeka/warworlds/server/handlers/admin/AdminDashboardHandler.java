@@ -2,22 +2,22 @@ package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Map;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
+import com.google.gson.JsonObject;
+
 public class AdminDashboardHandler extends AdminHandler {
-    private static final Logger log = LoggerFactory.getLogger(AdminDashboardHandler.class);
+    private static final Log log = new Log("AdminDashboardHandler");
 
     @Override
     protected void get() throws RequestException {
@@ -65,7 +65,6 @@ public class AdminDashboardHandler extends AdminHandler {
         }
         data.put("graph_data", graphData);
 
-        populateOldestStar(data);
         render("admin/index.html", data);
     }
 
@@ -75,12 +74,12 @@ public class AdminDashboardHandler extends AdminHandler {
             return;
         }
 
-        TreeMap<String, Object> data = new TreeMap<String, Object>();
-        populateOldestStar(data);
-        setResponseJson(data);
+        JsonObject json = new JsonObject();
+        populateOldestStar(json);
+        setResponseJson(json);
     }
 
-    private void populateOldestStar(Map<String, Object> data) {
+    private void populateOldestStar(JsonObject json) {
         // for reasons that I don't understand (I'm blaming crappy MySQL) this is hella slow
         // if I just try to select them all at once. So doing it like this is slightly faster.
         int starID = 0;
@@ -102,10 +101,10 @@ public class AdminDashboardHandler extends AdminHandler {
                 stmt.setInt(1, starID);
                 SqlResult res = stmt.select();
                 if (res.next()) {
-                    data.put("oldest_star_id", res.getInt(1));
-                    data.put("oldest_star_name", res.getString(2));
-                    data.put("oldest_star_time", TimeFormatter.create().withMaxDays(1000).format(
-                            res.getDateTime(3)));
+                    json.addProperty("oldest_star_id", res.getInt(1));
+                    json.addProperty("oldest_star_name", res.getString(2));
+                    json.addProperty("oldest_star_time",
+                            TimeFormatter.create().withMaxDays(1000).format(res.getDateTime(3)));
                 }
             } catch (Exception e) {
                 log.error("Error fetching oldest star.", e);

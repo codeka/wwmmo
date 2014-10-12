@@ -20,7 +20,7 @@ public class ChatConversationParticipantsHandler extends RequestHandler {
     @Override
     protected void post() throws RequestException {
         Messages.ChatConversationParticipant pb = getRequestBody(Messages.ChatConversationParticipant.class);
-        int conversationID = Integer.parseInt(getUrlParameter("conversation_id"));
+        int conversationID = Integer.parseInt(getUrlParameter("conversationid"));
 
         try (Transaction t = DB.beginTransaction()) {
             ChatConversation conversation = new ChatController(t).getConversation(conversationID);

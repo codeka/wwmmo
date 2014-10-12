@@ -11,8 +11,8 @@ import au.com.codeka.warworlds.server.model.AllianceRequestVote;
 public class AllianceRequestHandler extends RequestHandler {
     @Override
     protected void post() throws RequestException {
-        int allianceID = Integer.parseInt(getUrlParameter("alliance_id"));
-        int requestID = Integer.parseInt(getUrlParameter("request_id"));
+        int allianceID = Integer.parseInt(getUrlParameter("allianceid"));
+        int requestID = Integer.parseInt(getUrlParameter("requestid"));
         int empireID = getSession().getEmpireID();
 
         Messages.AllianceRequestVote vote_pb = getRequestBody(Messages.AllianceRequestVote.class);

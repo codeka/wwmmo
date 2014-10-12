@@ -1,6 +1,6 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import org.apache.xerces.impl.dv.util.Base64;
+import com.google.common.io.BaseEncoding;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
@@ -11,12 +11,12 @@ import au.com.codeka.warworlds.server.model.AllianceRequest;
 public class AllianceRequestsHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
-        int allianceID = Integer.parseInt(getUrlParameter("alliance_id"));
+        int allianceID = Integer.parseInt(getUrlParameter("allianceid"));
 
         Integer cursor = null;
         if (getRequest().getParameter("cursor") != null) {
             try {
-                cursor = Integer.parseInt(new String(Base64.decode(
+                cursor = Integer.parseInt(new String(BaseEncoding.base64().decode(
                         getRequest().getParameter("cursor")), "utf-8"));
             } catch (Exception e) {
                 throw new RequestException(400);
@@ -35,7 +35,8 @@ public class AllianceRequestsHandler extends RequestHandler {
         }
 
         if (minID != 0) {
-            alliance_requests_pb.setCursor(Base64.encode(Integer.toString(minID).getBytes()));
+            alliance_requests_pb.setCursor(BaseEncoding.base64().encode(
+                    Integer.toString(minID).getBytes()));
         }
 
         setResponseBody(alliance_requests_pb.build());
@@ -43,7 +44,7 @@ public class AllianceRequestsHandler extends RequestHandler {
 
     @Override
     protected void post() throws RequestException {
-        int allianceID = Integer.parseInt(getUrlParameter("alliance_id"));
+        int allianceID = Integer.parseInt(getUrlParameter("allianceid"));
         int empireID = getSession().getEmpireID();
         Messages.AllianceRequest alliance_request_pb = getRequestBody(Messages.AllianceRequest.class);
         if (alliance_request_pb.getAllianceId() != allianceID) {

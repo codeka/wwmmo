@@ -3,9 +3,8 @@ package au.com.codeka.warworlds.server.events;
 import java.util.List;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
@@ -22,7 +21,7 @@ import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class FleetDestroyedEvent extends Event {
-    private final Logger log = LoggerFactory.getLogger(FleetDestroyedEvent.class);
+    private final Log log = new Log("FleetDestroyedEvent");
 
     @Override
     protected String getNextEventTimeSql() {

@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
+import com.google.common.base.Throwables;
 
 /** SimpleFormatter is supposed to take a format string, but I couldn't get it work. Doing our
  * own custom class lets us do some extra stuff, too. */
@@ -42,7 +43,7 @@ public class LogFormatter extends Formatter {
         }
         if (record.getThrown() != null) {
             sb.append("\n");
-            sb.append(ExceptionUtils.getStackTrace(record.getThrown()));
+            sb.append(Throwables.getStackTraceAsString(record.getThrown()));
         }
 
         sb.append("\n");

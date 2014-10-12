@@ -3,8 +3,6 @@ package au.com.codeka.warworlds.ctrl;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.apache.commons.lang3.StringUtils;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.Html;
@@ -34,6 +32,8 @@ import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
+
+import com.google.common.base.CaseFormat;
 
 public class FleetListRow extends RelativeLayout {
     private Context context;
@@ -184,8 +184,8 @@ public class FleetListRow extends RelativeLayout {
 
     public static void populateFleetStanceRow(Context context, LinearLayout row, Fleet fleet) {
         String text = String.format("%s (stance: %s)",
-                StringUtils.capitalize(fleet.getState().toString().toLowerCase(Locale.ENGLISH)),
-                StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH)));
+                CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, fleet.getState().toString()),
+                CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, fleet.getStance().toString()));
         addTextToRow(context, row, text, 0);
     }
 

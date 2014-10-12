@@ -13,9 +13,8 @@ import java.util.TreeMap;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
@@ -50,7 +49,7 @@ import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class StarController {
-    private static final Logger log = LoggerFactory.getLogger(StarController.class);
+    private static final Log log = new Log("StarController");
     private DataBase db;
 
     public StarController() {

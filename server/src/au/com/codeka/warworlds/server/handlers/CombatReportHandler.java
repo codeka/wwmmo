@@ -8,7 +8,7 @@ import au.com.codeka.warworlds.server.ctrl.CombatReportController;
 public class CombatReportHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
-        int combatReportID = Integer.parseInt(getUrlParameter("combat_report_id"));
+        int combatReportID = Integer.parseInt(getUrlParameter("combatreportid"));
 
         Messages.CombatReport combat_report_pb = new CombatReportController().fetchCombatReportPb(
                 combatReportID);

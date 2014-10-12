@@ -2,9 +2,8 @@ package au.com.codeka.warworlds.server;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
@@ -18,7 +17,7 @@ import au.com.codeka.warworlds.server.model.Star;
  * TOO out-of-date.
  */
 public class StarSimulatorThread {
-    private static final Logger log = LoggerFactory.getLogger(StarSimulatorThread.class);
+    private static final Log log = new Log("StarSimulatorThread");
     private Thread mThread;
     private boolean mStopped;
 

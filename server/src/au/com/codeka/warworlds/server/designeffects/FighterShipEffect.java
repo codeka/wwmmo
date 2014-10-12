@@ -1,16 +1,15 @@
 package au.com.codeka.warworlds.server.designeffects;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseFleet.Stance;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.model.ShipEffect;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.model.BaseFleet.Stance;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Fleet;
 
@@ -19,7 +18,7 @@ import au.com.codeka.warworlds.server.model.Fleet;
  * combat.
  */
 public class FighterShipEffect extends ShipEffect {
-    private final Logger log = LoggerFactory.getLogger(FighterShipEffect.class);
+    private final Log log = new Log("FighterShipEffect");
 
     /**
      * This is called when we arrive on a star. If there's anybody to attack, we'll switch to
@@ -53,8 +52,8 @@ public class FighterShipEffect extends ShipEffect {
                 continue;
             }
 
-            log.info(String.format("Fleet #%s arrived at star #%s, found enemy fleet, switching to attack mode.",
-                                   fleet.getKey(), star.getKey()));
+            log.info("Fleet #%s arrived at star #%s, found enemy fleet, switching to attack mode.",
+                    fleet.getKey(), star.getKey());
             ((Fleet) fleet).attack(DateTime.now());
             break;
         }
@@ -89,8 +88,8 @@ public class FighterShipEffect extends ShipEffect {
             return;
         }
 
-        log.info(String.format("Fleet #%s arrived at star #%s, #%s switching to attack mode.",
-                otherFleet.getKey(), star.getKey(), fleet.getKey()));
+        log.info("Fleet #%s arrived at star #%s, #%s switching to attack mode.",
+                otherFleet.getKey(), star.getKey(), fleet.getKey());
         ((Fleet) fleet).attack(DateTime.now());
     }
 

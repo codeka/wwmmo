@@ -4,9 +4,8 @@ import java.util.Locale;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -15,7 +14,7 @@ import au.com.codeka.warworlds.server.model.ChatMessage;
 import au.com.codeka.warworlds.server.model.Empire;
 
 public class ChatAbuseController {
-    private final Logger log = LoggerFactory.getLogger(ChatAbuseController.class);
+    private final Log log = new Log("ChatAbuseController");
     private DataBase db;
 
     // number of unique empires who need to vote an empire in the sinbin before they get added

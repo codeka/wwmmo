@@ -17,10 +17,10 @@ public class FleetHandler extends RequestHandler {
         Messages.Fleet fleet_pb = getRequestBody(Messages.Fleet.class);
 
         // make sure the fleet in the pb is the same as the one referenced in the URL
-        if (!fleet_pb.getKey().equals(getUrlParameter("fleet_id"))) {
+        if (!fleet_pb.getKey().equals(getUrlParameter("fleetid"))) {
             throw new RequestException(400, "Invalid fleet_id");
         }
-        if (!fleet_pb.getStarKey().equals(getUrlParameter("star_id"))) {
+        if (!fleet_pb.getStarKey().equals(getUrlParameter("starid"))) {
             throw new RequestException(400, "Invalid star_id");
         }
 
@@ -31,10 +31,10 @@ public class FleetHandler extends RequestHandler {
 
         try (Transaction t = DB.beginTransaction()) {
             Simulation sim = new Simulation();
-            Star star = new StarController(t).getStar(Integer.parseInt(getUrlParameter("star_id")));
+            Star star = new StarController(t).getStar(Integer.parseInt(getUrlParameter("starid")));
             sim.simulate(star);
 
-            int fleetID = Integer.parseInt(getUrlParameter("fleet_id"));
+            int fleetID = Integer.parseInt(getUrlParameter("fleetid"));
             int empireID = getSession().getEmpireID();
             for (BaseFleet baseFleet : star.getFleets()) {
                 Fleet fleet = (Fleet) baseFleet;

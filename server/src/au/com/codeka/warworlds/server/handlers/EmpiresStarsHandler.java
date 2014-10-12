@@ -16,7 +16,7 @@ public class EmpiresStarsHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
         Empire empire = new EmpireController().getEmpire(Integer.parseInt(
-                this.getUrlParameter("empire_id")));
+                this.getUrlParameter("empireid")));
         if (!getSession().isAdmin() && empire.getID() != getSession().getEmpireID()) {
             throw new RequestException(403);
         }

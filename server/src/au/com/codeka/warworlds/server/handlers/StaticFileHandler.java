@@ -5,15 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
-import au.com.codeka.warworlds.server.handlers.admin.AdminGenericHandler;
 
 public class StaticFileHandler extends RequestHandler {
-    private final Logger log = LoggerFactory.getLogger(AdminGenericHandler.class);
+    private final Log log = new Log("AdminGenericHandler");
 
     private static String sBasePath;
     static {
@@ -35,6 +32,8 @@ public class StaticFileHandler extends RequestHandler {
             contentType = "text/javascript";
         } else if (path.endsWith(".png")) {
             contentType = "image/png";
+        } else if (path.endsWith(".ico")) {
+            contentType = "image/x-icon";
         } else {
             contentType = "text/plain";
         }

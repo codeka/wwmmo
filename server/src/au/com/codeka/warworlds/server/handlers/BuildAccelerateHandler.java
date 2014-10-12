@@ -19,10 +19,10 @@ public class BuildAccelerateHandler extends RequestHandler {
                 //log.info(message);
             }
         });
-        Star star = new StarController().getStar(Integer.parseInt(getUrlParameter("star_id")));
+        Star star = new StarController().getStar(Integer.parseInt(getUrlParameter("starid")));
         sim.simulate(star);
 
-        int buildRequestID = Integer.parseInt(getUrlParameter("build_id"));
+        int buildRequestID = Integer.parseInt(getUrlParameter("buildid"));
         int myEmpireID = getSession().getEmpireID();
         float accelerateAmount = 0.5f;
         if (getRequest().getParameter("amount") != null) {

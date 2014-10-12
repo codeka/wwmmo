@@ -4,7 +4,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -13,6 +12,8 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
+
+import com.google.common.io.BaseEncoding;
 
 public class SituationReportController {
     private DataBase db;
@@ -33,7 +34,7 @@ public class SituationReportController {
                     .build();
 
             int empireID = Integer.parseInt(new_sitrep_pb.getEmpireKey());
-            String base64 = Base64.encodeBase64String(new_sitrep_pb.toByteArray());
+            String base64 = BaseEncoding.base64().encode(new_sitrep_pb.toByteArray());
             new NotificationController().sendNotificationToEmpire(empireID, "sitrep", base64);
         } catch (Exception e) {
             throw new RequestException(e);

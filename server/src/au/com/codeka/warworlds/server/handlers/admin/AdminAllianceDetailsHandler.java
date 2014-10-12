@@ -32,7 +32,7 @@ public class AdminAllianceDetailsHandler extends AdminHandler {
                     " WHERE alliance_requests.alliance_id = ?" +
                     " ORDER BY date DESC";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, Integer.parseInt(getUrlParameter("alliance_id")));
+            stmt.setInt(1, Integer.parseInt(getUrlParameter("allianceid")));
             SqlResult result = stmt.select();
 
             ArrayList<BankBalanceAudit> audit = new ArrayList<BankBalanceAudit>();

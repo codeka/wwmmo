@@ -18,7 +18,7 @@ import au.com.codeka.warworlds.server.model.Empire;
 public class SitReportsHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
-        String starKey = getUrlParameter("star_id");
+        String starKey = getUrlParameter("starid");
         Integer starID = starKey == null
                        ? null : Integer.parseInt(starKey);
 

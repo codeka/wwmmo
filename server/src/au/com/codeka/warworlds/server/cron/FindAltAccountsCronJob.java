@@ -3,21 +3,18 @@ package au.com.codeka.warworlds.server.cron;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 /**
- * This cron job runs once per day an searches the database for potential
- * alts. We use this to display the alts on the empire's info screen in the
- * backend.
+ * This cron job runs once per day an searches the database for potential alts. We use this to
+ * display the alts on the empire's info screen in the backend.
  */
 public class FindAltAccountsCronJob extends CronJob {
-    private static final Logger log = LoggerFactory.getLogger(FindAltAccountsCronJob.class);
+    private static final Log log = new Log("FindAltAccountsCronJob");
 
     @Override
     public void run(String extra) throws Exception {
@@ -46,7 +43,8 @@ public class FindAltAccountsCronJob extends CronJob {
                 stmt.setString(1, emailAddr);
                 SqlResult res = stmt.select();
 
-                Messages.EmpireAltAccounts.Builder alt_acct_pb = Messages.EmpireAltAccounts.newBuilder();
+                Messages.EmpireAltAccounts.Builder alt_acct_pb =
+                        Messages.EmpireAltAccounts.newBuilder();
                 int numFound = 0;
                 while (res.next()) {
                     String altEmailAddr = res.getString("user_email");

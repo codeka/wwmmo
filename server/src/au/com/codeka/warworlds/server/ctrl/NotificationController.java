@@ -10,9 +10,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
@@ -29,7 +28,7 @@ import com.google.android.gcm.server.Sender;
 import com.google.common.collect.Lists;
 
 public class NotificationController {
-    private final Logger log = LoggerFactory.getLogger(NotificationController.class);
+    private final Log log = new Log("NotificationController");
     private static String API_KEY = "AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA";
 
     private static RecentNotificationCache sRecentNotifications = new RecentNotificationCache();
@@ -191,7 +190,8 @@ public class NotificationController {
     }
 
     private void handleNotRegisteredError(String registrationId, String userEmail, Result result) throws RequestException {
-        log.warn(String.format("Could not send notification: DeviceNotRegistered: user=%s registration=%s", userEmail, registrationId));
+        log.warning("Could not send notification: DeviceNotRegistered: user=%s registration=%s",
+                userEmail, registrationId);
         String sql = "UPDATE devices SET gcm_registration_id = NULL WHERE gcm_registration_id = ?";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setString(1, registrationId);
@@ -202,11 +202,13 @@ public class NotificationController {
     }
 
     private void handleOtherError(String registrationId, String userEmail, Result result) throws RequestException {
-        log.warn(String.format("Could not send notification: %s: user=%s registration=%s", result.getErrorCodeName(), userEmail, registrationId));
+        log.warning("Could not send notification: %s: user=%s registration=%s",
+                result.getErrorCodeName(), userEmail, registrationId);
     }
 
     private void handleCanonicalRegistrationId(String registrationId, String userEmail, Result result) throws RequestException {
-        log.info(String.format("Notification registration changed: user=%s registration=%s", userEmail, result.getCanonicalRegistrationId()));
+        log.info("Notification registration changed: user=%s registration=%s",
+                userEmail, result.getCanonicalRegistrationId());
         String sql = "UPDATE devices SET gcm_registration_id = ? WHERE gcm_registration_id = ?";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setString(1, result.getCanonicalRegistrationId());

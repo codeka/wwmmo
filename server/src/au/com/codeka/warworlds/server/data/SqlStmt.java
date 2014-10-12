@@ -11,14 +11,14 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import org.joda.time.ReadableInstant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import au.com.codeka.common.Log;
 
 /**
  * This is a wrapper around a \c PreparedStatement, for ease-of-use.
  */
 public class SqlStmt implements AutoCloseable {
-    private final Logger log = LoggerFactory.getLogger(SqlStmt.class);
+    private static final Log log = new Log("SqlStmt");
     private static Calendar sUTC;
 
     static {

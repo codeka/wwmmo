@@ -20,7 +20,7 @@ import au.com.codeka.warworlds.server.model.Star;
 public class StarHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
-        int id = Integer.parseInt(getUrlParameter("star_id"));
+        int id = Integer.parseInt(getUrlParameter("starid"));
         Star star = new StarController().getStar(id);
         if (star == null) {
             throw new RequestException(404);
@@ -43,10 +43,10 @@ public class StarHandler extends RequestHandler {
     @Override
     protected void put() throws RequestException {
         Messages.StarRenameRequest star_rename_request_pb = getRequestBody(Messages.StarRenameRequest.class);
-        if (!star_rename_request_pb.getStarKey().equals(getUrlParameter("star_id"))) {
+        if (!star_rename_request_pb.getStarKey().equals(getUrlParameter("starid"))) {
             throw new RequestException(404);
         }
-        int starID = Integer.parseInt(getUrlParameter("star_id"));
+        int starID = Integer.parseInt(getUrlParameter("starid"));
 
         if (star_rename_request_pb.getNewName().trim().equals("")) {
             throw new RequestException(400);

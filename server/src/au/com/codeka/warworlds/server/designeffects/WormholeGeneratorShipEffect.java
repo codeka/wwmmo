@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.server.designeffects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.ShipEffect;
@@ -12,7 +10,7 @@ import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class WormholeGeneratorShipEffect extends ShipEffect {
-    private final Logger log = LoggerFactory.getLogger(FighterShipEffect.class);
+    private final Log log = new Log("WormholeGeneratorShipEffect");
 
     /**
      * This is called when we arrive on a star. Assuming the star is a marker, we'll convert it to a wormhole!
@@ -23,7 +21,7 @@ public class WormholeGeneratorShipEffect extends ShipEffect {
         Fleet fleet = (Fleet) baseFleet;
 
         if (!star.getStarType().getInternalName().equals("marker")) {
-            log.warn("We arrived at a non-marker star -- this should be impossible!");
+            log.warning("We arrived at a non-marker star -- this should be impossible!");
             return;
         }
 
@@ -50,7 +48,7 @@ public class WormholeGeneratorShipEffect extends ShipEffect {
             stmt.setInt(1, fleet.getID());
             stmt.update();
         } catch (Exception e) {
-            log.error("", e);
+            log.error("Error removing wormhole generator.", e);
         }
         star.getFleets().remove(fleet);
     }

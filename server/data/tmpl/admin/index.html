@@ -45,20 +45,19 @@
     }
   </script>
 
-  <p id="oldest-star">
-    Oldest star (<a href="javascript:;">Refresh</a>):
-    <span><b>{{oldest_star_name}}</b> ({{oldest_star_id}}): {{oldest_star_time}}</span>
-  </p>
+  <p id="oldest-star">...</p>
   <script>
-    $("p#oldest-star").on("click", "a", function() {
+    function refreshOldestStar() {
       $.ajax({
         "url": "/realms/{{realm}}/admin",
         "type": "POST",
         "success": function(data) {
           $("p#oldest-star span").html("<b>" + data["oldest_star_name"] + "</b> (" +
-              data["oldest_star_id"] + "): " + data["oldest_star_time"]);
+            data["oldest_star_id"] + "): " + data["oldest_star_time"]);
         }
-      })
-    });
+      });
+    }
+    $("p#oldest-star").on("click", "a", refreshOldestStar);
+    refreshOldestStar();
   </script>
 {% endblock %}

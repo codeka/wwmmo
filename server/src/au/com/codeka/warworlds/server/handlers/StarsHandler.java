@@ -2,9 +2,7 @@ package au.com.codeka.warworlds.server.handlers;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -17,7 +15,7 @@ import au.com.codeka.warworlds.server.model.Star;
  * Handles /realm/.../stars URL
  */
 public class StarsHandler extends RequestHandler {
-    private static final Logger log = LoggerFactory.getLogger(StarsHandler.class);
+    private static final Log log = new Log("StarsHandler");
 
     @Override
     protected void get() throws RequestException {

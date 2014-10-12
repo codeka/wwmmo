@@ -15,8 +15,8 @@ import au.com.codeka.warworlds.server.model.Star;
 public class ColonyAttackHandler extends RequestHandler {
     @Override
     protected void post() throws RequestException {
-        int colonyID = Integer.parseInt(getUrlParameter("colony_id"));
-        int starID = Integer.parseInt(getUrlParameter("star_id"));
+        int colonyID = Integer.parseInt(getUrlParameter("colonyid"));
+        int starID = Integer.parseInt(getUrlParameter("starid"));
 
         try (Transaction t = DB.beginTransaction()) {
             Star star = new StarController(t).getStar(starID);

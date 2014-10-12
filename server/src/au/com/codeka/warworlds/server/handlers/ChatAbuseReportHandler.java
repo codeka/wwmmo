@@ -32,7 +32,7 @@ public class ChatAbuseReportHandler extends RequestHandler {
 
         Messages.ChatAbuseReport chat_abuse_report_pb = getRequestBody(Messages.ChatAbuseReport.class);
 
-        int chatMsgID = Integer.parseInt(getUrlParameter("msg_id"));
+        int chatMsgID = Integer.parseInt(getUrlParameter("msgid"));
         if (chatMsgID != chat_abuse_report_pb.getChatMsgId()) {
             throw new RequestException(400);
         }

@@ -4,16 +4,15 @@ import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.EventProcessor;
 import au.com.codeka.warworlds.server.RequestException;
@@ -32,7 +31,7 @@ import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class FleetOrdersHandler extends RequestHandler {
-    private static final Logger log = LoggerFactory.getLogger(FleetOrdersHandler.class);
+    private static final Log log = new Log("FleetOrdersHandler");
 
     @Override
     protected void post() throws RequestException {
@@ -40,10 +39,10 @@ public class FleetOrdersHandler extends RequestHandler {
 
         try (Transaction t = DB.beginTransaction()) {
             Simulation sim = new Simulation();
-            Star star = new StarController(t).getStar(Integer.parseInt(getUrlParameter("star_id")));
+            Star star = new StarController(t).getStar(Integer.parseInt(getUrlParameter("starid")));
             sim.simulate(star);
 
-            int fleetID = Integer.parseInt(getUrlParameter("fleet_id"));
+            int fleetID = Integer.parseInt(getUrlParameter("fleetid"));
             int empireID = getSession().getEmpireID();
             for (BaseFleet baseFleet : star.getFleets()) {
                 Fleet fleet = (Fleet) baseFleet;
