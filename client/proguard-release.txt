@@ -1,0 +1,5 @@
+# This is the proguard file that, along with proguard-base.txt, is included in release builds.
+
+# keep source file line numbers, but not source files
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable

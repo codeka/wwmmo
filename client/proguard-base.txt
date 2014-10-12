@@ -1,0 +1,31 @@
+# Base proguard file, included in both debug and release builds. Use this to include exclusions
+# for the most part.
+
+# We need to keep all the protobuf stuff, or it craps out
+-keep public class * extends com.google.protobuf.GeneratedMessage { *; }
+
+# We need to keep methods annotated with @EventHandler, so that event handlers work.
+-keepclasseswithmembers class * {
+  @au.com.codeka.warworlds.eventbus.EventHandler <methods>;
+}
+
+# The following are required for guava
+-dontwarn javax.annotation.**
+-dontwarn javax.inject.**
+-dontwarn sun.misc.Unsafe
+#-dontwarn com.google.common.collect.MinMaxPriorityQueue
+
+# The following are required by the Google Play Services library.
+-keep class * extends java.util.ListResourceBundle {
+    protected Object[][] getContents();
+}
+-keep public class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
+    public static final *** NULL;
+}
+-keepnames @com.google.android.gms.common.annotation.KeepName class *
+-keepclassmembernames class * {
+    @com.google.android.gms.common.annotation.KeepName *;
+}
+-keepnames class * implements android.os.Parcelable {
+    public static final ** CREATOR;
+}
