@@ -20,11 +20,31 @@
 
     <import file="${sdk.dir}/tools/ant/build.xml" />
 
-    <target name="-debug-obfuscation-check">
+    <target name="-set-proguard-config">
+        <condition property="proguard.config"
+                   value="${proguard.base.config}:proguard-release.txt"
+                   else="${proguard.base.config}:proguard-debug.txt">
+            <isfalse value="${build.is.packaging.debug}"/>
+        </condition>
+    </target>
+
+    <target name="-debug-obfuscation-check" depends="-set-proguard-config">
         <!-- enable proguard even in debug mode -->
         <property name="proguard.enabled" value="true"/>
+        <echo>proguard.config is ${proguard.config}</echo>
 
-        <!-- Secondary dx input (jar files) is empty since all the jar files will be in the obfuscated jar -->
+        <!-- Secondary dx input (jar files) is empty since all the jar files will be in the
+             obfuscated jar -->
+        <path id="out.dex.jar.input.ref" />
+    </target>
+
+    <target name="-release-obfuscation-check" depends="-set-proguard-config">
+        <!-- enable proguard even in debug mode -->
+        <property name="proguard.enabled" value="true"/>
+        <echo>proguard.config is ${proguard.config}</echo>
+
+        <!-- Secondary dx input (jar files) is empty since all the jar files will be in the
+             obfuscated jar -->
         <path id="out.dex.jar.input.ref" />
     </target>
 
