@@ -31,6 +31,7 @@ import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
 
 import com.google.android.gcm.GCMRegistrar;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 
 /**
  * This class is used to make sure we're said "Hello" to the server and that we've got our
@@ -127,7 +128,8 @@ public class ServerGreeter {
 
         PreferenceManager.setDefaultValues(activity, R.xml.global_options, false);
 
-        int memoryClass = ((ActivityManager) activity.getSystemService(BaseActivity.ACTIVITY_SERVICE)).getMemoryClass();
+        int memoryClass = ((ActivityManager) activity
+                .getSystemService(BaseActivity.ACTIVITY_SERVICE)).getMemoryClass();
         if (memoryClass < 40) {
             // on low memory devices, we want to make sure the background detail is always BLACK
             // this is a bit of a hack, but should stop the worst of the memory issues (I hope!)
@@ -155,6 +157,7 @@ public class ServerGreeter {
             private boolean mWasEmpireReset;
             private String mResetReason;
             private String mToastMessage;
+            private Intent mIntent;
 
             @Override
             protected String doInBackground() {
@@ -172,11 +175,15 @@ public class ServerGreeter {
                 Realm realm = RealmContext.i.getCurrentRealm();
                 if (!realm.getAuthenticator().isAuthenticated()) {
                     try {
+                        log.info("Not authenticated, re-authenticating.");
                         realm.getAuthenticator().authenticate(activity, realm);
                     } catch (ApiException e) {
                         mErrorOccured = true;
                         // if it wasn't a network error, it probably means we need to re-auth.
                         mNeedsReAuthenticate = !e.networkError();
+                        if (e.getCause() instanceof UserRecoverableAuthException) {
+                            mIntent = ((UserRecoverableAuthException) e.getCause()).getIntent();
+                        }
                         if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
                             mToastMessage = e.getServerErrorMessage();
                         }
@@ -269,6 +276,11 @@ public class ServerGreeter {
                                 "data connection.</p>";
                         mErrorOccured = true;
                         mNeedsReAuthenticate = false;
+                    } else if (e.getCause() instanceof UserRecoverableAuthException) {
+                        message = "<p class=\"error\">Authentication failed.</p>";
+                        mErrorOccured = true;
+                        mNeedsReAuthenticate = true;
+                        mIntent = ((UserRecoverableAuthException) e.getCause()).getIntent();
                     } else if (e.getHttpStatusLine().getStatusCode() == 403) {
                         // if it's an authentication problem, we'll want to re-authenticate
                         message = "<p class=\"error\">Authentication failed.</p>";
@@ -318,7 +330,11 @@ public class ServerGreeter {
                         editor.remove("AccountName");
                         editor.commit();
 
-                        mServerGreeting.mIntent = new Intent(activity, AccountsActivity.class);
+                        if (mIntent != null) {
+                            mServerGreeting.mIntent = mIntent;
+                        } else {
+                            mServerGreeting.mIntent = new Intent(activity, AccountsActivity.class);
+                        }
                         mHelloComplete = true;
                     } else {
                         synchronized(mHelloWatchers) {

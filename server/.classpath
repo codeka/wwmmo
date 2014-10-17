@@ -30,14 +30,16 @@
 	<classpathentry kind="lib" path="/home/dean/software/wwmmo/code/jetty/lib/jetty-webapp-9.0.1.v20130408.jar"/>
 	<classpathentry kind="lib" path="/home/dean/software/wwmmo/code/jetty/lib/jetty-xml-9.0.1.v20130408.jar"/>
 	<classpathentry kind="lib" path="/home/dean/software/wwmmo/code/jetty/lib/servlet-api-3.0.jar"/>
-	<classpathentry kind="lib" path="libs/google-api-client-1.18.0-rc.jar"/>
-	<classpathentry kind="lib" path="libs/google-http-client-1.18.0-rc.jar"/>
-	<classpathentry kind="lib" path="libs/google-http-client-gson-1.18.0-rc.jar"/>
-	<classpathentry kind="lib" path="libs/google-oauth-client-1.18.0-rc.jar"/>
 	<classpathentry kind="lib" path="libs/gson-2.1.jar"/>
 	<classpathentry kind="lib" path="libs/postgresql-9.3-1101.jdbc41.jar"/>
 	<classpathentry kind="lib" path="libs/proguard.jar"/>
 	<classpathentry kind="lib" path="libs/guava-18.0.jar"/>
 	<classpathentry kind="lib" path="libs/HikariCP-java6-2.1.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="libs/google-api-client-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/google-api-client-gson-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/google-http-client-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/google-http-client-gson-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/google-oauth-client-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/google-api-services-oauth2-v2-rev80-1.19.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

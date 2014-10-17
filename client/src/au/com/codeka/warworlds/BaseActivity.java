@@ -29,6 +29,8 @@ public class BaseActivity extends ActionBarActivity {
 
     private long mForegroundStartTimeMs;
 
+    public static final int AUTH_RECOVERY_REQUEST = 2397;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

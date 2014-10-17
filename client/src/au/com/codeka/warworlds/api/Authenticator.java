@@ -1,22 +1,26 @@
 package au.com.codeka.warworlds.api;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.apache.http.HttpEntity;
+import org.eclipse.jdt.annotation.Nullable;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AccountManagerFuture;
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
+import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.Realm;
+
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 
 public class Authenticator {
     private static final Log log = new Log("Authenticator");
@@ -44,10 +48,10 @@ public class Authenticator {
      * @return A cookie we can use in subsequent calls to the server.
      * @throws ApiException 
      */
-    public void authenticate(Activity activity, Realm realm) throws ApiException {
+    public boolean authenticate(@Nullable Activity activity, Realm realm) throws ApiException {
         // make sure we don't try to authenticate WHILE WE'RE AUTHENTICATING...
         if (mAuthenticating) {
-            return;
+            return true;
         }
         mAuthenticating = true;
 
@@ -58,76 +62,33 @@ public class Authenticator {
             throw new ApiException("No account has been selected yet!");
         }
 
-        AccountManager accountManager = AccountManager.get(activity == null ? App.i : activity);
+        Context context = App.i;
         log.info("(re-)authenticating \"%s\" to realm %s...", accountName, realm.getDisplayName());
         String cookie = null;
 
         try {
-            Account[] accts = accountManager.getAccountsByType("com.google");
-            for (Account acct : accts) {
-                final Account account = acct;
-                if (account.name.equals(accountName)) {
-                    log.info("Account found, fetching authentication token");
-
-                    final String scope = "oauth2:email";
-                    String authToken = getAuthToken(accountManager, account, activity, scope);
-                    accountManager.invalidateAuthToken(account.type, authToken);
-                    authToken = getAuthToken(accountManager, account, activity, scope);
-                    cookie = getCookie(authToken, realm);
-                }
+            final String scope = "oauth2:email";
+            String authToken = GoogleAuthUtil.getToken(context, accountName, scope);
+            cookie = getCookie(authToken, realm);
+            log.info("Authentication successful.");
+        } catch (UserRecoverableAuthException e) {
+            // If it's a 'recoverable' exception, we need to start the given intent and then try
+            // again.
+            if (activity == null) {
+                throw new ApiException("Cannot retry, no activity given.", e);
             }
+            Intent intent = e.getIntent();
+            activity.startActivityForResult(intent, BaseActivity.AUTH_RECOVERY_REQUEST);
+            log.warning("Got UserRecoverableAuthException, TODO");
+        } catch (GoogleAuthException e) {
+            throw new ApiException(e);
+        } catch (IOException e) {
+            throw new ApiException(e);
         } finally {
             mAuthenticating = false;
         }
         mAuthCookie = cookie;
-    }
-
-    private String getAuthToken(AccountManager accountManager, Account account, Activity activity, String scope) {
-        if (activity != null) {
-            log.info("Fetching auth token with activity");
-            AccountManagerFuture<Bundle>future = accountManager.getAuthToken(
-                    account, scope, new Bundle(), activity, null, null);
-            return getAuthToken(future);
-        } else {
-            log.info("Fetching auth token withOUT activity");
-            return getAuthTokenNoActivity(accountManager, account);
-        }
-    }
-
-    @SuppressLint("NewApi") // getAuthToken for >= ICE_CREAM_SANDWICH
-    @SuppressWarnings("deprecation") // getAuthToken for < ICE_CREAM_SANDWICH
-    private String getAuthTokenNoActivity(AccountManager accountManager, Account account) {
-        // this version will notify the user of failures, but won't pop up the 
-        // authentication page. Useful when running in the background.
-        AccountManagerFuture<Bundle> future;
-
-        int sdk = android.os.Build.VERSION.SDK_INT;
-        if (sdk < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            future = accountManager.getAuthToken(account, "ah", false,
-                                                 null, null);
-        } else {
-            future = accountManager.getAuthToken(account, "ah", new Bundle(),
-                                                 false, null, null);
-        }
-        return getAuthToken(future);
-    }
-
-    /**
-     * Gets the auth token from the given \c AccountmanagerFuture.
-     */
-    private String getAuthToken(AccountManagerFuture<Bundle> future) {
-        try {
-            Bundle authTokenBundle = future.getResult();
-            if (authTokenBundle == null || authTokenBundle.get(AccountManager.KEY_AUTHTOKEN) == null) {
-                return null;
-            }
-
-            String authToken = authTokenBundle.get(AccountManager.KEY_AUTHTOKEN).toString();
-            return authToken;
-        } catch (Exception e) {
-            log.error("Error fetching auth token", e);
-            return null;
-        }
+        return true;
     }
 
     /**

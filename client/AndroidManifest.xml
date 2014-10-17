@@ -36,9 +36,6 @@
          we need to enumerate the accounts so you can log on. -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
-    <!-- Permission to request auth tokens from the AccountManager - again, so you can log on. -->
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-
     <!-- Permission that allows us to access in-app billing -->
     <uses-permission android:name="com.android.vending.BILLING" />
 
