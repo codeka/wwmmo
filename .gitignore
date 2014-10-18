@@ -20,6 +20,8 @@ common/out
 client/bin
 client/bin.bak
 client/gen
+control-field/out
+planet-render/out
 planet-render-android/bin
 planet-render-android/gen
 website/.project
