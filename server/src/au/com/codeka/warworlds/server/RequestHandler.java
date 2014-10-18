@@ -44,7 +44,11 @@ public class RequestHandler {
     private String mExtraOption;
 
     protected String getUrlParameter(String name) {
-        return mRouteMatcher.group(name);
+        try {
+            return mRouteMatcher.group(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     protected String getRealm() {
