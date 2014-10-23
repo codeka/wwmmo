@@ -78,6 +78,14 @@ public class Simulation {
             return;
         }
 
+        // if the start time is in the future, actually start it now.
+        if (startTime.isAfter(now.plusSeconds(30))) {
+            throw new IllegalStateException("Start time is too far in the future");
+        }
+        if (startTime.isAfter(now)) {
+            startTime = now.minusSeconds(1);
+        }
+
         // if we have less than a few seconds of time to simulate, we'll extend the end time
         // a little to ensure there's no rounding errors and such
         DateTime endTime = now;
