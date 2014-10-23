@@ -78,10 +78,9 @@ public class Simulation {
             return;
         }
 
-        DateTime endTime = now;
-
         // if we have less than a few seconds of time to simulate, we'll extend the end time
         // a little to ensure there's no rounding errors and such
+        DateTime endTime = now;
         if (endTime.minusSeconds(3).compareTo(startTime) < 0) {
             endTime = startTime.plusSeconds(3);
         }

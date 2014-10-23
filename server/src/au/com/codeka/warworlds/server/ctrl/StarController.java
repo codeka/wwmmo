@@ -392,10 +392,10 @@ public class StarController {
                 if (lastSimulation.isAfter(now)) {
                     int difference = Seconds.secondsBetween(now, lastSimulation).getSeconds();
                     if (difference > 120) {
-                        log.error(String.format(Locale.ENGLISH,
-                                    "last_simulation is after now! [last_simulation=%s] [now=%s] [difference=%d seconds]",
-                                    lastSimulation, now, difference),
-                                  new Throwable());
+                        log.error(String.format(Locale.ENGLISH, "last_simulation is after now!"
+                                + " [star=%d %s] [last_simulation=%s] [now=%s] [difference=%d seconds]",
+                                star.getID(), star.getName(), lastSimulation, now, difference),
+                                new Throwable());
                         lastSimulation = DateTime.now();
                     }
                 }
