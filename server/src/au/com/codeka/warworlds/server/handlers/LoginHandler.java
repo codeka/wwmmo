@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.LoginController;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -56,6 +57,8 @@ public class LoginHandler extends RequestHandler {
 
             getResponse().setContentType("text/plain");
             getResponse().getWriter().write(cookie);
+        } catch (GoogleJsonResponseException e) {
+            throw new RequestException(e.getStatusCode(), e.getStatusMessage(), e);
         } catch (IOException e) {
             throw new RequestException(e);
         }
