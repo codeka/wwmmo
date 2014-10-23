@@ -42,13 +42,16 @@ public class Authenticator {
     /**
      * Authenticates the given user with the server.
      * 
-     * @param activity The activity we're current attached to, this can be null in which case we
-     *        will not prompt for authorization.
-     * @param accountName The name of the account we're authenticating as.
+     * @param activity
+     *            The activity we're current attached to, this can be null in
+     *            which case we will not prompt for authorization.
+     * @param accountName
+     *            The name of the account we're authenticating as.
      * @return A cookie we can use in subsequent calls to the server.
-     * @throws ApiException 
+     * @throws ApiException
      */
-    public boolean authenticate(@Nullable Activity activity, Realm realm) throws ApiException {
+    public boolean authenticate(@Nullable Activity activity, Realm realm)
+            throws ApiException {
         // make sure we don't try to authenticate WHILE WE'RE AUTHENTICATING...
         if (mAuthenticating) {
             return true;
@@ -63,22 +66,28 @@ public class Authenticator {
         }
 
         Context context = App.i;
-        log.info("(re-)authenticating \"%s\" to realm %s...", accountName, realm.getDisplayName());
+        log.info("(re-)authenticating \"%s\" to realm %s...", accountName,
+                realm.getDisplayName());
         String cookie = null;
 
         try {
             final String scope = "oauth2:email";
             String authToken = GoogleAuthUtil.getToken(context, accountName, scope);
+            if (authToken == null) {
+                throw new ApiException("Error getting auth token.");
+            }
             cookie = getCookie(authToken, realm);
             log.info("Authentication successful.");
         } catch (UserRecoverableAuthException e) {
-            // If it's a 'recoverable' exception, we need to start the given intent and then try
+            // If it's a 'recoverable' exception, we need to start the given
+            // intent and then try
             // again.
             if (activity == null) {
                 throw new ApiException("Cannot retry, no activity given.", e);
             }
             Intent intent = e.getIntent();
-            activity.startActivityForResult(intent, BaseActivity.AUTH_RECOVERY_REQUEST);
+            activity.startActivityForResult(intent,
+                    BaseActivity.AUTH_RECOVERY_REQUEST);
             log.warning("Got UserRecoverableAuthException, TODO");
         } catch (GoogleAuthException e) {
             throw new ApiException(e);
@@ -92,14 +101,17 @@ public class Authenticator {
     }
 
     /**
-     * Makes a request to the server to get a cookie which we can send with each subsequent request.
+     * Makes a request to the server to get a cookie which we can send with each
+     * subsequent request.
      */
     public String getCookie(String authToken, Realm realm) throws ApiException {
-        String url = realm.getBaseUrl().resolve("login?authToken="+authToken).toString();
+        String url = realm.getBaseUrl().resolve("login?authToken=" + authToken)
+                .toString();
 
-        String impersonate = Util.getProperties().getProperty("user.on_behalf_of", null);
+        String impersonate = Util.getProperties().getProperty(
+                "user.on_behalf_of", null);
         if (impersonate != null) {
-            url += "&impersonate="+impersonate;
+            url += "&impersonate=" + impersonate;
         }
 
         RequestManager.ResultWrapper resp = null;
@@ -107,7 +119,8 @@ public class Authenticator {
             resp = RequestManager.request("GET", url);
             int statusCode = resp.getResponse().getStatusLine().getStatusCode();
             if (statusCode != 200) {
-                log.warning("Authentication failure: %s", resp.getResponse().getStatusLine());
+                log.warning("Authentication failure: %s", resp.getResponse()
+                        .getStatusLine());
                 ApiException.checkResponse(resp.getResponse());
             }
 
@@ -116,7 +129,8 @@ public class Authenticator {
             if (entity != null) {
                 try {
                     InputStream ins = entity.getContent();
-                    cookie = new BufferedReader(new InputStreamReader(ins, "utf-8")).readLine();
+                    cookie = new BufferedReader(new InputStreamReader(ins,
+                            "utf-8")).readLine();
                 } catch (IllegalStateException e) {
                 } catch (Exception e) {
                     log.warning("Authentication failure, could got get response body.");
@@ -127,7 +141,7 @@ public class Authenticator {
             if (cookie == null) {
                 return null;
             }
-            return "SESSION="+cookie;
+            return "SESSION=" + cookie;
         } finally {
             if (resp != null) {
                 resp.close();

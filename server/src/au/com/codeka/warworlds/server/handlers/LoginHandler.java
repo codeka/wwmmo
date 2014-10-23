@@ -36,6 +36,11 @@ public class LoginHandler extends RequestHandler {
             return;
         }
 
+        String authToken = getRequest().getParameter("authToken");
+        if (authToken == null || authToken.equals("null")) {
+            throw new RequestException(400, "Bad login request.");
+        }
+
         GoogleCredential credential = new GoogleCredential();
         Oauth2 oauth2= new Oauth2.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName("wwmmo").build();

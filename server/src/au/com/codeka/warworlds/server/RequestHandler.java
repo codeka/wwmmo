@@ -103,6 +103,7 @@ public class RequestHandler {
                 if (e.getHttpErrorCode() < 500) {
                     log.warning("Unhandled error in URL: "+request.getRequestURI(), e);
                 } else {
+                    log.info("Request: " + getRequestDebugString(request));
                     log.error("Unhandled error in URL: "+request.getRequestURI(), e);
                 }
                 e.populate(mResponse);
@@ -391,5 +392,19 @@ public class RequestHandler {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /** Get details about the given request as a string (for debugging). */
+    private String getRequestDebugString(HttpServletRequest request) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(request.getRequestURI());
+        sb.append("\n");
+        sb.append("X-Real-IP: ");
+        sb.append(request.getHeader("X-Real-IP"));
+        sb.append("\n");
+        sb.append("User-Agent: ");
+        sb.append(request.getHeader("User-Agent"));
+        sb.append("\n");
+        return sb.toString();
     }
 }
