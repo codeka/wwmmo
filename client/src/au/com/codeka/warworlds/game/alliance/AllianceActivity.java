@@ -358,8 +358,7 @@ public class AllianceActivity extends TabFragmentActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     RequestListAdapter.ItemEntry entry = (RequestListAdapter.ItemEntry) mRequestListAdapter.getItem(position);
-                    RequestVoteDialog dialog = new RequestVoteDialog();
-                    dialog.setRequest(mAlliance, entry.request);
+                    RequestVoteDialog dialog = RequestVoteDialog.newInstance(mAlliance, entry.request);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
             });

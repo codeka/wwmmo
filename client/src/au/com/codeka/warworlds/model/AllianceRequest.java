@@ -27,7 +27,7 @@ public class AllianceRequest extends BaseAllianceRequest {
         case KICK:
             return "KICK";
         case DEPOSIT_CASH:
-            return String.format("Despoit %s", Cash.format(mAmount));
+            return String.format("Deposit %s", Cash.format(mAmount));
         case WITHDRAW_CASH:
             return String.format("Withdraw %s", Cash.format(mAmount));
         case CHANGE_NAME:
