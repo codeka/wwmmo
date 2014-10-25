@@ -25,7 +25,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.ctrl.NotificationController;
 import au.com.codeka.warworlds.server.ctrl.SessionController;
-import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlStateTranslater;
 import au.com.codeka.warworlds.server.handlers.admin.AdminGenericHandler;
 
 import com.google.gson.JsonObject;
@@ -90,7 +90,8 @@ public class RequestHandler {
                 return; // break out of the retry loop
             } catch(RequestException e) {
                 Throwable cause = e.getCause();
-                if (cause instanceof SQLException && DB.isRetryable((SQLException) cause)
+                if (cause instanceof SQLException
+                        && SqlStateTranslater.isRetryable((SQLException) cause)
                         && supportsRetryOnDeadlock()) {
                     try {
                         Thread.sleep(50 + new Random().nextInt(100));
@@ -341,26 +342,7 @@ public class RequestHandler {
      * directory is relative to this path.
      */
     protected static File getBasePath() {
-        String path = System.getProperty("au.com.codeka.warworlds.server.basePath");
-        if (path == null) {
-            URL url = AdminGenericHandler.class.getClassLoader().getResource("");
-            if (url == null) {
-                try {
-                    URI uri = AdminGenericHandler.class.getProtectionDomain().getCodeSource()
-                            .getLocation().toURI();
-                    if (uri != null) { // dafuk is dis?
-                        url = new URL(uri.getPath());
-                    }
-                } catch (Exception e) {}
-            }
-            if (url != null) {
-                path = url.getPath();
-            }
-        }
-        if (path == null) {
-            return new File(".");
-        }
-        return new File(path+"../").getAbsoluteFile();
+        return new File(System.getProperty(SystemProperties.BASE_PATH));
     }
 
     @SuppressWarnings("unchecked")

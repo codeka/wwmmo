@@ -35,9 +35,9 @@ public class DesignManager extends BaseDesignManager {
     protected InputStream open(DesignKind designKind) throws IOException {
         String fileName = mBasePath;
         if (designKind == DesignKind.SHIP) {
-            fileName += "../data/designs/ships.xml";
+            fileName += "data/designs/ships.xml";
         } else {
-            fileName += "../data/designs/buildings.xml";
+            fileName += "data/designs/buildings.xml";
         }
         return new FileInputStream(fileName);
     }

@@ -16,7 +16,7 @@ shift "$((OPTIND-1))"
 
 pushd $DIR
 nohup java -cp "bin/*" \
-     -Dau.com.codeka.warworlds.server.basePath=$DIR/bin/ \
+     -Dau.com.codeka.warworlds.server.basePath=$DIR/ \
      -Dau.com.codeka.warworlds.server.listenPort=8081 \
      -Dau.com.codeka.warworlds.server.dbName=wwmmo \
      -Dau.com.codeka.warworlds.server.dbUser=wwmmo_user \

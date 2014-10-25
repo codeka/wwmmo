@@ -16,7 +16,7 @@ public class NameGenerator {
     private static ArrayList<Vocabulary> sVocabularies;
 
     public static void setup(String basePath) {
-        File path = new File(basePath + "../data/vocab");
+        File path = new File(basePath + "data/vocab");
 
         ArrayList<String> files = new ArrayList<String>();
         for (File vocabFile : path.listFiles()) {

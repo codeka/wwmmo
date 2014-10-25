@@ -72,21 +72,6 @@ public class DB {
         return sStrategy.beginTransaction();
     }
 
-    // PostgreSQL error codes are documented here:
-    // http://www.postgresql.org/docs/current/static/errcodes-appendix.html
-
-    /** Determines whether the given {@link SQLException} was a constraint violation. */
-    public static boolean isConstraintViolation(SQLException e) {
-        PSQLException psql = (PSQLException) e;
-        return psql.getSQLState().startsWith("23");
-    }
-
-    /** Determines whether the given {@link SQLException} is retryable (e.g. deadlock, etc) */
-    public static boolean isRetryable(SQLException e) {
-        PSQLException psql = (PSQLException) e;
-        return psql.getSQLState().startsWith("40");
-    }
-
     private interface Strategy {
         SqlStmt prepare(String sql) throws SQLException;
         SqlStmt prepare(String sql, int autoGenerateKeys) throws SQLException;
@@ -141,7 +126,7 @@ public class DB {
         };
     }
 
-    @SuppressWarnings("unused") // we're using BoneCP now
+    @SuppressWarnings("unused") // we're using Hikari now
     private static class NoConnectionPoolStrategy implements Strategy {
         private static String jdbcUrl;
 
