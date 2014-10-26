@@ -10,13 +10,13 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseAllianceRequestVote;
 import au.com.codeka.common.protobuf.Messages;
@@ -38,7 +38,8 @@ public class RequestVoteDialog extends DialogFragment {
     private View mView;
     private Alliance mAlliance;
     private AllianceRequest mRequest;
-
+    private static final Log log = new Log("RequestVoteDialog");
+    
 	/**
 	 * Creates a new RequestVoteDialog and fills the supplied parameters into an
 	 * args Bundle. Usage of Bundle and serialization is necessary for correct
@@ -79,9 +80,7 @@ public class RequestVoteDialog extends DialogFragment {
 						.parseFrom(args.getByteArray("alliancerequest"));
 				mRequest.fromProtocolBuffer(messagealliancerequest);
 			} catch (InvalidProtocolBufferException e) {
-				Log.e(getTag(),
-						"Could not read AllianceRequest from Protocol Buffer: "
-								+ e.getLocalizedMessage());
+				log.error("Could not read AllianceRequest from Protocol Buffer", e);
 			}
 		}
 		return mRequest;
@@ -102,9 +101,7 @@ public class RequestVoteDialog extends DialogFragment {
 						.parseFrom(args.getByteArray("alliance"));
 				mAlliance.fromProtocolBuffer(messagealliance);
 			} catch (InvalidProtocolBufferException e) {
-				Log.e(getTag(),
-						"Could not read Alliance from Protocol Buffer: "
-								+ e.getLocalizedMessage());
+				log.error("Could not read Alliance from Protocol Buffer", e);
 			}
 
 		}

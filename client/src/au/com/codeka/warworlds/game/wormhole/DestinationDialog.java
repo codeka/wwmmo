@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
@@ -39,14 +40,49 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 public class DestinationDialog extends DialogFragment {
     private Star mSrcWormhole;
     private Star mDestWormhole;
     private View mView;
     private WormholeAdapter mWormholeAdapter;
+    private static final Log log = new Log("DestinatonDialog");
+    
+    /**
+     * Creates a DestinationDialog and puts the supplied Star into a Bundle as a ByteArray.
+     * @param srcWormhole
+     * @return new DestinationDialog with supplied Star as args
+     */
+    public static DestinationDialog newInstance(Star srcWormhole) {
+    	Bundle args = new Bundle();
+    	Messages.Star.Builder starbuilder = Messages.Star.newBuilder();
+    	srcWormhole.toProtocolBuffer(starbuilder);
+    	args.putByteArray("srcWormhole", starbuilder.build().toByteArray());
+    	
+    	DestinationDialog ret = new DestinationDialog();
+    	ret.setArguments(args);
+    	
+    	return ret;
+    }
 
-    public void loadWormholes(Star srcWormhole) {
-        mSrcWormhole = srcWormhole;
+    /**
+     * If mSrcWormhole is null, try to read mSrcWormhole from args-Bundle, return mSrcWormhole
+     * @return
+     */
+    private Star getSrcWormhole() {
+    	if (mSrcWormhole == null) {
+    		Bundle args = this.getArguments();
+    		mSrcWormhole = new Star();
+    		try {
+				Messages.Star starmessage = Messages.Star.parseFrom(args.getByteArray("srcWormhole"));
+				mSrcWormhole.fromProtocolBuffer(starmessage);
+			} catch (InvalidProtocolBufferException e) {
+				log.error("Failed to load srcWormhole from Protocol Buffer", e);
+			}
+    	}
+    	
+    	return mSrcWormhole;
     }
 
     @SuppressLint("InflateParams")
@@ -79,8 +115,8 @@ public class DestinationDialog extends DialogFragment {
         }
 
         TextView tuneTime = (TextView) mView.findViewById(R.id.tune_time);
-        int tuneTimeHours = mSrcWormhole.getWormholeExtra() == null
-                ? 0 : mSrcWormhole.getWormholeExtra().getTuneTimeHours();
+        int tuneTimeHours = getSrcWormhole().getWormholeExtra() == null
+                ? 0 : getSrcWormhole().getWormholeExtra().getTuneTimeHours();
         tuneTime.setText(String.format(Locale.ENGLISH, "Tune time: %d hr%s",
                 tuneTimeHours, tuneTimeHours == 1 ? "" : "s"));
 
@@ -160,10 +196,10 @@ public class DestinationDialog extends DialogFragment {
         new BackgroundRunner<Star>() {
             @Override
             protected Star doInBackground() {
-                String url = "stars/"+mSrcWormhole.getKey()+"/wormhole/tune";
+                String url = "stars/"+getSrcWormhole().getKey()+"/wormhole/tune";
                 try {
                     Messages.WormholeTuneRequest request_pb = Messages.WormholeTuneRequest.newBuilder()
-                            .setSrcStarId(Integer.parseInt(mSrcWormhole.getKey()))
+                            .setSrcStarId(Integer.parseInt(getSrcWormhole().getKey()))
                             .setDestStarId(Integer.parseInt(mDestWormhole.getKey()))
                             .build();
                     Messages.Star pb = ApiClient.postProtoBuf(url, request_pb, Messages.Star.class);
@@ -197,7 +233,7 @@ public class DestinationDialog extends DialogFragment {
         public void setWormholes(List<Star> wormholes) {
             ArrayList<Star> availableWormholes = new ArrayList<Star>();
             for (Star wormhole : wormholes) {
-                if (wormhole.getKey().equals(mSrcWormhole.getKey())) {
+                if (wormhole.getKey().equals(getSrcWormhole().getKey())) {
                     continue;
                 }
                 availableWormholes.add(wormhole);
@@ -252,7 +288,7 @@ public class DestinationDialog extends DialogFragment {
 
             wormholeName.setText(wormhole.getName());
 
-            float distanceInPc = Sector.distanceInParsecs(mSrcWormhole, wormhole);
+            float distanceInPc = Sector.distanceInParsecs(getSrcWormhole(), wormhole);
             distance.setText(String.format(Locale.ENGLISH, "%s %.1f pc", 
                     wormhole.getCoordinateString(), distanceInPc));
 
