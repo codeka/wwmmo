@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.ctrl.NotificationController;
 import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.data.SqlStateTranslater;
-import au.com.codeka.warworlds.server.handlers.admin.AdminGenericHandler;
 
 import com.google.gson.JsonObject;
 import com.google.protobuf.Message;
