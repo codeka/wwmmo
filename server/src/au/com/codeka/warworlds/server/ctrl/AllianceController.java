@@ -225,7 +225,7 @@ public class AllianceController {
                 if (allianceID1 == null || allianceID2 == null) {
                     return false;
                 } else {
-                    return allianceID1 == allianceID2;
+                    return allianceID1.intValue() == allianceID2.intValue();
                 }
             }
         }
