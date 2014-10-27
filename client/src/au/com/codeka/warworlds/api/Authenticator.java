@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import javax.annotation.Nullable;
+
 import org.apache.http.HttpEntity;
-import org.eclipse.jdt.annotation.Nullable;
 
 import android.app.Activity;
 import android.content.Context;

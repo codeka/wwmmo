@@ -24,7 +24,7 @@ public class Simulation {
     private final boolean predict;
     private DateTime now;
 
-    private static boolean sDebug = false;
+    private static boolean sDebug = true;
     private static int sNumSimulations;
     private static DateTime year2k = new DateTime(2000, 1, 1, 0, 0);
 
@@ -62,6 +62,9 @@ public class Simulation {
      */
     public void simulate(BaseStar star) {
         sNumSimulations ++;
+        if (logHandler != null) {
+            logHandler.setStarName(star.getName());
+        }
         log(String.format("Begin simulation for '%s'", star.getName()));
 
         HashSet<String> empireKeys = new HashSet<String>();
@@ -89,7 +92,7 @@ public class Simulation {
         // if we have less than a few seconds of time to simulate, we'll extend the end time
         // a little to ensure there's no rounding errors and such
         DateTime endTime = now;
-        if (endTime.minusSeconds(3).compareTo(startTime) < 0) {
+        if (endTime.minusSeconds(3).isBefore(startTime)) {
             endTime = startTime.plusSeconds(3);
         }
 
@@ -841,15 +844,22 @@ public class Simulation {
      * of debug log messages during the simulation process.
      */
     public interface LogHandler {
+        void setStarName(String starName);
         void log(String message);
     }
 
     private static class BasicLogHandler implements LogHandler {
         private static final Log log = new Log("Simulation");
+        private String starName;
+
+        @Override
+        public void setStarName(String starName) {
+            this.starName = starName;
+        }
 
         @Override
         public void log(String message) {
-            log.info(message);
+            log.info(starName + " - " + message);
         }
     }
 }

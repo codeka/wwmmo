@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.eclipse.jdt.annotation.Nullable;
+import javax.annotation.Nullable;
 
 import android.os.Handler;
 import android.util.SparseArray;

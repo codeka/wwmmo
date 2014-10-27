@@ -46,6 +46,9 @@ public class StarSimulateHandler extends RequestHandler {
 
         Simulation sim = new Simulation(new Simulation.LogHandler() {
             @Override
+            public void setStarName(String starName) {}
+
+            @Override
             public void log(String message) {
                 if (outw != null) {
                     outw.println(message);

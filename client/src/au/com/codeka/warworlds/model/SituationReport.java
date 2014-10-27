@@ -2,7 +2,8 @@ package au.com.codeka.warworlds.model;
 
 import java.util.Locale;
 
-import org.eclipse.jdt.annotation.Nullable;
+import javax.annotation.Nullable;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 

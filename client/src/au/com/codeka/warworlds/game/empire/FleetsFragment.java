@@ -3,7 +3,7 @@ package au.com.codeka.warworlds.game.empire;
 import java.util.List;
 import java.util.Locale;
 
-import org.eclipse.jdt.annotation.Nullable;
+import javax.annotation.Nullable;
 
 import android.content.Intent;
 import android.os.Bundle;

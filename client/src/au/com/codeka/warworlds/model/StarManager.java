@@ -7,7 +7,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.eclipse.jdt.annotation.Nullable;
+import javax.annotation.Nullable;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -155,9 +156,9 @@ public class StarManager extends BaseManager {
                 if (star != null) {
                     log.debug("Star %s refreshed, publishing event...", star.getName());
                     eventBus.publish(star);
-                    inProgress.remove(starID);
                     stars.put(star.getID(), new StarOrSummary(star));
                 }
+                inProgress.remove(starID);
             }
         }.execute();
 
