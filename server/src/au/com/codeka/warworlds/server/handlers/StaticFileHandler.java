@@ -34,7 +34,7 @@ public class StaticFileHandler extends RequestHandler {
 
         try {
             OutputStream outs = getResponse().getOutputStream();
-            InputStream ins = new FileInputStream(getBasePath() + "data/static/" + path);
+            InputStream ins = new FileInputStream(getBasePath() + "/data/static/" + path);
 
             byte[] buffer = new byte[1024];
             int bytes;
