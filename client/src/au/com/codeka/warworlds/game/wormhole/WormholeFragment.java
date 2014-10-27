@@ -80,8 +80,7 @@ public class WormholeFragment extends BaseGlFragment {
         destinationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DestinationDialog dialog = new DestinationDialog();
-                dialog.loadWormholes(star);
+                DestinationDialog dialog = DestinationDialog.newInstance(star);
                 dialog.show(getActivity().getSupportFragmentManager(), "");
             }
         });

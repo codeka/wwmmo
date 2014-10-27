@@ -16,8 +16,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseAllianceRequestVote;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
@@ -30,15 +32,81 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 public class RequestVoteDialog extends DialogFragment {
     private View mView;
     private Alliance mAlliance;
     private AllianceRequest mRequest;
+    private static final Log log = new Log("RequestVoteDialog");
+    
+	/**
+	 * Creates a new RequestVoteDialog and fills the supplied parameters into an
+	 * args Bundle. Usage of Bundle and serialization is necessary for correct
+	 * re-creation of fragments through android.
+	 * 
+	 * @param alliance
+	 * @param request
+	 * @return new instance of RequestVoteDialog with supplied args in a Bundle
+	 */
+	public static RequestVoteDialog newInstance(Alliance alliance,
+			AllianceRequest request) {
+		RequestVoteDialog requestVoteDialog = new RequestVoteDialog();
+		Bundle args = new Bundle();
+		Messages.Alliance.Builder abuilder = Messages.Alliance.newBuilder();
+		Messages.AllianceRequest.Builder arbuilder = Messages.AllianceRequest
+				.newBuilder();
+		alliance.toProtocolBuffer(abuilder);
+		request.toProtocolBuffer(arbuilder);
+		args.putByteArray("alliance", abuilder.build().toByteArray());
+		args.putByteArray("alliancerequest", arbuilder.build().toByteArray());
 
-    public void setRequest(Alliance alliance, AllianceRequest request) {
-        mAlliance = alliance;
-        mRequest = request;
-    }
+		requestVoteDialog.setArguments(args);
+		return requestVoteDialog;
+	}
+
+	/**
+	 * If mRequest is null, try to read mRequest via ProtocolBuffer from args
+	 * Bundle, return mRequest
+	 * 
+	 * @return mRequest
+	 */
+	private AllianceRequest getRequest() {
+		if (mRequest == null) {
+			Bundle args = this.getArguments();
+			mRequest = new AllianceRequest();
+			try {
+				Messages.AllianceRequest messagealliancerequest = Messages.AllianceRequest
+						.parseFrom(args.getByteArray("alliancerequest"));
+				mRequest.fromProtocolBuffer(messagealliancerequest);
+			} catch (InvalidProtocolBufferException e) {
+				log.error("Could not read AllianceRequest from Protocol Buffer", e);
+			}
+		}
+		return mRequest;
+	}
+
+	/**
+	 * If mAlliance is null, try to read mAlliance via ProtocolBuffer from args
+	 * Bundle, return mAlliance
+	 * 
+	 * @return mAlliance
+	 */
+	private Alliance getAlliance() {
+		if (mAlliance == null) {
+			Bundle args = this.getArguments();
+			mAlliance = new Alliance();
+			try {
+				Messages.Alliance messagealliance = Messages.Alliance
+						.parseFrom(args.getByteArray("alliance"));
+				mAlliance.fromProtocolBuffer(messagealliance);
+			} catch (InvalidProtocolBufferException e) {
+				log.error("Could not read Alliance from Protocol Buffer", e);
+			}
+
+		}
+		return mAlliance;
+	}
 
     @Override
     public void onStart() {
@@ -64,7 +132,7 @@ public class RequestVoteDialog extends DialogFragment {
 
         StyledDialog.Builder dialogBuilder = new StyledDialog.Builder(getActivity())
                    .setView(mView);
-        if (mRequest.getState() == AllianceRequest.RequestState.PENDING) {
+        if (getRequest().getState() == AllianceRequest.RequestState.PENDING) {
             dialogBuilder.setPositiveButton("Save Vote", new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {
@@ -83,9 +151,9 @@ public class RequestVoteDialog extends DialogFragment {
         RadioButton nayButton = (RadioButton) mView.findViewById(R.id.vote_nay);
 
         if (ayeButton.isChecked()) {
-            AllianceManager.i.vote(mRequest, true);
+            AllianceManager.i.vote(getRequest(), true);
         } else if (nayButton.isChecked()) {
-            AllianceManager.i.vote(mRequest, false);
+            AllianceManager.i.vote(getRequest(), false);
         }
 
         dismiss();
@@ -104,47 +172,47 @@ public class RequestVoteDialog extends DialogFragment {
         TextView requestBy = (TextView) mView.findViewById(R.id.request_by);
 
         Empire empire;
-        if (mRequest.getTargetEmpireID() != null) {
-            empire = EmpireManager.i.getEmpire(mRequest.getTargetEmpireID());
+        if (getRequest().getTargetEmpireID() != null) {
+            empire = EmpireManager.i.getEmpire(getRequest().getTargetEmpireID());
         } else {
-            empire = EmpireManager.i.getEmpire(mRequest.getRequestEmpireID());
+            empire = EmpireManager.i.getEmpire(getRequest().getRequestEmpireID());
         }
         if (empire != null) {
             // it should never be null, so we won't bother refreshing...
             empireName.setText(empire.getDisplayName());
             empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
         }
-        requestDescription.setText(mRequest.getDescription());
-        message.setText(mRequest.getMessage());
+        requestDescription.setText(getRequest().getDescription());
+        message.setText(getRequest().getMessage());
 
-        if (mRequest.getNumVotes() == 0) {
+        if (getRequest().getNumVotes() == 0) {
             requestVotes.setText("0");
         } else {
             requestVotes.setText(String.format(Locale.ENGLISH, "%s%d",
-                    mRequest.getNumVotes() < 0 ? "-" : "+", Math.abs(mRequest.getNumVotes())));
+                    getRequest().getNumVotes() < 0 ? "-" : "+", Math.abs(getRequest().getNumVotes())));
         }
 
-        if (mRequest.getPngImage() != null) {
+        if (getRequest().getPngImage() != null) {
             pngImage.setVisibility(View.VISIBLE);
-            pngImage.setImageBitmap(new ImageHelper(mRequest.getPngImage()).getImage());
+            pngImage.setImageBitmap(new ImageHelper(getRequest().getPngImage()).getImage());
         } else {
             pngImage.setVisibility(View.GONE);
         }
 
         TreeSet<Integer> excludingEmpires = new TreeSet<Integer>(
-                Arrays.asList(new Integer[] {mRequest.getRequestEmpireID()}));
-        if (mRequest.getTargetEmpireID() != null) {
-            excludingEmpires.add(mRequest.getTargetEmpireID());
+                Arrays.asList(new Integer[] {getRequest().getRequestEmpireID()}));
+        if (getRequest().getTargetEmpireID() != null) {
+            excludingEmpires.add(getRequest().getTargetEmpireID());
         }
-        int totalPossibleVotes = mAlliance.getTotalPossibleVotes(excludingEmpires);
-        int requiredVotes = mRequest.getRequestType().getRequiredVotes();
+        int totalPossibleVotes = getAlliance().getTotalPossibleVotes(excludingEmpires);
+        int requiredVotes = getRequest().getRequestType().getRequiredVotes();
         if (requiredVotes > totalPossibleVotes) {
             requiredVotes = totalPossibleVotes;
         }
         requestRequiredVotes.setText(String.format(Locale.ENGLISH, "/ %d", requiredVotes));
 
-        if (mRequest.getTargetEmpireID() != null) {
-            empire = EmpireManager.i.getEmpire(mRequest.getRequestEmpireID());
+        if (getRequest().getTargetEmpireID() != null) {
+            empire = EmpireManager.i.getEmpire(getRequest().getRequestEmpireID());
             if (empire != null) {
                 requestBy.setVisibility(View.VISIBLE);
                 requestBy.setText(String.format(Locale.ENGLISH, "by %s",
@@ -155,7 +223,7 @@ public class RequestVoteDialog extends DialogFragment {
         }
 
         // if it's not pending, then you can't vote....
-        if (mRequest.getState() != AllianceRequest.RequestState.PENDING) {
+        if (getRequest().getState() != AllianceRequest.RequestState.PENDING) {
             mView.findViewById(R.id.horz_sep_2).setVisibility(View.GONE);
             mView.findViewById(R.id.votes).setVisibility(View.GONE);
         } else {
@@ -165,9 +233,9 @@ public class RequestVoteDialog extends DialogFragment {
 
         LinearLayout currVoteContainer = (LinearLayout) mView.findViewById(R.id.curr_votes);
         currVoteContainer.removeAllViews();
-        if (!mRequest.getVotes().isEmpty()) {
+        if (!getRequest().getVotes().isEmpty()) {
             mView.findViewById(R.id.curr_votes_none).setVisibility(View.GONE);
-            for (BaseAllianceRequestVote vote : mRequest.getVotes()) {
+            for (BaseAllianceRequestVote vote : getRequest().getVotes()) {
                 View v = inflater.inflate(R.layout.alliance_request_vote_empire_row, currVoteContainer, false);
                 Empire voteEmpire = EmpireManager.i.getEmpire(vote.getEmpireID());
                 if (voteEmpire != null) {
