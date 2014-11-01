@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="/common/libs/protobuf-java-2.5.0.jar"/>
 	<classpathentry kind="lib" path="/common/libs/joda-convert-1.2.jar"/>
 	<classpathentry kind="lib" path="/common/libs/joda-time-2.1.jar"/>
-	<classpathentry kind="lib" path="libs/jangod-template.jar"/>
 	<classpathentry kind="lib" path="libs/gcm-server.jar"/>
 	<classpathentry kind="lib" path="/common/libs/jcl-over-slf4j-1.7.5.jar"/>
 	<classpathentry kind="lib" path="libs/commons-imaging-1.0-SNAPSHOT.jar"/>
@@ -42,5 +41,6 @@
 	<classpathentry kind="lib" path="libs/google-oauth-client-1.19.0.jar"/>
 	<classpathentry kind="lib" path="libs/google-api-services-oauth2-v2-rev80-1.19.0.jar"/>
 	<classpathentry kind="lib" path="libs/jsr305-1.3.9.jar"/>
+	<classpathentry kind="lib" path="libs/carrot-template.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

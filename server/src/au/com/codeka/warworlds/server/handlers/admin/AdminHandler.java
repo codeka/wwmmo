@@ -11,14 +11,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.asfun.jangod.interpret.InterpretException;
-import net.asfun.jangod.interpret.JangodInterpreter;
-import net.asfun.jangod.lib.Filter;
-import net.asfun.jangod.lib.FilterLibrary;
-import net.asfun.jangod.template.TemplateEngine;
-
 import org.joda.time.DateTime;
 
+import au.com.codeka.carrot.base.CarrotException;
+import au.com.codeka.carrot.base.Configuration;
+import au.com.codeka.carrot.base.FileResourceLocater;
+import au.com.codeka.carrot.interpret.CarrotInterpreter;
+import au.com.codeka.carrot.interpret.InterpretException;
+import au.com.codeka.carrot.lib.Filter;
+import au.com.codeka.carrot.template.TemplateEngine;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -34,12 +35,14 @@ public class AdminHandler extends RequestHandler {
     static {
         sTemplateEngine = new TemplateEngine();
 
-        sTemplateEngine.getConfiguration().setWorkspace(new File(getBasePath(), "data/tmpl").getAbsolutePath());
-        sTemplateEngine.getConfiguration().setEncoding("utf-8");
+        Configuration config = sTemplateEngine.getConfiguration();
+        config.setResourceLocater(new FileResourceLocater(config,
+            new File(getBasePath(), "data/tmpl").getAbsolutePath()));
+        config.setEncoding("utf-8");
 
-        FilterLibrary.addFilter(new NumberFilter());
-        FilterLibrary.addFilter(new AttrEscapeFilter());
-        FilterLibrary.addFilter(new LocalDateFilter());
+        config.getFilterLibrary().register(new NumberFilter());
+        config.getFilterLibrary().register(new AttrEscapeFilter());
+        config.getFilterLibrary().register(new LocalDateFilter());
     }
 
     @Override
@@ -78,7 +81,7 @@ public class AdminHandler extends RequestHandler {
         getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
         try {
             getResponse().getWriter().write(sTemplateEngine.process(path, data));
-        } catch (IOException e) {
+        } catch (CarrotException | IOException e) {
             log.error("Error rendering template!", e);
         }
     }
@@ -131,7 +134,7 @@ public class AdminHandler extends RequestHandler {
         }
 
         @Override
-        public Object filter(Object object, JangodInterpreter interpreter,
+        public Object filter(Object object, CarrotInterpreter interpreter,
                              String... args) throws InterpretException {
             if (object == null) {
                 return object;
@@ -165,7 +168,7 @@ public class AdminHandler extends RequestHandler {
         }
 
         @Override
-        public Object filter(Object object, JangodInterpreter interpreter,
+        public Object filter(Object object, CarrotInterpreter interpreter,
                              String... args) throws InterpretException {
             return object.toString().replace("\"", "&quot;")
                     .replace("'", "&squot;");
@@ -180,7 +183,7 @@ public class AdminHandler extends RequestHandler {
         }
 
         @Override
-        public Object filter(Object object, JangodInterpreter interpreter,
+        public Object filter(Object object, CarrotInterpreter interpreter,
                 String... args) throws InterpretException {
             if (object instanceof DateTime) {
                 DateTime dt = (DateTime) object;
