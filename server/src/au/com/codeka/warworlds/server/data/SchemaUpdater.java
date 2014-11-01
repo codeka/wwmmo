@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.warworlds.server.SystemProperties;
+import au.com.codeka.warworlds.server.Configuration;
 
 /** Ensures the database schema is working and up-to-date. */
 public class SchemaUpdater {
@@ -29,8 +29,8 @@ public class SchemaUpdater {
   }
 
   private void applyVersionUpgrade(int version) throws SchemaException {
-    String fileName = String.format("%sdata/schema/schema-%03d.sql",
-        System.getProperty(SystemProperties.BASE_PATH), version);
+    String fileName = new File(Configuration.i.getDataDirectory(),
+        String.format("schema/schema-%03d.sql", version)).getAbsolutePath();
     ScriptReader reader = null;
     try {
       reader = new ScriptReader(new BufferedReader(new FileReader(fileName)));
@@ -90,7 +90,7 @@ public class SchemaUpdater {
   private int getExpectedVersion() {
     int maxVersion = 0;
     Pattern pattern = Pattern.compile("schema-([0-9]+)\\.sql");
-    File folder = new File(new File(System.getProperty(SystemProperties.BASE_PATH)), "data/schema");
+    File folder = new File(Configuration.i.getDataDirectory(), "schema");
     log.debug("Scanning '%s' for schema files.", folder);
     for (File file : folder.listFiles()) {
       Matcher matcher = pattern.matcher(file.getName());

@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -16,27 +17,6 @@ import au.com.codeka.warworlds.server.model.Empire;
 public class ChatAbuseController {
     private final Log log = new Log("ChatAbuseController");
     private DataBase db;
-
-    // number of unique empires who need to vote an empire in the sinbin before they get added
-    private static int sSinBinUniqueEmpireVotes = 3;
-
-    // number of seconds that sSinBinUniqueEmpireVotes needs to come in for us to count them
-    private static int sSinBinVoteTimeSeconds = 4 * 60 * 60; // 4 hours
-
-    // you cannot vote more than this number of times per day
-    private static int sMaxVotesPerDay = 4;
-
-    static {
-        String str = System.getProperty("au.com.codeka.warworlds.server.sinbinUniqueEmpireVotes");
-        if (str != null) {
-            sSinBinUniqueEmpireVotes = Integer.parseInt(str);
-        }
-
-        str = System.getProperty("au.com.codeka.warworlds.server.sinbinVoteTimeSeconds");
-        if (str != null) {
-            sSinBinVoteTimeSeconds = Integer.parseInt(str);
-        }
-    }
 
     public ChatAbuseController() {
         db = new DataBase();
@@ -73,17 +53,19 @@ public class ChatAbuseController {
             throw new RequestException(400, "Cannot report an empire while you are in penalty.");
         }
 
-        if (getNumVotesToday(reportingEmpire.getID()) >= sMaxVotesPerDay) {
+        Configuration.SinbinConfiguration config = Configuration.i.getSinbinConfig();
+        if (getNumVotesToday(reportingEmpire.getID()) >= config.getMaxVotesPerDay()) {
             throw new RequestException(400, "Too many reports posted today, please wait before reporting again.");
         }
 
         try {
             db.reportAbuse(msg.getID(), msg.getEmpireID(), reportingEmpire.getID());
 
-            int numVotes = db.getUniqueReports(msg.getEmpireID(), DateTime.now().minusSeconds(sSinBinVoteTimeSeconds));
-            if (numVotes >= sSinBinUniqueEmpireVotes) {
+            int numVotes = db.getUniqueReports(msg.getEmpireID(),
+                DateTime.now().minusSeconds(config.getVoteTimeSeconds()));
+            if (numVotes >= config.getUniqueEmpireVotes()) {
                 log.info(String.format("Empire #%d received %d abuse reports in the last %.2f hours, moving them to the sin bin.",
-                        msg.getEmpireID(), numVotes, sSinBinVoteTimeSeconds / 3600.0f));
+                        msg.getEmpireID(), numVotes, config.getVoteTimeSeconds() / 3600.0f));
 
                 int numPenalties = db.getNumPenalties(msg.getEmpireID());
                 numPenalties ++;
@@ -101,7 +83,7 @@ public class ChatAbuseController {
                 new ChatController().postMessage(notification);
             } else {
                 log.info(String.format("Empire #%d received %d abuse reports in the last %.2f hours, not yet moving to the sin bin.",
-                        msg.getEmpireID(), numVotes, sSinBinVoteTimeSeconds / 3600.0f));
+                        msg.getEmpireID(), numVotes, config.getVoteTimeSeconds() / 3600.0f));
             }
         } catch (Exception e) {
             throw new RequestException(e);

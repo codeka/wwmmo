@@ -14,13 +14,13 @@ import java.util.TreeMap;
 import org.joda.time.DateTime;
 
 import au.com.codeka.carrot.base.CarrotException;
-import au.com.codeka.carrot.base.Configuration;
 import au.com.codeka.carrot.base.FileResourceLocater;
 import au.com.codeka.carrot.interpret.CarrotInterpreter;
 import au.com.codeka.carrot.interpret.InterpretException;
 import au.com.codeka.carrot.lib.Filter;
 import au.com.codeka.carrot.template.TemplateEngine;
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.Session;
@@ -35,14 +35,14 @@ public class AdminHandler extends RequestHandler {
     static {
         sTemplateEngine = new TemplateEngine();
 
-        Configuration config = sTemplateEngine.getConfiguration();
-        config.setResourceLocater(new FileResourceLocater(config,
-            new File(getBasePath(), "data/tmpl").getAbsolutePath()));
-        config.setEncoding("utf-8");
+        sTemplateEngine.getConfiguration().setResourceLocater(
+            new FileResourceLocater(sTemplateEngine.getConfiguration(),
+            new File(Configuration.i.getDataDirectory(), "tmpl").getAbsolutePath()));
+        sTemplateEngine.getConfiguration().setEncoding("utf-8");
 
-        config.getFilterLibrary().register(new NumberFilter());
-        config.getFilterLibrary().register(new AttrEscapeFilter());
-        config.getFilterLibrary().register(new LocalDateFilter());
+        sTemplateEngine.getConfiguration().getFilterLibrary().register(new NumberFilter());
+        sTemplateEngine.getConfiguration().getFilterLibrary().register(new AttrEscapeFilter());
+        sTemplateEngine.getConfiguration().getFilterLibrary().register(new LocalDateFilter());
     }
 
     @Override

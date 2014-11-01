@@ -1,8 +1,5 @@
 package au.com.codeka.warworlds.server;
 
-import java.net.URI;
-import java.net.URL;
-
 import org.eclipse.jetty.server.Server;
 
 import au.com.codeka.common.Log;
@@ -10,7 +7,6 @@ import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.cron.CronJobRegistry;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
 import au.com.codeka.warworlds.server.data.SchemaUpdater;
-import au.com.codeka.warworlds.server.handlers.admin.AdminGenericHandler;
 import au.com.codeka.warworlds.server.model.DesignManager;
 
 /** Main entry-point for the server. */
@@ -18,38 +14,13 @@ public class Runner {
   private static final Log log = new Log("Runner");
 
   public static void main(String[] args) throws Exception {
-    String basePath = System.getProperty(SystemProperties.BASE_PATH);
-    if (basePath == null) {
-      URL url = AdminGenericHandler.class.getClassLoader().getResource("");
-      if (url == null) {
-        try {
-          URI uri = AdminGenericHandler.class.getProtectionDomain().getCodeSource()
-              .getLocation().toURI();
-          if (uri != null) {
-            url = new URL(uri.getPath());
-          }
-        } catch (Exception e) {}
-      }
-      if (url != null) {
-        basePath = url.getPath() + "../";
-      }
-
-      if (basePath == null) {
-        throw new Exception("Could not determine basePath, cannot continue");
-      }
-    }
-
-    if (!basePath.endsWith("/")) {
-      basePath += "/";
-    }
-    System.setProperty(SystemProperties.BASE_PATH, basePath);
-
+    Configuration.loadConfig();
     LogImpl.setup();
     try {
       new SchemaUpdater().verifySchema();
       ErrorReportingLoggingHandler.setup();
-      DesignManager.setup(basePath);
-      NameGenerator.setup(basePath);
+      DesignManager.setup();
+      NameGenerator.setup();
 
       if (args.length >= 2 && args[0].equals("cron")) {
         String extra = null;
@@ -76,19 +47,14 @@ public class Runner {
     EventProcessor.i.ping();
 
     StarSimulatorThread starSimulatorThread = null;
-    if (System.getProperty(SystemProperties.DISABLE_STAR_SIMULATION_THREAD) == null) {
+    if (Configuration.i.getEnableStarSimulationThread()) {
       starSimulatorThread = new StarSimulatorThread();
       starSimulatorThread.start();
     } else {
       log.info("Star simulation thread disabled.");
     }
 
-    int port = 8080;
-    String portName = System.getProperty(SystemProperties.LISTEN_PORT);
-    if (portName != null) {
-      port = Integer.parseInt(portName);
-    }
-
+    int port = Configuration.i.getListenPort();
     Server server = new Server(port);
     server.setHandler(new RequestRouter());
     server.start();

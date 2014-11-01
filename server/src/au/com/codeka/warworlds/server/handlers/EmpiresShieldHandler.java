@@ -27,6 +27,7 @@ import org.apache.commons.imaging.Imaging;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protobuf.Messages.GenericError;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -157,7 +158,8 @@ public class EmpiresShieldHandler extends RequestHandler {
     }
 
     private BufferedImage mergeShieldImage(BufferedImage shieldImage) throws ImageReadException, IOException {
-        BufferedImage finalImage = Imaging.getBufferedImage(new File(getBasePath(), "data/static/img/shield.png"));
+        BufferedImage finalImage = Imaging.getBufferedImage(
+            new File(Configuration.i.getDataDirectory(), "static/img/shield.png"));
         int width = finalImage.getWidth();
         int height = finalImage.getHeight();
         int[] pixels = (int[]) finalImage.getRaster().getDataElements(0, 0, width, height, null);

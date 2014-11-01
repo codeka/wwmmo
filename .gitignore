@@ -28,3 +28,6 @@ website/.project
 website/.pydevproject
 google-play-services/bin
 google-play-services/gen
+
+server/data/config-debug.json
+

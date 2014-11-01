@@ -9,6 +9,7 @@ import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -80,7 +81,7 @@ public class ColonyController {
         Messages.SituationReport.Builder sitrep_pb = null;
         if (colony.getEmpireID() != null) {
             sitrep_pb = Messages.SituationReport.newBuilder();
-            sitrep_pb.setRealm(new RealmController().getRealmName());
+            sitrep_pb.setRealm(Configuration.i.getRealmName());
             sitrep_pb.setEmpireKey(Integer.toString(colony.getEmpireID()));
             sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
             sitrep_pb.setStarKey(star.getKey());

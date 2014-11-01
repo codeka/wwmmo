@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.handlers;
 
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.ChatAbuseController;
@@ -15,18 +16,9 @@ import au.com.codeka.warworlds.server.model.Empire;
  * Handles the /realms/.../chat/<id>/abuse-reports URL.
  */
 public class ChatAbuseReportHandler extends RequestHandler {
-    private static boolean sAbuseEnabled = false;
-
-    static {
-        String s = System.getProperty("au.com.codeka.warworlds.server.abuseEnabled");
-        if (s != null) {
-            sAbuseEnabled = Boolean.parseBoolean(s);
-        }
-    }
-
     @Override
     protected void post() throws RequestException {
-        if (!sAbuseEnabled) {
+        if (!Configuration.i.getSinbinConfig().isEnabled()) {
             throw new RequestException(400, "This feature has been disabled.");
         }
 

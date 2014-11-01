@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -181,7 +182,7 @@ public class NotificationController {
                 }
                 if (success) {
                     log.info(String.format("Notification successfully sent: %s user=%s registration=%s",
-                            new RealmController().getRealmName(), devices.get(registrationId), registrationId));
+                        Configuration.i.getRealmName(), devices.get(registrationId), registrationId));
                 }
             }
         } catch (IOException e) {

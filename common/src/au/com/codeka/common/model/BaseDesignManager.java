@@ -25,12 +25,8 @@ public abstract class BaseDesignManager {
 
     private SortedMap<DesignKind, SortedMap<String, Design>> mDesigns;
 
-    /**
-     * This should be called at the beginning of the game to initialize the
-     * design manager. We download the list of designs, parse them and set up the
-     * list.
-     */
-    public void setup() {
+    /** Call this to parse the design file. */
+    public void parseDesigns() {
         mDesigns = new TreeMap<DesignKind, SortedMap<String, Design>>();
         for (DesignKind designKind : DesignKind.values()) {
             Document xmldoc;

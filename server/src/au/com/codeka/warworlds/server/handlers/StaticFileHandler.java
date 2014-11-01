@@ -1,14 +1,15 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
-import au.com.codeka.warworlds.server.SystemProperties;
 
 public class StaticFileHandler extends RequestHandler {
     private final Log log = new Log("AdminGenericHandler");
@@ -34,7 +35,8 @@ public class StaticFileHandler extends RequestHandler {
 
         try {
             OutputStream outs = getResponse().getOutputStream();
-            InputStream ins = new FileInputStream(getBasePath() + "/data/static/" + path);
+            InputStream ins = new FileInputStream(new File(Configuration.i.getDataDirectory(),
+                "static/" + path));
 
             byte[] buffer = new byte[1024];
             int bytes;

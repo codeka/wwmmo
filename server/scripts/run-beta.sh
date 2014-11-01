@@ -16,13 +16,7 @@ shift "$((OPTIND-1))"
 
 pushd $DIR
 nohup java -cp "bin/*" \
-     -Dau.com.codeka.warworlds.server.basePath=$DIR/ \
-     -Dau.com.codeka.warworlds.server.listenPort=8080 \
-     -Dau.com.codeka.warworlds.server.dbName=wwmmo \
-     -Dau.com.codeka.warworlds.server.dbUser=wwmmo_user \
-    '-Dau.com.codeka.warworlds.server.dbPass=H98765gf!s876#Hdf2%7f' \
-     -Dau.com.codeka.warworlds.server.realmName=Beta \
-     -Dau.com.codeka.warworlds.server.abuseEnabled=true \
+     -Dau.com.codeka.warworlds.server.ConfigFile=$DIR/data/config-beta.json \
      -Djava.util.logging.config.file=logging-beta.properties \
      au.com.codeka.warworlds.server.Runner $@ &
 

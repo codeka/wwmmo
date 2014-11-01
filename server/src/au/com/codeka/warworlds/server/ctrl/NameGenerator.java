@@ -10,13 +10,15 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 
+import au.com.codeka.warworlds.server.Configuration;
+
 import com.google.common.base.CaseFormat;
 
 public class NameGenerator {
     private static ArrayList<Vocabulary> sVocabularies;
 
-    public static void setup(String basePath) {
-        File path = new File(basePath + "data/vocab");
+    public static void setup() {
+        File path = new File(Configuration.i.getDataDirectory(), "vocab");
 
         ArrayList<String> files = new ArrayList<String>();
         for (File vocabFile : path.listFiles()) {

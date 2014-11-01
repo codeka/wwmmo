@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import proguard.obfuscate.MappingProcessor;
 import proguard.obfuscate.MappingReader;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 
 /** Handler for de-obfuscating stack traces. */
@@ -45,7 +46,8 @@ public class AdminDebugRetraceHandler extends AdminHandler {
      */
     private static void unobfuscateStackTrace(String version, InputStream ins, OutputStream outs)
             throws IOException, RequestException {
-        File mappingFile = new File(getBasePath(), "data/proguard/mapping-" + version + ".txt");
+        File mappingFile = new File(Configuration.i.getDataDirectory(),
+            "proguard/mapping-" + version + ".txt");
         if (!mappingFile.isFile()) {
             throw new RequestException(404, "Error loading: " + mappingFile.getAbsolutePath());
         }

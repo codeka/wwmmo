@@ -27,11 +27,6 @@ public class LoginHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
         boolean isLoadTest = false;
-        String propValue = System.getProperty("au.com.codeka.warworlds.server.loadTest");
-        if (propValue != null && propValue.equals("true")) {
-            isLoadTest = true;
-        }
-
         if (isLoadTest) {
             loadTestAuthenticate();
             return;

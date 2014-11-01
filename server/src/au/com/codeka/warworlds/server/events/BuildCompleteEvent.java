@@ -9,13 +9,13 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.Event;
 import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.BuildingController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.FleetController;
-import au.com.codeka.warworlds.server.ctrl.RealmController;
 import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
@@ -131,7 +131,7 @@ public class BuildCompleteEvent extends Event {
 
         if (!disableNotification) {
             Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
-            sitrep_pb.setRealm(new RealmController().getRealmName());
+            sitrep_pb.setRealm(Configuration.i.getRealmName());
             sitrep_pb.setEmpireKey(Integer.toString(empireID));
             sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
             sitrep_pb.setStarKey(star.getKey());

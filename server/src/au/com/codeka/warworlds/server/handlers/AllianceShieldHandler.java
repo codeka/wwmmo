@@ -15,6 +15,7 @@ import org.apache.commons.imaging.Imaging;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protobuf.Messages.GenericError;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
@@ -40,7 +41,8 @@ public class AllianceShieldHandler extends RequestHandler {
         byte[] pngImage = new AllianceController().getAllianceShield(allianceID, shieldID);
         if (pngImage == null) {
             try {
-                BufferedImage defaultImage = Imaging.getBufferedImage(new File(getBasePath(), "data/static/img/alliance.png"));
+                BufferedImage defaultImage = Imaging.getBufferedImage(
+                    new File(Configuration.i.getDataDirectory(), "static/img/alliance.png"));
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(defaultImage, "png", baos);
                 pngImage = baos.toByteArray();

@@ -1,0 +1,32 @@
+//
+// This is a template configuration file for War Worlds server. You will have to customize
+// it for your own setup, hopefully the comments help with that.
+//
+{
+  "dataDirectory": "/path/to/data", // path to the data directory
+  "realmName": "Blitz", // name of the realm we're accepting requests for
+  "listenPort": 8080, // port to listen for HTTP connections on
+
+  // If false, we won't do star simulations (not good in production, but useful while testing
+  // to reduce CPU load and noise in log files)
+  "enableStarSimulationThread": false,
+
+  // Database configuration
+  "database": {
+    "server": "localhost",
+    "port": 5432,
+    "database": "wwmmo",
+    "username": "wwmmo_user",
+    "password": "********",
+    "schema": "blitz"
+  },
+
+  // Configuration of the settings for for the chat sinbin, see code in ChatAbuseController for
+  // details on how these are used.
+  "sinbin": {
+    "enabled": true, // Set to false to disable sinbining altogether
+    "uniqueEmpireVotes": 3, // Number of votes from unique empires before a player is sinbinned
+    "voteTimeSeconds": 14400, // Time (in seconds) in which votes much be received (14400 = 4 hours)
+    "maxVotesPerDay": 4 // Maximum number of times you can vote to sinbin per day
+  }
+}

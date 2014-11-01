@@ -335,14 +335,6 @@ public class RequestHandler {
         return result;
     }
 
-    /**
-     * Gets a file representing the "base" path where everything in installed into (e.g. the "data"
-     * directory is relative to this path.
-     */
-    protected static File getBasePath() {
-        return new File(System.getProperty(SystemProperties.BASE_PATH));
-    }
-
     @SuppressWarnings("unchecked")
     private <T> T getRequestBodyJson(Class<T> protoBuffFactory) {
         String json = null;
