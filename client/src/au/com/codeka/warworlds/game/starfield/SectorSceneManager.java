@@ -166,6 +166,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
 
         if (mScene != null) {
             scene.copySelection(mScene);
+            mScene.disposeScene();
         }
         mScene = scene;
         mActivity.getCamera().setHUD(hud);

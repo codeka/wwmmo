@@ -237,4 +237,12 @@ public class StarfieldScene extends Scene {
             mSelectedFleetEntity.attachChild(mSelectionIndicator);
         }
     }
+
+    /** Disposes the scene an all child entities. */
+    public void disposeScene() {
+        int childCount = this.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            getChildByIndex(i).dispose();
+        }
+    }
 }
