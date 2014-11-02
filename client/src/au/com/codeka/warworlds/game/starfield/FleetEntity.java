@@ -77,6 +77,15 @@ public class FleetEntity extends SelectableEntity {
         detachChild(mSelectionLine);
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+        int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            getChildByIndex(i).dispose();
+        }
+    }
+
     public Fleet getFleet() {
         return mFleet;
     }

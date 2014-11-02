@@ -88,6 +88,15 @@ public class StarEntity extends SelectableEntity {
     public void onDeselected(SelectionIndicatorEntity selectionIndicator) {
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+        int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            getChildByIndex(i).dispose();
+        }
+    }
+
     public Star getStar() {
         return mStar;
     }

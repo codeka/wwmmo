@@ -15,6 +15,7 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.input.touch.TouchEvent;
 
+import android.os.SystemClock;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -155,7 +156,11 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
         scene.setBackground(new Background(0.0f, 0.0f, 0.0f));
         scene.setOnSceneTouchListener(this);
 
+        long startTime = SystemClock.elapsedRealtime();
         refreshScene(scene);
+        long endTime = SystemClock.elapsedRealtime();
+        log.info("Scene re-drawn in %d ms [%d top-level entities]", (endTime - startTime),
+            scene.getChildCount());
 
         HUD hud = new HUD();
         refreshHud(hud);
