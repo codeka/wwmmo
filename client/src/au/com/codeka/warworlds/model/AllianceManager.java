@@ -140,6 +140,9 @@ public class AllianceManager {
                 }
                 try {
                     Messages.AllianceRequests pb = ApiClient.getProtoBuf(url, Messages.AllianceRequests.class);
+                    if (pb == null) {
+                        return null;
+                    }
                     ArrayList<AllianceRequest> requests = new ArrayList<AllianceRequest>();
                     TreeSet<Integer> empireIDs = new TreeSet<Integer>();
                     for (Messages.AllianceRequest request_pb : pb.getRequestsList()) {
