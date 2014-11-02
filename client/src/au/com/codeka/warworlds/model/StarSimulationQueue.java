@@ -7,7 +7,10 @@ import java.util.concurrent.LinkedBlockingDeque;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import android.os.SystemClock;
 import au.com.codeka.common.Log;
+import au.com.codeka.common.TimeFormatter;
+import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.Simulation;
 
 /** Manages a queue of stars that need to be simulated. */
@@ -58,10 +61,20 @@ public class StarSimulationQueue {
                         continue;
                     }
 
-                    log.info("Simulating star #%d %s...", star.getID(), star.getName());
+                    DateTime lastSimulationTime = star.getLastSimulation();
+                    long startTime = SystemClock.elapsedRealtime();
                     new Simulation(task.predict).simulate(star);
+                    long endTime = SystemClock.elapsedRealtime();
                     StarManager.eventBus.publish(star);
-                    log.info("Simulation of %s complete.", star.getID(), star.getName());
+
+                    StringBuilder sb = new StringBuilder();
+                    for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
+                        sb.append(String.format("%s->%.2f ", baseEmpirePresence.getEmpireKey(),
+                            baseEmpirePresence.getDeltaGoodsPerHour()));
+                    }
+                    log.info("Simulation of %d (%s) complete in %d ms (last simulation = %s) (Δ goods = %s)",
+                        star.getID(), star.getName(), endTime - startTime,
+                        TimeFormatter.create().format(lastSimulationTime), sb.toString().trim());
                 } catch(Exception e) {
                     log.error("Exception caught simulating stars.", e);
                     return; // we'll get restarted when a new star needs to be simulated.

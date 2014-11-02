@@ -102,30 +102,26 @@ public class Simulation {
         // population drops below a certain threshold so that we can warn the player.
         DateTime predictionTime = endTime.plusHours(24);
         BaseStar predictionStar = null;
-
         while (true) {
             Duration dt = Duration.standardMinutes(15);
             DateTime stepEndTime = startTime.plus(dt);
             if (stepEndTime.compareTo(endTime) < 0) {
                 simulateStepForAllEmpires(dt, startTime, star, empireKeys);
                 startTime = stepEndTime;
-            } else if (predict && stepEndTime.compareTo(predictionTime) < 0) {
-                if (predictionStar == null) {
-                    log("--------------------------------------------------");
-                    log("Prediction phase beginning...");
-                    log("--------------------------------------------------");
-                    now = endTime;
-                    dt = new Interval(startTime, endTime).toDuration();
-                    if (dt.getMillis() > 1000) {
-                        // last little bit of the simulation
-                        simulateStepForAllEmpires(dt, startTime, star, empireKeys);
-                    }
-                    startTime = startTime.plus(dt);
+            } else if (predictionStar == null && startTime.isBefore(endTime)) {
+                // We have to do the last little before of the simulation before predicting
+                now = endTime;
+                dt = new Interval(startTime, endTime).toDuration();
+                if (dt.getMillis() > 1000) {
+                    simulateStepForAllEmpires(dt, startTime, star, empireKeys);
+                }
+                startTime = endTime;
 
+                if (predict) {
                     predictionStar = star.clone();
                     dt = Duration.standardMinutes(15);
                 }
-
+            } else if (predict && stepEndTime.compareTo(predictionTime) < 0) {
                 simulateStepForAllEmpires(dt, startTime, predictionStar, empireKeys);
                 startTime = stepEndTime;
             } else {

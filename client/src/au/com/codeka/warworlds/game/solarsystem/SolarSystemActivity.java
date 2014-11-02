@@ -278,7 +278,8 @@ public class SolarSystemActivity extends BaseActivity {
                 }
             }
 
-            if (searchListAdapter.getStarsFetcher().hasStarID(starSummary.getID())) {
+            if (searchListAdapter.getStarsFetcher() == null
+                || searchListAdapter.getStarsFetcher().hasStarID(starSummary.getID())) {
                 searchListAdapter.notifyDataSetChanged();
             }
         }
