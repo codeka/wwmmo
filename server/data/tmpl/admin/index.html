@@ -45,7 +45,7 @@
     }
   </script>
 
-  <p id="oldest-star"><span>...</span></p>
+  <p id="oldest-star"><span>...</span> <a href="javascript:refreshOldestStar();">Refresh</a></p>
   <script>
     function refreshOldestStar() {
       $.ajax({
@@ -53,7 +53,8 @@
         "type": "POST",
         "success": function(data) {
           $("p#oldest-star span").html("<b>" + data["oldest_star_name"] + "</b> (" +
-            data["oldest_star_id"] + "): " + data["oldest_star_time"]);
+            data["oldest_star_id"] + "): " + data["oldest_star_time"] + " ago, <b>" +
+            formatNumber(data["num_stars"]) + "</b> stars to simulate");
         }
       });
     }

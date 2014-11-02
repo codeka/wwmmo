@@ -102,14 +102,20 @@ public class StarController {
     }
 
     public void update(Star star) throws RequestException {
+        update(star, true);
+    }
+
+    public void update(Star star, boolean pingEventProcessor) throws RequestException {
         try {
             updateNoRetry(star);
         } catch (Exception e) {
             throw new RequestException(e);
         }
 
-        // we may need to ping the event processor if a build time change, or whatever.
-        EventProcessor.i.ping();
+        if (pingEventProcessor) {
+            // we may need to ping the event processor if a build time change, or whatever.
+            EventProcessor.i.ping();
+        }
     }
 
     private void updateNoRetry(Star star) throws Exception {

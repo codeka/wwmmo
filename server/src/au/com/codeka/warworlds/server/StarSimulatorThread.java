@@ -59,8 +59,15 @@ public class StarSimulatorThread {
     }
 
     private void threadproc() {
+        int numSimulatedSinceEventProcessorPinged = 0;
         while (!mStopped) {
             int waitTimeMs = simulateOneStar();
+            numSimulatedSinceEventProcessorPinged ++;
+
+            if (numSimulatedSinceEventProcessorPinged >= 50) {
+                EventProcessor.i.ping();
+                numSimulatedSinceEventProcessorPinged = 0;
+            }
 
             if (waitTimeMs > 0) {
                 log.info(String.format("Waiting %d seconds before simulating next star.",
@@ -92,7 +99,8 @@ public class StarSimulatorThread {
             }
 
             new Simulation().simulate(star);
-            new StarController().update(star);
+            // we don't ping event processor now, because we rather do it once every 50 stars or so.
+            new StarController().update(star, false);
 
             long endTime = System.currentTimeMillis();
             log.info(String.format("Simulated star (%d colonies, %d fleets) in %dms: \"%s\" [%d]",
