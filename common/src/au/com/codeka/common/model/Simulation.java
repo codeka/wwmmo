@@ -824,7 +824,7 @@ public class Simulation {
 
         // check whether they're the same alliance, in which case they're friendly
         if (fleet1.getAllianceID() != null && fleet2.getAllianceID() != null &&
-                fleet1.getAllianceID() == fleet2.getAllianceID()) {
+                fleet1.getAllianceID().intValue() == fleet2.getAllianceID()) {
             return true;
         }
 
