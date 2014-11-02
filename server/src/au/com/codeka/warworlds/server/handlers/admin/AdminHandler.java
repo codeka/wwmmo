@@ -14,7 +14,7 @@ import java.util.TreeMap;
 import org.joda.time.DateTime;
 
 import au.com.codeka.carrot.base.CarrotException;
-import au.com.codeka.carrot.base.FileResourceLocater;
+import au.com.codeka.carrot.resource.FileResourceLocater;
 import au.com.codeka.carrot.interpret.CarrotInterpreter;
 import au.com.codeka.carrot.interpret.InterpretException;
 import au.com.codeka.carrot.lib.Filter;
