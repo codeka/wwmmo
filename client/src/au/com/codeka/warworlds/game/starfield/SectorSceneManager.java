@@ -105,9 +105,9 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
 
         needSceneRefresh = false;
         isSceneRefreshing = true;
-        new BackgroundRunner<Scene>() {
+        new BackgroundRunner<StarfieldScene>() {
             @Override
-            protected Scene doInBackground() {
+            protected StarfieldScene doInBackground() {
                 try {
                     return createScene();
                 } catch(Exception e) {
@@ -118,12 +118,20 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
             }
 
             @Override
-            protected void onComplete(final Scene scene) {
+            protected void onComplete(final StarfieldScene scene) {
                 final Engine engine = mActivity.getEngine();
                 if (scene != null && engine != null) {
                   engine.runOnUpdateThread(new Runnable() {
                         @Override
                         public void run() {
+                            if (mSectorX != scene.getSectorX() || mSectorY != scene.getSectorY()) {
+                                // if you've panned the map while the scene was being created, then
+                                // we'll have to update everything in the scene with the new
+                                // offsets.
+                                offsetChildren(scene, 
+                                    (scene.getSectorX() - mSectorX) * Sector.SECTOR_SIZE,
+                                    (scene.getSectorY() - mSectorY) * Sector.SECTOR_SIZE);
+                            }
                             engine.setScene(scene);
                         }
                     });
@@ -152,7 +160,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
     }
 
     public StarfieldScene createScene() {
-        StarfieldScene scene = new StarfieldScene(this, getDesiredSectorRadius());
+        StarfieldScene scene = new StarfieldScene(this, mSectorX, mSectorY, getDesiredSectorRadius());
         scene.setBackground(new Background(0.0f, 0.0f, 0.0f));
         scene.setOnSceneTouchListener(this);
 
@@ -225,14 +233,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                 }
 
                 if (dy != 0 || dx != 0) {
-                    scene.callOnChildren(new IEntityParameterCallable() {
-                        @Override
-                        public void call(IEntity entity) {
-                            entity.setPosition(
-                                    entity.getX() + (dx * Sector.SECTOR_SIZE),
-                                    entity.getY() - (dy * Sector.SECTOR_SIZE));
-                        }
-                    });
+                    offsetChildren(scene, dx * Sector.SECTOR_SIZE, -dy * Sector.SECTOR_SIZE);
                 }
 
                 if (missingSectors != null) {
@@ -242,6 +243,15 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                 }
 
                 mActivity.getCamera().setCenter(mOffsetX, mOffsetY);
+            }
+        });
+    }
+
+    private void offsetChildren(StarfieldScene scene, final float dx, final float dy) {
+        scene.callOnChildren(new IEntityParameterCallable() {
+            @Override
+            public void call(IEntity entity) {
+                entity.setPosition(entity.getX() + dx, entity.getY() + dy);
             }
         });
     }

@@ -19,6 +19,8 @@ public class StarfieldScene extends Scene {
     private SelectableEntity mSelectingEntity;
     private SelectionIndicatorEntity mSelectionIndicator;
     private RadarIndicatorEntity mRadarIndicator;
+    private long sectorX;
+    private long sectorY;
 
     private Map<String, StarEntity> mStars;
     private Map<String, FleetEntity> mFleets;
@@ -31,8 +33,11 @@ public class StarfieldScene extends Scene {
 
     private String mStarToSelect;
 
-    public StarfieldScene(SectorSceneManager sectorSceneManager, int sectorRadius) {
+    public StarfieldScene(SectorSceneManager sectorSceneManager, long sectorX, long sectorY,
+            int sectorRadius) {
         this.sectorRadius = sectorRadius;
+        this.sectorX = sectorX;
+        this.sectorY = sectorY;
         mStarfield = (StarfieldSceneManager) sectorSceneManager;
         mSelectionIndicator = new SelectionIndicatorEntity(
                 sectorSceneManager.getActivity().getEngine(),
@@ -74,6 +79,14 @@ public class StarfieldScene extends Scene {
 
     public int getSectorRadius() {
         return sectorRadius;
+    }
+
+    public long getSectorX() {
+        return sectorX;
+    }
+
+    public long getSectorY() {
+        return sectorY;
     }
 
     /** Makes sure whatever was selected in the given scene is also selected in this scene. */

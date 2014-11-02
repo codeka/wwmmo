@@ -335,8 +335,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
         for(int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
             for(int x = -scene.getSectorRadius(); x <= scene.getSectorRadius(); x++) {
-                long sX = mSectorX + x;
-                long sY = mSectorY + y;
+                long sX = scene.getSectorX() + x;
+                long sY = scene.getSectorY() + y;
                 Sector sector = SectorManager.i.getSector(sX, sY);
                 if (sector == null) {
                     if (missingSectors == null) {
@@ -356,8 +356,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
         for (int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
             for(int x = -scene.getSectorRadius(); x <= scene.getSectorRadius(); x++) {
-                long sX = mSectorX + x;
-                long sY = mSectorY + y;
+                long sX = scene.getSectorX() + x;
+                long sY = scene.getSectorY() + y;
 
                 Sector sector = SectorManager.i.getSector(sX, sY);
                 if (sector == null) {
@@ -474,12 +474,16 @@ public class StarfieldSceneManager extends SectorSceneManager {
     }
 
     /**
-     * Given a \c Sector, returns the (x, y) coordinates (in view-space) of the origin of this
+     * Given a sector, returns the (x, y) coordinates (in view-space) of the origin of this
      * sector.
      */
     public Vector2 getSectorOffset(long sx, long sy) {
-        sx -= mSectorX;
-        sy -= mSectorY;
+        return getSectorOffset(mSectorX, mSectorY, sx, sy);
+    }
+
+    public Vector2 getSectorOffset(long sectorX, long sectorY, long sx, long sy) {
+        sx -= sectorX;
+        sy -= sectorY;
         return Vector2.pool.borrow().reset((sx * Sector.SECTOR_SIZE),
                                            -(sy * Sector.SECTOR_SIZE));
     }
@@ -503,7 +507,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
         srcPoint.x += srcStar.getOffsetX();
         srcPoint.y += Sector.SECTOR_SIZE - srcStar.getOffsetY();
 
-        Vector2 destPoint = getSectorOffset(destStar.getSectorX(), destStar.getSectorY());
+        Vector2 destPoint = getSectorOffset(scene.getSectorX(), scene.getSectorY(),
+            destStar.getSectorX(), destStar.getSectorY());
         destPoint.x += destStar.getOffsetX();
         destPoint.y += Sector.SECTOR_SIZE - destStar.getOffsetY();
 
@@ -525,8 +530,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
         for(int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
             for(int x = -scene.getSectorRadius(); x <= scene.getSectorRadius(); x++) {
-                long sX = mSectorX + x;
-                long sY = mSectorY + y;
+                long sX = scene.getSectorX() + x;
+                long sY = scene.getSectorY() + y;
 
                 Sector sector = SectorManager.i.getSector(sX, sY);
                 if (sector == null) {
