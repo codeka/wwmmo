@@ -3,6 +3,9 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import org.andengine.engine.Engine;
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.IEntity;
@@ -30,7 +33,7 @@ import au.com.codeka.warworlds.model.SectorManager;
  */
 public abstract class SectorSceneManager implements IOnSceneTouchListener {
     private static final Log log = new Log("SectorSceneManager");
-    private StarfieldScene mScene;
+    @Nullable private StarfieldScene mScene;
     private GestureDetector mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     protected BaseGlActivity mActivity;
@@ -116,15 +119,12 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
 
             @Override
             protected void onComplete(final Scene scene) {
-                if (scene == null) {
-                    return;
-                }
-
-                if (mActivity.getEngine() != null) {
-                    mActivity.getEngine().runOnUpdateThread(new Runnable() {
+                final Engine engine = mActivity.getEngine();
+                if (scene != null && engine != null) {
+                  engine.runOnUpdateThread(new Runnable() {
                         @Override
                         public void run() {
-                            mActivity.getEngine().setScene(scene);
+                            engine.setScene(scene);
                         }
                     });
                 }
@@ -172,6 +172,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
         return mScene;
     }
 
+    @Nullable
     public StarfieldScene getScene() {
         return mScene;
     }

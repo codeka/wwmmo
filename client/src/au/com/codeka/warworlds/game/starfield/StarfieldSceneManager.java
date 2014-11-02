@@ -7,12 +7,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 
-import javax.annotation.Nullable;
-
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.Entity;
-import org.andengine.entity.primitive.DrawMode;
-import org.andengine.entity.primitive.Mesh;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
@@ -28,7 +24,6 @@ import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtla
 import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
-import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -39,13 +34,11 @@ import android.view.ScaleGestureDetector;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.PointCloud;
-import au.com.codeka.common.Triangle;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.Voronoi;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.controlfield.ControlField;
 import au.com.codeka.warworlds.eventbus.EventBus;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.BuildManager;
@@ -89,18 +82,11 @@ public class StarfieldSceneManager extends SectorSceneManager {
     private TiledTextureRegion mBackgroundGasTextureRegion;
     private BitmapTextureAtlas mBackgroundStarsTextureAtlas;
     private TiledTextureRegion mBackgroundStarsTextureRegion;
-    private ArrayList<Entity> mBackgroundEntities;
-    private boolean mIsBackgroundVisible = true;;
-    private float mBackgroundZoomAlpha = 1.0f;
 
-    /**
-     * Null if we're zoomed in too close to see the control fields (i.e. when
-     * {@link mIsTacticalVisible} is {@code false}.
-     */
-    @Nullable private SparseArray<TacticalControlField> mControlFields;
-    @Nullable private TacticalPointCloud mPointCloud;
-    private boolean mIsTacticalVisible;
-    private float mTacticalZoomAlpha;
+    private boolean isBackgroundVisible = true;
+    private float backgroundZoomAlpha = 1.0f;
+    private boolean isTacticalVisible = false;
+    private float tacticalZoomAlpha = 0.0f;
 
     public StarfieldSceneManager(BaseStarfieldActivity activity) {
         super(activity);
@@ -255,111 +241,93 @@ public class StarfieldSceneManager extends SectorSceneManager {
     @Override
     protected void updateZoomFactor(float zoomFactor) {
         super.updateZoomFactor(zoomFactor);
-        boolean wasTacticalVisible = mIsTacticalVisible;
+        boolean wasTacticalVisible = isTacticalVisible;
+        boolean wasBackgroundVisible = isBackgroundVisible;
 
         // we fade out the background between 0.55 and 0.50, it should be totally invisible < 0.50
         // and totally opaque for >= 0.55
-        if (zoomFactor < 0.5f && mIsBackgroundVisible) {
-            mIsBackgroundVisible = false;
+        if (zoomFactor < 0.5f && isBackgroundVisible) {
+            isBackgroundVisible = false;
             // we need to make the background as invisible
-            mActivity.runOnUpdateThread(new Runnable() {
-                @Override
-                public void run() {
-                    ArrayList<Entity> backgroundEntities = mBackgroundEntities;
-                    for (Entity entity : backgroundEntities) {
-                        entity.setVisible(mIsBackgroundVisible);
-                    }
-                }
-            });
-        } else if (zoomFactor >= 0.5f && !mIsBackgroundVisible) {
-            mIsBackgroundVisible = true;
+            mActivity.runOnUpdateThread(updateBackgroundRunnable);
+        } else if (zoomFactor >= 0.5f && !isBackgroundVisible) {
+            isBackgroundVisible = true;
             // we need to make the background as visible
-            mActivity.runOnUpdateThread(new Runnable() {
-                @Override
-                public void run() {
-                    ArrayList<Entity> backgroundEntities = mBackgroundEntities;
-                    for (Entity entity : backgroundEntities) {
-                        entity.setVisible(mIsBackgroundVisible);
-                    }
-                }
-            });
+            mActivity.runOnUpdateThread(updateBackgroundRunnable);
         }
         if (zoomFactor >= 0.5f && zoomFactor < 0.55f) {
             // between 0.5 and 0.55 we need to fade the background in
-            mBackgroundZoomAlpha = (zoomFactor - 0.5f) * 20.0f; // make it in the range 0...1
-            mActivity.runOnUpdateThread(new Runnable() {
-                @Override
-                public void run() {
-                    ArrayList<Entity> backgroundEntities = mBackgroundEntities;
-                    for (Entity entity : backgroundEntities) {
-                        entity.setAlpha(mBackgroundZoomAlpha);
-                        entity.setColor(mBackgroundZoomAlpha, mBackgroundZoomAlpha, mBackgroundZoomAlpha);
-                    }
-                }
-            });
+            backgroundZoomAlpha = (zoomFactor - 0.5f) * 20.0f; // make it in the range 0...1
+            mActivity.runOnUpdateThread(updateBackgroundRunnable);
         }
 
         // similarly, we fade IN the tactical view as you zoom out. It starts fading in a bit sooner
         // than the background fades out, and fades slower, too.
-        if (zoomFactor >= 0.6f && mIsTacticalVisible) {
-            mIsTacticalVisible = false;
-            mTacticalZoomAlpha = 0.0f;
-            mActivity.runOnUpdateThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (mControlFields == null) {
-                        return;
-                    }
-                    for (int i = 0; i < mControlFields.size(); i++) {
-                        mControlFields.valueAt(i).updateAlpha(
-                            mIsTacticalVisible, mTacticalZoomAlpha);
-                    }
-                }
-            });
-        } else if (zoomFactor < 0.4f && !mIsTacticalVisible ) {
-            mIsTacticalVisible = true;
-            mTacticalZoomAlpha = 1.0f;
-            mActivity.runOnUpdateThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (mControlFields == null) {
-                        return;
-                    }
-                    for (int i = 0; i < mControlFields.size(); i++) {
-                        mControlFields.valueAt(i).updateAlpha(
-                            mIsTacticalVisible, mTacticalZoomAlpha);
-                    }
-                }
-            });
+        if (zoomFactor >= 0.6f && isTacticalVisible) {
+            isTacticalVisible = false;
+            tacticalZoomAlpha = 0.0f;
+            mActivity.runOnUpdateThread(updateTacticalRunnable);
+        } else if (zoomFactor < 0.4f && !isTacticalVisible ) {
+            isTacticalVisible = true;
+            tacticalZoomAlpha = 1.0f;
+            mActivity.runOnUpdateThread(updateTacticalRunnable);
         }
         if (zoomFactor >= 0.4f && zoomFactor < 0.6f) {
-            mIsTacticalVisible = true;
-            mTacticalZoomAlpha = 1.0f - ((zoomFactor - 0.4f) * 5.0f); // make it 1...0
-            mActivity.runOnUpdateThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (mControlFields == null) {
-                        return;
-                    }
-                    for (int i = 0; i < mControlFields.size(); i++) {
-                        mControlFields.valueAt(i).updateAlpha(
-                            mIsTacticalVisible, mTacticalZoomAlpha);
-                    }
-                }
-            });
+            isTacticalVisible = true;
+            tacticalZoomAlpha = 1.0f - ((zoomFactor - 0.4f) * 5.0f); // make it 1...0
+            mActivity.runOnUpdateThread(updateTacticalRunnable);
         }
 
-        if (wasTacticalVisible != mIsTacticalVisible) {
-            // If the tactical view has gone from visible -> invisible (or vice versa), then
-            // we'll need to redraw the scene.
+        if (wasTacticalVisible != isTacticalVisible
+            || wasBackgroundVisible != isBackgroundVisible) {
+            // If the tactical view or background has gone from visible -> invisible (or vice
+            // versa), then we'll need to redraw the scene.
             queueRefreshScene();
         }
     }
 
+    /** Updates the background entities with the current zoom alpha on the update thread. */
+    private final Runnable updateBackgroundRunnable = new Runnable() {
+        @Override
+        public void run() {
+            StarfieldScene scene = getScene();
+            if (scene == null) {
+                return;
+            }
+            List<Entity> backgroundEntities = scene.getBackgroundEntities();
+            if (backgroundEntities == null) {
+                return;
+            }
+            for (Entity entity : backgroundEntities) {
+                entity.setVisible(isBackgroundVisible);
+                entity.setAlpha(backgroundZoomAlpha);
+                entity.setColor(backgroundZoomAlpha, backgroundZoomAlpha,
+                    backgroundZoomAlpha);
+            }
+        }
+    };
+
+    /** Updates the tactical entities with the current zoom alpha on the update thread. */
+    private final Runnable updateTacticalRunnable = new Runnable() {
+        @Override
+        public void run() {
+            StarfieldScene scene = getScene();
+            if (scene == null) {
+                return;
+            }
+            SparseArray<TacticalControlField> controlFields = scene.getControlFields();
+            if (controlFields == null) {
+                return;
+            }
+            for (int i = 0; i < controlFields.size(); i++) {
+                controlFields.valueAt(i).updateAlpha(isTacticalVisible, tacticalZoomAlpha);
+            }
+        }
+    };
+
     private List<Pair<Long, Long>> drawScene(StarfieldScene scene) {
         List<Pair<Long, Long>> missingSectors = null;
 
-        ArrayList<Entity> newBackgroundEntities = new ArrayList<Entity>();
         for(int y = -mSectorRadius; y <= mSectorRadius; y++) {
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
                 long sX = mSectorX + x;
@@ -375,10 +343,9 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
                 int sx = (int)(x * Sector.SECTOR_SIZE);
                 int sy = -(int)(y * Sector.SECTOR_SIZE);
-                drawBackground(scene, sector, sx, sy, newBackgroundEntities);
+                drawBackground(scene, sector, sx, sy);
             }
         }
-        mBackgroundEntities = newBackgroundEntities;
 
         addTacticalView(scene);
 
@@ -401,8 +368,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
         return missingSectors;
     }
 
-    private void drawBackground(Scene scene, Sector sector, int sx, int sy,
-            ArrayList<Entity> newBackgroundEntities) {
+    private void drawBackground(StarfieldScene scene, Sector sector, int sx, int sy) {
         Random r = new Random(sector.getX() ^ (long)(sector.getY() * 48647563));
         final int STAR_SIZE = 256;
         for (int y = 0; y < Sector.SECTOR_SIZE / STAR_SIZE; y++) {
@@ -414,8 +380,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
                         mBackgroundStarsTextureRegion.getTextureRegion(r.nextInt(16)),
                         mActivity.getVertexBufferObjectManager());
                 setBackgroundEntityZoomFactor(bgSprite);
-                scene.attachChild(bgSprite);
-                newBackgroundEntities.add(bgSprite);
+                scene.attachBackground(bgSprite);
             }
         }
 
@@ -431,19 +396,18 @@ public class StarfieldSceneManager extends SectorSceneManager {
                     mBackgroundGasTextureRegion.getTextureRegion(r.nextInt(14)),
                     mActivity.getVertexBufferObjectManager());
             setBackgroundEntityZoomFactor(bgSprite);
-            scene.attachChild(bgSprite);
-            newBackgroundEntities.add(bgSprite);
+            scene.attachBackground(bgSprite);
         }
     }
 
     private void setBackgroundEntityZoomFactor(Sprite bgSprite) {
-        if (mBackgroundZoomAlpha <= 0.0f) {
+        if (backgroundZoomAlpha <= 0.0f) {
             bgSprite.setVisible(false);
-        } else if (mBackgroundZoomAlpha >= 1.0f) {
+        } else if (backgroundZoomAlpha >= 1.0f) {
             // do nothing
         } else {
-            bgSprite.setAlpha(mBackgroundZoomAlpha);
-            bgSprite.setColor(mBackgroundZoomAlpha, mBackgroundZoomAlpha, mBackgroundZoomAlpha);
+            bgSprite.setAlpha(backgroundZoomAlpha);
+            bgSprite.setColor(backgroundZoomAlpha, backgroundZoomAlpha, backgroundZoomAlpha);
         }
     }
 
@@ -499,7 +463,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
         StarEntity starEntity = new StarEntity(this, star,
                                                (float) x, (float) y,
                                                textureRegion, mActivity.getVertexBufferObjectManager(),
-                                               !mIsTacticalVisible, 1.0f - mTacticalZoomAlpha);
+                                               !isTacticalVisible, 1.0f - tacticalZoomAlpha);
         scene.registerTouchArea(starEntity.getTouchEntity());
         scene.attachChild(starEntity);
     }
@@ -547,10 +511,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
         return this.getScene().getFleets().values();
     }
 
-    private void addTacticalView(Scene scene) {
-        if (!mIsTacticalVisible) {
-            mControlFields = null;
-            mPointCloud = null;
+    private void addTacticalView(StarfieldScene scene) {
+        if (!isTacticalVisible) {
             return;
         }
         ArrayList<Vector2> points = new ArrayList<Vector2>();
@@ -596,12 +558,12 @@ public class StarfieldSceneManager extends SectorSceneManager {
             }
         }
 
-        mControlFields = new SparseArray<TacticalControlField>();
-        mPointCloud = new TacticalPointCloud(points);
-        TacticalVoronoi v = new TacticalVoronoi(mPointCloud);
+        SparseArray<TacticalControlField> controlFields = new SparseArray<TacticalControlField>();
+        PointCloud pointCloud = new PointCloud(points);
+        Voronoi v = new Voronoi(pointCloud);
 
         for (int i = 0; i < empirePoints.size(); i++) {
-            TacticalControlField cf = new TacticalControlField(mPointCloud, v);
+            TacticalControlField cf = new TacticalControlField(pointCloud, v);
 
             List<Vector2> pts = empirePoints.valueAt(i);
             for (Vector2 pt : pts) {
@@ -622,9 +584,11 @@ public class StarfieldSceneManager extends SectorSceneManager {
                     }
                 });
             }
-            cf.addToScene(scene, getActivity().getVertexBufferObjectManager(), colour);
-            mControlFields.put(empireID, cf);
+            cf.addToScene(scene, getActivity().getVertexBufferObjectManager(), colour,
+                tacticalZoomAlpha);
+            controlFields.put(empireID, cf);
         }
+        scene.setControlFields(controlFields);
     }
 
     @Override
@@ -737,63 +701,6 @@ public class StarfieldSceneManager extends SectorSceneManager {
             queueRefreshScene();
         }
     };
-
-    /** Represents the PointCloud used by the tactical view. */
-    private class TacticalPointCloud extends PointCloud {
-        public TacticalPointCloud(ArrayList<Vector2> points) {
-            super(points);
-        }
-    }
-
-    /** Represents the ControlField used by the tactical view. */
-    private class TacticalControlField extends ControlField {
-        private ArrayList<Mesh> mMeshes;
-
-        public TacticalControlField(PointCloud pointCloud, Voronoi voronoi) {
-            super(pointCloud, voronoi);
-            mMeshes = new ArrayList<Mesh>();
-        }
-
-        public void updateAlpha(boolean visible, float alpha) {
-            for (Mesh mesh : mMeshes) {
-                mesh.setVisible(visible);
-                mesh.setAlpha(alpha);
-            }
-        }
-
-        public void addToScene(Scene scene, VertexBufferObjectManager vboManager, int colour) {
-            for (Vector2 pt : mOwnedPoints) {
-                List<Triangle> triangles = mVoronoi.getTrianglesForPoint(pt);
-                if (triangles == null) {
-                    continue;
-                }
-
-                float[] meshVertices = new float[(triangles.size() + 2) * Mesh.VERTEX_SIZE];
-                meshVertices[Mesh.VERTEX_INDEX_X] = (float) pt.x * Sector.SECTOR_SIZE;
-                meshVertices[Mesh.VERTEX_INDEX_Y] = (float) pt.y * Sector.SECTOR_SIZE;
-                for (int i = 0; i < triangles.size(); i++) {
-                    meshVertices[(i + 1) * Mesh.VERTEX_SIZE + Mesh.VERTEX_INDEX_X] = (float) triangles.get(i).centre.x * Sector.SECTOR_SIZE;
-                    meshVertices[(i + 1) * Mesh.VERTEX_SIZE + Mesh.VERTEX_INDEX_Y] = (float) triangles.get(i).centre.y * Sector.SECTOR_SIZE;
-                }
-                meshVertices[(triangles.size() + 1) * Mesh.VERTEX_SIZE + Mesh.VERTEX_INDEX_X] = (float) triangles.get(0).centre.x * Sector.SECTOR_SIZE;
-                meshVertices[(triangles.size() + 1) * Mesh.VERTEX_SIZE + Mesh.VERTEX_INDEX_Y] = (float) triangles.get(0).centre.y * Sector.SECTOR_SIZE;
-
-                Mesh mesh = new Mesh(0.0f, 0.0f, meshVertices, triangles.size() + 2, DrawMode.TRIANGLE_FAN, vboManager);
-                mesh.setColor(colour);
-                mesh.setAlpha(mTacticalZoomAlpha);
-                mesh.setVisible(mIsTacticalVisible);
-                scene.attachChild(mesh);
-                mMeshes.add(mesh);
-            }
-        }
-    }
-
-    /** Represents the Voronoi diagram of the tactical view. */
-    private class TacticalVoronoi extends Voronoi {
-        public TacticalVoronoi(PointCloud pc) {
-            super(pc);
-        }
-    }
 
     public static class SpaceTapEvent {
         public long sectorX;

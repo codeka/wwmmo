@@ -1,10 +1,14 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.andengine.entity.Entity;
 import org.andengine.entity.scene.Scene;
 
+import android.util.SparseArray;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Sector;
@@ -20,6 +24,8 @@ public class StarfieldScene extends Scene {
     private Map<String, FleetEntity> mFleets;
     private StarEntity mSelectedStarEntity;
     private FleetEntity mSelectedFleetEntity;
+    private List<Entity> backgroundEntities;
+    private SparseArray<TacticalControlField> controlFields;
 
     private String mStarToSelect;
 
@@ -33,7 +39,7 @@ public class StarfieldScene extends Scene {
 
         mFleets = new HashMap<String, FleetEntity>();
         mStars = new HashMap<String, StarEntity>();
-
+        backgroundEntities = new ArrayList<Entity>();
     }
 
     public void attachChild(StarEntity starEntity) {
@@ -44,6 +50,23 @@ public class StarfieldScene extends Scene {
     public void attachChild(FleetEntity fleetEntity) {
         super.attachChild(fleetEntity);
         mFleets.put(fleetEntity.getFleet().getKey(), fleetEntity);
+    }
+
+    public void attachBackground(Entity backgroundEntity) {
+      super.attachChild(backgroundEntity);
+      backgroundEntities.add(backgroundEntity);
+    }
+
+    public void setControlFields(SparseArray<TacticalControlField> controlFields) {
+        this.controlFields = controlFields;
+    }
+
+    public List<Entity> getBackgroundEntities() {
+        return backgroundEntities;
+    }
+
+    public SparseArray<TacticalControlField> getControlFields() {
+        return controlFields;
     }
 
     /** Makes sure whatever was selected in the given scene is also selected in this scene. */
