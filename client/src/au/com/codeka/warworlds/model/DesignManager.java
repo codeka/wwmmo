@@ -30,7 +30,7 @@ public class DesignManager extends BaseDesignManager {
     public static void setup(final Context context) {
         BaseDesignManager.i = new DesignManager();
         ((DesignManager) BaseDesignManager.i).mContext = context;
-        BaseDesignManager.i.setup();
+        BaseDesignManager.i.parseDesigns();
         ((DesignManager) BaseDesignManager.i).mContext = null;
     }
 

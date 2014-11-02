@@ -33,7 +33,8 @@ public class StarEntity extends SelectableEntity {
     public StarEntity(StarfieldSceneManager starfield, Star star,
                       float x, float y,
                       ITextureRegion textureRegion,
-                      VertexBufferObjectManager vertexBufferObjectManager) {
+                      VertexBufferObjectManager vertexBufferObjectManager,
+                      boolean showText, float textAlpha) {
         super(0.0f, 0.0f, 1.0f, 1.0f);//star.getSize() * 2.0f, star.getSize() * 2.0f);
         mStar = star;
         mStarfield = starfield;
@@ -59,14 +60,16 @@ public class StarEntity extends SelectableEntity {
         }
 
         // don't display the name for marker stars...
-        if (star.getStarType().getType() != Star.Type.Marker) {
+        if (showText && star.getStarType().getType() != Star.Type.Marker) {
             mStarName = new Text(0.0f, -starSize * 0.6f,
                     mStarfield.getFont(), star.getName(),
                     mStarfield.getActivity().getVertexBufferObjectManager());
             attachChild(mStarName);
         }
 
-        addEmpireIcons();
+        if (showText) {
+           addEmpireIcons(textAlpha);
+        }
 
         setPosition(x, y);
     }
@@ -96,7 +99,7 @@ public class StarEntity extends SelectableEntity {
         mStar = s;
     }
 
-    private void addEmpireIcons() {
+    private void addEmpireIcons(float alpha) {
         List<BaseColony> colonies = mStar.getColonies();
         SparseArray<Integer[]> empires = new SparseArray<Integer[]>();
         if (colonies != null && !colonies.isEmpty()) {
@@ -156,6 +159,7 @@ public class StarEntity extends SelectableEntity {
             Sprite shieldSprite = new Sprite(
                     (float) pt.x, (float) pt.y,
                     20.0f, 20.0f, texture, mStarfield.getActivity().getVertexBufferObjectManager());
+            shieldSprite.setAlpha(alpha);
             attachChild(shieldSprite);
 
             String text;
@@ -169,6 +173,7 @@ public class StarEntity extends SelectableEntity {
             }
             Text empireCounts = new Text((float) pt.x, (float) pt.y, mStarfield.getFont(),
                     text, mStarfield.getActivity().getVertexBufferObjectManager());
+            empireCounts.setAlpha(alpha);
             empireCounts.setScale(0.666f);
             float offset = ((empireCounts.getLineWidthMaximum() * 0.666f) / 2.0f) + 14.0f;
             empireCounts.setX(empireCounts.getX() + offset);

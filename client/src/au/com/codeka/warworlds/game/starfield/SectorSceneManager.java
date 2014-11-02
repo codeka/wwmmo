@@ -41,6 +41,8 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
     protected float mOffsetY;
     private boolean mWasStopped;
     private SceneCreatedHandler mSceneCreatedHandler;
+    private boolean needSceneRefresh;
+    private boolean isSceneRefreshing;
 
     public SectorSceneManager(BaseGlActivity activity) {
         mActivity = activity;
@@ -62,7 +64,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
 
         if (mWasStopped) {
             log.debug("We were stopped, refreshing the scene...");
-            refreshScene();
+            queueRefreshScene();
         }
     }
 
@@ -82,16 +84,24 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
     private final Object eventHandler = new Object() {
         @EventHandler(thread = EventHandler.UI_THREAD)
         public void onSectorUpdated(Sector sector) {
-            refreshScene();
+            queueRefreshScene();
         }
 
         @EventHandler(thread = EventHandler.UI_THREAD)
         public void onSectorListUpdated(SectorManager.SectorListChangedEvent event) {
-            refreshScene();
+            queueRefreshScene();
         }
     };
 
-    public void refreshScene() {
+    public void queueRefreshScene() {
+        if (isSceneRefreshing) {
+            // if a refresh is already running, don't do another one until the first has completed
+            needSceneRefresh = true;
+            return;
+        }
+
+        needSceneRefresh = false;
+        isSceneRefreshing = true;
         new BackgroundRunner<Scene>() {
             @Override
             protected Scene doInBackground() {
@@ -118,6 +128,12 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                         }
                     });
                 }
+
+                // We're done refreshing. but if we needed another one, do it now
+                isSceneRefreshing = false;
+                if (needSceneRefresh) {
+                    queueRefreshScene();
+                }
             }
         }.execute();
     }
@@ -134,7 +150,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
         return new ScaleGestureListener();
     }
 
-    public Scene createScene() {
+    public StarfieldScene createScene() {
         StarfieldScene scene = new StarfieldScene(this);
         scene.setBackground(new Background(0.0f, 0.0f, 0.0f));
         scene.setOnSceneTouchListener(this);
@@ -211,7 +227,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                 if (missingSectors != null) {
                     SectorManager.i.refreshSectors(missingSectors, false);
                 } else if (dx != 0 || dy != 0) {
-                    refreshScene();
+                    queueRefreshScene();
                 }
 
                 mActivity.getCamera().setCenter(mOffsetX, mOffsetY);

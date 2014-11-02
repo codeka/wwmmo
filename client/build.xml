@@ -49,6 +49,9 @@
     </target>
 
     <target name="-pre-build">
+        <delete>
+            <fileset dir="${basedir}" includes="**/crunch/**"/>
+        </delete>
         <if>
             <condition><equals arg1="${build.target}" arg2="release" /></condition>
             <then>

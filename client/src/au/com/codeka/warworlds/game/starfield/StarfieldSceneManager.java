@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 
+import javax.annotation.Nullable;
+
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.Entity;
 import org.andengine.entity.primitive.DrawMode;
@@ -91,8 +93,12 @@ public class StarfieldSceneManager extends SectorSceneManager {
     private boolean mIsBackgroundVisible = true;;
     private float mBackgroundZoomAlpha = 1.0f;
 
-    private TacticalPointCloud mPointCloud;
-    private SparseArray<TacticalControlField> mControlFields;
+    /**
+     * Null if we're zoomed in too close to see the control fields (i.e. when
+     * {@link mIsTacticalVisible} is {@code false}.
+     */
+    @Nullable private SparseArray<TacticalControlField> mControlFields;
+    @Nullable private TacticalPointCloud mPointCloud;
     private boolean mIsTacticalVisible;
     private float mTacticalZoomAlpha;
 
@@ -249,6 +255,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
     @Override
     protected void updateZoomFactor(float zoomFactor) {
         super.updateZoomFactor(zoomFactor);
+        boolean wasTacticalVisible = mIsTacticalVisible;
 
         // we fade out the background between 0.55 and 0.50, it should be totally invisible < 0.50
         // and totally opaque for >= 0.55
@@ -300,18 +307,24 @@ public class StarfieldSceneManager extends SectorSceneManager {
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (mControlFields == null) {
+                        return;
+                    }
                     for (int i = 0; i < mControlFields.size(); i++) {
                         mControlFields.valueAt(i).updateAlpha(
                             mIsTacticalVisible, mTacticalZoomAlpha);
                     }
                 }
             });
-        } else if (zoomFactor < 0.4f && !mIsTacticalVisible) {
+        } else if (zoomFactor < 0.4f && !mIsTacticalVisible ) {
             mIsTacticalVisible = true;
             mTacticalZoomAlpha = 1.0f;
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (mControlFields == null) {
+                        return;
+                    }
                     for (int i = 0; i < mControlFields.size(); i++) {
                         mControlFields.valueAt(i).updateAlpha(
                             mIsTacticalVisible, mTacticalZoomAlpha);
@@ -325,12 +338,21 @@ public class StarfieldSceneManager extends SectorSceneManager {
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (mControlFields == null) {
+                        return;
+                    }
                     for (int i = 0; i < mControlFields.size(); i++) {
                         mControlFields.valueAt(i).updateAlpha(
                             mIsTacticalVisible, mTacticalZoomAlpha);
                     }
                 }
             });
+        }
+
+        if (wasTacticalVisible != mIsTacticalVisible) {
+            // If the tactical view has gone from visible -> invisible (or vice versa), then
+            // we'll need to redraw the scene.
+            queueRefreshScene();
         }
     }
 
@@ -476,7 +498,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
         StarEntity starEntity = new StarEntity(this, star,
                                                (float) x, (float) y,
-                                               textureRegion, mActivity.getVertexBufferObjectManager());
+                                               textureRegion, mActivity.getVertexBufferObjectManager(),
+                                               !mIsTacticalVisible, 1.0f - mTacticalZoomAlpha);
         scene.registerTouchArea(starEntity.getTouchEntity());
         scene.attachChild(starEntity);
     }
@@ -525,6 +548,11 @@ public class StarfieldSceneManager extends SectorSceneManager {
     }
 
     private void addTacticalView(Scene scene) {
+        if (!mIsTacticalVisible) {
+            mControlFields = null;
+            mPointCloud = null;
+            return;
+        }
         ArrayList<Vector2> points = new ArrayList<Vector2>();
         SparseArray<List<Vector2>> empirePoints = new SparseArray<List<Vector2>>();
 
@@ -573,7 +601,6 @@ public class StarfieldSceneManager extends SectorSceneManager {
         TacticalVoronoi v = new TacticalVoronoi(mPointCloud);
 
         for (int i = 0; i < empirePoints.size(); i++) {
-            
             TacticalControlField cf = new TacticalControlField(mPointCloud, v);
 
             List<Vector2> pts = empirePoints.valueAt(i);
@@ -706,10 +733,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
                 }
             }
 
-            // otherwise, refresh the scene (but only if it's one we're actually displaying...)
-            if (mControlFields != null && mControlFields.indexOfKey(empire.getID()) >= 0) {
-                refreshScene();
-            }
+            // otherwise, queue up a refresh the scene
+            queueRefreshScene();
         }
     };
 

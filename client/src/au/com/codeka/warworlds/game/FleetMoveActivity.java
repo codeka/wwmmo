@@ -296,7 +296,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                         }
                         if (!markerStar.getAttachedEntities().contains(tooCloseIndicatorEntity)) {
                             markerStar.getAttachedEntities().add(tooCloseIndicatorEntity);
-                            mStarfield.refreshScene();
+                            mStarfield.queueRefreshScene();
                         }
                     }
                 }
