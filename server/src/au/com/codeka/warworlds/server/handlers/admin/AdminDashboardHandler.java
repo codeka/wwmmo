@@ -86,10 +86,10 @@ public class AdminDashboardHandler extends AdminHandler {
       SqlResult res = stmt.select();
       while (res.next()) {
         lastSimulation = res.getDateTime(3);
+        TimeFormatter fmt = TimeFormatter.create().withMaxDays(1000).withAlwaysIncludeMinutes(true);
         json.addProperty("oldest_star_id", res.getInt(1));
         json.addProperty("oldest_star_name", res.getString(2));
-        json.addProperty("oldest_star_time",
-            TimeFormatter.create().withMaxDays(1000).format(res.getDateTime(3)));
+        json.addProperty("oldest_star_time", fmt.format(res.getDateTime(3)));
       }
     } catch (Exception e) {
       log.error("Error fetching oldest star.", e);
