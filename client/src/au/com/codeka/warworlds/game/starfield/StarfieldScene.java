@@ -27,9 +27,12 @@ public class StarfieldScene extends Scene {
     private List<Entity> backgroundEntities;
     private SparseArray<TacticalControlField> controlFields;
 
+    private int sectorRadius;
+
     private String mStarToSelect;
 
-    public StarfieldScene(SectorSceneManager sectorSceneManager) {
+    public StarfieldScene(SectorSceneManager sectorSceneManager, int sectorRadius) {
+        this.sectorRadius = sectorRadius;
         mStarfield = (StarfieldSceneManager) sectorSceneManager;
         mSelectionIndicator = new SelectionIndicatorEntity(
                 sectorSceneManager.getActivity().getEngine(),
@@ -67,6 +70,10 @@ public class StarfieldScene extends Scene {
 
     public SparseArray<TacticalControlField> getControlFields() {
         return controlFields;
+    }
+
+    public int getSectorRadius() {
+        return sectorRadius;
     }
 
     /** Makes sure whatever was selected in the given scene is also selected in this scene. */
@@ -230,5 +237,4 @@ public class StarfieldScene extends Scene {
             mSelectedFleetEntity.attachChild(mSelectionIndicator);
         }
     }
-
 }

@@ -37,7 +37,6 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
     private GestureDetector mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     protected BaseGlActivity mActivity;
-    protected int mSectorRadius = 1;
     protected long mSectorX;
     protected long mSectorY;
     protected float mOffsetX;
@@ -141,6 +140,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
     public abstract void onLoadResources();
     protected abstract void refreshHud(HUD hud);
     protected abstract void refreshScene(StarfieldScene scene);
+    protected abstract int getDesiredSectorRadius();
 
     protected GestureDetector.OnGestureListener createGestureListener() {
         return new GestureListener();
@@ -151,7 +151,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
     }
 
     public StarfieldScene createScene() {
-        StarfieldScene scene = new StarfieldScene(this);
+        StarfieldScene scene = new StarfieldScene(this, getDesiredSectorRadius());
         scene.setBackground(new Background(0.0f, 0.0f, 0.0f));
         scene.setOnSceneTouchListener(this);
 
@@ -200,9 +200,13 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                 mOffsetX = offsetX;
                 mOffsetY = offsetY;
 
+                StarfieldScene scene = mScene;
+                if (scene == null) {
+                    return;
+                }
                 List<Pair<Long, Long>> missingSectors = null;
-                for(long sy = mSectorY - mSectorRadius; sy <= mSectorY + mSectorRadius; sy++) {
-                    for(long sx = mSectorX - mSectorRadius; sx <= mSectorX + mSectorRadius; sx++) {
+                for(long sy = mSectorY - scene.getSectorRadius(); sy <= mSectorY + scene.getSectorRadius(); sy++) {
+                    for(long sx = mSectorX - scene.getSectorRadius(); sx <= mSectorX + scene.getSectorRadius(); sx++) {
                         Pair<Long, Long> key = new Pair<Long, Long>(sx, sy);
                         Sector s = SectorManager.i.getSector(sx, sy);
                         if (s == null) {
@@ -215,7 +219,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                 }
 
                 if (dy != 0 || dx != 0) {
-                    mScene.callOnChildren(new IEntityParameterCallable() {
+                    scene.callOnChildren(new IEntityParameterCallable() {
                         @Override
                         public void call(IEntity entity) {
                             entity.setPosition(

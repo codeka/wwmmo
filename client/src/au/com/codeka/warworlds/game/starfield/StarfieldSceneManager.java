@@ -227,6 +227,11 @@ public class StarfieldSceneManager extends SectorSceneManager {
     }
 
     @Override
+    protected int getDesiredSectorRadius() {
+        return isTacticalVisible ? 2 : 1;
+    }
+
+    @Override
     protected void refreshHud(HUD hud) {
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire != null && myEmpire.getHomeStar() != null) {
@@ -328,8 +333,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
     private List<Pair<Long, Long>> drawScene(StarfieldScene scene) {
         List<Pair<Long, Long>> missingSectors = null;
 
-        for(int y = -mSectorRadius; y <= mSectorRadius; y++) {
-            for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
+        for(int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
+            for(int x = -scene.getSectorRadius(); x <= scene.getSectorRadius(); x++) {
                 long sX = mSectorX + x;
                 long sY = mSectorY + y;
                 Sector sector = SectorManager.i.getSector(sX, sY);
@@ -349,8 +354,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
         addTacticalView(scene);
 
-        for (int y = -mSectorRadius; y <= mSectorRadius; y++) {
-            for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
+        for (int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
+            for(int x = -scene.getSectorRadius(); x <= scene.getSectorRadius(); x++) {
                 long sX = mSectorX + x;
                 long sY = mSectorY + y;
 
@@ -518,8 +523,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
         ArrayList<Vector2> points = new ArrayList<Vector2>();
         SparseArray<List<Vector2>> empirePoints = new SparseArray<List<Vector2>>();
 
-        for(int y = -mSectorRadius; y <= mSectorRadius; y++) {
-            for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
+        for(int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
+            for(int x = -scene.getSectorRadius(); x <= scene.getSectorRadius(); x++) {
                 long sX = mSectorX + x;
                 long sY = mSectorY + y;
 
