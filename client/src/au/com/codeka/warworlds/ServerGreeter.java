@@ -398,7 +398,8 @@ public class ServerGreeter {
                       .detectLeakedRegistrationObjects()
                       .detectLeakedSqlLiteObjects()
                       .penaltyLog()
-                      .penaltyDeath() // these are bad enough to warrent death...
+                      // TODO: ads in google play services leak resources :\
+                      //.penaltyDeath() // these are bad enough to warrent death...
                       .build());
 
             // Replace System.err with one that'll monitor for StrictMode killing us and

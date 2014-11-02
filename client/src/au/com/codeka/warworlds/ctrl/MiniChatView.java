@@ -164,7 +164,7 @@ public class MiniChatView extends RelativeLayout {
             for (int i = 0; i < mMsgsContainer.getChildCount(); i++) {
                 TextView tv = (TextView) mMsgsContainer.getChildAt(i);
                 ChatMessage msg = (ChatMessage) tv.getTag();
-                if (msg.getEmpireID() == empire.getID()) {
+                if (msg != null && msg.getEmpireID() == empire.getID()) {
                     tv.setText(Html.fromHtml(msg.format(true, false, mAutoTranslate)));
                 }
             }
