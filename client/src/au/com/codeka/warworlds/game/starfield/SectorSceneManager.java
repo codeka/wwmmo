@@ -124,6 +124,8 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                   engine.runOnUpdateThread(new Runnable() {
                         @Override
                         public void run() {
+                            log.info("Setting scene: scene=[%d, %d] us=[%d, %d]", 
+                                scene.getSectorX(), scene.getSectorY(), mSectorX, mSectorY);
                             if (mSectorX != scene.getSectorX() || mSectorY != scene.getSectorY()) {
                                 // if you've panned the map while the scene was being created, then
                                 // we'll have to update everything in the scene with the new
