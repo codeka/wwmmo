@@ -81,7 +81,7 @@ public class AdminDashboardHandler extends AdminHandler {
     DateTime lastSimulation = null;
     String sql = "SELECT stars.id, stars.name, stars.last_simulation FROM stars"
         + " WHERE empire_count > 0"
-        + " ORDER BY last_simulation ASC LIMIT 2";
+        + " ORDER BY last_simulation ASC LIMIT 1";
     try (SqlStmt stmt = DB.prepare(sql)) {
       SqlResult res = stmt.select();
       while (res.next()) {
@@ -97,9 +97,8 @@ public class AdminDashboardHandler extends AdminHandler {
 
     if (lastSimulation != null) {
       sql = "SELECT COUNT(*) FROM stars"
-          + " WHERE empire_count > 0 AND last_simulation >= ?";
+          + " WHERE empire_count > 0";
       try (SqlStmt stmt = DB.prepare(sql)) {
-        stmt.setDateTime(1, lastSimulation);
         SqlResult res = stmt.select();
         while (res.next()) {
           json.addProperty("num_stars", res.getInt(1));

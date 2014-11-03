@@ -133,7 +133,7 @@ public class BuildQueueFragment extends BaseFragment {
     }
 
     private Object eventHandler = new Object() {
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onStarUpdated(Star star) {
             if (fetcher.onStarUpdated(star)) {
                 adapter.notifyDataSetChanged();

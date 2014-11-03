@@ -86,7 +86,7 @@ public class EmpireRankList extends ListView {
             mRankListAdapter.notifyDataSetChanged();
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onEmpireUpdated(Empire empire) {
             mRankListAdapter.onEmpireUpdated(empire);
         }

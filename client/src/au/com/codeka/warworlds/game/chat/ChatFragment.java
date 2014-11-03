@@ -191,7 +191,7 @@ public class ChatFragment extends Fragment {
     }
 
     private Object mEventHandler = new Object() {
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
             if (mConversation.getID() < 0) {
                 setupAllianceChatHeader(mHeaderContent);
@@ -199,12 +199,12 @@ public class ChatFragment extends Fragment {
             mChatAdapter.notifyDataSetChanged();
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onEmpireUpdated(Empire empire) {
             mChatAdapter.notifyDataSetChanged();
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onMessageAdded(ChatManager.MessageAddedEvent event) {
             if (event.conversation.getID() == mConversation.getID()) {
                 appendMessage(event.msg);
@@ -212,7 +212,7 @@ public class ChatFragment extends Fragment {
             }
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onUnreadMessageCountUpdated(ChatManager.UnreadMessageCountUpdatedEvent event) {
             refreshUnreadCountButton();
         }

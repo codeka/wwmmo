@@ -52,12 +52,12 @@ public class SectorView extends UniverseElementSurfaceView {
     }
 
     private final Object eventHandler = new Object() {
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onSectorUpdated(Sector sector) {
             redraw();
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onSectorListUpdated(SectorManager.SectorListChangedEvent event) {
             redraw();
         }

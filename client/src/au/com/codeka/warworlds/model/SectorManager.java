@@ -46,7 +46,7 @@ public class SectorManager extends BaseManager {
     }
 
     private final Object eventHandler = new Object() {
-        @EventHandler
+        @EventHandler(thread = EventHandler.ANY_THREAD)
         public void onStarUpdated(Star star) {
             Star ourStar = findStar(star.getKey());
             if (ourStar != null) {

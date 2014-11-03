@@ -266,7 +266,7 @@ public class SolarSystemActivity extends BaseActivity {
     }
 
     private Object eventHandler = new Object() {
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onStarUpdated(StarSummary starSummary) {
             if (starSummary.getID() == starID) {
                 star = starSummary;

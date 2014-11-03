@@ -85,12 +85,12 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
     }
 
     private final Object eventHandler = new Object() {
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onSectorUpdated(Sector sector) {
             queueRefreshScene();
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onSectorListUpdated(SectorManager.SectorListChangedEvent event) {
             queueRefreshScene();
         }

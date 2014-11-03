@@ -143,12 +143,12 @@ public class ChatActivity extends BaseActivity {
     }
 
     private Object mEventHandler = new Object() {
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onConversationsRefreshed(ChatManager.ConversationsUpdatedEvent event) {
             refreshConversations();
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onConversationsRefreshed(ChatManager.ConversationStartedEvent event) {
             refreshConversations();
 

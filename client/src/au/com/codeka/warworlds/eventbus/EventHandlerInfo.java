@@ -58,7 +58,10 @@ class EventHandlerInfo {
             }
         };
 
-        if (mHandler != null) {
+        // if we're scheduled to run on the UI thread, and we're *not* on the UI thread, then
+        // post a message to run on the UI thread. If we're alread on the UI then don't go through
+        // the trouble of posting a message.
+        if (mHandler != null && Looper.myLooper() != Looper.getMainLooper()) {
             mHandler.post(runnable);
         } else {
             runnable.run();

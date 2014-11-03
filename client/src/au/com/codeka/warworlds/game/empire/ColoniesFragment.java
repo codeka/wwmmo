@@ -125,7 +125,7 @@ public class ColoniesFragment extends StarsFragment {
     }
 
     private Object eventHandler = new Object() {
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onStarUpdated(Star star) {
             adapter.notifyDataSetChanged();
         }

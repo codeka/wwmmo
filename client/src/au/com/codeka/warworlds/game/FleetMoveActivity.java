@@ -161,7 +161,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
     }
 
     public Object eventHandler = new Object() {
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onStarUpdated(StarSummary star) {
             if (star.getID() == Integer.parseInt(fleet.getStarKey())) {
                 if (srcStar == null) {
@@ -171,7 +171,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             }
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onStarSelected(final StarfieldSceneManager.StarSelectedEvent event) {
             if (event.star == null) {
                 destStar = null;
@@ -189,7 +189,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             refreshSelection();
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onSpaceTap(final StarfieldSceneManager.SpaceTapEvent event) {
             // if the fleet you're moving has the 'empty space mover' effect, it means you can move it
             // to regions of empty space.

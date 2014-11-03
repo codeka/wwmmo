@@ -196,7 +196,7 @@ public class SitrepActivity extends BaseActivity {
             refreshTitle();
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onStarUpdated(StarSummary star) {
             if (mStarKey != null && star.getID() == Integer.parseInt(mStarKey)) {
                 refreshTitle();

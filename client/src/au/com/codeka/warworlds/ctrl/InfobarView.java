@@ -130,7 +130,7 @@ public class InfobarView extends FrameLayout
     }
 
     private Object mEventHandler = new Object() {
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onEmpireUpdated(Empire empire) {
             refreshEmpire(empire);
         }

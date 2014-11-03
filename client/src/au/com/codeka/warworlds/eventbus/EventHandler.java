@@ -12,5 +12,5 @@ public @interface EventHandler {
     public static final int UI_THREAD = 1;
 
     /** Which thread should the callback be called on, {#ANY_THREAD} or {#UI_THREAD}? */
-    int thread() default 0;
+    int thread() default UI_THREAD;
 }

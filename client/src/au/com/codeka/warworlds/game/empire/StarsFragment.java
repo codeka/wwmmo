@@ -33,7 +33,7 @@ public class StarsFragment extends BaseFragment {
         }
 
         private Object eventHandler = new Object() {
-            @EventHandler(thread = EventHandler.UI_THREAD)
+            @EventHandler
             public void onStarsFetched(EmpireStarsFetcher.StarsFetchedEvent event) {
                 notifyDataSetChanged();
             }

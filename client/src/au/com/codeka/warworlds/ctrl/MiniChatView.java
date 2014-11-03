@@ -171,13 +171,13 @@ public class MiniChatView extends RelativeLayout {
             scrollToBottom();
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onMessageAdded(ChatManager.MessageAddedEvent event) {
             appendMessage(event.msg);
             refreshUnreadCountButton();
         }
 
-        @EventHandler(thread = EventHandler.UI_THREAD)
+        @EventHandler
         public void onUnreadMessageCountUpdated(ChatManager.UnreadMessageCountUpdatedEvent event) {
             refreshUnreadCountButton();
         }
