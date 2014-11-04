@@ -261,11 +261,15 @@ public class BuildConfirmDialog extends DialogFragment {
 
         int count = 1;
         if (mDesign.canBuildMultiple()) {
-            count = Integer.parseInt(countEdit.getText().toString());
+            try {
+                count = Integer.parseInt(countEdit.getText().toString());
+            } catch (NumberFormatException e) {
+                StyledDialog.showErrorMessage(getActivity(), "The number you entered isn't valid.");
+                return;
+            }
         }
 
         BuildManager.getInstance().build(activity, mColony, mDesign, mExistingBuilding, count);
-
         dismiss();
     }
 }
