@@ -1,9 +1,10 @@
 package au.com.codeka.warworlds.server;
 
-import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Queue;
+import java.util.Set;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.data.DB;
@@ -15,6 +16,7 @@ public class StarSimulatorThreadManager {
 
   private final ArrayList<StarSimulatorThread> threads = new ArrayList<StarSimulatorThread>();
   private final Queue<Integer> starIDs = new ArrayDeque<Integer>();
+  private final Set<Integer> lastStarIDs = new HashSet<Integer>();
   private final Object lock = new Object();
 
   public void start() {
@@ -42,17 +44,28 @@ public class StarSimulatorThreadManager {
         try (SqlStmt stmt = DB.prepare(sql)) {
           SqlResult res = stmt.select();
           while (res.next()) {
-            starIDs.add(res.getInt(1));
+            int starID = res.getInt(1);
+            // If this starID was handed out in the last set, it's possible that another thread
+            // is still simulating it. Ignore it for now, and wait for the next time around.
+            if (lastStarIDs.contains(starID)) {
+              continue;
+            }
+            starIDs.add(starID);
           }
         } catch (Exception e) {
           log.error("Error fetching starIDs to simulate.", e);
         }
+
+        // clear out the lastStarIDs set and start afresh with this new batch.
+        lastStarIDs.clear();
       }
 
       if (starIDs.isEmpty()) {
         return 0;
       }
-      return starIDs.remove();
+      int starID = starIDs.remove();
+      lastStarIDs.add(starID);
+      return starID;
     }
   }
 }
