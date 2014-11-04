@@ -32,7 +32,7 @@ public class Configuration {
   private String realmName;
   private String dataDirectory;
   private int listenPort;
-  private boolean enableStarSimulationThread;
+  private Integer numStarSimulationThreads;
   private DatabaseConfiguration database;
   private SinbinConfiguration sinbin;
 
@@ -48,8 +48,11 @@ public class Configuration {
     return listenPort;
   }
 
-  public boolean getEnableStarSimulationThread() {
-    return enableStarSimulationThread;
+  public int getNumStarSimulationThreads() {
+    if (numStarSimulationThreads == null) {
+      return 1;
+    }
+    return numStarSimulationThreads.intValue();
   }
 
   public DatabaseConfiguration getDatabaseConfig() {

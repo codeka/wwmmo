@@ -54,7 +54,7 @@
         "success": function(data) {
           $("p#oldest-star span").html("<b>" + data["oldest_star_name"] + "</b> (" +
             data["oldest_star_id"] + "): " + data["oldest_star_time"] + " ago, <b>" +
-            formatNumber(data["num_stars"]) + "</b> stars to simulate");
+            formatNumber(data["num_stars_older_than_3_hrs"]) + "</b> stars are &gt; 3hrs old");
         }
       });
     }

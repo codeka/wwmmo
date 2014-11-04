@@ -97,11 +97,12 @@ public class AdminDashboardHandler extends AdminHandler {
 
     if (lastSimulation != null) {
       sql = "SELECT COUNT(*) FROM stars"
-          + " WHERE empire_count > 0";
+          + " WHERE empire_count > 0 AND last_simulation < ?";
       try (SqlStmt stmt = DB.prepare(sql)) {
+        stmt.setDateTime(1, DateTime.now().minusHours(3));
         SqlResult res = stmt.select();
         while (res.next()) {
-          json.addProperty("num_stars", res.getInt(1));
+          json.addProperty("num_stars_older_than_3_hrs", res.getInt(1));
         }
       } catch (Exception e) {
         log.error("Error fetching number of stars to simulate.", e);

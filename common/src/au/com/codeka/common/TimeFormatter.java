@@ -101,7 +101,7 @@ public class TimeFormatter {
     if (days > 0) {
       int hours = p.getHours() - (days * 24);
       if (alwaysIncludeMinutes) {
-        int minutes = p.getMinutes() - (hours * 60) - (Period.days(days).toStandardMinutes().getMinutes());
+        int minutes = p.getMinutes();
         return String.format(Locale.ENGLISH, "%d day%s, %d hr%s %d min%s", days,
             days == 1 ? "" : "s", hours, hours == 1 ? "" : "s", minutes, minutes == 1 ? "" : "s");
       } else {

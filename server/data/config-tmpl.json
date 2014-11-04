@@ -7,9 +7,8 @@
   "realmName": "Blitz", // name of the realm we're accepting requests for
   "listenPort": 8080, // port to listen for HTTP connections on
 
-  // If false, we won't do star simulations (not good in production, but useful while testing
-  // to reduce CPU load and noise in log files)
-  "enableStarSimulationThread": false,
+  // The number of star simulation threads to run, set to 0 to disable star simulations.
+  "numStarSimulationThreads": 1,
 
   // Database configuration
   "database": {

@@ -46,13 +46,8 @@ public class Runner {
   private static void gameMain() throws Exception {
     EventProcessor.i.ping();
 
-    StarSimulatorThread starSimulatorThread = null;
-    if (Configuration.i.getEnableStarSimulationThread()) {
-      starSimulatorThread = new StarSimulatorThread();
-      starSimulatorThread.start();
-    } else {
-      log.info("Star simulation thread disabled.");
-    }
+    StarSimulatorThreadManager starSimulatorThreadManager = new StarSimulatorThreadManager();
+    starSimulatorThreadManager.start();
 
     int port = Configuration.i.getListenPort();
     Server server = new Server(port);
@@ -61,8 +56,6 @@ public class Runner {
     log.info("Server started on http://localhost:%d/", port);
     server.join();
 
-    if (starSimulatorThread != null) {
-      starSimulatorThread.stop();
-    }
+    starSimulatorThreadManager.stop();
   }
 }
