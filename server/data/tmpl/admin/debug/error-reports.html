@@ -72,7 +72,7 @@
       dataTable.addColumn("number", "Empires Reporting");
       dataTable.addRows([
       {% for entry in error_histogram %}
-        [new Date({{entry.year}}, {{entry.month}}+1, {{entry.day}}), {{entry.num_client_errors}}, {{entry.num_server_errors}}, {{entry.num_empires_reporting}}],
+        [new Date({{entry.year}}, {{entry.month}}-1, {{entry.day}}), {{entry.num_client_errors}}, {{entry.num_server_errors}}, {{entry.num_empires_reporting}}],
       {% endfor %}
       ]);
 

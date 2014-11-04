@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
@@ -114,16 +115,20 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
 
         data.put("cursor", cursor);
 
+        // TODO: handle more than sydney timezone?
+        DateTimeZone timeZone = DateTimeZone.forID("Australia/Sydney");
+        int timeZoneOffset = timeZone.getOffset(DateTime.now());
+
         // add some data so we can display a histogram of the number of errors we're getting
         ArrayList<Integer> maxValues = new ArrayList<Integer>();
         ArrayList<TreeMap<String, Object>> histogram = new ArrayList<TreeMap<String, Object>>();
-        sql = "SELECT DATE(report_date) AS date," +
+        sql = "SELECT DATE(report_date AT TIME ZONE 'Australia/Sydney') AS date," +
                     " SUM(CASE WHEN empire_id IS NULL THEN 0 ELSE 1 END) AS num_client_errors," +
                     " SUM(CASE WHEN empire_id IS NULL THEN 1 ELSE 0 END) AS num_server_errors," +
                     " COUNT(DISTINCT empire_id) AS num_empires_reporting" +
               " FROM error_reports" +
-              " GROUP BY DATE(report_date)" +
-              " ORDER BY DATE(report_date) DESC" +
+              " GROUP BY DATE(report_date AT TIME ZONE 'Australia/Sydney')" +
+              " ORDER BY DATE(report_date AT TIME ZONE 'Australia/Sydney') DESC" +
               " LIMIT 60";
         try (SqlStmt stmt = DB.prepare(sql)) {
             SqlResult res = stmt.select();
