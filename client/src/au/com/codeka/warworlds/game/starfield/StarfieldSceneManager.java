@@ -24,6 +24,7 @@ import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtla
 import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
+import org.joda.time.DateTime;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -679,6 +680,9 @@ public class StarfieldSceneManager extends SectorSceneManager {
     }
 
     private Object mEventHandler = new Object() {
+        private String lastMyEmpireName;
+        private DateTime lastMyEmpireShieldUpdateTime;
+
         /**
          * When a star is updated, if it's one of ours, then we'll want to redraw to make sure we
          * have the latest data (e.g. it might've been renamed)
@@ -698,16 +702,29 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
         @EventHandler
         public void onEmpireUpdate(Empire empire) {
-            // if the player's empire changes, it might mean that the location of their HQ has changed,
-            // so we'll want to make sure it's still correct.
             MyEmpire myEmpire = EmpireManager.i.getEmpire();
             if (empire.getKey().equals(myEmpire.getKey())) {
+                // If the player's empire changes, it might mean that the location of their HQ has
+                // changed, so we'll want to make sure it's still correct.
                 if (mHqStar != null) {
                     mHqStar = empire.getHomeStar();
                 }
+
+                // Only refresh the scene if something we actually care about has changed (such
+                // as the player's name or the shield image). Otherwise, this gets fired for every
+                // notification, for example, and we don't need to redraw the scene for that.
+                if (lastMyEmpireName == null || !lastMyEmpireName.equals(empire.getDisplayName())
+                      || lastMyEmpireShieldUpdateTime == null
+                      || !lastMyEmpireShieldUpdateTime.equals(empire.getShieldLastUpdate())) {
+                  lastMyEmpireName = empire.getDisplayName();
+                  lastMyEmpireShieldUpdateTime = empire.getShieldLastUpdate();
+                  queueRefreshScene();
+                }
+
+                return;
             }
 
-            // otherwise, queue up a refresh the scene
+            // If it's anyone but the player, then just refresh the scene.
             queueRefreshScene();
         }
     };
