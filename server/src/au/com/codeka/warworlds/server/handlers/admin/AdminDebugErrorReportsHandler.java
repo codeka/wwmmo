@@ -115,10 +115,6 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
 
         data.put("cursor", cursor);
 
-        // TODO: handle more than sydney timezone?
-        DateTimeZone timeZone = DateTimeZone.forID("Australia/Sydney");
-        int timeZoneOffset = timeZone.getOffset(DateTime.now());
-
         // add some data so we can display a histogram of the number of errors we're getting
         ArrayList<Integer> maxValues = new ArrayList<Integer>();
         ArrayList<TreeMap<String, Object>> histogram = new ArrayList<TreeMap<String, Object>>();
