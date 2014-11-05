@@ -46,7 +46,8 @@ public class FleetOrdersHandler extends RequestHandler {
             int empireID = getSession().getEmpireID();
             for (BaseFleet baseFleet : star.getFleets()) {
                 Fleet fleet = (Fleet) baseFleet;
-                if (fleet.getID() == fleetID && fleet.getEmpireID() == empireID) {
+                if (fleet.getID() == fleetID && fleet.getEmpireID() != null
+                        && fleet.getEmpireID() == empireID) {
                     boolean pingEventProcessor = orderFleet(t, star, fleet, fleet_order_pb, sim);
                     new StarController(t).update(star);
                     if (pingEventProcessor) {
