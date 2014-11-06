@@ -566,9 +566,7 @@ public class Simulation {
         }
 
         // round up to the next minute
-        attackStartTime = new DateTime(
-                attackStartTime.getYear(), attackStartTime.getMonthOfYear(), attackStartTime.getDayOfMonth(),
-                attackStartTime.getHourOfDay(), attackStartTime.getMinuteOfHour(), 0);
+        attackStartTime = attackStartTime.withSecondOfMinute(0).withMillisOfSecond(0);
         attackStartTime = attackStartTime.plusMinutes(1);
 
         // if they're not supposed to start attacking yet, then don't start

@@ -116,7 +116,6 @@ public class StarSimulatorThread {
               - simulateEndTime, star.getName(), star.getID()));
       return WAIT_TIME_NORMAL;
     } catch (Exception e) {
-      log.info("HERE");
       log.error("Exception caught simulating star!", e);
       // TODO: if there are errors, it'll just keep reporting
       // over and over... probably a good thing because we'll
