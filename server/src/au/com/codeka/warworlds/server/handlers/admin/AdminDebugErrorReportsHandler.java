@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;

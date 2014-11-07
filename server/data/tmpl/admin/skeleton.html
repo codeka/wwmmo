@@ -16,13 +16,12 @@
       <div id="navmenu-toggle">≡</div>
       <img src="/realms/{{realm}}/img/logo.png" width="38" height="38" alt="Logo" />
       <h1>War Worlds</h1>
-      {% if msgs %}
-        <div class="msgs">
-          {% for msg in msgs %}
-            <div class="msg">{{ msg }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
+    {% if num_backend_users|equal:0 %}
+      <div class="no-backend-users-warning">
+        You have no backend users defined, that's <em>really bad</em>, and you should
+        <a href="/realms/{{realm}}/admin/users">create one now</a>.
+      </div>
+    {% endif %}
     </div></section>
 
     <section id="navmenu"><div class="navmenu-bg">

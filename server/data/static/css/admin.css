@@ -23,7 +23,7 @@ body {
     position: relative;
 }
 
-#header div.msgs {
+#header div.no-backend-users-warning {
     position: absolute;
     top: 4px;
     left: 300px;

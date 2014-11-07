@@ -12,21 +12,18 @@ import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.model.BackendUser;
 
 public class LoginController {
     private final Log log = new Log("LoginController");
 
     private static char[] SESSION_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
 
-    private static String[] ADMIN_USERS = {"dean@codeka.com.au"};
-
     // list of users that are allowed to impersonate others
     private static String[] IMPERSONATE_USERS = {"dean@codeka.com.au", "warworldstest1@gmail.com",
             "warworldstest2@gmail.com", "warworldstest3@gmail.com", "warworldstest4@gmail.com"};
 
-    /**
-     * Generates a cookie, assuming we've just finished authenticating as the given email.
-     */
+    /** Generates a cookie, assuming we've just finished authenticating as the given email. */
     public String generateCookie(String emailAddr, boolean doAdminTest, String impersonateUser)
                                  throws RequestException {
         // generate a random string for the session cookie
@@ -38,10 +35,9 @@ public class LoginController {
 
         boolean isAdmin = false;
         if (doAdminTest) {
-            for (String adminUserEmail : ADMIN_USERS) {
-                if (adminUserEmail.equals(emailAddr.toLowerCase())) {
-                    isAdmin = true;
-                }
+            BackendUser backendUser = new AdminController().getBackendUser(emailAddr);
+            if (backendUser != null) {
+                isAdmin = true;
             }
         }
 
