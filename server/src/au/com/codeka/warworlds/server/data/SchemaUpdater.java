@@ -48,11 +48,13 @@ public class SchemaUpdater {
       }
     }
 
-    try (SqlStmt stmt = DB.prepare("UPDATE schema_version SET version = ?")) {
-      stmt.setInt(1, version);
-      stmt.update();
-    } catch (Exception e) {
-      throw new SchemaException("Error upgrading to schema version " + version, e);
+    if (version > 1) {
+      try (SqlStmt stmt = DB.prepare("UPDATE schema_version SET version = ?")) {
+        stmt.setInt(1, version);
+        stmt.update();
+      } catch (Exception e) {
+        throw new SchemaException("Error upgrading to schema version " + version, e);
+      }
     }
   }
 
