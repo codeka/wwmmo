@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.common.collect.Lists;
 
 import au.com.codeka.warworlds.server.RequestException;
@@ -39,6 +42,17 @@ public class AdminController {
     }
   }
 
+  /**
+   * Gets a list of all the  {@link BackendUser} objects in the database (TODO: paging?)
+   */
+  public List<BackendUser> getBackendUsers() throws RequestException {
+    try {
+      return db.getBackendUsers();
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
   public int getNumBackendUsers() throws RequestException {
     try {
       return db.getNumBackendUsers();
@@ -62,6 +76,18 @@ public class AdminController {
         }
       }
       return null;
+    }
+
+    public List<BackendUser> getBackendUsers() throws Exception {
+      String sql = "SELECT * FROM backend_users ORDER BY id DESC";
+      try (SqlStmt stmt = prepare(sql)) {
+        SqlResult result = stmt.select();
+        ArrayList<BackendUser> users = Lists.newArrayList();
+        while (result.next()) {
+          users.add(new BackendUser(result));
+        }
+        return users;
+      }
     }
 
     public int getNumBackendUsers() throws Exception {
