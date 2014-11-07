@@ -507,6 +507,11 @@ public class StarfieldActivity extends BaseStarfieldActivity {
         mStarfield.scrollTo(star.getSectorX(), star.getSectorY(), offsetX,
                 Sector.SECTOR_SIZE - offsetY);
 
+        if (mStarfield.getScene() == null) {
+            // TODO: we should probably remember the fleet then navigate when the scene is
+            // ready.
+            return;
+        }
         if (fleet.getState() == Fleet.State.MOVING) {
             mStarfield.getScene().selectFleet(fleet.getKey());
         } else {
