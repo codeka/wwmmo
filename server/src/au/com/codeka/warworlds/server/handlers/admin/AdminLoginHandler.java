@@ -6,12 +6,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.Cookie;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.ctrl.AdminController;
 import au.com.codeka.warworlds.server.ctrl.LoginController;
+import au.com.codeka.warworlds.server.model.BackendUser;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -62,6 +65,12 @@ public class AdminLoginHandler extends AdminHandler {
       }
     } catch (Exception e) {
       throw new RequestException(e);
+    }
+
+    BackendUser backendUser = new AdminController().getBackendUser(emailAddr);
+    if (backendUser == null) {
+      render("admin/access-denied.html", new TreeMap<String, Object>());
+      return;
     }
 
     String cookieValue = new LoginController().generateCookie(emailAddr, true, null);
