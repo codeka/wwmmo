@@ -72,6 +72,7 @@ public class AdminLoginHandler extends AdminHandler {
       render("admin/access-denied.html", new TreeMap<String, Object>());
       return;
     }
+    new AdminController().recordLogin(backendUser);
 
     String cookieValue = new LoginController().generateCookie(emailAddr, true, null);
     log.info("Got cookie: %s", cookieValue);

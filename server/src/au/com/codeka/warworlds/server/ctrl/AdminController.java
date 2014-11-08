@@ -3,6 +3,8 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.time.DateTime;
+
 import com.google.common.collect.Lists;
 
 import au.com.codeka.warworlds.server.RequestException;
@@ -65,6 +67,15 @@ public class AdminController {
     }
   }
 
+  /** Updates the "last_login" time for the given {@link BackendUser}. */
+  public void recordLogin(BackendUser user) throws RequestException {
+    try {
+      db.recordLogin(user);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
   public int getNumBackendUsers() throws RequestException {
     try {
       return db.getNumBackendUsers();
@@ -108,6 +119,15 @@ public class AdminController {
         stmt.setString(1, user.getEmail()); // todo: allow a custom name
         stmt.setString(2, user.getEmail());
         stmt.setString(3, user.getRolesString());
+        stmt.update();
+      }
+    }
+
+    public void recordLogin(BackendUser user) throws Exception {
+      String sql = "UPDATE backend_users SET last_login=? WHERE id=?";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setDateTime(1, DateTime.now());
+        stmt.setInt(2, user.getID());
         stmt.update();
       }
     }
