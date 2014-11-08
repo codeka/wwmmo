@@ -11,6 +11,8 @@ body {
     overflow-x: hidden;
 }
 
+th { text-align: left; }
+
 #header {
     width: 100%;
     background: rgb(37,37,37);
@@ -271,3 +273,29 @@ button, a.button, input[type=submit], input[type=button] {
     background: #aaa;
 }
 
+/* popup-container is the same size as the main content area. */
+#popup-scrim {
+    display: none;
+    position: absolute;
+    top: 56px;
+    left: 300px;
+    right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.popup {
+  display: none;
+  position: absolute;
+  width: 500pt;
+  left: 50%;
+  top: 10%;
+  margin-left: -250pt;
+  background: white;
+  border: solid 2px;
+  border-radius: 5px;
+  padding: 10pt;
+}
+
+.popup .popup-buttons {
+  float: right;
+}

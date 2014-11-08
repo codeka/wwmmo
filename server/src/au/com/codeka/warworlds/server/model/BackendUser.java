@@ -60,6 +60,18 @@ public class BackendUser {
     return roles;
   }
 
+  /** Gets the roles this user is in as a comma-separated string. */
+  public String getRolesString() {
+    StringBuilder sb = new StringBuilder();
+    for (BackendUser.Role role : roles) {
+      if (sb.length() > 0) {
+        sb.append(", ");
+      }
+      sb.append(role);
+    }
+    return sb.toString();
+  }
+
   public boolean isInRole(Role role) {
     return roles.contains(Role.SuperAdmin) || roles.contains(role);
   }

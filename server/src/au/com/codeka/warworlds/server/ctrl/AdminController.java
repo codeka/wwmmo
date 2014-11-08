@@ -53,6 +53,18 @@ public class AdminController {
     }
   }
 
+  public void createUser(BackendUser user) throws RequestException {
+    if (user.getRoles().isEmpty()) {
+      throw new RequestException(400, "User must have at least one role assigned.");
+    }
+
+    try {
+      db.createUser(user);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
   public int getNumBackendUsers() throws RequestException {
     try {
       return db.getNumBackendUsers();
@@ -79,7 +91,7 @@ public class AdminController {
     }
 
     public List<BackendUser> getBackendUsers() throws Exception {
-      String sql = "SELECT * FROM backend_users ORDER BY id DESC";
+      String sql = "SELECT * FROM backend_users ORDER BY id ASC";
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult result = stmt.select();
         ArrayList<BackendUser> users = Lists.newArrayList();
@@ -87,6 +99,16 @@ public class AdminController {
           users.add(new BackendUser(result));
         }
         return users;
+      }
+    }
+
+    public void createUser(BackendUser user) throws Exception {
+      String sql = "INSERT INTO backend_users (name, email, roles) VALUES (?, ?, ?)";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setString(1, user.getEmail()); // todo: allow a custom name
+        stmt.setString(2, user.getEmail());
+        stmt.setString(3, user.getRolesString());
+        stmt.update();
       }
     }
 
