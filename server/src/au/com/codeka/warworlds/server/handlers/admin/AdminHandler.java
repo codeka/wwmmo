@@ -27,7 +27,6 @@ import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.ctrl.AdminController;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 
 public class AdminHandler extends RequestHandler {

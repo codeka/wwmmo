@@ -3,16 +3,13 @@ package au.com.codeka.warworlds.server.handlers.admin;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import com.google.common.collect.Lists;
-
-import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.AdminController;
 import au.com.codeka.warworlds.server.model.BackendUser;
 
-public class AdminUsersHandler extends AdminHandler {
-  private final Log log = new Log("AdminDebugErrorReportsHandler");
+import com.google.common.collect.Lists;
 
+public class AdminUsersHandler extends AdminHandler {
   @Override
   protected void get() throws RequestException {
     if (!isAdmin()) {

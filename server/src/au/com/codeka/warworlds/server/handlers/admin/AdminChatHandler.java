@@ -8,13 +8,14 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.model.BackendUser;
 
 public class AdminChatHandler extends AdminGenericHandler {
     private static final Log log = new Log("AdminChatHandler");
 
     @Override
     protected void get() throws RequestException {
-        if (!isAdmin()) {
+        if (!isInRole(BackendUser.Role.ChatRead)) {
             return;
         }
         TreeMap<String, Object> data = new TreeMap<String, Object>();

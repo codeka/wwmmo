@@ -21,9 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protoformat.PbFormatter;
+import au.com.codeka.warworlds.server.ctrl.AdminController;
 import au.com.codeka.warworlds.server.ctrl.NotificationController;
 import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.data.SqlStateTranslater;
+import au.com.codeka.warworlds.server.model.BackendUser;
 
 import com.google.gson.JsonObject;
 import com.google.protobuf.Message;
@@ -306,6 +308,25 @@ public class RequestHandler {
     protected boolean isAdmin() throws RequestException {
         Session s = getSessionNoError();
         return (s != null && s.isAdmin());
+    }
+
+    /**
+     * Checks whether the current user is in the given role. If the user is not an admin, then they
+     * are -- by definition -- not in any roles.
+     */
+    protected boolean isInRole(BackendUser.Role role) throws RequestException {
+        Session s = getSessionNoError();
+        if (s == null || !s.isAdmin()) {
+            return false;
+        }
+
+        BackendUser backendUser = new AdminController().getBackendUser(s.getActualEmail());
+        if (backendUser == null) {
+            // should  be impossible if it's really an admin user...
+            throw new RequestException(500, "This is impossible.");
+        }
+
+        return backendUser.isInRole(role);
     }
 
     @SuppressWarnings({"unchecked"})
