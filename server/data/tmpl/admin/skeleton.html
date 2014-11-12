@@ -32,12 +32,14 @@
       <ul>
         <li><a href="/realms/{{realm}}/admin">Dashboard</a>
         <li><a href="/realms/{{realm}}/admin/users">Users</a>
+        {% if backend_user|isinrole:ChatRead %}
         <li><span><span>Chat</span></span>
           <ul>
             <li><a href="/realms/{{realm}}/admin/chat">Messages</a>
             <li><a href="/realms/{{realm}}/admin/chat/profanity">Profanity Filter</a>
             <li><a href="/realms/{{realm}}/admin/chat/sinbin">Sinbin</a>
           </ul>
+        {% endif %}
         <li><span><span>Actions</span></span>
           <ul>
             <li><a href="/realms/{{realm}}/admin/actions/move-star">Move Star</a>

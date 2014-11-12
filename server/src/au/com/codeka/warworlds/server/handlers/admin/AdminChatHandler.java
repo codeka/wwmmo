@@ -16,6 +16,7 @@ public class AdminChatHandler extends AdminGenericHandler {
   @Override
   protected void get() throws RequestException {
     if (!isInRole(BackendUser.Role.ChatRead)) {
+      render("admin/access-denied.html", null);
       return;
     }
     TreeMap<String, Object> data = new TreeMap<String, Object>();

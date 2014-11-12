@@ -25,6 +25,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.ctrl.AdminController;
+import au.com.codeka.warworlds.server.model.BackendUser;
 
 import com.google.common.base.Throwables;
 import com.google.gson.JsonElement;
@@ -44,6 +45,7 @@ public class AdminHandler extends RequestHandler {
     TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new NumberFilter());
     TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new AttrEscapeFilter());
     TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new LocalDateFilter());
+    TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new IsInRoleFilter());
   }
 
   @Override
@@ -72,16 +74,19 @@ public class AdminHandler extends RequestHandler {
     }
   }
 
-  protected void render(String path, Map<String, Object> data) {
+  protected void render(String path, Map<String, Object> data) throws RequestException {
+    if (data == null) {
+      data = new TreeMap<String, Object>();
+    }
+
     data.put("realm", getRealm());
     Session session = getSessionNoError();
     if (session != null) {
       data.put("logged_in_user", session.getActualEmail());
+      data.put("backend_user", new AdminController().getBackendUser(session.getActualEmail()));
 
       // If there's no admins, then everyone is an admin, so we'll want to warn about that.
-      try {
-        data.put("num_backend_users", new AdminController().getNumBackendUsers());
-      } catch (RequestException e) { } // ignore errors, not a big deal
+      data.put("num_backend_users", new AdminController().getNumBackendUsers());
     }
 
     getResponse().setContentType("text/html");
@@ -198,6 +203,24 @@ public class AdminHandler extends RequestHandler {
       }
 
       throw new InterpretException("Expected a DateTime.");
+    }
+  }
+
+  private static class IsInRoleFilter implements Filter {
+    @Override
+    public String getName() {
+      return "isinrole";
+    }
+
+    @Override
+    public Object filter(Object object, CarrotInterpreter interpreter, String... args)
+        throws InterpretException {
+      if (object instanceof BackendUser) {
+        BackendUser.Role role = BackendUser.Role.valueOf(args[0]);
+        return ((BackendUser) object).isInRole(role);
+      }
+
+      throw new InterpretException("Expected a BackendUser, not " + object);
     }
   }
 }
