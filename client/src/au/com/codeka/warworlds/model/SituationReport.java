@@ -172,7 +172,8 @@ public class SituationReport {
         if (mBuildCompleteRecord != null) {
             msg = "Construction of ";
             if (mBuildCompleteRecord.getDesignKind().equals(DesignKind.SHIP)) {
-                msg += getFleetLine(mBuildCompleteRecord.getDesignID(), 1);
+                msg += getFleetLine(mBuildCompleteRecord.getDesignID(),
+                        mBuildCompleteRecord.getCount());
             } else {
                 Design design = DesignManager.i.getDesign(DesignKind.BUILDING, mBuildCompleteRecord.getDesignID());
                 msg += design.getDisplayName();
@@ -317,6 +318,7 @@ public class SituationReport {
     public static class BuildCompleteRecord {
         private DesignKind mDesignKind;
         private String mDesignID;
+        private int mCount;
 
         public DesignKind getDesignKind() {
             return mDesignKind;
@@ -324,11 +326,15 @@ public class SituationReport {
         public String getDesignID() {
             return mDesignID;
         }
+        public int getCount() {
+            return mCount;
+        }
 
         private static BuildCompleteRecord fromProtocolBuffer(Messages.SituationReport.BuildCompleteRecord pb) {
             BuildCompleteRecord bcr = new BuildCompleteRecord();
             bcr.mDesignKind = DesignKind.fromNumber(pb.getBuildKind().getNumber());
             bcr.mDesignID = pb.getDesignId();
+            bcr.mCount = pb.getCount();
             return bcr;
         }
     }
