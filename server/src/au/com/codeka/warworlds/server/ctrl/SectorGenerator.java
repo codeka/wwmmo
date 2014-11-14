@@ -126,8 +126,8 @@ public class SectorGenerator {
         try (SqlStmt stmt = DB.prepare(sql)) {
             SqlResult res = stmt.select();
             while (res.next()) {
-                long x = res.getLong(0);
-                long y = res.getLong(1);
+                long x = res.getLong(1);
+                long y = res.getLong(2);
 
                 Set<Long> xs = existingSectors.get(y);
                 if (xs == null) {
