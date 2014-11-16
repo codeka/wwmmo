@@ -26,7 +26,7 @@ public class DB {
         CallableStatement stmt = connection.prepareCall(
             String.format("SET search_path TO '%s'", schemaName));
         stmt.execute();
-        log.info("New connection created in schema: %s", schemaName);
+        log.debug("New connection created in schema: %s", schemaName);
       } catch (SQLException e) {
         log.error("Exception caught trying to set schema.", e);
       }
