@@ -26,108 +26,112 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class FleetActivity extends BaseActivity {
-    private Star mStar;
-    private FleetList mFleetList;
+  private Star star;
+  private FleetList fleetList;
+  private boolean firstRefresh = true;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
-        mFleetList = new FleetList(this);
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT);
-        addContentView(mFleetList, lp);
+    fleetList = new FleetList(this);
+    FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT);
+    addContentView(fleetList, lp);
 
-        mFleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
-            @Override
-            public void onFleetView(Star star, Fleet fleet) {
-                // won't be called here...
-            }
+    fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
+      @Override
+      public void onFleetView(Star star, Fleet fleet) {
+        // won't be called here...
+      }
 
-            @Override
-            public void onFleetSplit(Star star, Fleet fleet) {
-                FragmentManager fm = getSupportFragmentManager();
-                FleetSplitDialog dialog = new FleetSplitDialog();
-                dialog.setFleet(fleet);
-                dialog.show(fm, "");
-            }
+      @Override
+      public void onFleetSplit(Star star, Fleet fleet) {
+        FragmentManager fm = getSupportFragmentManager();
+        FleetSplitDialog dialog = new FleetSplitDialog();
+        dialog.setFleet(fleet);
+        dialog.show(fm, "");
+      }
 
-            @Override
-            public void onFleetBoost(Star star, Fleet fleet) {
-                FleetManager.i.boostFleet(fleet, null);
-            }
+      @Override
+      public void onFleetBoost(Star star, Fleet fleet) {
+        FleetManager.i.boostFleet(fleet, null);
+      }
 
-            @Override
-            public void onFleetMove(Star star, Fleet fleet) {
-                FleetMoveActivity.show(FleetActivity.this, fleet);;
-            }
+      @Override
+      public void onFleetMove(Star star, Fleet fleet) {
+        FleetMoveActivity.show(FleetActivity.this, fleet);
+        ;
+      }
 
-            @Override
-            public void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets) {
-                FragmentManager fm = getSupportFragmentManager();
-                FleetMergeDialog dialog = new FleetMergeDialog();
-                dialog.setup(fleet, potentialFleets);
-                dialog.show(fm, "");
-            }
+      @Override
+      public void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets) {
+        FragmentManager fm = getSupportFragmentManager();
+        FleetMergeDialog dialog = new FleetMergeDialog();
+        dialog.setup(fleet, potentialFleets);
+        dialog.show(fm, "");
+      }
 
-            @Override
-            public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
-                EmpireManager.i.getEmpire().updateFleetStance(star, fleet, newStance);
-            }
-        });
+      @Override
+      public void onFleetStanceModified(Star star, Fleet fleet,
+          Fleet.Stance newStance) {
+        EmpireManager.i.getEmpire().updateFleetStance(star, fleet, newStance);
+      }
+    });
 
-        // no "View" button, because it doesn't make sense here...
-        mFleetList.findViewById(R.id.view_btn).setVisibility(View.GONE);
-    }
+    // no "View" button, because it doesn't make sense here...
+    fleetList.findViewById(R.id.view_btn).setVisibility(View.GONE);
+  }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+  @Override
+  public void onResume() {
+    super.onResume();
 
-        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-            @Override
-            public void onHelloComplete(boolean success, ServerGreeting greeting) {
-                if (!success) {
-                    startActivity(new Intent(FleetActivity.this, WarWorldsActivity.class));
-                } else {
-                    String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-                    StarManager.eventBus.register(mEventHandler);
-                    mStar = StarManager.i.getStar(Integer.parseInt(starKey));
-                    if (mStar != null) {
-                        refreshStarDetails();
-                    }
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        StarManager.eventBus.unregister(mEventHandler);
-    }
-
-    private final Object mEventHandler = new Object() {
-        @EventHandler
-        public void onStarUpdated(Star star) {
-            if (mStar != null && !mStar.getKey().equals(star.getKey())) {
-                return;
-            }
-            mStar = star;
+    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+      @Override
+      public void onHelloComplete(boolean success, ServerGreeting greeting) {
+        if (!success) {
+          startActivity(new Intent(FleetActivity.this, WarWorldsActivity.class));
+        } else {
+          StarManager.eventBus.register(eventHandler);
+          String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
+          star = StarManager.i.getStar(Integer.parseInt(starKey));
+          if (star != null) {
             refreshStarDetails();
+          }
         }
-    };
+      }
+    });
+  }
 
-    private void refreshStarDetails() {
-        TreeMap<String, Star> stars = new TreeMap<String, Star>();
-        stars.put(mStar.getKey(), mStar);
-        mFleetList.refresh(mStar.getFleets(), stars);
+  @Override
+  public void onPause() {
+    super.onPause();
+    StarManager.eventBus.unregister(eventHandler);
+  }
 
-        String fleetKey = getIntent().getExtras().getString("au.com.codeka.warworlds.FleetKey");
-        if (fleetKey != null) {
-            mFleetList.selectFleet(fleetKey, true);
-        }
+  private final Object eventHandler = new Object() {
+    @EventHandler
+    public void onStarUpdated(Star s) {
+      if (star != null && !star.getKey().equals(s.getKey())) {
+        return;
+      }
+      star = s;
+      refreshStarDetails();
     }
+  };
+
+  private void refreshStarDetails() {
+    TreeMap<String, Star> stars = new TreeMap<String, Star>();
+    stars.put(star.getKey(), star);
+    fleetList.refresh(star.getFleets(), stars);
+
+    String fleetKey = getIntent().getExtras().getString("au.com.codeka.warworlds.FleetKey");
+    if (firstRefresh && fleetKey != null) {
+      fleetList.selectFleet(fleetKey, true);
+      firstRefresh = false;
+    }
+  }
 }
