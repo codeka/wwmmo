@@ -17,7 +17,7 @@
     "database": "wwmmo",
     "username": "wwmmo_user",
     "password": "********",
-    "schema": "blitz"
+    "schema": "beta"
   },
 
   // Configuration of the settings for for the chat sinbin, see code in ChatAbuseController for
