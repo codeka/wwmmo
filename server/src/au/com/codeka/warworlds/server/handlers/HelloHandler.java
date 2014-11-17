@@ -18,6 +18,7 @@ import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
+import au.com.codeka.warworlds.server.model.EmpireStarStats;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class HelloHandler extends RequestHandler {
@@ -68,11 +69,13 @@ public class HelloHandler extends RequestHandler {
                 new EmpireController().markActive(empire);
             }
 
-            // TODO: remove this
-            ArrayList<Integer> starIDs = new EmpireController().getStarsForEmpire(
-                    getSession().getEmpireID(), EmpireController.EmpireStarsFilter.Everything, null);
-            if (!findColony(starIDs, getSession().getEmpireID())) {
-                log.info(String.format("Empire #%d [%s] has been wiped out, resetting.", empire.getID(), empire.getDisplayName()));
+            // Make sure they haven't been wiped out.
+            EmpireStarStats stats = new EmpireController().getEmpireStarStats(
+                    getSession().getEmpireID());
+            if (stats.getNumColonies() == 0) {
+                log.info("Empire #%d [%s] has been wiped out (%d stars, %d colonies, %d fleets), resetting.",
+                        empire.getID(), empire.getDisplayName(), stats.getNumStars(),
+                        stats.getNumColonies(), stats.getNumFleets());
                 new EmpireController().createEmpire(empire);
                 hello_response_pb.setWasEmpireReset(true);
 
@@ -80,6 +83,10 @@ public class HelloHandler extends RequestHandler {
                 if (resetReason != null) {
                     hello_response_pb.setEmpireResetReason(resetReason);
                 }
+            } else {
+              log.info("Empire #%d [%s] has %d stars, %d colonies, and %d fleets.",
+                  empire.getID(), empire.getDisplayName(), stats.getNumStars(),
+                  stats.getNumColonies(), stats.getNumFleets());
             }
 
             Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();

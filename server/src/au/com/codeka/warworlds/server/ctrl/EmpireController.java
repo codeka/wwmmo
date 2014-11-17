@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.AllianceRequest;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
+import au.com.codeka.warworlds.server.model.EmpireStarStats;
 import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -99,6 +100,14 @@ public class EmpireController {
         }
 
         // TODO: remove the empire's stars from the "abandoned stars" list...
+    }
+
+    public EmpireStarStats getEmpireStarStats(int empireID) throws RequestException {
+        try {
+            return db.getEmpireStarStats(empireID);
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
     }
 
     public ArrayList<Integer> getStarsForEmpire(int empireId, EmpireStarsFilter filter,
@@ -555,6 +564,25 @@ public class EmpireController {
                 } catch (RequestException e) {
                     // TODO: ignore??
                 }
+            }
+        }
+
+        private EmpireStarStats getEmpireStarStats(int empireID) throws Exception {
+            String sql = "SELECT "
+                    + "? AS empire_id, "
+                    + "(SELECT COUNT(*) FROM colonies WHERE empire_id = ?) AS num_colonies, "
+                    + "(SELECT COUNT(*) FROM fleets WHERE empire_id = ?) AS num_fleets, "
+                    + "(SELECT COUNT(*) FROM empire_presences WHERE empire_id = ?) AS num_stars ";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, empireID);
+                stmt.setInt(2, empireID);
+                stmt.setInt(3, empireID);
+                stmt.setInt(4, empireID);
+                SqlResult result = stmt.select();
+                if (result.next()) {
+                    return new EmpireStarStats(result);
+                }
+                return null;
             }
         }
 
