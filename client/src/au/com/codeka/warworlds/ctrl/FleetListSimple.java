@@ -67,7 +67,8 @@ public class FleetListSimple extends LinearLayout {
         mFleets = new ArrayList<Fleet>();
         if (mStar.getFleets() != null) {
             for (BaseFleet f : mStar.getFleets()) {
-                if (!f.getState().equals(Fleet.State.MOVING)) {
+                if (!f.getState().equals(Fleet.State.MOVING)
+                        && f.getNumShips() > 0.01f) {
                     mFleets.add((Fleet) f);
                 }
             }

@@ -236,6 +236,17 @@ public class FleetList extends FrameLayout {
         }
     };
 
+    /** Filters the given list of fleets, removing the ones with no ships. */
+    public static ArrayList<Fleet> filterFleets(List<Fleet> fleets) {
+        ArrayList<Fleet> filtered = new ArrayList<Fleet>();
+        for (Fleet fleet : fleets) {
+            if (fleet.getNumShips() > 0.01f) {
+                filtered.add(fleet);
+            }
+        }
+        return filtered;
+    }
+
     /**
      * This adapter is used to populate the list of ship fleets that the current colony has.
      */
@@ -256,7 +267,7 @@ public class FleetList extends FrameLayout {
          * Sets the list of fleets that we'll be displaying.
          */
         public void setFleets(Map<String, Star> stars, List<Fleet> fleets) {
-            mFleets = new ArrayList<Fleet>(fleets);
+            mFleets = filterFleets(fleets);
             mStars = stars;
 
             Collections.sort(mFleets, new Comparator<Fleet>() {
