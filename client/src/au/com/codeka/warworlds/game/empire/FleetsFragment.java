@@ -155,25 +155,7 @@ public class FleetsFragment extends StarsFragment {
             // Note: we always want to update the list, even if the star isn't in the fetcher,
             // because it might be a destination of a fleet move.
             adapter.notifyDataSetChanged();
-
-            if (indexOfStarOfFleetToSelect != null && starOfFleetToSelect != null
-                    && starOfFleetToSelect == star.getID()) {
-                log.info("Expanding: index=%d, star=%d, fleet=%d", indexOfStarOfFleetToSelect,
-                        starOfFleetToSelect, fleetToSelect);
-                starsList.expandGroup(indexOfStarOfFleetToSelect);
-
-                for (int indexOfFleetToSelect = 0; indexOfFleetToSelect < star.getFleets().size();
-                        indexOfFleetToSelect++) {
-                    Fleet fleet = (Fleet) star.getFleets().get(indexOfFleetToSelect);
-                    if (Integer.parseInt(fleet.getKey()) == fleetToSelect) {
-                        starsList.setSelectedChild(indexOfStarOfFleetToSelect, indexOfFleetToSelect, true);
-                        fleetSelectionPanel.setSelectedFleet(star, fleet);
-                    }
-                }
-                indexOfStarOfFleetToSelect = null;
-                starOfFleetToSelect = null;
-                fleetToSelect = null;
-            }
+            maybeSelectFleet();
         }
     };
 
@@ -188,10 +170,34 @@ public class FleetsFragment extends StarsFragment {
             public void onIndexOfComplete(@Nullable Integer index) {
                 if (index != null) {
                     indexOfStarOfFleetToSelect = index;
-                    starsList.smoothScrollToPosition(index);
+                    maybeSelectFleet();
                 }
             }
         });
+    }
+
+    private void maybeSelectFleet() {
+        Star star = fetcher.getStar(indexOfStarOfFleetToSelect);
+        if (indexOfStarOfFleetToSelect != null && starOfFleetToSelect != null && star != null) {
+            log.info("Expanding: index=%d, star=%d, fleet=%d", indexOfStarOfFleetToSelect,
+                    starOfFleetToSelect, fleetToSelect);
+            starsList.expandGroup(indexOfStarOfFleetToSelect);
+
+            for (int indexOfFleetToSelect = 0; indexOfFleetToSelect < star.getFleets().size();
+                    indexOfFleetToSelect++) {
+                Fleet fleet = (Fleet) star.getFleets().get(indexOfFleetToSelect);
+                if (Integer.parseInt(fleet.getKey()) == fleetToSelect) {
+                    starsList.setSelectedChild(indexOfStarOfFleetToSelect, indexOfFleetToSelect, true);
+                    fleetSelectionPanel.setSelectedFleet(star, fleet);
+
+                    starsList.smoothScrollToPosition(indexOfStarOfFleetToSelect
+                        + indexOfFleetToSelect + 1);
+                }
+            }
+            indexOfStarOfFleetToSelect = null;
+            starOfFleetToSelect = null;
+            fleetToSelect = null;
+        }
     }
 
     public class FleetsStarsListAdapter extends StarsListAdapter {
