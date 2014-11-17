@@ -504,8 +504,7 @@ public class SitrepActivity extends BaseActivity {
       }
 
       SituationReport sitrep = items.get(position);
-      StarSummary starSummary = StarManager.i.getStarSummary(Integer
-          .parseInt(sitrep.getStarKey()));
+      StarSummary starSummary = StarManager.i.getStarSummary(Integer.parseInt(sitrep.getStarKey()));
       String msg = sitrep.getDescription(starSummary);
 
       TextView reportTitle = (TextView) view.findViewById(R.id.report_title);

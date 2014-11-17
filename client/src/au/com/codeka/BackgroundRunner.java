@@ -37,7 +37,7 @@ public abstract class BackgroundRunner<Result> {
     };
 
     private static final BlockingQueue<Runnable> sPoolWorkQueue = new LinkedBlockingQueue<Runnable>(
-            250 // Max queued items
+            750 // Max queued items
             );
 
     private static final Executor sExecutor = new ThreadPoolExecutor(
