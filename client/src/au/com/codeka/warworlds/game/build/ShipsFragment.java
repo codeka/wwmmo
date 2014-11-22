@@ -21,12 +21,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.FleetListRow;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.NotesDialog;
 import au.com.codeka.warworlds.game.build.BuildActivity.BaseTabFragment;
 import au.com.codeka.warworlds.model.BuildManager;
@@ -39,16 +41,110 @@ import au.com.codeka.warworlds.model.FleetManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
 
 public class ShipsFragment extends BaseTabFragment {
+  private ShipListAdapter shipListAdapter;
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
     View v = inflater.inflate(R.layout.build_ships_tab, container, false);
 
-    final Star star = getStar();
-    final Colony colony = getColony();
+    shipListAdapter = new ShipListAdapter();
+    updateStar(getStar(), getColony());
 
+    final ListView availableDesignsList = (ListView) v.findViewById(R.id.ship_list);
+    availableDesignsList.setAdapter(shipListAdapter);
+    availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        ShipListAdapter.ItemEntry entry =
+            (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
+        if (entry.fleet == null && entry.buildRequest == null) {
+          BuildConfirmDialog dialog = new BuildConfirmDialog();
+          dialog.setup(entry.design, getStar(), getColony());
+          dialog.show(getActivity().getSupportFragmentManager(), "");
+        } else if (entry.fleet != null && entry.buildRequest == null) {
+          ShipUpgradeDialog dialog = new ShipUpgradeDialog();
+          dialog.setup(getStar(), getColony(), entry.fleet);
+          dialog.show(getActivity().getSupportFragmentManager(), "");
+        }
+      }
+    });
+
+    availableDesignsList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+      @Override
+      public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+        final ShipListAdapter.ItemEntry entry =
+            (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
+
+        NotesDialog dialog = new NotesDialog();
+        dialog.setup(entry.fleet == null ? entry.buildRequest.getNotes() : entry.fleet.getNotes(),
+          new NotesDialog.NotesChangedHandler() {
+            @Override
+            public void onNotesChanged(String notes) {
+              if (entry.fleet != null) {
+                entry.fleet.setNotes(notes);
+              } else if (entry.buildRequest != null) {
+                entry.buildRequest.setNotes(notes);
+              }
+              shipListAdapter.notifyDataSetChanged();
+
+              if (entry.fleet != null) {
+                FleetManager.i.updateNotes(entry.fleet);
+              } else {
+                BuildManager.getInstance().updateNotes(entry.buildRequest.getKey(), notes);
+              }
+            }
+          });
+
+        dialog.show(getActivity().getSupportFragmentManager(), "");
+        return true;
+      }
+    });
+
+    return v;
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    StarManager.eventBus.register(eventHandler);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    StarManager.eventBus.unregister(eventHandler);
+  }
+
+  private final Object eventHandler = new Object() {
+    @EventHandler
+    public void onStarUpdated(Star s) {
+      if (!getStar().getKey().equals(s.getKey())) {
+        return;
+      }
+
+      // We can't guarantee that getColony() has been updated yet, but we only need the key
+      // and can update from that.
+      String colonyKey = getColony().getKey();
+      Colony colony = null;
+      for (BaseColony baseColony : s.getColonies()) {
+        if (baseColony.getKey().equals(colonyKey)) {
+          colony = (Colony) baseColony;
+          break;
+        }
+      }
+      if (colony == null) {
+        return;
+      }
+
+      updateStar(s, colony);
+    }
+  };
+
+  private void updateStar(Star star, Colony colony) {
     ArrayList<Fleet> fleets = new ArrayList<Fleet>();
     for (BaseFleet baseFleet : star.getFleets()) {
       if (baseFleet.getEmpireKey() != null
@@ -65,59 +161,7 @@ public class ShipsFragment extends BaseTabFragment {
       }
     }
 
-    final ShipListAdapter adapter = new ShipListAdapter();
-    adapter.setShips(DesignManager.i.getDesigns(DesignKind.SHIP), fleets, buildRequests);
-
-    final ListView availableDesignsList = (ListView) v.findViewById(R.id.ship_list);
-    availableDesignsList.setAdapter(adapter);
-    availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ShipListAdapter.ItemEntry entry = (ShipListAdapter.ItemEntry) adapter.getItem(position);
-        if (entry.fleet == null && entry.buildRequest == null) {
-          BuildConfirmDialog dialog = new BuildConfirmDialog();
-          dialog.setup(entry.design, star, colony);
-          dialog.show(getActivity().getSupportFragmentManager(), "");
-        } else if (entry.fleet != null && entry.buildRequest == null) {
-          ShipUpgradeDialog dialog = new ShipUpgradeDialog();
-          dialog.setup(star, colony, entry.fleet);
-          dialog.show(getActivity().getSupportFragmentManager(), "");
-        }
-      }
-    });
-
-    availableDesignsList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-      @Override
-      public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-        final ShipListAdapter.ItemEntry entry =
-            (ShipListAdapter.ItemEntry) adapter.getItem(position);
-
-        NotesDialog dialog = new NotesDialog();
-        dialog.setup(entry.fleet == null ? entry.buildRequest.getNotes() : entry.fleet.getNotes(),
-            new NotesDialog.NotesChangedHandler() {
-              @Override
-              public void onNotesChanged(String notes) {
-                if (entry.fleet != null) {
-                  entry.fleet.setNotes(notes);
-                } else if (entry.buildRequest != null) {
-                  entry.buildRequest.setNotes(notes);
-                }
-                adapter.notifyDataSetChanged();
-
-                if (entry.fleet != null) {
-                  FleetManager.i.updateNotes(entry.fleet);
-                } else {
-                  BuildManager.getInstance().updateNotes(entry.buildRequest.getKey(), notes);
-                }
-              }
-            });
-
-        dialog.show(getActivity().getSupportFragmentManager(), "");
-        return true;
-      }
-    });
-
-    return v;
+    shipListAdapter.setShips(DesignManager.i.getDesigns(DesignKind.SHIP), fleets, buildRequests);
   }
 
   /** This adapter is used to populate the list of ship designs in our view. */
