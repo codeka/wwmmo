@@ -23,101 +23,107 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class EmptyPlanetActivity extends BaseActivity {
-    private Star mStar;
-    private Planet mPlanet;
+  private Star star;
+  private Planet planet;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        setContentView(R.layout.planet_empty);
+    setContentView(R.layout.planet_empty);
 
-        View rootView = findViewById(android.R.id.content);
-        ActivityBackgroundGenerator.setBackground(rootView);
+    View rootView = findViewById(android.R.id.content);
+    ActivityBackgroundGenerator.setBackground(rootView);
 
-        Button colonizeBtn = (Button) findViewById(R.id.colonize_btn);
-        colonizeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onColonizeClick();
-            }
-        });
-    }
+    Button colonizeBtn = (Button) findViewById(R.id.colonize_btn);
+    colonizeBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        onColonizeClick();
+      }
+    });
+  }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+  @Override
+  public void onResume() {
+    super.onResume();
 
-        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-            @Override
-            public void onHelloComplete(boolean success, ServerGreeting greeting) {
-                if (!success) {
-                    startActivity(new Intent(EmptyPlanetActivity.this, WarWorldsActivity.class));
-                } else {
-                    String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-                    StarManager.eventBus.register(mEventHandler);
-                    Star star = StarManager.i.getStar(Integer.parseInt(starKey));
-                    if (star != null) {
-                        refresh(star);
-                    }
-                }
-            }
-        });
-    }
-
-    private Object mEventHandler = new Object() {
-        @EventHandler
-        public void onStarFetched(Star s) {
-            if (mStar != null && !mStar.getKey().equals(s.getKey())) {
-                return;
-            }
-
-            refresh(s);
+    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+      @Override
+      public void onHelloComplete(boolean success, ServerGreeting greeting) {
+        if (!success) {
+          startActivity(new Intent(EmptyPlanetActivity.this, WarWorldsActivity.class));
+        } else {
+          String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
+          StarManager.eventBus.register(eventHandler);
+          Star star = StarManager.i.getStar(Integer.parseInt(starKey));
+          if (star != null) {
+            refresh(star);
+          }
         }
-    };
+      }
+    });
+  }
 
-    private void refresh(Star star) {
-        int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
+  @Override
+  public void onPause() {
+    super.onPause();
+    StarManager.eventBus.unregister(eventHandler);
+  }
 
-        mStar = star;
-        mPlanet = (Planet) star.getPlanets()[planetIndex - 1];
+  private Object eventHandler = new Object() {
+    @EventHandler
+    public void onStarFetched(Star s) {
+      if (star != null && !star.getKey().equals(s.getKey())) {
+        return;
+      }
 
-        PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
-        planetDetails.setup(mStar, mPlanet, null);
+      refresh(s);
+    }
+  };
+
+  private void refresh(Star s) {
+    int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
+
+    star = s;
+    planet = (Planet) star.getPlanets()[planetIndex - 1];
+
+    PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
+    planetDetails.setup(star, planet, null);
+  }
+
+  private void onColonizeClick() {
+    MyEmpire empire = EmpireManager.i.getEmpire();
+
+    // check that we have a colony ship (the server will check too, but this is
+    // easy)
+    boolean hasColonyShip = false;
+    for (BaseFleet fleet : star.getFleets()) {
+      if (fleet.getEmpireKey() == null) {
+        continue;
+      }
+
+      if (fleet.getEmpireKey().equals(empire.getKey())) {
+        if (fleet.getDesignID().equals("colonyship")) { // TODO: hardcoded?
+          hasColonyShip = true;
+        }
+      }
     }
 
-    private void onColonizeClick() {
-        MyEmpire empire = EmpireManager.i.getEmpire();
-
-        // check that we have a colony ship (the server will check too, but this is easy)
-        boolean hasColonyShip = false;
-        for (BaseFleet fleet : mStar.getFleets()) {
-            if (fleet.getEmpireKey() == null) {
-                continue;
-            }
-
-            if (fleet.getEmpireKey().equals(empire.getKey())) {
-                if (fleet.getDesignID().equals("colonyship")) { // TODO: hardcoded?
-                    hasColonyShip = true;
-                }
-            }
-        }
-
-        if (!hasColonyShip) {
-            // TODO: better errors...
-            StyledDialog dialog = new StyledDialog.Builder(this)
-                .setMessage("You don't have a colony ship around this star, so you cannot colonize this planet.")
-                .setPositiveButton("OK", null)
-                .create();
-            dialog.show();
-        }
-
-        empire.colonize(mPlanet, new MyEmpire.ColonizeCompleteHandler() {
-            @Override
-            public void onColonizeComplete(Colony colony) {
-                finish();
-            }
-        });
+    if (!hasColonyShip) {
+      // TODO: better errors...
+      StyledDialog dialog = new StyledDialog.Builder(this).setMessage(
+          "You don't have a colony ship around this star, so you cannot colonize this planet.")
+          .setPositiveButton("OK", null).create();
+      dialog.show();
     }
+
+    empire.colonize(planet, new MyEmpire.ColonizeCompleteHandler() {
+      @Override
+      public void onColonizeComplete(Colony colony) {
+        finish();
+      }
+    });
+  }
 }

@@ -34,7 +34,7 @@ import au.com.codeka.warworlds.model.billing.SkuDetails;
 public class StarManager extends BaseManager {
     public static final StarManager i = new StarManager();
 
-    public static EventBus eventBus = new EventBus();
+    public static final EventBus eventBus = new EventBus();
 
     private static final Log log = new Log("StarManager");
     private LruCache<Integer, StarOrSummary> stars = new LruCache<Integer, StarOrSummary>(100);
