@@ -40,6 +40,7 @@ import au.com.codeka.warworlds.model.StarManager;
  * could also be an ally or faction member).
  */
 public class EnemyPlanetActivity extends BaseActivity {
+  private String starKey;
   private Star star;
   private Planet planet;
   private Colony colony;
@@ -65,20 +66,10 @@ public class EnemyPlanetActivity extends BaseActivity {
   }
 
   @Override
-  protected void onStart() {
-    super.onStart();
-    ShieldManager.eventBus.register(eventHandler);
-  }
-
-  @Override
-  protected void onStop() {
-    super.onStop();
-    ShieldManager.eventBus.unregister(eventHandler);
-  }
-
-  @Override
   public void onResume() {
     super.onResume();
+    ShieldManager.eventBus.register(eventHandler);
+    StarManager.eventBus.register(eventHandler);
 
     ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
       @Override
@@ -86,8 +77,7 @@ public class EnemyPlanetActivity extends BaseActivity {
         if (!success) {
           startActivity(new Intent(EnemyPlanetActivity.this, WarWorldsActivity.class));
         } else {
-          String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-          StarManager.eventBus.register(eventHandler);
+          starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
           star = StarManager.i.getStar(Integer.parseInt(starKey));
           if (star != null) {
             refreshStarDetails();
@@ -97,10 +87,17 @@ public class EnemyPlanetActivity extends BaseActivity {
     });
   }
 
+  @Override
+  public void onPause() {
+    super.onPause();
+    StarManager.eventBus.unregister(eventHandler);
+    ShieldManager.eventBus.unregister(eventHandler);
+  }
+
   private Object eventHandler = new Object() {
     @EventHandler
     public void onStarFetched(Star s) {
-      if (star != null && !star.getKey().equals(s.getKey())) {
+      if (starKey == null || !starKey.equals(s.getKey())) {
         return;
       }
 
@@ -129,9 +126,9 @@ public class EnemyPlanetActivity extends BaseActivity {
   private void refreshStarDetails() {
     int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
     planet = (Planet) star.getPlanets()[planetIndex - 1];
-    for (BaseColony colony : star.getColonies()) {
-      if (colony.getPlanetIndex() == planetIndex) {
-        colony = (Colony) colony;
+    for (BaseColony baseColony : star.getColonies()) {
+      if (baseColony.getPlanetIndex() == planetIndex) {
+        colony = (Colony) baseColony;
       }
     }
 

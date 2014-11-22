@@ -167,8 +167,8 @@ public class SolarSystemFragment extends Fragment {
 
     @SuppressLint("NewApi")
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
         Bundle args = getArguments();
         starID = (int) args.getLong("au.com.codeka.warworlds.StarID");
         StarManager.eventBus.register(mEventHandler);
@@ -206,8 +206,8 @@ public class SolarSystemFragment extends Fragment {
 
     @SuppressLint("NewApi")
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         StarManager.eventBus.unregister(mEventHandler);
         ShieldManager.eventBus.unregister(mEventHandler);
 
