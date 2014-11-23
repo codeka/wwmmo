@@ -92,15 +92,18 @@ public class DebugView extends FrameLayout {
 
   public void refresh(RequestManager.RequestManagerStateEvent state) {
     TextView connectionInfo = (TextView) view.findViewById(R.id.connection_info);
-    String str = String.format(Locale.ENGLISH, "Sim: %d Conn: %d Mem: %.1f MB",
-        Simulation.getNumRunningSimulations(), state.numInProgressRequests,
-        Debug.getNativeHeapSize() / 1024.02f / 1024.0f);
+    String str = String.format(Locale.ENGLISH, "Sim: %d Conn: %d",
+        Simulation.getNumRunningSimulations(), state.numInProgressRequests);
     connectionInfo.setText(str);
 
     ImageView memoryGraph = (ImageView) view.findViewById(R.id.memory_graph);
     memoryGraph.setImageBitmap(createMemoryGraph(memoryGraph.getWidth(), memoryGraph.getHeight()));
   }
 
+  /**
+   * Draws a bar graph with current memory usage split between dalvik, native and "other" (i.e.
+   * GL memory, mostly). Shows a watermark at the current maximum for each of those bars as well.
+   */
   private Bitmap createMemoryGraph(int width, int height) {
     if (width == 0 || height == 0) {
       return null;
@@ -131,27 +134,31 @@ public class DebugView extends FrameLayout {
 
     double max = Math.max(maxDalvikKb, Math.max(maxNativeKb, maxOtherKb));
 
+    // green = dalvik memory
     p.setARGB(255, 0, 100, 0);
     canvas.drawRect(new Rect(0, height - (int) ((dalvikKb / max) * height),
         (int) (width * 0.33), height), p);
-    canvas.drawRect(new Rect(0, height - (int) ((maxDalvikKb / max) * height) + 1,
-        (int) (width * 0.33), height - (int) ((maxDalvikKb / max) * height) - 1), p);
+    canvas.drawRect(new Rect(0, height - (int) ((maxDalvikKb / max) * height),
+        (int) (width * 0.33), height - (int) ((maxDalvikKb / max) * height) + 2), p);
 
+    // blue = native memory
     p.setARGB(255, 100, 100, 255);
     canvas.drawRect(new Rect((int) (width * 0.33) + 1, height - (int) ((nativeKb / max) * height),
         (int) (width * 0.66), height), p);
     canvas.drawRect(new Rect((int) (width * 0.33) + 1,
-        height - (int) ((maxNativeKb / max) * height) + 1,
-        (int) (width * 0.66), height - (int)((maxNativeKb / max) * height) - 1), p);
+        height - (int) ((maxNativeKb / max) * height),
+        (int) (width * 0.66), height - (int)((maxNativeKb / max) * height) + 2), p);
 
+    // red = other (= GL)
     p.setARGB(255, 255, 100, 100);
     canvas.drawRect(new Rect((int) (width * 0.66) + 1, height - (int) ((otherKb / max) * height),
         width, height), p);
     canvas.drawRect(new Rect((int) (width * 0.66) + 1,
-        height - (int) ((maxOtherKb / max) * height) + 1,
-        width, height - (int) ((maxOtherKb / max) * height) - 1), p);
+        height - (int) ((maxOtherKb / max) * height),
+        width, height - (int) ((maxOtherKb / max) * height) + 2), p);
 
     p.setARGB(255, 255, 255, 255);
+    p.setTextSize(16);
     p.setTextAlign(Paint.Align.CENTER);
     canvas.drawText(String.format("%d", dalvikKb / 1024), (0.00f + 0.167f) * width, height - 10, p);
     canvas.drawText(String.format("%d", nativeKb / 1024), (0.33f + 0.167f) * width, height - 10, p);
