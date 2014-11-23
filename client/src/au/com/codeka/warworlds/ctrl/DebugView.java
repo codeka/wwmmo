@@ -3,11 +3,16 @@ package au.com.codeka.warworlds.ctrl;
 import java.util.Locale;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Debug;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.R;
@@ -22,6 +27,11 @@ public class DebugView extends FrameLayout {
   private View view;
   private Handler handler;
   private boolean isAttached;
+
+  // Maximum values for the various memory stats we track, for the 'water level' bars.
+  private static long maxDalvikKb;
+  private static long maxNativeKb;
+  private static long maxOtherKb;
 
   public DebugView(Context context) {
     this(context, null);
@@ -42,9 +52,10 @@ public class DebugView extends FrameLayout {
       handler = new Handler();
 
       RequestManager.eventBus.register(eventHandler);
-      refresh(RequestManager.getCurrentState());
-
       isAttached = true;
+
+      refresh(RequestManager.getCurrentState());
+      queueRefresh();
     }
   }
 
@@ -65,7 +76,7 @@ public class DebugView extends FrameLayout {
     }
   };
 
-  public void queueRefresh() {
+  private void queueRefresh() {
     if (!isAttached) {
       return;
     }
@@ -85,5 +96,66 @@ public class DebugView extends FrameLayout {
         Simulation.getNumRunningSimulations(), state.numInProgressRequests,
         Debug.getNativeHeapSize() / 1024.02f / 1024.0f);
     connectionInfo.setText(str);
+
+    ImageView memoryGraph = (ImageView) view.findViewById(R.id.memory_graph);
+    memoryGraph.setImageBitmap(createMemoryGraph(memoryGraph.getWidth(), memoryGraph.getHeight()));
+  }
+
+  private Bitmap createMemoryGraph(int width, int height) {
+    if (width == 0 || height == 0) {
+      return null;
+    }
+
+    // Grab the current memory snapshot and update the maximums, if needed.
+    Debug.MemoryInfo memoryInfo = new Debug.MemoryInfo();
+    Debug.getMemoryInfo(memoryInfo);
+    long dalvikKb = memoryInfo.dalvikPrivateDirty;
+    long nativeKb = memoryInfo.nativePrivateDirty;
+    long otherKb = memoryInfo.otherPrivateDirty;
+    if (maxDalvikKb < dalvikKb) {
+      maxDalvikKb = dalvikKb;
+    }
+    if (maxNativeKb < nativeKb) {
+      maxNativeKb = nativeKb;
+    }
+    if (maxOtherKb < otherKb) {
+      maxOtherKb = otherKb;
+    }
+
+    Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(bmp);
+
+    Paint p = new Paint();
+    p.setARGB(80, 0, 0, 0);
+    canvas.drawRect(new Rect(0, 0, width, height), p);
+
+    double max = Math.max(maxDalvikKb, Math.max(maxNativeKb, maxOtherKb));
+
+    p.setARGB(255, 0, 100, 0);
+    canvas.drawRect(new Rect(0, height - (int) ((dalvikKb / max) * height),
+        (int) (width * 0.33), height), p);
+    canvas.drawRect(new Rect(0, height - (int) ((maxDalvikKb / max) * height) + 1,
+        (int) (width * 0.33), height - (int) ((maxDalvikKb / max) * height) - 1), p);
+
+    p.setARGB(255, 100, 100, 255);
+    canvas.drawRect(new Rect((int) (width * 0.33) + 1, height - (int) ((nativeKb / max) * height),
+        (int) (width * 0.66), height), p);
+    canvas.drawRect(new Rect((int) (width * 0.33) + 1,
+        height - (int) ((maxNativeKb / max) * height) + 1,
+        (int) (width * 0.66), height - (int)((maxNativeKb / max) * height) - 1), p);
+
+    p.setARGB(255, 255, 100, 100);
+    canvas.drawRect(new Rect((int) (width * 0.66) + 1, height - (int) ((otherKb / max) * height),
+        width, height), p);
+    canvas.drawRect(new Rect((int) (width * 0.66) + 1,
+        height - (int) ((maxOtherKb / max) * height) + 1,
+        width, height - (int) ((maxOtherKb / max) * height) - 1), p);
+
+    p.setARGB(255, 255, 255, 255);
+    p.setTextAlign(Paint.Align.CENTER);
+    canvas.drawText(String.format("%d", dalvikKb / 1024), (0.00f + 0.167f) * width, height - 10, p);
+    canvas.drawText(String.format("%d", nativeKb / 1024), (0.33f + 0.167f) * width, height - 10, p);
+    canvas.drawText(String.format("%d", otherKb / 1024), (0.66f + 0.167f) * width, height - 10, p);
+    return bmp;
   }
 }
