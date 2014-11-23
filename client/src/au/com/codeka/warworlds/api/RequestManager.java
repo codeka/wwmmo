@@ -42,6 +42,7 @@ import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.Util;
+import au.com.codeka.warworlds.eventbus.EventBus;
 import au.com.codeka.warworlds.model.Realm;
 
 /**
@@ -50,12 +51,10 @@ import au.com.codeka.warworlds.model.Realm;
 public class RequestManager {
     private static final Log log = new Log("RequestManager");
     private static Map<Integer, ConnectionPool> sConnectionPools;
-    private static List<ResponseReceivedHandler> sResponseReceivedHandlers =
-            new ArrayList<ResponseReceivedHandler>();
-    private static List<RequestManagerStateChangedHandler> sRequestManagerStateChangedHandlers =
-            new ArrayList<RequestManagerStateChangedHandler>();
     private static String sImpersonateUser;
     private static boolean sVerboseLog = false;
+
+    public static final EventBus eventBus = new EventBus();
 
     // we record the last status code we got from the server, don't try to re-authenticate if we
     // get two 403's in a row, for example.
@@ -160,7 +159,7 @@ public class RequestManager {
                 // requests fail, we force creating a new connection
                 conn = cp.getConnection(numAttempts > 0);
 
-                fireRequestManagerStateChangedHandlers();
+                eventBus.publish(getCurrentState());
 
                 String requestUrl = uri.getPath();
                 if (uri.getQuery() != null && uri.getQuery() != "") {
@@ -224,7 +223,6 @@ public class RequestManager {
                     log.debug("< %s", response.getStatusLine());
                 }
                 checkForAuthenticationError(request, response);
-                fireResponseReceivedHandlers(request, response);
 
                 return new ResultWrapper(conn, response);
             } catch (Exception e) {
@@ -286,8 +284,8 @@ public class RequestManager {
         sLastRequestStatusCode = response.getStatusLine().getStatusCode();
     }
 
-    public static RequestManagerState getCurrentState() {
-        RequestManagerState state = new RequestManagerState();
+    public static RequestManagerStateEvent getCurrentState() {
+        RequestManagerStateEvent state = new RequestManagerStateEvent();
         ConnectionPool cp = getConnectionPool();
         if (cp == null) {
             return state;
@@ -295,33 +293,6 @@ public class RequestManager {
         state.numInProgressRequests = cp.getNumBusyConnections();
         state.lastUri = cp.getLastUri();
         return state;
-    }
-
-    public static void addResponseReceivedHandler(ResponseReceivedHandler handler) {
-        sResponseReceivedHandlers.add(handler);
-    }
-
-    private static void fireResponseReceivedHandlers(BasicHttpRequest request,
-            BasicHttpResponse response) throws RequestRetryException {
-        for(ResponseReceivedHandler handler : sResponseReceivedHandlers) {
-            handler.onResponseReceived(request, response);
-        }
-    }
-
-    public static void addRequestManagerStateChangedHandler(RequestManagerStateChangedHandler handler) {
-        sRequestManagerStateChangedHandlers.add(handler);
-    }
-
-    public static void removeRequestManagerStateChangedHandler(RequestManagerStateChangedHandler handler) {
-        sRequestManagerStateChangedHandlers.remove(handler);
-    }
-
-    private static void fireRequestManagerStateChangedHandlers() {
-        ArrayList<RequestManagerStateChangedHandler> handlers = new ArrayList<RequestManagerStateChangedHandler>(
-                sRequestManagerStateChangedHandlers);
-        for(RequestManagerStateChangedHandler handler : handlers) {
-            handler.onStateChanged();
-        }
     }
 
     /**
@@ -341,30 +312,12 @@ public class RequestManager {
     }
 
     /**
-     * Register this interface to be notified of every HTTP response. You can do this, for example,
-     * to check for authentication errors and automatically re-authenticate.
+     * This is an event posted to our event bus whenever the state of the {@link RequestManager}
+     * changes.
      */
-    public interface ResponseReceivedHandler {
-        void onResponseReceived(BasicHttpRequest request,
-                                BasicHttpResponse response)
-                throws RequestRetryException;
-    }
-
-    /**
-     * Represents the current "state" of the request manager, and gets passed
-     * to any request manager state changed handlers.
-     */
-    public static class RequestManagerState {
+    public static class RequestManagerStateEvent {
         public int numInProgressRequests;
         public String lastUri;
-    }
-
-    /**
-     * Handler that's called whenever the state of the request manager changes
-     * (e.g. a new request is made, a request completes, etc).
-     */
-    public interface RequestManagerStateChangedHandler {
-        void onStateChanged();
     }
 
     /**
@@ -393,7 +346,7 @@ public class RequestManager {
 
             mConnection.getConnectionPool().returnConnection(mConnection);
 
-            fireRequestManagerStateChangedHandlers();
+            eventBus.publish(getCurrentState());
         }
     }
 
