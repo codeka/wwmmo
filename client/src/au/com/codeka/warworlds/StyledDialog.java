@@ -21,6 +21,7 @@ import au.com.codeka.common.Log;
  */
 public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLayoutListener {
     private static final Log log = new Log("StyledDialog");
+    private View mContentView;
     private Builder mBuilder;
     private Context mContext;
     private boolean mButtonsVisible;
@@ -99,8 +100,8 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         Window wnd = getWindow();
         wnd.requestFeature(Window.FEATURE_NO_TITLE);
 
-        View contentView = getLayoutInflater().inflate(R.layout.styled_dialog, null);
-        wnd.setContentView(contentView);
+        mContentView = getLayoutInflater().inflate(R.layout.styled_dialog, null);
+        wnd.setContentView(mContentView);
 
         if (mBuilder.mTitle != null) {
             TextView title = (TextView) wnd.findViewById(R.id.title);
@@ -116,7 +117,18 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
 
         layoutButtons(wnd);
 
-        contentView.getViewTreeObserver().addOnGlobalLayoutListener(this);
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mContentView.getViewTreeObserver().addOnGlobalLayoutListener(this);
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mContentView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
     }
 
     /**
@@ -129,7 +141,7 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
      */
     @Override
     public void onGlobalLayout() {
-        FrameLayout content = (FrameLayout) getWindow().findViewById(R.id.content);
+        FrameLayout scrollView = (FrameLayout) getWindow().findViewById(R.id.scroll_view);
 
         double pixelScale = mContext.getResources().getDisplayMetrics().density;
 
@@ -141,7 +153,7 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         if (mButtonsVisible) {
             availableHeight -= 40 * pixelScale;
         }
-        int contentHeight = content.getHeight();
+        int scrollViewHeight = scrollView.getHeight();
 
         int displayHeight = mContext.getResources().getDisplayMetrics().heightPixels;
         if (availableHeight > (displayHeight - 200)) {
@@ -152,13 +164,13 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         }
 
         log.info("available height: %d; content height: %d; content height in dp: %d",
-                 availableHeight, contentHeight, (int)(contentHeight / pixelScale));
+                 availableHeight, scrollViewHeight, (int)(scrollViewHeight / pixelScale));
 
-        if (availableHeight < contentHeight) {
+        if (availableHeight < scrollViewHeight) {
             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)
-                    content.getLayoutParams();
+                    scrollView.getLayoutParams();
             lp.height = availableHeight;
-            content.setLayoutParams(lp);
+            scrollView.setLayoutParams(lp);
         }
     }
 

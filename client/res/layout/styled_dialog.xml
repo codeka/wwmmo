@@ -36,7 +36,7 @@
         android:id="@+id/button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/content"
+        android:layout_below="@+id/scroll_view"
         android:orientation="horizontal">
 
         <Button
@@ -64,11 +64,15 @@
             android:text="Button" />
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/content"
+    <ScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title_container">
-    </FrameLayout>
-
+        <FrameLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </FrameLayout>
+    </ScrollView>
 </RelativeLayout>
