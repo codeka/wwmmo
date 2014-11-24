@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import au.com.codeka.Cash;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.common.protobuf.Messages;
@@ -277,6 +278,7 @@ public class AllianceDetailsFragment extends Fragment
 
             ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
             TextView empireName = (TextView) view.findViewById(R.id.empire_name);
+            TextView lastSeen = (TextView) view.findViewById(R.id.last_seen);
             TextView totalStars = (TextView) view.findViewById(R.id.total_stars);
             TextView totalColonies = (TextView) view.findViewById(R.id.total_colonies);
             TextView totalShips = (TextView) view.findViewById(R.id.total_ships);
@@ -286,6 +288,13 @@ public class AllianceDetailsFragment extends Fragment
             DecimalFormat formatter = new DecimalFormat("#,##0");
             empireName.setText(empire.getDisplayName());
             empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mActivity, empire));
+
+            if (empire.getLastSeen() == null) {
+                lastSeen.setText(Html.fromHtml("Last seen: <i>never</i>"));
+            } else {
+                lastSeen.setText(String.format("Last seen: %s",
+                        TimeFormatter.create().withMaxDays(30).format(empire.getLastSeen())));
+            }
 
             BaseEmpireRank rank = empire.getRank();
             if (rank != null) {

@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.Cash;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseActivity;
@@ -82,6 +83,10 @@ public class EnemyEmpireActivity extends BaseActivity {
                     mEmpireID = Integer.parseInt(
                             getIntent().getExtras().getString("au.com.codeka.warworlds.EmpireKey"));
                     mEmpire = EmpireManager.i.getEmpire(mEmpireID);
+                    if (mEmpire != null) {
+                        // Make sure it's update to date as well.
+                        EmpireManager.i.refreshEmpire(mEmpireID, true);
+                    }
                     refresh();
                 }
             }
@@ -92,14 +97,15 @@ public class EnemyEmpireActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
         ShieldManager.eventBus.register(mEventHandler);
+        EmpireManager.eventBus.register(mEventHandler);
     }
 
     @Override
     protected void onStop() {
         super.onStart();
         ShieldManager.eventBus.unregister(mEventHandler);
+        EmpireManager.eventBus.unregister(mEventHandler);
     }
-
 
     private Object mEventHandler = new Object() {
         @EventHandler
@@ -125,7 +131,14 @@ public class EnemyEmpireActivity extends BaseActivity {
         empireName.setText(mEmpire.getDisplayName());
         empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, mEmpire));
 
-        TextView tv = (TextView) findViewById(R.id.private_message_btn_msg);
+        TextView tv = (TextView) findViewById(R.id.last_seen);
+        if (mEmpire.getLastSeen() == null) {
+            tv.setText(Html.fromHtml("<i>never</i>"));
+        } else {
+            tv.setText(TimeFormatter.create().withMaxDays(30).format(mEmpire.getLastSeen()));
+        }
+
+        tv = (TextView) findViewById(R.id.private_message_btn_msg);
         tv.setText(String.format(tv.getText().toString(), mEmpire.getDisplayName()));
 
         tv = (TextView) findViewById(R.id.view_msg);
@@ -185,7 +198,7 @@ public class EnemyEmpireActivity extends BaseActivity {
             totalBuildings.setText("");
         }
 
-        View horzSep = findViewById(R.id.horz_sep_3);
+        View horzSep = findViewById(R.id.horz_sep_4);
         TextView kickInfo = (TextView) findViewById(R.id.kick_info);
         Button kickBtn = (Button) findViewById(R.id.kick_btn);
         if (mEmpire.getAlliance() != null && myEmpire.getAlliance() != null &&

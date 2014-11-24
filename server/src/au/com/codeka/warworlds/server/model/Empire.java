@@ -57,6 +57,9 @@ public class Empire extends BaseEmpire {
     public void setName(String name) {
         mDisplayName = name.trim();
     }
+    public void setLastSeen(DateTime dt) {
+        mLastSeen = dt;
+    }
 
     /**
      * Gets a value which indicates whether the flag in the database has been set that will

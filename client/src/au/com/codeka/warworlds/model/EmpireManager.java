@@ -148,6 +148,20 @@ public class EmpireManager {
         refreshEmpire(mEmpire.getID());
     }
 
+    public void refreshEmpire(final Integer empireID, boolean force) {
+      if (empireID == null) {
+          // Nothing to do for native empires
+          return;
+      }
+
+      if (force) {
+          // if we're forcing, clear out the local store first
+          new LocalEmpireStore().removeEmpire(empireID);
+      }
+
+      refreshEmpire(empireID);
+  }
+
     public void refreshEmpire(final Integer empireID) {
         if (empireID == null) {
             // Nothing to do for native empires
@@ -460,6 +474,13 @@ public class EmpireManager {
                 } finally {
                     db.close();
                 }
+            }
+        }
+
+        public void removeEmpire(int empireID) {
+            synchronized(sLock) {
+                SQLiteDatabase db = getWritableDatabase();
+                db.delete("empires", getWhereClause(empireID), null);
             }
         }
 

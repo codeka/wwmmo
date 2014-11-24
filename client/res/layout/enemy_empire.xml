@@ -115,6 +115,29 @@
         android:layout_below="@+id/taxes"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:text="Last Seen" />
+
+    <TextView
+        android:id="@+id/last_seen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/horz_sep_1"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:gravity="center"
+        android:layout_marginTop="6dp"
+        android:text="23 days ago" />
+
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/horz_sep_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/last_seen"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:text="Locate" />
 
     <TextView
@@ -122,7 +145,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/horz_sep_1"
+        android:layout_below="@+id/horz_sep_2"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:layout_marginTop="6dp"
@@ -138,7 +161,7 @@
         android:text="Locate Empire" />
 
     <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-        android:id="@+id/horz_sep_2"
+        android:id="@+id/horz_sep_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -154,7 +177,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/horz_sep_2"
+        android:layout_below="@+id/horz_sep_3"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:layout_marginTop="6dp"
@@ -170,7 +193,7 @@
         android:text="Private Message" />
 
     <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-        android:id="@+id/horz_sep_3"
+        android:id="@+id/horz_sep_4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -185,7 +208,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/horz_sep_3"
+        android:layout_below="@+id/horz_sep_4"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"

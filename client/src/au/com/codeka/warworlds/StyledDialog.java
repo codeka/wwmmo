@@ -116,7 +116,6 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         content.addView(mBuilder.mView);
 
         layoutButtons(wnd);
-
     }
 
     @Override
@@ -211,8 +210,8 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
             // they're all hidden, adjust the content so it fills up
             // the whole space
             View content = getWindow().findViewById(R.id.content);
-            RelativeLayout.LayoutParams lp = 
-                    (RelativeLayout.LayoutParams) content.getLayoutParams();
+            FrameLayout.LayoutParams lp = 
+                    (FrameLayout.LayoutParams) content.getLayoutParams();
             lp.bottomMargin = 0;
             content.setLayoutParams(lp);
             mButtonsVisible = false;

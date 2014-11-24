@@ -103,6 +103,11 @@ public class NotificationController {
     handlers.addNotificationHandler(empireID, handler);
   }
 
+  /** Returns {@code true} if the given empire is currently connected/online. */
+  public boolean isEmpireOnline(int empireID) {
+    return handlers.isConnected(empireID);
+  }
+
   /** Sends the given {@link Notification} to all the given chat conversation participants. */
   private void sendNotification(ChatConversationParticipant[] participants,
       Notification notification) throws RequestException {
@@ -311,6 +316,20 @@ public class NotificationController {
 
     public NotificationHandlerCache() {
       handlers = new HashMap<Integer, List<NotificationHandler>>();
+    }
+
+    /** Returns {@code true} if the given empire is currently connected. */
+    public boolean isConnected(int empireID) {
+      List<NotificationHandler> empireHandlers = handlers.get(empireID);
+      if (empireHandlers == null) {
+        return false;
+      }
+
+      if (empireHandlers.isEmpty()) {
+        return false;
+      }
+
+      return true;
     }
 
     public void addNotificationHandler(int empireID, NotificationHandler handler) {

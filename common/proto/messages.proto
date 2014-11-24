@@ -1,18 +1,12 @@
-//
-// Copyright (c) 2012, Dean Harding (dean@codeka.com.au)
-//
 
 package au.com.codeka.common.protobuf;
 
 
-//
-// This is used when you first connect, we display some news, important announcements,
-// stuff of that nature.
-//
+// Unused.
 message MessageOfTheDay
 {
     optional string message = 1;
-    optional string last_update = 2; // last update date (in ISO string format)
+    optional string last_update = 2;
 }
 
 
@@ -161,6 +155,9 @@ message Empire
 
     // if set, this is the amount of taxes collected per hour for all stars in this empire combined.
     optional double taxes_collected_per_hour = 15;
+
+    // the time we last saw this empire.
+    optional int64 last_seen = 16;
 }
 
 

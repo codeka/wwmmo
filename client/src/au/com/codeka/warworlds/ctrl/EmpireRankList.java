@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
@@ -242,6 +243,7 @@ public class EmpireRankList extends ListView {
             TextView rankView = (TextView) view.findViewById(R.id.rank);
             ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
             TextView empireName = (TextView) view.findViewById(R.id.empire_name);
+            TextView lastSeen = (TextView) view.findViewById(R.id.last_seen);
             TextView totalPopulation = (TextView) view.findViewById(R.id.total_population);
             TextView totalStars = (TextView) view.findViewById(R.id.total_stars);
             TextView totalColonies = (TextView) view.findViewById(R.id.total_colonies);
@@ -256,6 +258,12 @@ public class EmpireRankList extends ListView {
             if (empire != null) {
                 empireName.setText(empire.getDisplayName());
                 empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
+                if (empire.getLastSeen() == null) {
+                    lastSeen.setText(Html.fromHtml("Last seen: <i>never</i>"));
+                } else {
+                    lastSeen.setText(String.format("Last seen: %s",
+                        TimeFormatter.create().format(empire.getLastSeen())));
+                }
 
                 Alliance alliance = (Alliance) empire.getAlliance();
                 if (alliance != null) {
