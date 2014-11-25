@@ -12,27 +12,14 @@ import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.eventbus.EventBus;
 
 public class AllianceManager {
     public static AllianceManager i = new AllianceManager();
 
-    private List<AllianceUpdatedHandler> mAllianceUpdatedHandlers;
+    public static final EventBus eventBus = new EventBus();
 
     private AllianceManager() {
-        mAllianceUpdatedHandlers = new ArrayList<AllianceUpdatedHandler>();
-    }
-
-    public void addAllianceUpdatedHandler(AllianceUpdatedHandler handler) {
-        mAllianceUpdatedHandlers.add(handler);
-    }
-    public void removeAllianceUpdatedHandler(AllianceUpdatedHandler handler) {
-        mAllianceUpdatedHandlers.remove(handler);
-    }
-    protected void fireAllianceUpdated(Alliance alliance) {
-        for (AllianceUpdatedHandler handler : mAllianceUpdatedHandlers) {
-            handler.onAllianceUpdated(alliance);
-        }
-        EmpireManager.i.onAllianceUpdated(alliance);
     }
 
     /**
@@ -121,7 +108,7 @@ public class AllianceManager {
                 if (handler != null && alliance != null) {
                     handler.onAllianceFetched(alliance);
                 }
-                fireAllianceUpdated(alliance);
+                eventBus.publish(alliance);
             }
         }.execute();
     }
@@ -325,9 +312,6 @@ public class AllianceManager {
     }
     public interface FetchAllianceCompleteHandler {
         void onAllianceFetched(Alliance alliance);
-    }
-    public interface AllianceUpdatedHandler {
-        void onAllianceUpdated(Alliance alliance);
     }
     public interface FetchRequestsCompleteHandler {
         void onRequestsFetched(Map<Integer, Empire> empires, List<AllianceRequest> requests, String cursor);

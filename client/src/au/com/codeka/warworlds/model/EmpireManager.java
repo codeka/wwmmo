@@ -26,6 +26,7 @@ import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.eventbus.EventBus;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 
 /**
  * Manages stuff about your empire (e.g. colonising planets and what-not).
@@ -34,12 +35,16 @@ public class EmpireManager {
     private static final Log log = new Log("EmpireManager");
     public static EmpireManager i = new EmpireManager();
 
-    public static EventBus eventBus = new EventBus();
+    public static final EventBus eventBus = new EventBus();
 
     private LruCache<Integer, Empire> mEmpireCache = new LruCache<Integer, Empire>(64);
     private HashSet<Integer> mInProgress = new HashSet<Integer>();
     private MyEmpire mEmpire;
     private NativeEmpire mNativeEmpire = new NativeEmpire();
+
+    private EmpireManager() {
+        AllianceManager.eventBus.register(eventHandler);
+    }
 
     /**
      * This is called when you first connect to the server. We need to pass in details about
@@ -220,27 +225,6 @@ public class EmpireManager {
     }
 
     /**
-     * This is called by the AllianceManager when an alliance changes, we'll want to refresh
-     * any empires we have cached with the new data.
-     */
-    public void onAllianceUpdated(Alliance alliance) {
-        if (mEmpire != null && mEmpire.getAlliance() != null
-                && mEmpire.getAlliance().getKey().equals(alliance.getKey())) {
-            mEmpire.updateAlliance(alliance);
-            eventBus.publish(mEmpire);
-        }
-
-        for (Map.Entry<Integer, Empire> entry : mEmpireCache.snapshot().entrySet()) {
-            Empire empire = entry.getValue();
-            if (empire != null && empire.getAlliance() != null
-                    && empire.getAlliance().getKey().equals(alliance.getKey())) {
-                empire.updateAlliance(alliance);
-                eventBus.publish(empire);
-            }
-        }
-    }
-
-    /**
      * Synchronously fetch a list of empires. Note that we \i may return fewer empires than you
      * requested, if some of them are already in-progress.
      */
@@ -401,6 +385,26 @@ public class EmpireManager {
             }
         }.execute();
     }
+
+    private final Object eventHandler = new Object() {
+      @EventHandler
+      public void onAllianceUpdated(Alliance alliance) {
+        if (mEmpire != null && mEmpire.getAlliance() != null
+                && mEmpire.getAlliance().getKey().equals(alliance.getKey())) {
+            mEmpire.updateAlliance(alliance);
+            eventBus.publish(mEmpire);
+        }
+
+        for (Map.Entry<Integer, Empire> entry : mEmpireCache.snapshot().entrySet()) {
+            Empire empire = entry.getValue();
+            if (empire != null && empire.getAlliance() != null
+                    && empire.getAlliance().getKey().equals(alliance.getKey())) {
+                empire.updateAlliance(alliance);
+                eventBus.publish(empire);
+            }
+        }
+      }
+    };
 
     private static class LocalEmpireStore extends SQLiteOpenHelper {
         private static Object sLock = new Object();

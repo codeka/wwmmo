@@ -40,8 +40,7 @@ import au.com.codeka.warworlds.model.ShieldManager;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class AllianceDetailsFragment extends Fragment
-                                     implements AllianceManager.AllianceUpdatedHandler,
-                                                TabManager.Reloadable {
+                                     implements TabManager.Reloadable {
     private Handler mHandler;
     private Activity mActivity;
     private LayoutInflater mLayoutInflater;
@@ -103,7 +102,7 @@ public class AllianceDetailsFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
-        AllianceManager.i.addAllianceUpdatedHandler(this);
+        AllianceManager.eventBus.register(mEventHandler);
         EmpireManager.eventBus.register(mEventHandler);
         ShieldManager.eventBus.register(mEventHandler);
     }
@@ -111,20 +110,20 @@ public class AllianceDetailsFragment extends Fragment
     @Override
     public void onStop() {
         super.onStop();
-        AllianceManager.i.removeAllianceUpdatedHandler(this);
+        AllianceManager.eventBus.unregister(mEventHandler);
         EmpireManager.eventBus.unregister(mEventHandler);
         ShieldManager.eventBus.unregister(mEventHandler);
     }
 
-    @Override
-    public void onAllianceUpdated(Alliance alliance) {
-        if (alliance.getID() == mAllianceID) {
-            mAlliance = alliance;
-            fullRefresh();
-        }
-    }
-
     private Object mEventHandler = new Object() {
+        @EventHandler
+        public void onAllianceUpdated(Alliance alliance) {
+            if (alliance.getID() == mAllianceID) {
+                mAlliance = alliance;
+                fullRefresh();
+            }
+        }
+
         @EventHandler
         public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
             refreshAlliance();

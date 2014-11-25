@@ -106,8 +106,7 @@ public class AllianceActivity extends TabFragmentActivity {
     public static class BaseFragment extends Fragment {
     }
 
-    public static class AllianceListFragment extends BaseFragment
-                                             implements AllianceManager.AllianceUpdatedHandler {
+    public static class AllianceListFragment extends BaseFragment {
         private View mView;
         private RankListAdapter mRankListAdapter;
 
@@ -150,23 +149,23 @@ public class AllianceActivity extends TabFragmentActivity {
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            AllianceManager.i.addAllianceUpdatedHandler(this);
+            AllianceManager.eventBus.register(mEventHandler);
             ShieldManager.eventBus.register(mEventHandler);
         }
 
         @Override
         public void onDetach() {
             super.onDetach();
-            AllianceManager.i.removeAllianceUpdatedHandler(this);
+            AllianceManager.eventBus.unregister(mEventHandler);
             ShieldManager.eventBus.unregister(mEventHandler);
         }
 
-        @Override
-        public void onAllianceUpdated(Alliance alliance) {
-            refresh();
-        }
-
         private Object mEventHandler = new Object() {
+            @EventHandler
+            public void onAllianceUpdated(Alliance alliance) {
+                refresh();
+            }
+
             @EventHandler
             public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
                 mRankListAdapter.notifyDataSetChanged();
@@ -315,8 +314,7 @@ public class AllianceActivity extends TabFragmentActivity {
     }
 
     public static class RequestsFragment extends BaseFragment
-                                         implements AllianceManager.AllianceUpdatedHandler,
-                                                    TabManager.Reloadable {
+                                         implements TabManager.Reloadable {
         private View mView;
         private RequestListAdapter mRequestListAdapter;
         private Alliance mAlliance;
@@ -325,24 +323,16 @@ public class AllianceActivity extends TabFragmentActivity {
         private boolean mFetching;
 
         @Override
-        public void onAllianceUpdated(Alliance alliance) {
-            if (mAlliance == null || mAlliance.getKey().equals(alliance.getKey())) {
-                mAlliance = alliance;
-            }
-            refreshRequests();
-        }
-
-        @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            AllianceManager.i.addAllianceUpdatedHandler(this);
+            AllianceManager.eventBus.register(mEventHandler);
             ShieldManager.eventBus.register(mEventHandler);
         }
 
         @Override
         public void onDetach() {
             super.onDetach();
-            AllianceManager.i.removeAllianceUpdatedHandler(this);
+            AllianceManager.eventBus.unregister(mEventHandler);
             ShieldManager.eventBus.unregister(mEventHandler);
         }
 
@@ -371,6 +361,14 @@ public class AllianceActivity extends TabFragmentActivity {
             @EventHandler
             public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
                 mRequestListAdapter.notifyDataSetChanged();
+            }
+
+            @EventHandler
+            public void onAllianceUpdated(Alliance alliance) {
+                if (mAlliance == null || mAlliance.getKey().equals(alliance.getKey())) {
+                    mAlliance = alliance;
+                }
+                refreshRequests();
             }
         };
 
