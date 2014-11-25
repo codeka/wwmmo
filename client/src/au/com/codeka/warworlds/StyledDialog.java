@@ -127,7 +127,12 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mContentView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        // Bloody android...
+        try {
+            mContentView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        } catch (NoSuchMethodError x) {
+            mContentView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+        }
     }
 
     /**
