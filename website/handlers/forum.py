@@ -117,7 +117,7 @@ class ThreadRssPage(ForumPage):
     data = {}
     data["forum"] = forum
 
-    threads = ctrl.forum.getThreads(forum, 0, 25)
+    threads = ctrl.forum.getThreads(forum, 0, 10)
     data["threads"] = threads
     data["post_counts"] = ctrl.forum.getThreadPostCounts(threads)
     data["first_posts"] = ctrl.forum.getFirstPostsByForumThread(threads)
