@@ -98,14 +98,14 @@ public class SolarSystemActivity extends BaseActivity {
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 refreshTitle();
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
             }
 
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 refreshTitle();
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
                 searchListAdapter.onShow();
             }
         };
