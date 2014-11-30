@@ -31,12 +31,12 @@
         android:text="Tune the destination of this wormhole to another wormhole in your alliance."
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <ListView
+    <LinearLayout
         android:id="@+id/wormholes"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/destination_summary"
-        android:layout_above="@+id/tune_time" />
+        android:orientation="vertical" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -48,13 +48,26 @@
         android:layout_marginTop="30dp"
         android:layout_marginBottom="30dp" />
 
+    <TextView 
+        android:id="@+id/no_wormholes_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/star_icon"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:gravity="center"
+        android:textStyle="italic"
+        android:text="You don't have any other wormholes in your alliance." />
+
     <TextView
         android:id="@+id/tune_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@id/wormholes"
         android:gravity="center"
         android:text="Tune time: xx hr"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-    
+
 </RelativeLayout>
