@@ -16,6 +16,7 @@
 keystore.jks
 
 server/data/config-debug.json
+client/signing.properties
 
 # Android Studio/gradle files and directories
 .gradle
