@@ -91,7 +91,7 @@ public class SolarSystemActivity extends BaseActivity {
         });
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-                android.support.v7.appcompat.R.drawable.abc_ic_menu_moreoverflow_normal_holo_dark,
+                android.support.v7.appcompat.R.drawable.abc_ic_menu_moreoverflow_mtrl_alpha,
                 R.string.drawer_open, R.string.drawer_close) {
 
             @Override

@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:src="@drawable/abc_ic_search" />
+            android:src="@drawable/abc_ic_search_api_mtrl_alpha" />
 
         <ListView android:id="@+id/search_result"
             android:layout_width="match_parent"
