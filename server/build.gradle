@@ -20,3 +20,6 @@ mainClassName = "au.com.codeka.warworlds.server.Runner"
 applicationDistribution.from("data/") {
     into "data"
 }
+applicationDistribution.from("scripts/") {
+    into ""
+}

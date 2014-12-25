@@ -1,16 +1,21 @@
 #!/bin/bash
 
-pushd code/common
-ant build
-popd
-pushd code/server
-ant package
-RETVAL=$?
-popd
+set -e
 
-[ $RETVAL -ne 0 ] && exit
+SCRIPT=`realpath $0`
+SCRIPTPATH=`dirname $SCRIPT`
+ROOTPATH=`dirname $SCRIPTPATH`
+INSTALLPATH=$ROOTPATH/server/build/install/server
 
-pushd deploy
-chmod +x ./run-debug.sh
-./run-debug.sh $*
-popd
+pushd $ROOTPATH > /dev/null
+./gradlew :server:installApp
+popd > /dev/null
+
+pushd $INSTALLPATH > /dev/null
+SERVER_OPTS=""
+SERVER_OPTS="$SERVER_OPTS -Dau.com.codeka.warworlds.server.ConfigFile=$INSTALLPATH/data/config-debug.json"
+SERVER_OPTS="$SERVER_OPTS -Djava.util.logging.config.file=logging-debug.properties"
+SERVER_OPTS="$SERVER_OPTS" ./bin/server $*
+popd > /dev/null
+
+
