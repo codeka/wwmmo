@@ -12,22 +12,13 @@
 
 .gitignore
 
+# Make sure keystore.jks never gets added to source control, it's SEKRET!
 keystore.jks
-
-local.properties
-
-common/out
-client/bin
-client/bin.bak
-client/gen
-control-field/out
-planet-render/out
-planet-render-android/bin
-planet-render-android/gen
-website/.project
-website/.pydevproject
-google-play-services/bin
-google-play-services/gen
 
 server/data/config-debug.json
 
+# Android Studio/gradle files and directories
+.gradle
+.idea/
+build/
+local.properties
