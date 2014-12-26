@@ -1,3 +1,5 @@
+import java.util.regex.Pattern
+
 apply plugin: 'com.android.application'
 
 Properties props = new Properties()
@@ -72,5 +74,32 @@ android {
         release {
             signingConfig signingConfigs.release
         }
+    }
+}
+
+// This is a task which will increment the build # in AndroidManifest.xml
+task('incrementVersionCode') << {
+    def manifestFile = file("AndroidManifest.xml")
+
+    // First do the versionCode element, increment the new build #
+    def pattern = Pattern.compile("versionCode=\"(\\d+)\"")
+    def manifestText = manifestFile.getText()
+    def matcher = pattern.matcher(manifestText)
+    matcher.find()
+
+    def versionCode = Integer.parseInt(matcher.group(1)) + 1
+    manifestText = matcher.replaceAll("versionCode=\"" + versionCode + "\"")
+
+    // Now do versionName with the same build #.
+    pattern = Pattern.compile("versionName=\"([0-9]+)\\.([0-9]+)\\.[0-9]+\"")
+    matcher = pattern.matcher(manifestText)
+    manifestText = matcher.replaceAll("versionName=\"\$1.\$2." + versionCode + "\"")
+
+    manifestFile.write(manifestText)
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'generateReleaseBuildConfig') {
+        task.dependsOn 'incrementVersionCode'
     }
 }
