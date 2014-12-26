@@ -243,8 +243,9 @@ public class IabHelper {
                 }
             }
         };
-        mContext.bindService(new Intent("com.android.vending.billing.InAppBillingService.BIND"),
-                             mServiceConn, Context.BIND_AUTO_CREATE);
+        Intent iapIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
+        iapIntent.setPackage("com.android.vending");
+        mContext.bindService(iapIntent, mServiceConn, Context.BIND_AUTO_CREATE);
     }
 
     /**
