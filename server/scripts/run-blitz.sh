@@ -15,11 +15,9 @@ done
 shift "$((OPTIND-1))"
 
 pushd $DIR
-nohup java -cp "bin/*" \
-     -Dau.com.codeka.warworlds.server.ConfigFile=$DIR/data/config-blitz.json \
-     -Djava.util.logging.config.file=logging-blitz.properties \
-     au.com.codeka.warworlds.server.Runner $@ &
-
+SERVER_OPTS=""
+SERVER_OPTS="$SERVER_OPTS -Dau.com.codeka.warworlds.server.ConfigFile=data/config-blitz.json"
+SERVER_OPTS="$SERVER_OPTS -Djava.util.logging.config.file=logging-blitz.properties"
+SERVER_OPTS="$SERVER_OPTS" nohup ./bin/server $* &
 echo "$!" > $PIDFILE
-
 popd
