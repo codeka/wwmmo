@@ -98,8 +98,43 @@ task('incrementVersionCode') << {
     manifestFile.write(manifestText)
 }
 
+// This is a task which makes sure the warworlds.properties file is sanitized for release builds
+task('resetReleaseWarworldsPropertiesFile') << {
+    def warworldsPropertiesFile = file("assets/warworlds.properties")
+    def content = warworldsPropertiesFile.getText()
+
+    // make sure on_behalf_of is commented out
+    content = content.replaceAll("#?user.on_behalf_of\\s*=.*", "#user.on_behalf_of=nobody")
+
+    // make sure debug is set to 'false'
+    content = content.replaceAll("debug\\s*=.*", "debug=false")
+
+    // change all of the in-app purchase fields to their defaults
+    content = content.replaceAll("iap\\.([^=]+)=.*", "iap.\$1=\$1")
+
+    // make sure the welcome.rss field is pointing to the live server
+    content = content.replaceAll("welcome.rss=.*\$",
+            "welcome.rss=http://www.war-worlds.com/forum/announcements/rss")
+
+    warworldsPropertiesFile.write(content)
+}
+
+// This is a task which makes sure the warworlds.properties file is sanitized for debug builds
+task('resetDebugWarworldsPropertiesFile') << {
+    def warworldsPropertiesFile = file("assets/warworlds.properties")
+    def content = warworldsPropertiesFile.getText()
+
+    // make sure debug is set to 'true'
+    content = content.replaceAll("debug\\s*=.*", "debug=true")
+
+    warworldsPropertiesFile.write(content)
+}
+
 tasks.whenTaskAdded { task ->
     if (task.name == 'generateReleaseBuildConfig') {
         task.dependsOn 'incrementVersionCode'
+        task.dependsOn 'resetReleaseWarworldsPropertiesFile'
+    } else if (task.name == 'generateDebugBuildConfig') {
+        task.dependsOn 'resetDebugWarworldsPropertiesFile'
     }
 }
