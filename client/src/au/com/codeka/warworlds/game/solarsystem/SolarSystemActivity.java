@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.view.KeyEvent;
@@ -67,6 +67,7 @@ public class SolarSystemActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().show();
 
         if (savedInstanceState != null) {
             starID = savedInstanceState.getInt("au.com.codeka.warworlds.StarID");
@@ -91,7 +92,6 @@ public class SolarSystemActivity extends BaseActivity {
         });
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-                android.support.v7.appcompat.R.drawable.abc_ic_menu_moreoverflow_mtrl_alpha,
                 R.string.drawer_open, R.string.drawer_close) {
 
             @Override

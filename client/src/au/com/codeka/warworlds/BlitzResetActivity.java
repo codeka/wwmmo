@@ -24,7 +24,6 @@ public class BlitzResetActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
         setContentView(R.layout.blitz_reset);
 
         View rootView = findViewById(android.R.id.content);

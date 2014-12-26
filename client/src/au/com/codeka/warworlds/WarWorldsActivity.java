@@ -55,9 +55,8 @@ public class WarWorldsActivity extends BaseActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         log.info("WarWorlds activity starting...");
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
+        super.onCreate(savedInstanceState);
 
         setContentView(R.layout.welcome);
         Util.setup(mContext);

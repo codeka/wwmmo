@@ -43,7 +43,6 @@ public class ChatActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.chat);
 
         mChatPagerAdapter = new ChatPagerAdapter(getSupportFragmentManager());

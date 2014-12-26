@@ -29,8 +29,6 @@ public class EmptyPlanetActivity extends BaseActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
-
     setContentView(R.layout.planet_empty);
 
     View rootView = findViewById(android.R.id.content);

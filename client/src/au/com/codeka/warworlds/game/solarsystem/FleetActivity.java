@@ -33,7 +33,6 @@ public class FleetActivity extends BaseActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
     fleetList = new FleetList(this);
     FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(

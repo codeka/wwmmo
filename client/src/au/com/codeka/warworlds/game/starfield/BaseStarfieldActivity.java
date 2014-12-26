@@ -18,9 +18,7 @@ public abstract class BaseStarfieldActivity extends BaseGlActivity {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-
         mStarfield = new StarfieldSceneManager(this);
     }
 

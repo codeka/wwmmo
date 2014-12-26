@@ -1,8 +1,8 @@
 package au.com.codeka.warworlds;
 
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 
-public class App extends Application {
+public class App extends MultiDexApplication {
     public static App i;
 
     public App() {
@@ -20,3 +20,4 @@ public class App extends Application {
         }
     }
 }
+

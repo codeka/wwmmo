@@ -35,6 +35,9 @@ public class BaseActivity extends ActionBarActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // By default, this is hidden. Most of our activities have it hidden anyway.
+        getSupportActionBar().hide();
+
         // register our bug report shake listener with the accelerometer
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);

@@ -19,7 +19,6 @@ public class RealmSelectActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
         setContentView(R.layout.realm_select);
 
         View rootView = findViewById(android.R.id.content);

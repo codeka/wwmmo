@@ -41,8 +41,6 @@ public class EnemyEmpireActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         setContentView(R.layout.enemy_empire);
 
         Button viewBtn = (Button) findViewById(R.id.view_btn);

@@ -26,13 +26,6 @@ public class EmpireSetupActivity extends BaseActivity {
     private Context mContext = this;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
