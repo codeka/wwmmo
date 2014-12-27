@@ -1,10 +1,10 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeSet;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.Entity;
@@ -20,34 +20,27 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegion
 import org.andengine.opengl.texture.atlas.bitmap.BuildableBitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
 import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
-import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder
-    .TextureAtlasBuilderException;
+import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.joda.time.DateTime;
 
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.util.SparseArray;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
-import au.com.codeka.common.PointCloud;
 import au.com.codeka.common.Vector2;
-import au.com.codeka.common.Voronoi;
-import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.eventbus.EventBus;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.BuildManager;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Sector;
@@ -278,16 +271,16 @@ public class StarfieldSceneManager extends SectorSceneManager {
     if (zoomFactor >= 0.6f && isTacticalVisible) {
       isTacticalVisible = false;
       tacticalZoomAlpha = 0.0f;
-      mActivity.runOnUpdateThread(updateTacticalRunnable);
+      //mActivity.runOnUpdateThread(updateTacticalRunnable);
     } else if (zoomFactor < 0.4f && !isTacticalVisible) {
       isTacticalVisible = true;
       tacticalZoomAlpha = 1.0f;
-      mActivity.runOnUpdateThread(updateTacticalRunnable);
+      //mActivity.runOnUpdateThread(updateTacticalRunnable);
     }
     if (zoomFactor >= 0.4f && zoomFactor < 0.6f) {
       isTacticalVisible = true;
       tacticalZoomAlpha = 1.0f - ((zoomFactor - 0.4f) * 5.0f); // make it 1...0
-      mActivity.runOnUpdateThread(updateTacticalRunnable);
+      //mActivity.runOnUpdateThread(updateTacticalRunnable);
     }
 
     if (wasTacticalVisible != isTacticalVisible || wasBackgroundVisible != isBackgroundVisible) {
@@ -319,49 +312,30 @@ public class StarfieldSceneManager extends SectorSceneManager {
     }
   };
 
-  /**
-   * Updates the tactical entities with the current zoom alpha on the update thread.
-   */
-  private final Runnable updateTacticalRunnable = new Runnable() {
-    @Override
-    public void run() {
-      StarfieldScene scene = getScene();
-      if (scene == null) {
-        return;
-      }
-      SparseArray<TacticalControlField> controlFields = scene.getControlFields();
-      if (controlFields == null) {
-        return;
-      }
-      for (int i = 0; i < controlFields.size(); i++) {
-        controlFields.valueAt(i).updateAlpha(isTacticalVisible, tacticalZoomAlpha);
-      }
-    }
-  };
-
   private List<Pair<Long, Long>> drawScene(StarfieldScene scene) {
     List<Pair<Long, Long>> missingSectors = null;
 
-    for (int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
-      for (int x = -scene.getSectorRadius(); x <= scene.getSectorRadius(); x++) {
-        long sX = scene.getSectorX() + x;
-        long sY = scene.getSectorY() + y;
-        Sector sector = SectorManager.i.getSector(sX, sY);
-        if (sector == null) {
-          if (missingSectors == null) {
-            missingSectors = new ArrayList<>();
+    // if the tactical view is visible, we can completely skip drawing the background.
+    if (!isTacticalVisible) {
+      for (int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
+        for (int x = -scene.getSectorRadius(); x <= scene.getSectorRadius(); x++) {
+          long sX = scene.getSectorX() + x;
+          long sY = scene.getSectorY() + y;
+          Sector sector = SectorManager.i.getSector(sX, sY);
+          if (sector == null) {
+            if (missingSectors == null) {
+              missingSectors = new ArrayList<>();
+            }
+            missingSectors.add(new Pair<>(sX, sY));
+            continue;
           }
-          missingSectors.add(new Pair<>(sX, sY));
-          continue;
-        }
 
-        int sx = (x * Sector.SECTOR_SIZE);
-        int sy = -(y * Sector.SECTOR_SIZE);
-        drawBackground(scene, sector, sx, sy);
+          int sx = (x * Sector.SECTOR_SIZE);
+          int sy = -(y * Sector.SECTOR_SIZE);
+          drawBackground(scene, sector, sx, sy);
+        }
       }
     }
-
-    addTacticalView(scene);
 
     for (int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
       for (int x = -scene.getSectorRadius(); x <= scene.getSectorRadius(); x++) {
@@ -423,6 +397,10 @@ public class StarfieldSceneManager extends SectorSceneManager {
    * Draws a sector, which is a 1024x1024 area of stars.
    */
   private void addSector(StarfieldScene scene, int offsetX, int offsetY, Sector sector) {
+    if (isTacticalVisible) {
+      addTacticalSprite(scene, offsetX, offsetY, sector);
+    }
+
     for (BaseStar star : sector.getStars()) {
       addStar(scene, (Star) star, offsetX, offsetY);
     }
@@ -433,6 +411,24 @@ public class StarfieldSceneManager extends SectorSceneManager {
         }
       }
     }
+  }
+
+  /**
+   * Adds a sprite for the 'tactical' view, This is a single texture over the whole sector which
+   * is colored in depending on who owns the star underneath it.
+   */
+  private void addTacticalSprite(Scene scene, int offsetX, int offsetY, Sector sector) {
+    BitmapTextureAtlas textureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(),
+        256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+    TacticalBitmapTextureSource bitmapSource = TacticalBitmapTextureSource.create(sector);
+    ITextureRegion textureRegion = BitmapTextureAtlasTextureRegionFactory.createFromSource(
+        textureAtlas, bitmapSource, 0, 0);
+    textureAtlas.load();
+
+    Sprite tacticalSprite = new Sprite(offsetX + Sector.SECTOR_SIZE / 2,
+        offsetY + Sector.SECTOR_SIZE / 2, Sector.SECTOR_SIZE, Sector.SECTOR_SIZE,
+        textureRegion, mActivity.getVertexBufferObjectManager());
+    scene.attachChild(tacticalSprite);
   }
 
   /**
@@ -518,86 +514,6 @@ public class StarfieldSceneManager extends SectorSceneManager {
         new FleetEntity(this, srcPoint, destPoint, fleet, mActivity.getVertexBufferObjectManager());
     scene.registerTouchArea(fleetEntity.getTouchEntity());
     scene.attachChild(fleetEntity);
-  }
-
-  private void addTacticalView(StarfieldScene scene) {
-    if (!isTacticalVisible) {
-      return;
-    }
-    ArrayList<Vector2> points = new ArrayList<>();
-    SparseArray<List<Vector2>> empirePoints = new SparseArray<>();
-
-    for (int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
-      for (int x = -scene.getSectorRadius(); x <= scene.getSectorRadius(); x++) {
-        long sX = scene.getSectorX() + x;
-        long sY = scene.getSectorY() + y;
-
-        Sector sector = SectorManager.i.getSector(sX, sY);
-        if (sector == null) {
-          continue;
-        }
-
-        int sx = (x * Sector.SECTOR_SIZE);
-        int sy = -(y * Sector.SECTOR_SIZE);
-
-        for (BaseStar star : sector.getStars()) {
-          int starX = sx + star.getOffsetX();
-          int starY = sy + (Sector.SECTOR_SIZE - star.getOffsetY());
-          Vector2 pt =
-              new Vector2((float) starX / Sector.SECTOR_SIZE, (float) starY / Sector.SECTOR_SIZE);
-
-          TreeSet<Integer> doneEmpires = new TreeSet<>();
-          for (BaseColony c : star.getColonies()) {
-            Integer empireID = ((Colony) c).getEmpireID();
-            if (empireID == null) {
-              continue;
-            }
-            if (doneEmpires.contains(empireID)) {
-              continue;
-            }
-            doneEmpires.add(empireID);
-            List<Vector2> thisEmpirePoints = empirePoints.get(empireID);
-            if (thisEmpirePoints == null) {
-              thisEmpirePoints = new ArrayList<>();
-              empirePoints.put(empireID, thisEmpirePoints);
-            }
-            thisEmpirePoints.add(pt);
-          }
-          points.add(pt);
-        }
-      }
-    }
-
-    SparseArray<TacticalControlField> controlFields = new SparseArray<>();
-    PointCloud pointCloud = new PointCloud(points);
-    Voronoi v = new Voronoi(pointCloud);
-
-    for (int i = 0; i < empirePoints.size(); i++) {
-      TacticalControlField cf = new TacticalControlField(pointCloud, v);
-
-      List<Vector2> pts = empirePoints.valueAt(i);
-      for (Vector2 pt : pts) {
-        cf.addPointToControlField(pt);
-      }
-
-      int colour = Color.RED;
-      int empireID = empirePoints.keyAt(i);
-      Empire empire = EmpireManager.i.getEmpire(empireID);
-      if (empire != null) {
-        colour = EmpireShieldManager.i.getShieldColour(empire);
-      } else {
-        final int theEmpireID = empireID;
-        getActivity().runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            EmpireManager.i.refreshEmpire(theEmpireID);
-          }
-        });
-      }
-      cf.addToScene(scene, getActivity().getVertexBufferObjectManager(), colour, tacticalZoomAlpha);
-      controlFields.put(empireID, cf);
-    }
-    scene.setControlFields(controlFields);
   }
 
   @Override
