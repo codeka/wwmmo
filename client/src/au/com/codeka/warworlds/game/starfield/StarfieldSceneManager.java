@@ -419,16 +419,17 @@ public class StarfieldSceneManager extends SectorSceneManager {
    */
   private void addTacticalSprite(Scene scene, int offsetX, int offsetY, Sector sector) {
     BitmapTextureAtlas textureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(),
-        256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        256, 256, TextureOptions.NEAREST);
     TacticalBitmapTextureSource bitmapSource = TacticalBitmapTextureSource.create(sector);
     ITextureRegion textureRegion = BitmapTextureAtlasTextureRegionFactory.createFromSource(
         textureAtlas, bitmapSource, 0, 0);
     textureAtlas.load();
 
-    Sprite tacticalSprite = new Sprite(offsetX + Sector.SECTOR_SIZE / 2,
-        offsetY + Sector.SECTOR_SIZE / 2, Sector.SECTOR_SIZE, Sector.SECTOR_SIZE,
-        textureRegion, mActivity.getVertexBufferObjectManager());
-    scene.attachChild(tacticalSprite);
+    TacticalOverlayEntity tacticalOverlayEntity = new TacticalOverlayEntity(
+        offsetX + Sector.SECTOR_SIZE / 2, offsetY + Sector.SECTOR_SIZE / 2,
+        Sector.SECTOR_SIZE, Sector.SECTOR_SIZE, textureRegion,
+        mActivity.getVertexBufferObjectManager());
+    scene.attachChild(tacticalOverlayEntity);
   }
 
   /**

@@ -27,7 +27,6 @@ public class StarfieldScene extends Scene {
     private StarEntity mSelectedStarEntity;
     private FleetEntity mSelectedFleetEntity;
     private List<Entity> backgroundEntities;
-    private SparseArray<TacticalControlField> controlFields;
 
     private int sectorRadius;
 
@@ -45,9 +44,9 @@ public class StarfieldScene extends Scene {
         mRadarIndicator = new RadarIndicatorEntity(
                 sectorSceneManager.getActivity().getVertexBufferObjectManager());
 
-        mFleets = new HashMap<String, FleetEntity>();
-        mStars = new HashMap<String, StarEntity>();
-        backgroundEntities = new ArrayList<Entity>();
+        mFleets = new HashMap<>();
+        mStars = new HashMap<>();
+        backgroundEntities = new ArrayList<>();
     }
 
     public void attachChild(StarEntity starEntity) {
@@ -65,16 +64,8 @@ public class StarfieldScene extends Scene {
       backgroundEntities.add(backgroundEntity);
     }
 
-    public void setControlFields(SparseArray<TacticalControlField> controlFields) {
-        this.controlFields = controlFields;
-    }
-
     public List<Entity> getBackgroundEntities() {
         return backgroundEntities;
-    }
-
-    public SparseArray<TacticalControlField> getControlFields() {
-        return controlFields;
     }
 
     public int getSectorRadius() {
