@@ -220,4 +220,20 @@
     </upgrades>
     <show inSolarSystem="true" />
   </design>
+  <design id="wormhole-disruptor">
+    <name>Wormhole Disruptor</name>
+    <sprite>building.wormhole-disruptor</sprite>
+    <description><![CDATA[
+      <p>A Wormhole Disruptor is an offensive building used to attack nearby wormholes.</p>
+      <p>Each upgrade of the Wormhole Disruptor will extend it's range, but keep in mind the
+      range will always be quite limited, so be sure to only build a Disruptor on the closest
+      star to the wormhole you can.</p>
+    ]]></description>
+    <effects>
+      <!--effect kind="wormhole-disruptor" range="10" /-->
+    </effects>
+    <cost minerals="148000" time="215.0" />
+    <limits maxPerColony="1" />
+    <show  inSolarystem="true" />
+  </design>
 </designs>
