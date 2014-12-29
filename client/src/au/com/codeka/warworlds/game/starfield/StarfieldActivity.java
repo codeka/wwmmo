@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.util.Locale;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,12 +10,13 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
+
+import com.google.protobuf.InvalidProtocolBufferException;
+
+import java.util.Locale;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.BaseStar.StarType;
@@ -45,10 +44,7 @@ import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShieldManager;
-import au.com.codeka.warworlds.model.Sprite;
-import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
-import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.billing.IabException;
@@ -57,8 +53,6 @@ import au.com.codeka.warworlds.model.billing.IabResult;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 /**
  * The {@link StarfieldActivity} is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
@@ -66,13 +60,12 @@ import com.google.protobuf.InvalidProtocolBufferException;
 public class StarfieldActivity extends BaseStarfieldActivity {
   private static final Log log = new Log("StarfieldActivity");
   private Context context = this;
-  private PlanetListSimple planetList;
-  private FleetListSimple fleetList;
   private Star selectedStar;
   private Fleet selectedFleet;
   private StarSummary homeStar;
   private View bottomPane;
   private Button allianceBtn;
+  private SelectionDetailsView selectionDetailsView;
 
   private Purchase starRenamePurchase;
 
@@ -90,82 +83,65 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   public void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    planetList = (PlanetListSimple) findViewById(R.id.planet_list);
-    fleetList = (FleetListSimple) findViewById(R.id.fleet_list);
-
-    findViewById(R.id.selected_star).setVisibility(View.GONE);
-    findViewById(R.id.selected_fleet).setVisibility(View.GONE);
     bottomPane = findViewById(R.id.bottom_pane);
+    selectionDetailsView = (SelectionDetailsView) findViewById(R.id.selection_details);
 
     if (isPortrait()) {
       InfobarView infobar = (InfobarView) findViewById(R.id.infobar);
       infobar.hideEmpireName();
     }
 
-    planetList.setPlanetSelectedHandler(new PlanetListSimple.PlanetSelectedHandler() {
+    selectionDetailsView.setHandlers(new PlanetListSimple.PlanetSelectedHandler() {
       @Override
       public void onPlanetSelected(Planet planet) {
-        navigateToPlanet(selectedStar, planet, false);
-      }
-    });
-    fleetList.setFleetSelectedHandler(new FleetListSimple.FleetSelectedHandler() {
-      @Override
-      public void onFleetSelected(Fleet fleet) {
-        if (selectedStar == null) {
-          return; //??
-        }
+          navigateToPlanet(selectedStar, planet, false);
+          }
+        }, new FleetListSimple.FleetSelectedHandler() {
+          @Override
+          public void onFleetSelected(Fleet fleet) {
+            if (selectedStar == null) {
+              return; //??
+            }
 
-        openEmpireActivityAtFleet(selectedStar, fleet);
-      }
-    });
+            openEmpireActivityAtFleet(selectedStar, fleet);
+          }
+        }, new View.OnClickListener() { // "Rename" button
+          @Override
+          public void onClick(View v) {
+            onRenameClick();
+          }
+        }, new View.OnClickListener() { // "View" button
+          @Override
+          public void onClick(View v) {
+            if (selectedStar == null) {
+              return;
+            }
 
-    final Button empireBtn = (Button) findViewById(R.id.empire_btn);
-    empireBtn.setOnClickListener(new View.OnClickListener() {
+            Intent intent = new Intent(context, SolarSystemActivity.class);
+            intent.putExtra("au.com.codeka.warworlds.StarKey", selectedStar.getKey());
+            startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
+          }
+        }, new View.OnClickListener() { // "Intel" button
+          @Override
+          public void onClick(View v) {
+            if (selectedStar != null) {
+              ScoutReportDialog dialog = new ScoutReportDialog();
+              dialog.setStar(selectedStar);
+              dialog.show(getSupportFragmentManager(), "");
+            }
+          }
+        });
+
+    findViewById(R.id.empire_btn).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         openEmpireActivity();
       }
     });
-
-    final Button scoutReportBtn = (Button) findViewById(R.id.scout_report_btn);
-    scoutReportBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (selectedStar != null) {
-          ScoutReportDialog dialog = new ScoutReportDialog();
-          dialog.setStar(selectedStar);
-          dialog.show(getSupportFragmentManager(), "");
-        }
-      }
-    });
-
-    final Button sitrepBtn = (Button) findViewById(R.id.sitrep_btn);
-    sitrepBtn.setOnClickListener(new View.OnClickListener() {
+    findViewById(R.id.sitrep_btn).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         openSitrepActivity();
-      }
-    });
-
-    final Button viewBtn = (Button) findViewById(R.id.view_btn);
-    viewBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (selectedStar == null) {
-          return;
-        }
-
-        Intent intent = new Intent(context, SolarSystemActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.StarKey", selectedStar.getKey());
-        startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
-      }
-    });
-
-    final Button renameBtn = (Button) findViewById(R.id.rename_btn);
-    renameBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onRenameClick();
       }
     });
 
@@ -658,11 +634,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   private void handleDeselect() {
     selectedStar = null;
     selectedFleet = null;
-
-    findViewById(R.id.loading_container).setVisibility(View.GONE);
-    findViewById(R.id.selected_star).setVisibility(View.GONE);
-    findViewById(R.id.selected_fleet).setVisibility(View.GONE);
-
+    selectionDetailsView.deselect();
     hideBottomPane(false);
   }
 
@@ -671,7 +643,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     public void onStarFetched(Star star) {
       if (selectedStar != null && selectedStar.getID() == star.getID()) {
         selectedStar = star;
-        updateStarSelection();
+        selectionDetailsView.showStar(selectedStar);
       }
     }
 
@@ -724,62 +696,17 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     }
 
     if (selectedStar != null && selectedStar.getKey().equals(star.getKey())) {
-      updateStarSelection();
+      selectionDetailsView.showStar(selectedStar);
       return;
     }
     selectedStar = star;
     selectedFleet = null;
 
-    findViewById(R.id.loading_container).setVisibility(View.VISIBLE);
-    findViewById(R.id.selected_star).setVisibility(View.GONE);
-    findViewById(R.id.selected_fleet).setVisibility(View.GONE);
+    selectionDetailsView.loading();
     showBottomPane();
 
     // force the star to refresh itself
     StarManager.i.refreshStar(star.getID());
-  }
-
-  private void updateStarSelection() {
-    final View selectionLoadingContainer = findViewById(R.id.loading_container);
-    final View selectedStarContainer = findViewById(R.id.selected_star);
-    final View selectedFleetContainer = findViewById(R.id.selected_fleet);
-    final TextView starName = (TextView) findViewById(R.id.star_name);
-    final TextView starKind = (TextView) findViewById(R.id.star_kind);
-    final ImageView starIcon = (ImageView) findViewById(R.id.star_icon);
-    final Button renameButton = (Button) findViewById(R.id.rename_btn);
-
-    selectionLoadingContainer.setVisibility(View.GONE);
-    selectedStarContainer.setVisibility(View.VISIBLE);
-    selectedFleetContainer.setVisibility(View.GONE);
-
-    planetList.setStar(selectedStar);
-    fleetList.setStar(selectedStar);
-
-    MyEmpire myEmpire = EmpireManager.i.getEmpire();
-    int numMyEmpire = 0;
-    int numOtherEmpire = 0;
-    for (BaseColony colony : selectedStar.getColonies()) {
-      if (colony.getEmpireKey() == null) {
-        continue;
-      }
-      if (colony.getEmpireKey().equals(myEmpire.getKey())) {
-        numMyEmpire++;
-      } else {
-        numOtherEmpire++;
-      }
-    }
-    if (numMyEmpire > numOtherEmpire) {
-      renameButton.setVisibility(View.VISIBLE);
-    } else {
-      renameButton.setVisibility(View.GONE);
-    }
-
-    starName.setText(selectedStar.getName());
-    starKind.setText(String
-        .format(Locale.ENGLISH, "%s %s", selectedStar.getStarType().getShortName(),
-            selectedStar.getCoordinateString()));
-    Sprite starImage = StarImageManager.getInstance().getSprite(selectedStar, 80, true);
-    starIcon.setImageDrawable(new SpriteDrawable(starImage));
   }
 
   private void onFleetSelected(final Fleet fleet) {
@@ -791,15 +718,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     selectedStar = null;
     selectedFleet = fleet;
 
-    final View selectionLoadingContainer = findViewById(R.id.loading_container);
-    final View selectedStarContainer = findViewById(R.id.selected_star);
-    final FleetInfoView fleetInfoView = (FleetInfoView) findViewById(R.id.selected_fleet);
-
-    fleetInfoView.setFleet(fleet);
-    selectionLoadingContainer.setVisibility(View.GONE);
-    selectedStarContainer.setVisibility(View.GONE);
-    fleetInfoView.setVisibility(View.VISIBLE);
-
+    selectionDetailsView.showFleet(selectedFleet);
     showBottomPane();
   }
 }
