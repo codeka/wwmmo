@@ -6,7 +6,10 @@ import java.io.InputStream;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import au.com.codeka.common.Log;
+
 public class ImageHelper {
+    private static final Log log = new Log("ImageHelper");
     private InputStream mInputStream;
     private Bitmap mImage;
     private int mWidth;
@@ -52,6 +55,7 @@ public class ImageHelper {
         while (mWidth / scale / 2 >= 100 && mHeight / scale / 2 >= 100) {
             scale *= 2;
         }
+        log.info("Loading image width known size: %dx%d, scale=%d", mWidth, mHeight, scale);
 
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inPurgeable = true;
@@ -70,6 +74,7 @@ public class ImageHelper {
         while (opts.outWidth / scale / 2 >= 100 && opts.outHeight / scale / 2 >= 100) {
             scale *= 2;
         }
+        log.info("Loading image from markable stream, scale=%d", scale);
 
         opts = new BitmapFactory.Options();
         opts.inPurgeable = true;
@@ -79,6 +84,7 @@ public class ImageHelper {
     }
 
     private void loadImageNoMark() {
+        log.info("Loading image from unmarkable");
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inPurgeable = true;
         opts.inInputShareable = true;

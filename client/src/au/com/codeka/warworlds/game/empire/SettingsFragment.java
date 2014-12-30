@@ -259,6 +259,7 @@ public class SettingsFragment extends BaseFragment {
     private void loadShieldImage() {
         Bitmap bmp = mImagePickerHelper.getImage();
         if (bmp != null) {
+            log.info("Got an image from the image picker");
             bmp = combineShieldImage(getActivity(), bmp);
 
             ImageView currentShield = (ImageView) mView.findViewById(R.id.current_shield);
@@ -267,7 +268,9 @@ public class SettingsFragment extends BaseFragment {
             currentShieldSmall.setImageBitmap(bmp);
 
             // and now we can enable the 'save' button
-            ((Button) mView.findViewById(R.id.save_btn)).setEnabled(true);;
+            mView.findViewById(R.id.save_btn).setEnabled(true);;
+        } else {
+            log.info("No image picked, loading as normal.");
         }
     }
 

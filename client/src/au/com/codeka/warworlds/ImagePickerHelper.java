@@ -10,7 +10,10 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import au.com.codeka.common.Log;
+
 public class ImagePickerHelper {
+    private static final Log log = new Log("ImagePickerHelper");
     private static final int CHOOSE_IMAGE_RESULT_ID = 7406;
     private Activity mActivity;
     private ImageHelper mImageHelper;
@@ -23,22 +26,30 @@ public class ImagePickerHelper {
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == CHOOSE_IMAGE_RESULT_ID && data != null && data.getData() != null) {
             Uri uri = data.getData();
+            log.info("Image picked: %s", uri);
 
             // If we can query for with/height, that can save us loading the image twice. Not
             // all content providers support it, though.
             int width = 0;
             int height = 0;
+            Cursor cursor = null;
             try {
-                Cursor cursor = mActivity.getContentResolver().query(uri, new String[] {
+                cursor = mActivity.getContentResolver().query(uri, new String[] {
                         MediaStore.MediaColumns.WIDTH, MediaStore.MediaColumns.HEIGHT
                     }, null, null, null);
                 if (cursor.moveToFirst()) {
                     width = cursor.getInt(0);
                     height = cursor.getInt(1);
+                    log.info("Got image size: %dx%d", width, height);
                 }
             } catch (Exception e) {
                 // There can be various exceptions, all of which result in us ignoring width/height.
+                log.info("Could not get image size: %s", e.getMessage());
                 width = height = 0;
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
             }
 
             try {

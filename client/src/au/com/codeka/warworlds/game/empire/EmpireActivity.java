@@ -3,6 +3,8 @@ package au.com.codeka.warworlds.game.empire;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
@@ -15,6 +17,7 @@ import au.com.codeka.warworlds.model.EmpireManager;
  * This dialog shows the status of the empire. You can see all your colonies, all your fleets, etc.
  */
 public class EmpireActivity extends TabFragmentActivity {
+    private static final Log log = new Log("EmpireActivity");
     Context mContext = this;
     Bundle mExtras = null;
     boolean mFirstRefresh = true;
@@ -105,6 +108,7 @@ public class EmpireActivity extends TabFragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (mImagePickerHelper.onActivityResult(requestCode, resultCode, data)) {
+            log.info("Switching to settings tab!");
             getTabHost().setCurrentTabByTag("Settings");
         }
 
