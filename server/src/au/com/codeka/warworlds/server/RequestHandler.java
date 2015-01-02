@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -231,7 +232,9 @@ public class RequestHandler {
         mResponse.setContentType("text/plain");
         mResponse.setCharacterEncoding("utf-8");
         try {
-            mResponse.getWriter().write(PbFormatter.toJson(pb));
+            PrintWriter writer = mResponse.getWriter();
+            writer.write(PbFormatter.toJson(pb));
+            writer.flush();
         } catch (IOException e) {
         }
     }
@@ -240,7 +243,9 @@ public class RequestHandler {
         mResponse.setContentType("application/json");
         mResponse.setCharacterEncoding("utf-8");
         try {
-            mResponse.getWriter().write(PbFormatter.toJson(pb));
+            PrintWriter writer = mResponse.getWriter();
+            writer.write(PbFormatter.toJson(pb));
+            writer.flush();
         } catch (IOException e) {
         }
     }
