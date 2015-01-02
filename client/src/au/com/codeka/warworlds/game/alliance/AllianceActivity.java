@@ -475,6 +475,15 @@ public class AllianceActivity extends TabFragmentActivity {
             }
 
             @Override
+            public int getItemViewType(int position) {
+                if (getItem(position) == null) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+
+            @Override
             public long getItemId(int position) {
                 ItemEntry entry = (ItemEntry) getItem(position);
                 if (entry == null) {
