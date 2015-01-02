@@ -48,10 +48,10 @@ class Empire(db.Model):
     empire_mdl = Empire.get(empire_key)
     if not empire_mdl:
       empire_mdl = Empire(key=empire_key, realm_name=realm_name, empire_id=int(empire["key"]),
-                          display_name=empire["display_name"].strip(), user_email=empire["email"],
-                          empire_json=json.dumps(empire))
+                          display_name=empire["display_name"].strip().replace('\n', ' ').replace('\r', ' '),
+                          user_email=empire["email"], empire_json=json.dumps(empire))
     else:
-      empire_mdl.display_name = empire["display_name"].strip()
+      empire_mdl.display_name = empire["display_name"].strip().replace('\n', ' ').replace('\r', ' ')
       empire_mdl.user_email = empire["email"]
       empire_mdl.empire_json = json.dumps(empire)
 
