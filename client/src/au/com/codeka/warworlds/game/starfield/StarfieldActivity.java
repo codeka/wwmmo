@@ -130,6 +130,12 @@ public class StarfieldActivity extends BaseStarfieldActivity {
               dialog.show(getSupportFragmentManager(), "");
             }
           }
+        }, new SelectionDetailsView.ZoomToStarHandler() {
+          @Override
+          public void onZoomToStar(Star star) {
+            mStarfield.scrollTo(star.getSectorX(), star.getSectorY(),
+                star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY());
+          }
         });
 
     findViewById(R.id.empire_btn).setOnClickListener(new View.OnClickListener() {
