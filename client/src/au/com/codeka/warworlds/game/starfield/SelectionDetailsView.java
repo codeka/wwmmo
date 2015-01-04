@@ -161,6 +161,10 @@ public class SelectionDetailsView extends FrameLayout {
   }
 
   private void refreshWormholeDetails() {
+    if (star.getStarType().getType() != Star.Type.Wormhole) {
+      return;
+    }
+
     destStar = null;
     if (star.getWormholeExtra().getDestWormholeID() != 0) {
       destStar = StarManager.i.getStar(star.getWormholeExtra().getDestWormholeID());

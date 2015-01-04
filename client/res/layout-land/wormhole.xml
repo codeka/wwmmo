@@ -39,10 +39,33 @@
               android:gravity="center_horizontal"
               android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <RelativeLayout
+        android:id="@+id/empire_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_above="@id/destination_name"
+        android:layout_toLeftOf="@id/centre">
+
+        <TextView android:id="@+id/empire_name"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_centerHorizontal="true"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:text="Empire name"/>
+
+        <ImageView android:id="@+id/empire_icon"
+                   android:layout_width="20dp"
+                   android:layout_height="20dp"
+                   android:layout_centerHorizontal="true"
+                   android:layout_toLeftOf="@id/empire_name"
+                   android:src="@drawable/app_icon" />
+    </RelativeLayout>
+
     <TextView android:id="@+id/star_name"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_above="@id/destination_name"
+              android:layout_above="@id/empire_details"
               android:layout_alignParentLeft="true"
               android:layout_toLeftOf="@id/centre"
               android:gravity="center_horizontal"

@@ -10,6 +10,7 @@ import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.scene.Scene;
 import org.joda.time.DateTime;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
@@ -18,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseStar;
@@ -32,9 +34,11 @@ import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -179,6 +183,16 @@ public class WormholeFragment extends BaseGlFragment {
                 refreshStar();
             }
         }
+
+        @EventHandler
+        public void onEmpireUpdated(Empire empire) {
+          refreshStar();
+        }
+
+        @EventHandler
+        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+            refreshStar();
+        }
     };
 
     private void refreshStar() {
@@ -216,6 +230,21 @@ public class WormholeFragment extends BaseGlFragment {
             destinationName.setText(Html.fromHtml(str));
 
             updateTuningProgress();
+        }
+
+        Empire empire = EmpireManager.i.getEmpire(star.getWormholeExtra().getEmpireID());
+        if (empire != null) {
+            TextView empireName = (TextView) contentView.findViewById(R.id.empire_name);
+            empireName.setVisibility(View.VISIBLE);
+            empireName.setText(empire.getDisplayName());
+
+            Bitmap bmp = EmpireShieldManager.i.getShield(getActivity(), empire);
+            ImageView empireIcon = (ImageView) contentView.findViewById(R.id.empire_icon);
+            empireIcon.setVisibility(View.VISIBLE);
+            empireIcon.setImageBitmap(bmp);
+        } else {
+            contentView.findViewById(R.id.empire_name).setVisibility(View.GONE);
+            contentView.findViewById(R.id.empire_icon).setVisibility(View.GONE);
         }
     }
 

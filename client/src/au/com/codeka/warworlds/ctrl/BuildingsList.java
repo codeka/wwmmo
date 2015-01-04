@@ -375,7 +375,7 @@ public class BuildingsList extends ListView {
                 row1.removeAllViews();
                 addTextToRow(mContext, row1, design.getDisplayName());
                 String requiredHtml = design.getDependenciesHtml(mColony);
-                row2.setText(requiredHtml);
+                row2.setText(Html.fromHtml(requiredHtml));
 
                 row3.setVisibility(View.GONE);
             }

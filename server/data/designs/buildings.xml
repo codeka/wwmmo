@@ -66,6 +66,11 @@
       building, the more advanced research becomes available.</p>
     ]]></description>
     <cost minerals="1000" time="0.75" />
+    <upgrades>
+      <upgrade level="2">
+        <cost minerals="1500" time="1.2" />
+      </upgrade>
+    </upgrades>
     <limits maxPerColony="1" />
   </design>
   <design id="groundshield">
@@ -232,8 +237,11 @@
     <effects>
       <!--effect kind="wormhole-disruptor" range="10" /-->
     </effects>
+    <dependencies>
+      <requires building="research" level="2" />
+    </dependencies>
     <cost minerals="148000" time="215.0" />
     <limits maxPerColony="1" />
-    <show  inSolarystem="true" />
+    <show inSolarSystem="true" />
   </design>
 </designs>
