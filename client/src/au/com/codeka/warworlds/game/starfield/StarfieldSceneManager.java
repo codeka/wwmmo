@@ -137,6 +137,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
             "spritesheets/ship.upgrade.boost.png", 2, 1));
 
     mActivity.getShaderProgramManager().loadShaderProgram(RadarIndicatorEntity.getShaderProgram());
+    mActivity.getShaderProgramManager().loadShaderProgram(
+        WormholeDisruptorIndicatorEntity.getShaderProgram());
     mActivity.getTextureManager().loadTexture(starTextureAtlas);
     mActivity.getTextureManager().loadTexture(backgroundGasTextureAtlas);
     mActivity.getTextureManager().loadTexture(backgroundStarsTextureAtlas);

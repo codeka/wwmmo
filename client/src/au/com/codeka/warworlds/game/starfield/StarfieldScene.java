@@ -8,7 +8,6 @@ import java.util.Map;
 import org.andengine.entity.Entity;
 import org.andengine.entity.scene.Scene;
 
-import android.util.SparseArray;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Sector;
@@ -19,6 +18,7 @@ public class StarfieldScene extends Scene {
     private SelectableEntity mSelectingEntity;
     private SelectionIndicatorEntity mSelectionIndicator;
     private RadarIndicatorEntity mRadarIndicator;
+    private WormholeDisruptorIndicatorEntity mWormholeDisruptorIndicator;
     private long sectorX;
     private long sectorY;
 
@@ -42,6 +42,8 @@ public class StarfieldScene extends Scene {
                 sectorSceneManager.getActivity().getEngine(),
                 sectorSceneManager.getActivity().getVertexBufferObjectManager());
         mRadarIndicator = new RadarIndicatorEntity(
+                sectorSceneManager.getActivity().getVertexBufferObjectManager());
+        mWormholeDisruptorIndicator = new WormholeDisruptorIndicatorEntity(
                 sectorSceneManager.getActivity().getVertexBufferObjectManager());
 
         mFleets = new HashMap<>();
@@ -224,6 +226,9 @@ public class StarfieldScene extends Scene {
         if (mRadarIndicator.getParent() != null) {
             mRadarIndicator.getParent().detachChild(mRadarIndicator);
         }
+        if (mWormholeDisruptorIndicator.getParent() != null) {
+            mWormholeDisruptorIndicator.getParent().detachChild(mWormholeDisruptorIndicator);
+        }
 
         if (mSelectedStarEntity != null) {
             mSelectionIndicator.setSelectedEntity(mSelectedStarEntity);
@@ -234,6 +239,16 @@ public class StarfieldScene extends Scene {
             if (radarRadius > 0.0f) {
                 mSelectedStarEntity.attachChild(mRadarIndicator);
                 mRadarIndicator.setScale(radarRadius * Sector.PIXELS_PER_PARSEC * 2.0f);
+            }
+
+            // if the selected star has a wormhole disruptor, pick the one with the biggest radius
+            // to display
+            float wormholeDisruptorRadius = mSelectedStarEntity.getStar().getWormholeDisruptorRange(
+                EmpireManager.i.getEmpire().getKey());
+            if (wormholeDisruptorRadius > 0.0f) {
+                mSelectedStarEntity.attachChild(mWormholeDisruptorIndicator);
+                mWormholeDisruptorIndicator.setScale(
+                    wormholeDisruptorRadius * Sector.PIXELS_PER_PARSEC * 2.0f);
             }
         }
         if (mSelectedFleetEntity != null) {

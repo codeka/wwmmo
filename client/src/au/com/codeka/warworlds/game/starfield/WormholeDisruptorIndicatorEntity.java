@@ -5,16 +5,16 @@ import android.graphics.Color;
 import org.andengine.opengl.shader.ShaderProgram;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-/** Indicator entity to show the radius of the radar in a star. */
-public class RadarIndicatorEntity extends BaseIndicatorEntity {
+/** Indicator entity for a wormhole disruptor. */
+public class WormholeDisruptorIndicatorEntity extends BaseIndicatorEntity {
   private static final IndicatorEntityShaderProgram SHADER_PROGRAM
-      = new IndicatorEntityShaderProgram(Color.GREEN);
+      = new IndicatorEntityShaderProgram(Color.RED);
 
   public static ShaderProgram getShaderProgram() {
-        return SHADER_PROGRAM;
-    }
+    return SHADER_PROGRAM;
+  }
 
-  public RadarIndicatorEntity(VertexBufferObjectManager vertexBufferObjectManager) {
+  public WormholeDisruptorIndicatorEntity(VertexBufferObjectManager vertexBufferObjectManager) {
     super(vertexBufferObjectManager, SHADER_PROGRAM);
   }
 }

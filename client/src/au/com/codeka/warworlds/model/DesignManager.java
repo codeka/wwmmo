@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.model.designeffects.BuildingEffect;
 import au.com.codeka.warworlds.model.designeffects.EmptySpaceMoverShipEffect;
 import au.com.codeka.warworlds.model.designeffects.RadarBuildingEffect;
 import au.com.codeka.warworlds.model.designeffects.ShipEffect;
+import au.com.codeka.warworlds.model.designeffects.WormholeDisruptorBuildingEffect;
 
 /**
  * This is the base "manager" class that manages designs for ships and buildings.
@@ -57,6 +58,8 @@ public class DesignManager extends BaseDesignManager {
         } else {
             if (kind.equals("radar")) {
                 return new RadarBuildingEffect(effectElement);
+            } else if (kind.equals("wormhole-disruptor")) {
+                return new WormholeDisruptorBuildingEffect(effectElement);
             } else {
                 return new BuildingEffect(effectElement);
             }

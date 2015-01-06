@@ -235,13 +235,51 @@
       star to the wormhole you can.</p>
     ]]></description>
     <effects>
-      <!--effect kind="wormhole-disruptor" range="10" /-->
+      <effect kind="wormhole-disruptor" range="10" />
     </effects>
     <dependencies>
       <requires building="research" level="2" />
     </dependencies>
     <cost minerals="148000" time="215.0" />
     <limits maxPerColony="1" />
+    <upgrades>
+      <upgrade level="2">
+          <cost minerals="74000" time="160.0" />
+          <effects>
+              <effect kind="wormhole-disruptor" range="15" />
+          </effects>
+          <dependencies>
+              <requires building="research" level="2" />
+          </dependencies>
+      </upgrade>
+      <upgrade level="3">
+          <cost minerals="74000" time="160.0" />
+          <effects>
+              <effect kind="wormhole-disruptor" range="20" />
+          </effects>
+          <dependencies>
+              <requires building="research" level="2" />
+          </dependencies>
+      </upgrade>
+      <upgrade level="4">
+          <cost minerals="74000" time="160.0" />
+          <effects>
+              <effect kind="wormhole-disruptor" range="25" />
+          </effects>
+          <dependencies>
+              <requires building="research" level="2" />
+          </dependencies>
+      </upgrade>
+      <upgrade level="5">
+          <cost minerals="74000" time="160.0" />
+          <effects>
+              <effect kind="wormhole-disruptor" range="30" />
+          </effects>
+          <dependencies>
+              <requires building="research" level="2" />
+          </dependencies>
+      </upgrade>
+    </upgrades>
     <show inSolarSystem="true" />
   </design>
 </designs>
