@@ -80,6 +80,11 @@
                     android:layout_alignParentRight="true"
                     android:layout_marginBottom="-6dp">
 
+        <View android:id="@id/center"
+              android:layout_width="1dp"
+              android:layout_height="match_parent"
+              android:layout_centerHorizontal="true" />
+
         <Button android:id="@+id/rename_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -112,6 +117,28 @@
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="10dp"
                 android:text="View Destination" />
+
+        <Button android:id="@+id/destroy_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/center"
+                android:layout_above="@id/view_destination_btn"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="10dp"
+                android:text="Destroy" />
+
+        <Button android:id="@+id/takeover_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@id/center"
+                android:layout_above="@+id/view_destination_btn"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="10dp"
+                android:text="Take over" />
 
     </RelativeLayout>
 

@@ -10,6 +10,7 @@ import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.scene.Scene;
 import org.joda.time.DateTime;
 
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +29,7 @@ import au.com.codeka.warworlds.BaseGlFragment;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.ctrl.FleetListWormhole;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -107,6 +109,40 @@ public class WormholeFragment extends BaseGlFragment {
     });
     viewDestinationBtn.setEnabled(false);
 
+    Button destroyBtn = (Button) contentView.findViewById(R.id.destroy_btn);
+    destroyBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        new StyledDialog.Builder(getActivity())
+            .setMessage("Are you sure you want to destroy this wormhole?")
+            .setPositiveButton("Destroy", new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                destroyWormhole();
+              }
+            })
+            .setNegativeButton("Cancel", null)
+            .create().show();
+      }
+    });
+
+    Button takeOverBtn = (Button) contentView.findViewById(R.id.takeover_btn);
+    takeOverBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        new StyledDialog.Builder(getActivity())
+            .setMessage("Are you sure you want to take over this wormhole? You will become the new owner, and will be able to tune it to your alliance's wormholes.")
+            .setPositiveButton("Take over", new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                takeOverWormhole();
+              }
+            })
+            .setNegativeButton("Cancel", null)
+            .create().show();
+      }
+    });
+
     FleetListWormhole fleetList = (FleetListWormhole) contentView.findViewById(R.id.fleet_list);
     fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
       @Override
@@ -130,7 +166,6 @@ public class WormholeFragment extends BaseGlFragment {
       @Override
       public void onFleetMove(Star star, Fleet fleet) {
         FleetMoveActivity.show(getActivity(), fleet);
-        ;
       }
 
       @Override
@@ -199,6 +234,16 @@ public class WormholeFragment extends BaseGlFragment {
       refreshStar();
     }
   };
+
+  /** Sends a request to the server to destroy this wormhole. */
+  private void destroyWormhole() {
+    
+  }
+
+  /** Sends a request to the server to take over this wormhole. */
+  private void takeOverWormhole() {
+
+  }
 
   private void refreshStar() {
     if (star.getWormholeExtra().getDestWormholeID() != 0 && (destStar == null || !destStar.getKey()

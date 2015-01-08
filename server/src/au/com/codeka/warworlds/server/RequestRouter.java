@@ -55,6 +55,8 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("stars/(?<starid>[0-9]+)/scout-reports", ScoutReportsHandler.class));
         sRoutes.add(new Route("stars/(?<starid>[0-9]+)/sit-reports", SitReportsHandler.class));
         sRoutes.add(new Route("stars/(?<starid>[0-9]+)/wormhole/tune", WormholeTuneHandler.class));
+        sRoutes.add(new Route("stars/(?<starid>[0-9]+)/wormhole/destroy", WormholeDestroyHandler.class));
+        sRoutes.add(new Route("stars/(?<starid>[0-9]+)/wormhole/take-over", WormholeTakeOverHandler.class));
         sRoutes.add(new Route("stars/(?<starid>[0-9]+)", StarHandler.class));
         sRoutes.add(new Route("stars", StarsHandler.class));
         sRoutes.add(new Route("alliances/(?<allianceid>[0-9]+)/requests/(?<requestid>[0-9]+)", AllianceRequestHandler.class));
