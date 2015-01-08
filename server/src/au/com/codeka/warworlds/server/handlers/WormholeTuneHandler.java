@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.handlers;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.ctrl.AllianceController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.ctrl.WormholeController;
@@ -36,18 +37,14 @@ public class WormholeTuneHandler extends RequestHandler {
         Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
         if (srcWormholeExtra.getEmpireID() != empire.getID()) {
             Empire ownerEmpire = new EmpireController().getEmpire(srcWormholeExtra.getEmpireID());
-            if (ownerEmpire.getAlliance() == null ||
-                    empire.getAlliance() == null ||
-                    ((Alliance) ownerEmpire.getAlliance()).getID() != ((Alliance) empire.getAlliance()).getID()) {
+            if (!new AllianceController().isSameAlliance(ownerEmpire, empire)) {
                 throw new RequestException(400, "You do not have control of this wormhole and cannot tune it.");
             }
         }
 
         if (destWormholeExtra.getEmpireID() != empire.getID()) {
             Empire ownerEmpire = new EmpireController().getEmpire(destWormholeExtra.getEmpireID());
-            if (ownerEmpire.getAlliance() == null ||
-                    empire.getAlliance() == null ||
-                    ((Alliance) ownerEmpire.getAlliance()).getID() != ((Alliance) empire.getAlliance()).getID()) {
+            if (!new AllianceController().isSameAlliance(ownerEmpire, empire)) {
                 throw new RequestException(400, "You do not have control of the destination wormhole and cannot tune it.");
             }
         }
