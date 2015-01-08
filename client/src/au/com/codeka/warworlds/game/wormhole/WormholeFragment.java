@@ -237,7 +237,7 @@ public class WormholeFragment extends BaseGlFragment {
 
   /** Sends a request to the server to destroy this wormhole. */
   private void destroyWormhole() {
-    
+
   }
 
   /** Sends a request to the server to take over this wormhole. */
