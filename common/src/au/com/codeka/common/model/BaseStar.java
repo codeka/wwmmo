@@ -512,14 +512,16 @@ public abstract class BaseStar {
 
         public void tuneTo(int destWormholeID) {
             mDestWormholeID = destWormholeID;
-            mTuneCompleteTime = DateTime.now().plusHours(getTuneTimeHours());
+            if (destWormholeID != 0) {
+                mTuneCompleteTime = DateTime.now().plusHours(getTuneTimeHours());
 
-            if (mTuneHistory == null) {
-                mTuneHistory = new ArrayList<>();
-            }
-            mTuneHistory.add(0, mTuneCompleteTime);
-            while (mTuneHistory.size() > 10) {
-                mTuneHistory.remove(mTuneHistory.size() - 1);
+                if (mTuneHistory == null) {
+                    mTuneHistory = new ArrayList<>();
+                }
+                mTuneHistory.add(0, mTuneCompleteTime);
+                while (mTuneHistory.size() > 10) {
+                    mTuneHistory.remove(mTuneHistory.size() - 1);
+                }
             }
         }
 

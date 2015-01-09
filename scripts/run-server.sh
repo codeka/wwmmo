@@ -8,7 +8,7 @@ ROOTPATH=`dirname $SCRIPTPATH`
 INSTALLPATH=$ROOTPATH/server/build/install/server
 
 pushd $ROOTPATH > /dev/null
-./gradlew :server:installApp
+./gradlew --daemon :server:installApp
 popd > /dev/null
 
 pushd $INSTALLPATH > /dev/null

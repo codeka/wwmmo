@@ -123,7 +123,7 @@ public class WormholeFragment extends BaseGlFragment {
       @Override
       public void onClick(View v) {
         new StyledDialog.Builder(getActivity())
-            .setMessage("Are you sure you want to destroy this wormhole? Any ships at this wormhole will also be destroyed!")
+            .setMessage("Are you sure you want to destroy this wormhole? Any ships at this wormhole, as well as ships that are inbound/outbound, will be destroyed!")
             .setPositiveButton("Destroy", new DialogInterface.OnClickListener() {
               @Override
               public void onClick(DialogInterface dialog, int which) {
