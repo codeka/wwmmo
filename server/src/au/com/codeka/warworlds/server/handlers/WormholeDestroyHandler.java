@@ -19,7 +19,6 @@ public class WormholeDestroyHandler extends RequestHandler {
           "You don't have any wormhole disruptors in range of this wormhole.");
     }
 
-    // TODO: implement me.
-    throw new RequestException(400, "This isn't implemented yet.");
+    new WormholeController().destroyWormhole(wormhole);
   }
 }

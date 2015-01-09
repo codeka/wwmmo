@@ -2,8 +2,10 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.util.ArrayList;
 
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.designeffects.WormholeDisruptorBuildingEffect;
 import au.com.codeka.warworlds.server.model.BuildingPosition;
@@ -25,6 +27,19 @@ public class WormholeController {
 
     srcWormhole.getWormholeExtra().tuneTo(destWormhole.getID());
     new StarController().update(srcWormhole);
+  }
+
+  /** Destroy the given wormhole. */
+  public void destroyWormhole(Star wormhole) throws RequestException {
+    throw new RequestException(400, "This isn't implemented yet.");
+  }
+
+  /** Transfer ownership of the given wormhole to the given empire. */
+  public void takeOverWormhole(int empireID, Star wormhole) throws RequestException {
+    BaseStar.WormholeExtra extra = wormhole.getWormholeExtra();
+    extra.setEmpireID(empireID);
+    wormhole.setWormholeExtra(extra);
+    new StarController().update(wormhole);
   }
 
   /** Returns {@code true} if the given {@link Star} is within range of a wormhole disruptor. */

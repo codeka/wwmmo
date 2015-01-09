@@ -515,12 +515,23 @@ public abstract class BaseStar {
             mTuneCompleteTime = DateTime.now().plusHours(getTuneTimeHours());
 
             if (mTuneHistory == null) {
-                mTuneHistory = new ArrayList<DateTime>();
+                mTuneHistory = new ArrayList<>();
             }
             mTuneHistory.add(0, mTuneCompleteTime);
             while (mTuneHistory.size() > 10) {
                 mTuneHistory.remove(mTuneHistory.size() - 1);
             }
+        }
+
+        /*
+         * Update the owning empire of this wormhole to the given empire. This will also reset
+         * the wormhole so it's not tuned to anything any more. It does not clear out the tune
+         * history, however, which means re-tuning may take some time for the new owner.
+         */
+        public void setEmpireID(int empireID) {
+            mEmpireID = empireID;
+            mDestWormholeID = 0;
+            mTuneCompleteTime = null;
         }
 
         public void fromProtocolBuffer(Messages.Star.StarExtra pb) {
