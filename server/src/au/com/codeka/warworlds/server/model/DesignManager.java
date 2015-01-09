@@ -19,6 +19,7 @@ import au.com.codeka.warworlds.server.designeffects.RadarBuildingEffect;
 import au.com.codeka.warworlds.server.designeffects.ScoutShipEffect;
 import au.com.codeka.warworlds.server.designeffects.StorageBuildingEffect;
 import au.com.codeka.warworlds.server.designeffects.TroopCarrierShipEffect;
+import au.com.codeka.warworlds.server.designeffects.WormholeDisruptorBuildingEffect;
 import au.com.codeka.warworlds.server.designeffects.WormholeGeneratorShipEffect;
 
 public class DesignManager extends BaseDesignManager {
@@ -59,6 +60,8 @@ public class DesignManager extends BaseDesignManager {
                 return new PopulationBoostBuildingEffect();
             } else if (effectKind.equals("radar")) {
                 return new RadarBuildingEffect();
+            } else if (effectKind.equals("wormhole-disruptor")) {
+                return new WormholeDisruptorBuildingEffect();
             }
         } else {
             if (effectKind.equals("scout")) {

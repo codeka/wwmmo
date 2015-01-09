@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.DesignKind;
@@ -72,8 +74,13 @@ public class BuildingController {
 
     public ArrayList<BuildingPosition> getBuildings(int empireID, long minSectorX, long minSectorY,
             long maxSectorX, long maxSectorY) throws RequestException {
+        return getBuildings(empireID, minSectorX, minSectorY, maxSectorX, maxSectorY, null);
+    }
+
+    public ArrayList<BuildingPosition> getBuildings(int empireID, long minSectorX, long minSectorY,
+            long maxSectorX, long maxSectorY, @Nullable String designID) throws RequestException {
         try {
-            return db.getBuildings(empireID, minSectorX, minSectorY, maxSectorX, maxSectorY);
+            return db.getBuildings(empireID, minSectorX, minSectorY, maxSectorX, maxSectorY, designID);
         } catch(Exception e) {
             throw new RequestException(e);
         }
@@ -114,7 +121,7 @@ public class BuildingController {
         }
 
         public ArrayList<BuildingPosition> getBuildings(int empireID, long minSectorX, long minSectorY,
-                                                long maxSectorX, long maxSectorY) throws Exception {
+                long maxSectorX, long maxSectorY, @Nullable String designID) throws Exception {
             String sql = "SELECT buildings.*, sectors.x AS sector_x, sectors.y AS sector_y," +
                                " stars.x AS offset_x, stars.y AS offset_y " +
                         " FROM buildings" +
@@ -123,12 +130,18 @@ public class BuildingController {
                         " WHERE buildings.empire_id = ?" +
                           " AND sectors.x >= ? AND sectors.x <= ?" +
                           " AND sectors.y >= ? AND sectors.y <= ?";
+            if (designID != null) {
+                sql += " AND buildings.design_id = ?";
+            }
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireID);
                 stmt.setLong(2, minSectorX);
                 stmt.setLong(3, maxSectorX);
                 stmt.setLong(4, minSectorY);
                 stmt.setLong(5, maxSectorY);
+                if (designID != null) {
+                    stmt.setString(6, designID);
+                }
                 SqlResult res = stmt.select();
 
                 ArrayList<BuildingPosition> buildings = new ArrayList<BuildingPosition>();

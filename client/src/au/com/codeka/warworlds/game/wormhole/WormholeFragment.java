@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game.wormhole;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -10,6 +11,7 @@ import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.scene.Scene;
 import org.joda.time.DateTime;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -23,13 +25,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseGlFragment;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.ctrl.FleetListWormhole;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -41,6 +48,7 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
@@ -50,6 +58,7 @@ import au.com.codeka.warworlds.model.StarManager;
  * wormholes.
  */
 public class WormholeFragment extends BaseGlFragment {
+  private static final Log log = new Log("WormholeFragment");
   private WormholeSceneManager wormhole;
   private Star star;
   private Star destStar;
@@ -119,10 +128,9 @@ public class WormholeFragment extends BaseGlFragment {
               @Override
               public void onClick(DialogInterface dialog, int which) {
                 destroyWormhole();
+                dialog.dismiss();
               }
-            })
-            .setNegativeButton("Cancel", null)
-            .create().show();
+            }).setNegativeButton("Cancel", null).create().show();
       }
     });
 
@@ -136,6 +144,7 @@ public class WormholeFragment extends BaseGlFragment {
               @Override
               public void onClick(DialogInterface dialog, int which) {
                 takeOverWormhole();
+                dialog.dismiss();
               }
             })
             .setNegativeButton("Cancel", null)
@@ -237,12 +246,52 @@ public class WormholeFragment extends BaseGlFragment {
 
   /** Sends a request to the server to destroy this wormhole. */
   private void destroyWormhole() {
-
+    postDestroyOrTakeOverRequest("stars/" + star.getKey() + "/wormhole/destroy");
   }
 
   /** Sends a request to the server to take over this wormhole. */
   private void takeOverWormhole() {
+    postDestroyOrTakeOverRequest("stars/" + star.getKey() + "/wormhole/take-over");
+  }
 
+  private void postDestroyOrTakeOverRequest(final String url) {
+    final Activity activity = getActivity();
+
+    new BackgroundRunner<Boolean>() {
+      private String errorMessage;
+
+      @Override
+      protected Boolean doInBackground() {
+        try {
+          ApiClient.postProtoBuf(url, null);
+        } catch (ApiException e) {
+          errorMessage = e.getServerErrorMessage();
+          return false;
+        } catch (Exception e) {
+          log.error("Exception caught sending error reports.", e);
+          return false;
+        }
+
+        return true;
+      }
+
+      @Override
+      protected void onComplete(Boolean result) {
+        if (result) {
+          SectorManager.i.refreshSector(star.getSectorX(), star.getSectorY());
+
+          // due to the fact that we may have deleted the star, exit back to the starfield view.
+          // TODO ^^
+        } else {
+          if (errorMessage != null) {
+            new StyledDialog.Builder(activity)
+                .setMessage(errorMessage)
+                .setPositiveButton("OK", null)
+                .create().show();
+          }
+        }
+      }
+    }.execute();
   }
 
   private void refreshStar() {
