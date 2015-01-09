@@ -28,6 +28,8 @@ import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
+import au.com.codeka.common.model.BaseBuilding;
+import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseGlFragment;
@@ -44,14 +46,17 @@ import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
+import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.designeffects.WormholeDisruptorBuildingEffect;
 
 /**
  * This fragment is used in place of SolarSystemFragment in the SolarSystemActivity for
@@ -246,15 +251,15 @@ public class WormholeFragment extends BaseGlFragment {
 
   /** Sends a request to the server to destroy this wormhole. */
   private void destroyWormhole() {
-    postDestroyOrTakeOverRequest("stars/" + star.getKey() + "/wormhole/destroy");
+    postDestroyOrTakeOverRequest("stars/" + star.getKey() + "/wormhole/destroy", true);
   }
 
   /** Sends a request to the server to take over this wormhole. */
   private void takeOverWormhole() {
-    postDestroyOrTakeOverRequest("stars/" + star.getKey() + "/wormhole/take-over");
+    postDestroyOrTakeOverRequest("stars/" + star.getKey() + "/wormhole/take-over", false);
   }
 
-  private void postDestroyOrTakeOverRequest(final String url) {
+  private void postDestroyOrTakeOverRequest(final String url, final boolean destroy) {
     final Activity activity = getActivity();
 
     new BackgroundRunner<Boolean>() {
@@ -280,8 +285,13 @@ public class WormholeFragment extends BaseGlFragment {
         if (result) {
           SectorManager.i.refreshSector(star.getSectorX(), star.getSectorY());
 
-          // due to the fact that we may have deleted the star, exit back to the starfield view.
-          // TODO ^^
+          if (destroy) {
+            // if we've destroyed the star, exit back to the starfield.
+            activity.finish();
+          } else {
+            // otherwise, just refresh the star
+            StarManager.i.refreshStar(star.getID());
+          }
         } else {
           if (errorMessage != null) {
             new StyledDialog.Builder(activity)
@@ -304,9 +314,6 @@ public class WormholeFragment extends BaseGlFragment {
     TextView destinationName = (TextView) contentView.findViewById(R.id.destination_name);
     FleetListWormhole fleetList = (FleetListWormhole) contentView.findViewById(R.id.fleet_list);
 
-    if (destinationName.getText().toString().equals("")) {
-      destinationName.setText(Html.fromHtml("→ <i>None</i>"));
-    }
     starName.setText(star.getName());
 
     TreeMap<String, Star> stars = new TreeMap<String, Star>();
@@ -323,10 +330,13 @@ public class WormholeFragment extends BaseGlFragment {
       String str = String.format(Locale.ENGLISH, "→ %s", destStar.getName());
       if (tuneCompleteTime != null) {
         str = "<font color=\"red\">" + str + "</font>";
-      } else {
-        contentView.findViewById(R.id.view_destination_btn).setEnabled(true);
       }
+
+      contentView.findViewById(R.id.view_destination_btn).setEnabled(true);
       destinationName.setText(Html.fromHtml(str));
+    } else {
+      contentView.findViewById(R.id.view_destination_btn).setEnabled(false);
+      destinationName.setText(Html.fromHtml("→ <i>None</i>"));
     }
     updateTuningProgress();
 
@@ -344,6 +354,28 @@ public class WormholeFragment extends BaseGlFragment {
       contentView.findViewById(R.id.empire_name).setVisibility(View.GONE);
       contentView.findViewById(R.id.empire_icon).setVisibility(View.GONE);
     }
+
+    // if there's no star with a wormhole disruptor in range, then we disable the buttons that will
+    // require a nearby wormhole disruptor.
+    boolean nearbyWormholeDisruptor = true;
+    //TODO:
+    /*for (Star starWithWormholeDisruptor : SectorManager.i.getStarsWithWormholeDisruptors()) {
+      float distanceToStar = Sector.distanceInParsecs(star, starWithWormholeDisruptor);
+      for (BaseColony baseColony : starWithWormholeDisruptor.getColonies()) {
+        for (BaseBuilding baseBuilding : baseColony.getBuildings()) {
+          Building building = (Building) baseBuilding;
+          List<WormholeDisruptorBuildingEffect> effects = building.getDesign().getEffects(
+              building.getLevel(), WormholeDisruptorBuildingEffect.class);
+          for (WormholeDisruptorBuildingEffect effect : effects) {
+            if (effect.getRange() >= distanceToStar) {
+              nearbyWormholeDisruptor = true;
+            }
+          }
+        }
+      }
+    }*/
+    contentView.findViewById(R.id.destroy_btn).setEnabled(nearbyWormholeDisruptor);
+    contentView.findViewById(R.id.takeover_btn).setEnabled(nearbyWormholeDisruptor);
   }
 
   private void updateTuningProgress() {

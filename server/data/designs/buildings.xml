@@ -235,7 +235,7 @@
       star to the wormhole you can.</p>
     ]]></description>
     <effects>
-      <effect kind="wormhole-disruptor" range="10" />
+      <effect kind="wormhole-disruptor" range="9.5" />
     </effects>
     <dependencies>
       <requires building="research" level="2" />
@@ -246,7 +246,7 @@
       <upgrade level="2">
           <cost minerals="74000" time="160.0" />
           <effects>
-              <effect kind="wormhole-disruptor" range="15" />
+              <effect kind="wormhole-disruptor" range="14.5" />
           </effects>
           <dependencies>
               <requires building="research" level="2" />
@@ -255,7 +255,7 @@
       <upgrade level="3">
           <cost minerals="74000" time="160.0" />
           <effects>
-              <effect kind="wormhole-disruptor" range="20" />
+              <effect kind="wormhole-disruptor" range="19.5" />
           </effects>
           <dependencies>
               <requires building="research" level="2" />
@@ -264,7 +264,7 @@
       <upgrade level="4">
           <cost minerals="74000" time="160.0" />
           <effects>
-              <effect kind="wormhole-disruptor" range="25" />
+              <effect kind="wormhole-disruptor" range="24.5" />
           </effects>
           <dependencies>
               <requires building="research" level="2" />
@@ -273,7 +273,7 @@
       <upgrade level="5">
           <cost minerals="74000" time="160.0" />
           <effects>
-              <effect kind="wormhole-disruptor" range="30" />
+              <effect kind="wormhole-disruptor" range="29.5" />
           </effects>
           <dependencies>
               <requires building="research" level="2" />
