@@ -251,38 +251,46 @@ public class StarfieldSceneManager extends SectorSceneManager {
     boolean wasTacticalVisible = isTacticalVisible;
     boolean wasBackgroundVisible = isBackgroundVisible;
 
-    // we fade out the background between 0.55 and 0.50, it should be totally invisible < 0.50
-    // and totally opaque for >= 0.55
-    if (zoomFactor < 0.5f && isBackgroundVisible) {
+    // we fade out the background between 0.65 and 0.6, it should be totally invisible < 0.6
+    // and totally opaque for >= 0.65
+    boolean needUpdate = false;
+    if (zoomFactor < 0.6f && isBackgroundVisible) {
       isBackgroundVisible = false;
-      // we need to make the background as invisible
-      mActivity.runOnUpdateThread(updateBackgroundRunnable);
-    } else if (zoomFactor >= 0.5f && !isBackgroundVisible) {
+      backgroundZoomAlpha = 0.0f;
+      needUpdate = true;
+    } else if (zoomFactor >= 0.6f && !isBackgroundVisible) {
       isBackgroundVisible = true;
-      // we need to make the background as visible
-      mActivity.runOnUpdateThread(updateBackgroundRunnable);
+      backgroundZoomAlpha = 1.0f;
+      needUpdate = true;
     }
-    if (zoomFactor >= 0.5f && zoomFactor < 0.55f) {
-      // between 0.5 and 0.55 we need to fade the background in
-      backgroundZoomAlpha = (zoomFactor - 0.5f) * 20.0f; // make it in the range 0...1
+    if (zoomFactor >= 0.6f && zoomFactor < 0.65f) {
+      // between 0.6 and 0.65 we need to fade the background in
+      backgroundZoomAlpha = (zoomFactor - 0.6f) * 20.0f; // make it in the range 0...1
+      needUpdate = true;
+    }
+    if (needUpdate) {
       mActivity.runOnUpdateThread(updateBackgroundRunnable);
     }
 
     // similarly, we fade IN the tactical view as you zoom out. It starts fading in a bit sooner
     // than the background fades out, and fades slower, too.
+    needUpdate = false;
     if (zoomFactor >= 0.6f && isTacticalVisible) {
       isTacticalVisible = false;
       tacticalZoomAlpha = 0.0f;
-      //mActivity.runOnUpdateThread(updateTacticalRunnable);
+      needUpdate = true;
     } else if (zoomFactor < 0.4f && !isTacticalVisible) {
       isTacticalVisible = true;
       tacticalZoomAlpha = 1.0f;
-      //mActivity.runOnUpdateThread(updateTacticalRunnable);
+      needUpdate = true;
     }
     if (zoomFactor >= 0.4f && zoomFactor < 0.6f) {
       isTacticalVisible = true;
       tacticalZoomAlpha = 1.0f - ((zoomFactor - 0.4f) * 5.0f); // make it 1...0
-      //mActivity.runOnUpdateThread(updateTacticalRunnable);
+      needUpdate = true;
+    }
+    if (needUpdate) {
+      mActivity.runOnUpdateThread(updateTacticalRunnable);
     }
 
     if (wasTacticalVisible != isTacticalVisible || wasBackgroundVisible != isBackgroundVisible) {
@@ -310,6 +318,23 @@ public class StarfieldSceneManager extends SectorSceneManager {
         entity.setVisible(isBackgroundVisible);
         entity.setAlpha(backgroundZoomAlpha);
         entity.setColor(backgroundZoomAlpha, backgroundZoomAlpha, backgroundZoomAlpha);
+      }
+    }
+  };
+
+  private final Runnable updateTacticalRunnable = new Runnable() {
+    @Override
+    public void run() {
+      StarfieldScene scene = getScene();
+      if (scene == null) {
+        return;
+      }
+      List<Entity> tacticalEntities = scene.getTacticalEntities();
+      if (tacticalEntities == null) {
+        return;
+      }
+      for (Entity entity : tacticalEntities) {
+        setTacticalZoomFactor(entity);
       }
     }
   };
@@ -419,7 +444,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
    * Adds a sprite for the 'tactical' view, This is a single texture over the whole sector which
    * is colored in depending on who owns the star underneath it.
    */
-  private void addTacticalSprite(Scene scene, int offsetX, int offsetY, Sector sector) {
+  private void addTacticalSprite(StarfieldScene scene, int offsetX, int offsetY, Sector sector) {
     BitmapTextureAtlas textureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(),
         256, 256, TextureOptions.NEAREST);
     TacticalBitmapTextureSource bitmapSource = TacticalBitmapTextureSource.create(sector);
@@ -431,7 +456,14 @@ public class StarfieldSceneManager extends SectorSceneManager {
         offsetX + Sector.SECTOR_SIZE / 2, offsetY + Sector.SECTOR_SIZE / 2,
         Sector.SECTOR_SIZE, Sector.SECTOR_SIZE, textureRegion,
         mActivity.getVertexBufferObjectManager());
-    scene.attachChild(tacticalOverlayEntity);
+    setTacticalZoomFactor(tacticalOverlayEntity);
+    scene.attachTacticalEntity(tacticalOverlayEntity);
+  }
+
+  private void setTacticalZoomFactor(Entity entity) {
+    entity.setVisible(isTacticalVisible);
+    entity.setAlpha(tacticalZoomAlpha);
+    entity.setColor(tacticalZoomAlpha, tacticalZoomAlpha, tacticalZoomAlpha);
   }
 
   /**

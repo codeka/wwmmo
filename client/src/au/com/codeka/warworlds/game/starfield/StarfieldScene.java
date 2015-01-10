@@ -27,6 +27,7 @@ public class StarfieldScene extends Scene {
     private StarEntity mSelectedStarEntity;
     private FleetEntity mSelectedFleetEntity;
     private List<Entity> backgroundEntities;
+    private List<Entity> tacticalEntities;
 
     private int sectorRadius;
 
@@ -49,6 +50,7 @@ public class StarfieldScene extends Scene {
         mFleets = new HashMap<>();
         mStars = new HashMap<>();
         backgroundEntities = new ArrayList<>();
+        tacticalEntities = new ArrayList<>();
     }
 
     public void attachChild(StarEntity starEntity) {
@@ -61,14 +63,21 @@ public class StarfieldScene extends Scene {
         mFleets.put(fleetEntity.getFleet().getKey(), fleetEntity);
     }
 
+    public void attachTacticalEntity(TacticalOverlayEntity tacticalEntity) {
+        super.attachChild(tacticalEntity);
+        tacticalEntities.add(tacticalEntity);
+    }
+
     public void attachBackground(Entity backgroundEntity) {
-      super.attachChild(backgroundEntity);
-      backgroundEntities.add(backgroundEntity);
+        super.attachChild(backgroundEntity);
+        backgroundEntities.add(backgroundEntity);
     }
 
     public List<Entity> getBackgroundEntities() {
         return backgroundEntities;
     }
+
+    public List<Entity> getTacticalEntities() { return tacticalEntities; }
 
     public int getSectorRadius() {
         return sectorRadius;
