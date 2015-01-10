@@ -30,6 +30,7 @@ import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -46,7 +47,7 @@ import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
 
 
-public class SettingsFragment extends BaseFragment {
+public class SettingsFragment extends BaseFragment implements TabManager.Reloadable {
     private static final Log log = new Log("SettingsFragment");
     private View mView;
     private ImagePickerHelper mImagePickerHelper;
@@ -317,7 +318,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void purchase(String sku, final PurchaseCompleteHandler onComplete) {
-        if (Util.isDebug()) {
+/*        if (Util.isDebug()) {
             try {
                 onComplete.onPurchaseComplete(new Purchase("{" +
                         "\"orderId\": \"\"," +
@@ -332,7 +333,7 @@ public class SettingsFragment extends BaseFragment {
             }
             return;
         }
-
+*/
         try {
             PurchaseManager.i.launchPurchaseFlow(getActivity(), sku, new IabHelper.OnIabPurchaseFinishedListener() {
                 @Override
@@ -363,6 +364,13 @@ public class SettingsFragment extends BaseFragment {
             log.error("Couldn't get SKU details!", e);
             return;
         }
+    }
+
+    /** Called when the tab manager wants to reload us for whatever reason. */
+    @Override
+    public void reloadTab() {
+        // check if we've got a shield image to load.
+        loadShieldImage();
     }
 
     private interface PurchaseCompleteHandler {

@@ -110,6 +110,7 @@ public class EmpireActivity extends TabFragmentActivity {
         if (mImagePickerHelper.onActivityResult(requestCode, resultCode, data)) {
             log.info("Switching to settings tab!");
             getTabHost().setCurrentTabByTag("Settings");
+            getTabManager().reloadTab();
         }
 
         super.onActivityResult(requestCode, resultCode, data);
