@@ -41,7 +41,7 @@ public class FleetsFragment extends StarsFragment {
     private static final Log log = new Log("FleetsFragment");
     private ExpandableListView starsList;
     private FleetsStarsListAdapter adapter;
-    private EmpireStarsFetcher fetcher;
+    private final EmpireStarsFetcher fetcher;
     private FleetSelectionPanel fleetSelectionPanel;
     private Integer starOfFleetToSelect;
     private Integer indexOfStarOfFleetToSelect;
@@ -177,6 +177,9 @@ public class FleetsFragment extends StarsFragment {
     }
 
     private void maybeSelectFleet() {
+        if (indexOfStarOfFleetToSelect == null) {
+            return;
+        }
         Star star = fetcher.getStar(indexOfStarOfFleetToSelect);
         if (indexOfStarOfFleetToSelect != null && starOfFleetToSelect != null && star != null) {
             log.info("Expanding: index=%d, star=%d, fleet=%d", indexOfStarOfFleetToSelect,

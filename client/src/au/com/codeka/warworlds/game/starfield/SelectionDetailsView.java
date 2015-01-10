@@ -225,6 +225,9 @@ public class SelectionDetailsView extends FrameLayout {
   private final Object eventListener = new Object() {
     @EventHandler
     public void onStarUpdated(Star s) {
+      if (star == null) {
+        return;
+      }
       if (s.getKey().equals(star.getKey())) {
         star = s;
       }
@@ -233,11 +236,17 @@ public class SelectionDetailsView extends FrameLayout {
 
     @EventHandler
     public void onEmpireUpdated(Empire empire) {
+      if (star == null) {
+        return;
+      }
       refreshWormholeDetails();
     }
 
     @EventHandler
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+      if (star == null) {
+        return;
+      }
       refreshWormholeDetails();
     }
   };
