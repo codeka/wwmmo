@@ -19,6 +19,7 @@
         <EditText android:id="@+id/search_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_toLeftOf="@+id/search_button"
             android:inputType="text"
             android:imeOptions="actionSearch" />
@@ -26,6 +27,7 @@
         <ImageButton android:id="@+id/search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_alignParentRight="true"
             android:src="@drawable/abc_ic_search_api_mtrl_alpha" />
 

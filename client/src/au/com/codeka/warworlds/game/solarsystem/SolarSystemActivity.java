@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,6 +22,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -67,7 +69,6 @@ public class SolarSystemActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().show();
 
         if (savedInstanceState != null) {
             starID = savedInstanceState.getInt("au.com.codeka.warworlds.StarID");
@@ -76,6 +77,13 @@ public class SolarSystemActivity extends BaseActivity {
         setContentView(R.layout.solarsystem_activity);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer = findViewById(R.id.drawer);
+
+        // We have to offset the drawerLayout a bit because the action bar will be covering it.
+        final TypedArray styledAttributes = getTheme().obtainStyledAttributes(
+            new int[] { android.R.attr.actionBarSize });
+        int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
+        ((FrameLayout.LayoutParams) drawerLayout.getLayoutParams()).topMargin = actionBarHeight;
 
         ListView searchList = (ListView) findViewById(R.id.search_result);
         searchListAdapter = new SearchListAdapter(getLayoutInflater());
@@ -133,6 +141,12 @@ public class SolarSystemActivity extends BaseActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+    }
+
+    /** We want an action bar, so we override this to return true. */
+    @Override
+    protected boolean wantsActionBar() {
+        return true;
     }
 
     @Override

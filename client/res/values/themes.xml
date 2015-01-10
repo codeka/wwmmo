@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-
     <style name="WarWorlds" parent="@style/Theme.AppCompat">
         <item name="android:buttonStyle">@style/Button</item>
         <item name="android:imageButtonStyle">@style/ImageButton</item>
         <item name="android:spinnerStyle">@style/Spinner</item>
-    </style>
 
+        <item name="android:actionBarStyle">@style/ActionBar</item>
+        <item name="actionBarStyle">@style/ActionBar</item>
+
+        <!-- Make the action bar overlay the window, instead of pushing everything down. We then
+             have to manually push things down that we don't want hidden by it. This makes our
+             little offset in the top pane image look right and not have an ugly gray
+             background. -->
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+    </style>
 </resources>

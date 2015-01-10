@@ -32,6 +32,12 @@
         <item name="android:background">@drawable/top_pane_bg</item>
     </style>
 
+    <style name="ActionBar" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@drawable/top_pane_bg</item>
+        <item name="background">@drawable/top_pane_bg</item>
+        <item name="android:layout_marginBottom">-10dp</item>
+    </style>
+
     <style name="RightPane">
         <item name="android:background">@drawable/right_pane_bg</item>
     </style>

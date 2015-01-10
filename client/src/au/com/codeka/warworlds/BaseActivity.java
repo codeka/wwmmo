@@ -35,8 +35,10 @@ public class BaseActivity extends ActionBarActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // By default, this is hidden. Most of our activities have it hidden anyway.
-        getSupportActionBar().hide();
+        if (!wantsActionBar()) {
+            // If we don't want the action bar, then hide it.
+            getSupportActionBar().hide();
+        }
 
         // register our bug report shake listener with the accelerometer
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -52,6 +54,11 @@ public class BaseActivity extends ActionBarActivity {
                     PixelFormat.TRANSLUCENT);
             mDebugViewLayout.gravity = Gravity.TOP | Gravity.RIGHT;
         }
+    }
+
+    /** If you want the action bar in your activity, override this and return true. */
+    protected boolean wantsActionBar() {
+        return false;
     }
 
     @Override
