@@ -38,13 +38,12 @@ public class ApiClient {
         headers.get("Accept").add("text/plain");
 
         RequestManager.ResultWrapper res = RequestManager.request("GET", url, headers);
-
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-        builderFactory.setValidating(false);
-
         try {
+            HttpResponse resp = res.getResponse();
+            ApiException.checkResponse(resp);
+
             return CharStreams.toString(new InputStreamReader(
-                    res.getResponse().getEntity().getContent(), "utf-8"));
+                    resp.getEntity().getContent(), "utf-8"));
         } catch (Exception e) {
             throw new ApiException(e);
         } finally {

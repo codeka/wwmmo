@@ -357,25 +357,26 @@ public class WormholeFragment extends BaseGlFragment {
 
     // if there's no star with a wormhole disruptor in range, then we disable the buttons that will
     // require a nearby wormhole disruptor.
-    boolean nearbyWormholeDisruptor = true;
-    //TODO:
-    /*for (Star starWithWormholeDisruptor : SectorManager.i.getStarsWithWormholeDisruptors()) {
-      float distanceToStar = Sector.distanceInParsecs(star, starWithWormholeDisruptor);
-      for (BaseColony baseColony : starWithWormholeDisruptor.getColonies()) {
-        for (BaseBuilding baseBuilding : baseColony.getBuildings()) {
-          Building building = (Building) baseBuilding;
-          List<WormholeDisruptorBuildingEffect> effects = building.getDesign().getEffects(
-              building.getLevel(), WormholeDisruptorBuildingEffect.class);
-          for (WormholeDisruptorBuildingEffect effect : effects) {
-            if (effect.getRange() >= distanceToStar) {
-              nearbyWormholeDisruptor = true;
-            }
-          }
+    contentView.findViewById(R.id.destroy_btn).setEnabled(false);
+    contentView.findViewById(R.id.takeover_btn).setEnabled(false);
+    new BackgroundRunner<Boolean>() {
+      @Override
+      protected Boolean doInBackground() {
+        String url = "stars/" + star.getKey() + "/wormhole/disruptor-nearby";
+        try {
+          ApiClient.getString(url);
+          return true;
+        } catch (Exception e) {
+          return false;
         }
       }
-    }*/
-    contentView.findViewById(R.id.destroy_btn).setEnabled(nearbyWormholeDisruptor);
-    contentView.findViewById(R.id.takeover_btn).setEnabled(nearbyWormholeDisruptor);
+
+      @Override
+      protected void onComplete(Boolean found) {
+        contentView.findViewById(R.id.destroy_btn).setEnabled(found);
+        contentView.findViewById(R.id.takeover_btn).setEnabled(found);
+      }
+    }.execute();
   }
 
   private void updateTuningProgress() {
