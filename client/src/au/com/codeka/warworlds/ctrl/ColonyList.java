@@ -416,9 +416,9 @@ public class ColonyList extends FrameLayout {
                 populateColonyListRow(mContext, view, colony, star);
 
                 if (mSelectedColony != null && mSelectedColony.getKey().equals(colony.getKey())) {
-                    view.setBackgroundColor(0xff0c6476);
+                    view.setBackgroundResource(R.color.list_item_selected);
                 } else {
-                    view.setBackgroundColor(0xff000000);
+                    view.setBackgroundResource(android.R.color.transparent);
                 }
             }
 

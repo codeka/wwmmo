@@ -234,9 +234,9 @@ public class ShipUpgradeDialog extends DialogFragment {
             }
 
             if (mSelectedEntry != null && mSelectedEntry.getID().equals(entry.getID())) {
-                view.setBackgroundResource(R.drawable.list_item_selected);
+                view.setBackgroundResource(R.color.list_item_selected);
             } else {
-                view.setBackgroundResource(R.drawable.list_item_normal);
+                view.setBackgroundResource(R.color.list_item_normal);
             }
 
             ImageView upgradeIcon = (ImageView) view.findViewById(R.id.upgrade_icon);

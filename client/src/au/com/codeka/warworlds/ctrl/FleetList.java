@@ -406,9 +406,9 @@ public class FleetList extends FrameLayout {
                 ((FleetListRow) view).setFleet(fleet);
 
                 if (mSelectedFleet != null && mSelectedFleet.getKey().equals(fleet.getKey())) {
-                    view.setBackgroundColor(0xff0c6476);
+                    view.setBackgroundResource(R.color.list_item_selected);
                 } else {
-                    view.setBackgroundColor(0xff000000);
+                    view.setBackgroundResource(android.R.color.transparent);
                 }
             }
 

@@ -307,9 +307,9 @@ public class FleetsFragment extends StarsFragment {
                     Fleet selectedFleet = fleetSelectionPanel.getFleet();
                     if (selectedFleet != null
                             && selectedFleet.getKey().equals(fleet.getKey())) {
-                        view.setBackgroundColor(0xff0c6476);
+                        view.setBackgroundResource(R.color.list_item_selected);
                     } else {
-                        view.setBackgroundColor(0xff000000);
+                        view.setBackgroundResource(android.R.color.transparent);
                     }
                 }
             }

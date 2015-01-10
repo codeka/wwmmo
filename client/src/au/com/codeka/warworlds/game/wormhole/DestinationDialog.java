@@ -230,9 +230,9 @@ public class DestinationDialog extends DialogFragment {
         distanceInPc));
 
     if (destWormhole != null && destWormhole.getKey().equals(wormhole.getKey())) {
-      itemView.setBackgroundColor(0xff0c6476);
+      itemView.setBackgroundResource(R.color.list_item_selected);
     } else {
-      itemView.setBackgroundColor(0xff000000);
+      itemView.setBackgroundResource(android.R.color.transparent);
     }
   }
 
