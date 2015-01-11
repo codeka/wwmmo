@@ -9,7 +9,7 @@ ROOTPATH=`dirname $SCRIPTPATH`
 APKPATH=$ROOTPATH/client/build/outputs/apk/client-release.apk
 
 pushd $ROOTPATH > /dev/null
-./gradlew :client:assembleRelease
+./gradlew --daemon :client:assembleRelease $@
 popd > /dev/null
 
 # Assumes ANDROID_HOME is set to your Android SDK directory

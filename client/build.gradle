@@ -58,7 +58,7 @@ android {
 
 // This is a task which will increment the build # in AndroidManifest.xml
 task('incrementVersionCode') << {
-    def manifestFile = file("AndroidManifest.xml")
+    def manifestFile = file("src/main/AndroidManifest.xml")
 
     // First do the versionCode element, increment the new build #
     def pattern = Pattern.compile("versionCode=\"(\\d+)\"")
@@ -79,7 +79,7 @@ task('incrementVersionCode') << {
 
 // This is a task which makes sure the warworlds.properties file is sanitized for release builds
 task('resetReleaseWarworldsPropertiesFile') << {
-    def warworldsPropertiesFile = file("assets/warworlds.properties")
+    def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
     def content = warworldsPropertiesFile.getText()
 
     // make sure on_behalf_of is commented out
@@ -100,7 +100,7 @@ task('resetReleaseWarworldsPropertiesFile') << {
 
 // This is a task which makes sure the warworlds.properties file is sanitized for debug builds
 task('resetDebugWarworldsPropertiesFile') << {
-    def warworldsPropertiesFile = file("assets/warworlds.properties")
+    def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
     def content = warworldsPropertiesFile.getText()
 
     // make sure debug is set to 'true'
