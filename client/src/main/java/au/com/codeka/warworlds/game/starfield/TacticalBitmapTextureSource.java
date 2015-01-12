@@ -58,7 +58,7 @@ public class TacticalBitmapTextureSource extends BaseTextureAtlasSource
 
   @Override
   public Bitmap onLoadBitmap(Bitmap.Config config, boolean mutable) {
-    if (bitmap == null) {
+    if (bitmap == null || bitmap.isRecycled()) {
       // NOTE: This assumes the config never changes, is that OK?
       bitmap = createBitmap(config);
     }
