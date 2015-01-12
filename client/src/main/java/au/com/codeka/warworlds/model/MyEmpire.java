@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.model;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -12,6 +13,7 @@ import android.graphics.Bitmap.CompressFormat;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.RunnableArg;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
@@ -258,10 +260,11 @@ public class MyEmpire extends Empire {
         }.execute();
     }
 
-    public void rename(final String newName, final Purchase purchaseInfo) {
-        new BackgroundRunner<String>() {
+    public void rename(final String newName, final Purchase purchaseInfo,
+            final RunnableArg<Boolean> onComplete) {
+        new BackgroundRunner<Boolean>() {
             @Override
-            protected String doInBackground() {
+            protected Boolean doInBackground() {
                 String url = "empires/"+getKey()+"/display-name";
 
                 try {
@@ -277,23 +280,32 @@ public class MyEmpire extends Empire {
                                     .setPrice(sku.getPrice())
                                     .setDeveloperPayload(purchaseInfo.getDeveloperPayload()))
                             .build();
-                    Messages.Empire empire_pb = ApiClient.putProtoBuf(url, pb, Messages.Empire.class);
-                    return empire_pb.getDisplayName();
+                    ApiClient.putProtoBuf(url, pb, Messages.Empire.class);
+                    return true;
                 } catch(Exception e) {
                     log.error("Uh oh!", e);
-                    return null;
+                    return false;
                 }
             }
 
             @Override
-            protected void onComplete(String name) {
-                mDisplayName = name;
-                EmpireManager.eventBus.publish(MyEmpire.this);
+            protected void onComplete(Boolean success) {
+                if (success) {
+                    EmpireManager.i.refreshEmpire();
+                    onComplete.run(true);
+                } else {
+                    onComplete.run(false);
+                }
             }
         }.execute();
     }
 
-    public void changeShieldImage(final Bitmap bmp, final Purchase purchaseInfo) {
+    /**
+     * Call to the server to change the user's shield. Will call the given handler when the change
+     * completes, whether successful or not.
+     */
+    public void changeShieldImage(final Bitmap bmp, final Purchase purchaseInfo,
+            final RunnableArg<Boolean> onComplete) {
         new BackgroundRunner<DateTime>() {
             @Override
             protected DateTime doInBackground() {
@@ -318,7 +330,7 @@ public class MyEmpire extends Empire {
                     Messages.Empire empire_pb = ApiClient.putProtoBuf(url, pb, Messages.Empire.class);
                     return new DateTime(empire_pb.getShieldImageLastUpdate() * 1000, DateTimeZone.UTC);
                 } catch(Exception e) {
-                    log.error("Uh oh!", e);
+                    log.error("Error changing shield.", e);
                     return null;
                 }
             }
@@ -328,12 +340,16 @@ public class MyEmpire extends Empire {
                 if (lastUpdateTime != null) {
                     mShieldLastUpdate = lastUpdateTime;
                     EmpireManager.eventBus.publish(MyEmpire.this);
+                    onComplete.run(true);
+                } else {
+                    onComplete.run(false);
                 }
             }
         }.execute();
     }
 
-    public void resetEmpire(final String skuName, final Purchase purchaseInfo, final EmpireResetCompleteHandler handler) {
+    public void resetEmpire(final String skuName, final Purchase purchaseInfo,
+            final EmpireResetCompleteHandler handler) {
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {

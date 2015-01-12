@@ -195,7 +195,7 @@ public class EmpireManager {
                     try {
                         return refreshEmpiresSync(toFetch);
                     } catch (ApiException e) {
-                        log.error("An error occured fetching empires.", e);
+                        log.error("An error occurred fetching empires.", e);
                         return null;
                     }
                 }
@@ -209,14 +209,13 @@ public class EmpireManager {
                     for (Empire empire : empires) {
                         Integer empireID = empire.getID();
 
-                        if (mEmpire != null && empireID == mEmpire.getID()) {
+                        if (mEmpire != null && empireID.intValue() == mEmpire.getID()) {
                             mEmpire = (MyEmpire) empire;
                         } else {
                             mEmpireCache.put(empireID, empire);
                         }
 
                         mInProgress.remove(empire.getID());
-
                         eventBus.publish(empire);
                     }
                 }

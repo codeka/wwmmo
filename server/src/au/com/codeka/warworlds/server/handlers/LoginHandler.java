@@ -45,7 +45,6 @@ public class LoginHandler extends RequestHandler {
             Tokeninfo tokeninfo = oauth2.tokeninfo()
                     .setAccessToken(getRequest().getParameter("authToken")).execute();
 
-            log.info("About me: %s", tokeninfo.toPrettyString());
             String emailAddr = tokeninfo.getEmail();
             String impersonateUser = getRequest().getParameter("impersonate");
             String cookie = new LoginController().generateCookie(emailAddr, false, impersonateUser);

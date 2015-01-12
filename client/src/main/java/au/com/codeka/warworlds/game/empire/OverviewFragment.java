@@ -18,6 +18,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.EmpireRankList;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -31,6 +33,7 @@ import au.com.codeka.warworlds.model.ShieldManager;
 
 
 public class OverviewFragment extends BaseFragment {
+    private static final Log log = new Log("OverviewFragment");
     private View mView;
     private EmpireRankList mEmpireList;
 
@@ -38,12 +41,15 @@ public class OverviewFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
         ShieldManager.eventBus.register(mEventHandler);
+        EmpireManager.eventBus.register(mEventHandler);
+        refresh();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         ShieldManager.eventBus.unregister(mEventHandler);
+        EmpireManager.eventBus.unregister(mEventHandler);
     }
 
     private Object mEventHandler = new Object() {
@@ -138,6 +144,7 @@ public class OverviewFragment extends BaseFragment {
 
     private void refresh() {
         Empire empire = EmpireManager.i.getEmpire();
+        log.warning("REFRESHING: " + empire.getDisplayName());
 
         TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
         ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
