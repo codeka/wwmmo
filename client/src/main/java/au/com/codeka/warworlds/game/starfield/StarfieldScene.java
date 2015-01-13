@@ -7,7 +7,11 @@ import java.util.Map;
 
 import org.andengine.entity.Entity;
 import org.andengine.entity.scene.Scene;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+import org.andengine.opengl.texture.region.ITextureRegion;
 
+import au.com.codeka.common.Pair;
+import au.com.codeka.common.Tuple;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Sector;
@@ -19,6 +23,8 @@ public class StarfieldScene extends Scene {
     private SelectionIndicatorEntity mSelectionIndicator;
     private RadarIndicatorEntity mRadarIndicator;
     private WormholeDisruptorIndicatorEntity mWormholeDisruptorIndicator;
+    private HashMap<Pair<Long, Long>, Tuple<BitmapTextureAtlas, ITextureRegion>>
+        tacticalBitmapTextureAtlases;
     private long sectorX;
     private long sectorY;
 
@@ -51,6 +57,7 @@ public class StarfieldScene extends Scene {
         mStars = new HashMap<>();
         backgroundEntities = new ArrayList<>();
         tacticalEntities = new ArrayList<>();
+        tacticalBitmapTextureAtlases = new HashMap<>();
     }
 
     public void attachChild(StarEntity starEntity) {
@@ -63,14 +70,21 @@ public class StarfieldScene extends Scene {
         mFleets.put(fleetEntity.getFleet().getKey(), fleetEntity);
     }
 
-    public void attachTacticalEntity(TacticalOverlayEntity tacticalEntity) {
+    public void attachTacticalEntity(TacticalOverlayEntity tacticalEntity,
+            Pair<Long, Long> key, Tuple<BitmapTextureAtlas, ITextureRegion> texture) {
         super.attachChild(tacticalEntity);
         tacticalEntities.add(tacticalEntity);
+        tacticalBitmapTextureAtlases.put(key, texture);
     }
 
     public void attachBackground(Entity backgroundEntity) {
         super.attachChild(backgroundEntity);
         backgroundEntities.add(backgroundEntity);
+    }
+
+    public HashMap<Pair<Long, Long>, Tuple<BitmapTextureAtlas, ITextureRegion>>
+        getTacticalBitmapTextureAtlases() {
+      return tacticalBitmapTextureAtlases;
     }
 
     public List<Entity> getBackgroundEntities() {

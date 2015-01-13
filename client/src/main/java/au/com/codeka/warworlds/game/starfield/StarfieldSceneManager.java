@@ -33,6 +33,7 @@ import java.util.Random;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
+import au.com.codeka.common.Tuple;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
@@ -69,6 +70,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
   private ITextureRegion arrowIconTextureRegion;
 
   private HashMap<String, ITextureRegion> fleetSpriteTextures;
+  private HashMap<Pair<Long, Long>, Tuple<BitmapTextureAtlas, ITextureRegion>>
+      tacticalTextureAtlases;
 
   private TiledTextureRegion backgroundGasTextureRegion;
   private TiledTextureRegion backgroundStarsTextureRegion;
@@ -136,6 +139,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
         .createTiledFromAsset(fleetSpriteTextureAtlas, mActivity,
             "spritesheets/ship.upgrade.boost.png", 2, 1));
 
+    tacticalTextureAtlases = new HashMap<>();
+
     mActivity.getShaderProgramManager().loadShaderProgram(RadarIndicatorEntity.getShaderProgram());
     mActivity.getShaderProgramManager().loadShaderProgram(
         WormholeDisruptorIndicatorEntity.getShaderProgram());
@@ -158,7 +163,6 @@ public class StarfieldSceneManager extends SectorSceneManager {
     font = FontFactory.create(mActivity.getFontManager(), mActivity.getTextureManager(), 256, 256,
         Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 16, true, Color.WHITE);
     font.load();
-
   }
 
   @Override
@@ -380,6 +384,17 @@ public class StarfieldSceneManager extends SectorSceneManager {
       }
     }
 
+    // unload all the unused tactical texture atlases
+    ArrayList<Pair<Long, Long>> keys = new ArrayList<>(tacticalTextureAtlases.keySet());
+    for (Pair<Long, Long> key : keys) {
+      if (!scene.getTacticalBitmapTextureAtlases().containsKey(key)) {
+        Tuple<BitmapTextureAtlas, ITextureRegion> tuple = tacticalTextureAtlases.get(key);
+        getActivity().getTextureManager().unloadTexture(tuple.two.getTexture());
+        //tuple.one.unload();
+        tacticalTextureAtlases.remove(key);
+      }
+    }
+
     return missingSectors;
   }
 
@@ -445,19 +460,26 @@ public class StarfieldSceneManager extends SectorSceneManager {
    * is colored in depending on who owns the star underneath it.
    */
   private void addTacticalSprite(StarfieldScene scene, int offsetX, int offsetY, Sector sector) {
-    BitmapTextureAtlas textureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(),
-        256, 256, TextureOptions.NEAREST);
-    TacticalBitmapTextureSource bitmapSource = TacticalBitmapTextureSource.create(sector);
-    ITextureRegion textureRegion = BitmapTextureAtlasTextureRegionFactory.createFromSource(
-        textureAtlas, bitmapSource, 0, 0);
-    textureAtlas.load();
+   Pair<Long, Long> textureKey = new Pair<>(sector.getX(), sector.getY());
+    Tuple<BitmapTextureAtlas, ITextureRegion> texture = tacticalTextureAtlases.get(textureKey);
+    if (texture == null) {
+      BitmapTextureAtlas textureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(),
+          256, 256, TextureOptions.NEAREST);
+      TacticalBitmapTextureSource bitmapSource = TacticalBitmapTextureSource.create(sector);
+      ITextureRegion textureRegion = BitmapTextureAtlasTextureRegionFactory.createFromSource(
+          textureAtlas, bitmapSource, 0, 0);
+      textureAtlas.load();
+
+      texture = new Tuple<>(textureAtlas, textureRegion);
+      tacticalTextureAtlases.put(textureKey, texture);
+    }
 
     TacticalOverlayEntity tacticalOverlayEntity = new TacticalOverlayEntity(
         offsetX + Sector.SECTOR_SIZE / 2, offsetY + Sector.SECTOR_SIZE / 2,
-        Sector.SECTOR_SIZE, Sector.SECTOR_SIZE, textureRegion,
+        Sector.SECTOR_SIZE, Sector.SECTOR_SIZE, texture.two,
         mActivity.getVertexBufferObjectManager());
     setTacticalZoomFactor(tacticalOverlayEntity);
-    scene.attachTacticalEntity(tacticalOverlayEntity);
+    scene.attachTacticalEntity(tacticalOverlayEntity, textureKey, texture);
   }
 
   private void setTacticalZoomFactor(Entity entity) {
