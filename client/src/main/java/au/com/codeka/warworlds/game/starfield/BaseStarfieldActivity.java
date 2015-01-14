@@ -34,7 +34,7 @@ public abstract class BaseStarfieldActivity extends BaseGlActivity {
 
     @Override
     protected Scene onCreateScene() throws IOException {
-        return mStarfield.createScene();
+        return null;
     }
 
     @Override

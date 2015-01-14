@@ -2,12 +2,15 @@ package au.com.codeka.warworlds.game.starfield;
 
 import org.andengine.entity.Entity;
 import org.andengine.entity.scene.Scene;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+import org.andengine.opengl.texture.region.ITextureRegion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import au.com.codeka.common.Tuple;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.Star;
@@ -20,6 +23,8 @@ public class StarfieldScene extends Scene {
     private WormholeDisruptorIndicatorEntity mWormholeDisruptorIndicator;
     private long sectorX;
     private long sectorY;
+
+    private ArrayList<Tuple<BitmapTextureAtlas, ITextureRegion>> tacticalTextureAtlases;
 
     private Map<String, StarEntity> mStars;
     private Map<String, FleetEntity> mFleets;
@@ -49,6 +54,7 @@ public class StarfieldScene extends Scene {
         mFleets = new HashMap<>();
         mStars = new HashMap<>();
         backgroundEntities = new ArrayList<>();
+        tacticalTextureAtlases = new ArrayList<>();
         tacticalEntities = new ArrayList<>();
     }
 
@@ -62,9 +68,11 @@ public class StarfieldScene extends Scene {
         mFleets.put(fleetEntity.getFleet().getKey(), fleetEntity);
     }
 
-    public void attachTacticalEntity(TacticalOverlayEntity tacticalEntity) {
+    public void attachTacticalEntity(TacticalOverlayEntity tacticalEntity,
+            BitmapTextureAtlas textureAtlas, ITextureRegion textureRegion) {
         super.attachChild(tacticalEntity);
         tacticalEntities.add(tacticalEntity);
+        tacticalTextureAtlases.add(new Tuple<>(textureAtlas, textureRegion));
     }
 
     public void attachBackground(Entity backgroundEntity) {
@@ -267,6 +275,16 @@ public class StarfieldScene extends Scene {
 
     /** Disposes the scene an all child entities. */
     public void disposeScene() {
+        this.dispose();
+
+        // unload all the tactical texture atlases, they'll be recreated
+        for (Tuple<BitmapTextureAtlas, ITextureRegion> pair : tacticalTextureAtlases) {
+            pair.two.getTexture().unload();
+            pair.one.clearTextureAtlasSources();
+            pair.one.unload();
+        }
+        tacticalTextureAtlases.clear();
+
         int childCount = this.getChildCount();
         for (int i = 0; i < childCount; i++) {
             getChildByIndex(i).dispose();

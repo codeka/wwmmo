@@ -22,6 +22,7 @@ import android.view.ScaleGestureDetector;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
+import au.com.codeka.common.Tuple;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -105,9 +106,9 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
 
         needSceneRefresh = false;
         isSceneRefreshing = true;
-        new BackgroundRunner<StarfieldScene>() {
+        new BackgroundRunner<Tuple<StarfieldScene, HUD>>() {
             @Override
-            protected StarfieldScene doInBackground() {
+            protected Tuple<StarfieldScene, HUD> doInBackground() {
                 try {
                     return createScene();
                 } catch(Exception e) {
@@ -118,8 +119,10 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
             }
 
             @Override
-            protected void onComplete(final StarfieldScene scene) {
+            protected void onComplete(Tuple<StarfieldScene, HUD> tuple) {
                 final Engine engine = mActivity.getEngine();
+                final StarfieldScene scene = tuple.one;
+                final HUD hud = tuple.two;
                 if (scene != null && engine != null) {
                   engine.runOnUpdateThread(new Runnable() {
                         @Override
@@ -135,6 +138,17 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                                     (scene.getSectorY() - mSectorY) * Sector.SECTOR_SIZE);
                             }
                             engine.setScene(scene);
+
+                            if (mSceneCreatedHandler != null) {
+                                mSceneCreatedHandler.onSceneCreated(scene);
+                            }
+
+                            if (mScene != null) {
+                                scene.copySelection(mScene);
+                                mScene.disposeScene();
+                            }
+                            mScene = scene;
+                            mActivity.getCamera().setHUD(hud);
                         }
                     });
                 }
@@ -161,7 +175,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
         return new ScaleGestureListener();
     }
 
-    public StarfieldScene createScene() {
+    public Tuple<StarfieldScene, HUD> createScene() {
         StarfieldScene scene = new StarfieldScene(this, mSectorX, mSectorY, getDesiredSectorRadius());
         scene.setBackground(new Background(0.0f, 0.0f, 0.0f));
         scene.setOnSceneTouchListener(this);
@@ -175,17 +189,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
         HUD hud = new HUD();
         refreshHud(hud);
 
-        if (mSceneCreatedHandler != null) {
-            mSceneCreatedHandler.onSceneCreated(scene);
-        }
-
-        if (mScene != null) {
-            scene.copySelection(mScene);
-            mScene.disposeScene();
-        }
-        mScene = scene;
-        mActivity.getCamera().setHUD(hud);
-        return mScene;
+        return new Tuple(scene, hud);
     }
 
     @Nullable
