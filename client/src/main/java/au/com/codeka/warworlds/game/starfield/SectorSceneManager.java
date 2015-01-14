@@ -175,7 +175,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
         return new ScaleGestureListener();
     }
 
-    public Tuple<StarfieldScene, HUD> createScene() {
+    private Tuple<StarfieldScene, HUD> createScene() {
         StarfieldScene scene = new StarfieldScene(this, mSectorX, mSectorY, getDesiredSectorRadius());
         scene.setBackground(new Background(0.0f, 0.0f, 0.0f));
         scene.setOnSceneTouchListener(this);
@@ -221,12 +221,13 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                 mOffsetY = offsetY;
 
                 StarfieldScene scene = mScene;
-                if (scene == null) {
-                    return;
+                int sectorRadius = 1;
+                if (scene != null) {
+                    sectorRadius = scene.getSectorRadius();
                 }
                 List<Pair<Long, Long>> missingSectors = null;
-                for(long sy = mSectorY - scene.getSectorRadius(); sy <= mSectorY + scene.getSectorRadius(); sy++) {
-                    for(long sx = mSectorX - scene.getSectorRadius(); sx <= mSectorX + scene.getSectorRadius(); sx++) {
+                for(long sy = mSectorY - sectorRadius; sy <= mSectorY + sectorRadius; sy++) {
+                    for(long sx = mSectorX - sectorRadius; sx <= mSectorX + sectorRadius; sx++) {
                         Pair<Long, Long> key = new Pair<Long, Long>(sx, sy);
                         Sector s = SectorManager.i.getSector(sx, sy);
                         if (s == null) {
@@ -238,7 +239,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                     }
                 }
 
-                if (dy != 0 || dx != 0) {
+                if (scene != null && (dy != 0 || dx != 0)) {
                     offsetChildren(scene, dx * Sector.SECTOR_SIZE, -dy * Sector.SECTOR_SIZE);
                 }
 

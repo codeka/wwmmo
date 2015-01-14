@@ -34,7 +34,9 @@ public abstract class BaseStarfieldActivity extends BaseGlActivity {
 
     @Override
     protected Scene onCreateScene() throws IOException {
-        return null;
+        // return an empty scene, but queue up a refresh.
+        mStarfield.queueRefreshScene();
+        return new Scene();
     }
 
     @Override

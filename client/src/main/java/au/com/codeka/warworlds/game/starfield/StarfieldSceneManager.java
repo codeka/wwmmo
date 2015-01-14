@@ -159,8 +159,6 @@ public class StarfieldSceneManager extends SectorSceneManager {
     font = FontFactory.create(mActivity.getFontManager(), mActivity.getTextureManager(), 256, 256,
         Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 16, true, Color.WHITE);
     font.load();
-
-    queueRefreshScene();
   }
 
   @Override
