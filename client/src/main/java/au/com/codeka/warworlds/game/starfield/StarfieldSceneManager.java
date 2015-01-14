@@ -20,9 +20,9 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegion
 import org.andengine.opengl.texture.atlas.bitmap.BuildableBitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
 import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
-import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
+import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder
+    .TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.joda.time.DateTime;
 
@@ -70,8 +70,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
   private ITextureRegion arrowIconTextureRegion;
 
   private HashMap<String, ITextureRegion> fleetSpriteTextures;
-  private HashMap<Pair<Long, Long>, Tuple<BitmapTextureAtlas, ITextureRegion>>
-      tacticalTextureAtlases;
+  private ArrayList<Tuple<BitmapTextureAtlas, ITextureRegion>> tacticalTextureAtlases;
 
   private TiledTextureRegion backgroundGasTextureRegion;
   private TiledTextureRegion backgroundStarsTextureRegion;
@@ -139,7 +138,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
         .createTiledFromAsset(fleetSpriteTextureAtlas, mActivity,
             "spritesheets/ship.upgrade.boost.png", 2, 1));
 
-    tacticalTextureAtlases = new HashMap<>();
+    tacticalTextureAtlases = new ArrayList<>();
 
     mActivity.getShaderProgramManager().loadShaderProgram(RadarIndicatorEntity.getShaderProgram());
     mActivity.getShaderProgramManager().loadShaderProgram(
@@ -346,6 +345,14 @@ public class StarfieldSceneManager extends SectorSceneManager {
   private List<Pair<Long, Long>> drawScene(StarfieldScene scene) {
     List<Pair<Long, Long>> missingSectors = null;
 
+    // unload all the tactical texture atlases, they'll be recreated
+    for (Tuple<BitmapTextureAtlas, ITextureRegion> pair : tacticalTextureAtlases) {
+      pair.two.getTexture().unload();
+      pair.one.clearTextureAtlasSources();
+      pair.one.unload();
+    }
+    tacticalTextureAtlases.clear();
+
     // if the tactical view is visible, we can completely skip drawing the background.
     if (!isTacticalVisible) {
       for (int y = -scene.getSectorRadius(); y <= scene.getSectorRadius(); y++) {
@@ -381,17 +388,6 @@ public class StarfieldSceneManager extends SectorSceneManager {
         int sx = (x * Sector.SECTOR_SIZE);
         int sy = -(y * Sector.SECTOR_SIZE);
         addSector(scene, sx, sy, sector);
-      }
-    }
-
-    // unload all the unused tactical texture atlases
-    ArrayList<Pair<Long, Long>> keys = new ArrayList<>(tacticalTextureAtlases.keySet());
-    for (Pair<Long, Long> key : keys) {
-      if (!scene.getTacticalBitmapTextureAtlases().containsKey(key)) {
-        Tuple<BitmapTextureAtlas, ITextureRegion> tuple = tacticalTextureAtlases.get(key);
-        getActivity().getTextureManager().unloadTexture(tuple.two.getTexture());
-        //tuple.one.unload();
-        tacticalTextureAtlases.remove(key);
       }
     }
 
@@ -460,26 +456,20 @@ public class StarfieldSceneManager extends SectorSceneManager {
    * is colored in depending on who owns the star underneath it.
    */
   private void addTacticalSprite(StarfieldScene scene, int offsetX, int offsetY, Sector sector) {
-   Pair<Long, Long> textureKey = new Pair<>(sector.getX(), sector.getY());
-    Tuple<BitmapTextureAtlas, ITextureRegion> texture = tacticalTextureAtlases.get(textureKey);
-    if (texture == null) {
-      BitmapTextureAtlas textureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(),
-          256, 256, TextureOptions.NEAREST);
-      TacticalBitmapTextureSource bitmapSource = TacticalBitmapTextureSource.create(sector);
-      ITextureRegion textureRegion = BitmapTextureAtlasTextureRegionFactory.createFromSource(
-          textureAtlas, bitmapSource, 0, 0);
-      textureAtlas.load();
-
-      texture = new Tuple<>(textureAtlas, textureRegion);
-      tacticalTextureAtlases.put(textureKey, texture);
-    }
+    BitmapTextureAtlas textureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(),
+        256, 256, TextureOptions.NEAREST);
+    TacticalBitmapTextureSource bitmapSource = TacticalBitmapTextureSource.create(sector);
+    ITextureRegion textureRegion = BitmapTextureAtlasTextureRegionFactory.createFromSource(
+        textureAtlas, bitmapSource, 0, 0);
+    textureAtlas.load();
+    tacticalTextureAtlases.add(new Tuple(textureAtlas, textureRegion));
 
     TacticalOverlayEntity tacticalOverlayEntity = new TacticalOverlayEntity(
         offsetX + Sector.SECTOR_SIZE / 2, offsetY + Sector.SECTOR_SIZE / 2,
-        Sector.SECTOR_SIZE, Sector.SECTOR_SIZE, texture.two,
+        Sector.SECTOR_SIZE, Sector.SECTOR_SIZE, textureRegion,
         mActivity.getVertexBufferObjectManager());
     setTacticalZoomFactor(tacticalOverlayEntity);
-    scene.attachTacticalEntity(tacticalOverlayEntity, textureKey, texture);
+    scene.attachTacticalEntity(tacticalOverlayEntity);
   }
 
   private void setTacticalZoomFactor(Entity entity) {

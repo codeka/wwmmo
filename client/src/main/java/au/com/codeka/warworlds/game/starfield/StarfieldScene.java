@@ -1,19 +1,14 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import org.andengine.entity.Entity;
+import org.andengine.entity.scene.Scene;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.andengine.entity.Entity;
-import org.andengine.entity.scene.Scene;
-import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
-import org.andengine.opengl.texture.region.ITextureRegion;
-
-import au.com.codeka.common.Pair;
-import au.com.codeka.common.Tuple;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.Star;
 
@@ -23,8 +18,6 @@ public class StarfieldScene extends Scene {
     private SelectionIndicatorEntity mSelectionIndicator;
     private RadarIndicatorEntity mRadarIndicator;
     private WormholeDisruptorIndicatorEntity mWormholeDisruptorIndicator;
-    private HashMap<Pair<Long, Long>, Tuple<BitmapTextureAtlas, ITextureRegion>>
-        tacticalBitmapTextureAtlases;
     private long sectorX;
     private long sectorY;
 
@@ -57,7 +50,6 @@ public class StarfieldScene extends Scene {
         mStars = new HashMap<>();
         backgroundEntities = new ArrayList<>();
         tacticalEntities = new ArrayList<>();
-        tacticalBitmapTextureAtlases = new HashMap<>();
     }
 
     public void attachChild(StarEntity starEntity) {
@@ -70,21 +62,14 @@ public class StarfieldScene extends Scene {
         mFleets.put(fleetEntity.getFleet().getKey(), fleetEntity);
     }
 
-    public void attachTacticalEntity(TacticalOverlayEntity tacticalEntity,
-            Pair<Long, Long> key, Tuple<BitmapTextureAtlas, ITextureRegion> texture) {
+    public void attachTacticalEntity(TacticalOverlayEntity tacticalEntity) {
         super.attachChild(tacticalEntity);
         tacticalEntities.add(tacticalEntity);
-        tacticalBitmapTextureAtlases.put(key, texture);
     }
 
     public void attachBackground(Entity backgroundEntity) {
         super.attachChild(backgroundEntity);
         backgroundEntities.add(backgroundEntity);
-    }
-
-    public HashMap<Pair<Long, Long>, Tuple<BitmapTextureAtlas, ITextureRegion>>
-        getTacticalBitmapTextureAtlases() {
-      return tacticalBitmapTextureAtlases;
     }
 
     public List<Entity> getBackgroundEntities() {
@@ -158,7 +143,7 @@ public class StarfieldScene extends Scene {
                 refreshSelectionIndicator();
                 if (mSelectedStarEntity == null) {
                     StarfieldSceneManager.eventBus.publish(
-                            new StarfieldSceneManager.StarSelectedEvent((Star) null));
+                            new StarfieldSceneManager.StarSelectedEvent(null));
                 } else {
                     StarfieldSceneManager.eventBus.publish(
                             new StarfieldSceneManager.StarSelectedEvent(
@@ -226,14 +211,14 @@ public class StarfieldScene extends Scene {
                     mSelectedStarEntity = null;
                     refreshSelectionIndicator();
                     StarfieldSceneManager.eventBus.publish(
-                            new StarfieldSceneManager.StarSelectedEvent((Star) null));
+                            new StarfieldSceneManager.StarSelectedEvent(null));
                 }
 
                 if (mSelectedFleetEntity != null) {
                     mSelectedFleetEntity = null;
                     refreshSelectionIndicator();
                     StarfieldSceneManager.eventBus.publish(
-                            new StarfieldSceneManager.FleetSelectedEvent((Fleet) null));
+                            new StarfieldSceneManager.FleetSelectedEvent(null));
                 }
 
                 StarfieldSceneManager.eventBus.publish(new StarfieldSceneManager.SpaceTapEvent(
