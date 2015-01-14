@@ -135,7 +135,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                                 // offsets.
                                 offsetChildren(scene, 
                                     (scene.getSectorX() - mSectorX) * Sector.SECTOR_SIZE,
-                                    (scene.getSectorY() - mSectorY) * Sector.SECTOR_SIZE);
+                                    (mSectorY - scene.getSectorY()) * Sector.SECTOR_SIZE);
                             }
                             engine.setScene(scene);
 
@@ -147,6 +147,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                                 scene.copySelection(mScene);
                                 mScene.disposeScene();
                             }
+
                             mScene = scene;
                             mActivity.getCamera().setHUD(hud);
                         }
