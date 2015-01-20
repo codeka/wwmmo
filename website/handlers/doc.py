@@ -26,7 +26,7 @@ class DocViewPage(DocPage):
     if not page:
       self.render("doc/not_found.html", {"slug": slug})
     else:
-      self.render("doc/page_view.html", {"page": page, "is_writer": self._isWriter()})
+      self.render("doc/page_view.html", {"page": page})
 
 
 class DocEditPage(DocPage):
@@ -46,8 +46,6 @@ class DocEditPage(DocPage):
     if not self._isLoggedIn():
       return
     slug = self.request.get("slug")
-    if not self._isWriter():
-      self.redirect("/doc/" + slug)
     if slug[0] != "/":
       # TODO: invalid slug!
       return
@@ -69,8 +67,6 @@ class DocDeletePage(DocPage):
     if not self._isLoggedIn():
       return
     slug = self.request.get("slug")
-    if not self._isWriter():
-      self.redirect("/doc/" + slug)
     page = ctrl.doc.getPage(slug)
     if not page:
       self.response.set_status(404)
@@ -80,8 +76,6 @@ class DocDeletePage(DocPage):
   def post(self):
     if not self._isLoggedIn():
       return
-    if not self._isWriter():
-      self.redirect("/doc/")
     key = self.request.POST.get("key")
     ctrl.doc.deletePage(key)
     self.redirect("/doc/")
