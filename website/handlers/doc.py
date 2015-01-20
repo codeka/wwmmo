@@ -14,16 +14,7 @@ import handlers
 
 
 class DocPage(handlers.BaseHandler):
-  def _isWriter(self):
-    if not self.user:
-      return False
-    writers = memcache.get("docs:writers")
-    if not writers:
-      writers = []
-      for writer in model.doc.DocWriter.all():
-        writers.append(writer.user.email())
-      memcache.set("docs:writers", writers)
-    return self.user.email() in writers
+  pass
 
 
 class DocViewPage(DocPage):
@@ -44,8 +35,6 @@ class DocEditPage(DocPage):
     if not self._isLoggedIn():
       return
     slug = self.request.get("slug")
-    if not self._isWriter():
-      self.redirect("/doc/" + slug)
     page = ctrl.doc.getPage(slug)
     if not page:
       page = ctrl.doc.DocPage()
