@@ -17,8 +17,7 @@ class DocPage(object):
     self.title = None
     self.content = None
     self.slug = None
-    self.updatedDate = None
-    self.updatedUser = None
+    self.revisions = []
 
 
 class DocRevision(object):
@@ -38,19 +37,26 @@ def getPage(slug):
   if not page_mdl:
     return None
 
+  # Fetch the last four revisions. The latest one is the current, and
+  # then we want the rest so we can display a little history on the page
+  # as well (who edited the page, and when).
+  page = DocPage()
+  page.key = str(page_mdl.key())
+  page.title = page_mdl.title
+  page.slug = page_mdl.slug
+
   for rev_mdl in (model.doc.DocPageRevision.all()
                                            .ancestor(page_mdl)
                                            .order("-date")
-                                           .fetch(1)):
-    page = DocPage()
-    page.key = str(page_mdl.key())
-    page.title = page_mdl.title
-    page.content = rev_mdl.content
-    page.slug = page_mdl.slug
-    page.updatedDate = rev_mdl.date
-    page.updatedUser = rev_mdl.user
-    return page
-  return None
+                                           .fetch(4)):
+    if not page.content:
+      page.content = rev_mdl.content
+    revision = DocRevision()
+    revision.key = str(rev_mdl.key())
+    revision.date = rev_mdl.date
+    revision.user = rev_mdl.user
+    page.revisions.append(revision)
+  return page
 
 
 def getRevisionHistory(page_key):

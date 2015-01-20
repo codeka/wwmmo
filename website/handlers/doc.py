@@ -26,7 +26,13 @@ class DocViewPage(DocPage):
     if not page:
       self.render("doc/not_found.html", {"slug": slug})
     else:
-      self.render("doc/page_view.html", {"page": page})
+      user_ids = []
+      for revision in page.revisions:
+        if revision.user.user_id() not in user_ids:
+          user_ids.append(revision.user.user_id())
+      profiles = ctrl.profile.getProfiles(user_ids)
+
+      self.render("doc/page_view.html", {"page": page, "profiles": profiles})
 
 
 class DocEditPage(DocPage):

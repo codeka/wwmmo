@@ -21,16 +21,28 @@
       </ul>
     </nav>
 
+    <nav class="page-controls">
     {% if is_logged_in %}
-      <nav class="page-controls">
-        <h4>Controls</h4>
-        <ul>
-          <li><a href="/doc/_/edit?slug={{page.slug}}">Edit this page</a>
-          <li><a href="/doc/_/delete?slug={{page.slug}}">Delete this page</a>
-          <li><a href="/doc/_/revisions?slug={{page.slug}}">Revision History</a>
-        </ul>
-      </nav>
+      <div><a href="/doc/_/edit?slug={{page.slug}}">Edit this page</a></div>
     {% endif %}
+      <h2>Revisions</h2>
+    {% for revision in page.revisions %}
+      {% if loop.index > 3 %}
+        <div> . . . </div>
+      {% else %}
+        <div>
+          <a href="{{m.profile_url(profiles[revision.user.user_id()])}}"><img src="{{profiles[revision.user.user_id()]|profile_shield}}" class="editor-shield" width="16" height="16" alt="Shield" />
+            {{profiles[revision.user.user_id()].display_name}}</a>
+          <time datetime="{{revision.date|date_std}}">{{revision.date|date_std}}</time>
+        </div>
+      {% endif %}
+    {% endfor %}
+    {% if is_logged_in %}
+      <div><a href="/doc/_/revisions?slug={{page.slug}}">Revision History</a></div>
+      <div><a href="/doc/_/delete?slug={{page.slug}}">Delete this page</a></div>
+    {% endif %}
+    </nav>
+
     {{page.content}}
   </section>
 {% endblock %}
