@@ -59,6 +59,7 @@ def getPage(slug, revisionKey=None):
     page.content = rev_mdl.content
     revision = DocRevision()
     revision.key = str(rev_mdl.key())
+    revision.content = rev_mdl.content
     revision.date = rev_mdl.date
     revision.user = rev_mdl.user
     page.revisions.append(revision)
@@ -90,7 +91,7 @@ def getRevisionHistory(page_key):
     rev.user = rev_mdl.user
     rev.date = rev_mdl.date
     if prev_rev:
-    	_populateDelta(rev, prev_rev)
+     _populateDelta(rev, prev_rev)
     prev_rev = rev
     revisions.append(rev)
   if rev and prev_rev:
@@ -131,6 +132,25 @@ def deletePage(key):
   page_mdl.delete()
 
 
+def generateDiff(older_rev, newer_rev):
+  """Generates an HTML diff of the two revisions."""
+  older_words = _splitWords(older_rev.content)
+  newer_words = _splitWords(newer_rev.content)
+  diff = difflib.ndiff(older_words, newer_words)
+  html = ""
+  for word in diff:
+    action = word[:1]
+    if word[2] == '<':
+      html += word[2:]
+    elif action == "+":
+      html += "<span class=\"diff-added\"> " + word[2:] + " </span>"
+    elif action == "-":
+      html += "<span class=\"diff-removed\"> " + word[2:] + " </span>"
+    elif action != "?":
+      html += word[1:]
+  return html
+
+
 def _populateDelta(older_rev, newer_rev):
   """Populates the delta between the older revision and the newer."""
   if not older_rev.words:
@@ -143,12 +163,12 @@ def _populateDelta(older_rev, newer_rev):
   diff = difflib.ndiff(older_rev.words, newer_rev.words)
 
   last_change = ' '
-  for line in diff:
-    if line[0] == '+':
+  for word in diff:
+    if word[0] == '+':
       newer_rev.words_added += 1
-    elif line[0] == '-':
+    elif word[0] == '-':
       newer_rev.words_removed += 1
-    elif line[0] == '?':
+    elif word[0] == '?':
       if last_change == '+':
         newer_rev.words_added -= 1
       elif last_change == '-':

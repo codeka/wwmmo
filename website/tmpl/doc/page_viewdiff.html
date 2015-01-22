@@ -1,0 +1,35 @@
+{% extends "skeleton.html" %}
+{% import "doc/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+{% endblock %}
+{% block pagetitle %}{{page.title}}{% endblock %}
+{% block title %}{{page.title}}{% endblock %}
+
+{% block maincontent %}
+  <section class="content view-content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><a href="/doc">Docs</a>
+        <li><a href="/doc{{page.slug}}">{{page.title}}</a>
+        <li><a href="/doc/_/revisions?slug={{page.slug}}">Revision History</a>
+        <li><span><time datetime="{{page.revisions[0].date|date_std}}">{{page.revisions[0].date|date_std}}</time></span>
+      </ul>
+    </nav>
+
+    <nav class="page-controls">
+      <div><b>
+        {{m.profile_link(profiles[page.revisions[0].user.user_id()])}}
+        <time datetime="{{page.revisions[0].date|date_std}}">{{page.revisions[0].date|date_std}}</time>
+      </b></div>
+    {% if is_logged_in %}
+      <div><a href="/doc/_/revert?slug={{page.slug}}&revision={{page.revisions[0].key}}">Revert to this revision</a></div>
+    {% endif %}
+    </nav>
+
+    {{diff}}
+  </section>
+{% endblock %}
+

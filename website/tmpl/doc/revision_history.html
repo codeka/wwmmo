@@ -23,14 +23,21 @@
         {{m.profile_link(profiles[revision.user.user_id()])}}
         <time datetime="{{revision.date|date_std}}">{{revision.date|date_std}}</time>
         <div class="revision-details">
-          <div class="revision-graph">
-            <div class="words-removed" style="width: {{revision.words_removed_pct}}%;"></div>
-            <div class="words-changed" style="width: {{revision.words_changed_pct}}%;"></div>
-            <div class="words-added" style="width: {{revision.words_added_pct}}%;"></div>
-          </div>
-          <strong>{{revision.words|length|number}}</strong>
-          ({{revision.words_added}}+ {{revision.words_removed}}- {{revision.words_changed}}Δ)
-          <a href="/doc{{page.slug}}?revision={{revision.key}}">View</a>
+          {% if loop.last %}
+            <div class="revision-graph"></div>
+            <strong>{{revision.words|length|number}}</strong>
+            <a href="/doc{{page.slug}}?revision={{revision.key}}">View</a>
+          {% else %}
+            <div class="revision-graph">
+              <div class="words-removed" style="width: {{revision.words_removed_pct}}%;"></div>
+              <div class="words-changed" style="width: {{revision.words_changed_pct}}%;"></div>
+              <div class="words-added" style="width: {{revision.words_added_pct}}%;"></div>
+            </div>
+            <strong>{{revision.words|length|number}}</strong>
+            ({{revision.words_added}}+ {{revision.words_removed}}- {{revision.words_changed}}Δ)
+            <a href="/doc{{page.slug}}?revision={{revision.key}}">View</a>
+            <a href="/doc{{page.slug}}?revision={{revision.key}}&diff={{revisions[loop.index].key}}">Diff</a>
+          {% endif %}
         </div>
       </article>
     {% endfor %}

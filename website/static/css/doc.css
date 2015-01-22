@@ -146,6 +146,9 @@ div.revision-graph div {
   height: 100%;
 }
 
-div.revision-graph div.words-removed { background: red; }
-div.revision-graph div.words-added { background: green; }
+div.revision-graph div.words-removed { background: #ff7b6e; }
+div.revision-graph div.words-added { background: #a7e59b; }
 div.revision-graph div.words-changed { background: yellow; }
+
+span.diff-added { background: #a7e59b; }
+span.diff-removed { background: #ff7b6e; text-decoration: line-through; }

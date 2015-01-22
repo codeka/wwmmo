@@ -31,11 +31,16 @@ class DocViewPage(DocPage):
     if not page:
       self.render("doc/not_found.html", {"slug": slug})
     else:
-      profiles = self._getProfiles(page.revisions)
+      data = {"page": page}
       tmpl_name = "doc/page_view.html"
       if self.request.get("revision"):
         tmpl_name = "doc/page_viewrevision.html"
-      self.render(tmpl_name, {"page": page, "profiles": profiles})
+      if self.request.get("diff"):
+        previous_revision = ctrl.doc.getPage(slug, self.request.get("diff"))
+        data["diff"] = ctrl.doc.generateDiff(previous_revision.revisions[0], page.revisions[0])
+        tmpl_name = "doc/page_viewdiff.html"
+      data["profiles"] = self._getProfiles(page.revisions)
+      self.render(tmpl_name, data)
 
 
 class DocEditPage(DocPage):
