@@ -119,3 +119,33 @@ section.view-content img.float-right {
   margin-left: 1em;
 }
 
+/* --------------------------------------------------------------------
+ * Page "Revision History"
+ */
+
+article.revision {
+  margin-top: 0.5em;
+  margin-left: 1em;
+}
+
+div.revision-details {
+  margin-top: 0.5em;
+  margin-left: 1em;
+}
+
+div.revision-graph {
+  width: 70pt;
+  height: 0.5em;
+  float: left;
+  margin: 0.25em 1em;
+  border: solid 1px black;
+}
+
+div.revision-graph div {
+  float: right;
+  height: 100%;
+}
+
+div.revision-graph div.words-removed { background: red; }
+div.revision-graph div.words-added { background: green; }
+div.revision-graph div.words-changed { background: yellow; }

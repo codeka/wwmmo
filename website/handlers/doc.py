@@ -14,6 +14,13 @@ import handlers
 
 
 class DocPage(handlers.BaseHandler):
+  def _getProfiles(self, revisions):
+    user_ids = []
+    for revision in revisions:
+      if revision.user.user_id() not in user_ids:
+        user_ids.append(revision.user.user_id())
+    return ctrl.profile.getProfiles(user_ids)
+
   pass
 
 
@@ -26,12 +33,7 @@ class DocViewPage(DocPage):
     if not page:
       self.render("doc/not_found.html", {"slug": slug})
     else:
-      user_ids = []
-      for revision in page.revisions:
-        if revision.user.user_id() not in user_ids:
-          user_ids.append(revision.user.user_id())
-      profiles = ctrl.profile.getProfiles(user_ids)
-
+      profiles = self._getProfiles(page.revisions)
       self.render("doc/page_view.html", {"page": page, "profiles": profiles})
 
 
@@ -98,8 +100,18 @@ class DocRevisionHistoryPage(DocPage):
       self.response.set_status(404)
       return
     revisions = ctrl.doc.getRevisionHistory(page.key)
+    for revision in revisions:
+      # Add a % value for displaying in a nice graph
+      total_changes = revision.words_added + revision.words_removed + revision.words_changed
+      if total_changes < len(revision.words):
+        total_changes = len(revision.words)
+      revision.words_added_pct = int(100.0 * revision.words_added / total_changes)
+      revision.words_removed_pct = int(100.0 * revision.words_removed / total_changes)
+      revision.words_changed_pct = int(100.0 * revision.words_changed / total_changes)
+    profiles = self._getProfiles(revisions)
     self.render("doc/revision_history.html", {"page": page,
-                                              "revisions": revisions})
+                                              "revisions": revisions,
+                                              "profiles": profiles})
 
 
 app = webapp.WSGIApplication([("/doc/_/edit", DocEditPage),

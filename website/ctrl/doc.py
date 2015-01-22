@@ -1,5 +1,6 @@
 
 import datetime
+import difflib
 import re
 import logging
 import random
@@ -8,6 +9,8 @@ from google.appengine.api import memcache
 from google.appengine.ext import db
 
 import model.doc
+
+import html2text
 
 
 class DocPage(object):
@@ -26,6 +29,10 @@ class DocRevision(object):
     self.content = None
     self.user = None
     self.date = None
+    self.words = None
+    self.words_added = None
+    self.words_removed = None
+    self.words_changed = None
 
 
 def getPage(slug):
@@ -61,6 +68,8 @@ def getPage(slug):
 
 def getRevisionHistory(page_key):
   revisions = []
+  prev_rev = None
+  rev = None
   for rev_mdl in (model.doc.DocPageRevision.all()
                                            .ancestor(db.Key(page_key))
                                            .order("-date")):
@@ -69,9 +78,64 @@ def getRevisionHistory(page_key):
     rev.content = rev_mdl.content
     rev.user = rev_mdl.user
     rev.date = rev_mdl.date
+    if prev_rev:
+    	_populateDelta(rev, prev_rev)
+    prev_rev = rev
     revisions.append(rev)
+  if rev and prev_rev:
+    _populateDelta(rev, prev_rev)
   return revisions
 
+
+def _populateDelta(older_rev, newer_rev):
+  """Populates the delta between the older revision and the newer."""
+  if not older_rev.words:
+    older_rev.words = _splitWords(older_rev.content)
+  if not newer_rev.words:
+    newer_rev.words = _splitWords(newer_rev.content)
+  newer_rev.words_added = 0
+  newer_rev.words_removed = 0
+  newer_rev.words_changed = 0
+  diff = difflib.ndiff(older_rev.words, newer_rev.words)
+
+  last_change = ' '
+  for line in diff:
+    if line[0] == '+':
+      newer_rev.words_added += 1
+    elif line[0] == '-':
+      newer_rev.words_removed += 1
+    elif line[0] == '?':
+      if last_change == '+':
+        newer_rev.words_added -= 1
+      elif last_change == '-':
+        newer_rev.words_removed -= 1
+      newer_rev.words_changed += 1
+
+_htmlSplitRegex = re.compile(r"(\s*<[^>]+>\s*)")
+_wordSplitRegex = re.compile(r"\s+")
+
+def _splitWords(content):
+  """Splits the given string into words.
+
+  We first split the words into HTML tags and "text", then further split
+  the text into words (by spaces). For example, the following string:
+
+  Hello World, <a href="index.html">Link</a>
+
+  Will be split into:
+
+  ['Hello', 'World,', '<a href="index.html">', 'Link', '</a>']"""
+  # Santize the input a little.
+  content = content.replace("&nbsp;", " ")
+  words = []
+  for entry in _htmlSplitRegex.split(content):
+    if entry.strip() == "":
+      continue
+    elif entry[0] == '<':
+      words.append(entry)
+    else:
+      words.extend(_wordSplitRegex.split(entry))
+  return words
 
 def savePage(page):
   """Saves the given page to the data store."""

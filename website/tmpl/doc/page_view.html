@@ -22,9 +22,6 @@
     </nav>
 
     <nav class="page-controls">
-    {% if is_logged_in %}
-      <div><a href="/doc/_/edit?slug={{page.slug}}">Edit this page</a></div>
-    {% endif %}
       <h2>Revisions</h2>
     {% for revision in page.revisions %}
       {% if loop.index > 3 %}
@@ -39,6 +36,7 @@
     {% endfor %}
     {% if is_logged_in %}
       <div><a href="/doc/_/revisions?slug={{page.slug}}">Revision History</a></div>
+      <div><a href="/doc/_/edit?slug={{page.slug}}">Edit this page</a></div>
       <div><a href="/doc/_/delete?slug={{page.slug}}">Delete this page</a></div>
     {% endif %}
     </nav>

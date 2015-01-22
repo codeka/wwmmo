@@ -9,17 +9,33 @@
 
 {% block maincontent %}
   <section class="content revisions-content">
-    <h1>{{page.title}}</h1>
-    <p><a href="/doc{{page.slug}}">View Page</a></p>
-    <fieldset>
-      <legend>Revisions</legend>  
-      {% for rev in revisions %}
-        <article class="revision">
-          <h1>{{rev.date}} by {{rev.user}}</h1>
-          <p>(TODO)</p>
-        </article>
-      {% endfor %}
-    </fieldset>
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><a href="/doc">Docs</a>
+        <li><a href="/doc{{page.slug}}">{{page.title}}</a>
+        <li><span>Revision History</span>
+      </ul>
+    </nav>
+    <h1>Revision history of &ldquo;{{page.title}}&rdquo;</h1>
+    {% for revision in revisions %}
+      <article class="revision">
+        <a href="{{m.profile_url(profiles[revision.user.user_id()])}}">
+          <img src="{{profiles[revision.user.user_id()]|profile_shield}}" class="editor-shield" width="16" height="16" alt="Shield" />
+          {{profiles[revision.user.user_id()].display_name}}</a>
+        <time datetime="{{revision.date|date_std}}">{{revision.date|date_std}}</time>
+        <div class="revision-details">
+          <div class="revision-graph">
+            <div class="words-removed" style="width: {{revision.words_removed_pct}}%;"></div>
+            <div class="words-changed" style="width: {{revision.words_changed_pct}}%;"></div>
+            <div class="words-added" style="width: {{revision.words_added_pct}}%;"></div>
+          </div>
+          <strong>{{revision.words|length|number}}</strong>
+          ({{revision.words_added}}+ {{revision.words_removed}}- {{revision.words_changed}}Δ)
+          <a href="/doc{{page.slug}}?revision={{revision.key}}">View</a>
+        </div>
+      </article>
+    {% endfor %}
   </section>
 {% endblock %}
 
