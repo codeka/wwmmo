@@ -9,6 +9,6 @@
 {% block maincontent %}
   <section class="content">
     <h1>Not Found</h1>
-    <p>No page exists at this address, you can <a href="/doc/_/edit?slug={{slug}}">create one</a>.</p>
+    <p>No page exists at this address{% if slug %}, you can <a href="/doc/_/edit?slug={{slug}}">create one</a>{% endif %}.</p>
   </section>
 {% endblock %}

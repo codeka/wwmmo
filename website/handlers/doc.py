@@ -21,20 +21,21 @@ class DocPage(handlers.BaseHandler):
         user_ids.append(revision.user.user_id())
     return ctrl.profile.getProfiles(user_ids)
 
-  pass
-
 
 class DocViewPage(DocPage):
   def get(self, slug):
     if not slug:
       self.redirect("/doc/")
       return
-    page = ctrl.doc.getPage(slug)
+    page = ctrl.doc.getPage(slug, self.request.get("revision"))
     if not page:
       self.render("doc/not_found.html", {"slug": slug})
     else:
       profiles = self._getProfiles(page.revisions)
-      self.render("doc/page_view.html", {"page": page, "profiles": profiles})
+      tmpl_name = "doc/page_view.html"
+      if self.request.get("revision"):
+        tmpl_name = "doc/page_viewrevision.html"
+      self.render(tmpl_name, {"page": page, "profiles": profiles})
 
 
 class DocEditPage(DocPage):
@@ -91,12 +92,17 @@ class DocDeletePage(DocPage):
 
 class DocRevisionHistoryPage(DocPage):
   def get(self):
+    if not self._isLoggedIn():
+      return
     slug = self.request.get("slug")
     if slug[0] != '/':
-      # TODO: invalid slug
+      # Invalid slug
+      self.render("doc/not_found.html", {})
+      self.response.set_status(404)
       return
     page = ctrl.doc.getPage(slug)
     if not page:
+      self.render("doc/not_found.html", {})
       self.response.set_status(404)
       return
     revisions = ctrl.doc.getRevisionHistory(page.key)
@@ -114,8 +120,35 @@ class DocRevisionHistoryPage(DocPage):
                                               "profiles": profiles})
 
 
+class DocRevisionRevert(DocPage):
+  def get(self):
+    if not self._isLoggedIn():
+      return
+    slug = self.request.get("slug")
+    revision_key = self.request.get("revision")
+    if revision_key:
+      page = ctrl.doc.getPage(slug, revision_key)
+    else:
+      page = None
+    if not page:
+      self.render("doc/not_found.html", {})
+      self.response.set_status(404)
+    profiles = self._getProfiles(page.revisions)
+    self.render("doc/revision_revert.html", {"page": page,
+                                             "revision": page.revisions[0],
+                                             "profiles": profiles})
+
+  def post(self):
+    if not self._isLoggedIn():
+      return
+    revision_key = self.request.POST.get("key")
+    ctrl.doc.revertTo(revision_key, self.user)
+    self.redirect("/doc" + self.request.POST.get("slug"))
+
+
 app = webapp.WSGIApplication([("/doc/_/edit", DocEditPage),
                               ("/doc/_/delete", DocDeletePage),
                               ("/doc/_/revisions", DocRevisionHistoryPage),
+                              ("/doc/_/revert", DocRevisionRevert),
                               ("/doc(/.*)?", DocViewPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

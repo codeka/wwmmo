@@ -9,3 +9,10 @@
 {% macro profile_url(profile) -%}
 {% if not profile %}/profile{% else %}/profile/{{profile.key().name()|base64}}{% endif %}
 {%- endmacro %}
+
+{% macro profile_link(profile) %}{% if not profile -%}
+  <i>Unknown</i>
+{%- else %}
+  <a href="/profile/{{profile.key().name()|base64}}"><img src="{{profile|profile_shield}}" class="editor-shield" width="16" height="16" alt="Shield" />
+  {{profile.display_name}}</a>
+{%- endif %}{% endmacro %}

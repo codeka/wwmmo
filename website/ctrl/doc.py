@@ -35,7 +35,7 @@ class DocRevision(object):
     self.words_changed = None
 
 
-def getPage(slug):
+def getPage(slug, revisionKey=None):
   """Gets the document page with the give slug."""
   page_mdl = None
   for mdl in model.doc.DocPage.all().filter("slug", slug).fetch(1):
@@ -51,6 +51,17 @@ def getPage(slug):
   page.key = str(page_mdl.key())
   page.title = page_mdl.title
   page.slug = page_mdl.slug
+
+  if revisionKey:
+    rev_mdl = model.doc.DocPageRevision.get(db.Key(revisionKey))
+    if not rev_mdl:
+      return None
+    page.content = rev_mdl.content
+    revision = DocRevision()
+    revision.key = str(rev_mdl.key())
+    revision.date = rev_mdl.date
+    revision.user = rev_mdl.user
+    page.revisions.append(revision)
 
   for rev_mdl in (model.doc.DocPageRevision.all()
                                            .ancestor(page_mdl)
@@ -87,6 +98,39 @@ def getRevisionHistory(page_key):
   return revisions
 
 
+def revertTo(revision_key, user):
+  """Reverting a revision is simple, just re-save it as if it was brand new."""
+  rev_mdl = model.doc.DocPageRevision.get(db.Key(revision_key))
+  if not rev_mdl:
+    return
+  new_rev_mdl = model.doc.DocPageRevision(parent=rev_mdl.parent(),
+                                          content=rev_mdl.content,
+                                          user=user,
+                                          date=datetime.datetime.now())
+  new_rev_mdl.put()
+
+
+def savePage(page):
+  """Saves the given page to the data store."""
+  if not page.key:
+    page_mdl = model.doc.DocPage(slug=page.slug, title=page.title)
+  else:
+    page_mdl = model.doc.DocPage.get(db.Key(page.key))
+    page_mdl.title = page.title
+  page_mdl.put()
+
+  rev_mdl = model.doc.DocPageRevision(parent=page_mdl,
+                                      content=page.content,
+                                      user=page.updatedUser,
+                                      date=page.updatedDate)
+  rev_mdl.put()
+
+
+def deletePage(key):
+  page_mdl = model.doc.DocPage.get(db.Key(key))
+  page_mdl.delete()
+
+
 def _populateDelta(older_rev, newer_rev):
   """Populates the delta between the older revision and the newer."""
   if not older_rev.words:
@@ -110,6 +154,7 @@ def _populateDelta(older_rev, newer_rev):
       elif last_change == '-':
         newer_rev.words_removed -= 1
       newer_rev.words_changed += 1
+
 
 _htmlSplitRegex = re.compile(r"(\s*<[^>]+>\s*)")
 _wordSplitRegex = re.compile(r"\s+")
@@ -136,23 +181,3 @@ def _splitWords(content):
     else:
       words.extend(_wordSplitRegex.split(entry))
   return words
-
-def savePage(page):
-  """Saves the given page to the data store."""
-  if not page.key:
-    page_mdl = model.doc.DocPage(slug=page.slug, title=page.title)
-  else:
-    page_mdl = model.doc.DocPage.get(db.Key(page.key))
-    page_mdl.title = page.title
-  page_mdl.put()
-
-  rev_mdl = model.doc.DocPageRevision(parent=page_mdl,
-                                      content=page.content,
-                                      user=page.updatedUser,
-                                      date=page.updatedDate)
-  rev_mdl.put()
-
-def deletePage(key):
-  page_mdl = model.doc.DocPage.get(db.Key(key))
-  page_mdl.delete()
-

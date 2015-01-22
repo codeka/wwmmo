@@ -28,8 +28,7 @@
         <div> . . . </div>
       {% else %}
         <div>
-          <a href="{{m.profile_url(profiles[revision.user.user_id()])}}"><img src="{{profiles[revision.user.user_id()]|profile_shield}}" class="editor-shield" width="16" height="16" alt="Shield" />
-            {{profiles[revision.user.user_id()].display_name}}</a>
+          {{m.profile_link(profiles[revision.user.user_id()])}}
           <time datetime="{{revision.date|date_std}}">{{revision.date|date_std}}</time>
         </div>
       {% endif %}
