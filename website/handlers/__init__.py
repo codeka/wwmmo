@@ -14,7 +14,7 @@ import ctrl.tmpl
 
 # This value gets incremented every time we deploy so that we can cache bust
 # our static resources (css, js, etc)
-RESOURCE_VERSION = 74
+RESOURCE_VERSION = 78
 
 
 class BaseHandler(webapp.RequestHandler):

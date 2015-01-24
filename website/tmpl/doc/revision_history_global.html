@@ -1,0 +1,46 @@
+{% extends "skeleton.html" %}
+{% import "doc/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+{% endblock %}
+{% block pagetitle %}Revision History{% endblock %}
+{% block title %}Revision History{% endblock %}
+
+{% block maincontent %}
+  <section class="content revisions-content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><a href="/doc">Docs</a>
+        <li><span>Recent changes</span>
+      </ul>
+    </nav>
+    <h1>Recent changes</h1>
+    {% for entry in pages %}
+      <article class="revision">
+        <a href="/doc{{entry.page.slug}}">{{entry.page.title}}</a> by
+        {{m.profile_link(profiles[entry.revision.user.user_id()])}}
+        <time datetime="{{entry.revision.date|date_std}}">{{entry.revision.date|date_std}}</time>
+        <div class="revision-details">
+          {% if loop.last %}
+            <div class="revision-graph"></div>
+            <strong>{{entry.revision.words|length|number}}</strong>
+            <a href="/doc{{entry.page.slug}}?revision={{entry.revision.key}}">View</a>
+          {% else %}
+            <div class="revision-graph">
+              <div class="words-removed" style="width: {{entry.revision.words_removed_pct}}%;"></div>
+              <div class="words-changed" style="width: {{entry.revision.words_changed_pct}}%;"></div>
+              <div class="words-added" style="width: {{entry.revision.words_added_pct}}%;"></div>
+            </div>
+            <strong>{{entry.revision.words|length|number}}</strong>
+            ({{entry.revision.words_added}}+ {{entry.revision.words_removed}}- {{entry.revision.words_changed}}Δ)
+            <a href="/doc{{entry.page.slug}}?revision={{entry.revision.key}}">View</a>
+            <!--a href="/doc{{entry.page.slug}}?revision={{entry.revision.key}}&diff={{pages[loop.index].revision.key}}">Diff</a-->
+          {% endif %}
+        </div>
+      </article>
+    {% endfor %}
+  </section>
+{% endblock %}
+

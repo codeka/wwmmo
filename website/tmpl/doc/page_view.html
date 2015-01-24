@@ -34,9 +34,12 @@
       {% endif %}
     {% endfor %}
     {% if is_logged_in %}
-      <div><a href="/doc/_/revisions?slug={{page.slug}}">Revision History</a></div>
+      <div><a href="/doc/_/revisions?slug={{page.slug}}">Revision history</a></div>
       <div><a href="/doc/_/edit?slug={{page.slug}}">Edit this page</a></div>
-      <div><a href="/doc/_/delete?slug={{page.slug}}">Delete this page</a></div>
+      {% if page.slug == '/' %}
+      <hr>
+      <div><a href="/doc/_/recent-changes">Recent changes</a></div>
+      {% endif %}
     {% endif %}
     </nav>
 

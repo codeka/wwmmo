@@ -76,25 +76,6 @@ class DocEditPage(DocPage):
     self.redirect("/doc"+slug)
 
 
-class DocDeletePage(DocPage):
-  def get(self):
-    if not self._isLoggedIn():
-      return
-    slug = self.request.get("slug")
-    page = ctrl.doc.getPage(slug)
-    if not page:
-      self.response.set_status(404)
-      return
-    self.render("doc/page_delete.html", {"slug": slug, "page": page})
-
-  def post(self):
-    if not self._isLoggedIn():
-      return
-    key = self.request.POST.get("key")
-    ctrl.doc.deletePage(key)
-    self.redirect("/doc/")
-
-
 class DocRevisionHistoryPage(DocPage):
   def get(self):
     if not self._isLoggedIn():
@@ -125,6 +106,19 @@ class DocRevisionHistoryPage(DocPage):
                                               "profiles": profiles})
 
 
+class DocGlobalRevisionHistoryPage(DocPage):
+  """Like DocRevisionHistoryPage, but for the entire site not just one page."""
+  def get(self):
+    if not self._isLoggedIn():
+      return
+    pages = ctrl.doc.getGlobalRevisionHistory()
+    all_revisions = []
+    for entry in pages:
+      all_revisions.append(entry["revision"])
+    profiles = self._getProfiles(all_revisions)
+    self.render("doc/revision_history_global.html", {"pages": pages, "profiles": profiles})
+
+
 class DocRevisionRevert(DocPage):
   def get(self):
     if not self._isLoggedIn():
@@ -152,8 +146,8 @@ class DocRevisionRevert(DocPage):
 
 
 app = webapp.WSGIApplication([("/doc/_/edit", DocEditPage),
-                              ("/doc/_/delete", DocDeletePage),
                               ("/doc/_/revisions", DocRevisionHistoryPage),
                               ("/doc/_/revert", DocRevisionRevert),
+                              ("/doc/_/recent-changes", DocGlobalRevisionHistoryPage),
                               ("/doc(/.*)?", DocViewPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

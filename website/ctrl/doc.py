@@ -26,6 +26,7 @@ class DocPage(object):
 class DocRevision(object):
   def __init__(self):
     self.key = None
+    self.page_key = None
     self.content = None
     self.user = None
     self.date = None
@@ -79,14 +80,40 @@ def getPage(slug, revisionKey=None):
 
 
 def getRevisionHistory(page_key):
+  query = (model.doc.DocPageRevision.all()
+                                    .ancestor(db.Key(page_key))
+                                    .order("-date"))
+  return _getRevisionHistory(query)
+
+
+def getGlobalRevisionHistory():
+  query = (model.doc.DocPageRevision.all()
+                                    .order("-date")
+                                    .fetch(20))
+  revisions = _getRevisionHistory(query)
+  pages = []
+  page_map = {}
+  for revision in revisions:
+    if revision.page_key not in page_map:
+      page_mdl = model.doc.DocPage.get(db.Key(revision.page_key))
+      page = DocPage()
+      page.key = str(page_mdl.key())
+      page.title = page_mdl.title
+      page.slug = page_mdl.slug
+      page_map[revision.page_key] = page
+    page = page_map[revision.page_key]
+    pages.append({"page": page, "revision": revision})
+  return pages
+
+
+def _getRevisionHistory(query):
   revisions = []
   prev_rev = None
   rev = None
-  for rev_mdl in (model.doc.DocPageRevision.all()
-                                           .ancestor(db.Key(page_key))
-                                           .order("-date")):
+  for rev_mdl in query:
     rev = DocRevision()
     rev.key = str(rev_mdl.key())
+    rev.page_key = str(rev_mdl.key().parent())
     rev.content = rev_mdl.content
     rev.user = rev_mdl.user
     rev.date = rev_mdl.date
@@ -127,11 +154,6 @@ def savePage(page):
   rev_mdl.put()
 
 
-def deletePage(key):
-  page_mdl = model.doc.DocPage.get(db.Key(key))
-  page_mdl.delete()
-
-
 def generateDiff(older_rev, newer_rev):
   """Generates an HTML diff of the two revisions."""
   older_words = _splitWords(older_rev.content)
@@ -140,7 +162,7 @@ def generateDiff(older_rev, newer_rev):
   html = ""
   for word in diff:
     action = word[:1]
-    if word[2] == '<':
+    if '<' in word:
       html += word[2:]
     elif action == "+":
       html += "<span class=\"diff-added\"> " + word[2:] + " </span>"
@@ -196,7 +218,7 @@ def _splitWords(content):
   for entry in _htmlSplitRegex.split(content):
     if entry.strip() == "":
       continue
-    elif entry[0] == '<':
+    elif '<' in entry:
       words.append(entry)
     else:
       words.extend(_wordSplitRegex.split(entry))
