@@ -27,7 +27,10 @@ class DocViewPage(DocPage):
     if not slug:
       self.redirect("/doc/")
       return
-    page = ctrl.doc.getPage(slug, self.request.get("revision"))
+    if not self.request.get("revision"):
+      page = ctrl.doc.getPage(slug)
+    else:
+      page = ctrl.doc.getPageRevision(slug, self.request.get("revision"))
     if not page:
       self.render("doc/not_found.html", {"slug": slug})
     else:
@@ -36,7 +39,7 @@ class DocViewPage(DocPage):
       if self.request.get("revision"):
         tmpl_name = "doc/page_viewrevision.html"
       if self.request.get("diff"):
-        previous_revision = ctrl.doc.getPage(slug, self.request.get("diff"))
+        previous_revision = ctrl.doc.getPageRevision(slug, self.request.get("diff"))
         data["diff"] = ctrl.doc.generateDiff(previous_revision.revisions[0], page.revisions[0])
         tmpl_name = "doc/page_viewdiff.html"
       data["profiles"] = self._getProfiles(page.revisions)
@@ -76,6 +79,18 @@ class DocEditPage(DocPage):
     self.redirect("/doc"+slug)
 
 
+def calculate_percents(revision):
+  if revision.words_added == None:
+    return
+  # Add a % value for displaying in a nice graph
+  total_changes = revision.words_added + revision.words_removed + revision.words_changed
+  if total_changes < len(revision.words):
+    total_changes = len(revision.words)
+  revision.words_added_pct = int(100.0 * revision.words_added / total_changes)
+  revision.words_removed_pct = int(100.0 * revision.words_removed / total_changes)
+  revision.words_changed_pct = int(100.0 * revision.words_changed / total_changes)
+
+
 class DocRevisionHistoryPage(DocPage):
   def get(self):
     if not self._isLoggedIn():
@@ -92,14 +107,9 @@ class DocRevisionHistoryPage(DocPage):
       self.response.set_status(404)
       return
     revisions = ctrl.doc.getRevisionHistory(page.key)
+    # Add a % value for displaying in a nice graph
     for revision in revisions:
-      # Add a % value for displaying in a nice graph
-      total_changes = revision.words_added + revision.words_removed + revision.words_changed
-      if total_changes < len(revision.words):
-        total_changes = len(revision.words)
-      revision.words_added_pct = int(100.0 * revision.words_added / total_changes)
-      revision.words_removed_pct = int(100.0 * revision.words_removed / total_changes)
-      revision.words_changed_pct = int(100.0 * revision.words_changed / total_changes)
+      calculate_percents(revision)
     profiles = self._getProfiles(revisions)
     self.render("doc/revision_history.html", {"page": page,
                                               "revisions": revisions,
@@ -115,6 +125,9 @@ class DocGlobalRevisionHistoryPage(DocPage):
     all_revisions = []
     for entry in pages:
       all_revisions.append(entry["revision"])
+    # Add a % value for displaying in a nice graph
+    for revision in all_revisions:
+      calculate_percents(revision)
     profiles = self._getProfiles(all_revisions)
     self.render("doc/revision_history_global.html", {"pages": pages, "profiles": profiles})
 
@@ -126,7 +139,7 @@ class DocRevisionRevert(DocPage):
     slug = self.request.get("slug")
     revision_key = self.request.get("revision")
     if revision_key:
-      page = ctrl.doc.getPage(slug, revision_key)
+      page = ctrl.doc.getPageRevision(slug, revision_key)
     else:
       page = None
     if not page:

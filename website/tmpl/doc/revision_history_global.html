@@ -23,7 +23,7 @@
         {{m.profile_link(profiles[entry.revision.user.user_id()])}}
         <time datetime="{{entry.revision.date|date_std}}">{{entry.revision.date|date_std}}</time>
         <div class="revision-details">
-          {% if loop.last %}
+          {% if loop.last or not entry.revision.words_added %}
             <div class="revision-graph"></div>
             <strong>{{entry.revision.words|length|number}}</strong>
             <a href="/doc{{entry.page.slug}}?revision={{entry.revision.key}}">View</a>
@@ -36,7 +36,9 @@
             <strong>{{entry.revision.words|length|number}}</strong>
             ({{entry.revision.words_added}}+ {{entry.revision.words_removed}}- {{entry.revision.words_changed}}Δ)
             <a href="/doc{{entry.page.slug}}?revision={{entry.revision.key}}">View</a>
-            <!--a href="/doc{{entry.page.slug}}?revision={{entry.revision.key}}&diff={{pages[loop.index].revision.key}}">Diff</a-->
+            {% if entry.revision.older_revision_key %}
+              <a href="/doc{{entry.page.slug}}?revision={{entry.revision.key}}&diff={{entry.revision.older_revision_key}}">Diff</a>
+            {% endif %}
           {% endif %}
         </div>
       </article>

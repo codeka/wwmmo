@@ -30,14 +30,20 @@ class DocRevision(object):
     self.content = None
     self.user = None
     self.date = None
+    self.older_revision_key = None
     self.words = None
     self.words_added = None
     self.words_removed = None
     self.words_changed = None
 
 
-def getPage(slug, revisionKey=None):
+def getPage(slug):
   """Gets the document page with the give slug."""
+  cache_key = "doc:%s" % (slug)
+  page = memcache.get(cache_key)
+  if page:
+    return page
+
   page_mdl = None
   for mdl in model.doc.DocPage.all().filter("slug", slug).fetch(1):
     page_mdl = mdl
@@ -45,26 +51,14 @@ def getPage(slug, revisionKey=None):
   if not page_mdl:
     return None
 
-  # Fetch the last four revisions. The latest one is the current, and
-  # then we want the rest so we can display a little history on the page
-  # as well (who edited the page, and when).
   page = DocPage()
   page.key = str(page_mdl.key())
   page.title = page_mdl.title
   page.slug = page_mdl.slug
 
-  if revisionKey:
-    rev_mdl = model.doc.DocPageRevision.get(db.Key(revisionKey))
-    if not rev_mdl:
-      return None
-    page.content = rev_mdl.content
-    revision = DocRevision()
-    revision.key = str(rev_mdl.key())
-    revision.content = rev_mdl.content
-    revision.date = rev_mdl.date
-    revision.user = rev_mdl.user
-    page.revisions.append(revision)
-
+  # Fetch the last four revisions. The latest one is the current, and
+  # then we want the rest so we can display a little history on the page
+  # as well (who edited the page, and when).
   for rev_mdl in (model.doc.DocPageRevision.all()
                                            .ancestor(page_mdl)
                                            .order("-date")
@@ -76,6 +70,36 @@ def getPage(slug, revisionKey=None):
     revision.date = rev_mdl.date
     revision.user = rev_mdl.user
     page.revisions.append(revision)
+
+  memcache.set(cache_key, page)
+  return page
+
+
+def getPageRevision(slug, revision_key):
+  """Fetches a single revision of the page with the given slug."""
+  page_mdl = None
+  for mdl in model.doc.DocPage.all().filter("slug", slug).fetch(1):
+    page_mdl = mdl
+    break
+  if not page_mdl:
+    return None
+
+  page = DocPage()
+  page.key = str(page_mdl.key())
+  page.title = page_mdl.title
+  page.slug = page_mdl.slug
+
+  rev_mdl = model.doc.DocPageRevision.get(db.Key(revision_key))
+  if not rev_mdl:
+    return None
+  page.content = rev_mdl.content
+  revision = DocRevision()
+  revision.key = str(rev_mdl.key())
+  revision.content = rev_mdl.content
+  revision.date = rev_mdl.date
+  revision.user = rev_mdl.user
+  page.revisions.append(revision)
+
   return page
 
 
@@ -96,6 +120,8 @@ def getGlobalRevisionHistory():
   for revision in revisions:
     if revision.page_key not in page_map:
       page_mdl = model.doc.DocPage.get(db.Key(revision.page_key))
+      if not page_mdl:
+        continue
       page = DocPage()
       page.key = str(page_mdl.key())
       page.title = page_mdl.title
@@ -111,18 +137,27 @@ def _getRevisionHistory(query):
   prev_rev = None
   rev = None
   for rev_mdl in query:
-    rev = DocRevision()
-    rev.key = str(rev_mdl.key())
-    rev.page_key = str(rev_mdl.key().parent())
-    rev.content = rev_mdl.content
-    rev.user = rev_mdl.user
-    rev.date = rev_mdl.date
-    if prev_rev:
-     _populateDelta(rev, prev_rev)
+    cache_key = "doc-rev-history:%s" % (str(rev_mdl.key()))
+    rev = memcache.get(cache_key)
+    if rev:
+      revisions.append(rev)
+    else:
+      rev = DocRevision()
+      rev.key = str(rev_mdl.key())
+      rev.page_key = str(rev_mdl.key().parent())
+      rev.content = rev_mdl.content
+      rev.user = rev_mdl.user
+      rev.date = rev_mdl.date
+      if prev_rev and prev_rev.page_key == rev.page_key:
+        _populateDelta(rev, prev_rev)
+        prev_rev.older_revision_key = rev.key
+        memcache.set("doc-rev-history:%s" % (prev_rev.key), prev_rev)
+      revisions.append(rev)
     prev_rev = rev
-    revisions.append(rev)
-  if rev and prev_rev:
+  if rev and prev_rev and prev_rev.page_key == rev.page_key:
     _populateDelta(rev, prev_rev)
+    prev_rev.older_revision_key = rev.key
+    memcache.set("doc-rev-history:%s" % (prev_rev.key), prev_rev)
   return revisions
 
 
@@ -147,6 +182,7 @@ def savePage(page):
     page_mdl.title = page.title
   page_mdl.put()
 
+  memcache.delete("doc:" + page.slug)
   rev_mdl = model.doc.DocPageRevision(parent=page_mdl,
                                       content=page.content,
                                       user=page.updatedUser,
