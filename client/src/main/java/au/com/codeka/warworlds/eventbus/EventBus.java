@@ -30,16 +30,17 @@ public class EventBus {
 
     /** Subscribe the given object to the event bus. */
     public void register(Object subscriber) {
-        // Make sure it's not already subscribed. If it is, that's an error.
+        // If it's already registered, just increment it's register count.
+        boolean alreadyRegistered = false;
         for (EventHandlerInfo handler : mHandlers) {
             Object existingSubscriber = handler.getSubscriber();
             if (existingSubscriber != null && existingSubscriber == subscriber) {
-                if (Util.isDebug()) {
-                    throw new AlreadyRegisteredException();
-                } else {
-                    log.error("EventBus.register() called twice on the same object, ignoring second call.");
-                }
+                handler.register();
+                alreadyRegistered = true;
             }
+        }
+        if (alreadyRegistered) {
+            return;
         }
 
         int numMethods = 0;
@@ -78,7 +79,7 @@ public class EventBus {
         for (EventHandlerInfo handler : mHandlers) {
             Object existingSubscriber = handler.getSubscriber();
             if (existingSubscriber == null // Remove dead subscribers while we're here....
-                    || existingSubscriber == subscriber) {
+                    || (existingSubscriber == subscriber && handler.unregister() == 0)) {
                 kill.add(handler);
             }
         }

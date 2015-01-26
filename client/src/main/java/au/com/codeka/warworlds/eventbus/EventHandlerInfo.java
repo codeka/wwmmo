@@ -16,6 +16,7 @@ class EventHandlerInfo {
     private final WeakReference<?> mSubscriber;
     private final boolean mCallOnUiThread;
     private final Handler mHandler;
+    private int registerCount;
 
     public EventHandlerInfo(Class<?> eventClass, Method method, Object subscriber,
             boolean callOnUiThread) {
@@ -28,10 +29,19 @@ class EventHandlerInfo {
         } else {
             mHandler = null;
         }
+        registerCount = 1;
     }
 
     public boolean handles(Object event) {
         return mEventClass.isInstance(event);
+    }
+
+    public int register() {
+        return ++registerCount;
+    }
+
+    public int unregister() {
+        return --registerCount;
     }
 
     /** Gets the subscriber object, may be null. */
