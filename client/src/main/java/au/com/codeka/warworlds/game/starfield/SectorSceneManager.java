@@ -143,12 +143,14 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
                                 mSceneCreatedHandler.onSceneCreated(scene);
                             }
 
-                            if (mScene != null) {
-                                scene.copySelection(mScene);
-                                mScene.disposeScene();
+                            StarfieldScene oldScene = mScene;
+                            mScene = scene;
+
+                            if (oldScene != null) {
+                                scene.copySelection(oldScene);
+                                oldScene.disposeScene();
                             }
 
-                            mScene = scene;
                             mActivity.getCamera().setHUD(hud);
                         }
                     });
