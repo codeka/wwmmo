@@ -158,7 +158,7 @@ public class StarfieldScene extends Scene {
                                     mSelectedStarEntity.getStar()));
                 }
             }
-        });
+        }, false);
     }
 
     public void selectStar(String starKey) {
@@ -192,7 +192,7 @@ public class StarfieldScene extends Scene {
                 StarfieldSceneManager.eventBus.publish(new StarfieldSceneManager.FleetSelectedEvent(
                         mSelectedFleetEntity == null ? null : mSelectedFleetEntity.getFleet()));
             }
-        });
+        }, false);
     }
 
     public void selectFleet(String fleetKey) {
