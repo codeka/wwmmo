@@ -115,7 +115,7 @@ public class SolarSystemFragment extends Fragment {
         focusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mStar == null || mStar.getPlanets() == null) {
+                if (mStar == null || mStar.getPlanets() == null || mColony == null) {
                     return;
                 }
 
