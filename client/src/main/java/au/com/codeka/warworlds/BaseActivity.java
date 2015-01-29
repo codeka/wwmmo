@@ -74,7 +74,7 @@ public class BaseActivity extends ActionBarActivity {
     }
 
     @Override
-    public void onResume() {
+    public void onResumeFragments() {
         Util.loadProperties();
 
         int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
@@ -93,7 +93,7 @@ public class BaseActivity extends ActionBarActivity {
         }
 
         BackgroundDetector.i.onActivityResume();
-        super.onResume();
+        super.onResumeFragments();
     }
 
     @Override

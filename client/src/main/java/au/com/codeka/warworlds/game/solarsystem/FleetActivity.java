@@ -85,8 +85,8 @@ public class FleetActivity extends BaseActivity {
   }
 
   @Override
-  public void onResume() {
-    super.onResume();
+  public void onResumeFragments() {
+    super.onResumeFragments();
 
     ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
       @Override

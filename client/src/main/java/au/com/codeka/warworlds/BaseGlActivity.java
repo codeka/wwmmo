@@ -145,7 +145,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
     }
 
     @Override
-    public void onResume() {
+    public void onResumeFragments() {
         Util.loadProperties();
 
         mForegroundStartTimeMs = System.currentTimeMillis();
@@ -157,7 +157,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
         }
 
         BackgroundDetector.i.onActivityResume();
-        super.onResume();
+        super.onResumeFragments();
     }
 
     @Override

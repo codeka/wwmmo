@@ -114,11 +114,6 @@ public class AccountsActivity extends BaseActivity {
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
     /**
      * Registers for C2DM messaging with the given account name.
      * 

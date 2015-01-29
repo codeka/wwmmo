@@ -176,8 +176,8 @@ public class SolarSystemActivity extends BaseActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onResumeFragments() {
+        super.onResumeFragments();
 
         StarManager.eventBus.register(eventHandler);
 

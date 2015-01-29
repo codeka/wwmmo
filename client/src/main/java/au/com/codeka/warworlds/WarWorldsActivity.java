@@ -120,8 +120,8 @@ public class WarWorldsActivity extends BaseActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onResumeFragments() {
+        super.onResumeFragments();
         SharedPreferences prefs = Util.getSharedPreferences();
         if (prefs.getBoolean("WarmWelcome",  false) == false) {
             // if we've never done the warm-welcome, do it now

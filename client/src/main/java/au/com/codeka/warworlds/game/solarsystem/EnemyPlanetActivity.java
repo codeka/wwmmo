@@ -64,8 +64,8 @@ public class EnemyPlanetActivity extends BaseActivity {
   }
 
   @Override
-  public void onResume() {
-    super.onResume();
+  public void onResumeFragments() {
+    super.onResumeFragments();
     ShieldManager.eventBus.register(eventHandler);
     StarManager.eventBus.register(eventHandler);
 
