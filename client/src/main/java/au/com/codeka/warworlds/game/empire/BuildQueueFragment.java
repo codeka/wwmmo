@@ -87,6 +87,10 @@ public class BuildQueueFragment extends BaseFragment {
                 // if it doesn't have any builds, go to the star view
                 if (adapter.getChildrenCount(groupPosition) == 0) {
                     Star star = (Star) adapter.getGroup(groupPosition);
+                    if (star == null) {
+                        // huh?
+                        return false;
+                    }
 
                     Intent intent = new Intent(getActivity(), SolarSystemActivity.class);
                     intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
