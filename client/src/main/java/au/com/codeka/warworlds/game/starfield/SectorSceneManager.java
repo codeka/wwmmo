@@ -121,8 +121,8 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
             @Override
             protected void onComplete(Tuple<StarfieldScene, HUD> tuple) {
                 final Engine engine = mActivity.getEngine();
-                final StarfieldScene scene = tuple.one;
-                final HUD hud = tuple.two;
+                final StarfieldScene scene = tuple == null ? null : tuple.one;
+                final HUD hud = tuple == null ? null : tuple.two;
                 if (scene != null && engine != null) {
                   engine.runOnUpdateThread(new Runnable() {
                         @Override
