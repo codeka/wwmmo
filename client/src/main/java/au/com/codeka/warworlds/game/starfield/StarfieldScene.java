@@ -14,6 +14,7 @@ import au.com.codeka.common.Tuple;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
 
 public class StarfieldScene extends Scene {
     private StarfieldSceneManager mStarfield;
@@ -250,8 +251,16 @@ public class StarfieldScene extends Scene {
             mSelectionIndicator.setSelectedEntity(mSelectedStarEntity);
             mSelectedStarEntity.attachChild(mSelectionIndicator);
 
+            // make sure we get it from the StarManager so that we can be sure it's always got
+            // the buildings and stuff.
+            Star star = StarManager.i.getStar(Integer.parseInt(mSelectedStarEntity.getStar().getKey()));
+            if (star == null) {
+                // if we don't have it yet, just use this one, even though it might not be "complete".
+                star = mSelectedStarEntity.getStar();
+            }
+
             // if the selected star has a radar, pick the one with the biggest radius to display
-            float radarRadius = mSelectedStarEntity.getStar().getRadarRange(EmpireManager.i.getEmpire().getKey());
+            float radarRadius = star.getRadarRange(EmpireManager.i.getEmpire().getKey());
             if (radarRadius > 0.0f) {
                 mSelectedStarEntity.attachChild(mRadarIndicator);
                 mRadarIndicator.setScale(radarRadius * Sector.PIXELS_PER_PARSEC * 2.0f);
@@ -259,7 +268,7 @@ public class StarfieldScene extends Scene {
 
             // if the selected star has a wormhole disruptor, pick the one with the biggest radius
             // to display
-            float wormholeDisruptorRadius = mSelectedStarEntity.getStar().getWormholeDisruptorRange(
+            float wormholeDisruptorRadius = star.getWormholeDisruptorRange(
                 EmpireManager.i.getEmpire().getKey());
             if (wormholeDisruptorRadius > 0.0f) {
                 mSelectedStarEntity.attachChild(mWormholeDisruptorIndicator);
