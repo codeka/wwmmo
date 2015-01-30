@@ -25,79 +25,32 @@ import au.com.codeka.warworlds.model.Realm;
  */
 public class RequestManager {
   private static final Log log = new Log("RequestManager");
-  private static Map<Integer, ConnectionPool> sConnectionPools;
-  private static String sImpersonateUser;
-  private static boolean sVerboseLog = false;
+  private static RequestManager i = new RequestManager();
+  private boolean DBG = false;
 
   public static final EventBus eventBus = new EventBus();
 
-  // we record the last status code we got from the server, don't try to re-authenticate if we
-  // get two 403's in a row, for example.
-  private static int sLastRequestStatusCode = 200;
+  /** If {@code true}, the user we will attempt to impersonate in all our requests. */
+  private String impersonateUser;
 
-  static {
-    sConnectionPools = new TreeMap<>();
-  }
+  /**
+   * The last status code we got from the server, don't try to re-authenticate if we get two 403's
+   * in a row, for example.
+   */
+  private int lastRequestStatusCode = 200;
 
-  private static ConnectionPool getConnectionPool() {
-    Realm realm = RealmContext.i.getCurrentRealm();
-    if (realm == null) {
-      return null;
-    }
-
-    synchronized (sConnectionPools) {
-      if (!sConnectionPools.containsKey(realm.getID())) {
-        ConnectionPool cp = configureConnectionPool(realm);
-        sConnectionPools.put(realm.getID(), cp);
-        return cp;
-      }
-    }
-    return sConnectionPools.get(realm.getID());
-  }
-
-  private static ConnectionPool configureConnectionPool(Realm realm) {
-    URI baseUrl = realm.getBaseUrl();
-    boolean ssl = false;
-    if (baseUrl.getScheme().equalsIgnoreCase("https")) {
-      ssl = true;
-    } else if (!baseUrl.getScheme().equalsIgnoreCase("http")) {
-      // should never happen
-      log.error("Invalid URI scheme \"%s\", assuming http.", baseUrl.getScheme());
-    }
-
-    return new ConnectionPool(ssl, baseUrl.getHost(), baseUrl.getPort(), sVerboseLog);
-  }
-
-  public static void impersonate(String user) {
-    sImpersonateUser = user;
+  /** Start impersonating the given user. */
+  public void impersonate(String user) {
+    impersonateUser = user;
   }
 
   /**
-   * Performs a request with the given method to the given URL. The URL is assumed to be
-   * relative to the \c baseUri that was passed in to \c configure().
-   *
-   * @param method The HTTP method (GET, POST, etc)
-   * @param url    The URL, relative to the \c baseUri we were configured with.
-   * @return A \c ResultWrapper representing the server's response (if any)
+   * Enqueues the given request to send to the server.
    */
-  public static ResultWrapper request(String method, String url) throws ApiException {
-    return request(method, url, null, null);
+  public void sendRequest(ApiRequest apiRequest) throws ApiException {
+
   }
 
-  /**
-   * Performs a request with the given method to the given URL. The URL is assumed to be
-   * relative to the \c baseUri that was passed in to \c configure().
-   *
-   * @param method       The HTTP method (GET, POST, etc)
-   * @param url          The URL, relative to the \c baseUri we were configured with.
-   * @param extraHeaders a mapping of additional headers to include in the request (e.g.
-   *                     cookies, etc)
-   * @return A \c ResultWrapper representing the server's response (if any)
-   */
-  public static ResultWrapper request(String method, String url,
-      Map<String, List<String>> extraHeaders) throws ApiException {
-    return request(method, url, extraHeaders, null);
-  }
 
   /**
    * Performs a request with the given method to the given URL. The URL is assumed to be
@@ -294,35 +247,4 @@ public class RequestManager {
     public int numInProgressRequests;
     public String lastUri;
   }
-
-  /**
-   * Wraps the result of a request that we've made.
-   */
-  public static class ResultWrapper {
-    private HttpResponse mResponse;
-    private Connection mConnection;
-
-    public ResultWrapper(Connection conn, HttpResponse resp) {
-      mConnection = conn;
-      mResponse = resp;
-    }
-
-    public HttpResponse getResponse() {
-      return mResponse;
-    }
-
-    public void close() {
-      // make sure we've finished with the entity...
-      try {
-        mResponse.getEntity().consumeContent();
-      } catch (IOException e) {
-        // ignore....
-      }
-
-      mConnection.getConnectionPool().returnConnection(mConnection);
-
-      eventBus.publish(getCurrentState());
-    }
-  }
-
 }
