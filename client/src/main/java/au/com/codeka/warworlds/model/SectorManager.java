@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.model;
 
+import android.support.v4.util.LruCache;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -9,15 +11,12 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import android.support.v4.util.LruCache;
-
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiRequest;
+import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventBus;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 
@@ -113,57 +112,34 @@ public class SectorManager extends BaseManager {
       }
 
       if (!missingSectors.isEmpty()) {
-        new BackgroundRunner<List<Sector>>() {
-          @Override
-          protected List<Sector> doInBackground() {
-            List<Sector> sectors = null;
-
-            String url = "";
-            for (Pair<Long, Long> coord : missingSectors) {
-              if (url.length() != 0) {
-                url += "%7C"; // Java doesn't like "|" for some reason (it's valid!!)
-              }
-              url += String.format("%d,%d", coord.one, coord.two);
-            }
-            url = "sectors?coords=" + url;
-            try {
-              Messages.Sectors pb = ApiClient.getProtoBuf(url, Messages.Sectors.class);
-              sectors = new ArrayList<>();
-              for (Messages.Sector sector_pb : pb.getSectorsList()) {
-                Sector sector = new Sector();
-                sector.fromProtocolBuffer(sector_pb);
-                sectors.add(sector);
-              }
-            } catch (Exception e) {
-              log.error("Uh Oh!", e);
-            }
-
-            return sectors;
+        String url = "";
+        for (Pair<Long, Long> coord : missingSectors) {
+          if (url.length() != 0) {
+            url += "%7C"; // Java doesn't like "|" for some reason (it's valid!!)
           }
+          url += String.format("%d,%d", coord.one, coord.two);
+        }
+        url = "sectors?coords=" + url;
+        log.debug("Fetching sectors: %s", url);
 
-          @Override
-          protected void onComplete(List<Sector> sectors) {
-            if (sectors != null) {
-              for (Sector s : sectors) {
-                Pair<Long, Long> key = new Pair<>(s.getX(), s.getY());
+        ApiRequest request = new ApiRequest.Builder(url, "GET")
+            .completeCallback(new ApiRequest.CompleteCallback() {
+              @Override
+              public void onRequestComplete(ApiRequest request) {
+                Messages.Sectors sectorsPb = request.body(Messages.Sectors.class);
+                for (Messages.Sector sector_pb : sectorsPb.getSectorsList()) {
+                  Sector sector = new Sector();
+                  sector.fromProtocolBuffer(sector_pb);
 
-                SectorManager.this.sectors.put(key, s);
-
-                for (BaseStar star : s.getStars()) {
-                  sectorStars.put(star.getKey(), (Star) star);
+                  Pair<Long, Long> key = new Pair<>(sector.getX(), sector.getY());
+                  sectors.put(key, sector);
+                  eventBus.publish(sector);
+                  pendingSectors.remove(key);
                 }
-
-                eventBus.publish(s);
+                eventBus.publish(new SectorListChangedEvent());
               }
-            }
-
-            for (Pair<Long, Long> coord : missingSectors) {
-              pendingSectors.remove(coord);
-            }
-
-            eventBus.publish(new SectorListChangedEvent());
-          }
-        }.execute();
+            }).build();
+        RequestManager.i.sendRequest(request);
       }
     }
   }
