@@ -111,7 +111,7 @@ public class StarManager extends BaseManager {
     }
 
     RequestManager.i.sendRequest(new ApiRequest.Builder(String.format("stars/%s", starID), "GET")
-        .responseType(Messages.Star.class).completeCallback(requestCompleteCallback).build());
+        .completeCallback(requestCompleteCallback).build());
     return true;
   }
 
@@ -119,7 +119,7 @@ public class StarManager extends BaseManager {
       new ApiRequest.CompleteCallback() {
     @Override
     public void onRequestComplete(ApiRequest request) {
-      Messages.Star starPb = request.body();
+      Messages.Star starPb = request.body(Messages.Star.class);
       if (starPb != null) {
         Star star = new Star();
         star.fromProtocolBuffer(starPb);
@@ -140,6 +140,7 @@ public class StarManager extends BaseManager {
       try {
         sku = PurchaseManager.i.getInventory().getSkuDetails(purchase.getSku());
       } catch (IabException e1) {
+        // Just ignore.
       }
     }
     if (sku != null) {
@@ -157,14 +158,13 @@ public class StarManager extends BaseManager {
 
     ApiRequest request = new ApiRequest.Builder(String.format("stars/%d", star.getID()), "PUT")
         .body(pb.build())
-        .responseType(Messages.Star.class)
         .completeCallback(new ApiRequest.CompleteCallback() {
           @Override
           public void onRequestComplete(ApiRequest request) {
             // if failure() {
             //  onCompleteHandler.onStarRename(null, false, errorMessage);
             // }
-            Messages.Star starPb = request.body();
+            Messages.Star starPb = request.body(Messages.Star.class);
             Star star = new Star();
             star.fromProtocolBuffer(starPb);
 

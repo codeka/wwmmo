@@ -12,11 +12,10 @@ import javax.annotation.Nullable;
 import android.os.Handler;
 import android.util.SparseArray;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.ApiRequest;
+import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventBus;
 
 /**
@@ -166,28 +165,14 @@ public class EmpireStarsFetcher {
     appendFilterAndSearch(url);
     log.debug("Fetching: %s", url);
 
-    new BackgroundRunner<Integer>() {
-      @Override
-      protected Integer doInBackground() {
-        try {
-          String s = ApiClient.getString(url.toString());
-          return Integer.parseInt(s);
-        } catch (ApiException e) {
-          log.error("Error fetching stars!", e);
-          return null;
-        }
-      }
-
-      @Override
-      protected void onComplete(Integer index) {
-        if (index < 0) {
-          index = null;
-        }
-
-        onCompleteHandler.onIndexOfComplete(index);
-      }
-    }.execute();
-
+    RequestManager.i.sendRequest(new ApiRequest.Builder(url.toString(), "GET")
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            int index = Integer.parseInt(request.bodyString());
+            onCompleteHandler.onIndexOfComplete(index);
+          }
+        }).build());
   }
 
   /**
@@ -222,50 +207,36 @@ public class EmpireStarsFetcher {
     appendFilterAndSearch(url);
     log.debug("Fetching: %s", url);
 
-    new BackgroundRunner<SparseArray<Star>>() {
-      @Override
-      protected SparseArray<Star> doInBackground() {
-        try {
-          Messages.EmpireStars pb = ApiClient.getProtoBuf(
-              url.toString(), Messages.EmpireStars.class);
-          if (pb == null) {
-            return null;
-          }
-
-          SparseArray<Star> stars = new SparseArray<>();
-          for (Messages.EmpireStar empire_star_pb : pb.getStarsList()) {
-            Star star = new Star();
-            star.fromProtocolBuffer(empire_star_pb.getStar());
-            stars.put(empire_star_pb.getIndex(), star);
-          }
-
-          numStars = pb.getTotalStars();
-
-          return stars;
-        } catch (ApiException e) {
-          log.error("Error fetching stars!", e);
-          return null;
-        }
-      }
-
-      @Override
-      protected void onComplete(SparseArray<Star> result) {
-        if (result != null) {
-          synchronized (cache) {
-            for (int i = 0; i < result.size(); i++) {
-              Star star = result.valueAt(i);
-              // notify the StarManager as well, in case someone else is interested in
-              // this star.
-              StarManager.i.notifyStarUpdated(star);
-              cache.put(result.keyAt(i), new WeakReference<>(star));
-            }
-          }
-
-          eventBus.publish(new StarsFetchedEvent(result));
-        }
-      }
-    }.execute();
+    RequestManager.i.sendRequest(new ApiRequest.Builder(url.toString(), "GET")
+        .completeCallback(fetchCompleteCallback)
+        .build());
   }
+
+  private final ApiRequest.CompleteCallback fetchCompleteCallback
+      = new ApiRequest.CompleteCallback() {
+    @Override
+    public void onRequestComplete(ApiRequest request) {
+      Messages.EmpireStars pb = request.body(Messages.EmpireStars.class);
+      SparseArray<Star> stars = new SparseArray<>();
+      for (Messages.EmpireStar empire_star_pb : pb.getStarsList()) {
+        Star star = new Star();
+        star.fromProtocolBuffer(empire_star_pb.getStar());
+        stars.put(empire_star_pb.getIndex(), star);
+      }
+
+      numStars = pb.getTotalStars();
+      synchronized (cache) {
+        for (int i = 0; i < stars.size(); i++) {
+          Star star = stars.valueAt(i);
+          // notify the StarManager as well, in case someone else is interested in this star.
+          StarManager.i.notifyStarUpdated(star);
+          cache.put(stars.keyAt(i), new WeakReference<>(star));
+        }
+      }
+
+      eventBus.publish(new StarsFetchedEvent(stars));
+    }
+  };
 
   private void appendFilterAndSearch(StringBuilder url) {
     url.append("&filter=");

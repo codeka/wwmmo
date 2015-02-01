@@ -9,6 +9,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,19 +28,17 @@ public class ApiRequest {
   private final String url;
   private final String method;
   @Nullable private final Message requestBody;
-  @Nullable private Class<? extends Message> responseBodyClass;
   private CompleteCallback completeCallback;
+  @Nullable Response response;
   @Nullable private Message responseBody;
   @Nullable Map<String, List<String>> extraHeaders;
 
   private ApiRequest(String url, String method, @Nullable Message requestBody,
-      @Nullable Class<? extends Message> responseBodyClass,
       @Nullable Map<String, List<String>> extraHeaders,
       @Nullable CompleteCallback completeCallback) {
     this.url = url;
     this.method = method;
     this.requestBody = requestBody;
-    this.responseBodyClass = responseBodyClass;
     this.extraHeaders = extraHeaders;
     this.completeCallback = completeCallback;
   }
@@ -66,14 +65,27 @@ public class ApiRequest {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T body() {
+  public <T> T body(Class<? extends Message> responseClass) {
+    if (responseBody == null) {
+      responseBody = RequestManager.parseResponse(response, responseClass);
+    }
     return (T) responseBody;
   }
 
-  void handleResponse(Response response) {
-    if (response.body().contentLength() > 0 && responseBodyClass != null) {
-      responseBody = RequestManager.parseResponse(response, responseBodyClass);
+  /**
+   * Returns the body of the response, as a String. If the Content-Type isn't text/* then null is
+   * returned instead.
+   */
+  public String bodyString() {
+    try {
+      return response.body().string();
+    } catch (IOException e) {
+      return null;
     }
+  }
+
+  void handleResponse(Response response) {
+    this.response = response;
 
     // Call the callback, if there is one, on the main thread
     if (completeCallback != null) {
@@ -101,7 +113,6 @@ public class ApiRequest {
     private String url;
     private String method;
     @Nullable private Message requestBody;
-    @Nullable private Class<? extends Message> responseBodyClass;
     @Nullable private Map<String, List<String>> extraHeaders;
     @Nullable private CompleteCallback completeCallback;
 
@@ -112,11 +123,6 @@ public class ApiRequest {
 
     public Builder body(Message body) {
       requestBody = body;
-      return this;
-    }
-
-    public Builder responseType(Class<? extends Message> responseType) {
-      responseBodyClass = responseType;
       return this;
     }
 
@@ -143,8 +149,7 @@ public class ApiRequest {
     }
 
     public ApiRequest build() {
-      return new ApiRequest(url, method, requestBody, responseBodyClass, extraHeaders,
-          completeCallback);
+      return new ApiRequest(url, method, requestBody, extraHeaders, completeCallback);
     }
   }
 }
