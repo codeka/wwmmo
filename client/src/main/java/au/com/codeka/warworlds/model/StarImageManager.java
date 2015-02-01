@@ -15,7 +15,7 @@ public class StarImageManager extends ImageManager {
     /**
      * Gets the \c Bitmap for the given star.
      */
-    public Sprite getSprite(StarSummary star, int size, boolean forceGeneric) {
+    public Sprite getSprite(Star star, int size, boolean forceGeneric) {
         StarExtra starExtra = new StarExtra(star);
         Sprite sprite = null;
         if (size > 0 && !forceGeneric) {
@@ -60,9 +60,9 @@ public class StarImageManager extends ImageManager {
     }
 
     private static class StarExtra {
-        public StarSummary star;
+        public Star star;
 
-        public StarExtra(StarSummary star) {
+        public StarExtra(Star star) {
             this.star = star;
         }
     }

@@ -49,6 +49,7 @@ import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.SituationReport;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
@@ -206,7 +207,7 @@ public class SitrepActivity extends BaseActivity {
     }
 
     @EventHandler
-    public void onStarUpdated(StarSummary star) {
+    public void onStarUpdated(Star star) {
       if (starKey != null && star.getID() == Integer.parseInt(starKey)) {
         refreshTitle();
       }
@@ -231,12 +232,11 @@ public class SitrepActivity extends BaseActivity {
             .setImageBitmap(EmpireShieldManager.i.getShield(this, empire));
       }
     } else {
-      StarSummary starSummary = StarManager.i.getStarSummary(Integer
-          .parseInt(starKey));
-      if (starSummary != null) {
-        empireName.setText(starSummary.getName());
+      Star star = StarManager.i.getStar(Integer.parseInt(starKey));
+      if (star != null) {
+        empireName.setText(star.getName());
         Sprite starSprite = StarImageManager.getInstance().getSprite(
-            starSummary, empireIcon.getWidth(), true);
+            star, empireIcon.getWidth(), true);
         empireIcon.setImageDrawable(new SpriteDrawable(starSprite));
       }
     }
@@ -394,7 +394,7 @@ public class SitrepActivity extends BaseActivity {
     private boolean hasMore;
 
     public SituationReportAdapter() {
-      items = new ArrayList<SituationReport>();
+      items = new ArrayList<>();
     }
 
     public SituationReport getSituationReport(int position) {
@@ -403,7 +403,7 @@ public class SitrepActivity extends BaseActivity {
 
     public void setItems(List<SituationReport> items, boolean hasMore) {
       if (items == null) {
-        items = new ArrayList<SituationReport>();
+        items = new ArrayList<>();
       }
 
       if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
@@ -417,7 +417,7 @@ public class SitrepActivity extends BaseActivity {
 
     public void appendItems(List<SituationReport> items, boolean hasMore) {
       if (items == null) {
-        items = new ArrayList<SituationReport>();
+        items = new ArrayList<>();
       }
 
       if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
@@ -502,8 +502,8 @@ public class SitrepActivity extends BaseActivity {
       }
 
       SituationReport sitrep = items.get(position);
-      StarSummary starSummary = StarManager.i.getStarSummary(Integer.parseInt(sitrep.getStarKey()));
-      String msg = sitrep.getDescription(starSummary);
+      Star star = StarManager.i.getStar(Integer.parseInt(sitrep.getStarKey()));
+      String msg = sitrep.getDescription(star);
 
       TextView reportTitle = (TextView) view.findViewById(R.id.report_title);
       TextView reportContent = (TextView) view
@@ -512,11 +512,9 @@ public class SitrepActivity extends BaseActivity {
       ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
       ImageView overlayIcon = (ImageView) view.findViewById(R.id.overlay_icon);
 
-      if (starSummary != null) {
-        int imageSize = (int) (starSummary.getSize()
-            * starSummary.getStarType().getImageScale() * 2);
-        Sprite starSprite = StarImageManager.getInstance().getSprite(
-            starSummary, imageSize, true);
+      if (star != null) {
+        int imageSize = (int) (star.getSize() * star.getStarType().getImageScale() * 2);
+        Sprite starSprite = StarImageManager.getInstance().getSprite(star, imageSize, true);
         starIcon.setImageDrawable(new SpriteDrawable(starSprite));
       } else {
         starIcon.setImageBitmap(null);

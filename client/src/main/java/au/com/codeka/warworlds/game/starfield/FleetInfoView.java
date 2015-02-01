@@ -1,8 +1,5 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
 import android.content.Context;
 import android.text.Html;
 import android.util.AttributeSet;
@@ -14,6 +11,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Locale;
+
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
@@ -29,8 +30,8 @@ import au.com.codeka.warworlds.model.FleetUpgrade;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
 /** This view displays information about a fleet you've selected on the starfield view. */
 public class FleetInfoView extends FrameLayout {
@@ -107,10 +108,9 @@ public class FleetInfoView extends FrameLayout {
         ArrayList<Integer> starIDs = new ArrayList<Integer>();
         starIDs.add(Integer.parseInt(fleet.getStarKey()));
         starIDs.add(Integer.parseInt(fleet.getDestinationStarKey()));
-        SparseArray<StarSummary> starSummaries = StarManager.i.getStarSummaries(
-                starIDs, Float.MAX_VALUE);
-        StarSummary srcStar = starSummaries.get(Integer.parseInt(fleet.getStarKey()));
-        StarSummary destStar = starSummaries.get(Integer.parseInt(fleet.getDestinationStarKey()));
+        SparseArray<Star> starSummaries = StarManager.i.getStars(starIDs);
+        Star srcStar = starSummaries.get(Integer.parseInt(fleet.getStarKey()));
+        Star destStar = starSummaries.get(Integer.parseInt(fleet.getDestinationStarKey()));
         if (srcStar != null && destStar != null) {
             float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
             float timeFromSourceInHours = fleet.getTimeFromSource();

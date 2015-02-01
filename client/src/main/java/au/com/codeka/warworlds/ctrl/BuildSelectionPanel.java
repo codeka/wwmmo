@@ -25,7 +25,6 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
 public class BuildSelectionPanel extends RelativeLayout {
     private BuildQueueActionListener actionListener;
@@ -169,7 +168,7 @@ public class BuildSelectionPanel extends RelativeLayout {
         this.star = star;
         for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
             if (baseBuildRequest.getKey().equals(buildRequest.getKey())) {
-                this.buildRequest = (BuildRequest) buildRequest;
+                this.buildRequest = (BuildRequest) baseBuildRequest;
             }
         }
         refresh();
@@ -197,7 +196,7 @@ public class BuildSelectionPanel extends RelativeLayout {
     }
 
     public interface BuildQueueActionListener {
-        void onAccelerateClick(StarSummary star, BuildRequest buildRequest);
-        void onStopClick(StarSummary star, BuildRequest buildRequest);
+        void onAccelerateClick(Star star, BuildRequest buildRequest);
+        void onStopClick(Star star, BuildRequest buildRequest);
     }
 }

@@ -6,7 +6,7 @@ import android.view.View;
 import au.com.codeka.common.Log;
 
 public class BaseManager {
-    private static final Log log = new Log("StarManager");
+    private static final Log log = new Log("BaseManager");
 
     /**
      * Attempts to execute the given \c Runnable instance on whatever type \c context is. For

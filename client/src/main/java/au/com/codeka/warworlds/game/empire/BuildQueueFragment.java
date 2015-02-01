@@ -1,10 +1,5 @@
 package au.com.codeka.warworlds.game.empire;
 
-import java.util.Locale;
-
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +14,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+
+import java.util.Locale;
+
 import au.com.codeka.NumberFormatter;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseEmpirePresence;
@@ -43,7 +44,6 @@ import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
 
 public class BuildQueueFragment extends BaseFragment {
@@ -66,14 +66,14 @@ public class BuildQueueFragment extends BaseFragment {
         buildSelectionPanel.setBuildQueueActionListener(
                 new BuildSelectionPanel.BuildQueueActionListener() {
             @Override
-            public void onAccelerateClick(StarSummary star, BuildRequest buildRequest) {
+            public void onAccelerateClick(Star star, BuildRequest buildRequest) {
                 BuildAccelerateDialog dialog = new BuildAccelerateDialog();
                 dialog.setBuildRequest(star, buildRequest);
                 dialog.show(getActivity().getSupportFragmentManager(), "");
             }
 
             @Override
-            public void onStopClick(StarSummary star, BuildRequest buildRequest) {
+            public void onStopClick(Star star, BuildRequest buildRequest) {
                 BuildStopConfirmDialog dialog = new BuildStopConfirmDialog();
                 dialog.setBuildRequest(star, buildRequest);
                 dialog.show(getActivity().getSupportFragmentManager(), "");

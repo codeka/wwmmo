@@ -24,9 +24,6 @@ import au.com.codeka.warworlds.model.Realm;
 public class ApiRequest {
   private static final MediaType PROTOBUF = MediaType.parse("application/x-protobuf");
 
-  public static final String GET = "GET";
-  public static final String POST = "POST";
-
   private final String url;
   private final String method;
   @Nullable private final Message requestBody;
@@ -35,7 +32,7 @@ public class ApiRequest {
   @Nullable private Message responseBody;
   @Nullable Map<String, List<String>> extraHeaders;
 
-  ApiRequest(String url, String method, @Nullable Message requestBody,
+  private ApiRequest(String url, String method, @Nullable Message requestBody,
       @Nullable Class<? extends Message> responseBodyClass,
       @Nullable Map<String, List<String>> extraHeaders,
       @Nullable CompleteCallback completeCallback) {
@@ -54,9 +51,11 @@ public class ApiRequest {
         .url(realm.getBaseUrl().resolve(url).toString())
         .method(method, convertRequestBody())
         .addHeader("User-Agent", "wwmmo/" + Util.getVersion());
-    for (String headerName : extraHeaders.keySet()) {
-      for (String headerValue : extraHeaders.get(headerName)) {
-        builder.addHeader(headerName, headerValue);
+    if (extraHeaders != null) {
+      for (String headerName : extraHeaders.keySet()) {
+        for (String headerValue : extraHeaders.get(headerName)) {
+          builder.addHeader(headerName, headerValue);
+        }
       }
     }
     if (realm.getAuthenticator().isAuthenticated()) {
@@ -64,6 +63,11 @@ public class ApiRequest {
     }
     builder.tag(this);
     return builder.build();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T body() {
+    return (T) responseBody;
   }
 
   void handleResponse(Response response) {

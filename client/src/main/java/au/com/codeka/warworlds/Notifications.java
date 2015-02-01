@@ -175,10 +175,8 @@ public class Notifications {
     private static void displayNotification(final Context context,
                                             final Messages.SituationReport sitrep) {
         String starKey = sitrep.getStarKey();
-        StarSummary starSummary = StarManager.i.getStarSummary(Integer.parseInt(starKey),
-                Float.MAX_VALUE // always prefer a cached version, no matter how old
-            );
-        if (starSummary == null) {
+        Star star = StarManager.i.getStar(Integer.parseInt(starKey));
+        if (star == null) {
             log.error("Could not get star summary for star %s, cannot display notification.",
                     starKey);
             return;
@@ -189,7 +187,7 @@ public class Notifications {
         notification.realm = RealmContext.i.getCurrentRealm();
 
         Messages.Star.Builder star_pb = Messages.Star.newBuilder();
-        starSummary.toProtocolBuffer(star_pb);
+        star.toProtocolBuffer(star_pb);
         notification.star = star_pb.build();
 
         DatabaseHelper db = new DatabaseHelper();

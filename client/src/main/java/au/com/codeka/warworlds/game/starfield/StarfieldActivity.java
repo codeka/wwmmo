@@ -46,7 +46,6 @@ import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.IabHelper;
 import au.com.codeka.warworlds.model.billing.IabResult;
@@ -62,7 +61,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   private Context context = this;
   private Star selectedStar;
   private Fleet selectedFleet;
-  private StarSummary homeStar;
+  private Star homeStar;
   private View bottomPane;
   private Button allianceBtn;
   private SelectionDetailsView selectionDetailsView;
@@ -237,7 +236,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
         if (homeStar != null && (
             StarfieldActivity.this.homeStar == null || !StarfieldActivity.this.homeStar.getKey()
             .equals(homeStar.getKey()))) {
-          StarfieldActivity.this.homeStar = (StarSummary) homeStar;
+          StarfieldActivity.this.homeStar = (Star) homeStar;
           if (!doNotNavigateToHomeStar) {
             mStarfield.scrollTo(homeStar);
           }
@@ -466,11 +465,11 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   }
 
   public void navigateToFleet(final String starKey, final String fleetKey) {
-    StarSummary star = StarManager.i.getStarSummary(Integer.parseInt(starKey));
+    Star star = StarManager.i.getStar(Integer.parseInt(starKey));
     if (star == null) {
       StarManager.eventBus.register(new Object() {
         @EventHandler
-        public void onStarUpdated(StarSummary star) {
+        public void onStarUpdated(Star star) {
           if (star.getKey().equals(starKey)) {
             navigateToFleet(star, star.findFleet(fleetKey));
             StarManager.eventBus.unregister(this);
@@ -486,7 +485,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     }
   }
 
-  public void navigateToFleet(StarSummary star, BaseFleet fleet) {
+  public void navigateToFleet(Star star, BaseFleet fleet) {
     int offsetX = star.getOffsetX();
     int offsetY = star.getOffsetY();
 
@@ -613,11 +612,11 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       if (res == EmpireActivity.EmpireActivityResult.NavigateToPlanet) {
         final int planetIndex = intent.getIntExtra("au.com.codeka.warworlds.PlanetIndex", 0);
 
-        StarSummary star = StarManager.i.getStarSummary(Integer.parseInt(starKey));
+        Star star = StarManager.i.getStar(Integer.parseInt(starKey));
         if (star == null) {
           StarManager.eventBus.register(new Object() {
             @EventHandler
-            public void onStarUpdated(StarSummary star) {
+            public void onStarUpdated(Star star) {
               if (star.getKey().equals(starKey)) {
                 navigateToPlanet(star.getStarType(), sectorX, sectorY, starKey, starOffsetX,
                     starOffsetY, planetIndex, true);

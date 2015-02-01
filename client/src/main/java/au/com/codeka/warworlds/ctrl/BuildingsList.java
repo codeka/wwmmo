@@ -120,14 +120,14 @@ public class BuildingsList extends ListView {
         private static final int NEW_BUILDING_TYPE = 2;
 
         public void setColony(Star star, Colony colony) {
-            mEntries = new ArrayList<Entry>();
+            mEntries = new ArrayList<>();
 
             List<BaseBuilding> buildings = colony.getBuildings();
             if (buildings == null) {
-                buildings = new ArrayList<BaseBuilding>();
+                buildings = new ArrayList<>();
             }
 
-            ArrayList<Entry> existingBuildingEntries = new ArrayList<Entry>();
+            ArrayList<Entry> existingBuildingEntries = new ArrayList<>();
             for (BaseBuilding b : buildings) {
                 Entry entry = new Entry();
                 entry.building = (Building) b;

@@ -48,7 +48,6 @@ import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
 public class BuildQueueList extends FrameLayout {
     private Context mContext;
@@ -152,7 +151,7 @@ public class BuildQueueList extends FrameLayout {
     }
 
     public void refresh(final Star star, final Colony colony, List<BuildRequest> allBuildRequests) {
-        Map<String, StarSummary> stars = new TreeMap<String, StarSummary>();
+        Map<String, Star> stars = new TreeMap<>();
         stars.put(star.getKey(), star);
 
         Map<String, Colony> colonies = new TreeMap<String, Colony>();
@@ -189,11 +188,11 @@ public class BuildQueueList extends FrameLayout {
         });*/
     }
 
-    public void refresh(final Map<String, StarSummary> stars,
+    public void refresh(final Map<String, Star> stars,
                         final List<BuildRequest> buildRequests) {
         // save the list of star keys we're interested in here
-        mStarKeys = new ArrayList<String>();
-        for (StarSummary star : stars.values()) {
+        mStarKeys = new ArrayList<>();
+        for (Star star : stars.values()) {
             mStarKeys.add(star.getKey());
         }
 
@@ -282,12 +281,12 @@ public class BuildQueueList extends FrameLayout {
      */
     private class BuildQueueListAdapter extends BaseAdapter {
         private List<BuildRequest> mBuildRequests;
-        private Map<String, StarSummary> mStarSummaries;
+        private Map<String, Star> mStarSummaries;
         private List<ItemEntry> mEntries;
 
-        public void setBuildQueue(Map<String, StarSummary> stars,
+        public void setBuildQueue(Map<String, Star> stars,
                                   List<BuildRequest> buildRequests) {
-            mBuildRequests = new ArrayList<BuildRequest>(buildRequests);
+            mBuildRequests = new ArrayList<>(buildRequests);
             mStarSummaries = stars;
 
             Collections.sort(mBuildRequests, new Comparator<BuildRequest>() {
@@ -296,8 +295,8 @@ public class BuildQueueList extends FrameLayout {
                     // sort by star, then by design, then by count
                     if (!lhs.getColonyKey().equals(rhs.getColonyKey())) {
                         if (!lhs.getStarKey().equals(rhs.getStarKey())) {
-                            StarSummary lhsStar = mStarSummaries.get(lhs.getStarKey());
-                            StarSummary rhsStar = mStarSummaries.get(rhs.getStarKey());
+                            Star lhsStar = mStarSummaries.get(lhs.getStarKey());
+                            Star rhsStar = mStarSummaries.get(rhs.getStarKey());
 
                             if (lhsStar == null) {
                                 return -1;
@@ -319,7 +318,7 @@ public class BuildQueueList extends FrameLayout {
             String lastStarKey = "";
             int lastPlanetIndex = -1;
             for (BuildRequest buildRequest : mBuildRequests) {
-                StarSummary star = mStarSummaries.get(buildRequest.getStarKey());
+                Star star = mStarSummaries.get(buildRequest.getStarKey());
                 if (star == null) {
                     continue;
                 }
@@ -427,7 +426,7 @@ public class BuildQueueList extends FrameLayout {
             }
         }
 
-        public StarSummary getStarForBuildRequest(BuildRequest buildRequest) {
+        public Star getStarForBuildRequest(BuildRequest buildRequest) {
             return mStarSummaries.get(buildRequest.getStarKey());
         }
 
@@ -576,7 +575,7 @@ public class BuildQueueList extends FrameLayout {
         }
 
         private class ItemEntry {
-            public StarSummary star;
+            public Star star;
             public Planet planet;
             public SpriteDrawable starDrawable;
             public SpriteDrawable planetDrawable;
@@ -603,7 +602,7 @@ public class BuildQueueList extends FrameLayout {
     }
 
     public interface BuildQueueActionListener {
-        void onAccelerateClick(StarSummary star, BuildRequest buildRequest);
-        void onStopClick(StarSummary star, BuildRequest buildRequest);
+        void onAccelerateClick(Star star, BuildRequest buildRequest);
+        void onStopClick(Star star, BuildRequest buildRequest);
     }
 }

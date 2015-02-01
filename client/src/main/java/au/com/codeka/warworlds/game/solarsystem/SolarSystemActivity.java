@@ -1,16 +1,13 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +25,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+
+import java.util.ArrayList;
+import java.util.Locale;
+
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseActivity;
@@ -46,7 +47,6 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSimulationQueue;
-import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * This activity is displayed when you're actually looking at a solar system (star + planets)
@@ -56,14 +56,14 @@ public class SolarSystemActivity extends BaseActivity {
     private View drawer;
     private ActionBarDrawerToggle drawerToggle;
     private Integer starID;
-    private StarSummary star;
+    private Star star;
     private SearchListAdapter searchListAdapter;
     private boolean waitingForStarToShow;
 
     // We keep the last 5 stars you've visited in an LRU cache so we can display them at the top
     // of the search list (note we actually keep 6 but ignore the most recent one, which is always
     // "this star").
-    private static ArrayList<StarSummary> lastStars = new ArrayList<StarSummary>();
+    private static final ArrayList<Star> lastStars = new ArrayList<>();
     private static final int LAST_STARS_MAX_SIZE = 6;
 
     @Override
@@ -92,7 +92,7 @@ public class SolarSystemActivity extends BaseActivity {
         searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                StarSummary star = (StarSummary) searchListAdapter.getItem(position);
+                Star star = (Star) searchListAdapter.getItem(position);
                 if (star != null) {
                     showStar(star.getID());
                 }
@@ -212,7 +212,7 @@ public class SolarSystemActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        StarSummary star = StarManager.i.getStarSummary(starID, Float.MAX_VALUE);
+        Star star = StarManager.i.getStar(starID);
         Intent intent = new Intent();
         if (star != null) {
             intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
@@ -231,7 +231,7 @@ public class SolarSystemActivity extends BaseActivity {
 
     public void showStar(Integer starID) {
         this.starID = starID;
-        star = StarManager.i.getStarSummary(starID);
+        star = StarManager.i.getStar(starID);
         if (star == null) {
             // we need the star summary in order to know whether it's a wormhole or normal star.
             waitingForStarToShow = true;
@@ -281,19 +281,19 @@ public class SolarSystemActivity extends BaseActivity {
 
     private Object eventHandler = new Object() {
         @EventHandler
-        public void onStarUpdated(StarSummary starSummary) {
-            if (starSummary.getID() == starID) {
-                star = starSummary;
+        public void onStarUpdated(Star star) {
+            if (star.getID() == starID) {
+                SolarSystemActivity.this.star = star;
                 if (waitingForStarToShow) {
                     waitingForStarToShow = false;
                     showStar(starID);
                 } else {
-                    getSupportActionBar().setTitle(starSummary.getName());
+                    getSupportActionBar().setTitle(star.getName());
                 }
             }
 
             if (searchListAdapter.getStarsFetcher() == null
-                || searchListAdapter.getStarsFetcher().hasStarID(starSummary.getID())) {
+                || searchListAdapter.getStarsFetcher().hasStarID(star.getID())) {
                 searchListAdapter.notifyDataSetChanged();
             }
         }
@@ -400,7 +400,7 @@ public class SolarSystemActivity extends BaseActivity {
                 return view;
             }
 
-            StarSummary star = (StarSummary) getItem(position);
+            Star star = (Star) getItem(position);
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
             TextView starName = (TextView) view.findViewById(R.id.star_name);
             TextView starType = (TextView) view.findViewById(R.id.star_type);
@@ -438,9 +438,7 @@ public class SolarSystemActivity extends BaseActivity {
                     }
                 }
 
-                if (star instanceof Star
-                        && (StarSimulationQueue.needsSimulation((Star) star)
-                                || empirePresence == null)) {
+                if (StarSimulationQueue.needsSimulation(star) || empirePresence == null) {
                     // if the star hasn't been simulated for > 5 minutes, schedule a simulation
                     // now and just display ??? for the various parameters
                     starGoodsDelta.setText("");

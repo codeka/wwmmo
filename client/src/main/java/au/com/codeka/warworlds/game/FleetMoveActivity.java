@@ -46,13 +46,13 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 /** This activity is used to select a location for moves. It's a bit annoying that we have to do it like this... */
 public class FleetMoveActivity extends BaseStarfieldActivity {
-    private StarSummary srcStar;
-    private StarSummary destStar;
+    private Star srcStar;
+    private Star destStar;
     private Fleet fleet;
     private float estimatedCost;
     private FleetIndicatorEntity fleetIndicatorEntity;
 
-    private StarSummary markerStar;
+    private Star markerStar;
     private RadiusIndicatorEntity tooCloseIndicatorEntity;
 
     public static void show(Activity activity, Fleet fleet) {
@@ -76,8 +76,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
 
         super.onCreate(savedInstanceState);
 
-        srcStar = StarManager.i.getStarSummary(Integer.parseInt(fleet.getStarKey()),
-                Float.MAX_VALUE);
+        srcStar = StarManager.i.getStar(Integer.parseInt(fleet.getStarKey()));
         if (srcStar != null) {
             mStarfield.scrollTo(srcStar);
         }
@@ -162,7 +161,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
 
     public Object eventHandler = new Object() {
         @EventHandler
-        public void onStarUpdated(StarSummary star) {
+        public void onStarUpdated(Star star) {
             if (star.getID() == Integer.parseInt(fleet.getStarKey())) {
                 if (srcStar == null) {
                     srcStar = star;
@@ -305,7 +304,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
     }
 
     /** Searches for, and returns the distance to, the clostest star to the given star. */
-    private float findClosestStar(StarSummary toStar) {
+    private float findClosestStar(Star toStar) {
         float minDistance = -1.0f;
         for (Star star : SectorManager.i.getAllVisibleStars()) {
             if (star == toStar || star.getKey().equals(toStar.getKey())) {
