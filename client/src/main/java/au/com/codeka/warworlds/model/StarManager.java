@@ -26,6 +26,7 @@ import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.eventbus.EventBus;
 import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.Purchase;
@@ -38,7 +39,7 @@ public class StarManager extends BaseManager {
 
     private static final Log log = new Log("StarManager");
     private LruCache<Integer, StarOrSummary> stars = new LruCache<Integer, StarOrSummary>(100);
-    private HashSet<Integer> inProgress = new HashSet<Integer>();
+    private SparseArray<ApiRequest> inProgress = new SparseArray<>();
 
     public static float DEFAULT_MAX_CACHE_HOURS = 24.0f;
 
@@ -62,13 +63,9 @@ public class StarManager extends BaseManager {
         return null;
     }
 
-    public SparseArray<StarSummary> getStarSummaries(Collection<Integer> starIDs) {
-        return getStarSummaries(starIDs, DEFAULT_MAX_CACHE_HOURS);
-    }
-
     public SparseArray<StarSummary> getStarSummaries(Collection<Integer> starIDs,
             float maxCacheAgeHours) {
-        SparseArray<StarSummary> result = new SparseArray<StarSummary>();
+        SparseArray<StarSummary> result = new SparseArray<>();
 
         ArrayList<Integer> toFetch = null;
         for (Integer starID : starIDs) {
@@ -78,7 +75,7 @@ public class StarManager extends BaseManager {
                 result.put(starSummary.getID(), starSummary);
             } else {
                 if (toFetch == null) {
-                    toFetch = new ArrayList<Integer>();
+                    toFetch = new ArrayList<>();
                 }
                 toFetch.add(starID);
             }
@@ -134,7 +131,7 @@ public class StarManager extends BaseManager {
         }
 
         synchronized(inProgress) {
-            if (!inProgress.add(starID)) {
+            if (inProgress.get(starID) != null) {
                 log.debug("Star is already being refreshed, not calling again.");
                 return true;
             }
@@ -233,7 +230,7 @@ public class StarManager extends BaseManager {
             }
         }.execute();
     }
-
+/*
     private List<Star> requestStars(Collection<Integer> starIDs) {
         ArrayList<Star> stars = new ArrayList<Star>();
         for (Integer starID : starIDs) {
@@ -244,7 +241,7 @@ public class StarManager extends BaseManager {
         }
         return stars;
     }
-
+*/
     public void renameStar(final Purchase purchase, final Star star, final String newName,
             final StarRenameCompleteHandler onCompleteHandler) {
         new BackgroundRunner<Star>() {
@@ -310,7 +307,7 @@ public class StarManager extends BaseManager {
             }
         }.execute();
     }
-
+/*
     //TODO: add support for fetching multiple stars in a single request
     private Star requestStar(final Integer starID) {
         Star star = null;
@@ -337,7 +334,7 @@ public class StarManager extends BaseManager {
 
         return star;
     }
-
+*/
     private static class LocalStarsStore extends SQLiteOpenHelper {
         private static Object sLock = new Object();
 
