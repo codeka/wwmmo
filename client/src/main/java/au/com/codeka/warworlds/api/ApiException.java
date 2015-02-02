@@ -4,9 +4,6 @@ import com.squareup.okhttp.Response;
 
 import java.net.SocketException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-
 import au.com.codeka.common.protobuf.Messages;
 
 public class ApiException extends Exception {

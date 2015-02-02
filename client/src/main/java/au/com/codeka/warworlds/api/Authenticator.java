@@ -102,7 +102,7 @@ public class Authenticator {
       url += "&impersonate=" + impersonate;
     }
 
-    ApiRequest request = new ApiRequest(url, ApiRequest.GET, null, null);
+    ApiRequest request = new ApiRequest.Builder(url, "GET").build();
     try {
       Response resp = RequestManager.i.callRequest(request);
       if (!resp.isSuccessful()) {
