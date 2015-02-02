@@ -1,15 +1,14 @@
 package au.com.codeka.warworlds.model;
 
-import java.util.TreeMap;
-
 import android.content.Context;
 
-import au.com.codeka.BackgroundRunner;
+import java.util.TreeMap;
+
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.ApiRequest;
+import au.com.codeka.warworlds.api.RequestManager;
 
 public class BuildManager {
   public static final BuildManager i = new BuildManager();
@@ -37,23 +36,9 @@ public class BuildManager {
   }
 
   public void updateNotes(final String buildRequestKey, final String notes) {
-    new BackgroundRunner<BuildRequest>() {
-      @Override
-      protected BuildRequest doInBackground() {
-        try {
-          Messages.BuildRequest build = Messages.BuildRequest.newBuilder()
-              .setKey(buildRequestKey).setNotes(notes).build();
-          ApiClient.putProtoBuf("buildqueue", build, Messages.BuildRequest.class);
-        } catch (ApiException e) {
-        }
-
-        return null;
-      }
-
-      @Override
-      protected void onComplete(BuildRequest buildRequest) {
-      }
-    }.execute();
+    Messages.BuildRequest build = Messages.BuildRequest.newBuilder()
+        .setKey(buildRequestKey).setNotes(notes).build();
+    RequestManager.i.sendRequest(new ApiRequest.Builder("buildqueue", "PUT").body(build).build());
   }
 
   public void build(final Context context, final Colony colony, final Design design,
@@ -86,34 +71,18 @@ public class BuildManager {
     build(context, build_request_pb);
   }
 
-  private void build(final Context context, final Messages.BuildRequest build_request_pb) {
-    new BackgroundRunner<BuildRequest>() {
-      private int mErrorCode;
-      private String mErrorMsg;
+  private void build(final Context context, final Messages.BuildRequest buildRequestPb) {
+    RequestManager.i.sendRequest(new ApiRequest.Builder("buildqueue", "POST").body(buildRequestPb)
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            Messages.BuildRequest buildRequestPb = request.body(Messages.BuildRequest.class);
+            BuildRequest br = new BuildRequest();
+            br.fromProtocolBuffer(buildRequestPb);
 
-      @Override
-      protected BuildRequest doInBackground() {
-        try {
-          Messages.BuildRequest build = build_request_pb;
-          build = ApiClient.postProtoBuf("buildqueue", build, Messages.BuildRequest.class);
-
-          BuildRequest br = new BuildRequest();
-          br.fromProtocolBuffer(build);
-          return br;
-        } catch (ApiException e) {
-          if (e.getServerErrorCode() > 0) {
-            mErrorCode = e.getServerErrorCode();
-            mErrorMsg = e.getServerErrorMessage();
-          }
-        }
-
-        return null;
-      }
-
-      @Override
-      protected void onComplete(BuildRequest buildRequest) {
-        if (mErrorCode > 0) {
-          try {
+            // TODO: error
+            /*
+                      try {
             new StyledDialog.Builder(context).setTitle("Cannot Build").setMessage(mErrorMsg)
                 .setPositiveButton("Close", true, null).create().show();
           } catch (Exception e) {
@@ -121,10 +90,10 @@ public class BuildManager {
             // finished, we should probably do something about it but it's kinda too
             // late...
           }
-        } else if (buildRequest != null) {
-          StarManager.i.refreshStar(Integer.parseInt(build_request_pb.getStarKey()));
-        }
-      }
-    }.execute();
+
+             */
+            StarManager.i.refreshStar(Integer.parseInt(buildRequestPb.getStarKey()));
+          }
+        }).build());
   }
 }

@@ -186,7 +186,7 @@ public class BuildingsList extends ListView {
                     }
                 }
                 if (bd.getMaxPerEmpire() > 0) {
-                    int numExisting = BuildManager.getInstance().getTotalBuildingsInEmpire(bd.getID());
+                    int numExisting = BuildManager.i.getTotalBuildingsInEmpire(bd.getID());
                     // If you're building one, we'll still think it's OK to build again, but it's
                     // actually going to be blocked by the server.
                     if (numExisting >= bd.getMaxPerEmpire()) {

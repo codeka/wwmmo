@@ -171,7 +171,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
     MyEmpire myEmpire = EmpireManager.i.getEmpire();
     if (myEmpire != null) {
       BaseStar homeStar = myEmpire.getHomeStar();
-      int numHqs = BuildManager.getInstance().getTotalBuildingsInEmpire("hq");
+      int numHqs = BuildManager.i.getTotalBuildingsInEmpire("hq");
       if (numHqs > 0) {
         hqStar = homeStar;
       }
@@ -238,7 +238,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
     MyEmpire myEmpire = EmpireManager.i.getEmpire();
     if (myEmpire != null && myEmpire.getHomeStar() != null) {
       // if you have a HQ, it'll be on your home star.
-      if (BuildManager.getInstance().getTotalBuildingsInEmpire("hq") > 0) {
+      if (BuildManager.i.getTotalBuildingsInEmpire("hq") > 0) {
         hud.attachChild(new HqEntity(this, myEmpire.getHomeStar(), mActivity.getCamera(),
             mActivity.getVertexBufferObjectManager()));
       }

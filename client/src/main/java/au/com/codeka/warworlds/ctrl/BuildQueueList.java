@@ -96,7 +96,7 @@ public class BuildQueueList extends FrameLayout {
                         entry.buildRequest.setNotes(notes);
                         mBuildQueueListAdapter.notifyDataSetChanged();
 
-                        BuildManager.getInstance().updateNotes(entry.buildRequest.getKey(), notes);
+                        BuildManager.i.updateNotes(entry.buildRequest.getKey(), notes);
                     }
                 });
 
