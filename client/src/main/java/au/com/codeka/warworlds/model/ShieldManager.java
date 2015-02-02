@@ -27,7 +27,8 @@ import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.RealmContext;
-import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.ApiRequest;
+import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventBus;
 
 /**
@@ -99,7 +100,9 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
     return bmp;
   }
 
-  /** Gets (or creates) the empire's shield as an andengine texture. */
+  /**
+   * Gets (or creates) the empire's shield as an andengine texture.
+   */
   protected ITextureRegion getShieldTexture(BaseGlActivity glActivity, ShieldInfo shieldInfo) {
     ITextureRegion textureRegion = shieldTextures.get(shieldInfo.id);
     if (textureRegion == null) {
@@ -120,8 +123,8 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
           TextureOptions.BILINEAR_PREMULTIPLYALPHA);
       atlas.setTextureAtlasStateListener(
           new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
-      textureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromSource(
-          atlas, FileBitmapTextureAtlasSource.create(f), 0, 0, 1, 1);
+      textureRegion = BitmapTextureAtlasTextureRegionFactory
+          .createTiledFromSource(atlas, FileBitmapTextureAtlasSource.create(f), 0, 0, 1, 1);
       glActivity.getTextureManager().loadTexture(atlas);
 
       shieldTextures.put(shieldInfo.id, textureRegion);
@@ -143,35 +146,32 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
       fetchingShields.add(shieldInfo.id);
     }
 
-    new BackgroundRunner<Bitmap>() {
-      @Override
-      protected Bitmap doInBackground() {
-        String url = getFetchUrl(shieldInfo);
-        try {
-          Bitmap bmp = ApiClient.getImage(url);
+    RequestManager.i.sendRequest(new ApiRequest.Builder(getFetchUrl(shieldInfo), "GET")
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            final Bitmap bmp = request.bodyBitmap();
 
-          // save the cached version
-          saveCachedShieldImage(App.i, shieldInfo, bmp);
-          shields.put(shieldInfo.id, bmp);
+            // Save the image now.
+            new BackgroundRunner<Void>() {
+              @Override
+              protected Void doInBackground() {
+                saveCachedShieldImage(App.i, shieldInfo, bmp);
+                return null;
+              }
 
-          // TODO: fix it
-          shieldTextures.remove(shieldInfo.id);
+              @Override
+              protected void onComplete(Void aVoid) {
+              }
+            }.execute();
 
-          return bmp;
-        } catch (ApiException e) {
-          return null;
-        }
-      }
+            shields.put(shieldInfo.id, bmp);
+            // TODO: fix it
+            shieldTextures.remove(shieldInfo.id);
 
-      @Override
-      protected void onComplete(Bitmap bmp) {
-        if (bmp == null) {
-          return; // TODO: handle errors
-        }
-
-        eventBus.publish(new ShieldUpdatedEvent(shieldInfo.kind, shieldInfo.id));
-      }
-    }.execute();
+            eventBus.publish(new ShieldUpdatedEvent(shieldInfo.kind, shieldInfo.id));
+          }
+        }).build());
   }
 
   private Bitmap loadCachedShieldImage(Context context, ShieldInfo shieldInfo) {
@@ -189,7 +189,9 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
     // make sure the directory exists...
     File f = new File(fullPath);
     f = f.getParentFile();
-    f.mkdirs();
+    if (!f.mkdirs()) {
+      // Couldn't create directory, just ignore.
+    }
 
     FileOutputStream fos = null;
     try {
@@ -202,6 +204,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
         try {
           fos.close();
         } catch (IOException e) {
+          // Ignore.
         }
       }
     }

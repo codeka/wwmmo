@@ -1,17 +1,14 @@
 package au.com.codeka.warworlds.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.andengine.opengl.texture.region.ITextureRegion;
-
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import au.com.codeka.warworlds.App;
-import au.com.codeka.warworlds.BaseGlActivity;
 
 public class AllianceShieldManager extends ShieldManager {
   public static AllianceShieldManager i = new AllianceShieldManager();
@@ -67,6 +64,7 @@ public class AllianceShieldManager extends ShieldManager {
         try {
           ins.close();
         } catch (IOException e) {
+          // Ignore.
         }
       }
     }

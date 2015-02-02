@@ -105,6 +105,7 @@ public class EmpireShieldManager extends ShieldManager {
         try {
           ins.close();
         } catch (IOException e) {
+          // Ignore.
         }
       }
     }

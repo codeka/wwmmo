@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.api;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -82,6 +84,17 @@ public class ApiRequest {
     } catch (IOException e) {
       return null;
     }
+  }
+
+  /**
+   * Returns the body of the response, as a {@link Bitmap}. If the Content-Type isn't image/*, then
+   * null is returned instead.
+   */
+  public Bitmap bodyBitmap() {
+    if (!response.body().contentType().type().equals("image")) {
+      return null;
+    }
+    return BitmapFactory.decodeStream(response.body().byteStream());
   }
 
   void handleResponse(Response response) {
