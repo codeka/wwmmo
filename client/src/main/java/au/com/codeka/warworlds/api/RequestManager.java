@@ -21,7 +21,7 @@ import au.com.codeka.warworlds.eventbus.EventBus;
  * Provides the low-level interface for making requests to the API.
  */
 public class RequestManager {
-  public static RequestManager i = new RequestManager();
+  public static final RequestManager i = new RequestManager();
   public static final EventBus eventBus = new EventBus();
 
   private static final Log log = new Log("RequestManager");
