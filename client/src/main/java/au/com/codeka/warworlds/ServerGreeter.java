@@ -269,8 +269,8 @@ public class ServerGreeter {
                 } catch(ApiException e) {
                     log.error("Error occurred in 'hello'", e);
 
-                    if (e.getHttpStatusLine() == null) {
-                        // if there's no status line, it likely means we were unable to connect
+                    if (e.getHttpStatusMessage() == null) {
+                        // if there's no status message, it likely means we were unable to connect
                         // (i.e. a network error) just keep retrying until it works.
                         message = "<p class=\"error\">An error occured talking to the server, check " +
                                 "data connection.</p>";
@@ -281,7 +281,7 @@ public class ServerGreeter {
                         mErrorOccured = true;
                         mNeedsReAuthenticate = true;
                         mIntent = ((UserRecoverableAuthException) e.getCause()).getIntent();
-                    } else if (e.getHttpStatusLine().getStatusCode() == 403) {
+                    } else if (e.getHttpStatusCode() == 403) {
                         // if it's an authentication problem, we'll want to re-authenticate
                         message = "<p class=\"error\">Authentication failed.</p>";
                         mErrorOccured = true;
@@ -306,7 +306,7 @@ public class ServerGreeter {
                     mHelloComplete = true;
                 } else if (!mErrorOccured) {
                     Util.setup(activity);
-                    ChatManager.i.setup(activity);
+                    ChatManager.i.setup();
                     Notifications.startLongPoll();
 
                     // make sure we're correctly registered as online.

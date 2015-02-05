@@ -12,6 +12,8 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +33,10 @@ public class ApiRequest {
   private final String method;
   @Nullable private final Message requestBody;
   private CompleteCallback completeCallback;
-  @Nullable Response response;
-  @Nullable private Message responseBody;
+  @Nullable private byte[] responseBytes;
+  @Nullable private Message responseProto;
+  @Nullable private Bitmap responseBitmap;
+  @Nullable private String responseString;
   @Nullable Map<String, List<String>> extraHeaders;
 
   private ApiRequest(String url, String method, @Nullable Message requestBody,
@@ -68,10 +72,15 @@ public class ApiRequest {
 
   @SuppressWarnings("unchecked")
   public <T extends Message> T body(Class<T> responseClass) {
-    if (responseBody == null) {
-      responseBody = RequestManager.parseResponse(response, responseClass);
+    if (responseProto == null) {
+      try {
+        Method m = responseClass.getDeclaredMethod("parseFrom", byte[].class);
+        responseProto = (Message) m.invoke(null, new Object[] {responseBytes});
+      } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        // Should never happen.
+      }
     }
-    return (T) responseBody;
+    return (T) responseProto;
   }
 
   /**
@@ -79,11 +88,7 @@ public class ApiRequest {
    * returned instead.
    */
   public String bodyString() {
-    try {
-      return response.body().string();
-    } catch (IOException e) {
-      return null;
-    }
+    return responseString;
   }
 
   /**
@@ -91,14 +96,24 @@ public class ApiRequest {
    * null is returned instead.
    */
   public Bitmap bodyBitmap() {
-    if (!response.body().contentType().type().equals("image")) {
-      return null;
-    }
-    return BitmapFactory.decodeStream(response.body().byteStream());
+    return responseBitmap;
   }
 
   void handleResponse(Response response) {
-    this.response = response;
+    try {
+      if (response.body() != null) {
+        if (response.body().contentType().type().equals("text")) {
+          responseString = response.body().string();
+        } else if (response.body().contentType().type().equals("image")) {
+          responseBitmap = BitmapFactory.decodeStream(response.body().byteStream());
+        } else {
+          responseBytes = response.body().bytes();
+        }
+        response.body().close();
+      }
+    } catch (IOException e) {
+      // TODO: call failure methods
+    }
 
     // Call the callback, if there is one, on the main thread
     if (completeCallback != null) {
@@ -116,6 +131,11 @@ public class ApiRequest {
       return null;
     }
     return RequestBody.create(PROTOBUF, requestBody.toByteArray());
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s %s", method, url);
   }
 
   public interface CompleteCallback {

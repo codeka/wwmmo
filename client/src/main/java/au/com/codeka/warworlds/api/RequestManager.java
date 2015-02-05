@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.api;
 
 import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.CertificatePinner;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -25,11 +26,11 @@ public class RequestManager {
   public static final EventBus eventBus = new EventBus();
 
   private static final Log log = new Log("RequestManager");
-  private static final boolean DBG = false;
+  private static final boolean DBG = true;
 
   private static final int MAX_INFLIGHT_REQUESTS = 8;
 
-  private final OkHttpClient httpClient = new OkHttpClient();
+  private final OkHttpClient httpClient;
 
   // The last status code we got from the server, don't try to re-authenticate if we get two 403's
   // in a row, for example.
@@ -42,6 +43,16 @@ public class RequestManager {
   private final Stack<ApiRequest> waitingRequests = new Stack<>();
 
   private final Object lock = new Object();
+
+  private RequestManager() {
+    httpClient = new OkHttpClient();
+
+    CertificatePinner certificatePinner = new CertificatePinner.Builder()
+        .add("game.war-worlds.com", "sha1/DQYffq7Bm+6ChL1D0VUBHAd3k6g=")
+        .add("game.war-worlds.com", "sha1/o5OZxATDsgmwgcIfIWIneMJ0jkw=")
+        .build();
+    httpClient.setCertificatePinner(certificatePinner);
+  }
 
   /**
    * Enqueues the given request to send to the server. The request's callbacks will be called
@@ -57,16 +68,6 @@ public class RequestManager {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public static <T> T parseResponse(Response response, Class<T> protoBuffFactory) {
-    try {
-      Method m = protoBuffFactory.getDeclaredMethod("parseFrom", InputStream.class);
-      return (T) m.invoke(null, response.body().byteStream());
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
   private void handleResponse(ApiRequest request, Response response) {
     requestComplete(request);
     request.handleResponse(response);
@@ -79,7 +80,7 @@ public class RequestManager {
   private void handleFailure(ApiRequest request, @Nullable Response response,
       @Nullable IOException e) {
     requestComplete(request);
-    // TODO: handle
+    log.error("Error in request: %s", request, e);
   }
 
   /** Removes the given request from the in-flight collection and potentially enqueues another. */
@@ -98,6 +99,7 @@ public class RequestManager {
 
   void enqueueRequest(ApiRequest apiRequest) {
     inFlightRequests.add(apiRequest);
+    if (DBG) log.info("Sending request: %s", apiRequest);
     httpClient.newCall(apiRequest.buildOkRequest()).enqueue(responseCallback);
   }
 

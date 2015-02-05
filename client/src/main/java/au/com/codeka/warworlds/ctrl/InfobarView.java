@@ -120,7 +120,8 @@ public class InfobarView extends FrameLayout {
     }
 
     // set up the initial state
-    refresh(RequestManager.getCurrentState());
+    //TODO
+    //refresh(RequestManager.getCurrentState());
   }
 
   private Object eventHandler = new Object() {

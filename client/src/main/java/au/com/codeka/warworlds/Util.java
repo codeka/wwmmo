@@ -1,15 +1,15 @@
 
 package au.com.codeka.warworlds;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.res.AssetManager;
-import au.com.codeka.warworlds.api.ApiClient;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.RealmManager;
@@ -90,12 +90,6 @@ public class Util {
                 }
             } catch(IOException e) {
             }
-        }
-
-        // TODO: remove when we shut down the alpha realm
-        String impersonateUser = sProperties.getProperty("user.on_behalf_of", null);
-        if (impersonateUser != null) {
-            ApiClient.impersonate(impersonateUser);
         }
 
         return sProperties;

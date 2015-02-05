@@ -54,7 +54,8 @@ public class DebugView extends FrameLayout {
       RequestManager.eventBus.register(eventHandler);
       isAttached = true;
 
-      refresh(RequestManager.getCurrentState());
+      //TODO
+      //refresh(RequestManager.getCurrentState());
       queueRefresh();
     }
   }
@@ -84,7 +85,8 @@ public class DebugView extends FrameLayout {
     handler.postDelayed(new Runnable() {
       @Override
       public void run() {
-        refresh(RequestManager.getCurrentState());
+        //TODO
+        //refresh(RequestManager.getCurrentState());
         queueRefresh();
       }
     }, 1000);

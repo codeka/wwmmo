@@ -44,7 +44,7 @@ public class ApiException extends Exception {
      */
     public static void throwApiException(Response resp) throws ApiException {
         ApiException ex = new ApiException();
-        Messages.GenericError err = RequestManager.parseResponse(resp, Messages.GenericError.class);
+        Messages.GenericError err = null;//TODO: RequestManager.parseResponse(resp, Messages.GenericError.class);
         if (err != null) {
             ex.mServerErrorCode = err.getErrorCode();
             ex.mServerErrorMessage = err.getErrorMessage();

@@ -24,7 +24,7 @@ public class Empire extends BaseEmpire {
 
     @Override
     protected BaseStar createStar(Messages.Star pb) {
-        StarSummary s = new StarSummary();
+        Star s = new Star();
         if (pb != null) {
             s.fromProtocolBuffer(pb);
         }

@@ -39,7 +39,6 @@ import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.designeffects.EmptySpaceMoverShipEffect;
 
 import com.google.protobuf.InvalidProtocolBufferException;
