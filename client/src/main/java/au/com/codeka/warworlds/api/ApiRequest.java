@@ -67,7 +67,7 @@ public class ApiRequest {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T body(Class<? extends Message> responseClass) {
+  public <T extends Message> T body(Class<T> responseClass) {
     if (responseBody == null) {
       responseBody = RequestManager.parseResponse(response, responseClass);
     }

@@ -16,6 +16,8 @@ import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.ApiRequest;
+import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventBus;
 
 /**
@@ -44,14 +46,14 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
    * Called when the game starts up, we need to register with the channel and get
    * ready to start receiving chat messages.
    */
-  public void setup(Context context) {
+  public void setup() {
     BackgroundDetector.i.addBackgroundChangeHandler(this);
 
     conversations.clear();
     conversations.append(GLOBAL_CONVERSATION_ID, new ChatConversation(GLOBAL_CONVERSATION_ID));
     if (EmpireManager.i.getEmpire().getAlliance() != null) {
-      conversations.append(ALLIANCE_CONVERSATION_ID,
-          new ChatConversation(ALLIANCE_CONVERSATION_ID));
+      conversations.append(ALLIANCE_CONVERSATION_ID, new ChatConversation
+          (ALLIANCE_CONVERSATION_ID));
     }
     refreshConversations();
 
@@ -64,40 +66,28 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
   /** * Posts a message from us to the server. */
   public void postMessage(final ChatMessage msg) {
-    new BackgroundRunner<ChatMessage>() {
-      @Override
-      protected ChatMessage doInBackground() {
-        try {
-          Messages.ChatMessage.Builder pb =
-              Messages.ChatMessage.newBuilder().setMessage(msg.getMessage())
-                  .setAllianceKey(msg.getAllianceKey() == null ? "" : msg.getAllianceKey());
-          if (msg.getConversationID() != null) {
-            pb.setConversationId(msg.getConversationID());
-          }
-          Messages.ChatMessage chat_msg =
-              ApiClient.postProtoBuf("chat", pb.build(), Messages.ChatMessage.class);
-          ChatMessage respMsg = new ChatMessage();
-          respMsg.fromProtocolBuffer(chat_msg);
-          return respMsg;
-        } catch (Exception e) {
-          log.error("Error posting chat!", e);
-          return null;
-        }
-      }
+    Messages.ChatMessage.Builder msgPb = Messages.ChatMessage.newBuilder()
+        .setMessage(msg.getMessage())
+        .setAllianceKey(msg.getAllianceKey() == null ? "" : msg.getAllianceKey());
+    if (msg.getConversationID() != null) {
+      msgPb.setConversationId(msg.getConversationID());
+    }
 
-      @Override
-      protected void onComplete(ChatMessage msg) {
-        if (msg != null) {
-          ChatConversation conv = getConversation(msg);
-          if (conv != null) {
-            conv.addMessage(msg, true);
-            if (recentMessages.addMessage(msg)) {
-              eventBus.publish(new MessageAddedEvent(conv, msg));
+    RequestManager.i.sendRequest(new ApiRequest.Builder("chat", "POST").body(msgPb.build())
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            ChatMessage respMsg = new ChatMessage();
+            respMsg.fromProtocolBuffer(request.body(Messages.ChatMessage.class));
+            ChatConversation conv = getConversation(msg);
+            if (conv != null) {
+              conv.addMessage(msg);
+              if (recentMessages.addMessage(msg)) {
+                eventBus.publish(new MessageAddedEvent(conv, msg));
+              }
             }
           }
-        }
-      }
-    }.execute();
+        }).build());
   }
 
   public void addMessage(ChatConversation conv, ChatMessage msg) {
@@ -112,29 +102,17 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
   }
 
   public void reportMessageForAbuse(final Context context, final ChatMessage msg) {
-    new BackgroundRunner<Boolean>() {
-      String mErrorMessage;
+    Messages.ChatAbuseReport abuseReportPb = Messages.ChatAbuseReport.newBuilder()
+        .setChatMsgId(msg.getID())
+        .build();
 
-      @Override
-      protected Boolean doInBackground() {
-        try {
-          Messages.ChatAbuseReport pb =
-              Messages.ChatAbuseReport.newBuilder().setChatMsgId(msg.getID()).build();
-          ApiClient.postProtoBuf("chat/" + msg.getID() + "/abuse-reports", pb, null);
-          return true;
-        } catch (ApiException e) {
-          if (e.getServerErrorMessage() != null) {
-            mErrorMessage = e.getServerErrorMessage();
-          }
-          return false;
-        } catch (Exception e) {
-          log.error("Error posting chat!", e);
-          return false;
-        }
-      }
-
-      @Override
-      protected void onComplete(Boolean success) {
+    String url = String.format("chat/%d/abuse-reports", msg.getID());
+    RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST")
+        .body(abuseReportPb)
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+/*
         if (!success) {
           if (mErrorMessage == null || mErrorMessage.isEmpty()) {
             mErrorMessage = "An error occured reporting this empire. Try again later.";
@@ -147,9 +125,9 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
           // ignore
           //}
         }
-      }
-    }.execute();
-
+*/
+          }
+        }).build());
   }
 
   public void addParticipant(final Context context, final ChatConversation conversation,
@@ -178,34 +156,25 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
    * Adds the given participant to the given conversation.
    */
   private void addParticipant(final ChatConversation conversation, final Empire empire) {
-    new BackgroundRunner<Boolean>() {
-      @Override
-      protected Boolean doInBackground() {
-        try {
-          Messages.ChatConversationParticipant pb =
-              Messages.ChatConversationParticipant.newBuilder()
-                  .setEmpireId(Integer.parseInt(empire.getKey())).build();
+    Messages.ChatConversationParticipant participantPb =
+        Messages.ChatConversationParticipant.newBuilder()
+            .setEmpireId(Integer.parseInt(empire.getKey()))
+            .build();
 
-          String url = "chat/conversations/" + conversation.getID() + "/participants";
-          ApiClient.postProtoBuf(url, pb);
-          return true;
-        } catch (Exception e) {
-          log.error("Error adding participant (maybe already there, etc?)", e);
-          return false;
-        }
-      }
-
-      @Override
-      protected void onComplete(Boolean success) {
-        if (success) {
-          // update our internal representation with the new empire
-          ChatConversation realConvo = getConversationByID(conversation.getID());
-          realConvo.getParticipants()
-              .add(new ChatConversationParticipant(Integer.parseInt(empire.getKey())));
-          eventBus.publish(new ConversationsUpdatedEvent());
-        }
-      }
-    }.execute();
+    String url = String.format("chat/conversations/%d/participants", conversation.getID());
+    RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST")
+        .body(participantPb)
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            // Update our internal representation with the new empire.
+            ChatConversation realConv = getConversationByID(conversation.getID());
+            realConv.getParticipants()
+                .add(new ChatConversationParticipant(Integer.parseInt(empire.getKey())));
+            eventBus.publish(new ConversationsUpdatedEvent());
+          }
+        })
+        .build());
   }
 
   public ChatConversation getConversation(ChatMessage msg) {
@@ -254,7 +223,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         log.info("Conversation #%d hasn't been created yet, creating now.", conversationID);
         conversations.append(conversationID, new ChatConversation(conversationID));
 
-        // it's OK to call this, it won't do anything if a refresh is already happening
+        // It's OK to call this, it won't do anything if a refresh is already happening.
         refreshConversations();
       }
     }
@@ -281,42 +250,29 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
       }
     }
 
-    new BackgroundRunner<ChatConversation>() {
-      @Override
-      protected ChatConversation doInBackground() {
-        try {
-          Messages.ChatConversation.Builder conversation_pb_builder =
-              Messages.ChatConversation.newBuilder()
-                  .addParticipants(Messages.ChatConversationParticipant.newBuilder()
-                      .setEmpireId(Integer.parseInt(EmpireManager.i.getEmpire().getKey()))
-                      .setIsMuted(false));
-          if (empireID != null) {
-            conversation_pb_builder.addParticipants(
-                Messages.ChatConversationParticipant.newBuilder()
-                    .setEmpireId(Integer.parseInt(empireID))
-                    .setIsMuted(false));
+    Messages.ChatConversation.Builder conversationPb = Messages.ChatConversation.newBuilder()
+            .addParticipants(Messages.ChatConversationParticipant.newBuilder()
+                .setEmpireId(Integer.parseInt(EmpireManager.i.getEmpire().getKey()))
+                .setIsMuted(false));
+    if (empireID != null) {
+      conversationPb.addParticipants(Messages.ChatConversationParticipant.newBuilder()
+          .setEmpireId(Integer.parseInt(empireID))
+          .setIsMuted(false));
+    }
+
+    RequestManager.i.sendRequest(new ApiRequest.Builder("chat/conversations", "POST")
+        .body(conversationPb.build())
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            Messages.ChatConversation conversationPb = request.body(Messages.ChatConversation.class);
+            ChatConversation conversation = new ChatConversation(conversationPb.getId());
+            conversation.fromProtocolBuffer(conversationPb);
+            conversations.put(conversation.getID(), conversation);
+            eventBus.publish(new ConversationStartedEvent(conversation));
           }
-          Messages.ChatConversation conversation_pb = conversation_pb_builder.build();
-          conversation_pb = ApiClient
-              .postProtoBuf("chat/conversations", conversation_pb, Messages.ChatConversation.class);
-
-          ChatConversation conversation = new ChatConversation(conversation_pb.getId());
-          conversation.fromProtocolBuffer(conversation_pb);
-          return conversation;
-        } catch (Exception e) {
-          log.error("Error starting conversation.", e);
-          return null;
-        }
-      }
-
-      @Override
-      protected void onComplete(ChatConversation conversation) {
-        if (conversation != null) {
-          conversations.put(conversation.getID(), conversation);
-          eventBus.publish(new ConversationStartedEvent(conversation));
-        }
-      }
-    }.execute();
+        })
+        .build());
   }
 
   public void leaveConversation(final ChatConversation conversation) {
