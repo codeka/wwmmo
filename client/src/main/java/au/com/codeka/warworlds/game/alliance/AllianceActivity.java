@@ -410,7 +410,7 @@ public class AllianceActivity extends TabFragmentActivity {
                 mRequestListAdapter.clearRequests();
             }
 
-            AllianceManager.i.fetchRequests(mAlliance.getKey(), mCursor,
+            AllianceManager.i.fetchRequests(Integer.parseInt(mAlliance.getKey()), mCursor,
                     new AllianceManager.FetchRequestsCompleteHandler() {
                         @Override
                         public void onRequestsFetched(Map<Integer, Empire> empires,
