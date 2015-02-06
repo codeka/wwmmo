@@ -19,7 +19,6 @@ public class Session {
     private int mEmpireID;
     private Integer mAllianceID;
     private boolean mIsAdmin;
-    private boolean mAllowInlineNotifications;
 
     public Session() {
     }
@@ -35,7 +34,6 @@ public class Session {
         }
         mAllianceID = res.getInt("alliance_id");
         mIsAdmin = res.getInt("is_admin") == 1;
-        mAllowInlineNotifications = (res.getInt("inline_notifications") == 1);
     }
     public Session(Session copy) {
         mCookie = copy.mCookie;
@@ -45,7 +43,6 @@ public class Session {
         mEmpireID = copy.mEmpireID;
         mAllianceID = copy.mAllianceID;
         mIsAdmin = copy.mIsAdmin;
-        mAllowInlineNotifications = copy.mAllowInlineNotifications;
     }
     public Session(String cookie, String email, DateTime loginTime, int empireID,
             Integer allianceID, boolean isAdmin) {
@@ -84,13 +81,6 @@ public class Session {
     }
     public boolean isAdmin() {
         return mIsAdmin;
-    }
-    public boolean allowInlineNotifications() {
-        return mAllowInlineNotifications;
-    }
-
-    public void setAllowInlineNotifications(boolean allow) {
-        mAllowInlineNotifications = allow;
     }
 
     public Session impersonate(String email, int empireID) {
