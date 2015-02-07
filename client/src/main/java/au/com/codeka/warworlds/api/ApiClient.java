@@ -9,11 +9,15 @@ import java.util.concurrent.TimeoutException;
 
 import javax.validation.constraints.NotNull;
 
+import au.com.codeka.common.Log;
+
 /**
  * This is the main "client" that accesses the War Worlds API.
  */
 @Deprecated
 public class ApiClient {
+  private static final Log log = new Log("ApiClient");
+
   /**
    * Fetches a simple string from the given URL.
    */
@@ -25,7 +29,9 @@ public class ApiClient {
           public void onRequestComplete(ApiRequest request) {
             future.set(request.bodyString());
           }
-        }).build());
+        })
+        .completeOnAnyThread(true)
+        .build());
 
     try {
       return future.get();
@@ -54,6 +60,7 @@ public class ApiClient {
             future.set(request.body(protoBuffFactory));
           }
         })
+        .completeOnAnyThread(true)
         .build());
 
     try {
@@ -120,6 +127,7 @@ public class ApiClient {
             future.set(request.body(protoBuffFactory));
           }
         })
+        .completeOnAnyThread(true)
         .build());
 
     try {
@@ -127,7 +135,6 @@ public class ApiClient {
     } catch (InterruptedException | ExecutionException e) {
       throw new ApiException(e);
     }
-
   }
 
   /**
@@ -139,6 +146,7 @@ public class ApiClient {
 
   private static class RequestFuture<T> implements Future<T> {
     private final Object lock = new Object();
+    private boolean finished;
     private T protoBuff;
 
     @Override
@@ -159,7 +167,7 @@ public class ApiClient {
     @Override
     public T get() throws InterruptedException, ExecutionException {
       synchronized (lock) {
-        while (protoBuff == null) {
+        while (!finished) {
           lock.wait();
         }
       }
@@ -175,7 +183,8 @@ public class ApiClient {
     public void set(T protoBuff) {
       synchronized (lock) {
         this.protoBuff = protoBuff;
-        lock.notify();
+        finished = true;
+        lock.notifyAll();
       }
     }
   }

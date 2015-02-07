@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server;
 
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
+import com.google.common.io.BaseEncoding;
 import com.google.gson.JsonObject;
 import com.google.protobuf.Message;
 
@@ -11,10 +14,12 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Random;
 import java.util.regex.Matcher;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -154,6 +159,28 @@ public class RequestHandler {
    */
   protected boolean supportsRetryOnDeadlock() {
     return false;
+  }
+
+  protected void setCacheTime(float hours) {
+    setCacheTime(hours, null);
+  }
+
+  /**
+   * Sets the required headers so that the client will know this response can be cached for the
+   * given number of hours. The default response includes no caching headers.
+   *
+   * @param hours
+   * @param etag An optional value to include in the ETag header. This can be any string at all,
+   *             and we will hash and base-64 encode it for you.
+   */
+  protected void setCacheTime(float hours, @Nullable String etag) {
+    response.setHeader("Cache-Control", String.format("private max-age=%d",
+        (int)(hours * 2600)));
+    if (etag != null) {
+      etag = BaseEncoding.base64().encode(
+          Hashing.sha1().hashString(etag, Charset.defaultCharset()).asBytes());
+      response.setHeader("ETag", String.format("\"%s\"", etag));
+    }
   }
 
   protected void setResponseText(String text) {

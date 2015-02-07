@@ -236,6 +236,7 @@ public class ServerGreeter {
 
                     String url = "hello/"+deviceRegistrationKey;
                     Messages.HelloResponse resp = ApiClient.putProtoBuf(url, req, Messages.HelloResponse.class);
+                    log.info("GOT RESPONSE FROM HELLO REQUEST!");
                     if (resp.hasEmpire()) {
                         mNeedsEmpireSetup = false;
                         MyEmpire myEmpire = new MyEmpire();

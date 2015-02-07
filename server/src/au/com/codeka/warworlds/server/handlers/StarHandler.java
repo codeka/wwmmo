@@ -35,6 +35,8 @@ public class StarHandler extends RequestHandler {
             new StarController().sanitizeStar(star, myEmpireID, buildings, null);
         }
 
+        setCacheTime(24, star.getLastSimulation().toString());
+
         Messages.Star.Builder star_pb = Messages.Star.newBuilder();
         star.toProtocolBuffer(star_pb);
         setResponseBody(star_pb.build());

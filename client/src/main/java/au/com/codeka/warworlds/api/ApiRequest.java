@@ -4,12 +4,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 
 import com.google.protobuf.Message;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -21,18 +23,23 @@ import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.Realm;
 
 /** Encapsulates a request to the server. */
 public class ApiRequest {
+  private static final Log log = new Log("ApiRequest");
+
   private static final MediaType PROTOBUF = MediaType.parse("application/x-protobuf");
 
+  private final Timing timing;
   private final String url;
   private final String method;
   @Nullable private final Message requestBody;
   private CompleteCallback completeCallback;
+  private boolean completeOnAnyThread;
   @Nullable private byte[] responseBytes;
   @Nullable private Message responseProto;
   @Nullable private Bitmap responseBitmap;
@@ -41,12 +48,14 @@ public class ApiRequest {
 
   private ApiRequest(String url, String method, @Nullable Message requestBody,
       @Nullable Map<String, List<String>> extraHeaders,
-      @Nullable CompleteCallback completeCallback) {
+      @Nullable CompleteCallback completeCallback, boolean completeOnAnyThread) {
+    this.timing = new Timing();
     this.url = url;
     this.method = method;
     this.requestBody = requestBody;
     this.extraHeaders = extraHeaders;
     this.completeCallback = completeCallback;
+    this.completeOnAnyThread = completeOnAnyThread;
   }
 
   /** Builds the OkHttp request for this request. */
@@ -70,14 +79,18 @@ public class ApiRequest {
     return builder.build();
   }
 
+  public Timing getTiming() {
+    return timing;
+  }
+
   @SuppressWarnings("unchecked")
   public <T extends Message> T body(Class<T> responseClass) {
-    if (responseProto == null) {
+    if (responseProto == null && responseBytes != null) {
       try {
         Method m = responseClass.getDeclaredMethod("parseFrom", byte[].class);
         responseProto = (Message) m.invoke(null, new Object[] {responseBytes});
       } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-        // Should never happen.
+        log.error("Unexpected error parsing response.", e);
       }
     }
     return (T) responseProto;
@@ -101,15 +114,16 @@ public class ApiRequest {
 
   void handleResponse(Response response) {
     try {
-      if (response.body() != null) {
-        if (response.body().contentType().type().equals("text")) {
-          responseString = response.body().string();
-        } else if (response.body().contentType().type().equals("image")) {
+      ResponseBody body = response.body();
+      if (body != null && body.contentType() != null) {
+        if (body.contentType().type().equals("text")) {
+          responseString = body.string();
+        } else if (body.contentType().type().equals("image")) {
           responseBitmap = BitmapFactory.decodeStream(response.body().byteStream());
         } else {
-          responseBytes = response.body().bytes();
+          responseBytes = body.bytes();
         }
-        response.body().close();
+        body.close();
       }
     } catch (IOException e) {
       // TODO: call failure methods
@@ -117,12 +131,16 @@ public class ApiRequest {
 
     // Call the callback, if there is one, on the main thread
     if (completeCallback != null) {
-      new Handler(Looper.getMainLooper()).post(new Runnable() {
-        @Override
-        public void run() {
-          completeCallback.onRequestComplete(ApiRequest.this);
-        }
-      });
+      if (completeOnAnyThread) {
+        completeCallback.onRequestComplete(this);
+      } else {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+          @Override
+          public void run() {
+            completeCallback.onRequestComplete(ApiRequest.this);
+          }
+        });
+      }
     }
   }
 
@@ -148,6 +166,7 @@ public class ApiRequest {
     @Nullable private Message requestBody;
     @Nullable private Map<String, List<String>> extraHeaders;
     @Nullable private CompleteCallback completeCallback;
+    private boolean completeOnAnyThread;
 
     public Builder(String url, String method) {
       this.url = url;
@@ -173,16 +192,50 @@ public class ApiRequest {
     }
 
     /**
-     * Sets the callback that is called when the request completes. The callback will always be
-     * called on the UI thread.
+     * Sets the callback that is called when the request completes. The callback will be called on
+     * the UI thread, unless you set {@link #completeOnAnyThread} to true.
      */
     public Builder completeCallback(CompleteCallback completeCallback) {
       this.completeCallback = completeCallback;
       return this;
     }
 
+    /**
+     * By setting this to true, you're indicating that you don't care what thread the complete
+     * callback is called on. If this is false, then the callback is called on the UI thread.
+     */
+    public Builder completeOnAnyThread(boolean completeOnAnyThread) {
+      this.completeOnAnyThread = completeOnAnyThread;
+      return this;
+    }
+
     public ApiRequest build() {
-      return new ApiRequest(url, method, requestBody, extraHeaders, completeCallback);
+      return new ApiRequest(url, method, requestBody, extraHeaders, completeCallback,
+          completeOnAnyThread);
+    }
+  }
+
+  public static class Timing {
+    private long startTime;
+    private long requestSentTime;
+    private long responseReceivedTime;
+
+    public Timing() {
+      startTime = SystemClock.elapsedRealtime();
+    }
+
+    public void onRequestSent() {
+      requestSentTime = SystemClock.elapsedRealtime();
+    }
+
+    public void onResponseReceived() {
+      responseReceivedTime = SystemClock.elapsedRealtime();
+    }
+
+    @Override
+    public String toString() {
+      return String.format("[queue-time: %dms, server-time: %dms]",
+          requestSentTime - startTime, responseReceivedTime - requestSentTime);
     }
   }
 }

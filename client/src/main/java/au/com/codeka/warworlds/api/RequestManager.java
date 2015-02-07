@@ -52,6 +52,8 @@ public class RequestManager {
         .add("game.war-worlds.com", "sha1/o5OZxATDsgmwgcIfIWIneMJ0jkw=")
         .build();
     httpClient.setCertificatePinner(certificatePinner);
+    httpClient.getDispatcher().setMaxRequests(MAX_INFLIGHT_REQUESTS);
+    httpClient.getDispatcher().setMaxRequestsPerHost(MAX_INFLIGHT_REQUESTS);
   }
 
   /**
@@ -69,7 +71,7 @@ public class RequestManager {
   }
 
   private void handleResponse(ApiRequest request, Response response) {
-    requestComplete(request);
+    requestComplete(request, response);
     request.handleResponse(response);
   }
 
@@ -79,13 +81,22 @@ public class RequestManager {
    */
   private void handleFailure(ApiRequest request, @Nullable Response response,
       @Nullable IOException e) {
-    requestComplete(request);
-    log.error("Error in request: %s", request, e);
+    requestComplete(request, response);
+    if (e != null) {
+      log.error("Error in request: %s", request, e);
+    } else if (response != null) {
+      log.error("Error in response: %d %s", response.code(), response.message());
+    } else {
+      throw new IllegalStateException("One of response or e should be non-null.");
+    }
   }
 
   /** Removes the given request from the in-flight collection and potentially enqueues another. */
-  private void requestComplete(ApiRequest request) {
+  private void requestComplete(ApiRequest request, @Nullable Response response) {
     synchronized (lock) {
+      request.getTiming().onResponseReceived();
+      if (DBG) log.info("<< %s %d %s timing=%s", request, response == null ? 0 : response.code(),
+          response == null ? "<network-error>" : response.message(), request.getTiming());
       inFlightRequests.remove(request);
       if (!waitingRequests.isEmpty()) {
         ApiRequest nextRequest = waitingRequests.pop();
@@ -99,7 +110,8 @@ public class RequestManager {
 
   void enqueueRequest(ApiRequest apiRequest) {
     inFlightRequests.add(apiRequest);
-    if (DBG) log.info("Sending request: %s", apiRequest);
+    if (DBG) log.info(">> %s", apiRequest);
+    apiRequest.getTiming().onRequestSent();
     httpClient.newCall(apiRequest.buildOkRequest()).enqueue(responseCallback);
   }
 
