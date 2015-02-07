@@ -48,11 +48,12 @@ public class BaseActivity extends ActionBarActivity {
         if (Util.isDebug()) {
             mDebugView = new DebugView(this);
             mDebugViewLayout = new WindowManager.LayoutParams(
-                    WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
                     WindowManager.LayoutParams.TYPE_APPLICATION,
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT);
-            mDebugViewLayout.gravity = Gravity.TOP | Gravity.RIGHT;
+            mDebugViewLayout.gravity = Gravity.TOP;
         }
     }
 

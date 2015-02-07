@@ -30,6 +30,8 @@ import au.com.codeka.common.Log;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiRequest;
+import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
@@ -599,16 +601,13 @@ public class Notifications {
         public void run() {
             while (true) {
                 try {
-                    Messages.Notifications notifications_pb = ApiClient.getProtoBuf(
-                            "notifications", Messages.Notifications.class);
-                    if (notifications_pb == null) {
-                        log.info("Long-poll timed out, re-requesting.");;
-                        continue;
-                    }
-
+                    ApiRequest apiRequest = new ApiRequest.Builder("notifications", "GET").build();
+                    RequestManager.i.sendRequestSync(apiRequest);
+                    Messages.Notifications notificationsPb =
+                            apiRequest.body(Messages.Notifications.class);
                     log.info("Long-poll complete, got %d notifications.",
-                            notifications_pb.getNotificationsCount());
-                    for (Messages.Notification pb : notifications_pb.getNotificationsList()) {
+                        notificationsPb.getNotificationsCount());
+                    for (Messages.Notification pb : notificationsPb.getNotificationsList()) {
                         final String name = pb.getName();
                         final String value = pb.getValue();
                         log.info("[%s] = %s", name, value);

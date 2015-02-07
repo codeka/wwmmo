@@ -60,7 +60,7 @@ public class InfobarView extends FrameLayout {
   };
 
   /** Must be run on the UI thread. */
-  private void refresh(RequestManager.RequestManagerStateEvent state) {
+  private void refresh() {
     if (isInEditMode()) {
       return;
     }
@@ -70,11 +70,12 @@ public class InfobarView extends FrameLayout {
     // We will always have one busy request for the notification long-poll,
     // but
     // that one doesn't really count.
-    if (state.numInProgressRequests > 1) {
-      working.setVisibility(View.VISIBLE);
-    } else {
+    //TODO
+    //if (state.numInProgressRequests > 1) {
+   //   working.setVisibility(View.VISIBLE);
+    //} else {
       working.setVisibility(View.GONE);
-    }
+    //}
   }
 
   @Override
@@ -86,7 +87,6 @@ public class InfobarView extends FrameLayout {
     handler = new Handler();
 
     EmpireManager.eventBus.register(eventHandler);
-    RequestManager.eventBus.register(eventHandler);
 
     refreshEmpire(EmpireManager.i.getEmpire());
   }
@@ -99,7 +99,6 @@ public class InfobarView extends FrameLayout {
     }
 
     EmpireManager.eventBus.unregister(eventHandler);
-    RequestManager.eventBus.unregister(eventHandler);
   }
 
   private void refreshEmpire(Empire empire) {
@@ -128,11 +127,6 @@ public class InfobarView extends FrameLayout {
     @EventHandler
     public void onEmpireUpdated(Empire empire) {
       refreshEmpire(empire);
-    }
-
-    @EventHandler
-    public void onRequestManagerStateChange(RequestManager.RequestManagerStateEvent event) {
-      refresh(event);
     }
   };
 }

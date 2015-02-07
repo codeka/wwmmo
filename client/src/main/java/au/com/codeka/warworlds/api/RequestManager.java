@@ -1,8 +1,11 @@
 package au.com.codeka.warworlds.api;
 
+import com.google.common.collect.Lists;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.CertificatePinner;
+import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Protocol;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
@@ -23,7 +26,6 @@ import au.com.codeka.warworlds.eventbus.EventBus;
  */
 public class RequestManager {
   public static final RequestManager i = new RequestManager();
-  public static final EventBus eventBus = new EventBus();
 
   private static final Log log = new Log("RequestManager");
   private static final boolean DBG = true;
@@ -52,6 +54,7 @@ public class RequestManager {
         .add("game.war-worlds.com", "sha1/o5OZxATDsgmwgcIfIWIneMJ0jkw=")
         .build();
     httpClient.setCertificatePinner(certificatePinner);
+
     httpClient.getDispatcher().setMaxRequests(MAX_INFLIGHT_REQUESTS);
     httpClient.getDispatcher().setMaxRequestsPerHost(MAX_INFLIGHT_REQUESTS);
   }
@@ -68,6 +71,25 @@ public class RequestManager {
         waitingRequests.push(apiRequest);
       }
     }
+  }
+
+  public void sendRequestSync(ApiRequest apiRequest) {
+    if (DBG) log.info(">> %s", apiRequest);
+    apiRequest.getTiming().onRequestSent();
+    try {
+      Response resp = httpClient.newCall(apiRequest.buildOkRequest()).execute();
+      apiRequest.handleResponse(resp);
+    } catch (IOException e) {
+      // TODO: handle
+    }
+  }
+
+  public void addInterceptor(Interceptor interceptor) {
+    httpClient.interceptors().add(interceptor);
+  }
+
+  public void removeInterceptor(Interceptor interceptor) {
+    httpClient.interceptors().remove(interceptor);
   }
 
   private void handleResponse(ApiRequest request, Response response) {
@@ -131,13 +153,4 @@ public class RequestManager {
       handleResponse(request, response);
     }
   };
-
-  /**
-   * This is an event posted to our event bus whenever the state of the {@link RequestManager}
-   * changes.
-   */
-  public static class RequestManagerStateEvent {
-    public int numInProgressRequests;
-    public String lastUri;
-  }
 }
