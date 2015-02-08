@@ -1,5 +1,7 @@
 include ':common'
 include ':control-field'
+include ':intel:generator'
 include ':planet-render'
 include ':client'
 include ':server'
+
