@@ -28,6 +28,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common" exported="" />
+    <orderEntry type="library" exported="" name="commons-csv-1.0" level="project" />
     <orderEntry type="library" exported="" name="postgresql-9.3-1101.jdbc41" level="project" />
     <orderEntry type="library" exported="" name="google-api-client-1.19.0" level="project" />
     <orderEntry type="library" exported="" name="javassist" level="project" />

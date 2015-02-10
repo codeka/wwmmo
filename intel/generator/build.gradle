@@ -1,10 +1,13 @@
 apply plugin: 'java'
+apply plugin:'application'
 
 repositories {
   mavenCentral()
 }
 
 dependencies {
-  compile 'net.sf.opencsv:opencsv:2.3'
+  compile 'org.apache.commons:commons-csv:1.0'
   compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+mainClassName = "au.com.codeka.warworlds.intel.generator.Program"
