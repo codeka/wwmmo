@@ -24,6 +24,7 @@ import java.util.TreeMap;
 import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.Realm;
@@ -38,7 +39,8 @@ public class ApiRequest {
   private final String url;
   private final String method;
   @Nullable private final Message requestBody;
-  private CompleteCallback completeCallback;
+  @Nullable private CompleteCallback completeCallback;
+  @Nullable ErrorCallback errorCallback;
   private boolean completeOnAnyThread;
   @Nullable private byte[] responseBytes;
   @Nullable private Message responseProto;
@@ -48,13 +50,15 @@ public class ApiRequest {
 
   private ApiRequest(String url, String method, @Nullable Message requestBody,
       @Nullable Map<String, List<String>> extraHeaders,
-      @Nullable CompleteCallback completeCallback, boolean completeOnAnyThread) {
+      @Nullable CompleteCallback completeCallback, @Nullable ErrorCallback errorCallback,
+      boolean completeOnAnyThread) {
     this.timing = new Timing();
     this.url = url;
     this.method = method;
     this.requestBody = requestBody;
     this.extraHeaders = extraHeaders;
     this.completeCallback = completeCallback;
+    this.errorCallback = errorCallback;
     this.completeOnAnyThread = completeOnAnyThread;
   }
 
@@ -126,7 +130,9 @@ public class ApiRequest {
         body.close();
       }
     } catch (IOException e) {
-      // TODO: call failure methods
+      log.error("Unexpected error decoding body.", e);
+      handleError(response, e);
+      return;
     }
 
     // Call the callback, if there is one, on the main thread
@@ -142,6 +148,40 @@ public class ApiRequest {
         });
       }
     }
+  }
+
+  void handleError(Response response, Throwable e) {
+    Messages.GenericError err = null;
+    if (response != null && response.body() != null) {
+      try {
+        responseBytes = response.body().bytes();
+        err = body(Messages.GenericError.class);
+      } catch (IOException ex) {
+        if (e == null) {
+          err = convertToGenericError(ex);
+        }
+      }
+    }
+    if (err == null && e != null) {
+      err = convertToGenericError(e);
+    }
+
+    if (errorCallback != null) {
+      final Messages.GenericError finalError = err;
+      new Handler(Looper.getMainLooper()).post(new Runnable() {
+        @Override
+        public void run() {
+          errorCallback.onRequestError(ApiRequest.this, finalError);
+        }
+      });
+    }
+  }
+
+  private Messages.GenericError convertToGenericError(Throwable e) {
+    return Messages.GenericError.newBuilder()
+        .setErrorCode(Messages.GenericError.ErrorCode.UnknownError.getNumber())
+        .setErrorMessage(e.getMessage())
+        .build();
   }
 
   private RequestBody convertRequestBody() {
@@ -160,12 +200,17 @@ public class ApiRequest {
     void onRequestComplete(ApiRequest request);
   }
 
+  public interface ErrorCallback {
+    void onRequestError(ApiRequest request, Messages.GenericError error);
+  }
+
   public static class Builder {
     private String url;
     private String method;
     @Nullable private Message requestBody;
     @Nullable private Map<String, List<String>> extraHeaders;
     @Nullable private CompleteCallback completeCallback;
+    @Nullable private ErrorCallback errorCallback;
     private boolean completeOnAnyThread;
 
     public Builder(String url, String method) {
@@ -201,6 +246,16 @@ public class ApiRequest {
     }
 
     /**
+     * Sets the callback that is called when the request completes with an error. The normal
+     * {@link CompleteCallback} will not be called in this case. Regardless of what you have set
+     * for {@link #completeOnAnyThread}, this will always be called on the UI thread.
+     */
+    public Builder errorCallback(ErrorCallback errorCallback) {
+      this.errorCallback = errorCallback;
+      return this;
+    }
+
+    /**
      * By setting this to true, you're indicating that you don't care what thread the complete
      * callback is called on. If this is false, then the callback is called on the UI thread.
      */
@@ -210,7 +265,7 @@ public class ApiRequest {
     }
 
     public ApiRequest build() {
-      return new ApiRequest(url, method, requestBody, extraHeaders, completeCallback,
+      return new ApiRequest(url, method, requestBody, extraHeaders, completeCallback, errorCallback,
           completeOnAnyThread);
     }
   }

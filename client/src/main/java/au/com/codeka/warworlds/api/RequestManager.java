@@ -94,7 +94,11 @@ public class RequestManager {
 
   private void handleResponse(ApiRequest request, Response response) {
     requestComplete(request, response);
-    request.handleResponse(response);
+    if (!response.isSuccessful()) {
+      handleFailure(request, response, null);
+    } else {
+      request.handleResponse(response);
+    }
   }
 
   /**
@@ -107,10 +111,12 @@ public class RequestManager {
     if (e != null) {
       log.error("Error in request: %s", request, e);
     } else if (response != null) {
-      log.error("Error in response: %d %s", response.code(), response.message());
+      log.warning("Error in response: %d %s", response.code(), response.message());
     } else {
       throw new IllegalStateException("One of response or e should be non-null.");
     }
+
+    request.handleError(response, e);
   }
 
   /** Removes the given request from the in-flight collection and potentially enqueues another. */

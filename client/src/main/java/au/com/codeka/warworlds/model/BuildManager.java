@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 
@@ -79,20 +80,21 @@ public class BuildManager {
             Messages.BuildRequest buildRequestPb = request.body(Messages.BuildRequest.class);
             BuildRequest br = new BuildRequest();
             br.fromProtocolBuffer(buildRequestPb);
-
-            // TODO: error
-            /*
-                      try {
-            new StyledDialog.Builder(context).setTitle("Cannot Build").setMessage(mErrorMsg)
-                .setPositiveButton("Close", true, null).create().show();
-          } catch (Exception e) {
-            // we can get a WindowManager.BadTokenException here if the activity has
-            // finished, we should probably do something about it but it's kinda too
-            // late...
-          }
-
-             */
             StarManager.i.refreshStar(Integer.parseInt(buildRequestPb.getStarKey()));
+          }
+        }).errorCallback(new ApiRequest.ErrorCallback() {
+          @Override
+          public void onRequestError(ApiRequest request, Messages.GenericError error) {
+            try {
+              new StyledDialog.Builder(context)
+                  .setTitle("Cannot Build")
+                  .setMessage(error.getErrorMessage())
+                  .setPositiveButton("Close", true, null)
+                  .create().show();
+            } catch (Exception e) {
+              // we can get a WindowManager.BadTokenException here if the activity has finished, we
+              // should probably do something about it but it's kinda too late...
+            }
           }
         }).build());
   }
