@@ -31,6 +31,7 @@ import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
@@ -582,20 +583,27 @@ public class Notifications {
   private static class NotificationLongPoller implements Runnable {
     private static final Log log = new Log("NotificationLongPoller");
 
-    private Thread mPollThread;
-    private Handler mHandler;
+    private Thread pollThread;
+    private Handler handler;
+    private boolean paused;
 
     public void start() {
       log.debug("Notification long-poll starting.");
-      mHandler = new Handler();
-      mPollThread = new Thread(this);
-      mPollThread.setDaemon(true);
-      mPollThread.start();
+      handler = new Handler();
+      restartPollThread();
+
+      BackgroundDetector.eventBus.register(eventHandler);
+    }
+
+    private void restartPollThread() {
+      pollThread = new Thread(this);
+      pollThread.setDaemon(true);
+      pollThread.start();
     }
 
     @Override
     public void run() {
-      while (true) {
+      while (!paused) {
         try {
           ApiRequest apiRequest = new ApiRequest.Builder("notifications", "GET").build();
           RequestManager.i.sendRequestSync(apiRequest);
@@ -607,7 +615,7 @@ public class Notifications {
             final String name = pb.getName();
             final String value = pb.getValue();
             log.info("[%s] = %s", name, value);
-            mHandler.post(new Runnable() {
+            handler.post(new Runnable() {
               @Override
               public void run() {
                 Notifications.handleNotification(App.i, name, value);
@@ -623,6 +631,18 @@ public class Notifications {
           }
         }
       }
+
+      pollThread = null;
     }
+
+    private final Object eventHandler = new Object() {
+      @EventHandler(thread=EventHandler.ANY_THREAD)
+      public void onBackgroundChangeEvent(BackgroundDetector.BackgroundChangeEvent event) {
+        paused = event.isInBackground;
+        if (!paused && pollThread == null) {
+          restartPollThread();
+        }
+      }
+    };
   }
 }

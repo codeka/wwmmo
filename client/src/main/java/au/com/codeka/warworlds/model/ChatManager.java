@@ -20,11 +20,12 @@ import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventBus;
+import au.com.codeka.warworlds.eventbus.EventHandler;
 
 /**
  * This class keeps track of chats and what-not.
  */
-public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
+public class ChatManager {
   public static final ChatManager i = new ChatManager();
   private static final Log log = new Log("ChatManager");
 
@@ -48,7 +49,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
    * ready to start receiving chat messages.
    */
   public void setup() {
-    BackgroundDetector.i.addBackgroundChangeHandler(this);
+    BackgroundDetector.eventBus.register(eventHandler);
 
     conversations.clear();
     conversations.append(GLOBAL_CONVERSATION_ID, new ChatConversation(GLOBAL_CONVERSATION_ID));
@@ -110,23 +111,16 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     String url = String.format("chat/%d/abuse-reports", msg.getID());
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST")
         .body(abuseReportPb)
-        .completeCallback(new ApiRequest.CompleteCallback() {
+        .errorCallback(new ApiRequest.ErrorCallback() {
           @Override
-          public void onRequestComplete(ApiRequest request) {
-/*
-        if (!success) {
-          if (mErrorMessage == null || mErrorMessage.isEmpty()) {
-            mErrorMessage = "An error occured reporting this empire. Try again later.";
-          }
+          public void onRequestError(ApiRequest request, Messages.GenericError error) {
+            String msg = error.getErrorMessage();
+            if (msg == null || msg.isEmpty()) {
+              msg = "An error occurred reporting this empire. Try again later.";
+            }
 
-          // try {
-          new StyledDialog.Builder(context).setTitle("Error").setMessage(mErrorMessage)
-              .setPositiveButton("OK", null).create().show();
-          //} catch (Exception e) {
-          // ignore
-          //}
-        }
-*/
+            new StyledDialog.Builder(context).setTitle("Error").setMessage(msg)
+                .setPositiveButton("OK", null).create().show();
           }
         }).build());
   }
@@ -318,12 +312,14 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     new GlobalOptions().muteConversation(conversation.getID(), false);
   }
 
-  @Override
-  public void onBackgroundChange(boolean isInBackground) {
-    if (!isInBackground) {
-      requestMessages(mostRecentMsg);
+  private final Object eventHandler = new Object() {
+    @EventHandler(thread=EventHandler.UI_THREAD)
+    public void onBackgroundChangeEvent(BackgroundDetector.BackgroundChangeEvent event) {
+      if (!event.isInBackground) {
+        requestMessages(mostRecentMsg);
+      }
     }
-  }
+  };
 
   private void refreshConversations() {
     if (isConversationsRefreshing) {
