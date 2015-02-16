@@ -1,22 +1,19 @@
 package au.com.codeka.warworlds.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.joda.time.DateTime;
-
 import android.content.Context;
 import android.util.SparseArray;
 
-import au.com.codeka.BackgroundRunner;
+import org.joda.time.DateTime;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventBus;
@@ -271,31 +268,21 @@ public class ChatManager {
   }
 
   public void leaveConversation(final ChatConversation conversation) {
-    new BackgroundRunner<Boolean>() {
-      @Override
-      protected Boolean doInBackground() {
-        try {
-          String url =
-              "chat/conversations/" + conversation.getID() + "/participants/" + EmpireManager.i
-                  .getEmpire().getKey();
-          ApiClient.delete(url);
+    String url = "chat/conversations/" + conversation.getID() + "/participants/"
+        + EmpireManager.i.getEmpire().getKey();
 
-          synchronized (conversations) {
-            log.info("Leaving conversation #%d.", conversation.getID());
-            conversations.remove(conversation.getID());
+    RequestManager.i.sendRequest(new ApiRequest.Builder(url, "DELETE")
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            synchronized (conversations) {
+              log.info("Leaving conversation #%d.", conversation.getID());
+              conversations.remove(conversation.getID());
+            }
+
+            eventBus.publish(new ConversationsUpdatedEvent());
           }
-          return true;
-        } catch (Exception e) {
-          log.error("Error leaving conversation.", e);
-          return false;
-        }
-      }
-
-      @Override
-      protected void onComplete(Boolean success) {
-        eventBus.publish(new ConversationsUpdatedEvent());
-      }
-    }.execute();
+        }).build());
   }
 
   public void muteConversation(ChatConversation conversation) {
@@ -327,63 +314,52 @@ public class ChatManager {
     }
     isConversationsRefreshing = true;
 
-    new BackgroundRunner<Boolean>() {
-      @Override
-      protected Boolean doInBackground() {
-        try {
-          String url = "chat/conversations";
-          Messages.ChatConversations pb =
-              ApiClient.getProtoBuf(url, Messages.ChatConversations.class);
-
-          // this comes back most recent first, but we work in the
-          // opposite order...
-          for (Messages.ChatConversation conversation_pb : pb.getConversationsList()) {
-            ChatConversation conversation = new ChatConversation(conversation_pb.getId());
-            conversation.fromProtocolBuffer(conversation_pb);
-            synchronized (conversations) {
-              if (conversations.indexOfKey(conversation_pb.getId()) < 0) {
-                conversations.append(conversation_pb.getId(), conversation);
-              } else {
-                conversations.get(conversation_pb.getId()).update(conversation);
+    RequestManager.i.sendRequest(new ApiRequest.Builder("chat/conversations", "GET")
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            Messages.ChatConversations pb = request.body(Messages.ChatConversations.class);
+            // this comes back most recent first, but we work in the
+            // opposite order...
+            for (Messages.ChatConversation conversation_pb : pb.getConversationsList()) {
+              ChatConversation conversation = new ChatConversation(conversation_pb.getId());
+              conversation.fromProtocolBuffer(conversation_pb);
+              synchronized (conversations) {
+                if (conversations.indexOfKey(conversation_pb.getId()) < 0) {
+                  conversations.append(conversation_pb.getId(), conversation);
+                } else {
+                  conversations.get(conversation_pb.getId()).update(conversation);
+                }
               }
             }
-          }
-        } catch (Exception e) {
-          // TODO: errors?
-          return false;
-        }
 
-        return true;
-      }
-
-      @Override
-      protected void onComplete(Boolean success) {
-        isConversationsRefreshing = false;
-
-        // now that we've updated all of the conversations, if there's any left that are
-        // "needs update" then we'll have to queue another one... :/
-        boolean needsUpdate = false;
-        synchronized (conversations) {
-          for (int i = 0; i < conversations.size(); i++) {
-            ChatConversation conversation = conversations.valueAt(i);
-            if (conversation.getID() > 0 && conversation.needUpdate()) {
-              needsUpdate = true;
-              // However, we want to make sure this is the LAST time that "refreshConversations" is
-              // called for this set of conversations (for example, if one of our conversations
-              // doesn't exist on the server, it won't get updated by another call) so we call this
-              // to make sure "needs update" is reset on all of them first.
-              conversation.update(conversation);
+            // now that we've updated all of the conversations, if there's any left that are
+            // "needs update" then we'll have to queue another one... :/
+            boolean needsUpdate = false;
+            synchronized (conversations) {
+              for (int i = 0; i < conversations.size(); i++) {
+                ChatConversation conversation = conversations.valueAt(i);
+                if (conversation.getID() > 0 && conversation.needUpdate()) {
+                  needsUpdate = true;
+                  // However, we want to make sure this is the LAST time that "refreshConversations"
+                  // is called for this set of conversations (for example, if one of our
+                  // conversations doesn't exist on the server, it won't get updated by another
+                  // call) so we call this to make sure "needs update" is reset on all of them
+                  // first.
+                  conversation.update(conversation);
+                }
+              }
             }
-          }
-        }
 
-        if (needsUpdate) {
-          refreshConversations();
-        } else {
-          eventBus.publish(new ConversationsUpdatedEvent());
-        }
-      }
-    }.execute();
+            if (needsUpdate) {
+              refreshConversations();
+            } else {
+              eventBus.publish(new ConversationsUpdatedEvent());
+            }
+
+            isConversationsRefreshing = false;
+          }
+        }).build());
   }
 
   private void requestMessages(final DateTime after) {
@@ -408,45 +384,36 @@ public class ChatManager {
     }
     requesting = true;
 
-    new BackgroundRunner<ArrayList<ChatMessage>>() {
-      @Override
-      protected ArrayList<ChatMessage> doInBackground() {
-        ArrayList<ChatMessage> msgs = new ArrayList<ChatMessage>();
+    String url = "chat?after=" + (after.getMillis() / 1000);
+    if (before != null) {
+      url += "&before=" + (before.getMillis() / 1000);
+    }
+    if (max != null) {
+      url += "&max=" + max;
+    }
+    if (conversationID != null) {
+      url += "&conversation=" + conversationID;
+    }
 
-        try {
-          String url = "chat?after=" + (after.getMillis() / 1000);
-          if (before != null) {
-            url += "&before=" + (before.getMillis() / 1000);
+    RequestManager.i.sendRequest(new ApiRequest.Builder(url, "GET")
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            Messages.ChatMessages pb = request.body(Messages.ChatMessages.class);
+            ArrayList<ChatMessage> msgs = new ArrayList<>();
+
+            // these comes back most recent first, but we work in the opposite order...
+            for (int i = pb.getMessagesCount() - 1; i >= 0; i--) {
+              ChatMessage msg = new ChatMessage();
+              msg.fromProtocolBuffer(pb.getMessages(i));
+              msgs.add(msg);
+            }
+
+            handler.onMessagesFetched(msgs);
+            requesting = false;
           }
-          if (max != null) {
-            url += "&max=" + max;
-          }
-          if (conversationID != null) {
-            url += "&conversation=" + conversationID;
-          }
-          Messages.ChatMessages pb = ApiClient.getProtoBuf(url, Messages.ChatMessages.class);
-
-          // this comes back most recent first, but we work in the
-          // opposite order...
-          for (int i = pb.getMessagesCount() - 1; i >= 0; i--) {
-            ChatMessage msg = new ChatMessage();
-            msg.fromProtocolBuffer(pb.getMessages(i));
-            msgs.add(msg);
-          }
-        } catch (Exception e) {
-          log.error("Error fetching chat messages.", e);
-        }
-
-        return msgs;
-      }
-
-      @Override
-      protected void onComplete(ArrayList<ChatMessage> msgs) {
-        handler.onMessagesFetched(msgs);
-
-        requesting = false;
-      }
-    }.execute();
+        })
+        .build());
   }
 
   public static class MessageAddedEvent {
