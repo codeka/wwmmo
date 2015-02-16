@@ -300,6 +300,17 @@ public class EmpireController {
     new StarController().update(star);
   }
 
+  /** Bans an empire. */
+  public void banEmpire(int empireID) throws RequestException {
+    String sql = "UPDATE empires SET state = 2 WHERE id = ?";
+    try (SqlStmt stmt = db.prepare(sql)) {
+      stmt.setInt(1, empireID);
+      stmt.update();
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
   /**
    * Resets the given empire. This is obviously fairly destructive, so be
    * careful!
