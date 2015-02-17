@@ -59,8 +59,9 @@ public class RequestHandler {
         return mExtraOption;
     }
 
-    public void handle(Matcher matcher, String extraOption, HttpServletRequest request,
-                       HttpServletResponse response) {
+    public void handle(Matcher matcher, String extraOption, Session session,
+            HttpServletRequest request, HttpServletResponse response) {
+        mSession = session;
         mRequest = request;
         mResponse = response;
         mRouteMatcher = matcher;
@@ -280,34 +281,13 @@ public class RequestHandler {
 
     protected Session getSession() throws RequestException {
         if (mSession == null) {
-            String impersonate = getRequest().getParameter("on_behalf_of");
 
-            if (mRequest.getCookies() == null) {
-                throw new RequestException(403);
-            }
-
-            String sessionCookieValue = "";
-            for (Cookie cookie : mRequest.getCookies()) {
-                if (cookie.getName().equals("SESSION")) {
-                    sessionCookieValue = cookie.getValue();
-                    mSession = new SessionController().getSession(sessionCookieValue, impersonate);
-                }
-            }
-
-            if (mSession == null) {
-                throw new RequestException(403);
-            }
         }
-
         return mSession;
     }
 
     protected Session getSessionNoError() {
-        try {
-            return getSession();
-        } catch(RequestException e) {
-            return null;
-        }
+        return mSession;
     }
 
     protected boolean isAdmin() throws RequestException {

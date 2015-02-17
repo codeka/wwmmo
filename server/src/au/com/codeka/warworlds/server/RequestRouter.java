@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,13 +14,17 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.handlers.*;
 import au.com.codeka.warworlds.server.handlers.admin.*;
+import au.com.codeka.warworlds.server.monitor.MonitorManager;
 
 
 public class RequestRouter extends AbstractHandler {
     private static final Log log = new Log("RequestRouter");
     private static ArrayList<Route> sRoutes;
+
+    private final MonitorManager monitorManager = new MonitorManager();
 
     {
         sRoutes = new ArrayList<Route>();
@@ -128,7 +133,29 @@ public class RequestRouter extends AbstractHandler {
             return; // TODO: error
         }
 
-        handler.handle(matcher, route.extraOption, request, response);
+        Session session = null;
+        String impersonate = request.getParameter("on_behalf_of");
+        if (request.getCookies() != null) {
+            String sessionCookieValue = "";
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("SESSION")) {
+                    sessionCookieValue = cookie.getValue();
+                    try {
+                        session =
+                            new SessionController().getSession(sessionCookieValue, impersonate);
+                    } catch (RequestException e) {
+                        log.error("Error getting session: cookie=" + sessionCookieValue, e);
+                    }
+                }
+            }
+        }
+
+        try {
+            monitorManager.onBeginRequest(session, request, response);
+            handler.handle(matcher, route.extraOption, session, request, response);
+        } finally {
+            monitorManager.onEndRequest(session, request, response);
+        }
     }
 
     private static class Route {
