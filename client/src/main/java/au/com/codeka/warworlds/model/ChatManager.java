@@ -28,9 +28,9 @@ public class ChatManager {
 
   public static final EventBus eventBus = new EventBus();
 
+  private final SparseArray<ChatConversation> conversations = new SparseArray<>();
   private DateTime mostRecentMsg;
   private boolean requesting;
-  private final SparseArray<ChatConversation> conversations = new SparseArray<>();
   private boolean isConversationsRefreshing = false;
   private boolean isSetup = false;
   private ChatRecentMessages recentMessages = new ChatRecentMessages();
