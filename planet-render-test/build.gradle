@@ -1,5 +1,5 @@
 apply plugin: 'java'
-apply plugin:'application'
+apply plugin: 'application'
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
@@ -12,3 +12,8 @@ tasks.withType(JavaCompile) {
     targetCompatibility = "1.7"
 }
 
+mainClassName = "au.com.codeka.planetrendertest.MainWindow"
+
+applicationDistribution.from("src/main/data/") {
+  into "data"
+}
