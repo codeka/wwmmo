@@ -1,0 +1,14 @@
+apply plugin: 'java'
+apply plugin:'application'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile project(':common')
+    compile project(':planet-render')
+}
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility = "1.7"
+    targetCompatibility = "1.7"
+}
+
