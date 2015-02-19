@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.swing.DefaultComboBoxModel;
@@ -276,7 +277,9 @@ public class AppContent extends JPanel {
     }
 
     String[] array = new String[fileNames.size()];
-    return fileNames.toArray(array);
+    fileNames.toArray(array);
+    Arrays.sort(array);
+    return array;
   }
 
   private String loadTemplate(String name) {
