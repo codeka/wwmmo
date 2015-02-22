@@ -63,7 +63,7 @@ public class ChatManager {
     requestMessages(mostRecentMsg);
   }
 
-  /** * Posts a message from us to the server. */
+  /** Posts a message from us to the server. */
   public void postMessage(final ChatMessage msg) {
     Messages.ChatMessage.Builder msgPb = Messages.ChatMessage.newBuilder()
         .setMessage(msg.getMessage())
