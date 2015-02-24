@@ -608,6 +608,9 @@ public class Notifications {
           ApiRequest apiRequest = new ApiRequest.Builder("notifications", "GET").build();
           RequestManager.i.sendRequestSync(apiRequest);
           Messages.Notifications notificationsPb = apiRequest.body(Messages.Notifications.class);
+          if (notificationsPb == null) {
+            continue;
+          }
 
           log.info("Long-poll complete, got %d notifications.",
               notificationsPb.getNotificationsCount());

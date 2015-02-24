@@ -46,6 +46,7 @@ public class ApiRequest {
   @Nullable private Message responseProto;
   @Nullable private Bitmap responseBitmap;
   @Nullable private String responseString;
+  @Nullable private MediaType responseContentType;
   @Nullable Map<String, List<String>> extraHeaders;
 
   private ApiRequest(String url, String method, @Nullable Message requestBody,
@@ -87,6 +88,7 @@ public class ApiRequest {
     return timing;
   }
 
+  @Nullable
   @SuppressWarnings("unchecked")
   public <T extends Message> T body(Class<T> responseClass) {
     if (responseProto == null && responseBytes != null) {
@@ -96,6 +98,9 @@ public class ApiRequest {
       } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
         log.error("Unexpected error parsing response.", e);
       }
+    } else if (responseProto == null) {
+      log.info("Got no response body (content-type was: %s), not returning any proto.",
+          responseContentType);
     }
     return (T) responseProto;
   }
@@ -119,15 +124,18 @@ public class ApiRequest {
   void handleResponse(Response response) {
     try {
       ResponseBody body = response.body();
-      if (body != null && body.contentType() != null) {
-        if (body.contentType().type().equals("text")) {
-          responseString = body.string();
-        } else if (body.contentType().type().equals("image")) {
-          responseBitmap = BitmapFactory.decodeStream(response.body().byteStream());
-        } else {
-          responseBytes = body.bytes();
+      if (body != null) {
+        responseContentType = body.contentType();
+        if (responseContentType != null) {
+          if (responseContentType.type().equals("text")) {
+            responseString = body.string();
+          } else if (responseContentType.type().equals("image")) {
+            responseBitmap = BitmapFactory.decodeStream(response.body().byteStream());
+          } else {
+            responseBytes = body.bytes();
+          }
+          body.close();
         }
-        body.close();
       }
     } catch (IOException e) {
       log.error("Unexpected error decoding body.", e);
