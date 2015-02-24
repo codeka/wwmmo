@@ -20,7 +20,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Debug;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 
@@ -30,7 +29,6 @@ import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -85,9 +83,7 @@ public class ErrorReporter {
     }
 
     private void askToSend(Context context, final String[] errorReportFiles) {
-      LayoutInflater inflater =
-          (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-      final View view = inflater.inflate(R.layout.error_report_send_dlg, null);
+      final View view = View.inflate(context, R.layout.error_report_send_dlg, null);
       final CheckBox alwaysChk = (CheckBox) view.findViewById(R.id.always_chk);
 
       new StyledDialog.Builder(context).setView(view).setTitle("Error reports")
