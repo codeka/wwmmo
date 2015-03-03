@@ -23,6 +23,7 @@ import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.ctrl.BannerAdView;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatManager;
@@ -150,6 +151,8 @@ public class ServerGreeter {
     if (handler == null) {
       handler = new Handler();
     }
+
+    RequestManager.i.setup(activity);
 
     new BackgroundRunner<String>() {
       private boolean mNeedsEmpireSetup;

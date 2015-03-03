@@ -174,8 +174,8 @@ public class RequestHandler {
    *             and we will hash and base-64 encode it for you.
    */
   protected void setCacheTime(float hours, @Nullable String etag) {
-    response.setHeader("Cache-Control", String.format("private max-age=%d",
-        (int)(hours * 2600)));
+    response.setHeader("Cache-Control", String.format("private, max-age=%d",
+        (int)(hours * 3600)));
     if (etag != null) {
       etag = BaseEncoding.base64().encode(
           Hashing.sha1().hashString(etag, Charset.defaultCharset()).asBytes());

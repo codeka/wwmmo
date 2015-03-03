@@ -111,7 +111,9 @@ public class StarManager extends BaseManager {
     }
 
     RequestManager.i.sendRequest(new ApiRequest.Builder(String.format("stars/%s", starID), "GET")
-        .completeCallback(requestCompleteCallback).build());
+        .completeCallback(requestCompleteCallback)
+        .skipCache(true)
+        .build());
     return true;
   }
 

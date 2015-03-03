@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 
 import com.google.protobuf.Message;
+import com.squareup.okhttp.CacheControl;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
@@ -16,10 +17,6 @@ import com.squareup.okhttp.ResponseBody;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
@@ -47,17 +44,17 @@ public class ApiRequest {
   @Nullable private Bitmap responseBitmap;
   @Nullable private String responseString;
   @Nullable private MediaType responseContentType;
-  @Nullable Map<String, List<String>> extraHeaders;
+  private boolean skipCache;
 
   private ApiRequest(String url, String method, @Nullable Message requestBody,
-      @Nullable Map<String, List<String>> extraHeaders,
-      @Nullable CompleteCallback completeCallback, @Nullable ErrorCallback errorCallback,
+      boolean skipCache, @Nullable CompleteCallback completeCallback,
+      @Nullable ErrorCallback errorCallback,
       boolean completeOnAnyThread) {
     this.timing = new Timing();
     this.url = url;
     this.method = method;
     this.requestBody = requestBody;
-    this.extraHeaders = extraHeaders;
+    this.skipCache = skipCache;
     this.completeCallback = completeCallback;
     this.errorCallback = errorCallback;
     this.completeOnAnyThread = completeOnAnyThread;
@@ -70,12 +67,8 @@ public class ApiRequest {
         .url(realm.getBaseUrl().resolve(url).toString())
         .method(method, convertRequestBody())
         .addHeader("User-Agent", "wwmmo/" + Util.getVersion());
-    if (extraHeaders != null) {
-      for (String headerName : extraHeaders.keySet()) {
-        for (String headerValue : extraHeaders.get(headerName)) {
-          builder.addHeader(headerName, headerValue);
-        }
-      }
+    if (skipCache) {
+      builder.cacheControl(CacheControl.FORCE_NETWORK);
     }
     if (realm.getAuthenticator().isAuthenticated()) {
       builder.addHeader("Cookie", realm.getAuthenticator().getAuthCookie());
@@ -216,7 +209,7 @@ public class ApiRequest {
     private String url;
     private String method;
     @Nullable private Message requestBody;
-    @Nullable private Map<String, List<String>> extraHeaders;
+    private boolean skipCache;
     @Nullable private CompleteCallback completeCallback;
     @Nullable private ErrorCallback errorCallback;
     private boolean completeOnAnyThread;
@@ -231,16 +224,8 @@ public class ApiRequest {
       return this;
     }
 
-    public Builder header(String name, String value) {
-      if (extraHeaders == null) {
-        extraHeaders = new TreeMap<>();
-      }
-      List<String> values = extraHeaders.get(name);
-      if (values == null) {
-        values = new ArrayList<>();
-        extraHeaders.put(name, values);
-      }
-      values.add(value);
+    public Builder skipCache(boolean skipCache) {
+      this.skipCache = skipCache;
       return this;
     }
 
@@ -273,7 +258,7 @@ public class ApiRequest {
     }
 
     public ApiRequest build() {
-      return new ApiRequest(url, method, requestBody, extraHeaders, completeCallback, errorCallback,
+      return new ApiRequest(url, method, requestBody, skipCache, completeCallback, errorCallback,
           completeOnAnyThread);
     }
   }

@@ -1,6 +1,9 @@
 package au.com.codeka.warworlds.api;
 
+import android.content.Context;
+
 import com.google.common.collect.Lists;
+import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.CertificatePinner;
 import com.squareup.okhttp.Interceptor;
@@ -9,6 +12,7 @@ import com.squareup.okhttp.Protocol;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -31,13 +35,9 @@ public class RequestManager {
   private static final boolean DBG = true;
 
   private static final int MAX_INFLIGHT_REQUESTS = 8;
+  private static final int MAX_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
 
   private final OkHttpClient httpClient;
-
-  // The last status code we got from the server, don't try to re-authenticate if we get two 403's
-  // in a row, for example.
-  private int lastRequestStatusCode = 200;
-
   private final Set<ApiRequest> inFlightRequests = new HashSet<>();
 
   // We use a stack because the most recent request is likely the most important (since it's usually
@@ -57,6 +57,21 @@ public class RequestManager {
 
     httpClient.getDispatcher().setMaxRequests(MAX_INFLIGHT_REQUESTS);
     httpClient.getDispatcher().setMaxRequestsPerHost(MAX_INFLIGHT_REQUESTS);
+  }
+
+  /** Sets up the request manager, once we've got a context. Initializes the cache and so on. */
+  public void setup(Context context) {
+    if (httpClient.getCache() == null) {
+      try {
+        File cacheDir = new File(context.getCacheDir(), "api");
+        if (!cacheDir.mkdirs()) {
+          // Ignore, directory (probably) already exists
+        }
+        httpClient.setCache(new Cache(cacheDir, MAX_CACHE_SIZE));
+      } catch (IOException e) {
+        log.error("Error setting up HTTP cache.", e);
+      }
+    }
   }
 
   /**
