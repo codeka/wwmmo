@@ -34,14 +34,13 @@ public class ChatConversation extends BaseChatConversation {
 
   public void update(ChatConversation conversation) {
     if (conversation.getParticipants() != null) {
-      mParticipants =
-          new ArrayList<>(conversation.getParticipants());
+      mParticipants = new ArrayList<>(conversation.getParticipants());
     }
     needUpdate = false;
   }
 
   /**
-   * Returns the nth message, where 0 is the {i most recent} message.
+   * Returns the nth message, where 0 is the most recent message.
    */
   public ChatMessage getMessage(int n) {
     synchronized (messages) {
@@ -87,7 +86,7 @@ public class ChatConversation extends BaseChatConversation {
   }
 
   public void addMessage(ChatMessage msg) {
-    addMessage(0, msg);
+    addMessage(messages.size(), msg);
   }
 
   /** Adds a new message to the chat list at the given index. */
