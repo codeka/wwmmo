@@ -9,4 +9,7 @@ import au.com.codeka.common.model.BaseEmpirePresence;
  *
  */
 public class EmpirePresence extends BaseEmpirePresence {
+  public int getEmpireID() {
+    return Integer.parseInt(mEmpireKey);
+  }
 }

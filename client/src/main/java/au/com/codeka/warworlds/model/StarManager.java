@@ -127,9 +127,12 @@ public class StarManager extends BaseManager {
         star.fromProtocolBuffer(starPb);
         stars.put(star.getID(), star);
 
-        log.debug("Star %s refreshed, publishing event...", star.getName());
-        eventBus.publish(star);
         inProgress.remove(star.getID());
+
+        // Enqueue the star so that it get simulated, this will post to the event bus when
+        // simulation finishes, so we don't need to do that here.
+        log.debug("Star %d %s fetched from server, simulating...", star.getID(), star.getName());
+        StarSimulationQueue.i.simulate(star, true);
       }
     }
   };
