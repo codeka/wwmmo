@@ -585,6 +585,7 @@ public class EmpireController {
         sql += "state != 2 AND ";
       }
       sql += whereClause;
+      sql += " ORDER BY id DESC";
       return sql;
     }
 
