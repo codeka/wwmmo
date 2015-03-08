@@ -72,8 +72,6 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   private String starKeyToSelect;
   private Fleet fleetToSelect;
 
-  private boolean doNotNavigateToHomeStar;
-
   private static final int SOLAR_SYSTEM_REQUEST = 1;
   private static final int EMPIRE_REQUEST = 2;
   private static final int SITREP_REQUEST = 3;
@@ -186,22 +184,25 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       starToSelect = selectedStar;
       fleetToSelect = selectedFleet;
     }
-    if (savedInstanceState == null) {
-      Intent intent = getIntent();
-      if (intent != null && intent.getExtras() != null) {
-        String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
-        if (starKey != null) {
-          long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
-          long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
-          int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
-          int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
-          mStarfield.scrollTo(sectorX, sectorY, offsetX, Sector.SECTOR_SIZE - offsetY);
-          doNotNavigateToHomeStar = true;
-        }
-      }
-    }
 
     hideBottomPane(true);
+  }
+
+  private boolean processIntent() {
+    Intent intent = getIntent();
+    if (intent != null && intent.getExtras() != null) {
+      String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
+      if (starKey != null) {
+        long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
+        long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
+        int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
+        int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
+        mStarfield.scrollTo(sectorX, sectorY, offsetX, Sector.SECTOR_SIZE - offsetY);
+      }
+      setIntent(null);
+      return true;
+    }
+    return false;
   }
 
   @Override
@@ -233,6 +234,8 @@ public class StarfieldActivity extends BaseStarfieldActivity {
         }
 
         BaseStar homeStar = myEmpire.getHomeStar();
+
+        boolean doNotNavigateToHomeStar = processIntent();
         if (homeStar != null && (
             StarfieldActivity.this.homeStar == null || !StarfieldActivity.this.homeStar.getKey()
             .equals(homeStar.getKey()))) {
@@ -241,10 +244,14 @@ public class StarfieldActivity extends BaseStarfieldActivity {
             mStarfield.scrollTo(homeStar);
           }
         }
-
-        doNotNavigateToHomeStar = true;
       }
     });
+  }
+
+  @Override
+  protected void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    setIntent(intent);
   }
 
   @Override

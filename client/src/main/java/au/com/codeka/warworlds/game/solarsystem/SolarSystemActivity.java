@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
 import au.com.codeka.warworlds.game.wormhole.WormholeFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
@@ -165,6 +167,9 @@ public class SolarSystemActivity extends BaseActivity {
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
+    // Inflate the menu items for use in the action bar
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.solarsystem_menu, menu);
     return super.onCreateOptionsMenu(menu);
   }
 
@@ -172,6 +177,21 @@ public class SolarSystemActivity extends BaseActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     if (drawerToggle.onOptionsItemSelected(item)) {
       return true;
+    }
+
+    switch (item.getItemId()) {
+      case R.id.menu_locate:
+        Intent intent = new Intent(this, StarfieldActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (star != null) {
+          intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
+          intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
+          intent.putExtra("au.com.codeka.warworlds.OffsetX", star.getOffsetX());
+          intent.putExtra("au.com.codeka.warworlds.OffsetY", star.getOffsetY());
+          intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+        }
+        startActivity(intent);
+        break;
     }
 
     return super.onOptionsItemSelected(item);
