@@ -103,7 +103,6 @@ public class SolarSystemActivity extends BaseActivity {
 
     drawerToggle =
         new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
-
           @Override
           public void onDrawerClosed(View view) {
             super.onDrawerClosed(view);
