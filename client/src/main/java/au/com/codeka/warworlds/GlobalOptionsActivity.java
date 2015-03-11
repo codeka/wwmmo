@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds;
 
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -29,6 +30,13 @@ public class GlobalOptionsActivity extends BaseActivity {
         .beginTransaction()
         .replace(R.id.content, new GlobalOptionsFragment(), null)
         .commit();
+
+    // We have to offset the drawerLayout a bit because the action bar will be covering it.
+    final TypedArray styledAttributes =
+        getTheme().obtainStyledAttributes(new int[] {android.R.attr.actionBarSize});
+    int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
+    styledAttributes.recycle();
+    ((FrameLayout.LayoutParams) frame.getLayoutParams()).topMargin = actionBarHeight;
 
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setHomeButtonEnabled(true);
