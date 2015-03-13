@@ -235,7 +235,7 @@ public class EmpireController {
         try {
           t.close();
         } catch (Exception e) {
-          throw new RequestException(e);
+          // Ignore
         }
       }
     }
@@ -349,7 +349,7 @@ public class EmpireController {
    * returned this, we'll reset the reason back to NULL.
    */
   public String getResetReason(int empireID) throws RequestException {
-    String reason = null;
+    String reason;
 
     // empty the star of it's current (native) inhabitants
     String sql = "SELECT reset_reason FROM empires WHERE id = ?";
@@ -376,7 +376,7 @@ public class EmpireController {
    * new one.
    */
   public void findNewHomeStar(int empireID) throws RequestException {
-    ArrayList<Integer> starIds = new ArrayList<Integer>();
+    ArrayList<Integer> starIds = new ArrayList<>();
     String sql = "SELECT DISTINCT star_id" + " FROM colonies" + " WHERE empire_id = ?";
     try (SqlStmt stmt = DB.prepare(sql)) {
       stmt.setInt(1, empireID);
@@ -482,12 +482,12 @@ public class EmpireController {
     }
 
     public Collection<Empire> getEmpires(int[] ids) throws Exception {
-      String sql = getSelectEmpire("empires.id IN " + buildInClause(ids), true);
+      String sql = getSelectEmpire("empires.id IN " + buildInClause(ids), true, null);
 
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
 
-        HashMap<Integer, Empire> empires = new HashMap<Integer, Empire>();
+        HashMap<Integer, Empire> empires = new HashMap<>();
         while (res.next()) {
           Empire empire = new Empire(res);
           empires.put(empire.getID(), empire);
@@ -506,7 +506,7 @@ public class EmpireController {
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
 
-        Map<Integer, Double> taxRates = new TreeMap<Integer, Double>();
+        Map<Integer, Double> taxRates = new TreeMap<>();
         while (res.next()) {
           taxRates.put(res.getInt(1), res.getDouble(2));
         }
@@ -515,12 +515,12 @@ public class EmpireController {
     }
 
     public Empire getEmpireByEmail(String email) throws Exception {
-      String sql = getSelectEmpire("user_email = ?", true);
+      String sql = getSelectEmpire("user_email = ?", true, null);
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setString(1, email);
         SqlResult res = stmt.select();
 
-        HashMap<Integer, Empire> empires = new HashMap<Integer, Empire>();
+        HashMap<Integer, Empire> empires = new HashMap<>();
         Integer empireID = null;
         while (res.next()) {
           Empire empire = new Empire(res);
@@ -537,13 +537,12 @@ public class EmpireController {
     }
 
     public Collection<Empire> getEmpiresByName(String name, int limit) throws Exception {
-      String sql = getSelectEmpire("empires.name ~* ? LIMIT ?", false);
+      String sql = getSelectEmpire("empires.name ~* ?", false, limit);
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setString(1, name);
-        stmt.setInt(2, limit);
         SqlResult res = stmt.select();
 
-        HashMap<Integer, Empire> empires = new HashMap<Integer, Empire>();
+        HashMap<Integer, Empire> empires = new HashMap<>();
         while (res.next()) {
           Empire empire = new Empire(res);
           empires.put(empire.getID(), empire);
@@ -556,13 +555,14 @@ public class EmpireController {
 
     public Collection<Empire> getEmpiresByRank(int minRank, int maxRank) throws Exception {
       String sql = getSelectEmpire(
-          "empires.id IN (SELECT empire_id FROM empire_ranks WHERE rank BETWEEN ? AND ?)", false);
+          "empires.id IN (SELECT empire_id FROM empire_ranks WHERE rank BETWEEN ? AND ?)", false,
+          null);
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, minRank);
         stmt.setInt(2, maxRank);
         SqlResult res = stmt.select();
 
-        HashMap<Integer, Empire> empires = new HashMap<Integer, Empire>();
+        HashMap<Integer, Empire> empires = new HashMap<>();
         while (res.next()) {
           Empire empire = new Empire(res);
           empires.put(empire.getID(), empire);
@@ -573,7 +573,7 @@ public class EmpireController {
       }
     }
 
-    private String getSelectEmpire(String whereClause, boolean includeBanned) {
+    private String getSelectEmpire(String whereClause, boolean includeBanned, Integer limit) {
       String sql = "SELECT *, alliances.id AS alliance_id, alliances.name as alliance_name,"
           + " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires,"
           + " (SELECT MAX(create_date) FROM empire_shields WHERE empire_shields.empire_id = empires.id AND rejected = 0) AS shield_last_update,"
@@ -585,12 +585,15 @@ public class EmpireController {
         sql += "state != 2 AND ";
       }
       sql += whereClause;
-      sql += " ORDER BY id DESC";
+      sql += " ORDER BY empires.id DESC";
+      if (limit != null) {
+        sql += " LIMIT " + limit;
+      }
       return sql;
     }
 
     private void populateEmpires(Map<Integer, Empire> empires) throws Exception {
-      HashSet<Integer> notOnlineEmpireIDs = new HashSet<Integer>();
+      HashSet<Integer> notOnlineEmpireIDs = new HashSet<>();
       DateTime now = DateTime.now();
       for (Empire empire : empires.values()) {
         empire.setHomeStar(new StarController().getStar(empire.getHomeStarID()));
@@ -677,7 +680,7 @@ public class EmpireController {
         }
         SqlResult res = stmt.select();
 
-        ArrayList<Integer> starIds = new ArrayList<Integer>();
+        ArrayList<Integer> starIds = new ArrayList<>();
         while (res.next()) {
           starIds.add(res.getInt(1));
         }
