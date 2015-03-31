@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
@@ -46,7 +47,7 @@ public class SectorManager extends BaseManager {
       public void onStarUpdated(Star star) {
         Star ourStar = findStar(star.getKey());
         if (ourStar != null) {
-          if (!areStarsSame(ourStar, star)) {
+          if (!needsUpdate(ourStar, star)) {
             sectorStars.put(star.getKey(), star);
             Pair<Long, Long> coord = new Pair<>(star.getSectorX(), star.getSectorY());
             Sector sector = sectors.get(coord);
@@ -135,6 +136,11 @@ public class SectorManager extends BaseManager {
                   sectors.put(key, sector);
                   eventBus.publish(sector);
                   pendingSectors.remove(key);
+
+                  for (BaseStar baseStar : sector.getStars()) {
+                    Star star = (Star) baseStar;
+                    sectorStars.put(star.getKey(), star);
+                  }
                 }
                 eventBus.publish(new SectorListChangedEvent());
               }
@@ -145,17 +151,19 @@ public class SectorManager extends BaseManager {
   }
 
   /**
-   * Determines whether the two stars are the "same" for our purposes. They're only different
-   * if they have a new name, or if a fleet has gone from moving->idle or idle->moving.
+   * When we get a notification that a star has been updated, we may need to refresh the whole
+   * sector. But we only need to do that if something 'important' about the star has changed (i.e.
+   * something actually visible on the starfield view) such as a name change. We don't care if the
+   * buildings have changed, for instance.
    */
-  private boolean areStarsSame(Star lhs, Star rhs) {
-    if (!lhs.getName().equals(rhs.getName())) {
+  private boolean needsUpdate(Star oldStart, Star newStar) {
+    if (!oldStart.getName().equals(newStar.getName())) {
       return false;
     }
 
-    for (BaseFleet lhsBaseFleet : lhs.getFleets()) {
+    for (BaseFleet lhsBaseFleet : oldStart.getFleets()) {
       Fleet lhsFleet = (Fleet) lhsBaseFleet;
-      Fleet rhsFleet = (Fleet) rhs.getFleet(Integer.parseInt(lhsFleet.getKey()));
+      Fleet rhsFleet = (Fleet) newStar.getFleet(Integer.parseInt(lhsFleet.getKey()));
       if (rhsFleet == null) {
         return false;
       }
@@ -165,9 +173,9 @@ public class SectorManager extends BaseManager {
       }
     }
 
-    for (BaseFleet rhsBaseFleet : rhs.getFleets()) {
+    for (BaseFleet rhsBaseFleet : newStar.getFleets()) {
       Fleet rhsFleet = (Fleet) rhsBaseFleet;
-      Fleet lhsFleet = (Fleet) lhs.getFleet(Integer.parseInt(rhsFleet.getKey()));
+      Fleet lhsFleet = (Fleet) oldStart.getFleet(Integer.parseInt(rhsFleet.getKey()));
       if (lhsFleet == null) {
         return false;
       }
@@ -177,16 +185,16 @@ public class SectorManager extends BaseManager {
   }
 
   private static class SectorCache implements RealmManager.RealmChangedHandler {
-    LruCache<String, Sector> mSectors;
+    LruCache<String, Sector> sectors;
 
     public SectorCache() {
-      mSectors = new LruCache<>(30);
+      sectors = new LruCache<>(30);
 
       RealmManager.i.addRealmChangedHandler(this);
     }
 
     public void clear() {
-      mSectors.evictAll();
+      sectors.evictAll();
     }
 
     public static String key(Pair<Long, Long> coord) {
@@ -194,11 +202,11 @@ public class SectorManager extends BaseManager {
     }
 
     public Sector get(Pair<Long, Long> coords) {
-      return mSectors.get(key(coords));
+      return sectors.get(key(coords));
     }
 
     public void put(Pair<Long, Long> coords, Sector s) {
-      mSectors.put(key(coords), s);
+      sectors.put(key(coords), s);
     }
 
     /** When we switch realms, we'll want to clear out the cache. */
