@@ -170,7 +170,11 @@ public class EmpireStarsFetcher {
           @Override
           public void onRequestComplete(ApiRequest request) {
             int index = Integer.parseInt(request.bodyString());
-            onCompleteHandler.onIndexOfComplete(index);
+            if (index < 0) {
+              onCompleteHandler.onIndexOfComplete(null);
+            } else {
+              onCompleteHandler.onIndexOfComplete(index);
+            }
           }
         }).build());
   }
@@ -203,7 +207,7 @@ public class EmpireStarsFetcher {
     if (lastIndex >= numStars) {
       lastIndex = numStars - 1;
     }
-    url.append(Integer.toString(lastIndex + 5));
+    url.append(Integer.toString(lastIndex));
     appendFilterAndSearch(url);
     log.debug("Fetching: %s", url);
 
