@@ -11,11 +11,15 @@ import android.text.Html;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.common.base.Preconditions;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.TimeFormatter;
@@ -77,7 +81,7 @@ public class EmpireRankList extends ListView {
     RankListAdapter.ItemEntry entry =
         (RankListAdapter.ItemEntry) mRankListAdapter.getItem(position);
     if (entry != null) {
-      return entry.empire;
+      return entry.getEmpire();
     }
     return null;
   }
@@ -132,10 +136,10 @@ public class EmpireRankList extends ListView {
 
       boolean refreshedAll = true;
       for (ItemEntry entry : mEntries) {
-        if (entry.rank.getEmpireKey().equals(empire.getKey())) {
-          entry.empire = empire;
+        if (entry.getRank() != null && entry.getRank().getEmpireKey().equals(empire.getKey())) {
+          entry.setEmpire(empire);
         }
-        if (entry.empire == null) {
+        if (entry.getEmpire() == null) {
           refreshedAll = false;
         }
       }
@@ -152,27 +156,29 @@ public class EmpireRankList extends ListView {
       Collections.sort(entries, new Comparator<ItemEntry>() {
         @Override
         public int compare(ItemEntry lhs, ItemEntry rhs) {
-          // should never happen, but just in case...
-          if (lhs.rank == null || rhs.rank == null) {
-            if (lhs.empire == null || rhs.empire == null) {
+          if (lhs.getRank() == null || rhs.getRank() == null) {
+            if (lhs.getEmpire() == null || rhs.getEmpire() == null) {
               return 0;
             } else {
-              return lhs.empire.getDisplayName().compareTo(rhs.empire.getDisplayName());
+              return lhs.getEmpire().getDisplayName().compareTo(rhs.getEmpire().getDisplayName());
             }
           }
 
-          int lhsRank = lhs.rank.getRank();
-          int rhsRank = rhs.rank.getRank();
+          int lhsRank = lhs.getRank().getRank();
+          int rhsRank = rhs.getRank().getRank();
           return lhsRank - rhsRank;
         }
       });
 
       int lastRank = 0;
       for (ItemEntry entry : entries) {
-        if (lastRank != 0 && entry.rank.getRank() != lastRank + 1 && addGaps) {
+        if (entry.getRank() == null) {
+          continue;
+        }
+        if (lastRank != 0 && entry.getRank().getRank() != lastRank + 1 && addGaps) {
           mEntries.add(new ItemEntry());
         }
-        lastRank = entry.rank.getRank();
+        lastRank = entry.getRank().getRank();
         mEntries.add(entry);
       }
 
@@ -190,7 +196,7 @@ public class EmpireRankList extends ListView {
         return 0;
       }
 
-      if (mEntries.get(position).empire == null) {
+      if (mEntries.get(position).getEmpire() == null) {
         return 1;
       }
       return 0;
@@ -198,7 +204,7 @@ public class EmpireRankList extends ListView {
 
     @Override
     public boolean isEnabled(int position) {
-      return mEntries != null && mEntries.get(position).empire != null;
+      return mEntries != null && mEntries.get(position).getEmpire() != null;
     }
 
     @Override
@@ -228,16 +234,7 @@ public class EmpireRankList extends ListView {
       View view = convertView;
 
       if (view == null) {
-        if (entry.rank == null) {
-          view = new View(mContext);
-          view.setLayoutParams(
-              new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 10));
-        } else {
-          view = View.inflate(mContext, R.layout.empire_rank_list_ctrl_row, null);
-        }
-      }
-      if (entry.rank == null) {
-        return view;
+        view = View.inflate(mContext, R.layout.empire_rank_list_ctrl_row, null);
       }
 
       TextView rankView = (TextView) view.findViewById(R.id.rank);
@@ -252,8 +249,8 @@ public class EmpireRankList extends ListView {
       TextView allianceName = (TextView) view.findViewById(R.id.alliance_name);
       ImageView allianceIcon = (ImageView) view.findViewById(R.id.alliance_icon);
 
-      Empire empire = entry.empire;
-      EmpireRank rank = entry.rank;
+      Empire empire = entry.getEmpire();
+      EmpireRank rank = entry.getRank();
 
       if (empire != null) {
         empireName.setText(empire.getDisplayName());
@@ -281,25 +278,34 @@ public class EmpireRankList extends ListView {
         scheduleEmpireFetch(entry);
       }
 
-      DecimalFormat formatter = new DecimalFormat("#,##0");
-      rankView.setText(formatter.format(rank.getRank()));
-      totalPopulation.setText(Html.fromHtml(
-          String.format("Population: <b>%s</b>", formatter.format(rank.getTotalPopulation()))));
-      totalStars.setText(
-          Html.fromHtml(String.format("Stars: <b>%s</b>", formatter.format(rank.getTotalStars()))));
-      totalColonies.setText(Html.fromHtml(
-          String.format("Colonies: <b>%s</b>", formatter.format(rank.getTotalColonies()))));
-
-      MyEmpire myEmpire = EmpireManager.i.getEmpire();
-      if (rank.getTotalStars() > 10 || (empire != null && empire.getKey()
-          .equals(myEmpire.getKey()))) {
-        totalShips.setText(Html.fromHtml(
-            String.format("Ships: <b>%s</b>", formatter.format(rank.getTotalShips()))));
-        totalBuildings.setText(Html.fromHtml(
-            String.format("Buildings: <b>%s</b>", formatter.format(rank.getTotalBuildings()))));
-      } else {
+      if (rank == null) {
+        rankView.setText("");
+        totalPopulation.setText("");
+        totalStars.setText("");
+        totalColonies.setText("");
         totalShips.setText("");
         totalBuildings.setText("");
+      } else {
+        DecimalFormat formatter = new DecimalFormat("#,##0");
+        rankView.setText(formatter.format(rank.getRank()));
+        totalPopulation.setText(Html.fromHtml(
+            String.format("Population: <b>%s</b>", formatter.format(rank.getTotalPopulation()))));
+        totalStars.setText(Html.fromHtml(
+            String.format("Stars: <b>%s</b>", formatter.format(rank.getTotalStars()))));
+        totalColonies.setText(Html.fromHtml(
+            String.format("Colonies: <b>%s</b>", formatter.format(rank.getTotalColonies()))));
+
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        if (rank.getTotalStars() > 10 || (empire != null && empire.getKey()
+            .equals(myEmpire.getKey()))) {
+          totalShips.setText(Html.fromHtml(
+              String.format("Ships: <b>%s</b>", formatter.format(rank.getTotalShips()))));
+          totalBuildings.setText(Html.fromHtml(
+              String.format("Buildings: <b>%s</b>", formatter.format(rank.getTotalBuildings()))));
+        } else {
+          totalShips.setText("");
+          totalBuildings.setText("");
+        }
       }
 
       return view;
@@ -332,7 +338,9 @@ public class EmpireRankList extends ListView {
             protected void onComplete(final ArrayList<ItemEntry> toFetch) {
               ArrayList<Integer> empireIDs = new ArrayList<>();
               for (ItemEntry entry : toFetch) {
-                empireIDs.add(entry.rank.getEmpireID());
+                if (entry.getRank() != null) {
+                  empireIDs.add(entry.getRank().getEmpireID());
+                }
               }
 
               EmpireManager.i.refreshEmpires(empireIDs);
@@ -346,19 +354,31 @@ public class EmpireRankList extends ListView {
     }
 
     public class ItemEntry {
-      public Empire empire;
-      public EmpireRank rank;
+      @Nullable private Empire empire;
+      @Nullable private EmpireRank rank;
 
       public ItemEntry() {
       }
 
       public ItemEntry(Empire empire) {
-        this.empire = empire;
-        this.rank = (EmpireRank) empire.getRank();
+        this.empire = Preconditions.checkNotNull(empire);
+        this.rank = Preconditions.checkNotNull((EmpireRank) empire.getRank());
       }
 
       public ItemEntry(EmpireRank rank) {
-        this.rank = rank;
+        this.rank = Preconditions.checkNotNull(rank);
+      }
+
+      @Nullable public Empire getEmpire() {
+        return empire;
+      }
+
+      public void setEmpire(@Nonnull Empire empire) {
+        this.empire = Preconditions.checkNotNull(empire);
+      }
+
+      @Nullable public EmpireRank getRank() {
+        return rank;
       }
     }
   }

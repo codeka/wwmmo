@@ -205,7 +205,7 @@ public class EmpireStarsFetcher {
     }
     lastIndex += 5; // fetch 5 more stars than we actually need
     if (lastIndex >= numStars) {
-      lastIndex = numStars - 1;
+      lastIndex = numStars + 4; // try to fetch a bit more
     }
     url.append(Integer.toString(lastIndex));
     appendFilterAndSearch(url);
