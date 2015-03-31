@@ -116,6 +116,10 @@ public class EmpiresStarsHandler extends RequestHandler {
     TreeMap<Integer, Integer> ids = new TreeMap<>();
     for (String s : indices.split(",")) {
       String[] parts = s.split("-");
+      if (parts.length != 2) {
+        log.error("Invalid indices string: %s", indices);
+        continue;
+      }
       int startIndex = Integer.parseInt(parts[0]);
       int endIndex = Integer.parseInt(parts[1]);
 
