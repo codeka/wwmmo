@@ -33,7 +33,6 @@ import java.util.Random;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
-import au.com.codeka.common.Tuple;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
@@ -85,64 +84,64 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
   @Override
   public void onLoadResources() {
-    BitmapTextureAtlas starTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(),
+    BitmapTextureAtlas starTextureAtlas = new BitmapTextureAtlas(activity.getTextureManager(),
         256, 384, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
     starTextureAtlas.setTextureAtlasStateListener(
         new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
 
     normalStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(
-        starTextureAtlas, mActivity, "stars/stars_small.png", 0, 0, 4, 6);
+        starTextureAtlas, activity, "stars/stars_small.png", 0, 0, 4, 6);
     bigStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(
-        starTextureAtlas, mActivity, "stars/stars_small.png", 0, 0, 2, 3);
+        starTextureAtlas, activity, "stars/stars_small.png", 0, 0, 2, 3);
 
     BitmapTextureAtlas backgroundGasTextureAtlas = new BitmapTextureAtlas(
-        mActivity.getTextureManager(), 512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        activity.getTextureManager(), 512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
     backgroundGasTextureAtlas.setTextureAtlasStateListener(
         new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
 
     backgroundGasTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(
-        backgroundGasTextureAtlas, mActivity, "decoration/gas.png", 0, 0, 4, 4);
+        backgroundGasTextureAtlas, activity, "decoration/gas.png", 0, 0, 4, 4);
     BitmapTextureAtlas backgroundStarsTextureAtlas = new BitmapTextureAtlas(
-        mActivity.getTextureManager(), 512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        activity.getTextureManager(), 512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
     backgroundStarsTextureRegion = BitmapTextureAtlasTextureRegionFactory
-        .createTiledFromAsset(backgroundStarsTextureAtlas, mActivity, "decoration/starfield.png",
+        .createTiledFromAsset(backgroundStarsTextureAtlas, activity, "decoration/starfield.png",
             0, 0, 4, 4);
 
     BuildableBitmapTextureAtlas iconTextureAtlas = new BuildableBitmapTextureAtlas(
-        mActivity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
     iconTextureAtlas.setTextureAtlasStateListener(
         new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
 
     arrowIconTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
-        iconTextureAtlas, mActivity, "img/arrow.png");
+        iconTextureAtlas, activity, "img/arrow.png");
 
     BuildableBitmapTextureAtlas fleetSpriteTextureAtlas = new BuildableBitmapTextureAtlas(
-        mActivity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
     fleetSpriteTextureAtlas.setTextureAtlasStateListener(
         new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
 
     fleetSpriteTextures = new HashMap<>();
     fleetSpriteTextures.put("ship.fighter", BitmapTextureAtlasTextureRegionFactory
-        .createFromAsset(fleetSpriteTextureAtlas, mActivity, "spritesheets/ship.fighter.png"));
+        .createFromAsset(fleetSpriteTextureAtlas, activity, "spritesheets/ship.fighter.png"));
     fleetSpriteTextures.put("ship.scout", BitmapTextureAtlasTextureRegionFactory
-        .createFromAsset(fleetSpriteTextureAtlas, mActivity, "spritesheets/ship.scout.png"));
+        .createFromAsset(fleetSpriteTextureAtlas, activity, "spritesheets/ship.scout.png"));
     fleetSpriteTextures.put("ship.colony", BitmapTextureAtlasTextureRegionFactory
-        .createFromAsset(fleetSpriteTextureAtlas, mActivity, "spritesheets/ship.colony.png"));
+        .createFromAsset(fleetSpriteTextureAtlas, activity, "spritesheets/ship.colony.png"));
     fleetSpriteTextures.put("ship.troopcarrier", BitmapTextureAtlasTextureRegionFactory
-        .createFromAsset(fleetSpriteTextureAtlas, mActivity, "spritesheets/ship.troopcarrier.png"));
+        .createFromAsset(fleetSpriteTextureAtlas, activity, "spritesheets/ship.troopcarrier.png"));
     fleetSpriteTextures.put("ship.wormhole-generator", BitmapTextureAtlasTextureRegionFactory
-        .createFromAsset(fleetSpriteTextureAtlas, mActivity,
+        .createFromAsset(fleetSpriteTextureAtlas, activity,
             "spritesheets/ship.wormhole-generator.png"));
     fleetSpriteTextures.put("ship.upgrade.boost", BitmapTextureAtlasTextureRegionFactory
-        .createTiledFromAsset(fleetSpriteTextureAtlas, mActivity,
+        .createTiledFromAsset(fleetSpriteTextureAtlas, activity,
             "spritesheets/ship.upgrade.boost.png", 2, 1));
 
-    mActivity.getShaderProgramManager().loadShaderProgram(RadarIndicatorEntity.getShaderProgram());
-    mActivity.getShaderProgramManager().loadShaderProgram(
+    activity.getShaderProgramManager().loadShaderProgram(RadarIndicatorEntity.getShaderProgram());
+    activity.getShaderProgramManager().loadShaderProgram(
         WormholeDisruptorIndicatorEntity.getShaderProgram());
-    mActivity.getTextureManager().loadTexture(starTextureAtlas);
-    mActivity.getTextureManager().loadTexture(backgroundGasTextureAtlas);
-    mActivity.getTextureManager().loadTexture(backgroundStarsTextureAtlas);
+    activity.getTextureManager().loadTexture(starTextureAtlas);
+    activity.getTextureManager().loadTexture(backgroundGasTextureAtlas);
+    activity.getTextureManager().loadTexture(backgroundStarsTextureAtlas);
 
     try {
       BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas> builder =
@@ -156,7 +155,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
       log.error("Error building texture atlas.", e);
     }
 
-    font = FontFactory.create(mActivity.getFontManager(), mActivity.getTextureManager(), 256, 256,
+    font = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256,
         Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 16, true, Color.WHITE);
     font.load();
   }
@@ -214,7 +213,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
       return;
     }
 
-    if (mActivity.getEngine() == null) {
+    if (activity.getEngine() == null) {
       // if the engine hasn't been created yet, we can't really do anything.
       return;
     }
@@ -239,8 +238,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
     if (myEmpire != null && myEmpire.getHomeStar() != null) {
       // if you have a HQ, it'll be on your home star.
       if (BuildManager.i.getTotalBuildingsInEmpire("hq") > 0) {
-        hud.attachChild(new HqEntity(this, myEmpire.getHomeStar(), mActivity.getCamera(),
-            mActivity.getVertexBufferObjectManager()));
+        hud.attachChild(new HqEntity(this, myEmpire.getHomeStar(), activity.getCamera(),
+            activity.getVertexBufferObjectManager()));
       }
     }
   }
@@ -269,7 +268,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
       needUpdate = true;
     }
     if (needUpdate) {
-      mActivity.runOnUpdateThread(updateBackgroundRunnable);
+      activity.runOnUpdateThread(updateBackgroundRunnable);
     }
 
     // similarly, we fade IN the tactical view as you zoom out. It starts fading in a bit sooner
@@ -290,7 +289,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
       needUpdate = true;
     }
     if (needUpdate) {
-      mActivity.runOnUpdateThread(updateTacticalRunnable);
+      activity.runOnUpdateThread(updateTacticalRunnable);
     }
 
     if (wasTacticalVisible != isTacticalVisible || wasBackgroundVisible != isBackgroundVisible) {
@@ -390,7 +389,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
       for (int x = 0; x < Sector.SECTOR_SIZE / STAR_SIZE; x++) {
         Sprite bgSprite = new Sprite((float) (sx + (x * STAR_SIZE)), (float) (sy + (y * STAR_SIZE)),
             STAR_SIZE, STAR_SIZE, backgroundStarsTextureRegion.getTextureRegion(r.nextInt(16)),
-            mActivity.getVertexBufferObjectManager());
+            activity.getVertexBufferObjectManager());
         setBackgroundEntityZoomFactor(bgSprite);
         scene.attachBackground(bgSprite);
       }
@@ -403,7 +402,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
 
       Sprite bgSprite = new Sprite((sx + x) - (GAS_SIZE / 2.0f), (sy + y) - (GAS_SIZE / 2.0f),
           GAS_SIZE, GAS_SIZE, backgroundGasTextureRegion.getTextureRegion(r.nextInt(14)),
-          mActivity.getVertexBufferObjectManager());
+          activity.getVertexBufferObjectManager());
       setBackgroundEntityZoomFactor(bgSprite);
       scene.attachBackground(bgSprite);
     }
@@ -445,7 +444,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
    * is colored in depending on who owns the star underneath it.
    */
   private void addTacticalSprite(StarfieldScene scene, int offsetX, int offsetY, Sector sector) {
-    BitmapTextureAtlas textureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(),
+    BitmapTextureAtlas textureAtlas = new BitmapTextureAtlas(activity.getTextureManager(),
         256, 256, TextureOptions.NEAREST);
     TacticalBitmapTextureSource bitmapSource = TacticalBitmapTextureSource.create(sector);
     ITextureRegion textureRegion = BitmapTextureAtlasTextureRegionFactory.createFromSource(
@@ -455,7 +454,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
     TacticalOverlayEntity tacticalOverlayEntity = new TacticalOverlayEntity(
         offsetX + Sector.SECTOR_SIZE / 2, offsetY + Sector.SECTOR_SIZE / 2,
         Sector.SECTOR_SIZE, Sector.SECTOR_SIZE, textureRegion,
-        mActivity.getVertexBufferObjectManager());
+        activity.getVertexBufferObjectManager());
     setTacticalZoomFactor(tacticalOverlayEntity);
     scene.attachTacticalEntity(tacticalOverlayEntity, textureAtlas, textureRegion);
   }
@@ -500,7 +499,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
     }
 
     StarEntity starEntity = new StarEntity(this, star, (float) x, (float) y, textureRegion,
-        mActivity.getVertexBufferObjectManager(), !isTacticalVisible, 1.0f - tacticalZoomAlpha);
+        activity.getVertexBufferObjectManager(), !isTacticalVisible, 1.0f - tacticalZoomAlpha);
     scene.registerTouchArea(starEntity.getTouchEntity());
     scene.attachChild(starEntity);
   }
@@ -510,7 +509,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
    * sector.
    */
   public Vector2 getSectorOffset(long sx, long sy) {
-    return getSectorOffset(mSectorX, mSectorY, sx, sy);
+    return getSectorOffset(sectorX, sectorY, sx, sy);
   }
 
   public Vector2 getSectorOffset(long sectorX, long sectorY, long sx, long sy) {
@@ -546,7 +545,7 @@ public class StarfieldSceneManager extends SectorSceneManager {
     destPoint.y += Sector.SECTOR_SIZE - destStar.getOffsetY();
 
     FleetEntity fleetEntity =
-        new FleetEntity(this, srcPoint, destPoint, fleet, mActivity.getVertexBufferObjectManager());
+        new FleetEntity(this, srcPoint, destPoint, fleet, activity.getVertexBufferObjectManager());
     scene.registerTouchArea(fleetEntity.getTouchEntity());
     scene.attachChild(fleetEntity);
   }
@@ -562,8 +561,8 @@ public class StarfieldSceneManager extends SectorSceneManager {
         float tx = touchEvent.getX();
         float ty = touchEvent.getY();
 
-        long sectorX = (long) (tx / Sector.SECTOR_SIZE) + mSectorX;
-        long sectorY = (long) (ty / Sector.SECTOR_SIZE) + mSectorY;
+        long sectorX = (long) (tx / Sector.SECTOR_SIZE) + this.sectorX;
+        long sectorY = (long) (ty / Sector.SECTOR_SIZE) + this.sectorY;
         int offsetX = (int) (tx - (tx / Sector.SECTOR_SIZE));
         int offsetY = Sector.SECTOR_SIZE - (int) (ty - (ty / Sector.SECTOR_SIZE));
         while (offsetX < 0) {
