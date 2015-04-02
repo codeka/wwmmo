@@ -16,11 +16,10 @@ import au.com.codeka.common.Log;
  */
 @Deprecated
 public class ApiClient {
-  private static final Log log = new Log("ApiClient");
-
   /**
    * Fetches a simple string from the given URL.
    */
+  @Deprecated
   public static String getString(String url) throws ApiException {
     final RequestFuture<String> future = new RequestFuture<>();
     RequestManager.i.sendRequest(
@@ -50,6 +49,7 @@ public class ApiClient {
    * \param protoBuffFactory the class that we want to fetch, this will also determine
    *        the return value of this method.
    */
+  @Deprecated
   public static <T extends Message> T getProtoBuf(String url, final Class<T> protoBuffFactory)
       throws ApiException {
     final RequestFuture<T> future = new RequestFuture<>();
@@ -71,17 +71,10 @@ public class ApiClient {
   }
 
   /**
-   * Uses the "PUT" HTTP method to put a protocol buffer at the given URL. This is useful when
-   * you don't expect a response (other than "201", success)
-   */
-  public static boolean putProtoBuf(String url, Message pb) throws ApiException {
-    return putOrPostProtoBuf("PUT", url, pb);
-  }
-
-  /**
    * Uses the "POST" HTTP method to post a protocol buffer at the given URL. This is useful when
    * you don't expect a response (other than "200", success)
    */
+  @Deprecated
   public static boolean postProtoBuf(String url, Message pb) throws ApiException {
     return putOrPostProtoBuf("POST", url, pb);
   }
@@ -93,15 +86,15 @@ public class ApiClient {
   private static boolean putOrPostProtoBuf(String method, String url, Message pb)
       throws ApiException {
 
-    RequestManager.i.sendRequest(new ApiRequest.Builder(url, method)
+    return RequestManager.i.sendRequestSync(new ApiRequest.Builder(url, method)
         .body(pb)
         .build());
-    return true;
   }
 
   /**
    * Uses the "PUT" HTTP method to put a protocol buffer at the given URL.
    */
+  @Deprecated
   public static <T extends Message> T putProtoBuf(String url, Message pb, Class<T> protoBuffFactory)
       throws ApiException {
     return putOrPostProtoBuff("PUT", url, pb, protoBuffFactory);
@@ -110,6 +103,7 @@ public class ApiClient {
   /**
    * Uses the "POST" HTTP method to post a protocol buffer at the given URL.
    */
+  @Deprecated
   public static <T extends Message> T postProtoBuf(String url, Message pb,
       Class<T> protoBuffFactory) throws ApiException {
     return putOrPostProtoBuff("POST", url, pb, protoBuffFactory);
@@ -118,30 +112,12 @@ public class ApiClient {
   private static <T extends Message> T putOrPostProtoBuff(String method, String url, Message pb,
       final Class<T> protoBuffFactory) throws ApiException {
 
-    final RequestFuture<T> future = new RequestFuture<>();
-    RequestManager.i.sendRequest(new ApiRequest.Builder(url, method)
-        .body(pb)
-        .completeCallback(new ApiRequest.CompleteCallback() {
-          @Override
-          public void onRequestComplete(ApiRequest request) {
-            future.set(request.body(protoBuffFactory));
-          }
-        })
-        .completeOnAnyThread(true)
-        .build());
-
-    try {
-      return future.get();
-    } catch (InterruptedException | ExecutionException e) {
-      throw new ApiException(e);
+    ApiRequest request = new ApiRequest.Builder(url, method).body(pb).build();
+    if (!RequestManager.i.sendRequestSync(request)) {
+      throw new ApiException();
     }
-  }
 
-  /**
-   * Sends a HTTP 'DELETE' to the given URL.
-   */
-  public static void delete(String url) throws ApiException {
-    RequestManager.i.sendRequest(new ApiRequest.Builder(url, "DELETE").build());
+    return request.body(protoBuffFactory);
   }
 
   private static class RequestFuture<T> implements Future<T> {

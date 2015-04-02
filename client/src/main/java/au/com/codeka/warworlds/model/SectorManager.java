@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
@@ -32,8 +31,6 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
  * sectors (so you can smoothly scroll, of course).
  */
 public class SectorManager extends BaseManager {
-  private static final Log log = new Log("SectorManager");
-
   public static final SectorManager i = new SectorManager();
   public static final EventBus eventBus = new EventBus();
 
@@ -42,27 +39,6 @@ public class SectorManager extends BaseManager {
   private final Map<String, Star> sectorStars = new TreeMap<>();
 
   private SectorManager() {
-    Object eventHandler = new Object() {
-      @EventHandler(thread = EventHandler.ANY_THREAD)
-      public void onStarUpdated(Star star) {
-        Star ourStar = findStar(star.getKey());
-        if (ourStar != null) {
-          if (!needsUpdate(ourStar, star)) {
-            sectorStars.put(star.getKey(), star);
-            Pair<Long, Long> coord = new Pair<>(star.getSectorX(), star.getSectorY());
-            Sector sector = sectors.get(coord);
-            if (sector != null) {
-              for (int i = 0; i < sector.getStars().size(); i++) {
-                if (sector.getStars().get(i).getKey().equals(star.getKey())) {
-                  sector.getStars().set(i, star);
-                  eventBus.publish(sector);
-                }
-              }
-            }
-          }
-        }
-      }
-    };
     StarManager.eventBus.register(eventHandler);
   }
 
@@ -121,7 +97,6 @@ public class SectorManager extends BaseManager {
           url += String.format("%d,%d", coord.one, coord.two);
         }
         url = "sectors?coords=" + url;
-        log.debug("Fetching sectors: %s", url);
 
         ApiRequest request = new ApiRequest.Builder(url, "GET")
             .completeCallback(new ApiRequest.CompleteCallback() {
@@ -158,18 +133,18 @@ public class SectorManager extends BaseManager {
    */
   private boolean needsUpdate(Star oldStart, Star newStar) {
     if (!oldStart.getName().equals(newStar.getName())) {
-      return false;
+      return true;
     }
 
     for (BaseFleet lhsBaseFleet : oldStart.getFleets()) {
       Fleet lhsFleet = (Fleet) lhsBaseFleet;
       Fleet rhsFleet = (Fleet) newStar.getFleet(Integer.parseInt(lhsFleet.getKey()));
       if (rhsFleet == null) {
-        return false;
+        return true;
       }
 
       if (lhsFleet.getState() != rhsFleet.getState()) {
-        return false;
+        return true;
       }
     }
 
@@ -177,11 +152,11 @@ public class SectorManager extends BaseManager {
       Fleet rhsFleet = (Fleet) rhsBaseFleet;
       Fleet lhsFleet = (Fleet) oldStart.getFleet(Integer.parseInt(rhsFleet.getKey()));
       if (lhsFleet == null) {
-        return false;
+        return true;
       }
     }
 
-    return true;
+    return false;
   }
 
   private static class SectorCache implements RealmManager.RealmChangedHandler {
@@ -215,6 +190,29 @@ public class SectorManager extends BaseManager {
       clear();
     }
   }
+
+  private final Object eventHandler = new Object() {
+    @EventHandler(thread = EventHandler.ANY_THREAD)
+    public void onStarUpdated(Star star) {
+      Star ourStar = findStar(star.getKey());
+      if (ourStar != null) {
+        if (needsUpdate(ourStar, star)) {
+          sectorStars.put(star.getKey(), star);
+          Pair<Long, Long> coord = new Pair<>(star.getSectorX(), star.getSectorY());
+          Sector sector = sectors.get(coord);
+          if (sector != null) {
+            for (int i = 0; i < sector.getStars().size(); i++) {
+              if (sector.getStars().get(i).getKey().equals(star.getKey())) {
+                sector.getStars().set(i, star);
+                eventBus.publish(sector);
+                return;
+              }
+            }
+          }
+        }
+      }
+    }
+  };
 
   public static class SectorListChangedEvent {
   }

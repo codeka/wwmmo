@@ -84,7 +84,6 @@ public class StarSimulationQueue {
           long startTime = SystemClock.elapsedRealtime();
           new Simulation(task.predict).simulate(star);
           long endTime = SystemClock.elapsedRealtime();
-          StarManager.eventBus.publish(star);
 
           StringBuilder sb = new StringBuilder();
           for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
@@ -94,6 +93,8 @@ public class StarSimulationQueue {
           log.info("Simulation of %d (%s) complete in %d ms (last simulation = %s) (Δ goods = %s)",
               star.getID(), star.getName(), endTime - startTime,
               TimeFormatter.create().format(lastSimulationTime), sb.toString().trim());
+
+          StarManager.eventBus.publish(star);
         } catch (Exception e) {
           log.error("Exception caught simulating stars.", e);
           return; // we'll get restarted when a new star needs to be simulated.

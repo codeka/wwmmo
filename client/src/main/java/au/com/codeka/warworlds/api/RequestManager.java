@@ -88,14 +88,16 @@ public class RequestManager {
     }
   }
 
-  public void sendRequestSync(ApiRequest apiRequest) {
+  public boolean sendRequestSync(ApiRequest apiRequest) {
     if (DBG) log.info(">> %s", apiRequest);
     apiRequest.getTiming().onRequestSent();
     try {
       Response resp = httpClient.newCall(apiRequest.buildOkRequest()).execute();
       apiRequest.handleResponse(resp);
+      return true;
     } catch (IOException e) {
-      // TODO: handle
+      log.error("Error in sendRequestSync.", e);
+      return false;
     }
   }
 
