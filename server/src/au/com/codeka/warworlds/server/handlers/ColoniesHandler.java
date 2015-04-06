@@ -59,13 +59,13 @@ public class ColoniesHandler extends RequestHandler {
         if (!fleet.getDesignID().equals("colonyship")) {
           continue;
         }
-        if (fleet.hasUpgrade("cryogenics")
-            && (colonyShipFleet == null || !colonyShipFleet.hasUpgrade("cryogenics"))) {
+        if (fleet.hasUpgrade("cryogenics") && (colonyShipFleet == null || !colonyShipFleet
+            .hasUpgrade("cryogenics"))) {
           // If this fleet has a cryogenics upgrade and the existing one doesn't, choose this fleet.
           colonyShipFleet = fleet;
         }
-        if (colonyShipFleet != null && colonyShipFleet.hasUpgrade("cryogenics")
-            && !fleet.hasUpgrade("cryogenics")) {
+        if (colonyShipFleet != null && colonyShipFleet.hasUpgrade("cryogenics") && !fleet
+            .hasUpgrade("cryogenics")) {
           // if the existing fleet has a cryogenics upgrade and this one doesn't, skip this one
           continue;
         }
