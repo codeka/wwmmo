@@ -17,7 +17,7 @@ public class EmpiresSearchHandler extends RequestHandler {
 
   @Override
   protected void get() throws RequestException {
-    ArrayList<Empire> empires = new ArrayList<Empire>();
+    ArrayList<Empire> empires = new ArrayList<>();
     EmpireController ctrl = new EmpireController();
 
     String str = getRequest().getParameter("email");
@@ -83,7 +83,7 @@ public class EmpiresSearchHandler extends RequestHandler {
       myAllianceID = getSession().getAllianceID();
     }
 
-    ArrayList<Integer> empiresToFetchTaxRateFor = new ArrayList<Integer>();
+    ArrayList<Integer> empiresToFetchTaxRateFor = new ArrayList<>();
     for (Empire empire : empires) {
       if (myAllianceID > 0 && empire.getAlliance() != null &&
           ((Alliance) empire.getAlliance()).getID() == myAllianceID) {
@@ -97,6 +97,7 @@ public class EmpiresSearchHandler extends RequestHandler {
       taxRates = new HashMap<>();
     }
 
+    StringBuilder etag = new StringBuilder();
     Messages.Empires.Builder pb = Messages.Empires.newBuilder();
     for (Empire empire : empires) {
       Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
@@ -120,7 +121,12 @@ public class EmpiresSearchHandler extends RequestHandler {
         log.debug(String.format("No tax for empire %d", empire.getID()));
       }
       pb.addEmpires(empire_pb);
+      etag.append(":");
+      etag.append(empire_pb.getKey());
     }
+    etag.append(":");
+
+    setCacheTime(24, etag.toString());
     setResponseBody(pb.build());
   }
 }

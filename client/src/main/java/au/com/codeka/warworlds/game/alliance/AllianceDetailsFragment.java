@@ -242,7 +242,7 @@ public class AllianceDetailsFragment extends Fragment
             populateEmpireList(membersList, members);
 
             if (missingMembers.size() > 0) {
-                EmpireManager.i.refreshEmpires(missingMembers);
+                EmpireManager.i.refreshEmpires(missingMembers, false);
             }
         }
     }

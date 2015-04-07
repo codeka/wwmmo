@@ -343,7 +343,7 @@ public class EmpireRankList extends ListView {
                 }
               }
 
-              EmpireManager.i.refreshEmpires(empireIDs);
+              EmpireManager.i.refreshEmpires(empireIDs, false);
 
               mEmpireFetcher = null;
             }

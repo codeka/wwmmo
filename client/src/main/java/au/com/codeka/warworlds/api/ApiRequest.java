@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.api;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -216,6 +217,11 @@ public class ApiRequest {
 
     public Builder(String url, String method) {
       this.url = url;
+      this.method = method;
+    }
+
+    public Builder(Uri uri, String method) {
+      this.url = uri.toString();
       this.method = method;
     }
 

@@ -1,30 +1,19 @@
 package au.com.codeka.warworlds.model;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import android.net.Uri;
+import android.support.v4.util.LruCache;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import javax.annotation.Nullable;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.support.v4.util.LruCache;
-import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.App;
-import au.com.codeka.warworlds.RealmContext;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.ApiRequest;
+import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventBus;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 
@@ -32,538 +21,225 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
  * Manages stuff about your empire (e.g. colonising planets and what-not).
  */
 public class EmpireManager {
-    private static final Log log = new Log("EmpireManager");
-    public static EmpireManager i = new EmpireManager();
+  public static final EmpireManager i = new EmpireManager();
 
-    public static final EventBus eventBus = new EventBus();
+  public static final EventBus eventBus = new EventBus();
 
-    private LruCache<Integer, Empire> mEmpireCache = new LruCache<Integer, Empire>(64);
-    private HashSet<Integer> mInProgress = new HashSet<Integer>();
-    private MyEmpire mEmpire;
-    private NativeEmpire mNativeEmpire = new NativeEmpire();
+  private LruCache<Integer, Empire> empireCache = new LruCache<>(64);
+  private final HashSet<Integer> inProgress = new HashSet<>();
+  private MyEmpire myEmpire;
+  private NativeEmpire nativeEmpire = new NativeEmpire();
 
-    private EmpireManager() {
-        AllianceManager.eventBus.register(eventHandler);
-    }
-
-    /**
-     * This is called when you first connect to the server. We need to pass in details about
-     * the empire and stuff.
-     */
-    public void setup(MyEmpire empire) {
-        mEmpire = empire;
-    }
-
-    /**
-     * Gets a reference to the current empire.
-     */
-    public MyEmpire getEmpire() {
-        return mEmpire;
-    }
-    public void clearEmpire() {
-        mEmpire = null;
-    }
-
-    public Empire getEmpire(Integer empireID) {
-        return getEmpire(empireID, false);
-    }
-
-    public Empire getEmpire(Integer empireID, boolean allowOld) {
-        if (empireID == null) {
-            return mNativeEmpire;
-        }
-
-        if (empireID == mEmpire.getID()) {
-            return mEmpire;
-        }
-
-        Empire empire = mEmpireCache.get(empireID);
-        if (empire != null) {
-            return empire;
-        }
-
-        // Refresh the empire from the server, but just return null for now.
-        refreshEmpire(empireID);
-        return null;
-    }
-
-    /**
-     * Gets all of the empires with the given IDs. If we don't have them all cached, you may not
-     * get all of the ones you ask for.
-     */
-    public List<Empire> getEmpires(Collection<Integer> empireIDs) {
-        return getEmpires(empireIDs, false);
-    }
-
-    /**
-     * Gets all of the empires with the given IDs. If we don't have them all cached, you may not
-     * get all of the ones you ask for.
-     */
-    public List<Empire> getEmpires(Collection<Integer> empireIDs, boolean allowOld) {
-        ArrayList<Empire> empires = new ArrayList<Empire>();
-        ArrayList<Integer> missing = new ArrayList<Integer>();
-
-        for(Integer empireID : empireIDs) {
-            if (empireID == mEmpire.getID()) {
-                empires.add(mEmpire);
-                continue;
-            }
-
-            Empire empire = mEmpireCache.get(empireID);
-            if (empire != null) {
-                empires.add(empire);
-                continue;
-            }
-
-            missing.add(empireID);
-        }
-
-        if (missing.size() > 0) {
-            refreshEmpires(missing);
-        }
-
-        return empires;
-    }
-
-    public List<Empire> getMatchingEmpiresFromCache(String filter) {
-        Messages.Empires empires_pb = new LocalEmpireStore().getMatchingEmpires(filter);
-        if (empires_pb == null) {
-            return null;
-        }
-
-        ArrayList<Empire> empires = new ArrayList<Empire>();
-        for (Messages.Empire empire_pb : empires_pb.getEmpiresList()) {
-            Empire empire = new Empire();
-            empire.fromProtocolBuffer(empire_pb);
-            empires.add(empire);
-        }
-
-        return empires;
-    }
-
-    public NativeEmpire getNativeEmpire() {
-        return mNativeEmpire;
-    }
-
-    public void refreshEmpire() {
-        if (mEmpire == null) {
-            return;
-        }
-
-        refreshEmpire(mEmpire.getID());
-    }
-
-    public void refreshEmpire(final Integer empireID, boolean force) {
-      if (empireID == null) {
-          // Nothing to do for native empires
-          return;
-      }
-
-      if (force) {
-          // if we're forcing, clear out the local store first
-          new LocalEmpireStore().removeEmpire(empireID);
-      }
-
-      refreshEmpire(empireID);
+  private EmpireManager() {
+    AllianceManager.eventBus.register(eventHandler);
   }
 
-    public void refreshEmpire(final Integer empireID) {
-        if (empireID == null) {
-            // Nothing to do for native empires
-            return;
-        }
+  /**
+   * This is called when you first connect to the server. We need to pass in details about
+   * the myEmpire and stuff.
+   */
+  public void setup(MyEmpire empire) {
+    this.myEmpire = empire;
+  }
 
-        ArrayList<Integer> empireIDs = new ArrayList<Integer>();
-        empireIDs.add(empireID);
-        refreshEmpires(empireIDs);
+  /**
+   * Gets a reference to the current empire.
+   */
+  public MyEmpire getEmpire() {
+    return myEmpire;
+  }
+
+  public void clearEmpire() {
+    myEmpire = null;
+  }
+
+  public Empire getEmpire(Integer empireID) {
+    if (empireID == null) {
+      return nativeEmpire;
     }
 
-    public void refreshEmpires(final Collection<Integer> empireIDs) {
-        final ArrayList<Integer> toFetch = new ArrayList<Integer>();
-
-        for (Integer empireID : empireIDs) {
-            if (!mInProgress.contains(empireID)) {
-                toFetch.add(empireID);
-                mInProgress.add(empireID);
-            }
-        }
-
-        if (toFetch.size() > 0) {
-            new BackgroundRunner<List<Empire>>() {
-                @Override
-                protected List<Empire> doInBackground() {
-                    try {
-                        return refreshEmpiresSync(toFetch);
-                    } catch (ApiException e) {
-                        log.error("An error occurred fetching empires.", e);
-                        return null;
-                    }
-                }
-
-                @Override
-                protected void onComplete(List<Empire> empires) {
-                    if (empires == null) {
-                        return; // BAD!
-                    }
-
-                    for (Empire empire : empires) {
-                        Integer empireID = empire.getID();
-
-                        if (mEmpire != null && empireID.intValue() == mEmpire.getID()) {
-                            mEmpire = (MyEmpire) empire;
-                        } else {
-                            mEmpireCache.put(empireID, empire);
-                        }
-
-                        mInProgress.remove(empire.getID());
-                        eventBus.publish(empire);
-                    }
-                }
-            }.execute();
-        }
+    if (empireID == myEmpire.getID()) {
+      return myEmpire;
     }
 
-    /**
-     * Synchronously fetch a list of empires. Note that we \i may return fewer empires than you
-     * requested, if some of them are already in-progress.
-     */
-    public List<Empire> refreshEmpiresSync(final Collection<Integer> empireKeys) throws ApiException {
-        ArrayList<Empire> empires = new ArrayList<Empire>();
-        LocalEmpireStore store = new LocalEmpireStore();
-
-        Iterator<Integer> iter = empireKeys.iterator();
-        while (iter.hasNext()) {
-            String url = null;
-            int num = 0;
-            while (iter.hasNext()) {
-                Integer empireID = iter.next();
-
-                // If it's in the empire store, then we don't need to fetch from the server, yay!
-                if (mEmpire != null && mEmpire.getID() != empireID) {
-                    Messages.Empire pb = new LocalEmpireStore().getEmpire(empireID, false);
-                    if (pb != null) {
-                        Empire empire = new Empire();
-                        empire.fromProtocolBuffer(pb);
-                        mEmpireCache.put(empireID, empire);
-                        empires.add(empire);
-                        continue;
-                    }
-                }
-
-                if (url == null) {
-                    url = "empires/search?ids=";
-                } else {
-                    url += ",";
-                }
-                url += empireID;
-                num ++;
-                if (num >= 25 || url.length() > 1000) {
-                    break;
-                }
-            }
-            if (url == null) {
-                break;
-            }
-
-            Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
-            for (Messages.Empire empire_pb : pb.getEmpiresList()) {
-                store.addEmpire(empire_pb);
-
-                if (mEmpire != null && empire_pb.getKey().equals(mEmpire.getKey())) {
-                    MyEmpire empire = new MyEmpire();
-                    empire.fromProtocolBuffer(empire_pb);
-                    empires.add(empire);
-                } else {
-                    Empire empire = new Empire();
-                    empire.fromProtocolBuffer(empire_pb);
-                    empires.add(empire);
-                    mEmpireCache.put(empire.getID(), empire);
-                }
-            }
-        }
-
-        return empires;
+    Empire empire = empireCache.get(empireID);
+    if (empire != null) {
+      return empire;
     }
 
-    // we cache the call below, because it's annoying when you switch between
-    // tabs to have to keep reloading the list for no real reason.
-    private int mLastFetchMinRank = 0;
-    private int mLastFetchMaxRank = 0;
-    private List<Empire> mLastRankFetchEmpires;
+    // Refresh the empire from the server, but just return null for now.
+    refreshEmpire(empireID, false);
+    return null;
+  }
 
-    /**
-     * Searches empires in the given rank range. This will always include the top three
-     * empires as well (since that's usually what you want in addition to the specific
-     * range you asked for as well).
-     */
-    public void searchEmpiresByRank(final int minRank, final int maxRank,
-                                    final SearchCompleteHandler handler) {
-        if (mLastFetchMinRank == minRank && mLastFetchMaxRank == maxRank) {
-            handler.onSearchComplete(mLastRankFetchEmpires);
-            return;
-        }
+  /**
+   * Gets all of the empires with the given IDs. If we don't have them all cached, you may not
+   * get all of the ones you ask for.
+   */
+  public List<Empire> getEmpires(Collection<Integer> empireIDs) {
+    ArrayList<Empire> empires = new ArrayList<>();
+    ArrayList<Integer> missing = new ArrayList<>();
 
-        new BackgroundRunner<List<Empire>>() {
-            @Override
-            protected List<Empire> doInBackground() {
-                List<Empire> empires = new ArrayList<Empire>();
+    for (Integer empireID : empireIDs) {
+      if (empireID == myEmpire.getID()) {
+        empires.add(myEmpire);
+        continue;
+      }
 
-                try {
-                    String url = "empires/search?minRank="+minRank+"&maxRank="+maxRank;
+      Empire empire = empireCache.get(empireID);
+      if (empire != null) {
+        empires.add(empire);
+        continue;
+      }
 
-                    Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
-
-                    LocalEmpireStore les = new LocalEmpireStore();
-                    for (Messages.Empire empire_pb : pb.getEmpiresList()) {
-                        les.addEmpire(empire_pb);
-                        Empire empire = new Empire();
-                        empire.fromProtocolBuffer(empire_pb);
-                        empires.add(empire);
-                    }
-                } catch(Exception e) {
-                    log.error("Error fetching empires.", e);
-                }
-
-                return empires;
-            }
-
-            @Override
-            protected void onComplete(List<Empire> empires) {
-                for (Empire empire : empires) {
-                    if (!empire.getKey().equals(mEmpire.getKey())) {
-                        mEmpireCache.put(empire.getID(), empire);
-                        eventBus.publish(empire);
-                    }
-                }
-
-                mLastFetchMinRank = minRank;
-                mLastFetchMaxRank = maxRank;
-                mLastRankFetchEmpires = empires;
-                handler.onSearchComplete(empires);
-            }
-        }.execute();
+      missing.add(empireID);
     }
 
-    public void searchEmpires(final Context context, final String nameSearch,
-                              final SearchCompleteHandler handler) {
-        new BackgroundRunner<List<Empire>>() {
-            @Override
-            protected List<Empire> doInBackground() {
-                List<Empire> empires = new ArrayList<Empire>();
-
-                try {
-                    String url = "empires/search?name="+nameSearch;
-
-                    Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
-
-                    LocalEmpireStore les = new LocalEmpireStore();
-                    for (Messages.Empire empire_pb : pb.getEmpiresList()) {
-                        les.addEmpire(empire_pb);
-                        Empire empire = new Empire();
-                        empire.fromProtocolBuffer(empire_pb);
-                        empires.add(empire);
-                    }
-                } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error("Error fetching empires.", e);
-                }
-
-                return empires;
-            }
-
-            @Override
-            protected void onComplete(List<Empire> empires) {
-                for (Empire empire : empires) {
-                    if (!empire.getKey().equals(mEmpire.getKey())) {
-                        mEmpireCache.put(empire.getID(), empire);
-                        eventBus.publish(empire);
-                    }
-                }
-
-                handler.onSearchComplete(empires);
-            }
-        }.execute();
+    if (missing.size() > 0) {
+      refreshEmpires(missing, false);
     }
 
-    private final Object eventHandler = new Object() {
-      @EventHandler
-      public void onAllianceUpdated(Alliance alliance) {
-        if (mEmpire != null && mEmpire.getAlliance() != null
-                && mEmpire.getAlliance().getKey().equals(alliance.getKey())) {
-            mEmpire.updateAlliance(alliance);
-            eventBus.publish(mEmpire);
+    return empires;
+  }
+
+  public NativeEmpire getNativeEmpire() {
+    return nativeEmpire;
+  }
+
+  public void refreshEmpire() {
+    if (myEmpire == null) {
+      return;
+    }
+
+    refreshEmpire(myEmpire.getID(), false);
+  }
+
+  public void refreshEmpire(final Integer empireID) {
+    refreshEmpire(empireID, false);
+  }
+
+  public void refreshEmpire(final Integer empireID, boolean skipCache) {
+    if (empireID == null) {
+      // Nothing to do for native empires
+      return;
+    }
+
+    ArrayList<Integer> empireIDs = new ArrayList<>();
+    empireIDs.add(empireID);
+    refreshEmpires(empireIDs, skipCache);
+  }
+
+  public void refreshEmpires(final Collection<Integer> empireIDs, boolean skipCache) {
+    for (Integer empireID : empireIDs) {
+      synchronized (inProgress) {
+        if (!inProgress.contains(empireID)) {
+          inProgress.add(empireID);
+        } else {
+          continue;
         }
 
-        for (Map.Entry<Integer, Empire> entry : mEmpireCache.snapshot().entrySet()) {
-            Empire empire = entry.getValue();
-            if (empire != null && empire.getAlliance() != null
-                    && empire.getAlliance().getKey().equals(alliance.getKey())) {
-                empire.updateAlliance(alliance);
-                eventBus.publish(empire);
-            }
-        }
+        String url = String.format("empires/search?ids=%d", empireID);
+        RequestManager.i.sendRequest(new ApiRequest.Builder(url, "GET")
+            .completeCallback(createSearchCompleteCallback(null))
+            .errorCallback(refreshEmpiresErrorCallback)
+            .skipCache(skipCache).build());
+      }
+    }
+  }
+
+  private final ApiRequest.ErrorCallback refreshEmpiresErrorCallback =
+    new ApiRequest.ErrorCallback() {
+      @Override
+      public void onRequestError(ApiRequest request, Messages.GenericError error) {
+        // TODO: handle errors
       }
     };
 
-    private static class LocalEmpireStore extends SQLiteOpenHelper {
-        private static Object sLock = new Object();
+  /**
+   * Searches empires in the given rank range. This will always include the top three
+   * empires as well (since that's usually what you want in addition to the specific
+   * range you asked for as well).
+   */
+  public void searchEmpiresByRank(final int minRank, final int maxRank,
+      final SearchCompleteHandler handler) {
+    Uri uri = Uri.parse("empires/search")
+        .buildUpon()
+        .appendQueryParameter("minRank", Integer.toString(minRank))
+        .appendQueryParameter("maxRank", Integer.toString(maxRank))
+        .build();
+    RequestManager.i.sendRequest(new ApiRequest.Builder(uri, "GET")
+        .completeCallback(createSearchCompleteCallback(handler))
+        .build());
+  }
 
-        public LocalEmpireStore() {
-            super(App.i, "empires.db", null, 4);
+  public void searchEmpires(final String nameSearch, final SearchCompleteHandler handler) {
+    Uri uri = Uri.parse("empires/search")
+        .buildUpon()
+        .appendQueryParameter("name", nameSearch)
+        .build();
+    RequestManager.i.sendRequest(new ApiRequest.Builder(uri, "GET")
+        .completeCallback(createSearchCompleteCallback(handler))
+        .build());
+  }
+
+  private ApiRequest.CompleteCallback createSearchCompleteCallback(
+      @Nullable final SearchCompleteHandler handler) {
+    return new ApiRequest.CompleteCallback() {
+      @Override
+      public void onRequestComplete(ApiRequest request) {
+        List<Empire> empires = new ArrayList<>();
+
+        Messages.Empires pbs = request.body(Messages.Empires.class);
+        if (pbs == null) {
+          return;
+        }
+        for (Messages.Empire pb : pbs.getEmpiresList()) {
+          Empire newEmpire = new Empire();
+          newEmpire.fromProtocolBuffer(pb);
+          empires.add(newEmpire);
+
+          if (myEmpire != null && pb.getKey().equals(myEmpire.getKey())) {
+            MyEmpire myEmpire = new MyEmpire();
+            myEmpire.fromProtocolBuffer(pb);
+            newEmpire = myEmpire;
+            EmpireManager.this.myEmpire = myEmpire;
+          } else {
+            newEmpire.fromProtocolBuffer(pb);
+            empireCache.put(newEmpire.getID(), newEmpire);
+          }
+
+          empireCache.put(newEmpire.getID(), newEmpire);
+          eventBus.publish(newEmpire);
         }
 
-        /**
-         * This is called the first time we open the database, in order to create the required
-         * tables, etc.
-         */
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE empires ("
-                      +"  id INTEGER PRIMARY KEY,"
-                      +"  realm_id INTEGER,"
-                      +"  empire_key STRING,"
-                      +"  empire_name STRING,"
-                      +"  empire BLOB,"
-                      +"  timestamp INTEGER);");
-            db.execSQL("CREATE INDEX IX_empire_key_realm_id ON empires (empire_key, realm_id)");
-            db.execSQL("CREATE INDEX IX_empire_name_realm_id ON empires (empire_name, realm_id)");
+        if (handler != null) {
+          handler.onSearchComplete(empires);
         }
+      }
+    };
+  }
 
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (oldVersion < 2) {
-                db.execSQL("ALTER TABLE empires "
-                          +"ADD COLUMN timestamp INTEGER DEFAULT 0;");
-            }
-            if (oldVersion < 3) {
-                db.execSQL("ALTER TABLE empires "
-                          +"ADD COLUMN realm_id INTEGER DEFAULT "+RealmManager.BETA_REALM_ID);
-                db.execSQL("CREATE INDEX IX_empire_key_realm_id ON empires (empire_key, realm_id)");
-            }
-            if (oldVersion < 4) {
-                db.execSQL("ALTER TABLE empires "
-                          +"ADD COLUMN empire_name STRING");
-                db.execSQL("CREATE INDEX IX_empire_name_realm_id ON empires (empire_name, realm_id)");
-                // Note: we don't bother populating the empire_name column, since it's only used
-                // for filtering and it'll be populated anyway the next time the empire is fetched.
-            }
+  private final Object eventHandler = new Object() {
+    @EventHandler
+    public void onAllianceUpdated(Alliance alliance) {
+      if (myEmpire != null && myEmpire.getAlliance() != null && myEmpire.getAlliance().getKey()
+          .equals(alliance.getKey())) {
+        myEmpire.updateAlliance(alliance);
+        eventBus.publish(myEmpire);
+      }
+
+      for (Map.Entry<Integer, Empire> entry : empireCache.snapshot().entrySet()) {
+        Empire empire = entry.getValue();
+        if (empire != null && empire.getAlliance() != null && empire.getAlliance().getKey()
+            .equals(alliance.getKey())) {
+          empire.updateAlliance(alliance);
+          eventBus.publish(empire);
         }
-
-        public void addEmpire(Messages.Empire empire) {
-            synchronized(sLock) {
-                SQLiteDatabase db = getWritableDatabase();
-                try {
-                    ByteArrayOutputStream empireBlob = new ByteArrayOutputStream();
-                    try {
-                        empire.writeTo(empireBlob);
-                    } catch (IOException e) {
-                        // we won't get the notification, but not the end of the world...
-                        return;
-                    }
-
-                    // delete any old cached values first
-                    db.delete("empires", getWhereClause(Integer.parseInt(empire.getKey())), null);
-
-                    // insert a new cached value
-                    ContentValues values = new ContentValues();
-                    values.put("empire", empireBlob.toByteArray());
-                    values.put("empire_key", empire.getKey());
-                    values.put("empire_name", empire.getDisplayName());
-                    values.put("realm_id", RealmContext.i.getCurrentRealm().getID());
-                    values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
-                    db.insert("empires", null, values);
-                } catch(Exception e) {
-                    // ignore errors... todo: log them
-                } finally {
-                    db.close();
-                }
-            }
-        }
-
-        public void removeEmpire(int empireID) {
-            synchronized(sLock) {
-                SQLiteDatabase db = getWritableDatabase();
-                db.delete("empires", getWhereClause(empireID), null);
-            }
-        }
-
-        public Messages.Empires getMatchingEmpires(String filter) {
-            synchronized(sLock) {
-                SQLiteDatabase db = getReadableDatabase();
-                Cursor cursor = null;
-                try {
-                    cursor = db.query("empires", new String[] {"empire", "empire_name", "timestamp"},
-                            getFilterClause(filter),
-                            null, null, null, "empire_name");
-
-                    Messages.Empires.Builder empires_pb = Messages.Empires.newBuilder();
-                    if (cursor.moveToFirst()) {
-                        while (true) {
-                            // NOTE: we ignore the timestamp for this operation.
-                            Messages.Empire empire_pb = Messages.Empire.parseFrom(cursor.getBlob(0));
-                            empires_pb.addEmpires(empire_pb);
-    
-                            if (!cursor.moveToNext()) {
-                                break;
-                            }
-                        }
-                    }
-
-                    return empires_pb.build();
-                } catch (Exception e) {
-                    log.error("Error occured fetching matching empires.", e);
-                    return null;
-                } finally {
-                    if (cursor != null) cursor.close();
-                    db.close();
-                }
-
-            }
-        }
-
-        public Messages.Empire getEmpire(Integer empireID, boolean allowOld) {
-            synchronized(sLock) {
-                SQLiteDatabase db = getReadableDatabase();
-                Cursor cursor = null;
-                try {
-                    cursor = db.query("empires", new String[] {"empire", "timestamp"},
-                            getWhereClause(empireID),
-                            null, null, null, null);
-                    if (!cursor.moveToFirst()) {
-                        cursor.close();
-                        return null;
-                    }
-
-                    // if it's too old, we'll want to refresh it anyway from the server
-                    if (!allowOld) {
-                        long timestamp = cursor.getLong(1);
-                        long oneDayAgo = DateTime.now(DateTimeZone.UTC).minusDays(1).getMillis();
-                        if (timestamp == 0 || timestamp < oneDayAgo) {
-                            return null;
-                        }
-                    }
-
-                    return Messages.Empire.parseFrom(cursor.getBlob(0));
-                } catch (Exception e) {
-                    // todo: log errors
-                    return null;
-                } finally {
-                    if (cursor != null) cursor.close();
-                    db.close();
-                }
-            }
-        }
-
-        private String getWhereClause(Integer empireID) {
-            return "empire_key = '"+empireID+"' AND realm_id="+RealmContext.i.getCurrentRealm().getID();
-        }
-
-        private String getFilterClause(String empireName) {
-            return "empire_name LIKE '%"+empireName.replace('\'', ' ').replace('%', ' ')+"%' AND realm_id="+RealmContext.i.getCurrentRealm().getID();
-        }
+      }
     }
+  };
 
-    public interface SearchCompleteHandler {
-        public void onSearchComplete(List<Empire> empires);
-    }
+  public interface SearchCompleteHandler {
+    public void onSearchComplete(List<Empire> empires);
+  }
 }

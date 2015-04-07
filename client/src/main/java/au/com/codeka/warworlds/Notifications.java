@@ -339,7 +339,7 @@ public class Notifications {
     String empireName = "Chat";
 
     if (first) {
-      Empire empire = EmpireManager.i.getEmpire(Integer.parseInt(msg.getEmpireKey()), true);
+      Empire empire = EmpireManager.i.getEmpire(Integer.parseInt(msg.getEmpireKey()));
       if (empire != null) {
         empireName = empire.getDisplayName();
 

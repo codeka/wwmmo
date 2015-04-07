@@ -122,17 +122,9 @@ public class ChatManager {
         }).build());
   }
 
-  public void addParticipant(final Context context, final ChatConversation conversation,
+  public void addParticipant(final ChatConversation conversation,
       final String empireName) {
-    // look in the cache first, it'll be quicker and one less request to the server...
-    List<Empire> empires = EmpireManager.i.getMatchingEmpiresFromCache(empireName);
-    if (empires != null && empires.size() > 0) {
-      addParticipant(conversation, empires.get(0));
-      return;
-    }
-
-    // otherwise we'll have to query the server anyway.
-    EmpireManager.i.searchEmpires(context, empireName, new EmpireManager.SearchCompleteHandler() {
+    EmpireManager.i.searchEmpires(empireName, new EmpireManager.SearchCompleteHandler() {
       @Override
       public void onSearchComplete(List<Empire> empires) {
         if (empires.isEmpty()) {
