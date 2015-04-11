@@ -1,10 +1,5 @@
 package au.com.codeka.warworlds;
 
-import java.io.File;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -17,12 +12,20 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.google.android.gcm.GCMRegistrar;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+
+import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.ErrorReporter;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.ctrl.BannerAdView;
 import au.com.codeka.warworlds.model.BuildManager;
@@ -31,9 +34,6 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
-
-import com.google.android.gcm.GCMRegistrar;
-import com.google.android.gms.auth.UserRecoverableAuthException;
 
 /**
  * This class is used to make sure we're said "Hello" to the server and that we've got our
@@ -147,7 +147,6 @@ public class ServerGreeter {
       return;
     }
 
-    serverGreeting.mIsConnected = false;
     if (handler == null) {
       handler = new Handler();
     }
@@ -155,13 +154,13 @@ public class ServerGreeter {
     RequestManager.i.setup(activity);
 
     new BackgroundRunner<String>() {
-      private boolean mNeedsEmpireSetup;
-      private boolean mErrorOccured;
-      private boolean mNeedsReAuthenticate;
-      private boolean mWasEmpireReset;
-      private String mResetReason;
-      private String mToastMessage;
-      private Intent mIntent;
+      private boolean needsEmpireSetup;
+      private boolean errorOccured;
+      private boolean needsReAuthenticate;
+      private boolean wasEmpireReset;
+      private String resetReason;
+      private String toastMessage;
+      private Intent intent;
 
       @Override
       protected String doInBackground() {
@@ -182,14 +181,14 @@ public class ServerGreeter {
             log.info("Not authenticated, re-authenticating.");
             realm.getAuthenticator().authenticate(activity, realm);
           } catch (ApiException e) {
-            mErrorOccured = true;
+            errorOccured = true;
             // if it wasn't a network error, it probably means we need to re-auth.
-            mNeedsReAuthenticate = !e.networkError();
+            needsReAuthenticate = !e.networkError();
             if (e.getCause() instanceof UserRecoverableAuthException) {
-              mIntent = ((UserRecoverableAuthException) e.getCause()).getIntent();
+              intent = ((UserRecoverableAuthException) e.getCause()).getIntent();
             }
             if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
-              mToastMessage = e.getServerErrorMessage();
+              toastMessage = e.getServerErrorMessage();
             }
             return null;
           }
@@ -203,11 +202,11 @@ public class ServerGreeter {
           try {
             deviceRegistrationKey = DeviceRegistrar.register();
           } catch (ApiException e) {
-            mErrorOccured = true;
+            errorOccured = true;
             // only re-authenticate for non-network related errors
-            mNeedsReAuthenticate = !e.networkError();
+            needsReAuthenticate = !e.networkError();
             if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
-              mToastMessage = e.getServerErrorMessage();
+              toastMessage = e.getServerErrorMessage();
             }
             return null;
           }
@@ -226,33 +225,38 @@ public class ServerGreeter {
 
         // say hello to the server
         String message;
-        try {
-          int memoryClass = ((ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE))
-              .getMemoryClass();
-          Messages.HelloRequest req =
-              Messages.HelloRequest.newBuilder().setDeviceBuild(android.os.Build.DISPLAY)
-                  .setDeviceManufacturer(android.os.Build.MANUFACTURER)
-                  .setDeviceModel(android.os.Build.MODEL)
-                  .setDeviceVersion(android.os.Build.VERSION.RELEASE).setMemoryClass(memoryClass)
-                  .setAllowInlineNotfications(false).setNoStarList(true).build();
+        int memoryClass = ((ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE))
+            .getMemoryClass();
+        Messages.HelloRequest req =
+            Messages.HelloRequest.newBuilder().setDeviceBuild(android.os.Build.DISPLAY)
+                .setDeviceManufacturer(android.os.Build.MANUFACTURER)
+                .setDeviceModel(android.os.Build.MODEL)
+                .setDeviceVersion(android.os.Build.VERSION.RELEASE).setMemoryClass(memoryClass)
+                .setAllowInlineNotfications(false).setNoStarList(true).build();
 
-          String url = "hello/" + deviceRegistrationKey;
-          Messages.HelloResponse resp =
-              ApiClient.putProtoBuf(url, req, Messages.HelloResponse.class);
-          log.info("GOT RESPONSE FROM HELLO REQUEST!");
+        String url = "hello/" + deviceRegistrationKey;
+        ApiRequest request = new ApiRequest.Builder(url, "PUT").body(req).build();
+        RequestManager.i.sendRequestSync(request);
+        if (request.error() == null) {
+          Messages.HelloResponse resp = request.body(Messages.HelloResponse.class);
+          if (resp == null) {
+            errorOccured = true;
+            return "Unknown error";
+          }
+
           if (resp.hasEmpire()) {
-            mNeedsEmpireSetup = false;
+            needsEmpireSetup = false;
             MyEmpire myEmpire = new MyEmpire();
             myEmpire.fromProtocolBuffer(resp.getEmpire());
             EmpireManager.i.setup(myEmpire);
           } else {
-            mNeedsEmpireSetup = true;
+            needsEmpireSetup = true;
           }
 
           if (resp.hasWasEmpireReset() && resp.getWasEmpireReset()) {
-            mWasEmpireReset = true;
+            wasEmpireReset = true;
             if (resp.hasEmpireResetReason() && resp.getEmpireResetReason().length() > 0) {
-              mResetReason = resp.getEmpireResetReason();
+              resetReason = resp.getEmpireResetReason();
             }
           }
 
@@ -269,32 +273,36 @@ public class ServerGreeter {
           BuildManager.i.setup(resp.getBuildingStatistics());
 
           message = resp.getMotd().getMessage();
-          mErrorOccured = false;
-        } catch (ApiException e) {
-          log.error("Error occurred in 'hello'", e);
+          errorOccured = false;
+        } else {
+          log.error("Error occurred in 'hello': %s", request.error().getErrorMessage());
 
-          if (e.getHttpStatusMessage() == null) {
+          @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+          Throwable exception = request.exception();
+          if (exception != null
+                && (exception.getCause() instanceof UserRecoverableAuthException)) {
+              message = "<p class=\"error\">Authentication failed.</p>";
+              errorOccured = true;
+              needsReAuthenticate = true;
+              intent = ((UserRecoverableAuthException) exception.getCause()).getIntent();
+          } else if (exception != null) {
             // if there's no status message, it likely means we were unable to connect
             // (i.e. a network error) just keep retrying until it works.
-            message = "<p class=\"error\">An error occured talking to the server, check "
+            message = "<p class=\"error\">An error occurred talking to the server, check "
                 + "data connection.</p>";
-            mErrorOccured = true;
-            mNeedsReAuthenticate = false;
-          } else if (e.getCause() instanceof UserRecoverableAuthException) {
-            message = "<p class=\"error\">Authentication failed.</p>";
-            mErrorOccured = true;
-            mNeedsReAuthenticate = true;
-            mIntent = ((UserRecoverableAuthException) e.getCause()).getIntent();
-          } else if (e.getHttpStatusCode() == 403) {
+            errorOccured = true;
+            needsReAuthenticate = false;
+          } else if (request.error().getErrorCode()
+              == Messages.GenericError.ErrorCode.AuthenticationError.getNumber()) {
             // if it's an authentication problem, we'll want to re-authenticate
             message = "<p class=\"error\">Authentication failed.</p>";
-            mErrorOccured = true;
-            mNeedsReAuthenticate = true;
+            errorOccured = true;
+            needsReAuthenticate = true;
           } else {
             // any other HTTP error, let's display that
-            message = "<p class=\"error\">AN ERROR OCCURED.</p>";
-            mErrorOccured = true;
-            mNeedsReAuthenticate = false;
+            message = "<p class=\"error\">AN ERROR OCCURRED.</p>";
+            errorOccured = true;
+            needsReAuthenticate = false;
           }
         }
 
@@ -303,12 +311,10 @@ public class ServerGreeter {
 
       @Override
       protected void onComplete(String result) {
-        serverGreeting.mIsConnected = true;
-
-        if (mNeedsEmpireSetup) {
+        if (needsEmpireSetup) {
           serverGreeting.mIntent = new Intent(activity, EmpireSetupActivity.class);
           helloComplete = true;
-        } else if (!mErrorOccured) {
+        } else if (!errorOccured) {
           Util.setup(activity);
           ChatManager.i.setup();
           Notifications.startLongPoll();
@@ -316,17 +322,14 @@ public class ServerGreeter {
           // make sure we're correctly registered as online.
           BackgroundDetector.i.onBackgroundStatusChange();
 
-          serverGreeting.mMessageOfTheDay = result;
           helloComplete = true;
-        } else /* mErrorOccured */ {
-          serverGreeting.mIsConnected = false;
-
-          if (mToastMessage != null && mToastMessage.length() > 0) {
-            Toast toast = Toast.makeText(App.i, mToastMessage, Toast.LENGTH_LONG);
+        } else /* errorOccured */ {
+          if (toastMessage != null && toastMessage.length() > 0) {
+            Toast toast = Toast.makeText(App.i, toastMessage, Toast.LENGTH_LONG);
             toast.show();
           }
 
-          if (mNeedsReAuthenticate) {
+          if (needsReAuthenticate) {
             // if we need to re-authenticate, first forget the current credentials
             // the switch to the AccountsActivity.
             final SharedPreferences prefs = Util.getSharedPreferences();
@@ -334,8 +337,8 @@ public class ServerGreeter {
             editor.remove("AccountName");
             editor.apply();
 
-            if (mIntent != null) {
-              serverGreeting.mIntent = mIntent;
+            if (intent != null) {
+              serverGreeting.mIntent = intent;
             } else {
               serverGreeting.mIntent = new Intent(activity, AccountsActivity.class);
             }
@@ -358,13 +361,13 @@ public class ServerGreeter {
           }
         }
 
-        if (mWasEmpireReset) {
-          if (mResetReason != null && mResetReason.equals("blitz")) {
+        if (wasEmpireReset) {
+          if (resetReason != null && resetReason.equals("blitz")) {
             serverGreeting.mIntent = new Intent(activity, BlitzResetActivity.class);
           } else {
             serverGreeting.mIntent = new Intent(activity, EmpireResetActivity.class);
-            if (mResetReason != null) {
-              serverGreeting.mIntent.putExtra("au.com.codeka.warworlds.ResetReason", mResetReason);
+            if (resetReason != null) {
+              serverGreeting.mIntent.putExtra("au.com.codeka.warworlds.ResetReason", resetReason);
             }
           }
         }
@@ -372,7 +375,7 @@ public class ServerGreeter {
         if (helloComplete) {
           synchronized (helloCompleteHandlers) {
             for (HelloCompleteHandler handler : helloCompleteHandlers) {
-              handler.onHelloComplete(!mErrorOccured, serverGreeting);
+              handler.onHelloComplete(!errorOccured, serverGreeting);
             }
             helloCompleteHandlers.clear();
           }
@@ -436,17 +439,7 @@ public class ServerGreeter {
   }
 
   public static class ServerGreeting {
-    private boolean mIsConnected;
-    private String mMessageOfTheDay;
     private Intent mIntent;
-
-    public boolean isConnected() {
-      return mIsConnected;
-    }
-
-    public String getMessageOfTheDay() {
-      return mMessageOfTheDay;
-    }
 
     public Intent getIntent() {
       return mIntent;

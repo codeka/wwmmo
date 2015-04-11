@@ -160,10 +160,6 @@ public class RequestManager {
     httpClient.newCall(apiRequest.buildOkRequest()).enqueue(responseCallback);
   }
 
-  Response callRequest(ApiRequest apiRequest) throws IOException {
-    return httpClient.newCall(apiRequest.buildOkRequest()).execute();
-  }
-
   private Callback responseCallback = new Callback() {
     @Override
     public void onFailure(Request request, IOException e) {

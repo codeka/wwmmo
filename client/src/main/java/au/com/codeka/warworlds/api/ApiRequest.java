@@ -15,6 +15,8 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 
+import org.apache.http.HttpException;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -45,6 +47,8 @@ public class ApiRequest {
   @Nullable private Bitmap responseBitmap;
   @Nullable private String responseString;
   @Nullable private MediaType responseContentType;
+  @Nullable private Messages.GenericError error;
+  @Nullable private Throwable exception;
   private boolean skipCache;
 
   private ApiRequest(String url, String method, @Nullable Message requestBody,
@@ -107,6 +111,14 @@ public class ApiRequest {
     return responseString;
   }
 
+  public Messages.GenericError error() {
+    return this.error;
+  }
+
+  public Throwable exception() {
+    return exception;
+  }
+
   /**
    * Returns the body of the response, as a {@link Bitmap}. If the Content-Type isn't image/*, then
    * null is returned instead.
@@ -153,35 +165,43 @@ public class ApiRequest {
   }
 
   void handleError(Response response, Throwable e) {
-    Messages.GenericError err = null;
     if (response != null && response.body() != null) {
       try {
         responseBytes = response.body().bytes();
-        err = body(Messages.GenericError.class);
+        error = body(Messages.GenericError.class);
       } catch (IOException ex) {
         if (e == null) {
-          err = convertToGenericError(ex);
+          error = convertToGenericError(ex);
         }
       }
     }
-    if (err == null && e != null) {
-      err = convertToGenericError(e);
+    if (response != null && response.code() == 403) {
+      error = Messages.GenericError.newBuilder()
+          .setErrorCode(Messages.GenericError.ErrorCode.AuthenticationError.getNumber())
+          .setErrorMessage(response.message())
+          .build();
     }
-
+    if (error == null && e != null) {
+      error = convertToGenericError(e);
+    }
+    exception = e;
     if (errorCallback != null) {
-      final Messages.GenericError finalError = err;
       new Handler(Looper.getMainLooper()).post(new Runnable() {
         @Override
         public void run() {
-          errorCallback.onRequestError(ApiRequest.this, finalError);
+          errorCallback.onRequestError(ApiRequest.this, error);
         }
       });
     }
   }
 
   private Messages.GenericError convertToGenericError(Throwable e) {
+    Messages.GenericError.ErrorCode errorCode = Messages.GenericError.ErrorCode.UnknownError;
+    if (e instanceof IOException) {
+      errorCode = Messages.GenericError.ErrorCode.NetworkError;
+    }
     return Messages.GenericError.newBuilder()
-        .setErrorCode(Messages.GenericError.ErrorCode.UnknownError.getNumber())
+        .setErrorCode(errorCode.getNumber())
         .setErrorMessage(e.getMessage())
         .build();
   }

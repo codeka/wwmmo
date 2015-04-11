@@ -15,6 +15,7 @@ import java.io.IOException;
 import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.Util;
@@ -102,21 +103,18 @@ public class Authenticator {
       url += "&impersonate=" + impersonate;
     }
 
-    ApiRequest request = new ApiRequest.Builder(url, "GET").build();
-    try {
-      Response resp = RequestManager.i.callRequest(request);
-      if (!resp.isSuccessful()) {
-        log.warning("Authentication failure: %s", resp.message());
-        ApiException.checkResponse(resp);
-      }
+    ApiRequest request = new ApiRequest.Builder(url, "GET")
+        .errorCallback(new ApiRequest.ErrorCallback() {
+          @Override
+          public void onRequestError(ApiRequest request, Messages.GenericError error) {
 
-      String cookie = resp.body().string();
-      if (cookie == null) {
-        return null;
-      }
-      return "SESSION=" + cookie;
-    } catch (IOException e) {
-      throw new ApiException(e);
+          }
+        }).build();
+    RequestManager.i.sendRequestSync(request);
+    String cookie = request.bodyString();
+    if (cookie == null) {
+      return null;
     }
+    return "SESSION=" + cookie;
   }
 }
