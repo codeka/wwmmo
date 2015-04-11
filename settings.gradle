@@ -1,6 +1,6 @@
 include ':common'
 include ':control-field'
-include ':intel:generator'
+include ':intel'
 include ':planet-render'
 include ':planet-render-test'
 include ':client'
