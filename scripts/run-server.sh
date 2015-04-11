@@ -1,7 +1,5 @@
 #!/bin/bash
 
-trap "echo hello" DEBUG
-
 set -e
 
 SCRIPT=`realpath $0`
@@ -12,8 +10,6 @@ INSTALLPATH=$ROOTPATH/server/build/install/server
 pushd $ROOTPATH > /dev/null
 ./gradlew --daemon :server:installApp
 popd > /dev/null
-
-#trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 pushd $INSTALLPATH > /dev/null
 SERVER_OPTS=""

@@ -1,12 +1,20 @@
-package au.com.codeka.warworlds.intel.generator;
+package au.com.codeka.warworlds.intel;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import javax.annotation.Nullable;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import au.com.codeka.common.Log;
 
 /**
  * The {@link Universe} contains all the stars we have loaded. There can be quite a lot, but so far,
@@ -17,6 +25,9 @@ import java.util.ArrayList;
  * children, zoom level 2 is the children of those children and so on.
  */
 public class Universe {
+  private static final Log log = new Log("Universe");
+  public static Universe i;
+
   private final Node rootNode;
 
   private Universe(Node rootNode) {
@@ -31,10 +42,98 @@ public class Universe {
     return rootNode;
   }
 
+  /** Finds the node at the given zoom level with the given x/y. */
+  public Node findNode(int zoom, long x, long y) {
+    if (x < 0 || y < 0) {
+      return null;
+    }
+    int maxCoord = (int) Math.pow(2, zoom);
+    if (x >= maxCoord || y >= maxCoord) {
+      return null;
+    }
+
+    return findNode(rootNode, zoom, x, y);
+  }
+
+  private static Node findNode(Node node, int zoom, long x, long y) {
+    if (zoom == 0) {
+      return node;
+    }
+
+    int halfBoard = (int) Math.pow(2, zoom) / 2;
+    int nx = (x >= halfBoard) ? 1 : 0;
+    int ny = (y >= halfBoard) ? 1 : 0;
+    if (nx == 0 && ny == 0) {
+      return findNode(node.NW, zoom - 1, x, y);
+    } else if (nx == 1 && ny == 0) {
+      return findNode(node.NE, zoom - 1, x - halfBoard, y);
+    } else if (nx == 0 && ny == 1) {
+      return findNode(node.SW, zoom - 1, x, y - halfBoard);
+    } else /* if (nx == 1 && ny == 1) */ {
+      return findNode(node.SE, zoom - 1, x - halfBoard, y - halfBoard);
+    }
+  }
+
+  public static void setup() throws IOException {
+    // These are the bounds of the universe we create. These are just arbitrarily chosen because it
+    // is often the case that there's a large number of stars outside the main "hub" of the
+    // universe. We'll ignore those.
+    long minX = -500000;
+    long maxX = 500000;
+    long minY = -500000;
+    long maxY = 500000;
+
+    log.info("Universe bounds: (%d, %d) - (%d, %d)", minX, minY, maxX, maxY);
+    long width = maxX - minX;
+    long height = maxY - minY;
+    log.info("Universe dimensions: %dx%d", width, height);
+
+    // Make sure it's a square, that's how the tiles are expected to be.
+    if (height < width) {
+      //noinspection SuspiciousNameCombination
+      height = width;
+    }
+    if (width < height) {
+      //noinspection SuspiciousNameCombination
+      width = height;
+    }
+
+    // work out how many zoom levels we need so that the maximum zoom less than 256x256 (which is
+    // the size of the generator image).
+    int maxZoomLevel = 0;
+    long zoomLevelTileSize = width;
+    while (zoomLevelTileSize > 1024) {
+      maxZoomLevel ++;
+      zoomLevelTileSize /= 2;
+    }
+    log.info("Generating %d zoom levels.", maxZoomLevel);
+
+    long numStarsIgnored = 0;
+    Universe universe = Universe.create(maxZoomLevel, width);
+    try (CSVParser parser = CSVFormat.RFC4180.parse(new FileReader(Configuration.i.getCsvPath()))) {
+      for(CSVRecord record : parser) {
+        if (parser.getCurrentLineNumber() == 1) {
+          continue;
+        }
+        Universe.Star star = Universe.Star.fromCsv(record, minX, minY);
+        if (star.x < 0 || star.y < 0 || star.x >= width || star.y >= height) {
+          numStarsIgnored ++;
+          continue;
+        }
+        universe.addStar(star);
+      }
+    }
+    log.info("Universe generated, %d stars, %d out-of-bounds (%.2f%%)",
+        universe.getRootNode().numStars, numStarsIgnored,
+        (((float) numStarsIgnored / universe.getRootNode().numStars) * 100.0));
+
+    i = universe;
+  }
+
   /**
    * Creates an empty universe with no stars. We initialize {@code #maxLevels} of nodes.
    */
-  public static Universe create(int maxLevels, long size) {
+  private static Universe create(int maxLevels, long size) {
     RectL bounds = new RectL(0, 0, size, size);
     Node rootNode = new Node(0, 0, 0, bounds);
     addChildren(rootNode, 1, maxLevels - 1, bounds);
@@ -66,7 +165,7 @@ public class Universe {
     public final String type;
     @Nullable public final String empireName;
 
-    public Star(long x, long y, String name, String type, String empireName) {
+    public Star(long x, long y, String name, String type, @Nullable String empireName) {
       this.x = x;
       this.y = y;
       this.name = name;
@@ -80,7 +179,7 @@ public class Universe {
           (long)(Double.parseDouble(csvRecord.get(1)) * 1024) - minY,
           csvRecord.get(2),
           csvRecord.get(4),
-          csvRecord.get(5));
+          Strings.isNullOrEmpty(csvRecord.get(5)) ? null : csvRecord.get(5));
     }
   }
 

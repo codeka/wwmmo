@@ -1,0 +1,24 @@
+<html>
+<head>
+  <script src="/js/leaflet.js"></script>
+  <link href="/css/leaflet.css" rel="stylesheet">
+  <style>
+    body {
+      background: #000;
+    }
+  </style>
+  <title>War Worlds Intel map</title>
+</head>
+<body>
+  <div id="map" style="width: 100%; height: 100%;"></div>
+  <script>
+    // create a map in the "map" div, set the view to a given place and zoom
+    var map = L.map('map').setView([0, 0], 3);
+
+    // add our layer
+    L.tileLayer('/tiles/{z}/{x}/{y}', {
+      continuousWorld: true
+    }).addTo(map);
+  </script>
+</body>
+</html>

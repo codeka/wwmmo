@@ -1,0 +1,12 @@
+//
+// This is a template configuration file for the War Worlds intel server. You will have to customize
+// it for your own setup, hopefully the comments help with that.
+//
+{
+  "dataDirectory": "/home/deanh/src/wwmmo/code/intel/src/main/data", // path to the data directory
+
+  "listenPort": 8085, // port to listen for HTTP connections on
+
+  // The path to look for the stars.csv file.
+  "csvPath": "/home/deanh/src/wwmmo/stars.csv"
+}
