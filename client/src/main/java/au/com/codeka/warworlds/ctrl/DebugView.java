@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.ctrl;
 
-import java.util.Locale;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,15 +7,26 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Debug;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import au.com.codeka.common.model.Simulation;
+
+import com.squareup.okhttp.Interceptor;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.RequestManager;
-import au.com.codeka.warworlds.eventbus.EventHandler;
 
 /**
  * This is a view that's displayed over all activities and shows up a little bit of debugging
@@ -32,6 +41,9 @@ public class DebugView extends FrameLayout {
   private static long maxDalvikKb;
   private static long maxNativeKb;
   private static long maxOtherKb;
+
+  private static boolean interceptorAdded;
+  private static final ArrayList<MessageInfo> messages = new ArrayList<>();
 
   public DebugView(Context context) {
     this(context, null);
@@ -51,10 +63,12 @@ public class DebugView extends FrameLayout {
     if (!isInEditMode()) {
       handler = new Handler();
 
-      RequestManager.eventBus.register(eventHandler);
+      if (!interceptorAdded) {
+        interceptorAdded = true;
+        RequestManager.i.addInterceptor(requestInterceptor);
+      }
       isAttached = true;
 
-      refresh(RequestManager.getCurrentState());
       queueRefresh();
     }
   }
@@ -64,17 +78,9 @@ public class DebugView extends FrameLayout {
     super.onDetachedFromWindow();
 
     if (!isInEditMode()) {
-      RequestManager.eventBus.unregister(eventHandler);
       isAttached = false;
     }
   }
-
-  private final Object eventHandler = new Object() {
-    @EventHandler(thread = EventHandler.UI_THREAD)
-    public void onRequestManagerStateChanged(RequestManager.RequestManagerStateEvent event) {
-      refresh(event);
-    }
-  };
 
   private void queueRefresh() {
     if (!isAttached) {
@@ -84,20 +90,33 @@ public class DebugView extends FrameLayout {
     handler.postDelayed(new Runnable() {
       @Override
       public void run() {
-        refresh(RequestManager.getCurrentState());
+        refresh();
         queueRefresh();
       }
     }, 1000);
   }
 
-  public void refresh(RequestManager.RequestManagerStateEvent state) {
-    TextView connectionInfo = (TextView) view.findViewById(R.id.connection_info);
-    String str = String.format(Locale.ENGLISH, "Sim: %d Conn: %d",
-        Simulation.getNumRunningSimulations(), state.numInProgressRequests);
-    connectionInfo.setText(str);
-
+  public void refresh() {
     ImageView memoryGraph = (ImageView) view.findViewById(R.id.memory_graph);
     memoryGraph.setImageBitmap(createMemoryGraph(memoryGraph.getWidth(), memoryGraph.getHeight()));
+
+    LinearLayout messagesContainer = (LinearLayout) view.findViewById(R.id.messages);
+    for (int i = 0; i < messagesContainer.getChildCount(); i++) {
+      TextView tv = (TextView) messagesContainer.getChildAt(i);
+      if (messages.size() > i) {
+        tv.setText(messages.get(i).toString());
+      } else {
+        tv.setText("");
+      }
+    }
+
+    long old = SystemClock.elapsedRealtime() - 5000;
+    for (int i = 0; i < messages.size(); i++) {
+      if (messages.get(i).millis > 0 && messages.get(i).createTime < old) {
+        messages.remove(i);
+        i--;
+      }
+    }
   }
 
   /**
@@ -164,5 +183,65 @@ public class DebugView extends FrameLayout {
     canvas.drawText(String.format("%d", nativeKb / 1024), (0.33f + 0.167f) * width, height - 10, p);
     canvas.drawText(String.format("%d", otherKb / 1024), (0.66f + 0.167f) * width, height - 10, p);
     return bmp;
+  }
+
+  private static final Interceptor requestInterceptor = new Interceptor() {
+    @Override
+    public Response intercept(Chain chain) throws IOException {
+      Request request = chain.request();
+
+      MessageInfo msg = new MessageInfo();
+      msg.request = request;
+      synchronized (messages) {
+        messages.add(0, msg);
+        while (messages.size() > 8) {
+          messages.remove(messages.size() - 1);
+        }
+      }
+
+      long startTime = SystemClock.elapsedRealtime();
+      Response response = chain.proceed(request);
+      long endTime = SystemClock.elapsedRealtime();
+
+      msg.millis = endTime - startTime;
+
+      return response;
+    }
+  };
+
+  private static class MessageInfo {
+    public long createTime;
+    @Nullable public Request request;
+    public long millis;
+
+    public MessageInfo() {
+      createTime = SystemClock.elapsedRealtime();
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder();
+      if (request != null) {
+        String url = request.url().getPath();
+        String realmUrl = RealmContext.i.getCurrentRealm().getBaseUrl().getPath().toString();
+        if (url.startsWith(realmUrl)) {
+          url = url.substring(realmUrl.length());
+        }
+        if (request.url().getQuery() != null) {
+          url += "?" + request.url().getQuery();
+        }
+
+        if (millis == 0) {
+          sb.append(">> ");
+          sb.append(url);
+        } else {
+          sb.append("<< ");
+          sb.append(millis);
+          sb.append("ms ");
+          sb.append(url);
+        }
+      }
+      return sb.toString();
+    }
   }
 }

@@ -46,7 +46,6 @@ import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.IabHelper;
 import au.com.codeka.warworlds.model.billing.IabResult;
@@ -62,7 +61,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   private Context context = this;
   private Star selectedStar;
   private Fleet selectedFleet;
-  private StarSummary homeStar;
+  private Star homeStar;
   private View bottomPane;
   private Button allianceBtn;
   private SelectionDetailsView selectionDetailsView;
@@ -72,8 +71,6 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   private Star starToSelect;
   private String starKeyToSelect;
   private Fleet fleetToSelect;
-
-  private boolean doNotNavigateToHomeStar;
 
   private static final int SOLAR_SYSTEM_REQUEST = 1;
   private static final int EMPIRE_REQUEST = 2;
@@ -133,7 +130,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
         }, new SelectionDetailsView.ZoomToStarHandler() {
           @Override
           public void onZoomToStar(Star star) {
-            mStarfield.scrollTo(star.getSectorX(), star.getSectorY(),
+            starfield.scrollTo(star.getSectorX(), star.getSectorY(),
                 star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY());
           }
         });
@@ -187,22 +184,25 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       starToSelect = selectedStar;
       fleetToSelect = selectedFleet;
     }
-    if (savedInstanceState == null) {
-      Intent intent = getIntent();
-      if (intent != null && intent.getExtras() != null) {
-        String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
-        if (starKey != null) {
-          long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
-          long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
-          int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
-          int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
-          mStarfield.scrollTo(sectorX, sectorY, offsetX, Sector.SECTOR_SIZE - offsetY);
-          doNotNavigateToHomeStar = true;
-        }
-      }
-    }
 
     hideBottomPane(true);
+  }
+
+  private boolean processIntent() {
+    Intent intent = getIntent();
+    if (intent != null && intent.getExtras() != null) {
+      String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
+      if (starKey != null) {
+        long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
+        long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
+        int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
+        int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
+        starfield.scrollTo(sectorX, sectorY, offsetX, Sector.SECTOR_SIZE - offsetY);
+      }
+      setIntent(null);
+      return true;
+    }
+    return false;
   }
 
   @Override
@@ -216,15 +216,15 @@ public class StarfieldActivity extends BaseStarfieldActivity {
           return;
         }
 
-        if (starToSelect != null && mStarfield.getScene() != null) {
+        if (starToSelect != null && starfield.getScene() != null) {
           selectedStar = starToSelect;
-          mStarfield.getScene().selectStar(starToSelect.getKey());
-          mStarfield.scrollTo(starToSelect);
+          starfield.getScene().selectStar(starToSelect.getKey());
+          starfield.scrollTo(starToSelect);
           starToSelect = null;
         }
 
-        if (fleetToSelect != null && mStarfield.getScene() != null) {
-          mStarfield.getScene().selectFleet(fleetToSelect.getKey());
+        if (fleetToSelect != null && starfield.getScene() != null) {
+          starfield.getScene().selectFleet(fleetToSelect.getKey());
           fleetToSelect = null;
         }
 
@@ -234,18 +234,24 @@ public class StarfieldActivity extends BaseStarfieldActivity {
         }
 
         BaseStar homeStar = myEmpire.getHomeStar();
+
+        boolean doNotNavigateToHomeStar = processIntent();
         if (homeStar != null && (
             StarfieldActivity.this.homeStar == null || !StarfieldActivity.this.homeStar.getKey()
             .equals(homeStar.getKey()))) {
-          StarfieldActivity.this.homeStar = (StarSummary) homeStar;
+          StarfieldActivity.this.homeStar = (Star) homeStar;
           if (!doNotNavigateToHomeStar) {
-            mStarfield.scrollTo(homeStar);
+            starfield.scrollTo(homeStar);
           }
         }
-
-        doNotNavigateToHomeStar = true;
       }
     });
+  }
+
+  @Override
+  protected void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    setIntent(intent);
   }
 
   @Override
@@ -451,7 +457,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   private void navigateToPlanet(StarType starType, long sectorX, long sectorY, String starKey,
       int starOffsetX, int starOffsetY, int planetIndex, boolean scrollView) {
     if (scrollView) {
-      mStarfield.scrollTo(sectorX, sectorY, starOffsetX, Sector.SECTOR_SIZE - starOffsetY);
+      starfield.scrollTo(sectorX, sectorY, starOffsetX, Sector.SECTOR_SIZE - starOffsetY);
     }
 
     Intent intent;
@@ -466,11 +472,11 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   }
 
   public void navigateToFleet(final String starKey, final String fleetKey) {
-    StarSummary star = StarManager.i.getStarSummary(Integer.parseInt(starKey));
+    Star star = StarManager.i.getStar(Integer.parseInt(starKey));
     if (star == null) {
       StarManager.eventBus.register(new Object() {
         @EventHandler
-        public void onStarUpdated(StarSummary star) {
+        public void onStarUpdated(Star star) {
           if (star.getKey().equals(starKey)) {
             navigateToFleet(star, star.findFleet(fleetKey));
             StarManager.eventBus.unregister(this);
@@ -486,21 +492,21 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     }
   }
 
-  public void navigateToFleet(StarSummary star, BaseFleet fleet) {
+  public void navigateToFleet(Star star, BaseFleet fleet) {
     int offsetX = star.getOffsetX();
     int offsetY = star.getOffsetY();
 
-    mStarfield
+    starfield
         .scrollTo(star.getSectorX(), star.getSectorY(), offsetX, Sector.SECTOR_SIZE - offsetY);
 
-    if (mStarfield.getScene() == null) {
+    if (starfield.getScene() == null) {
       // TODO: we should probably remember the fleet then navigate when the scene is ready.
       return;
     }
     if (fleet.getState() == Fleet.State.MOVING) {
-      mStarfield.getScene().selectFleet(fleet.getKey());
+      starfield.getScene().selectFleet(fleet.getKey());
     } else {
-      mStarfield.getScene().selectStar(star.getKey());
+      starfield.getScene().selectStar(star.getKey());
     }
   }
 
@@ -594,9 +600,9 @@ public class StarfieldActivity extends BaseStarfieldActivity {
 
       if (wasSectorUpdated) {
         SectorManager.i.refreshSector(sectorX, sectorY);
-      } else if (starKey != null && mStarfield.getScene() != null) {
+      } else if (starKey != null && starfield.getScene() != null) {
         // make sure we re-select the star you had selected before.
-        mStarfield.getScene().selectStar(starKey);
+        starfield.getScene().selectStar(starKey);
       } else if (starKey != null) {
         starKeyToSelect = starKey;
       }
@@ -613,11 +619,11 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       if (res == EmpireActivity.EmpireActivityResult.NavigateToPlanet) {
         final int planetIndex = intent.getIntExtra("au.com.codeka.warworlds.PlanetIndex", 0);
 
-        StarSummary star = StarManager.i.getStarSummary(Integer.parseInt(starKey));
+        Star star = StarManager.i.getStar(Integer.parseInt(starKey));
         if (star == null) {
           StarManager.eventBus.register(new Object() {
             @EventHandler
-            public void onStarUpdated(StarSummary star) {
+            public void onStarUpdated(Star star) {
               if (star.getKey().equals(starKey)) {
                 navigateToPlanet(star.getStarType(), sectorX, sectorY, starKey, starOffsetX,
                     starOffsetY, planetIndex, true);

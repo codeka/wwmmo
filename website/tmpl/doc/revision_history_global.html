@@ -23,7 +23,11 @@
         {{m.profile_link(profiles[entry.revision.user.user_id()])}}
         <time datetime="{{entry.revision.date|date_std}}">{{entry.revision.date|date_std}}</time>
         <div class="revision-details">
-          {% if loop.last or not entry.revision.words_added %}
+          {% if not entry.revision.words %}
+            <div class="revision-graph"></div>
+            <strong>N/A</strong>
+            <a href="/doc{{entry.page.slug}}?revision={{entry.revision.key}}">View</a>
+          {% elif loop.last or not entry.revision.words_added %}
             <div class="revision-graph"></div>
             <strong>{{entry.revision.words|length|number}}</strong>
             <a href="/doc{{entry.page.slug}}?revision={{entry.revision.key}}">View</a>

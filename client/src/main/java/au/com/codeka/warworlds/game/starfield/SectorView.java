@@ -1,228 +1,151 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import au.com.codeka.common.Pair;
-import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
-import au.com.codeka.warworlds.model.Star;
 
 /**
  * This is the base class for StarfieldSurfaceView and TacticalMapView, it contains the common code
  * for scrolling through sectors of stars, etc.
  */
 public class SectorView extends UniverseElementSurfaceView {
-    protected boolean mScrollToCentre = false;
+  protected boolean scrollToCentre = false;
 
-    protected int mSectorRadius = 1;
-    protected long mSectorX;
-    protected long mSectorY;
-    protected float mOffsetX;
-    protected float mOffsetY;
+  protected int sectorRadius = 1;
+  protected long sectorX;
+  protected long sectorY;
+  protected float offsetX;
+  protected float offsetY;
 
-    public SectorView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        if (this.isInEditMode()) {
-            return;
-        }
-
-        mSectorX = mSectorY = 0;
-        mOffsetX = mOffsetY = 0;
+  public SectorView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    if (this.isInEditMode()) {
+      return;
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        SectorManager.eventBus.register(eventHandler);
+    sectorX = sectorY = 0;
+    offsetX = offsetY = 0;
+  }
+
+  @Override
+  protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    SectorManager.eventBus.register(eventHandler);
+  }
+
+  @Override
+  protected void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+    SectorManager.eventBus.unregister(eventHandler);
+  }
+
+  private final Object eventHandler = new Object() {
+    @EventHandler
+    public void onSectorUpdated(Sector sector) {
+      redraw();
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        SectorManager.eventBus.unregister(eventHandler);
+    @EventHandler
+    public void onSectorListUpdated(SectorManager.SectorListChangedEvent event) {
+      redraw();
+    }
+  };
+
+  /**
+   * Scroll to the given sector (x,y) and offset into the sector.
+   */
+  public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY) {
+    scrollTo(sectorX, sectorY, offsetX, offsetY, false);
+  }
+
+  /**
+   * Scroll to the given sector (x,y) and offset into the sector.
+   */
+  public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY, boolean centre) {
+    this.sectorX = sectorX;
+    this.sectorY = sectorY;
+    this.offsetX = -offsetX;
+    this.offsetY = -offsetY;
+
+    if (centre) {
+      scrollToCentre = true;
     }
 
-    private final Object eventHandler = new Object() {
-        @EventHandler
-        public void onSectorUpdated(Sector sector) {
-            redraw();
-        }
+    List<Pair<Long, Long>> missingSectors = new ArrayList<>();
 
-        @EventHandler
-        public void onSectorListUpdated(SectorManager.SectorListChangedEvent event) {
-            redraw();
+    for (sectorY = this.sectorY - sectorRadius; sectorY <= this.sectorY + sectorRadius; sectorY++) {
+      for (sectorX = this.sectorX - sectorRadius; sectorX <= this.sectorX + sectorRadius; sectorX++) {
+        Pair<Long, Long> key = new Pair<>(sectorX, sectorY);
+        Sector s = SectorManager.i.getSector(sectorX, sectorY);
+        if (s == null) {
+          missingSectors.add(key);
         }
-    };
-
-    /**
-     * Scroll to the given sector (x,y) and offset into the sector.
-     */
-    public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY) {
-        scrollTo(sectorX, sectorY, offsetX, offsetY, false);
+      }
     }
 
-    /**
-     * Scroll to the given sector (x,y) and offset into the sector.
-     */
-    public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY, boolean centre) {
-        mSectorX = sectorX;
-        mSectorY = sectorY;
-        mOffsetX = -offsetX;
-        mOffsetY = -offsetY;
-
-        if (centre) {
-            mScrollToCentre = true;
-        }
-
-        List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
-
-        for(sectorY = mSectorY - mSectorRadius; sectorY <= mSectorY + mSectorRadius; sectorY++) {
-            for(sectorX = mSectorX - mSectorRadius; sectorX <= mSectorX + mSectorRadius; sectorX++) {
-                Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
-                Sector s = SectorManager.i.getSector(sectorX, sectorY);
-                if (s == null) {
-                    missingSectors.add(key);
-                }
-            }
-        }
-
-        if (!missingSectors.isEmpty()) {
-            SectorManager.i.refreshSectors(missingSectors, false);
-        }
-
-        redraw();
+    if (!missingSectors.isEmpty()) {
+      SectorManager.i.refreshSectors(missingSectors, false);
     }
 
-    /**
-     * Scrolls the view by a relative amount.
-     * @param distanceX Number of pixels in the X direction to scroll.
-     * @param distanceY Number of pixels in the Y direction to scroll.
-     */
-    public void scroll(float distanceX, float distanceY) {
-        mOffsetX += distanceX;
-        mOffsetY += distanceY;
+    redraw();
+  }
 
-        boolean needUpdate = false;
-        while (mOffsetX < -(Sector.SECTOR_SIZE / 2)) {
-            mOffsetX += Sector.SECTOR_SIZE;
-            mSectorX ++;
-            needUpdate = true;
-        }
-        while (mOffsetX > (Sector.SECTOR_SIZE / 2)) {
-            mOffsetX -= Sector.SECTOR_SIZE;
-            mSectorX --;
-            needUpdate = true;
-        }
-        while (mOffsetY < -(Sector.SECTOR_SIZE / 2)) {
-            mOffsetY += Sector.SECTOR_SIZE;
-            mSectorY ++;
-            needUpdate = true;
-        }
-        while (mOffsetY > (Sector.SECTOR_SIZE / 2)) {
-            mOffsetY -= Sector.SECTOR_SIZE;
-            mSectorY --;
-            needUpdate = true;
-        }
+  /**
+   * Scrolls the view by a relative amount.
+   *
+   * @param distanceX Number of pixels in the X direction to scroll.
+   * @param distanceY Number of pixels in the Y direction to scroll.
+   */
+  public void scroll(float distanceX, float distanceY) {
+    offsetX += distanceX;
+    offsetY += distanceY;
 
-        if (needUpdate) {
-            scrollTo(mSectorX, mSectorY, -mOffsetX, -mOffsetY);
-        }
+    boolean needUpdate = false;
+    while (offsetX < -(Sector.SECTOR_SIZE / 2)) {
+      offsetX += Sector.SECTOR_SIZE;
+      sectorX++;
+      needUpdate = true;
+    }
+    while (offsetX > (Sector.SECTOR_SIZE / 2)) {
+      offsetX -= Sector.SECTOR_SIZE;
+      sectorX--;
+      needUpdate = true;
+    }
+    while (offsetY < -(Sector.SECTOR_SIZE / 2)) {
+      offsetY += Sector.SECTOR_SIZE;
+      sectorY++;
+      needUpdate = true;
+    }
+    while (offsetY > (Sector.SECTOR_SIZE / 2)) {
+      offsetY -= Sector.SECTOR_SIZE;
+      sectorY--;
+      needUpdate = true;
     }
 
-
-    /**
-     * Gets the \c Star that's closest to the given (x,y), based on the current sector
-     * centre and offsets.
-     */
-    public Star getStarAt(int viewX, int viewY) {
-        // first, work out which sector your actually inside of. If (mOffsetX, mOffsetY) is (0,0)
-        // then (x,y) corresponds exactly to the offset into (mSectorX, mSectorY). Otherwise, we
-        // have to adjust (x,y) by the offset so that it works out like that.
-        int x = viewX - (int) mOffsetX;
-        int y = viewY - (int) mOffsetY;
-
-        long sectorX = mSectorX;
-        long sectorY = mSectorY;
-        while (x < 0) {
-            x += Sector.SECTOR_SIZE;
-            sectorX --;
-        }
-        while (x >= Sector.SECTOR_SIZE) {
-            x -= Sector.SECTOR_SIZE;
-            sectorX ++;
-        }
-        while (y < 0) {
-            y += Sector.SECTOR_SIZE;
-            sectorY --;
-        }
-        while (y >= Sector.SECTOR_SIZE) {
-            y -= Sector.SECTOR_SIZE;
-            sectorY ++;
-        }
-
-        Sector sector = SectorManager.i.getSector(sectorX, sectorY);
-        if (sector == null) {
-            // if it's not loaded yet, you can't have tapped on anything...
-            return null;
-        }
-
-        int minDistance = 0;
-        BaseStar closestStar = null;
-
-        for(BaseStar star : sector.getStars()) {
-            int starX = star.getOffsetX();
-            int starY = star.getOffsetY();
-
-            int distance = (starX - x)*(starX - x) + (starY - y)*(starY - y);
-            if (closestStar == null || distance < minDistance) {
-                closestStar = star;
-                minDistance = distance;
-            }
-        }
-
-        // only return it if you tapped within a 48 pixel radius
-        if (Math.sqrt(minDistance) <= 48) {
-            return (Star) closestStar;
-        }
-        return null;
+    if (needUpdate) {
+      scrollTo(sectorX, sectorY, -offsetX, -offsetY);
     }
+  }
 
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (isInEditMode()) {
-            return;
-        }
-        super.onDraw(canvas);
-
-        if (mScrollToCentre) {
-            scroll(getWidth() / 2.0f / getPixelScale(),
-                   getHeight() / 2.0f / getPixelScale());
-            mScrollToCentre = false;
-        }
+  @Override
+  public void onDraw(Canvas canvas) {
+    if (isInEditMode()) {
+      return;
     }
+    super.onDraw(canvas);
 
-    /**
-     * Implements the \c OnGestureListener methods that we use to respond to
-     * various touch events.
-     */
-    protected class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                float distanceY) {
-            scroll(-(float)(distanceX / getPixelScale()),
-                   -(float)(distanceY / getPixelScale()));
-
-            redraw();
-            return false;
-        }
+    if (scrollToCentre) {
+      scroll(getWidth() / 2.0f / getPixelScale(), getHeight() / 2.0f / getPixelScale());
+      scrollToCentre = false;
     }
+  }
 }

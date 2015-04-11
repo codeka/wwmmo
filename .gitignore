@@ -21,5 +21,9 @@ client/signing.properties
 # Android Studio/gradle files and directories
 .gradle
 .idea/
-build/
 local.properties
+
+# Ignore build directory in top-level folder and the first child. This is where
+# build artifacts go.
+/build
+/*/build/

@@ -177,7 +177,7 @@ public class OverviewFragment extends BaseFragment {
         imm.hideSoftInputFromWindow(empireSearch.getWindowToken(), 0);
 
         String nameSearch = empireSearch.getText().toString();
-        EmpireManager.i.searchEmpires(getActivity(), nameSearch,
+        EmpireManager.i.searchEmpires(nameSearch,
             new EmpireManager.SearchCompleteHandler() {
                 @Override
                 public void onSearchComplete(List<Empire> empires) {

@@ -42,7 +42,7 @@ public class ChatPrivateSettingsDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 inviteBtn.setEnabled(false);
-                ChatManager.i.addParticipant(getActivity(), mConversation, inviteEmpireName.getText().toString());
+                ChatManager.i.addParticipant(mConversation, inviteEmpireName.getText().toString());
                 dismiss();
             }
         });

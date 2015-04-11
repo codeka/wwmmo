@@ -8,6 +8,7 @@ import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSourc
 import org.andengine.opengl.texture.atlas.source.BaseTextureAtlasSource;
 
 import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -105,12 +106,19 @@ public class TacticalBitmapTextureSource extends BaseTextureAtlasSource
         continue;
       }
 
+      int color = 0;
       Empire empire = getEmpire((Star) baseStar);
       if (empire == null) {
-        continue;
+        empire = getFleetOnlyEmpire((Star) baseStar);
+        if (empire != null) {
+          color = EmpireShieldManager.i.getShieldColour(empire);
+          color = 0x66ffffff & color;
+        }
+      } else {
+        color = EmpireShieldManager.i.getShieldColour(empire);
       }
-      paint.setColor(EmpireShieldManager.i.getShieldColour(empire));
 
+      paint.setColor(color);
       canvas.drawCircle(x, y, radius, paint);
     }
   }
@@ -127,6 +135,21 @@ public class TacticalBitmapTextureSource extends BaseTextureAtlasSource
     for (BaseColony colony : star.getColonies()) {
       if (colony.getEmpireKey() != null) {
         return EmpireManager.i.getEmpire(Integer.parseInt(colony.getEmpireKey()));
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * If we can't find an empire by colony, look for a fleet. If there's one, we'll display a circle
+   * that a little dimmed.
+   */
+  private static Empire getFleetOnlyEmpire(Star star) {
+    // TODO: what if there is more than one fleet? Should try to mix the colors.
+    for (BaseFleet fleet : star.getFleets()) {
+      if (fleet.getEmpireKey() != null) {
+        return EmpireManager.i.getEmpire(Integer.parseInt(fleet.getEmpireKey()));
       }
     }
 

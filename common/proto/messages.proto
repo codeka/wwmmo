@@ -55,6 +55,8 @@ message GenericError
         FleetMoveTooCloseToStar = 32;
         CannotVoteOnNonPendingRequest = 33;
         NoWormholeDisruptorInRange = 34;
+        NetworkError = 35;
+        AuthenticationError = 36;
     }
 }
 

@@ -1,328 +1,175 @@
 package au.com.codeka.warworlds.api;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.apache.http.message.BasicHttpRequest;
-import org.apache.http.message.BasicHttpResponse;
+import android.content.Context;
 
+import com.google.common.collect.Lists;
+import com.squareup.okhttp.Cache;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.CertificatePinner;
+import com.squareup.okhttp.Interceptor;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Protocol;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
+import java.io.File;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
+
+import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.warworlds.RealmContext;
-import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.eventbus.EventBus;
-import au.com.codeka.warworlds.model.Realm;
 
 /**
  * Provides the low-level interface for making requests to the API.
  */
 public class RequestManager {
+  public static final RequestManager i = new RequestManager();
+
   private static final Log log = new Log("RequestManager");
-  private static Map<Integer, ConnectionPool> sConnectionPools;
-  private static String sImpersonateUser;
-  private static boolean sVerboseLog = false;
+  private static final boolean DBG = true;
 
-  public static final EventBus eventBus = new EventBus();
+  private static final int MAX_INFLIGHT_REQUESTS = 8;
+  private static final int MAX_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
 
-  // we record the last status code we got from the server, don't try to re-authenticate if we
-  // get two 403's in a row, for example.
-  private static int sLastRequestStatusCode = 200;
+  private final OkHttpClient httpClient;
+  private final Set<ApiRequest> inFlightRequests = new HashSet<>();
 
-  static {
-    sConnectionPools = new TreeMap<>();
+  // We use a stack because the most recent request is likely the most important (since it's usually
+  // going to be in response to the most recent UI interaction).
+  private final Stack<ApiRequest> waitingRequests = new Stack<>();
+
+  private final Object lock = new Object();
+
+  private RequestManager() {
+    httpClient = new OkHttpClient();
+
+    CertificatePinner certificatePinner = new CertificatePinner.Builder()
+        .add("game.war-worlds.com", "sha1/DQYffq7Bm+6ChL1D0VUBHAd3k6g=")
+        .add("game.war-worlds.com", "sha1/o5OZxATDsgmwgcIfIWIneMJ0jkw=")
+        .build();
+    httpClient.setCertificatePinner(certificatePinner);
+
+    httpClient.getDispatcher().setMaxRequests(MAX_INFLIGHT_REQUESTS);
+    httpClient.getDispatcher().setMaxRequestsPerHost(MAX_INFLIGHT_REQUESTS);
   }
 
-  private static ConnectionPool getConnectionPool() {
-    Realm realm = RealmContext.i.getCurrentRealm();
-    if (realm == null) {
-      return null;
-    }
-
-    synchronized (sConnectionPools) {
-      if (!sConnectionPools.containsKey(realm.getID())) {
-        ConnectionPool cp = configureConnectionPool(realm);
-        sConnectionPools.put(realm.getID(), cp);
-        return cp;
-      }
-    }
-    return sConnectionPools.get(realm.getID());
-  }
-
-  private static ConnectionPool configureConnectionPool(Realm realm) {
-    URI baseUrl = realm.getBaseUrl();
-    boolean ssl = false;
-    if (baseUrl.getScheme().equalsIgnoreCase("https")) {
-      ssl = true;
-    } else if (!baseUrl.getScheme().equalsIgnoreCase("http")) {
-      // should never happen
-      log.error("Invalid URI scheme \"%s\", assuming http.", baseUrl.getScheme());
-    }
-
-    return new ConnectionPool(ssl, baseUrl.getHost(), baseUrl.getPort(), sVerboseLog);
-  }
-
-  public static void impersonate(String user) {
-    sImpersonateUser = user;
-  }
-
-  /**
-   * Performs a request with the given method to the given URL. The URL is assumed to be
-   * relative to the \c baseUri that was passed in to \c configure().
-   *
-   * @param method The HTTP method (GET, POST, etc)
-   * @param url    The URL, relative to the \c baseUri we were configured with.
-   * @return A \c ResultWrapper representing the server's response (if any)
-   */
-  public static ResultWrapper request(String method, String url) throws ApiException {
-    return request(method, url, null, null);
-  }
-
-  /**
-   * Performs a request with the given method to the given URL. The URL is assumed to be
-   * relative to the \c baseUri that was passed in to \c configure().
-   *
-   * @param method       The HTTP method (GET, POST, etc)
-   * @param url          The URL, relative to the \c baseUri we were configured with.
-   * @param extraHeaders a mapping of additional headers to include in the request (e.g.
-   *                     cookies, etc)
-   * @return A \c ResultWrapper representing the server's response (if any)
-   */
-  public static ResultWrapper request(String method, String url,
-      Map<String, List<String>> extraHeaders) throws ApiException {
-    return request(method, url, extraHeaders, null);
-  }
-
-  /**
-   * Performs a request with the given method to the given URL. The URL is assumed to be
-   * relative to the \c baseUri that was passed in to \c configure().
-   *
-   * @param method       The HTTP method (GET, POST, etc)
-   * @param url          The URL, relative to the \c baseUri we were configured with.
-   * @param extraHeaders a mapping of additional headers to include in the request (e.g.
-   *                     cookies, etc)
-   * @return A \c ResultWrapper representing the server's response (if any)
-   */
-  public static ResultWrapper request(String method, String url,
-      Map<String, List<String>> extraHeaders, HttpEntity body) throws ApiException {
-    Connection conn = null;
-
-    ConnectionPool cp = getConnectionPool();
-    Realm realm = RealmContext.i.getCurrentRealm();
-    if (cp == null || realm == null) {
-      throw new ApiException("Not yet configured, cannot execute " + method + " " + url);
-    }
-
-    if (!realm.getAuthenticator().isAuthenticated()) {
-      realm.getAuthenticator().authenticate(null, realm);
-    }
-
-    URI uri = realm.getBaseUrl().resolve(url);
-    if (sVerboseLog) {
-      log.debug("Requesting: %s", uri);
-    }
-
-    for (int numAttempts = 0; ; numAttempts++) {
+  /** Sets up the request manager, once we've got a context. Initializes the cache and so on. */
+  public void setup(Context context) {
+    if (httpClient.getCache() == null) {
       try {
-        // Note: we only allow connections from the pool on the first attempt, if
-        // requests fail, we force creating a new connection
-        conn = cp.getConnection(numAttempts > 0);
-
-        eventBus.publish(getCurrentState());
-
-        String requestUrl = uri.getPath();
-        if (uri.getQuery() != null && uri.getQuery() != "") {
-          requestUrl += "?" + uri.getQuery();
+        File cacheDir = new File(context.getCacheDir(), "api");
+        if (!cacheDir.mkdirs()) {
+          // Ignore, directory (probably) already exists
         }
-        if (sImpersonateUser != null) {
-          if (requestUrl.indexOf("?") > 0) {
-            requestUrl += "&";
-          } else {
-            requestUrl += "?";
-          }
-          requestUrl += "on_behalf_of=" + sImpersonateUser;
-        }
-        if (sVerboseLog) {
-          log.debug("> %s %s", method, requestUrl);
-        }
-
-        BasicHttpRequest request;
-        if (body != null) {
-          BasicHttpEntityEnclosingRequest beer =
-              new BasicHttpEntityEnclosingRequest(method, requestUrl);
-          beer.setEntity(body);
-          request = beer;
-        } else {
-          request = new BasicHttpRequest(method, requestUrl);
-        }
-
-        String host = uri.getHost();
-        if (uri.getPort() > 0 && ((uri.getScheme().equals("http") && uri.getPort() != 80) || (
-            uri.getScheme().equals("https") && uri.getPort() != 443))) {
-          host += ":" + uri.getPort();
-        }
-        request.addHeader("Host", host);
-
-        request.addHeader("User-Agent", "wwmmo/" + Util.getVersion());
-
-        if (extraHeaders != null) {
-          for (String headerName : extraHeaders.keySet()) {
-            for (String headerValue : extraHeaders.get(headerName)) {
-              request.addHeader(headerName, headerValue);
-            }
-          }
-        }
-        if (realm.getAuthenticator().isAuthenticated()) {
-          String cookie = realm.getAuthenticator().getAuthCookie();
-          if (sVerboseLog) {
-            log.debug("Adding session cookie: %s", cookie);
-          }
-          request.addHeader("Cookie", cookie);
-        }
-        if (body != null) {
-          request.addHeader(body.getContentType());
-          request.addHeader("Content-Length", Long.toString(body.getContentLength()));
-        } else if (method.equalsIgnoreCase("PUT") || method.equalsIgnoreCase("POST")) {
-          request.addHeader("Content-Length", "0");
-        }
-
-        BasicHttpResponse response = conn.sendRequest(request, body);
-        if (sVerboseLog) {
-          log.debug("< %s", response.getStatusLine());
-        }
-        checkForAuthenticationError(request, response);
-
-        return new ResultWrapper(conn, response);
-      } catch (Exception e) {
-        if (canRetry(e) && numAttempts == 0) {
-          if (sVerboseLog) {
-            log.warning("Got retryable exception making request to: %s", url, e);
-          }
-
-          // Note: the connection doesn't go back in the pool, and we'll close this
-          // one, it's probably no good anyway...
-          if (conn != null) {
-            conn.close();
-            cp.returnConnection(conn);
-          }
-        } else {
-          if (numAttempts >= 5) {
-            log.error("Got %d retryable exceptions (giving up) making request to: %s", numAttempts,
-                url, e);
-          } else {
-            log.error("Got non-retryable exception making request to: ", uri, e);
-          }
-
-          throw new ApiException("Error performing " + method + " " + url, e);
-        }
+        httpClient.setCache(new Cache(cacheDir, MAX_CACHE_SIZE));
+      } catch (IOException e) {
+        log.error("Error setting up HTTP cache.", e);
       }
     }
   }
 
   /**
-   * If we get a 403 (and not on a 'login' URL), we'll reset the authenticated status of the
-   * current Authenticator, and try the request again.
-   *
-   * @throws RequestRetryException
+   * Enqueues the given request to send to the server. The request's callbacks will be called
+   * when the request actually completes.
    */
-  private static void checkForAuthenticationError(HttpRequest request, HttpResponse response)
-      throws ApiException, RequestRetryException {
-    // if we get a 403 (and not on a 'login' URL), it means we need to re-authenticate,
-    // so do that
-    if (response.getStatusLine().getStatusCode() == 403
-        && request.getRequestLine().getUri().indexOf("login") < 0) {
-
-      if (sLastRequestStatusCode == 403) {
-        // if the last status code we received was 403, then re-authenticating
-        // again isn't going to help. This is only useful if, for example, the
-        // token has expired.
-        return;
+  public void sendRequest(ApiRequest apiRequest) {
+    synchronized (lock) {
+      if (inFlightRequests.size() < MAX_INFLIGHT_REQUESTS) {
+        enqueueRequest(apiRequest);
+      } else {
+        waitingRequests.push(apiRequest);
       }
-      // record the fact that the last status code was 403, so we can fail on the
-      // next request if we get another 403 (no point retrying that over and over)
-      sLastRequestStatusCode = 403;
-
-      log.info("403 HTTP response code received, attempting to re-authenticate.");
-      Realm realm = RealmContext.i.getCurrentRealm();
-      realm.getAuthenticator().authenticate(null, realm);
-
-      // throw an exception so that we try the request for a second time.
-      throw new RequestRetryException();
     }
-
-    sLastRequestStatusCode = response.getStatusLine().getStatusCode();
   }
 
-  public static RequestManagerStateEvent getCurrentState() {
-    RequestManagerStateEvent state = new RequestManagerStateEvent();
-    ConnectionPool cp = getConnectionPool();
-    if (cp == null) {
-      return state;
-    }
-    state.numInProgressRequests = cp.getNumBusyConnections();
-    state.lastUri = cp.getLastUri();
-    return state;
-  }
-
-  /**
-   * Determines whether the given exception is re-tryable or not.
-   */
-  private static boolean canRetry(Exception e) {
-    if (e instanceof RequestRetryException) {
+  public boolean sendRequestSync(ApiRequest apiRequest) {
+    if (DBG) log.info(">> %s", apiRequest);
+    apiRequest.getTiming().onRequestSent();
+    try {
+      Response resp = httpClient.newCall(apiRequest.buildOkRequest()).execute();
+      apiRequest.handleResponse(resp);
       return true;
-    }
-
-    if (e instanceof ConnectException) {
+    } catch (IOException e) {
+      log.error("Error in sendRequestSync.", e);
       return false;
     }
+  }
 
-    // may be others that we can't, but we'll just rety everything for now
-    return true;
+  public void addInterceptor(Interceptor interceptor) {
+    httpClient.interceptors().add(interceptor);
+  }
+
+  public void removeInterceptor(Interceptor interceptor) {
+    httpClient.interceptors().remove(interceptor);
+  }
+
+  private void handleResponse(ApiRequest request, Response response) {
+    requestComplete(request, response);
+    if (!response.isSuccessful()) {
+      handleFailure(request, response, null);
+    } else {
+      request.handleResponse(response);
+    }
   }
 
   /**
-   * This is an event posted to our event bus whenever the state of the {@link RequestManager}
-   * changes.
+   * Handles a failed request. Either response or the exception will set, depending on whether the
+   * error was network-related or API related.
    */
-  public static class RequestManagerStateEvent {
-    public int numInProgressRequests;
-    public String lastUri;
+  private void handleFailure(ApiRequest request, @Nullable Response response,
+      @Nullable IOException e) {
+    requestComplete(request, response);
+    if (e != null) {
+      log.error("Error in request: %s", request, e);
+    } else if (response != null) {
+      log.warning("Error in response: %d %s", response.code(), response.message());
+    } else {
+      throw new IllegalStateException("One of response or e should be non-null.");
+    }
+
+    request.handleError(response, e);
   }
 
-  /**
-   * Wraps the result of a request that we've made.
-   */
-  public static class ResultWrapper {
-    private HttpResponse mResponse;
-    private Connection mConnection;
-
-    public ResultWrapper(Connection conn, HttpResponse resp) {
-      mConnection = conn;
-      mResponse = resp;
-    }
-
-    public HttpResponse getResponse() {
-      return mResponse;
-    }
-
-    public void close() {
-      // make sure we've finished with the entity...
-      try {
-        mResponse.getEntity().consumeContent();
-      } catch (IOException e) {
-        // ignore....
+  /** Removes the given request from the in-flight collection and potentially enqueues another. */
+  private void requestComplete(ApiRequest request, @Nullable Response response) {
+    synchronized (lock) {
+      request.getTiming().onResponseReceived();
+      if (DBG) log.info("<< %s %d %s timing=%s", request, response == null ? 0 : response.code(),
+          response == null ? "<network-error>" : response.message(), request.getTiming());
+      inFlightRequests.remove(request);
+      if (!waitingRequests.isEmpty()) {
+        ApiRequest nextRequest = waitingRequests.pop();
+        if (inFlightRequests.size() < MAX_INFLIGHT_REQUESTS) {
+          inFlightRequests.add(nextRequest);
+          enqueueRequest(nextRequest);
+        }
       }
-
-      mConnection.getConnectionPool().returnConnection(mConnection);
-
-      eventBus.publish(getCurrentState());
     }
   }
 
+  void enqueueRequest(ApiRequest apiRequest) {
+    inFlightRequests.add(apiRequest);
+    if (DBG) log.info(">> %s", apiRequest);
+    apiRequest.getTiming().onRequestSent();
+    httpClient.newCall(apiRequest.buildOkRequest()).enqueue(responseCallback);
+  }
+
+  private Callback responseCallback = new Callback() {
+    @Override
+    public void onFailure(Request request, IOException e) {
+      handleFailure((ApiRequest) request.tag(), null, e);
+    }
+
+    @Override
+    public void onResponse(Response response) throws IOException {
+      ApiRequest request = (ApiRequest) response.request().tag();
+      handleResponse(request, response);
+    }
+  };
 }

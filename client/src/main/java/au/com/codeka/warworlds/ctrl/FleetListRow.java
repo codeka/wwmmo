@@ -29,9 +29,9 @@ import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
 import com.google.common.base.CaseFormat;
 
@@ -139,17 +139,16 @@ public class FleetListRow extends RelativeLayout {
         ArrayList<Integer> starIDs = new ArrayList<Integer>();
         starIDs.add(Integer.parseInt(fleet.getStarKey()));
         starIDs.add(Integer.parseInt(fleet.getDestinationStarKey()));
-        SparseArray<StarSummary> starSummaries = StarManager.i.getStarSummaries(
-                starIDs, Float.MAX_VALUE);
-        StarSummary srcStar = starSummaries.get(Integer.parseInt(fleet.getStarKey()));
-        StarSummary destStar = starSummaries.get(Integer.parseInt(fleet.getDestinationStarKey()));
+        SparseArray<Star> starSummaries = StarManager.i.getStars(starIDs);
+        Star srcStar = starSummaries.get(Integer.parseInt(fleet.getStarKey()));
+        Star destStar = starSummaries.get(Integer.parseInt(fleet.getDestinationStarKey()));
         if (srcStar != null && destStar != null) {
             populateFleetDestinationRow(context, row, fleet, srcStar, destStar, includeEta);
         }
     }
 
     private static void populateFleetDestinationRow(Context context, LinearLayout row,
-            Fleet fleet, StarSummary src, StarSummary dest, boolean includeEta) {
+            Fleet fleet, Star src, Star dest, boolean includeEta) {
         float timeRemainingInHours = fleet.getTimeToDestination();
         Sprite sprite = StarImageManager.getInstance().getSprite(dest, -1, true);
         String eta = TimeFormatter.create().format(timeRemainingInHours);

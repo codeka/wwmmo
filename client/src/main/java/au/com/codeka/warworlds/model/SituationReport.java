@@ -93,7 +93,7 @@ public class SituationReport {
     /**
      * Gets an HTML summary of this notification, useful for notification messages.
      */
-    public String getSummaryLine(StarSummary starSummary) {
+    public String getSummaryLine(Star starSummary) {
         String msg;
         if (mPlanetIndex >= 0) {
             msg = String.format(Locale.ENGLISH, "<b>%s %s:</b>",
@@ -159,7 +159,7 @@ public class SituationReport {
         return msg;
     }
 
-    public String getDescription(@Nullable StarSummary starSummary) {
+    public String getDescription(@Nullable Star starSummary) {
         String msg = "";
         String starName = (starSummary == null ? "star" : starSummary.getName());
 

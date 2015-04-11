@@ -50,12 +50,6 @@ public class HelloHandler extends RequestHandler {
     }
 
     private void processHello(Messages.HelloRequest hello_request_pb) throws RequestException {
-        Session sess = getSession();
-        if (hello_request_pb.hasAllowInlineNotfications()) {
-            sess.setAllowInlineNotifications(hello_request_pb.getAllowInlineNotfications());
-            new SessionController().saveSession(sess);
-        }
-
         Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder();
 
         // damn, this is why things should never be marked "required" in protobufs!
