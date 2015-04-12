@@ -102,10 +102,10 @@ public class TileGenerator {
       float sx = (float) (star.x - node.bounds.left) / node.bounds.width() * 255.0f;
       float sy = (float) (star.y - node.bounds.top) / node.bounds.height() * 255.0f;
 
-      int destLeft = (int) sx - 10;//zoomLevel - 3;
-      int destTop = (int) sy - 10;//zoomLevel - 3;
-      int destRight = (int) sx + 10;//(zoomLevel - 3);
-      int destBottom = (int) sy + 10;//(zoomLevel - 3);
+      int destLeft = (int) sx - (zoomLevel - (10 - zoomLevel) * 2);
+      int destTop = (int) sy - (zoomLevel - (10 - zoomLevel) * 2);
+      int destRight = (int) sx + (zoomLevel - (10 - zoomLevel) * 2);
+      int destBottom = (int) sy + (zoomLevel - (10 - zoomLevel) * 2);
 
       int srcLeft, srcTop, srcRight, srcBottom;
       if (star.type.toLowerCase().equals("blue")) {
@@ -150,7 +150,6 @@ public class TileGenerator {
         srcBottom = srcTop + 128;
       }
 
-      //g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 1.0f));
       g.drawImage(sprite, destLeft, destTop, destRight, destBottom,
           srcLeft, srcTop, srcRight, srcBottom, null);
     }
