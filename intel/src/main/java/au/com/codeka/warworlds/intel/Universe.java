@@ -78,10 +78,10 @@ public class Universe {
     // These are the bounds of the universe we create. These are just arbitrarily chosen because it
     // is often the case that there's a large number of stars outside the main "hub" of the
     // universe. We'll ignore those.
-    long minX = -500000;
-    long maxX = 500000;
-    long minY = -500000;
-    long maxY = 500000;
+    long minX = -200000;
+    long maxX = 200000;
+    long minY = -200000;
+    long maxY = 200000;
 
     log.info("Universe bounds: (%d, %d) - (%d, %d)", minX, minY, maxX, maxY);
     long width = maxX - minX;
