@@ -5,6 +5,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import au.com.codeka.common.Log;
 
@@ -18,7 +22,7 @@ public class TileGenerator {
   }
 
   public void setDebugTileCoords(boolean value) {
-    debugTileCoords = true;
+    debugTileCoords = value;
   }
 
   public BufferedImage generateTile(int zoomLevel, long x, long y) {
@@ -86,19 +90,69 @@ public class TileGenerator {
   }
 
   private void generateTileLarge(Universe.Node node, Graphics2D g, int zoomLevel) {
+    BufferedImage sprite = null;
+    try {
+      sprite = ImageIO.read(
+          new File(new File(Configuration.i.getDataDirectory()), "images/stars.png"));
+    } catch (IOException e) {
+      log.warning("Error loading stars.png", e);
+    }
+
     for (Universe.Star star : node.allStars()) {
       float sx = (float) (star.x - node.bounds.left) / node.bounds.width() * 255.0f;
       float sy = (float) (star.y - node.bounds.top) / node.bounds.height() * 255.0f;
 
-      int color = getStarColor(star);
-      if (star.empireName == null) {
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.6f));
+      int destLeft = (int) sx - 10;//zoomLevel - 3;
+      int destTop = (int) sy - 10;//zoomLevel - 3;
+      int destRight = (int) sx + 10;//(zoomLevel - 3);
+      int destBottom = (int) sy + 10;//(zoomLevel - 3);
+
+      int srcLeft, srcTop, srcRight, srcBottom;
+      if (star.type.toLowerCase().equals("blue")) {
+        srcLeft = 64;
+        srcTop = 128;
+        srcRight = srcLeft + 64;
+        srcBottom = srcTop + 64;
+      } else if (star.type.toLowerCase().equals("white")) {
+        srcLeft = 0;
+        srcTop = 256;
+        srcRight = srcLeft + 64;
+        srcBottom = srcTop + 64;
+      } else if (star.type.toLowerCase().equals("red")) {
+        srcLeft = 64;
+        srcTop = 192;
+        srcRight = srcLeft + 64;
+        srcBottom = srcTop + 64;
+      } else if (star.type.toLowerCase().equals("yellow")) {
+        srcLeft = 64;
+        srcTop = 256;
+        srcRight = srcLeft + 64;
+        srcBottom = srcTop + 64;
+      } else if (star.type.toLowerCase().equals("orange")) {
+        srcLeft = 0;
+        srcTop = 192;
+        srcRight = srcLeft + 64;
+        srcBottom = srcTop + 64;
+      } else if (star.type.toLowerCase().equals("neutron")) {
+        srcLeft = 0;
+        srcTop = 0;
+        srcRight = srcLeft + 128;
+        srcBottom = srcTop + 128;
+      } else if (star.type.toLowerCase().equals("black hole")) {
+        srcLeft = 0;
+        srcTop = 128;
+        srcRight = srcLeft + 64;
+        srcBottom = srcTop + 64;
       } else {
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+        srcLeft = 128;
+        srcTop = 0;
+        srcRight = srcLeft + 128;
+        srcBottom = srcTop + 128;
       }
 
-      g.setColor(new Color(color));
-      g.drawOval((int) sx, (int) sy, zoomLevel - 3, zoomLevel - 3);
+      //g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 1.0f));
+      g.drawImage(sprite, destLeft, destTop, destRight, destBottom,
+          srcLeft, srcTop, srcRight, srcBottom, null);
     }
   }
 
