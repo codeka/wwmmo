@@ -102,7 +102,7 @@ public class Universe {
     // the size of the generator image).
     int maxZoomLevel = 0;
     long zoomLevelTileSize = width;
-    while (zoomLevelTileSize > 1024) {
+    while (zoomLevelTileSize > 256) {
       maxZoomLevel ++;
       zoomLevelTileSize /= 2;
     }
