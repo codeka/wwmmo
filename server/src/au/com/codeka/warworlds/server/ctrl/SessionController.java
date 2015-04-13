@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.util.concurrent.TimeUnit;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.data.DB;
@@ -12,11 +13,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import org.joda.time.DateTime;
-
 import javax.annotation.Nonnull;
 
 public class SessionController {
+  private static final Log log = new Log("SessionController");
   private static final LoadingCache<String, Session> SESSION_CACHE;
   private static final LoadingCache<String, Integer> EMPIRE_ID_CACHE;
 
@@ -27,12 +27,20 @@ public class SessionController {
         .build(new CacheLoader<String, Session>() {
           @Override
           public Session load(@Nonnull String cookie) throws Exception {
+            log.info("Loading session for cookie: %s", cookie);
             try (SqlStmt stmt = DB.prepare("SELECT * FROM sessions WHERE session_cookie=?")) {
               stmt.setString(1, cookie);
               SqlResult res = stmt.select();
               if (res.next()) {
                 return new Session(res);
               }
+            }
+
+            if (cookie.endsWith("_anon.war-worlds.com")) {
+              // Anonymous cookies are OK, we always accept them.
+              log.info("Session cookie indicates anonymous user: %s", cookie.replace('_', '@'));
+              return new LoginController().createSession(cookie, cookie.replace('_', '@'),
+                  null, false);
             }
 
             throw new RequestException(403, "Could not find session, session cookie: " + cookie);

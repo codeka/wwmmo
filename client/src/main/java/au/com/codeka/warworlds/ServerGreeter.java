@@ -18,6 +18,7 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
 import au.com.codeka.BackgroundRunner;
@@ -40,7 +41,7 @@ import au.com.codeka.warworlds.model.RealmManager;
  * empire and stuff all set up.
  */
 public class ServerGreeter {
-  private static Log log = new Log("ServerGreeter");
+  private static final Log log = new Log("ServerGreeter");
   private static final ArrayList<HelloCompleteHandler> helloCompleteHandlers;
   private static final ArrayList<HelloWatcher> helloWatchers;
   private static Handler handler;
@@ -107,14 +108,6 @@ public class ServerGreeter {
     }
   }
 
-  private static void fireHelloComplete(boolean success) {
-    synchronized (helloCompleteHandlers) {
-      for (HelloCompleteHandler handler : helloCompleteHandlers) {
-        handler.onHelloComplete(success, serverGreeting);
-      }
-    }
-  }
-
   private static void sayHello(final Activity activity, final int retries) {
     LogImpl.setup();
     log.debug("Saying 'hello'...");
@@ -130,8 +123,8 @@ public class ServerGreeter {
 
     PreferenceManager.setDefaultValues(activity, R.xml.global_options, false);
 
-    int memoryClass = ((ActivityManager) activity.getSystemService(BaseActivity.ACTIVITY_SERVICE))
-        .getMemoryClass();
+    int memoryClass = ((ActivityManager) activity
+        .getSystemService(BaseActivity.ACTIVITY_SERVICE)).getMemoryClass();
     if (memoryClass < 40) {
       // on low memory devices, we want to make sure the background detail is always BLACK
       // this is a bit of a hack, but should stop the worst of the memory issues (I hope!)
@@ -140,11 +133,12 @@ public class ServerGreeter {
 
     // if we've saved off the authentication cookie, cool!
     SharedPreferences prefs = Util.getSharedPreferences();
-    final String accountName = prefs.getString("AccountName", null);
+    String accountName = prefs.getString("AccountName", null);
     if (accountName == null) {
-      fireHelloComplete(false);
-      activity.startActivity(new Intent(activity, AccountsActivity.class));
-      return;
+      // If we don't have an account name, just generate a random one that we'll be able to use
+      // (though on this device only, and assuming you never clear your data!)
+      accountName = generateAnonUserName();
+      prefs.edit().putString("AccountName", accountName).apply();
     }
 
     if (handler == null) {
@@ -155,7 +149,7 @@ public class ServerGreeter {
 
     new BackgroundRunner<String>() {
       private boolean needsEmpireSetup;
-      private boolean errorOccured;
+      private boolean errorOccurred;
       private boolean needsReAuthenticate;
       private boolean wasEmpireReset;
       private String resetReason;
@@ -181,7 +175,7 @@ public class ServerGreeter {
             log.info("Not authenticated, re-authenticating.");
             realm.getAuthenticator().authenticate(activity, realm);
           } catch (ApiException e) {
-            errorOccured = true;
+            errorOccurred = true;
             // if it wasn't a network error, it probably means we need to re-auth.
             needsReAuthenticate = !e.networkError();
             if (e.getCause() instanceof UserRecoverableAuthException) {
@@ -202,7 +196,7 @@ public class ServerGreeter {
           try {
             deviceRegistrationKey = DeviceRegistrar.register();
           } catch (ApiException e) {
-            errorOccured = true;
+            errorOccurred = true;
             // only re-authenticate for non-network related errors
             needsReAuthenticate = !e.networkError();
             if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
@@ -240,7 +234,7 @@ public class ServerGreeter {
         if (request.error() == null) {
           Messages.HelloResponse resp = request.body(Messages.HelloResponse.class);
           if (resp == null) {
-            errorOccured = true;
+            errorOccurred = true;
             return "Unknown error";
           }
 
@@ -273,7 +267,7 @@ public class ServerGreeter {
           BuildManager.i.setup(resp.getBuildingStatistics());
 
           message = resp.getMotd().getMessage();
-          errorOccured = false;
+          errorOccurred = false;
         } else {
           log.error("Error occurred in 'hello': %s", request.error().getErrorMessage());
 
@@ -282,7 +276,7 @@ public class ServerGreeter {
           if (exception != null
                 && (exception.getCause() instanceof UserRecoverableAuthException)) {
               message = "<p class=\"error\">Authentication failed.</p>";
-              errorOccured = true;
+              errorOccurred = true;
               needsReAuthenticate = true;
               intent = ((UserRecoverableAuthException) exception.getCause()).getIntent();
           } else if (exception != null) {
@@ -290,18 +284,18 @@ public class ServerGreeter {
             // (i.e. a network error) just keep retrying until it works.
             message = "<p class=\"error\">An error occurred talking to the server, check "
                 + "data connection.</p>";
-            errorOccured = true;
+            errorOccurred = true;
             needsReAuthenticate = false;
           } else if (request.error().getErrorCode()
               == Messages.GenericError.ErrorCode.AuthenticationError.getNumber()) {
             // if it's an authentication problem, we'll want to re-authenticate
             message = "<p class=\"error\">Authentication failed.</p>";
-            errorOccured = true;
+            errorOccurred = true;
             needsReAuthenticate = true;
           } else {
             // any other HTTP error, let's display that
             message = "<p class=\"error\">AN ERROR OCCURRED.</p>";
-            errorOccured = true;
+            errorOccurred = true;
             needsReAuthenticate = false;
           }
         }
@@ -314,7 +308,7 @@ public class ServerGreeter {
         if (needsEmpireSetup) {
           serverGreeting.mIntent = new Intent(activity, EmpireSetupActivity.class);
           helloComplete = true;
-        } else if (!errorOccured) {
+        } else if (!errorOccurred) {
           Util.setup(activity);
           ChatManager.i.setup();
           Notifications.startLongPoll();
@@ -323,7 +317,7 @@ public class ServerGreeter {
           BackgroundDetector.i.onBackgroundStatusChange();
 
           helloComplete = true;
-        } else /* errorOccured */ {
+        } else /* errorOccurred */ {
           if (toastMessage != null && toastMessage.length() > 0) {
             Toast toast = Toast.makeText(App.i, toastMessage, Toast.LENGTH_LONG);
             toast.show();
@@ -333,14 +327,19 @@ public class ServerGreeter {
             // if we need to re-authenticate, first forget the current credentials
             // the switch to the AccountsActivity.
             final SharedPreferences prefs = Util.getSharedPreferences();
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.remove("AccountName");
-            editor.apply();
-
-            if (intent != null) {
-              serverGreeting.mIntent = intent;
+            String currAccountName = prefs.getString("AccountName", null);
+            if (currAccountName != null && currAccountName.endsWith("@anon.war-worlds.com")) {
+              log.error("Need to re-authenticate, but AccountName is anonymous, cannot re-auth.");
             } else {
-              serverGreeting.mIntent = new Intent(activity, AccountsActivity.class);
+              SharedPreferences.Editor editor = prefs.edit();
+              editor.remove("AccountName");
+              editor.apply();
+
+              if (intent != null) {
+                serverGreeting.mIntent = intent;
+              } else {
+                serverGreeting.mIntent = new Intent(activity, AccountsActivity.class);
+              }
             }
             helloComplete = true;
           } else {
@@ -375,7 +374,7 @@ public class ServerGreeter {
         if (helloComplete) {
           synchronized (helloCompleteHandlers) {
             for (HelloCompleteHandler handler : helloCompleteHandlers) {
-              handler.onHelloComplete(!errorOccured, serverGreeting);
+              handler.onHelloComplete(!errorOccurred, serverGreeting);
             }
             helloCompleteHandlers.clear();
           }
@@ -436,6 +435,17 @@ public class ServerGreeter {
         }
       }
     }
+  }
+
+  /** Generates a user-name that an anonymous user can use. */
+  private static String generateAnonUserName() {
+    char[] validChars= "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+    SecureRandom rand = new SecureRandom();
+    StringBuilder userName = new StringBuilder();
+    for (int i = 0; i < 64; i++) {
+      userName.append(validChars[rand.nextInt(validChars.length)]);
+    }
+    return userName + "@anon.war-worlds.com";
   }
 
   public static class ServerGreeting {

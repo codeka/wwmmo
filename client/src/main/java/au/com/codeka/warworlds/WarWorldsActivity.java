@@ -128,12 +128,6 @@ public class WarWorldsActivity extends BaseActivity {
       return;
     }
 
-    if (prefs.getString("AccountName", null) == null) {
-      log.info("No accountName saved, switching to AccountsActivity");
-      startActivity(new Intent(this, AccountsActivity.class));
-      return;
-    }
-
     if (RealmContext.i.getCurrentRealm() == null) {
       log.info("No realm selected, switching to RealmSelectActivity");
       startActivity(new Intent(this, RealmSelectActivity.class));
@@ -141,8 +135,8 @@ public class WarWorldsActivity extends BaseActivity {
     }
 
     startGameButton.setEnabled(false);
-    realmName.setText(String
-        .format(Locale.ENGLISH, "Realm: %s", RealmContext.i.getCurrentRealm().getDisplayName()));
+    realmName.setText(String.format(Locale.ENGLISH,
+        "Realm: %s", RealmContext.i.getCurrentRealm().getDisplayName()));
 
     final TextView empireName = (TextView) findViewById(R.id.empire_name);
     final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
@@ -158,7 +152,6 @@ public class WarWorldsActivity extends BaseActivity {
       @Override
       public void onHelloComplete(boolean success, ServerGreeter.ServerGreeting greeting) {
         if (success) {
-
           // we'll display a bit of debugging info along with the 'connected' message
           long maxMemoryBytes = Runtime.getRuntime().maxMemory();
           int memoryClass = ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getMemoryClass();

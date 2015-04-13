@@ -64,29 +64,32 @@ public class Authenticator {
     Context context = App.i;
     log.info("(re-)authenticating \"%s\" to realm %s...", accountName, realm.getDisplayName());
     String cookie = null;
-
-    try {
-      final String scope = "oauth2:email";
-      String authToken = GoogleAuthUtil.getToken(context, accountName, scope);
-      if (authToken == null) {
-        throw new ApiException("Error getting auth token.");
+    if (accountName.endsWith("@anon.war-worlds.com")) {
+      // If it's an anonymous account, there's no password/authentication required. We just pass
+      // the email address directly as the cookie.
+      cookie = String.format("SESSION=%s",accountName.replace('@', '_'));
+    } else {
+      try {
+        final String scope = "oauth2:email";
+        String authToken = GoogleAuthUtil.getToken(context, accountName, scope);
+        if (authToken == null) {
+          throw new ApiException("Error getting auth token.");
+        }
+        cookie = getCookie(authToken, realm);
+        log.info("Authentication successful.");
+      } catch (UserRecoverableAuthException e) {
+        // If it's a 'recoverable' exception, we need to start the given intent and then try again.
+        if (activity == null) {
+          throw new ApiException("Cannot retry, no activity given.", e);
+        }
+        Intent intent = e.getIntent();
+        activity.startActivityForResult(intent, BaseActivity.AUTH_RECOVERY_REQUEST);
+        log.warning("Got UserRecoverableAuthException, TODO");
+      } catch (GoogleAuthException | IOException e) {
+        throw new ApiException(e);
+      } finally {
+        authenticating = false;
       }
-      cookie = getCookie(authToken, realm);
-      log.info("Authentication successful.");
-    } catch (UserRecoverableAuthException e) {
-      // If it's a 'recoverable' exception, we need to start the given intent and then try again.
-      if (activity == null) {
-        throw new ApiException("Cannot retry, no activity given.", e);
-      }
-      Intent intent = e.getIntent();
-      activity.startActivityForResult(intent, BaseActivity.AUTH_RECOVERY_REQUEST);
-      log.warning("Got UserRecoverableAuthException, TODO");
-    } catch (GoogleAuthException e) {
-      throw new ApiException(e);
-    } catch (IOException e) {
-      throw new ApiException(e);
-    } finally {
-      authenticating = false;
     }
     authCookie = cookie;
     return true;
