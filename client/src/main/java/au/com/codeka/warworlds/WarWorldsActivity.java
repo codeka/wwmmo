@@ -20,10 +20,12 @@ import org.w3c.dom.NodeList;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -111,8 +113,7 @@ public class WarWorldsActivity extends BaseActivity {
     findViewById(R.id.reauth_btn).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        final Intent intent = new Intent(context, AccountsActivity.class);
-        startActivity(intent);
+        onReauthClick();
       }
     });
   }
@@ -120,7 +121,7 @@ public class WarWorldsActivity extends BaseActivity {
   @Override
   public void onResumeFragments() {
     super.onResumeFragments();
-    SharedPreferences prefs = Util.getSharedPreferences();
+    final SharedPreferences prefs = Util.getSharedPreferences();
     if (!prefs.getBoolean("WarmWelcome", false)) {
       // if we've never done the warm-welcome, do it now
       log.info("Starting Warm Welcome");
@@ -135,8 +136,8 @@ public class WarWorldsActivity extends BaseActivity {
     }
 
     startGameButton.setEnabled(false);
-    realmName.setText(String.format(Locale.ENGLISH,
-        "Realm: %s", RealmContext.i.getCurrentRealm().getDisplayName()));
+    realmName.setText(String
+        .format(Locale.ENGLISH, "Realm: %s", RealmContext.i.getCurrentRealm().getDisplayName()));
 
     final TextView empireName = (TextView) findViewById(R.id.empire_name);
     final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
@@ -169,9 +170,48 @@ public class WarWorldsActivity extends BaseActivity {
             empireName.setText(empire.getDisplayName());
             empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
           }
+
+          String currAccountName = prefs.getString("AccountName", null);
+          if (currAccountName != null && currAccountName.endsWith("@anon.war-worlds.com")) {
+            Button reauthButton = (Button) findViewById(R.id.reauth_btn);
+            reauthButton.setText("Sign in");
+          }
+          maybeShowSignInPrompt();
         }
       }
     });
+  }
+
+  private void onReauthClick() {
+    final Intent intent = new Intent(context, AccountsActivity.class);
+    startActivity(intent);
+  }
+
+  private void maybeShowSignInPrompt() {
+    final SharedPreferences prefs = Util.getSharedPreferences();
+    int numStartsSinceSignInPrompt = prefs.getInt("NumStartsSinceSignInPrompt", 0);
+    if (numStartsSinceSignInPrompt < 5) {
+      prefs.edit().putInt("NumStartsSinceSignInPrompt", numStartsSinceSignInPrompt + 1).apply();
+      return;
+    }
+
+    // set the count to -95, which means they won't get prompted for another 100 starts... should
+    // be plenty to not be annoying, yet still be a useful prompt.
+    prefs.edit().putInt("NumStartsSinceSignInPrompt", -95).apply();
+    new StyledDialog.Builder(context)
+        .setMessage(Html.fromHtml("<p>In order to ensure your empire is safe in the event you lose "
+            + "your phone, it's recommended that you sign in. You must also sign in if you want to "
+            + "access your empire from multiple devices.</p><p>Click \"Sign in\" below to sign in "
+            + "with a Google account.</p>"))
+        .setTitle("Sign in")
+        .setNegativeButton("No, thanks", null)
+        .setPositiveButton("Sign in", new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                onReauthClick();
+              }
+            })
+        .create().show();
   }
 
   private void refreshWelcomeMessage() {
