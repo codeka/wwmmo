@@ -19,15 +19,14 @@ import au.com.codeka.warworlds.server.handlers.*;
 import au.com.codeka.warworlds.server.handlers.admin.*;
 import au.com.codeka.warworlds.server.monitor.MonitorManager;
 
-
 public class RequestRouter extends AbstractHandler {
     private static final Log log = new Log("RequestRouter");
     private static ArrayList<Route> sRoutes;
 
     private final MonitorManager monitorManager = new MonitorManager();
 
-    {
-        sRoutes = new ArrayList<Route>();
+    static {
+        sRoutes = new ArrayList<>();
         sRoutes.add(new Route("login", LoginHandler.class));
         sRoutes.add(new Route("devices/(?<id>[0-9]*)", DevicesHandler.class));
         sRoutes.add(new Route("devices", DevicesHandler.class));
@@ -77,6 +76,7 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("motd", MotdHandler.class));
         sRoutes.add(new Route("notifications", NotificationHandler.class));
         sRoutes.add(new Route("error-reports", ErrorReportsHandler.class));
+        sRoutes.add(new Route("anon-associate", AnonUserAssociateHandler.class));
 
         sRoutes.add(new Route("admin/login", AdminLoginHandler.class));
         sRoutes.add(new Route("admin/(?<path>actions/move-star)", AdminActionsMoveStarHandler.class, "admin/"));

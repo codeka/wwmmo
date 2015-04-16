@@ -9,13 +9,6 @@
     <string name="focus">Focus</string>
     <string name="view">View</string>
 
-    <!-- "log_in.xml" layout -->
-    <string name="log_in">Log In</string>
-
-    <!-- "log_out.xml" layout -->
-    <string name="log_out_msg">You are currently logged in as %1$s, are you sure you want to log out?</string>
-    <string name="log_out">Log Out</string>
-
     <!-- "home.xml" layout -->
     <string name="start_game">Start Game</string>
     <string name="options">Options</string>

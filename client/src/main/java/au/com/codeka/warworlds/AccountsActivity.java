@@ -19,6 +19,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.api.ApiRequest;
+import au.com.codeka.warworlds.api.RequestManager;
+
 /**
  * Account selections activity - handles device registration and unregistration.
  */
@@ -35,10 +39,13 @@ public class AccountsActivity extends BaseActivity {
 
     Util.setup(this);
     Util.loadProperties();
+    setContentView(R.layout.accounts);
+
     SharedPreferences prefs = Util.getSharedPreferences();
     String accountName = prefs.getString("AccountName", null);
-
-    setContentView(R.layout.accounts);
+    if (accountName != null && !accountName.endsWith("@anon.war-worlds.com")) {
+      findViewById(R.id.anon_overwrite_notice).setVisibility(View.GONE);
+    }
 
     List<String> accounts = getGoogleAccounts();
     if (accounts.size() == 0) {
@@ -81,16 +88,18 @@ public class AccountsActivity extends BaseActivity {
         accountSelectedPosition = listView.getCheckedItemPosition();
         TextView account = (TextView) listView.getChildAt(accountSelectedPosition);
 
-        // Save the new account name, and force another 'hello'
-        Util.getSharedPreferences().edit()
-            .putString("AccountName", account.getText().toString())
-            .apply();
-        if (RealmContext.i.getCurrentRealm() != null) {
-          RealmContext.i.getCurrentRealm().getAuthenticator().logout();
-        }
-        ServerGreeter.clearHello();
+        SharedPreferences prefs = Util.getSharedPreferences();
+        String accountName = prefs.getString("AccountName", null);
 
-        finish();
+        // If they're currently anonymous, then we should associate them before continuing.
+        if (accountName != null && accountName.endsWith("@anon.war-worlds.com")) {
+          logInButton.setEnabled(false);
+          associateAnonAccount(account.getText().toString());
+          return;
+        }
+
+        // Otherwise, just save the new account name and we're done.
+        saveAccountName(account.getText().toString());
       }
     });
 
@@ -111,6 +120,37 @@ public class AccountsActivity extends BaseActivity {
         startActivity(i);
       }
     });
+  }
+
+  /** Associates the current anonymous empire with the given new account name. */
+  private void associateAnonAccount(final String newAccountName) {
+    RequestManager.i.sendRequest(new ApiRequest.Builder("anon-associate", "POST")
+        .body(Messages.AnonUserAssociate.newBuilder().setUserEmail(newAccountName).build())
+        .completeCallback(new ApiRequest.CompleteCallback() {
+              @Override
+              public void onRequestComplete(ApiRequest request) {
+                saveAccountName(newAccountName);
+              }
+            })
+        .errorCallback(new ApiRequest.ErrorCallback() {
+              @Override
+              public void onRequestError(ApiRequest request, Messages.GenericError error) {
+                findViewById(R.id.log_in_btn).setEnabled(true);
+                StyledDialog.showErrorMessage(AccountsActivity.this, error.getErrorMessage());
+              }
+            })
+        .build());
+  }
+
+  /** Saves the new account name and finishes this activity. */
+  private void saveAccountName(String accountName) {
+    Util.getSharedPreferences().edit().putString("AccountName", accountName).apply();
+    if (RealmContext.i.getCurrentRealm() != null) {
+      RealmContext.i.getCurrentRealm().getAuthenticator().logout();
+    }
+    ServerGreeter.clearHello();
+
+    finish();
   }
 
   /**

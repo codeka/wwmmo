@@ -57,6 +57,7 @@ message GenericError
         NoWormholeDisruptorInRange = 34;
         NetworkError = 35;
         AuthenticationError = 36;
+        NotAnonymous = 37;
     }
 }
 
@@ -74,6 +75,14 @@ message PurchaseInfo
     optional string developer_payload = 5;
 }
 
+
+//
+// Message to associate an empire with a "real" user account.
+//
+message AnonUserAssociate
+{
+    optional string user_email = 1;
+}
 
 //
 // Details of an empire's rank (such as number of ships, number of colonies etc)

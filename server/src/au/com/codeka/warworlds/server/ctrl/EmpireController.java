@@ -169,6 +169,15 @@ public class EmpireController {
     return null;
   }
 
+  /** Associates the given empire with the given user, overwriting the previous association. */
+  public void associateEmpire(int empireId, String userEmail) throws RequestException {
+    try {
+      db.associateEmpire(empireId, userEmail);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
   public boolean withdrawCash(int empireId, float amount,
       Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
     return adjustBalance(empireId, -amount, audit_record_pb);
@@ -570,6 +579,15 @@ public class EmpireController {
 
         populateEmpires(empires);
         return empires.values();
+      }
+    }
+
+    public void associateEmpire(int empireID, String userEmail) throws Exception {
+      String sql = "UPDATE empires SET user_email = ? WHERE id = ?";
+      try (SqlStmt stmt = DB.prepare(sql)) {
+        stmt.setString(1, userEmail);
+        stmt.setInt(2, empireID);
+        stmt.update();
       }
     }
 

@@ -17,7 +17,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/title_icon"
-        android:text="Log In"
+        android:text="Sign in"
         style="@style/TitleText" />
 
     <Button
@@ -84,6 +84,19 @@
         android:textSize="16sp" >
     </ListView>
 
+    <TextView
+        android:id="@+id/anon_overwrite_notice"
+        android:layout_width="310dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/log_in_btn"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="@dimen/tablet_margin_10dp"
+        android:layout_marginRight="@dimen/tablet_margin_10dp"
+        android:layout_marginBottom="10dp"
+        android:textStyle="bold"
+        android:text="When you sign in, your empire will be associated with this account and you'll be able to use the same account to play War Worlds on multiple devices." />
+
     <Button
         android:id="@+id/log_in_btn"
         android:layout_width="330dp"
@@ -93,6 +106,6 @@
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginRight="@dimen/tablet_margin_5dp"
-        android:text="Select User" />
+        android:text="Sign in" />
     
 </RelativeLayout>
