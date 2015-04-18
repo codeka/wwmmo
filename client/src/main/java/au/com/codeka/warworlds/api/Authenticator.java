@@ -68,6 +68,7 @@ public class Authenticator {
       // If it's an anonymous account, there's no password/authentication required. We just pass
       // the email address directly as the cookie.
       cookie = String.format("SESSION=%s",accountName.replace('@', '_'));
+      authenticating = false;
     } else {
       try {
         final String scope = "oauth2:email";

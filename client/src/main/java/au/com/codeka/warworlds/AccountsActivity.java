@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Html;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -22,6 +23,8 @@ import android.widget.TextView;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 
 /**
  * Account selections activity - handles device registration and unregistration.
@@ -133,12 +136,29 @@ public class AccountsActivity extends BaseActivity {
               }
             })
         .errorCallback(new ApiRequest.ErrorCallback() {
-              @Override
-              public void onRequestError(ApiRequest request, Messages.GenericError error) {
-                findViewById(R.id.log_in_btn).setEnabled(true);
-                StyledDialog.showErrorMessage(AccountsActivity.this, error.getErrorMessage());
-              }
-            })
+          @Override
+          public void onRequestError(ApiRequest request, Messages.GenericError error) {
+            MyEmpire empire = EmpireManager.i.getEmpire();
+            new StyledDialog.Builder(AccountsActivity.this).setTitle("Cannot associate")
+                .setMessage(Html.fromHtml("<p>" + error.getErrorMessage() + "</p>"
+                    + "<p>Do you want to switch to this account anyway? Doing so will leave "
+                    + empire.getDisplayName() + " abandoned.</p>"))
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                      @Override
+                      public void onClick(DialogInterface dialog, int which) {
+                        findViewById(R.id.log_in_btn).setEnabled(true);
+                      }
+                    })
+                .setPositiveButton("Switch", new DialogInterface.OnClickListener() {
+                      @Override
+                      public void onClick(DialogInterface dialog, int which) {
+                        findViewById(R.id.log_in_btn).setEnabled(true);
+                        saveAccountName(newAccountName);
+                      }
+                    })
+                .create().show();
+          }
+        })
         .build());
   }
 
