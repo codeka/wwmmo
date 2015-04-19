@@ -66,6 +66,14 @@
         <requestFocus />
     </EditText>
 
+    <Button
+        android:id="@+id/switch_account_btn"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@id/empire_setup_name"
+        android:layout_margin="10dp"
+        android:text="I already have an empire"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -2,6 +2,7 @@ package au.com.codeka.warworlds;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.KeyEvent;
 import android.view.View;
@@ -32,6 +33,7 @@ public class EmpireSetupActivity extends BaseActivity {
 
     final TextView empireName = (TextView) findViewById(R.id.empire_setup_name);
     final Button doneButton = (Button) findViewById(R.id.empire_setup_done);
+    final Button switchAccountBtn = (Button) findViewById(R.id.switch_account_btn);
 
     empireName.setOnEditorActionListener(new OnEditorActionListener() {
       @Override
@@ -41,18 +43,31 @@ public class EmpireSetupActivity extends BaseActivity {
       }
     });
 
+    switchAccountBtn.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        switchAccount();
+      }
+    });
+
     doneButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
         saveEmpire();
       }
     });
-
   }
 
   private void saveEmpire() {
     final TextView empireName = (TextView) findViewById(R.id.empire_setup_name);
     saveEmpire(empireName.getText().toString());
+  }
+
+  private void switchAccount() {
+    SharedPreferences prefs = Util.getSharedPreferences();
+    prefs.edit().putString("AccountName", null).apply();
+    startActivity(new Intent(this, AccountsActivity.class));
+    finish();
   }
 
   private void saveEmpire(final String empireName) {
@@ -89,8 +104,7 @@ public class EmpireSetupActivity extends BaseActivity {
           public void onRequestError(ApiRequest request, Messages.GenericError error) {
             pleaseWaitDialog.dismiss();
 
-            new StyledDialog.Builder(context).setTitle("Error").setMessage(error.getErrorMessage())
-                .setNeutralButton("OK", null).create().show();
+            StyledDialog.showErrorMessage(context, error.getErrorMessage());
           }
         }).build());
   }
