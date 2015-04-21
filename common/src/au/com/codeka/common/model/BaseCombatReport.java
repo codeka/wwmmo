@@ -6,7 +6,7 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.CombatReport;
 
 public class BaseCombatReport {
     protected String mKey;
@@ -53,17 +53,15 @@ public class BaseCombatReport {
         return mCombatRounds;
     }
 
-    public void fromProtocolBuffer(Messages.CombatReport pb) {
-        if (pb.hasKey()) {
-            mKey = pb.getKey();
-        }
-        mStarKey = pb.getStarKey();
-        mStartTime = new DateTime(pb.getStartTime() * 1000, DateTimeZone.UTC);
-        mEndTime = new DateTime(pb.getEndTime() * 1000, DateTimeZone.UTC);
+    public void fromProtocolBuffer(CombatReport pb) {
+        mKey = pb.key;
+        mStarKey = pb.star_key;
+        mStartTime = new DateTime(pb.start_time * 1000, DateTimeZone.UTC);
+        mEndTime = new DateTime(pb.end_time * 1000, DateTimeZone.UTC);
         // TODO: mStartEmpires
         // TODO: mEndEmpires
-        mTotalDestroyed = pb.getNumDestroyed();
-        for (Messages.CombatRound crpb : pb.getRoundsList()) {
+        mTotalDestroyed = pb.num_destroyed;
+        for (au.com.codeka.common.protobuf.CombatRound crpb : pb.rounds) {
             CombatRound combatRound = CombatRound.fromProtocolBuffer(crpb);
             mCombatRounds.add(combatRound);
             if (mCombatRounds.size() > 50) {
@@ -73,24 +71,24 @@ public class BaseCombatReport {
         }
     }
 
-    public void toProtocolBuffer(Messages.CombatReport.Builder pb) {
-        if (mKey != null) {
-            pb.setKey(mKey);
-        }
-        pb.setStarKey(mStarKey);
+    public void toProtocolBuffer(CombatReport.Builder pb) {
+        pb.key = mKey;
+        pb.star_key = mStarKey;
         if (mStartTime != null) {
-            pb.setStartTime(mStartTime.getMillis() / 1000);
+            pb.start_time = mStartTime.getMillis() / 1000;
         }
         if (mEndTime != null) {
-            pb.setEndTime(mEndTime.getMillis() / 1000);
+            pb.end_time = mEndTime.getMillis() / 1000;
         }
         // TODO: mStartEmpires
         // TODO: mEndEmpires
-        pb.setNumDestroyed(mTotalDestroyed);
+        pb.num_destroyed = mTotalDestroyed;
+        pb.rounds = new ArrayList<>();
         for (CombatRound round : mCombatRounds) {
-            Messages.CombatRound.Builder combat_round_pb = Messages.CombatRound.newBuilder();
+            au.com.codeka.common.protobuf.CombatRound.Builder combat_round_pb =
+                    new au.com.codeka.common.protobuf.CombatRound.Builder();
             round.toProtocolBuffer(combat_round_pb);
-            pb.addRounds(combat_round_pb.build());
+            pb.rounds.add(combat_round_pb.build());
         }
     }
 
@@ -104,11 +102,11 @@ public class BaseCombatReport {
         private List<FleetDamagedRecord> mFleetDamagedRecords;
 
         public CombatRound() {
-            mFleets = new ArrayList<FleetSummary>();
-            mFleetJoinedRecords = new ArrayList<FleetJoinedRecord>();
-            mFleetTargetRecords = new ArrayList<FleetTargetRecord>();
-            mFleetAttackRecords = new ArrayList<FleetAttackRecord>();
-            mFleetDamagedRecords = new ArrayList<FleetDamagedRecord>();
+            mFleets = new ArrayList<>();
+            mFleetJoinedRecords = new ArrayList<>();
+            mFleetTargetRecords = new ArrayList<>();
+            mFleetAttackRecords = new ArrayList<>();
+            mFleetDamagedRecords = new ArrayList<>();
         }
 
         public String getStarKey() {
@@ -139,65 +137,75 @@ public class BaseCombatReport {
             return mFleetDamagedRecords;
         }
 
-        public static CombatRound fromProtocolBuffer(Messages.CombatRound pb) {
+        public static CombatRound fromProtocolBuffer(au.com.codeka.common.protobuf.CombatRound pb) {
             CombatRound combatRound = new CombatRound();
-            combatRound.mStarKey = pb.getStarKey();
-            combatRound.mRoundTime = new DateTime(pb.getRoundTime() * 1000, DateTimeZone.UTC);
-            for (Messages.CombatRound.FleetSummary fspb : pb.getFleetsList()) {
+            combatRound.mStarKey = pb.star_key;
+            combatRound.mRoundTime = new DateTime(pb.round_time * 1000, DateTimeZone.UTC);
+            for (au.com.codeka.common.protobuf.CombatRound.FleetSummary fspb : pb.fleets) {
                 combatRound.mFleets.add(FleetSummary.fromProtocolBuffer(fspb));
             }
-            for (Messages.CombatRound.FleetJoinedRecord fjrpb : pb.getFleetsJoinedList()) {
+            for (au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord fjrpb : pb.fleets_joined) {
                 combatRound.mFleetJoinedRecords.add(FleetJoinedRecord.fromProtocolBuffer(combatRound.mFleets, fjrpb));
             }
-            for (Messages.CombatRound.FleetTargetRecord ftrpb : pb.getFleetsTargettedList()) {
+            for (au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord ftrpb : pb.fleets_targetted) {
                 combatRound.mFleetTargetRecords.add(FleetTargetRecord.fromProtocolBuffer(combatRound.mFleets, ftrpb));
             }
-            for (Messages.CombatRound.FleetAttackRecord farpb : pb.getFleetsAttackedList()) {
+            for (au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord farpb : pb.fleets_attacked) {
                 combatRound.mFleetAttackRecords.add(FleetAttackRecord.fromProtocolBuffer(combatRound.mFleets, farpb));
             }
-            for (Messages.CombatRound.FleetDamagedRecord fdrpb : pb.getFleetsDamagedList()) {
+            for (au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord fdrpb : pb.fleets_damaged) {
                 combatRound.mFleetDamagedRecords.add(FleetDamagedRecord.fromProtocolBuffer(combatRound.mFleets, fdrpb));
             }
             return combatRound;
         }
 
 
-        public void toProtocolBuffer(Messages.CombatRound.Builder pb) {
-            pb.setStarKey(mStarKey);
-            pb.setRoundTime(mRoundTime.getMillis() / 1000);
+        public void toProtocolBuffer(au.com.codeka.common.protobuf.CombatRound.Builder pb) {
+            pb.star_key = mStarKey;
+            pb.round_time = mRoundTime.getMillis() / 1000;
+            pb.fleets = new ArrayList<>();
             for (FleetSummary fleetSummary : mFleets) {
-                Messages.CombatRound.FleetSummary.Builder fleet_summary_pb = Messages.CombatRound.FleetSummary.newBuilder();
-                fleet_summary_pb.addAllFleetKeys(fleetSummary.mFleetKeys);
+                au.com.codeka.common.protobuf.CombatRound.FleetSummary.Builder fleet_summary_pb =
+                        new au.com.codeka.common.protobuf.CombatRound.FleetSummary.Builder();
+                fleet_summary_pb.fleet_keys(fleetSummary.mFleetKeys);
                 if (fleetSummary.mEmpireKey != null) {
-                    fleet_summary_pb.setEmpireKey(fleetSummary.mEmpireKey);
+                    fleet_summary_pb.empire_key = fleetSummary.mEmpireKey;
                 }
-                fleet_summary_pb.setDesignId(fleetSummary.mDesignID);
-                fleet_summary_pb.setNumShips(fleetSummary.mNumShips);
-                pb.addFleets(fleet_summary_pb);
+                fleet_summary_pb.design_id = fleetSummary.mDesignID;
+                fleet_summary_pb.num_ships = fleetSummary.mNumShips;
+                pb.fleets.add(fleet_summary_pb.build());
             }
+            pb.fleets_joined = new ArrayList<>();
             for (FleetJoinedRecord fleetJoined : mFleetJoinedRecords) {
-                Messages.CombatRound.FleetJoinedRecord.Builder fleet_joined_pb = Messages.CombatRound.FleetJoinedRecord.newBuilder();
-                fleet_joined_pb.setFleetIndex(fleetJoined.mFleetIndex);
-                pb.addFleetsJoined(fleet_joined_pb);
+                au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord.Builder fleet_joined_pb =
+                    new au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord.Builder();
+                fleet_joined_pb.fleet_index = fleetJoined.mFleetIndex;
+                pb.fleets_joined.add(fleet_joined_pb.build());
             }
+            pb.fleets_targetted = new ArrayList<>();
             for (FleetTargetRecord fleetTargetted : mFleetTargetRecords) {
-                Messages.CombatRound.FleetTargetRecord.Builder fleet_targetted_pb = Messages.CombatRound.FleetTargetRecord.newBuilder();
-                fleet_targetted_pb.setFleetIndex(fleetTargetted.mFleetIndex);
-                fleet_targetted_pb.setTargetIndex(fleetTargetted.mTargetIndex);
-                pb.addFleetsTargetted(fleet_targetted_pb);
+                au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord.Builder fleet_targetted_pb =
+                        new au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord.Builder();
+                fleet_targetted_pb.fleet_index = fleetTargetted.mFleetIndex;
+                fleet_targetted_pb.target_index = fleetTargetted.mTargetIndex;
+                pb.fleets_targetted.add(fleet_targetted_pb.build());
             }
+            pb.fleets_attacked = new ArrayList<>();
             for (FleetAttackRecord fleetTargetted : mFleetAttackRecords) {
-                Messages.CombatRound.FleetAttackRecord.Builder fleet_attack_pb = Messages.CombatRound.FleetAttackRecord.newBuilder();
-                fleet_attack_pb.setFleetIndex(fleetTargetted.mFleetIndex);
-                fleet_attack_pb.setTargetIndex(fleetTargetted.mTargetIndex);
-                fleet_attack_pb.setDamage(fleetTargetted.mDamage);
-                pb.addFleetsAttacked(fleet_attack_pb);
+                au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord.Builder fleet_attack_pb =
+                        new au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord.Builder();
+                fleet_attack_pb.fleet_index = fleetTargetted.mFleetIndex;
+                fleet_attack_pb.target_index = fleetTargetted.mTargetIndex;
+                fleet_attack_pb.damage = fleetTargetted.mDamage;
+                pb.fleets_attacked.add(fleet_attack_pb.build());
             }
+            pb.fleets_damaged = new ArrayList<>();
             for (FleetDamagedRecord fleetDamaged : mFleetDamagedRecords) {
-                Messages.CombatRound.FleetDamagedRecord.Builder fleet_damage_pb = Messages.CombatRound.FleetDamagedRecord.newBuilder();
-                fleet_damage_pb.setFleetIndex(fleetDamaged.mFleetIndex);
-                fleet_damage_pb.setDamage(fleetDamaged.mDamage);
-                pb.addFleetsDamaged(fleet_damage_pb);
+                au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord.Builder fleet_damage_pb =
+                        new au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord.Builder();
+                fleet_damage_pb.fleet_index = fleetDamaged.mFleetIndex;
+                fleet_damage_pb.damage = fleetDamaged.mDamage;
+                pb.fleets_damaged.add(fleet_damage_pb.build());
             }
         }
     }
@@ -211,8 +219,8 @@ public class BaseCombatReport {
         private int mIndex;
 
         public FleetSummary() {
-            mFleetKeys = new ArrayList<String>();
-            mFleets = new ArrayList<BaseFleet>();
+            mFleetKeys = new ArrayList<>();
+            mFleets = new ArrayList<>();
         }
         public FleetSummary(BaseFleet fleet) {
             this();
@@ -280,12 +288,12 @@ public class BaseCombatReport {
             mIndex = index;
         }
 
-        public static FleetSummary fromProtocolBuffer(Messages.CombatRound.FleetSummary pb) {
+        public static FleetSummary fromProtocolBuffer(au.com.codeka.common.protobuf.CombatRound.FleetSummary pb) {
             FleetSummary fleetSummary = new FleetSummary();
-            fleetSummary.mFleetKeys = pb.getFleetKeysList();
-            fleetSummary.mEmpireKey = pb.getEmpireKey();
-            fleetSummary.mDesignID = pb.getDesignId();
-            fleetSummary.mNumShips = pb.getNumShips();
+            fleetSummary.mFleetKeys = pb.fleet_keys;
+            fleetSummary.mEmpireKey = pb.empire_key;
+            fleetSummary.mDesignID = pb.design_id;
+            fleetSummary.mNumShips = pb.num_ships;
             return fleetSummary;
         }
     }
@@ -308,9 +316,9 @@ public class BaseCombatReport {
         }
 
         public static FleetJoinedRecord fromProtocolBuffer(List<FleetSummary> fleets,
-                                                           Messages.CombatRound.FleetJoinedRecord pb) {
+                au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord pb) {
             FleetJoinedRecord fjr = new FleetJoinedRecord(fleets);
-            fjr.mFleetIndex = pb.getFleetIndex();
+            fjr.mFleetIndex = pb.fleet_index;
             return fjr;
         }
     }
@@ -338,10 +346,10 @@ public class BaseCombatReport {
         }
 
         public static FleetTargetRecord fromProtocolBuffer(List<FleetSummary> fleets,
-                                                           Messages.CombatRound.FleetTargetRecord pb) {
+                au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord pb) {
             FleetTargetRecord ftr = new FleetTargetRecord(fleets);
-            ftr.mFleetIndex = pb.getFleetIndex();
-            ftr.mTargetIndex = pb.getTargetIndex();
+            ftr.mFleetIndex = pb.fleet_index;
+            ftr.mTargetIndex = pb.target_index;
             return ftr;
         }
     }
@@ -374,11 +382,11 @@ public class BaseCombatReport {
         }
 
         public static FleetAttackRecord fromProtocolBuffer(List<FleetSummary> fleets,
-                                                           Messages.CombatRound.FleetAttackRecord pb) {
+                au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord pb) {
             FleetAttackRecord far = new FleetAttackRecord(fleets);
-            far.mFleetIndex = pb.getFleetIndex();
-            far.mTargetIndex = pb.getTargetIndex();
-            far.mDamage = pb.getDamage();
+            far.mFleetIndex = pb.fleet_index;
+            far.mTargetIndex = pb.target_index;
+            far.mDamage = pb.damage;
             return far;
         }
     }
@@ -406,10 +414,10 @@ public class BaseCombatReport {
         }
 
         public static FleetDamagedRecord fromProtocolBuffer(List<FleetSummary> fleets,
-                                                            Messages.CombatRound.FleetDamagedRecord pb) {
+                au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord pb) {
             FleetDamagedRecord fdr = new FleetDamagedRecord(fleets);
-            fdr.mFleetIndex = pb.getFleetIndex();
-            fdr.mDamage = pb.getDamage();
+            fdr.mFleetIndex = pb.fleet_index;
+            fdr.mDamage = pb.damage;
             return fdr;
         }
     }

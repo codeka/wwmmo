@@ -1,6 +1,6 @@
 package au.com.codeka.common.model;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.ChatConversationParticipant;
 
 public class BaseChatConversationParticipant {
     protected int mEmpireID;
@@ -14,13 +14,13 @@ public class BaseChatConversationParticipant {
         return mIsMuted;
     }
 
-    public void fromProtocolBuffer(Messages.ChatConversationParticipant pb) {
-        mEmpireID = pb.getEmpireId();
-        mIsMuted = pb.getIsMuted();
+    public void fromProtocolBuffer(ChatConversationParticipant pb) {
+        mEmpireID = pb.empire_id;
+        mIsMuted = pb.is_muted;
     }
 
-    public void toProtocolBuffer(Messages.ChatConversationParticipant.Builder pb) {
-        pb.setEmpireId(mEmpireID);
-        pb.setIsMuted(mIsMuted);
+    public void toProtocolBuffer(ChatConversationParticipant.Builder pb) {
+        pb.empire_id = mEmpireID;
+        pb.is_muted = mIsMuted;
     }
 }

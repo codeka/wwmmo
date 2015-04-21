@@ -3,9 +3,10 @@ package au.com.codeka.common.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import com.google.common.base.Strings;
 import com.google.common.html.HtmlEscapers;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.ChatMessage;
 
 public class BaseChatMessage {
     protected int mID;
@@ -72,58 +73,34 @@ public class BaseChatMessage {
         return mProfanityLevel;
     }
 
-    public void fromProtocolBuffer(Messages.ChatMessage pb) {
-        if (pb.hasId()) {
-            mID = pb.getId();
-        }
-        mMessage = pb.getMessage();
-        if (pb.getEmpireKey() != null && !pb.getEmpireKey().equals("")) {
-            mEmpireKey = pb.getEmpireKey();
-        }
-        if (pb.getAllianceKey() != null && !pb.getAllianceKey().equals("")) {
-            mAllianceKey = pb.getAllianceKey();
-        }
-        mDatePosted = new DateTime(pb.getDatePosted() * 1000, DateTimeZone.UTC);
-        if (pb.hasMessageEn() && !pb.getMessageEn().equals("")) {
-            mMessageEn = pb.getMessageEn();
-        }
-        if (pb.hasConversationId()) {
-            mConversationID = pb.getConversationId();
-        }
-        if (pb.hasAction()) {
-            mAction = MessageAction.fromNumber(pb.getAction().getNumber());
-        } else {
-            mAction = MessageAction.Normal;
-        }
-        if (pb.hasProfanityLevel()) {
-            mProfanityLevel = pb.getProfanityLevel();
-        }
+    public void fromProtocolBuffer(ChatMessage pb) {
+        mID = pb.id;
+        mMessage = pb.message;
+        mEmpireKey = Strings.emptyToNull(pb.empire_key);
+        mAllianceKey = Strings.emptyToNull(pb.alliance_key);
+        mDatePosted = new DateTime(pb.date_posted * 1000, DateTimeZone.UTC);
+        mMessageEn = Strings.emptyToNull(pb.message_en);
+        mConversationID = pb.conversation_id;
+        mAction = pb.action == null ? MessageAction.Normal : MessageAction.fromNumber(pb.action.getValue());
+        mProfanityLevel = pb.profanity_level == null ? 0 : pb.profanity_level;
     }
 
-    public void toProtocolBuffer(Messages.ChatMessage.Builder pb, boolean encodeHtml) {
-        pb.setId(mID);
+    public void toProtocolBuffer(ChatMessage.Builder pb, boolean encodeHtml) {
+        pb.id = mID;
         if (encodeHtml) {
-            pb.setMessage(HtmlEscapers.htmlEscaper().escape(mMessage));
+            pb.message = HtmlEscapers.htmlEscaper().escape(mMessage);
         } else {
-            pb.setMessage(mMessage);
+            pb.message = mMessage;
         }
-        if (mEmpireKey != null) {
-            pb.setEmpireKey(mEmpireKey);
-        }
-        if (mAllianceKey != null) {
-            pb.setAllianceKey(mAllianceKey);
-        }
-        pb.setDatePosted(mDatePosted.getMillis() / 1000);
-        if (mMessageEn != null && mMessageEn.length() > 0) {
-            pb.setMessageEn(mMessageEn);
-        }
-        if (mConversationID != null) {
-            pb.setConversationId(mConversationID);
-        }
+        pb.empire_key = mEmpireKey;
+        pb.alliance_key = mAllianceKey;
+        pb.date_posted = mDatePosted.getMillis() / 1000;
+        pb.message_en = Strings.emptyToNull(mMessageEn);
+        pb.conversation_id = mConversationID;
         if (mAction != null && mAction != MessageAction.Normal) {
-            pb.setAction(Messages.ChatMessage.MessageAction.valueOf(mAction.getValue()));
+            pb.action = ChatMessage.MessageAction.valueOf(mAction.toString());
         }
-        pb.setProfanityLevel(mProfanityLevel);
+        pb.profanity_level = mProfanityLevel;
     }
 
     public enum MessageAction {

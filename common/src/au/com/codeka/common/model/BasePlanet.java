@@ -1,6 +1,6 @@
 package au.com.codeka.common.model;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Planet;
 
 
 public class BasePlanet {
@@ -84,29 +84,29 @@ public class BasePlanet {
     /**
      * Converts the given Planet protocol buffer into a \c Planet.
      */
-    public void fromProtocolBuffer(BaseStar star, Messages.Planet pb) {
+    public void fromProtocolBuffer(BaseStar star, Planet pb) {
         mStar = star;
-        mIndex = pb.getIndex();
-        mPlanetType = sPlanetTypes[pb.getPlanetType().getNumber() - 1];
-        mSize = pb.getSize();
-        if (pb.hasPopulationCongeniality()) {
-            mPopulationCongeniality = pb.getPopulationCongeniality();
+        mIndex = pb.index;
+        mPlanetType = sPlanetTypes[pb.planet_type.getValue() - 1];
+        mSize = pb.size;
+        if (pb.population_congeniality != null) {
+            mPopulationCongeniality = pb.population_congeniality;
         }
-        if (pb.hasFarmingCongeniality()) {
-            mFarmingCongeniality = pb.getFarmingCongeniality();
+        if (pb.farming_congeniality != null) {
+            mFarmingCongeniality = pb.farming_congeniality;
         }
-        if (pb.hasMiningCongeniality()) {
-            mMiningCongeniality = pb.getMiningCongeniality();
+        if (pb.mining_congeniality != null) {
+            mMiningCongeniality = pb.mining_congeniality;
         }
     }
 
-    public void toProtocolBuffer(Messages.Planet.Builder pb) {
-        pb.setIndex(mIndex);
-        pb.setPlanetType(Messages.Planet.PLANET_TYPE.valueOf(mPlanetType.mIndex + 1));
-        pb.setSize(mSize);
-        pb.setPopulationCongeniality(mPopulationCongeniality);
-        pb.setFarmingCongeniality(mFarmingCongeniality);
-        pb.setMiningCongeniality(mMiningCongeniality);
+    public void toProtocolBuffer(Planet.Builder pb) {
+        pb.index = mIndex;
+        pb.planet_type = Planet.PLANET_TYPE.values()[mPlanetType.mIndex + 1];
+        pb.size = mSize;
+        pb.population_congeniality = mPopulationCongeniality;
+        pb.farming_congeniality = mFarmingCongeniality;
+        pb.mining_congeniality = mMiningCongeniality;
     }
 
     /**

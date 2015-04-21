@@ -94,14 +94,14 @@
     <orderEntry type="library" exported="" name="andengine" level="project" />
     <orderEntry type="library" exported="" name="gcm" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
+    <orderEntry type="library" exported="" name="wire-runtime-1.7.0" level="project" />
     <orderEntry type="library" exported="" name="joda-time-2.1" level="project" />
     <orderEntry type="library" exported="" name="validation-api-1.0.0.GA" level="project" />
     <orderEntry type="library" exported="" name="jsr305-1.3.9" level="project" />
-    <orderEntry type="library" exported="" name="protobuf-java-2.5.0" level="project" />
     <orderEntry type="library" exported="" name="multidex-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="okhttp-2.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
-    <orderEntry type="library" exported="" name="okio-1.2.0" level="project" />
+    <orderEntry type="library" exported="" name="okio-1.3.0" level="project" />
     <orderEntry type="module" module-name="control-field" exported="" />
     <orderEntry type="module" module-name="planet-render" exported="" />
     <orderEntry type="module" module-name="common" exported="" />

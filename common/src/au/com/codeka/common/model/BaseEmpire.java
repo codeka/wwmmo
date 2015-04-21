@@ -1,9 +1,15 @@
 package au.com.codeka.common.model;
 
+import com.google.common.base.Strings;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import au.com.codeka.common.protobuf.Alliance;
+import au.com.codeka.common.protobuf.Empire;
+import au.com.codeka.common.protobuf.EmpireRank;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Star;
 
 public abstract class BaseEmpire {
     protected String mKey;
@@ -18,9 +24,9 @@ public abstract class BaseEmpire {
     protected Double mTaxCollectedPerHour;
     protected DateTime mLastSeen;
 
-    protected abstract BaseEmpireRank createEmpireRank(Messages.EmpireRank pb);
-    protected abstract BaseStar createStar(Messages.Star pb);
-    protected abstract BaseAlliance createAlliance(Messages.Alliance pb);
+    protected abstract BaseEmpireRank createEmpireRank(EmpireRank pb);
+    protected abstract BaseStar createStar(Star pb);
+    protected abstract BaseAlliance createAlliance(Alliance pb);
 
     public String getKey() {
         return mKey;
@@ -63,83 +69,76 @@ public abstract class BaseEmpire {
         mAlliance = alliance;
     }
 
-    public void fromProtocolBuffer(Messages.Empire pb) {
-        mKey = pb.getKey();
-        mDisplayName = pb.getDisplayName();
-        mCash = pb.getCash();
-        mEmailAddr = pb.getEmail();
-        mState = State.fromNumber(pb.getState().getNumber());
-        if (pb.hasLastSeen()) {
-            mLastSeen = new DateTime(pb.getLastSeen() * 1000, DateTimeZone.UTC);
+    public void fromProtocolBuffer(Empire pb) {
+        mKey = pb.key;
+        mDisplayName = pb.display_name;
+        mCash = pb.cash;
+        mEmailAddr = pb.email;
+        mState = State.fromNumber(pb.state.getValue());
+        if (pb.last_seen != null) {
+            mLastSeen = new DateTime(pb.last_seen * 1000, DateTimeZone.UTC);
         }
 
-        if (pb.getRank() != null && pb.getRank().getEmpireKey() != null &&
-                pb.getRank().getEmpireKey().length() > 0) {
-            mRank = createEmpireRank(pb.getRank());
+        if (pb.rank != null && !Strings.isNullOrEmpty(pb.rank.empire_key)) {
+            mRank = createEmpireRank(pb.rank);
         }
 
-        if (pb.getHomeStar() != null && pb.getHomeStar().getKey() != null &&
-                 pb.getHomeStar().getKey().length() > 0) {
-            mHomeStar = createStar(pb.getHomeStar());
+        if (pb.home_star != null && !Strings.isNullOrEmpty(pb.home_star.key)) {
+            mHomeStar = createStar(pb.home_star);
         }
 
-        if (pb.getAlliance() != null && pb.getAlliance().getKey() != null &&
-                pb.getAlliance().getKey().length() > 0) {
-            mAlliance = createAlliance(pb.getAlliance());
+        if (pb.alliance != null && !Strings.isNullOrEmpty(pb.alliance.key)) {
+            mAlliance = createAlliance(pb.alliance);
         }
 
-        if (pb.hasShieldImageLastUpdate()) {
-            mShieldLastUpdate = new DateTime(pb.getShieldImageLastUpdate() * 1000, DateTimeZone.UTC);
+        if (pb.shield_image_last_update != null) {
+            mShieldLastUpdate = new DateTime(pb.shield_image_last_update * 1000, DateTimeZone.UTC);
         }
 
-        if (pb.hasTaxesCollectedPerHour()) {
-            mTaxCollectedPerHour = pb.getTaxesCollectedPerHour();
-        }
+        mTaxCollectedPerHour = pb.taxes_collected_per_hour;
     }
 
-    public void toProtocolBuffer(Messages.Empire.Builder pb, boolean isTrusted) {
-        pb.setKey(mKey);
-        pb.setDisplayName(mDisplayName);
-        pb.setCash(mCash);
+    public void toProtocolBuffer(Empire.Builder pb, boolean isTrusted) {
+        pb.key = mKey;
+        pb.display_name = mDisplayName;
+        pb.cash = mCash;
         if (isTrusted) {
-            pb.setEmail(mEmailAddr);
+            pb.email = mEmailAddr;
         } else {
-            pb.setEmail("");
+            pb.email = "";
         }
         if (mState == State.ABANDONED) {
-            pb.setState(Messages.Empire.EmpireState.valueOf(State.ACTIVE.getValue()));
+            pb.state = Empire.EmpireState.valueOf(State.ACTIVE.toString());
         } else {
-            pb.setState(Messages.Empire.EmpireState.valueOf(mState.getValue()));
+            pb.state = Empire.EmpireState.valueOf(mState.toString());
         }
         if (mLastSeen != null) {
-            pb.setLastSeen(mLastSeen.getMillis() / 1000);
+            pb.last_seen = mLastSeen.getMillis() / 1000;
         }
 
         if (mHomeStar != null) {
-            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            Star.Builder star_pb = new Star.Builder();
             mHomeStar.toProtocolBuffer(star_pb, true);
-            pb.setHomeStar(star_pb);
+            pb.home_star = star_pb.build();
         }
 
         if (mAlliance != null) {
-            Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
+            Alliance.Builder alliance_pb = new Alliance.Builder();
             mAlliance.toProtocolBuffer(alliance_pb);
-            pb.setAlliance(alliance_pb);
+            pb.alliance = alliance_pb.build();
         }
 
         if (mRank != null) {
-            Messages.EmpireRank.Builder empire_rank_pb = Messages.EmpireRank.newBuilder();
+            EmpireRank.Builder empire_rank_pb = new EmpireRank.Builder();
             mRank.toProtocolBuffer(empire_rank_pb);
-            pb.setRank(empire_rank_pb);
+            pb.rank = empire_rank_pb.build();
         }
 
         if (mShieldLastUpdate != null) {
-            pb.setShieldImageLastUpdate(mShieldLastUpdate.getMillis() / 1000);
+            pb.shield_image_last_update = mShieldLastUpdate.getMillis() / 1000;
         }
 
-        if (mTaxCollectedPerHour != null) {
-            pb.setTaxesCollectedPerHour(mTaxCollectedPerHour);
-        }
+        pb.taxes_collected_per_hour = mTaxCollectedPerHour;
     }
 
     public enum State {

@@ -3,7 +3,7 @@ package au.com.codeka.common.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.EmpirePresence;
 
 /**
  * The \c EmpirePresence stores the data that relates to an empire's "presence" in a starsystem.
@@ -87,33 +87,33 @@ public abstract class BaseEmpirePresence {
         mGoodsZeroTime = dt;
     }
 
-    public void fromProtocolBuffer(Messages.EmpirePresence pb) {
-        mKey = pb.getKey();
-        mEmpireKey = pb.getEmpireKey();
-        mStarKey = pb.getStarKey();
-        mTotalGoods = pb.getTotalGoods();
-        mTotalMinerals = pb.getTotalMinerals();
-        mDeltaGoodsPerHour = pb.getGoodsDeltaPerHour();
-        mDeltaMineralsPerHour = pb.getMineralsDeltaPerHour();
-        mMaxGoods = pb.getMaxGoods();
-        mMaxMinerals = pb.getMaxMinerals();
-        if (pb.hasGoodsZeroTime()) {
-            mGoodsZeroTime = new DateTime(pb.getGoodsZeroTime() * 1000, DateTimeZone.UTC);
+    public void fromProtocolBuffer(EmpirePresence pb) {
+        mKey = pb.key;
+        mEmpireKey = pb.empire_key;
+        mStarKey = pb.star_key;
+        mTotalGoods = pb.total_goods;
+        mTotalMinerals = pb.total_minerals;
+        mDeltaGoodsPerHour = pb.goods_delta_per_hour;
+        mDeltaMineralsPerHour = pb.minerals_delta_per_hour;
+        mMaxGoods = pb.max_goods;
+        mMaxMinerals = pb.max_minerals;
+        if (pb.goods_zero_time != null) {
+            mGoodsZeroTime = new DateTime(pb.goods_zero_time * 1000, DateTimeZone.UTC);
         }
     }
 
-    public void toProtocolBuffer(Messages.EmpirePresence.Builder pb) {
-        pb.setKey(mKey);
-        pb.setEmpireKey(mEmpireKey);
-        pb.setStarKey(mStarKey);
-        pb.setTotalGoods(mTotalGoods);
-        pb.setTotalMinerals(mTotalMinerals);
-        pb.setGoodsDeltaPerHour(mDeltaGoodsPerHour);
-        pb.setMineralsDeltaPerHour(mDeltaMineralsPerHour);
-        pb.setMaxGoods(mMaxGoods);
-        pb.setMaxMinerals(mMaxMinerals);
+    public void toProtocolBuffer(EmpirePresence.Builder pb) {
+        pb.key = mKey;
+        pb.empire_key = mEmpireKey;
+        pb.star_key = mStarKey;
+        pb.total_goods = mTotalGoods;
+        pb.total_minerals = mTotalMinerals;
+        pb.goods_delta_per_hour = mDeltaGoodsPerHour;
+        pb.minerals_delta_per_hour = mDeltaMineralsPerHour;
+        pb.max_goods = mMaxGoods;
+        pb.max_minerals = mMaxMinerals;
         if (mGoodsZeroTime != null) {
-            pb.setGoodsZeroTime(mGoodsZeroTime.getMillis() / 1000);
+            pb.goods_zero_time = mGoodsZeroTime.getMillis() / 1000;
         }
     }
 }

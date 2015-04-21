@@ -6,9 +6,9 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import com.google.protobuf.ByteString;
-
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.AllianceRequest;
+import au.com.codeka.common.protobuf.AllianceRequestVote;
+import okio.ByteString;
 
 public abstract class BaseAllianceRequest {
     protected int mID;
@@ -63,70 +63,59 @@ public abstract class BaseAllianceRequest {
     }
     public List<BaseAllianceRequestVote> getVotes() {
         if (mVotes == null) {
-            mVotes = new ArrayList<BaseAllianceRequestVote>();
+            mVotes = new ArrayList<>();
         }
         return mVotes;
     }
 
-    protected abstract BaseAllianceRequestVote createVote(Messages.AllianceRequestVote pb);
+    protected abstract BaseAllianceRequestVote createVote(AllianceRequestVote pb);
 
-    public void fromProtocolBuffer(Messages.AllianceRequest pb) {
-        if (pb.hasId()) {
-            mID = pb.getId();
+    public void fromProtocolBuffer(AllianceRequest pb) {
+        if (pb.id != null) {
+            mID = pb.id;
         }
-        mAllianceID = pb.getAllianceId();
-        mRequestEmpireID = pb.getRequestEmpireId();
-        mRequestDate = new DateTime(pb.getRequestDate() * 1000, DateTimeZone.UTC);
-        mRequestType = RequestType.fromNumber(pb.getRequestType().getNumber());
-        mMessage = pb.getMessage();
-        mState = RequestState.fromNumber(pb.getState().getNumber());
-        mNumVotes = pb.getNumVotes();
-        if (pb.hasTargetEmpireId()) {
-            mTargetEmpireID = pb.getTargetEmpireId();
+        mAllianceID = pb.alliance_id;
+        mRequestEmpireID = pb.request_empire_id;
+        mRequestDate = new DateTime(pb.request_date * 1000, DateTimeZone.UTC);
+        mRequestType = RequestType.fromNumber(pb.request_type.getValue());
+        mMessage = pb.message;
+        mState = RequestState.fromNumber(pb.state.getValue());
+        mNumVotes = pb.num_votes;
+        mTargetEmpireID = pb.target_empire_id;
+        mAmount = pb.amount;
+        if (pb.png_image != null) {
+            mPngImage = pb.png_image.toByteArray();
         }
-        if (pb.hasAmount()) {
-            mAmount = pb.getAmount();
-        }
-        if (pb.hasPngImage()) {
-            mPngImage = pb.getPngImage().toByteArray();
-        }
-        if (pb.hasNewName()) {
-            mNewName = pb.getNewName();
-        }
-        if (pb.getVoteList() != null) {
-            mVotes = new ArrayList<BaseAllianceRequestVote>();
-            for (Messages.AllianceRequestVote vote_pb : pb.getVoteList()) {
+        mNewName = pb.new_name;
+        if (pb.vote.size() > 0) {
+            mVotes = new ArrayList<>();
+            for (AllianceRequestVote vote_pb : pb.vote) {
                 mVotes.add(createVote(vote_pb));
             }
         }
     }
 
-    public void toProtocolBuffer(Messages.AllianceRequest.Builder pb) {
-        pb.setId(mID);
-        pb.setAllianceId(mAllianceID);
-        pb.setRequestEmpireId(mRequestEmpireID);
-        pb.setRequestDate(mRequestDate.getMillis() / 1000);
-        pb.setRequestType(Messages.AllianceRequest.RequestType.valueOf(mRequestType.getNumber()));
-        pb.setMessage(mMessage);
-        pb.setState(Messages.AllianceRequest.RequestState.valueOf(mState.getNumber()));
-        pb.setNumVotes(mNumVotes);
-        if (mTargetEmpireID != null) {
-            pb.setTargetEmpireId((int) mTargetEmpireID);
-        }
-        if (mAmount != null) {
-            pb.setAmount((float) mAmount);
-        }
+    public void toProtocolBuffer(AllianceRequest.Builder pb) {
+        pb.id = mID;
+        pb.alliance_id = mAllianceID;
+        pb.request_empire_id = mRequestEmpireID;
+        pb.request_date = mRequestDate.getMillis() / 1000;
+        pb.request_type = (AllianceRequest.RequestType.valueOf(mRequestType.toString()));
+        pb.message = mMessage;
+        pb.state = AllianceRequest.RequestState.valueOf(mState.toString());
+        pb.num_votes = mNumVotes;
+        pb.target_empire_id = mTargetEmpireID;
+        pb.amount = mAmount;
         if (mPngImage != null) {
-            pb.setPngImage(ByteString.copyFrom(mPngImage));
+            pb.png_image = ByteString.of(mPngImage);
         }
-        if (mNewName != null) {
-            pb.setNewName(mNewName);
-        }
+        pb.new_name = mNewName;
         if (mVotes != null) {
+            pb.vote = new ArrayList<>();
             for (BaseAllianceRequestVote vote : mVotes) {
-                Messages.AllianceRequestVote.Builder vote_pb = Messages.AllianceRequestVote.newBuilder();
+                AllianceRequestVote.Builder vote_pb = new AllianceRequestVote.Builder();
                 vote.toProtocolBuffer(vote_pb);
-                pb.addVote(vote_pb);
+                pb.vote.add(vote_pb.build());
             }
         }
     }

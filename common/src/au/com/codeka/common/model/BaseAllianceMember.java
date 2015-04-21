@@ -3,7 +3,7 @@ package au.com.codeka.common.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.AllianceMember;
 
 public class BaseAllianceMember {
     protected String mKey;
@@ -31,28 +31,24 @@ public class BaseAllianceMember {
         return mRank;
     }
 
-    public void fromProtocolBuffer(Messages.AllianceMember pb) {
-        if (pb.hasKey()) {
-            mKey = pb.getKey();
-        }
-        mAllianceKey = pb.getAllianceKey();
-        mEmpireKey = pb.getEmpireKey();
-        mTimeJoined = new DateTime(pb.getTimeJoined() * 1000, DateTimeZone.UTC);
-        if (pb.hasRank()) {
-            mRank = Rank.fromNumber(pb.getRank().getNumber());
+    public void fromProtocolBuffer(AllianceMember pb) {
+        mKey = pb.key;
+        mAllianceKey = pb.alliance_key;
+        mEmpireKey = pb.empire_key;
+        mTimeJoined = new DateTime(pb.time_joined * 1000, DateTimeZone.UTC);
+        if (pb.rank != null) {
+            mRank = Rank.fromNumber(pb.rank.getValue());
         } else {
             mRank = Rank.MEMBER;
         }
     }
 
-    public void toProtocolBuffer(Messages.AllianceMember.Builder pb) {
-        if (mKey != null) {
-            pb.setKey(mKey);
-        }
-        pb.setAllianceKey(mAllianceKey);
-        pb.setEmpireKey(mEmpireKey);
-        pb.setTimeJoined(mTimeJoined.getMillis() / 1000);
-        pb.setRank(Messages.AllianceMember.Rank.valueOf(mRank.getNumber()));
+    public void toProtocolBuffer(AllianceMember.Builder pb) {
+        pb.key = mKey;
+        pb.alliance_key = mAllianceKey;
+        pb.empire_key = mEmpireKey;
+        pb.time_joined = mTimeJoined.getMillis() / 1000;
+        pb.rank = AllianceMember.Rank.valueOf(mRank.toString());
     }
 
     public enum Rank {

@@ -6,7 +6,7 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Colony;
 
 public abstract class BaseColony {
     protected String mKey;
@@ -116,50 +116,46 @@ public abstract class BaseColony {
         return mCooldownTimeEnd;
     }
 
-    public void fromProtocolBuffer(Messages.Colony pb) {
-        mKey = pb.getKey();
-        mStarKey = pb.getStarKey();
-        mPlanetIndex = pb.getPlanetIndex();
-        mPopulation = pb.getPopulation();
-        if (pb.hasEmpireKey()) {
-            mEmpireKey = pb.getEmpireKey();
-        }
-        mBuildings = new ArrayList<BaseBuilding>();
-        mFarmingFocus = pb.getFocusFarming();
-        mConstructionFocus = pb.getFocusConstruction();
-        mMiningFocus = pb.getFocusMining();
-        mPopulationFocus = pb.getFocusPopulation();
-        mPopulationDelta = pb.getDeltaPopulation();
-        mGoodsDelta = pb.getDeltaGoods();
-        mMineralsDelta = pb.getDeltaMinerals();
-        mUncollectedTaxes = pb.getUncollectedTaxes();
-        mMaxPopulation = pb.getMaxPopulation();
-        mDefenceBoost = pb.getDefenceBonus();
-        if (pb.hasCooldownEndTime()) {
-            mCooldownTimeEnd = new DateTime(pb.getCooldownEndTime() * 1000, DateTimeZone.UTC);
+    public void fromProtocolBuffer(Colony pb) {
+        mKey = pb.key;
+        mStarKey = pb.star_key;
+        mPlanetIndex = pb.planet_index;
+        mPopulation = pb.population;
+        mEmpireKey = pb.empire_key;
+        mBuildings = new ArrayList<>();
+        mFarmingFocus = pb.focus_farming;
+        mConstructionFocus = pb.focus_construction;
+        mMiningFocus = pb.focus_mining;
+        mPopulationFocus = pb.focus_population;
+        mPopulationDelta = pb.delta_population;
+        mGoodsDelta = pb.delta_goods;
+        mMineralsDelta = pb.delta_minerals;
+        mUncollectedTaxes = pb.uncollected_taxes;
+        mMaxPopulation = pb.max_population;
+        mDefenceBoost = pb.defence_bonus;
+        if (pb.cooldown_end_time != null) {
+            mCooldownTimeEnd = new DateTime(pb.cooldown_end_time * 1000, DateTimeZone.UTC);
         }
     }
 
-    public void toProtocolBuffer(Messages.Colony.Builder pb) {
-        pb.setKey(mKey);
-        pb.setPlanetIndex(mPlanetIndex);
-        pb.setStarKey(mStarKey);
-        if (mEmpireKey != null) {
-            pb.setEmpireKey(mEmpireKey);
-        }
-        pb.setPopulation(mPopulation);
-        pb.setFocusPopulation(mPopulationFocus);
-        pb.setFocusFarming(mFarmingFocus);
-        pb.setFocusMining(mMiningFocus);
-        pb.setFocusConstruction(mConstructionFocus);
-        pb.setDeltaMinerals(mMineralsDelta);
-        pb.setDeltaGoods(mGoodsDelta);
-        pb.setDeltaPopulation(mPopulationDelta);
-        pb.setMaxPopulation(mMaxPopulation);
-        pb.setUncollectedTaxes(mUncollectedTaxes);
-        pb.setDefenceBonus(mDefenceBoost);
+    public void toProtocolBuffer(Colony.Builder pb) {
+        pb.key = mKey;
+        pb.planet_index = mPlanetIndex;
+        pb.star_key = mStarKey;
+        pb.empire_key = mEmpireKey;
+        pb.population = mPopulation;
+        pb.focus_population = mPopulationFocus;
+        pb.focus_farming = mFarmingFocus;
+        pb.focus_mining = mMiningFocus;
+        pb.focus_construction = mConstructionFocus;
+        pb.delta_minerals = mMineralsDelta;
+        pb.delta_goods = mGoodsDelta;
+        pb.delta_population = mPopulationDelta;
+        pb.max_population = mMaxPopulation;
+        pb.uncollected_taxes = mUncollectedTaxes;
+        pb.defence_bonus = mDefenceBoost;
         if (mCooldownTimeEnd != null) {
-            pb.setCooldownEndTime(mCooldownTimeEnd.getMillis() / 1000);
+            pb.cooldown_end_time = mCooldownTimeEnd.getMillis() / 1000;
         }
     }
 }

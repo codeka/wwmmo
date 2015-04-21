@@ -1,6 +1,6 @@
 package au.com.codeka.common.model;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Building;
 
 /**
  * Represents a single building on a colony.
@@ -29,23 +29,19 @@ public class BaseBuilding {
         return mNotes;
     }
 
-    public void fromProtocolBuffer(Messages.Building pb) {
-        mKey = pb.getKey();
-        mColonyKey = pb.getColonyKey();
-        mDesignID = pb.getDesignName();
-        mLevel = pb.getLevel();
-        if (pb.hasNotes()) {
-            mNotes = pb.getNotes();
-        }
+    public void fromProtocolBuffer(Building pb) {
+        mKey = pb.key;
+        mColonyKey = pb.colony_key;
+        mDesignID = pb.design_name;
+        mLevel = pb.level;
+        mNotes = pb.notes;
     }
 
-    public void toProtocolBuffer(Messages.Building.Builder pb) {
-        pb.setKey(mKey);
-        pb.setColonyKey(mColonyKey);
-        pb.setDesignName(mDesignID);
-        pb.setLevel(mLevel);
-        if (mNotes != null) {
-            pb.setNotes(mNotes);
-        }
+    public void toProtocolBuffer(Building.Builder pb) {
+        pb.key = mKey;
+        pb.colony_key = mColonyKey;
+        pb.design_name = mDesignID;
+        pb.level = mLevel;
+        pb.notes = mNotes;
     }
 }

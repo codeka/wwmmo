@@ -5,7 +5,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.BuildRequest;
 
 /**
  * Represents an in-progress build order.
@@ -142,57 +142,49 @@ public abstract class BaseBuildRequest  {
         mEndTime = dt;
     }
 
-    public void fromProtocolBuffer(Messages.BuildRequest pb) {
-        if (pb.hasKey()) {
-            mKey = pb.getKey();
+    public void fromProtocolBuffer(BuildRequest pb) {
+        mKey = pb.key;
+        mDesignKind = DesignKind.fromNumber(pb.build_kind.getValue());
+        mDesignID = pb.design_name;
+        mColonyKey = pb.colony_key;
+        mEndTime = new DateTime(pb.end_time * 1000, DateTimeZone.UTC);
+        mStartTime = new DateTime(pb.start_time * 1000, DateTimeZone.UTC);
+        mProgress = pb.progress;
+        mCount = pb.count;
+        mStarKey = pb.star_key;
+        mPlanetIndex = pb.planet_index;
+        mEmpireKey = pb.empire_key;
+        if (pb.existing_building_key != null && !pb.existing_building_key.equals("")) {
+            mExistingBuildingKey = pb.existing_building_key;
+            mExistingBuildingLevel = pb.existing_building_level;
         }
-        mDesignKind = DesignKind.fromNumber(pb.getBuildKind().getNumber());
-        mDesignID = pb.getDesignName();
-        mColonyKey = pb.getColonyKey();
-        mEndTime = new DateTime(pb.getEndTime() * 1000, DateTimeZone.UTC);
-        mStartTime = new DateTime(pb.getStartTime() * 1000, DateTimeZone.UTC);
-        mProgress = pb.getProgress();
-        mCount = pb.getCount();
-        mStarKey = pb.getStarKey();
-        mPlanetIndex = pb.getPlanetIndex();
-        mEmpireKey = pb.getEmpireKey();
-        if (pb.getExistingBuildingKey() != null && !pb.getExistingBuildingKey().equals("")) {
-            mExistingBuildingKey = pb.getExistingBuildingKey();
-            mExistingBuildingLevel = pb.getExistingBuildingLevel(); 
+        if (pb.existing_fleet_id != null && pb.upgrade_id != null) {
+            mExistingFleetID = pb.existing_fleet_id;
+            mUpgradeID = pb.upgrade_id;
         }
-        if (pb.hasExistingFleetId() && pb.hasUpgradeId()) {
-            mExistingFleetID = pb.getExistingFleetId();
-            mUpgradeID = pb.getUpgradeId();
-        }
-        if (pb.hasNotes()) {
-            mNotes = pb.getNotes();
-        }
+        mNotes = pb.notes;
     }
 
-    public void toProtocolBuffer(Messages.BuildRequest.Builder pb) {
-        if (mKey != null) {
-            pb.setKey(mKey);
-        }
-        pb.setBuildKind(Messages.BuildRequest.BUILD_KIND.valueOf(mDesignKind.getValue()));
-        pb.setDesignName(mDesignID);
-        pb.setColonyKey(mColonyKey);
-        pb.setEndTime(mEndTime.getMillis() / 1000);
-        pb.setStartTime(mStartTime.getMillis() /1000);
-        pb.setProgress(mProgress);
-        pb.setCount(mCount);
-        pb.setStarKey(mStarKey);
-        pb.setPlanetIndex(mPlanetIndex);
-        pb.setEmpireKey(mEmpireKey);
+    public void toProtocolBuffer(BuildRequest.Builder pb) {
+        pb.key = mKey;
+        pb.build_kind = BuildRequest.BUILD_KIND.valueOf(mDesignKind.toString());
+        pb.design_name = mDesignID;
+        pb.colony_key = mColonyKey;
+        pb.end_time = mEndTime.getMillis() / 1000;
+        pb.start_time = mStartTime.getMillis() /1000;
+        pb.progress = mProgress;
+        pb.count = mCount;
+        pb.star_key = mStarKey;
+        pb.planet_index = mPlanetIndex;
+        pb.empire_key = mEmpireKey;
         if (mExistingBuildingKey != null) {
-            pb.setExistingBuildingKey(mExistingBuildingKey);
-            pb.setExistingBuildingLevel(mExistingBuildingLevel);
+            pb.existing_building_key = mExistingBuildingKey;
+            pb.existing_building_level = mExistingBuildingLevel;
         }
         if (mExistingFleetID != null) {
-            pb.setExistingFleetId((int) mExistingFleetID);
-            pb.setUpgradeId(mUpgradeID);
+            pb.existing_fleet_id = mExistingFleetID;
+            pb.upgrade_id = mUpgradeID;
         }
-        if (mNotes != null) {
-            pb.setNotes(mNotes);
-        }
+        pb.notes = mNotes;
     }
 }

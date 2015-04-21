@@ -3,7 +3,7 @@ package au.com.codeka.common.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.AllianceRequestVote;
 
 public class BaseAllianceRequestVote {
     protected int mID;
@@ -32,23 +32,21 @@ public class BaseAllianceRequestVote {
         return mDate;
     }
 
-    public void fromProtocolBuffer(Messages.AllianceRequestVote pb) {
-        mID = pb.getId();
-        mAllianceID = pb.getAllianceId();
-        mAllianceRequestID = pb.getAllianceRequestId();
-        if (pb.hasEmpireId()) {
-            mEmpireID = pb.getEmpireId();
-        }
-        mVotes = pb.getVotes();
-        mDate = new DateTime(pb.getDate() * 1000, DateTimeZone.UTC);
+    public void fromProtocolBuffer(AllianceRequestVote pb) {
+        mID = pb.id;
+        mAllianceID = pb.alliance_id;
+        mAllianceRequestID = pb.alliance_request_id;
+        mEmpireID = pb.empire_id;
+        mVotes = pb.votes;
+        mDate = new DateTime(pb.date * 1000, DateTimeZone.UTC);
     }
 
-    public void toProtocolBuffer(Messages.AllianceRequestVote.Builder pb) {
-        pb.setId(mID);
-        pb.setAllianceId(mAllianceID);
-        pb.setAllianceRequestId(mAllianceRequestID);
-        pb.setEmpireId(mEmpireID);
-        pb.setVotes(mVotes);
-        pb.setDate(mDate.getMillis() / 1000);
+    public void toProtocolBuffer(AllianceRequestVote.Builder pb) {
+        pb.id = mID;
+        pb.alliance_id = mAllianceID;
+        pb.alliance_request_id = mAllianceRequestID;
+        pb.empire_id = mEmpireID;
+        pb.votes = mVotes;
+        pb.date = mDate.getMillis() / 1000;
     }
 }

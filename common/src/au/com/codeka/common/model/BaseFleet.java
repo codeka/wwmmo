@@ -6,7 +6,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Fleet;
+import au.com.codeka.common.protobuf.FleetUpgrade;
 
 public abstract class BaseFleet {
     protected String mKey;
@@ -157,83 +158,66 @@ public abstract class BaseFleet {
         return (Seconds.secondsBetween(mStateStartTime, now).getSeconds() / 3600.0f);
     }
 
-    protected abstract BaseFleetUpgrade createUpgrade(Messages.FleetUpgrade pb);
+    protected abstract BaseFleetUpgrade createUpgrade(FleetUpgrade pb);
 
-    public void fromProtocolBuffer(Messages.Fleet pb) {
-        mKey = pb.getKey();
-        if (pb.hasEmpireKey()) {
-            mEmpireKey = pb.getEmpireKey();
-        }
-        if (pb.hasAllianceId()) {
-            mAllianceID = pb.getAllianceId();
-        }
-        mDesignID = pb.getDesignName();
-        mNumShips = pb.getNumShips();
-        mState = State.fromNumber(pb.getState().getNumber());
-        mStateStartTime = new DateTime(pb.getStateStartTime() * 1000, DateTimeZone.UTC);
-        mStarKey = pb.getStarKey();
-        mDestinationStarKey = pb.getDestinationStarKey();
-        mTargetFleetKey = pb.getTargetFleetKey();
-        mTargetColonyKey = pb.getTargetColonyKey();
-        if (pb.hasStance()) {
-            mStance = Stance.fromNumber(pb.getStance().getNumber());
+    public void fromProtocolBuffer(Fleet pb) {
+        mKey = pb.key;
+        mEmpireKey = pb.empire_key;
+        mAllianceID = pb.alliance_id;
+        mDesignID = pb.design_name;
+        mNumShips = pb.num_ships;
+        mState = State.fromNumber(pb.state.getValue());
+        mStateStartTime = new DateTime(pb.state_start_time * 1000, DateTimeZone.UTC);
+        mStarKey = pb.star_key;
+        mDestinationStarKey = pb.destination_star_key;
+        mTargetFleetKey = pb.target_fleet_key;
+        mTargetColonyKey = pb.target_colony_key;
+        if (pb.stance != null) {
+            mStance = Stance.fromNumber(pb.stance.getValue());
         } else {
             mStance = Stance.NEUTRAL;
         }
-        if (pb.hasEta()) {
-            mEta = new DateTime(pb.getEta() * 1000, DateTimeZone.UTC);
+        if (pb.eta != null) {
+            mEta = new DateTime(pb.eta * 1000, DateTimeZone.UTC);
         }
-        if (pb.hasTimeDestroyed()) {
-            mTimeDestroyed = new DateTime(pb.getTimeDestroyed() * 1000, DateTimeZone.UTC);
+        if (pb.time_destroyed != null) {
+            mTimeDestroyed = new DateTime(pb.time_destroyed * 1000, DateTimeZone.UTC);
         }
-        mUpgrades = new ArrayList<BaseFleetUpgrade>();
-        for (Messages.FleetUpgrade upgrade_pb : pb.getUpgradesList()) {
+        mUpgrades = new ArrayList<>();
+        for (FleetUpgrade upgrade_pb : pb.upgrades) {
             mUpgrades.add(createUpgrade(upgrade_pb));
         }
-        if (pb.hasNotes()) {
-            mNotes = pb.getNotes();
-        }
+        mNotes = pb.notes;
     }
 
-    public void toProtocolBuffer(Messages.Fleet.Builder pb) {
-        pb.setKey(mKey);
-        if (mEmpireKey != null) {
-            pb.setEmpireKey(mEmpireKey);
-        }
-        if (mAllianceID != null) {
-            pb.setAllianceId(mAllianceID);
-        }
-        pb.setDesignName(mDesignID);
-        pb.setNumShips(mNumShips);
-        pb.setState(Messages.Fleet.FLEET_STATE.valueOf(mState.getValue()));
-        pb.setStance(Messages.Fleet.FLEET_STANCE.valueOf(mStance.getValue()));
-        pb.setStateStartTime(mStateStartTime.getMillis() / 1000);
-        pb.setStarKey(mStarKey);
-        if (mDestinationStarKey != null) {
-            pb.setDestinationStarKey(mDestinationStarKey);
-        }
-        if (mTargetFleetKey != null) {
-            pb.setTargetFleetKey(mTargetFleetKey);
-        }
-        if (mTargetColonyKey != null) {
-            pb.setTargetColonyKey(mTargetColonyKey);
-        }
+    public void toProtocolBuffer(Fleet.Builder pb) {
+        pb.key = mKey;
+        pb.empire_key = mEmpireKey;
+        pb.alliance_id = mAllianceID;
+        pb.design_name = mDesignID;
+        pb.num_ships = mNumShips;
+        pb.state = Fleet.FLEET_STATE.valueOf(mState.toString());
+        pb.stance = Fleet.FLEET_STANCE.valueOf(mStance.toString());
+        pb.state_start_time = mStateStartTime.getMillis() / 1000;
+        pb.star_key = mStarKey;
+        pb.destination_star_key = mDestinationStarKey;
+        pb.target_fleet_key = mTargetFleetKey;
+        pb.target_colony_key = mTargetColonyKey;
         if (mEta != null) {
-            pb.setEta(mEta.getMillis() / 1000);
+            pb.eta = mEta.getMillis() / 1000;
         }
         if (mTimeDestroyed != null) {
-            pb.setTimeDestroyed(mTimeDestroyed.getMillis() / 1000);
+            pb.time_destroyed = mTimeDestroyed.getMillis() / 1000;
         }
         if (mUpgrades != null) {
+            pb.upgrades = new ArrayList<>();
             for (BaseFleetUpgrade baseFleetUpgrade : mUpgrades) {
-                Messages.FleetUpgrade.Builder upgrade_pb = Messages.FleetUpgrade.newBuilder();
+                FleetUpgrade.Builder upgrade_pb = new FleetUpgrade.Builder();
                 baseFleetUpgrade.toProtocolBuffer(upgrade_pb);
-                pb.addUpgrades(upgrade_pb);
+                pb.upgrades.add(upgrade_pb.build());
             }
         }
-        if  (mNotes != null) {
-            pb.setNotes(mNotes);
-        }
+        pb.notes = mNotes;
     }
 
     public enum State {

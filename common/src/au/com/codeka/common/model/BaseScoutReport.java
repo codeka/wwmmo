@@ -3,10 +3,12 @@ package au.com.codeka.common.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.Message;
+import au.com.codeka.common.protobuf.ScoutReport;
+import au.com.codeka.common.protobuf.Star;
+import okio.ByteString;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
+import java.io.IOException;
 
 public abstract class BaseScoutReport {
     protected String mKey;
@@ -15,7 +17,7 @@ public abstract class BaseScoutReport {
     protected String mStarKey;
     protected BaseStar mStarSnapshot;
 
-    protected abstract BaseStar createStar(Messages.Star pb);
+    protected abstract BaseStar createStar(Star pb);
 
     public String getKey() {
         return mKey;
@@ -33,31 +35,28 @@ public abstract class BaseScoutReport {
         return mStarSnapshot;
     }
 
-    public void fromProtocolBuffer(Messages.ScoutReport pb) {
-        mKey = pb.getKey();
-        mReportDate = new DateTime(pb.getDate() * 1000, DateTimeZone.UTC);
-        mEmpireKey = pb.getEmpireKey();
-        mStarKey = pb.getStarKey();
-        ByteString starSnapshotSerialized = pb.getStarPb();
-        Messages.Star star_pb;
+    public void fromProtocolBuffer(ScoutReport pb) {
+        mKey = pb.key;
+        mReportDate = new DateTime(pb.date * 1000, DateTimeZone.UTC);
+        mEmpireKey = pb.empire_key;
+        mStarKey = pb.star_key;
+        Star star_pb;
         try {
-            star_pb = Messages.Star.parseFrom(starSnapshotSerialized);
+            star_pb = Message.wire.parseFrom(pb.star_pb.toByteArray(), Star.class);
             mStarSnapshot = createStar(star_pb);
-        } catch (InvalidProtocolBufferException e) {
-            // TODO: handle errors?
+        } catch (IOException e) {
+            // Ignore.
         }
     }
 
-    public void toProtocolBuffer(Messages.ScoutReport.Builder pb) {
-        if (mKey != null) {
-            pb.setKey(mKey);
-        }
-        pb.setDate(mReportDate.getMillis() / 1000);
-        pb.setEmpireKey(mEmpireKey);
-        pb.setStarKey(mStarKey);
+    public void toProtocolBuffer(ScoutReport.Builder pb) {
+        pb.key = mKey;
+        pb.date = mReportDate.getMillis() / 1000;
+        pb.empire_key = mEmpireKey;
+        pb.star_key = mStarKey;
 
-        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+        Star.Builder star_pb = new Star.Builder();
         mStarSnapshot.toProtocolBuffer(star_pb, false);
-        pb.setStarPb(ByteString.copyFrom(star_pb.build().toByteArray()));
+        pb.star_pb = ByteString.of(star_pb.build().toByteArray());
     }
 }

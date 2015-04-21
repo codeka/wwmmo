@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.common.model.BaseAllianceMember;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class Alliance extends BaseAlliance {
@@ -19,7 +18,7 @@ public class Alliance extends BaseAlliance {
         if (id == null) {
             mID = res.getInt("id");
         } else {
-            mID = (int) id;
+            mID = id;
         }
         mKey = Integer.toString(mID);
         try {
@@ -55,7 +54,8 @@ public class Alliance extends BaseAlliance {
     }
 
     @Override
-    protected BaseAllianceMember createAllianceMember(Messages.AllianceMember pb) {
+    protected BaseAllianceMember createAllianceMember(
+            au.com.codeka.common.protobuf.AllianceMember pb) {
         AllianceMember am = new AllianceMember();
         if (pb != null) {
             am.fromProtocolBuffer(pb);

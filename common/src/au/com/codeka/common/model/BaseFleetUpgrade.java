@@ -3,7 +3,7 @@ package au.com.codeka.common.model;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.FleetUpgrade;
 
 public class BaseFleetUpgrade {
     protected int mFleetID;
@@ -35,17 +35,15 @@ public class BaseFleetUpgrade {
         }
     }
 
-    public void fromProtocolBuffer(BaseFleet fleet, Messages.FleetUpgrade pb) {
+    public void fromProtocolBuffer(BaseFleet fleet, FleetUpgrade pb) {
         mFleetID = Integer.parseInt(fleet.getKey());
         mStarID = Integer.parseInt(fleet.getStarKey());
-        mUpgradeID = pb.getUpgradeId();
-        mExtra = pb.getExtra();
+        mUpgradeID = pb.upgrade_id;
+        mExtra = pb.extra;
     }
 
-    public void toProtocolBuffer(Messages.FleetUpgrade.Builder pb) {
-        pb.setUpgradeId(mUpgradeID);
-        if (mExtra != null) {
-            pb.setExtra(mExtra);
-        }
+    public void toProtocolBuffer(FleetUpgrade.Builder pb) {
+        pb.upgrade_id = mUpgradeID;
+        pb.extra = mExtra;
     }
 }

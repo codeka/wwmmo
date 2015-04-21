@@ -1,6 +1,6 @@
 package au.com.codeka.common.model;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.EmpireRank;
 
 public class BaseEmpireRank {
     protected String mEmpireKey;
@@ -37,25 +37,25 @@ public class BaseEmpireRank {
         return mLastRank;
     }
 
-    public void fromProtocolBuffer(Messages.EmpireRank pb) {
-        mEmpireKey = pb.getEmpireKey();
-        mTotalStars = pb.getTotalStars();
-        mTotalColonies = pb.getTotalColonies();
-        mTotalBuildings = pb.getTotalBuildings();
-        mTotalShips = pb.getTotalShips();
-        mTotalPopulation = pb.getTotalPopulation();
-        mRank = pb.getRank();
-        mLastRank = pb.getLastRank();
+    public void fromProtocolBuffer(EmpireRank pb) {
+        mEmpireKey = pb.empire_key;
+        mTotalStars = pb.total_stars;
+        mTotalColonies = pb.total_colonies;
+        mTotalBuildings = pb.total_buildings;
+        mTotalShips = pb.total_ships;
+        mTotalPopulation = pb.total_population;
+        mRank = pb.rank;
+        mLastRank = pb.last_rank;
     }
 
-    public void toProtocolBuffer(Messages.EmpireRank.Builder pb) {
-        pb.setEmpireKey(mEmpireKey);
-        pb.setTotalStars(mTotalStars);
-        pb.setTotalColonies(mTotalColonies);
-        pb.setTotalBuildings(mTotalBuildings);
-        pb.setTotalShips(mTotalShips);
-        pb.setTotalPopulation(mTotalPopulation);
-        pb.setRank(mRank);
-        pb.setLastRank(mLastRank);
+    public void toProtocolBuffer(EmpireRank.Builder pb) {
+        pb.empire_key = mEmpireKey;
+        pb.total_stars = mTotalStars;
+        pb.total_colonies = mTotalColonies;
+        pb.total_buildings = mTotalBuildings;
+        pb.total_ships = mTotalShips;
+        pb.total_population = mTotalPopulation;
+        pb.rank = mRank;
+        pb.last_rank = mLastRank;
     }
 }

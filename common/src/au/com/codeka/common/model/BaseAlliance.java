@@ -7,7 +7,8 @@ import java.util.Set;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Alliance;
+import au.com.codeka.common.protobuf.AllianceMember;
 
 public abstract class BaseAlliance {
     protected String mKey;
@@ -20,7 +21,7 @@ public abstract class BaseAlliance {
     protected DateTime mDateImageUpdated;
     protected Integer mNumPendingRequests;
 
-    protected abstract BaseAllianceMember createAllianceMember(Messages.AllianceMember pb);
+    protected abstract BaseAllianceMember createAllianceMember(AllianceMember pb);
 
     public String getKey() {
         return mKey;
@@ -66,53 +67,48 @@ public abstract class BaseAlliance {
         return totalVotes;
     }
 
-    public void fromProtocolBuffer(Messages.Alliance pb) {
-        if (pb.hasKey()) {
-            mKey = pb.getKey();
+    public void fromProtocolBuffer(Alliance pb) {
+        mKey = pb.key;
+        mName = pb.name;
+        mTimeCreated = new DateTime(pb.time_created * 1000, DateTimeZone.UTC);
+        mCreatorEmpireKey = pb.creator_empire_key;
+        if (pb.num_members != null) {
+            mNumMembers = pb.num_members;
         }
-        mName = pb.getName();
-        mTimeCreated = new DateTime(pb.getTimeCreated() * 1000, DateTimeZone.UTC);
-        if (pb.hasCreatorEmpireKey()) {
-            mCreatorEmpireKey = pb.getCreatorEmpireKey();
-        }
-        if (pb.hasNumMembers()) {
-            mNumMembers = pb.getNumMembers();
-        }
-        mBankBalance = pb.getBankBalance();
+        mBankBalance = pb.bank_balance;
 
-        if (pb.getMembersCount() > 0) {
-            mMembers = new ArrayList<BaseAllianceMember>();
-            for (Messages.AllianceMember member_pb : pb.getMembersList()) {
+        if (pb.members.size() > 0) {
+            mMembers = new ArrayList<>();
+            for (AllianceMember member_pb : pb.members) {
                 mMembers.add(createAllianceMember(member_pb));
             }
         }
 
-        mDateImageUpdated = new DateTime(pb.getDateImageUpdated() * 1000, DateTimeZone.UTC);
+        mDateImageUpdated = new DateTime(pb.date_image_updated * 1000, DateTimeZone.UTC);
 
-        if (pb.hasNumPendingRequests()) {
-            mNumPendingRequests = pb.getNumPendingRequests();
+        if (pb.num_pending_requests != null) {
+            mNumPendingRequests = pb.num_pending_requests;
         }
     }
 
-    public void toProtocolBuffer(Messages.Alliance.Builder pb) {
-        if (mKey != null) {
-            pb.setKey(mKey);
-        }
-        pb.setName(mName);
-        pb.setTimeCreated(mTimeCreated.getMillis() / 1000);
-        pb.setCreatorEmpireKey(mCreatorEmpireKey);
-        pb.setNumMembers(mNumMembers);
-        pb.setBankBalance(mBankBalance);
-        pb.setDateImageUpdated(mDateImageUpdated.getMillis() / 1000);
+    public void toProtocolBuffer(Alliance.Builder pb) {
+        pb.key = mKey;
+        pb.name = mName;
+        pb.time_created = mTimeCreated.getMillis() / 1000;
+        pb.creator_empire_key = mCreatorEmpireKey;
+        pb.num_members = mNumMembers;
+        pb.bank_balance = mBankBalance;
+        pb.date_image_updated = mDateImageUpdated.getMillis() / 1000;
         if (mNumPendingRequests != null) {
-            pb.setNumPendingRequests(mNumPendingRequests);
+            pb.num_pending_requests = mNumPendingRequests;
         }
 
         if (mMembers != null) {
+            pb.members = new ArrayList<>();
             for (BaseAllianceMember member : mMembers) {
-                Messages.AllianceMember.Builder member_pb = Messages.AllianceMember.newBuilder();
+                AllianceMember.Builder member_pb = new AllianceMember.Builder();
                 member.toProtocolBuffer(member_pb);
-                pb.addMembers(member_pb);
+                pb.members.add(member_pb.build());
             }
         }
     }
