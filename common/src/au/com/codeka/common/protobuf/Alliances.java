@@ -15,10 +15,13 @@ public final class Alliances extends Message {
   public static final List<Alliance> DEFAULT_ALLIANCES = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = Alliance.class)
-  public final List<Alliance> alliances;
+  public List<Alliance> alliances;
+
+  public Alliances() {
+  }
 
   public Alliances(List<Alliance> alliances) {
-    this.alliances = immutableCopyOf(alliances);
+    this.alliances = copyOf(alliances);
   }
 
   private Alliances(Builder builder) {

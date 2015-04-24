@@ -35,58 +35,61 @@ public final class AllianceRequest extends Message {
   public static final List<AllianceRequestVote> DEFAULT_VOTE = Collections.emptyList();
 
   @ProtoField(tag = 1, type = INT32)
-  public final Integer id;
+  public Integer id;
 
   @ProtoField(tag = 2, type = INT32)
-  public final Integer alliance_id;
+  public Integer alliance_id;
 
   @ProtoField(tag = 3, type = INT32)
-  public final Integer request_empire_id;
+  public Integer request_empire_id;
 
   @ProtoField(tag = 4, type = INT64)
-  public final Long request_date;
+  public Long request_date;
 
   @ProtoField(tag = 5, type = ENUM)
-  public final RequestType request_type;
+  public RequestType request_type;
 
   @ProtoField(tag = 6, type = STRING)
-  public final String message;
+  public String message;
 
   @ProtoField(tag = 7, type = ENUM)
-  public final RequestState state;
+  public RequestState state;
 
   @ProtoField(tag = 8, type = INT32)
-  public final Integer num_votes;
+  public Integer num_votes;
 
   /**
    * for KICK requests, this is the empire we're kicking
    */
   @ProtoField(tag = 9, type = INT32)
-  public final Integer target_empire_id;
+  public Integer target_empire_id;
 
   /**
    * for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
    */
   @ProtoField(tag = 10, type = FLOAT)
-  public final Float amount;
+  public Float amount;
 
   /**
    * for CHANGE_IMAGE, the new image to use
    */
   @ProtoField(tag = 11, type = BYTES)
-  public final ByteString png_image;
+  public ByteString png_image;
 
   /**
    * for CHANGE_NAME, the new name you want
    */
   @ProtoField(tag = 12, type = STRING)
-  public final String new_name;
+  public String new_name;
 
   /**
    * the votes we've received for this request so far.
    */
   @ProtoField(tag = 13, label = REPEATED, messageType = AllianceRequestVote.class)
-  public final List<AllianceRequestVote> vote;
+  public List<AllianceRequestVote> vote;
+
+  public AllianceRequest() {
+  }
 
   public AllianceRequest(Integer id, Integer alliance_id, Integer request_empire_id, Long request_date, RequestType request_type, String message, RequestState state, Integer num_votes, Integer target_empire_id, Float amount, ByteString png_image, String new_name, List<AllianceRequestVote> vote) {
     this.id = id;
@@ -101,7 +104,7 @@ public final class AllianceRequest extends Message {
     this.amount = amount;
     this.png_image = png_image;
     this.new_name = new_name;
-    this.vote = immutableCopyOf(vote);
+    this.vote = copyOf(vote);
   }
 
   private AllianceRequest(Builder builder) {

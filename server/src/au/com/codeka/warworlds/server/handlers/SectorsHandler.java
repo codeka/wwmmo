@@ -5,7 +5,7 @@ import java.util.List;
 
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Sectors;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.BuildingController;
@@ -88,7 +88,8 @@ public class SectorsHandler extends RequestHandler {
             }
         }
 
-        Messages.Sectors.Builder sectors_pb = Messages.Sectors.newBuilder();
+        Sectors sectors_pb = new Sectors();
+        sectors_pb.sectors = new ArrayList<>();
         for (Sector sector : sectors) {
             if (!isAdmin()) {
                 for (BaseStar baseStar : sector.getStars()) {
@@ -97,8 +98,11 @@ public class SectorsHandler extends RequestHandler {
                 }
             }
 
-            sector.toProtocolBuffer(sectors_pb.addSectorsBuilder());
+            au.com.codeka.common.protobuf.Sector sector_pb =
+                    new au.com.codeka.common.protobuf.Sector();
+            sector.toProtocolBuffer(sector_pb);
+            sectors_pb.sectors.add(sector_pb);
         }
-        setResponseBody(sectors_pb.build());
+        setResponseBody(sectors_pb);
     }
 }

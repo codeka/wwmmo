@@ -1,8 +1,8 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.StarController;
@@ -20,11 +20,14 @@ public class AllianceWormholeHandler extends RequestHandler {
 
         List<Star> stars = new StarController().getWormholesForAlliance(allianceID);
 
-        Messages.Stars.Builder stars_pb = Messages.Stars.newBuilder();
+        au.com.codeka.common.protobuf.Stars.Builder stars_pb =
+                new au.com.codeka.common.protobuf.Stars.Builder();
+        stars_pb.stars = new ArrayList<>();
         for (Star star : stars) {
-            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            au.com.codeka.common.protobuf.Star star_pb =
+                    new au.com.codeka.common.protobuf.Star();
             star.toProtocolBuffer(star_pb);
-            stars_pb.addStars(star_pb);
+            stars_pb.stars.add(star_pb);
         }
         setResponseBody(stars_pb.build());
     }

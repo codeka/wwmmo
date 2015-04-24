@@ -1,6 +1,6 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -17,7 +17,7 @@ public class WormholeDestroyHandler extends RequestHandler {
     Star wormhole = new StarController().getStar(starID);
     int myEmpireID = getSession().getEmpireID();
     if (!new WormholeController().isInRangeOfWormholeDistruptor(myEmpireID, wormhole)) {
-      throw new RequestException(400, Messages.GenericError.ErrorCode.NoWormholeDisruptorInRange,
+      throw new RequestException(400, GenericError.ErrorCode.NoWormholeDisruptorInRange,
           "You don't have any wormhole disruptors in range of this wormhole.");
     }
 

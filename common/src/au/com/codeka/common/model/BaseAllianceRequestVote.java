@@ -41,7 +41,7 @@ public class BaseAllianceRequestVote {
         mDate = new DateTime(pb.date * 1000, DateTimeZone.UTC);
     }
 
-    public void toProtocolBuffer(AllianceRequestVote.Builder pb) {
+    public void toProtocolBuffer(AllianceRequestVote pb) {
         pb.id = mID;
         pb.alliance_id = mAllianceID;
         pb.alliance_request_id = mAllianceRequestID;

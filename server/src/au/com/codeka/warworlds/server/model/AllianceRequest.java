@@ -4,7 +4,6 @@ import java.sql.SQLException;
 
 import au.com.codeka.common.model.BaseAllianceRequest;
 import au.com.codeka.common.model.BaseAllianceRequestVote;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.utils.ImageSizer;
 
@@ -42,7 +41,7 @@ public class AllianceRequest extends BaseAllianceRequest {
     }
 
     @Override
-    protected BaseAllianceRequestVote createVote(Messages.AllianceRequestVote pb) {
+    protected BaseAllianceRequestVote createVote(au.com.codeka.common.protobuf.AllianceRequestVote pb) {
         AllianceRequestVote vote = new AllianceRequestVote();
         if (pb != null) {
             vote.fromProtocolBuffer(pb);

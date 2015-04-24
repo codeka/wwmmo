@@ -1,8 +1,8 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
@@ -15,18 +15,22 @@ public class AlliancesHandler extends RequestHandler {
     protected void get() throws RequestException {
         List<Alliance> alliances = new AllianceController().getAlliances();
 
-        Messages.Alliances.Builder alliances_pb = Messages.Alliances.newBuilder();
+        au.com.codeka.common.protobuf.Alliances.Builder alliances_pb =
+                new au.com.codeka.common.protobuf.Alliances.Builder();
+        alliances_pb.alliances = new ArrayList<>();
         for (Alliance alliance : alliances) {
-            Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
+            au.com.codeka.common.protobuf.Alliance alliance_pb =
+                    new au.com.codeka.common.protobuf.Alliance();
             alliance.toProtocolBuffer(alliance_pb);
-            alliances_pb.addAlliances(alliance_pb);
+            alliances_pb.alliances.add(alliance_pb);
         }
         setResponseBody(alliances_pb.build());
     }
 
     @Override
     protected void post() throws RequestException {
-        Messages.Alliance alliance_pb = getRequestBody(Messages.Alliance.class);
+        au.com.codeka.common.protobuf.Alliance alliance_pb =
+                getRequestBody(au.com.codeka.common.protobuf.Alliance.class);
         Alliance alliance = new Alliance();
         alliance.fromProtocolBuffer(alliance_pb);
 

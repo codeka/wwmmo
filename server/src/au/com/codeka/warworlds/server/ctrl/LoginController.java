@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseEmpire;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.data.DB;
@@ -94,7 +94,7 @@ public class LoginController {
     }
 
     if (banned) {
-      throw new RequestException(403, Messages.GenericError.ErrorCode.EmpireBanned,
+      throw new RequestException(403, GenericError.ErrorCode.EmpireBanned,
           "You have been banned for misconduct.");
     }
 

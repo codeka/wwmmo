@@ -20,16 +20,19 @@ public final class EmpireRenameRequest extends Message {
   public static final String DEFAULT_OLD_NAME = "";
 
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String new_name;
+  public String new_name;
 
   @ProtoField(tag = 4, type = STRING)
-  public final String old_name;
+  public String old_name;
 
   @ProtoField(tag = 3)
-  public final PurchaseInfo purchase_info;
+  public PurchaseInfo purchase_info;
+
+  public EmpireRenameRequest() {
+  }
 
   public EmpireRenameRequest(String key, String new_name, String old_name, PurchaseInfo purchase_info) {
     this.key = key;

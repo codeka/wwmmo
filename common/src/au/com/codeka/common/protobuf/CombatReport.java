@@ -29,53 +29,56 @@ public final class CombatReport extends Message {
   public static final List<CombatRound> DEFAULT_ROUNDS = Collections.emptyList();
 
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String star_key;
+  public String star_key;
 
   /**
    * The time the conflict started/finished
    */
   @ProtoField(tag = 3, type = INT64)
-  public final Long start_time;
+  public Long start_time;
 
   @ProtoField(tag = 4, type = INT64)
-  public final Long end_time;
+  public Long end_time;
 
   /**
    * A list of the empires who joined the conflict
    */
   @ProtoField(tag = 5, type = STRING, label = REPEATED)
-  public final List<String> start_empire_keys;
+  public List<String> start_empire_keys;
 
   /**
    * A list of the empires who were left when the conflict was resolved
    */
   @ProtoField(tag = 6, type = STRING, label = REPEATED)
-  public final List<String> end_empire_keys;
+  public List<String> end_empire_keys;
 
   /**
    * The number of ships/buildings destroyed in the conflict
    */
   @ProtoField(tag = 7, type = INT32)
-  public final Integer num_destroyed;
+  public Integer num_destroyed;
 
   /**
    * A page of CombatRound objects that represent this set of results
    */
   @ProtoField(tag = 8, label = REPEATED, messageType = CombatRound.class)
-  public final List<CombatRound> rounds;
+  public List<CombatRound> rounds;
+
+  public CombatReport() {
+  }
 
   public CombatReport(String key, String star_key, Long start_time, Long end_time, List<String> start_empire_keys, List<String> end_empire_keys, Integer num_destroyed, List<CombatRound> rounds) {
     this.key = key;
     this.star_key = star_key;
     this.start_time = start_time;
     this.end_time = end_time;
-    this.start_empire_keys = immutableCopyOf(start_empire_keys);
-    this.end_empire_keys = immutableCopyOf(end_empire_keys);
+    this.start_empire_keys = copyOf(start_empire_keys);
+    this.end_empire_keys = copyOf(end_empire_keys);
     this.num_destroyed = num_destroyed;
-    this.rounds = immutableCopyOf(rounds);
+    this.rounds = copyOf(rounds);
   }
 
   private CombatReport(Builder builder) {

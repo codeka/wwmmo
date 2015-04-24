@@ -16,6 +16,7 @@ import org.joda.time.Seconds;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.Wire;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
@@ -27,7 +28,7 @@ import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.BuildingEffect;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Planets;
 import au.com.codeka.warworlds.server.EventProcessor;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -368,13 +369,14 @@ public class StarController {
                 stmt.setString(5, name);
                 stmt.setInt(6, starType.ordinal());
 
-                Messages.Planets.Builder planets_pb = Messages.Planets.newBuilder();
+                Planets.Builder planets_pb = new Planets.Builder();
                 if (planets == null) {
                 } else {
                     for (Planet planet : planets) {
-                        Messages.Planet.Builder planet_pb = Messages.Planet.newBuilder();
+                        au.com.codeka.common.protobuf.Planet planet_pb =
+                            new au.com.codeka.common.protobuf.Planet();
                         planet.toProtocolBuffer(planet_pb);
-                        planets_pb.addPlanets(planet_pb);
+                        planets_pb.planets.add(planet_pb);
                     }
                 }
                 stmt.setBytes(7, planets_pb.build().toByteArray());
@@ -417,15 +419,15 @@ public class StarController {
                 }
                 stmt.setInt(4, empireCount);
 
-                Messages.Star.StarExtra.Builder star_extra_pb = null;
+                au.com.codeka.common.protobuf.Star.StarExtra star_extra_pb = null;
                 if (star.getWormholeExtra() != null) {
-                    star_extra_pb = Messages.Star.StarExtra.newBuilder();
+                    star_extra_pb = new au.com.codeka.common.protobuf.Star.StarExtra();
                     star.getWormholeExtra().toProtocolBuffer(star_extra_pb);
                 }
                 if (star_extra_pb == null) {
                     stmt.setNull(5);
                 } else {
-                    stmt.setBytes(5, star_extra_pb.build().toByteArray());
+                    stmt.setBytes(5, star_extra_pb.toByteArray());
                 }
 
                 stmt.setInt(6, star.getID());
@@ -704,7 +706,8 @@ public class StarController {
         }
 
         private void updateCombatReport(Star star, CombatReport combatReport) throws Exception {
-            Messages.CombatReport.Builder pb = Messages.CombatReport.newBuilder();
+            au.com.codeka.common.protobuf.CombatReport pb =
+                    new au.com.codeka.common.protobuf.CombatReport();
             combatReport.toProtocolBuffer(pb);
 
             String sql;
@@ -717,7 +720,7 @@ public class StarController {
                 stmt.setInt(1, star.getID());
                 stmt.setDateTime(2, combatReport.getStartTime());
                 stmt.setDateTime(3, combatReport.getEndTime());
-                stmt.setBytes(4, pb.build().toByteArray());
+                stmt.setBytes(4, pb.toByteArray());
                 if (combatReport.getKey() != null) {
                     stmt.setInt(5, Integer.parseInt(combatReport.getKey()));
                 }
@@ -863,7 +866,8 @@ public class StarController {
 
                 while (res.next()) {
                     int starID = res.getInt(1);
-                    Messages.CombatReport pb = Messages.CombatReport.parseFrom(res.getBytes(2));
+                    au.com.codeka.common.protobuf.CombatReport pb =
+                            Wire.i.parseFrom(res.getBytes(2), au.com.codeka.common.protobuf.CombatReport.class);
                     CombatReport combatReport = new CombatReport();
                     combatReport.fromProtocolBuffer(pb);
 

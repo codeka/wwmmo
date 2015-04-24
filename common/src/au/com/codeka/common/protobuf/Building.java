@@ -25,31 +25,34 @@ public final class Building extends Message {
    * The unique key of this building.
    */
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   /**
    * The key of the colony to which this building belongs.
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String colony_key;
+  public String colony_key;
 
   /**
    * The name of the design of this building (defined in data/buildings.xml)
    */
   @ProtoField(tag = 3, type = STRING)
-  public final String design_name;
+  public String design_name;
 
   /**
    * The level of this building
    */
   @ProtoField(tag = 4, type = INT32)
-  public final Integer level;
+  public Integer level;
 
   /**
    * not as useful for buildings, but notes the player can attach
    */
   @ProtoField(tag = 5, type = STRING)
-  public final String notes;
+  public String notes;
+
+  public Building() {
+  }
 
   public Building(String key, String colony_key, String design_name, Integer level, String notes) {
     this.key = key;

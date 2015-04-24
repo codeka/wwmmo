@@ -11,7 +11,7 @@ import java.util.logging.SimpleFormatter;
 
 import org.joda.time.DateTime;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.ErrorReport;
 import au.com.codeka.warworlds.server.ctrl.ErrorReportsController;
 
 /**
@@ -58,21 +58,21 @@ public class ErrorReportingLoggingHandler extends Handler {
 
     private void saveErrorReport(LogRecord record) {
         try {
-            Messages.ErrorReport.Builder error_report_pb = Messages.ErrorReport.newBuilder();
-            error_report_pb.setContext(RequestContext.i.getContextName());
+            ErrorReport error_report_pb = new ErrorReport();
+            error_report_pb.context = RequestContext.i.getContextName();
             Runtime rt = Runtime.getRuntime();
-            error_report_pb.setHeapSize(rt.totalMemory());
-            error_report_pb.setHeapFree(rt.freeMemory());
-            error_report_pb.setHeapAllocated(rt.totalMemory() - rt.freeMemory());
+            error_report_pb.heap_size = rt.totalMemory();
+            error_report_pb.heap_free = rt.freeMemory();
+            error_report_pb.heap_allocated = rt.totalMemory() - rt.freeMemory();
             StringBuilder sb = new StringBuilder();
             for (String line : mLogBuffer) {
                 sb.append(line);
                 sb.append("\r\n");
             }
-            error_report_pb.setLogOutput(sb.toString());
-            error_report_pb.setReportTime(DateTime.now().getMillis());
-            error_report_pb.setServerRequestUserAgent(RequestContext.i.getUserAgent());
-            error_report_pb.setServerRequestQs(RequestContext.i.getQueryString());
+            error_report_pb.log_output = sb.toString();
+            error_report_pb.report_time = DateTime.now().getMillis();
+            error_report_pb.server_request_user_agent = RequestContext.i.getUserAgent();
+            error_report_pb.server_request_qs = RequestContext.i.getQueryString();
 
             if (record.getThrown() != null) {
                 Throwable thrown = record.getThrown();
@@ -82,14 +82,14 @@ public class ErrorReportingLoggingHandler extends Handler {
                     innermostThrowable = innermostThrowable.getCause();
                 }
 
-                error_report_pb.setExceptionClass(innermostThrowable.getClass().getName());
-                error_report_pb.setMessage(thrown.getMessage());
+                error_report_pb.exception_class = innermostThrowable.getClass().getName();
+                error_report_pb.message = thrown.getMessage();
                 StringWriter stacktrace = new StringWriter();
                 thrown.printStackTrace(new PrintWriter(stacktrace));
-                error_report_pb.setStackTrace(stacktrace.toString());
+                error_report_pb.stack_trace = stacktrace.toString();
             }
 
-            new ErrorReportsController().saveErrorReport(error_report_pb.build());
+            new ErrorReportsController().saveErrorReport(error_report_pb);
         } catch (Exception e) {
             // this is probably bad, but we'll just ignore them...
         }

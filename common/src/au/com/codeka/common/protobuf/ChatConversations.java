@@ -15,10 +15,13 @@ public final class ChatConversations extends Message {
   public static final List<ChatConversation> DEFAULT_CONVERSATIONS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = ChatConversation.class)
-  public final List<ChatConversation> conversations;
+  public List<ChatConversation> conversations;
+
+  public ChatConversations() {
+  }
 
   public ChatConversations(List<ChatConversation> conversations) {
-    this.conversations = immutableCopyOf(conversations);
+    this.conversations = copyOf(conversations);
   }
 
   private ChatConversations(Builder builder) {

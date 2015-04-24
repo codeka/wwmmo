@@ -37,53 +37,53 @@ public final class BuildRequest extends Message {
   public static final String DEFAULT_NOTES = "";
 
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   /**
    * The key of the colony you're trying to build at. Must have a shipyard to build
    * a ship.
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String colony_key;
+  public String colony_key;
 
   /**
    * The empire this build operation belongs to.
    */
   @ProtoField(tag = 3, type = STRING)
-  public final String empire_key;
+  public String empire_key;
 
   /**
    * The key of the star/planet this build request is happening on
    */
   @ProtoField(tag = 11, type = STRING)
-  public final String star_key;
+  public String star_key;
 
   @ProtoField(tag = 12, type = INT32)
-  public final Integer planet_index;
+  public Integer planet_index;
 
   @ProtoField(tag = 4, type = ENUM)
-  public final BUILD_KIND build_kind;
+  public BUILD_KIND build_kind;
 
   /**
    * The name of the design you're trying to build
    */
   @ProtoField(tag = 5, type = STRING)
-  public final String design_name;
+  public String design_name;
 
   /**
    * The number of things we're building in this single operation
    */
   @ProtoField(tag = 9, type = INT32)
-  public final Integer count;
+  public Integer count;
 
   /**
    * The date/time this build request started and the current predicted time of completion
    */
   @ProtoField(tag = 6, type = INT64)
-  public final Long start_time;
+  public Long start_time;
 
   @ProtoField(tag = 7, type = INT64)
-  public final Long end_time;
+  public Long end_time;
 
   /**
    * this is the "progress" of the build, from 0 (just started) to 1.0 (complete). It's not
@@ -91,7 +91,7 @@ public final class BuildRequest extends Message {
    * etc etc)
    */
   @ProtoField(tag = 8, type = FLOAT)
-  public final Float progress;
+  public Float progress;
 
   /**
    * If this is set, then we're upgrading an existing building with the given key. This is only
@@ -99,25 +99,28 @@ public final class BuildRequest extends Message {
    * current colony as well.
    */
   @ProtoField(tag = 10, type = STRING)
-  public final String existing_building_key;
+  public String existing_building_key;
 
   @ProtoField(tag = 13, type = INT32)
-  public final Integer existing_building_level;
+  public Integer existing_building_level;
 
   /**
    * when upgrading a fleet, these will be set
    */
   @ProtoField(tag = 14, type = INT32)
-  public final Integer existing_fleet_id;
+  public Integer existing_fleet_id;
 
   @ProtoField(tag = 15, type = STRING)
-  public final String upgrade_id;
+  public String upgrade_id;
 
   /**
    * notes you can attach to the fleet/building when it's finished
    */
   @ProtoField(tag = 16, type = STRING)
-  public final String notes;
+  public String notes;
+
+  public BuildRequest() {
+  }
 
   public BuildRequest(String key, String colony_key, String empire_key, String star_key, Integer planet_index, BUILD_KIND build_kind, String design_name, Integer count, Long start_time, Long end_time, Float progress, String existing_building_key, Integer existing_building_level, Integer existing_fleet_id, String upgrade_id, String notes) {
     this.key = key;

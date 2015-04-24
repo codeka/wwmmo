@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.EmpireAltAccounts;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -31,7 +31,7 @@ public class FindAltAccountsCronJob extends CronJob {
       }
     }
 
-    ArrayList<Messages.EmpireAltAccounts> alts = new ArrayList<>();
+    ArrayList<EmpireAltAccounts> alts = new ArrayList<>();
 
     sql = "SELECT *, empires.id AS empire_id FROM devices " +
         " INNER JOIN empires ON empires.user_email = devices.user_email" +
@@ -43,12 +43,14 @@ public class FindAltAccountsCronJob extends CronJob {
         stmt.setString(1, emailAddress);
         SqlResult res = stmt.select();
 
-        Messages.EmpireAltAccounts.Builder alt_acct_pb = Messages.EmpireAltAccounts.newBuilder();
+        EmpireAltAccounts.Builder alt_acct_pb = new EmpireAltAccounts.Builder();
+        alt_acct_pb.device = new ArrayList<>();
+        alt_acct_pb.alt_empire = new ArrayList<>();
         int numFound = 0;
         while (res.next()) {
           String altEmailAddress = res.getString("user_email");
           if (altEmailAddress.equals(emailAddress)) {
-            alt_acct_pb.setEmpireId(res.getInt("empire_id"));
+            alt_acct_pb.empire_id = res.getInt("empire_id");
           }
 
           addDeviceInfo(alt_acct_pb, res);
@@ -58,8 +60,8 @@ public class FindAltAccountsCronJob extends CronJob {
 
         if (numFound > 0) {
           log.info(String.format(
-              "Found %d alts and %d devices for: %s", alt_acct_pb.getAltEmpireCount() - 1,
-              alt_acct_pb.getDeviceCount(), emailAddress));
+              "Found %d alts and %d devices for: %s", alt_acct_pb.alt_empire.size() - 1,
+              alt_acct_pb.device.size(), emailAddress));
           alts.add(alt_acct_pb.build());
         } else {
           log.info("No alts and only one device found for: " + emailAddress);
@@ -74,54 +76,50 @@ public class FindAltAccountsCronJob extends CronJob {
 
     sql = "INSERT INTO empire_alts (empire_id, alt_blob) VALUES (?, ?)";
     try (SqlStmt stmt = DB.prepare(sql)) {
-      for (Messages.EmpireAltAccounts pb : alts) {
-        stmt.setInt(1, pb.getEmpireId());
+      for (EmpireAltAccounts pb : alts) {
+        stmt.setInt(1, pb.empire_id);
         stmt.setBytes(2, pb.toByteArray());
         stmt.update();
       }
     }
   }
 
-  private void addDeviceInfo(Messages.EmpireAltAccounts.Builder alt_acct_pb, SqlResult res)
+  private void addDeviceInfo(EmpireAltAccounts.Builder alt_acct_pb, SqlResult res)
       throws SQLException {
     // check whether we've added this device already, and add it if not
     String deviceId = res.getString("device_id");
-    for (Messages.EmpireAltAccounts.DeviceInfo device_info_pb : alt_acct_pb.getDeviceList()) {
-      if (device_info_pb.getDeviceId().equals(deviceId)) {
+    for (EmpireAltAccounts.DeviceInfo device_info_pb : alt_acct_pb.device) {
+      if (device_info_pb.device_id.equals(deviceId)) {
         return;
       }
     }
 
-    Messages.EmpireAltAccounts.DeviceInfo.Builder device_info_pb =
-        Messages.EmpireAltAccounts.DeviceInfo.newBuilder();
-    device_info_pb.setDeviceId(deviceId);
-    device_info_pb.setDeviceBuild(res.getString("device_build"));
-    device_info_pb.setDeviceManufacturer(res.getString("device_manufacturer"));
-    device_info_pb.setDeviceModel(res.getString("device_model"));
-    device_info_pb.setDeviceVersion(res.getString("device_version"));
-    alt_acct_pb.addDevice(device_info_pb);
+    EmpireAltAccounts.DeviceInfo.Builder device_info_pb =
+        new EmpireAltAccounts.DeviceInfo.Builder();
+    device_info_pb.device_id = deviceId;
+    device_info_pb.device_build = res.getString("device_build");
+    device_info_pb.device_manufacturer = res.getString("device_manufacturer");
+    device_info_pb.device_model = res.getString("device_model");
+    device_info_pb.device_version = res.getString("device_version");
+    alt_acct_pb.device.add(device_info_pb.build());
   }
 
-  private void addEmpireInfo(Messages.EmpireAltAccounts.Builder alt_acct_pb, SqlResult res)
+  private void addEmpireInfo(EmpireAltAccounts.Builder alt_acct_pb, SqlResult res)
       throws SQLException {
-    // check whether we've added this device already, and add it if not
+    // check whether we've added this empire already, and add it if not
     int empireId = res.getInt("empire_id");
-    for (Messages.EmpireAltAccounts.EmpireAltEmpire alt_empire_pb : alt_acct_pb
-        .getAltEmpireList()) {
-      if (alt_empire_pb.getEmpireId() == empireId) {
+    for (EmpireAltAccounts.EmpireAltEmpire alt_empire_pb : alt_acct_pb.alt_empire) {
+      if (alt_empire_pb.empire_id == empireId) {
         return;
       }
     }
 
-    Messages.EmpireAltAccounts.EmpireAltEmpire.Builder alt_empire_pb =
-        Messages.EmpireAltAccounts.EmpireAltEmpire.newBuilder();
-    alt_empire_pb.setEmpireId(empireId);
-    alt_empire_pb.setEmpireName(res.getString("name"));
-    alt_empire_pb.setUserEmail(res.getString("user_email"));
-    Integer allianceID = res.getInt("alliance_id");
-    if (allianceID != null) {
-      alt_empire_pb.setAllianceId(allianceID);
-    }
-    alt_acct_pb.addAltEmpire(alt_empire_pb);
+    EmpireAltAccounts.EmpireAltEmpire.Builder alt_empire_pb =
+        new EmpireAltAccounts.EmpireAltEmpire.Builder();
+    alt_empire_pb.empire_id = empireId;
+    alt_empire_pb.empire_name = res.getString("name");
+    alt_empire_pb.user_email = res.getString("user_email");
+    alt_empire_pb.alliance_id = res.getInt("alliance_id");
+    alt_acct_pb.alt_empire.add(alt_empire_pb.build());
   }
 }

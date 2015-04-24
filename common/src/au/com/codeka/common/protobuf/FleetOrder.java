@@ -26,7 +26,7 @@ public final class FleetOrder extends Message {
   public static final Integer DEFAULT_OFFSET_Y = 0;
 
   @ProtoField(tag = 1, type = ENUM)
-  public final FLEET_ORDER order;
+  public FLEET_ORDER order;
 
   /**
    * if the order is to split, this will be the number of ships
@@ -34,44 +34,47 @@ public final class FleetOrder extends Message {
    * the original number of ships you had.
    */
   @ProtoField(tag = 2, type = INT32)
-  public final Integer split_left;
+  public Integer split_left;
 
   @ProtoField(tag = 3, type = INT32)
-  public final Integer split_right;
+  public Integer split_right;
 
   /**
    * when moving or attacking, this represents the destination star
    */
   @ProtoField(tag = 4, type = STRING)
-  public final String star_key;
+  public String star_key;
 
   /**
    * if the order is SET_STANCE, this will be the stance we want to change to
    */
   @ProtoField(tag = 5, type = ENUM)
-  public final Fleet.FLEET_STANCE stance;
+  public Fleet.FLEET_STANCE stance;
 
   /**
    * if the order is MERGE, this will be the fleet to merge with
    */
   @ProtoField(tag = 6, type = STRING)
-  public final String merge_fleet_key;
+  public String merge_fleet_key;
 
   /**
    * if it's a move command, but to empty space and not a star (e.g. for wormhole generators),
    * then this represents the coordinates you want to move to
    */
   @ProtoField(tag = 7, type = INT64)
-  public final Long sector_x;
+  public Long sector_x;
 
   @ProtoField(tag = 8, type = INT64)
-  public final Long sector_y;
+  public Long sector_y;
 
   @ProtoField(tag = 9, type = INT32)
-  public final Integer offset_x;
+  public Integer offset_x;
 
   @ProtoField(tag = 10, type = INT32)
-  public final Integer offset_y;
+  public Integer offset_y;
+
+  public FleetOrder() {
+  }
 
   public FleetOrder(FLEET_ORDER order, Integer split_left, Integer split_right, String star_key, Fleet.FLEET_STANCE stance, String merge_fleet_key, Long sector_x, Long sector_y, Integer offset_x, Integer offset_y) {
     this.order = order;

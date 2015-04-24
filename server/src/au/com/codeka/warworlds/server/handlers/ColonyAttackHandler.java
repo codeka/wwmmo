@@ -2,7 +2,7 @@ package au.com.codeka.warworlds.server.handlers;
 
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.ColonyController;
@@ -30,12 +30,12 @@ public class ColonyAttackHandler extends RequestHandler {
                 }
             }
             if (colony == null) {
-                throw new RequestException(404, Messages.GenericError.ErrorCode.CannotAttackColonyGone,
+                throw new RequestException(404, GenericError.ErrorCode.CannotAttackColonyGone,
                         "No colony found on this planet.");
             }
 
             if (colony.getEmpireID() != null && colony.getEmpireID() == getSession().getEmpireID()) {
-                throw new RequestException(400, Messages.GenericError.ErrorCode.CannotAttackOwnColony,
+                throw new RequestException(400, GenericError.ErrorCode.CannotAttackOwnColony,
                         "Cannot attack your own colony.");
             }
 
@@ -46,9 +46,9 @@ public class ColonyAttackHandler extends RequestHandler {
             new StarController(t).update(star);
             t.commit();
 
-            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            au.com.codeka.common.protobuf.Star star_pb = new au.com.codeka.common.protobuf.Star();
             star.toProtocolBuffer(star_pb);
-            setResponseBody(star_pb.build());
+            setResponseBody(star_pb);
         } catch(Exception e) {
             throw new RequestException(e);
         }

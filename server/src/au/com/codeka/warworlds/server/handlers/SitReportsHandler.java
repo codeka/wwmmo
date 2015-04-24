@@ -1,11 +1,14 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.SituationReport;
+import au.com.codeka.common.protobuf.SituationReportFilter;
+import au.com.codeka.common.protobuf.SituationReports;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -38,35 +41,36 @@ public class SitReportsHandler extends RequestHandler {
             }
         }
 
-        Messages.SituationReportFilter filter = null;
+        SituationReportFilter filter = null;
         if (getRequest().getParameter("filter") != null) {
-            filter = Messages.SituationReportFilter.valueOf(getRequest().getParameter("filter"));
+            filter = SituationReportFilter.valueOf(getRequest().getParameter("filter"));
         }
 
         Integer empireID = getSession().getEmpireID();
         if (getSession().isAdmin()) {
             empireID = null;
         }
-        List<Messages.SituationReport> sitreps = new SituationReportController().fetch(
+        List<SituationReport> sitreps = new SituationReportController().fetch(
                 empireID, starID, before, after, filter, 50);
 
         DateTime first = null;
         if (!sitreps.isEmpty()) {
-            first = new DateTime(sitreps.get(sitreps.size() - 1).getReportTime() * 1000,
+            first = new DateTime(sitreps.get(sitreps.size() - 1).report_time * 1000,
                     DateTimeZone.UTC);
         }
 
-        Messages.SituationReports.Builder sitreps_pb = Messages.SituationReports.newBuilder();
-        for (Messages.SituationReport sitrep : sitreps) {
-            sitreps_pb.addSituationReports(sitrep);
+        SituationReports sitreps_pb = new SituationReports();
+        sitreps_pb.situation_reports = new ArrayList<>();
+        for (SituationReport sitrep : sitreps) {
+            sitreps_pb.situation_reports.add(sitrep);
         }
 
         if (first == null) {
-            cursor = "";
+            sitreps_pb.cursor = "";
         } else {
-            cursor = Long.toString(first.getMillis());
+            sitreps_pb.cursor = Long.toString(first.getMillis());
         }
-        sitreps_pb.setCursor(cursor);
-        setResponseBody(sitreps_pb.build());
+
+        setResponseBody(sitreps_pb);
     }
 }

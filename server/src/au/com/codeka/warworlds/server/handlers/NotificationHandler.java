@@ -3,8 +3,11 @@ package au.com.codeka.warworlds.server.handlers;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
 
+import java.util.ArrayList;
+
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Notification;
+import au.com.codeka.common.protobuf.Notifications;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.NotificationController;
@@ -32,12 +35,12 @@ public class NotificationHandler extends RequestHandler {
         if (notification != null) {
             // if we get a notification message...
 
-            Messages.Notifications.Builder notifications_pb = Messages.Notifications.newBuilder();
+            Notifications.Builder notifications_pb = new Notifications.Builder();
+            notifications_pb.notifications = new ArrayList<>();
             for (String key : notification.values.keySet()) {
                 log.info("Adding notification: "+key);
-                notifications_pb.addNotifications(Messages.Notification.newBuilder()
-                        .setName(key)
-                        .setValue(notification.values.get(key))
+                notifications_pb.notifications.add(
+                    new Notification.Builder().name(key).value(notification.values.get(key))
                         .build());
             }
             setResponseBody(notifications_pb.build());

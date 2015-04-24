@@ -25,8 +25,8 @@ import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.common.protobuf.Messages.GenericError;
+import au.com.codeka.common.protobuf.EmpireChangeShieldRequest;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -117,16 +117,16 @@ public class EmpiresShieldHandler extends RequestHandler {
 
     @Override
     protected void put() throws RequestException {
-        Messages.EmpireChangeShieldRequest shield_request_pb = getRequestBody(Messages.EmpireChangeShieldRequest.class);
+        EmpireChangeShieldRequest shield_request_pb = getRequestBody(EmpireChangeShieldRequest.class);
         int empireID = getSession().getEmpireID();
-        if (!Integer.toString(empireID).equals(shield_request_pb.getKey())) {
+        if (!Integer.toString(empireID).equals(shield_request_pb.key)) {
             throw new RequestException(403, "Cannot change someone else's shield image.");
         }
 
         // load up the image, make sure it's valid and reasonable dimenions
         BufferedImage img;
         try {
-            img = Imaging.getBufferedImage(shield_request_pb.getPngImage().toByteArray());
+            img = Imaging.getBufferedImage(shield_request_pb.png_image.toByteArray());
         } catch (Exception e) {
             log.error("Exception caught loading image, assuming invalid!", e);
             throw new RequestException(400, GenericError.ErrorCode.InvalidImage, "Supplied image is not valid.");
@@ -148,13 +148,13 @@ public class EmpiresShieldHandler extends RequestHandler {
             throw new RequestException(e);
         }
 
-        new PurchaseController().addPurchase(empireID, shield_request_pb.getPurchaseInfo(), shield_request_pb);
+        new PurchaseController().addPurchase(empireID, shield_request_pb.purchase_info, shield_request_pb);
         new EmpireController().changeEmpireShield(empireID, png.toByteArray());
 
-        Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
+        au.com.codeka.common.protobuf.Empire empire_pb = new au.com.codeka.common.protobuf.Empire();
         Empire empire = new EmpireController().getEmpire(empireID);
         empire.toProtocolBuffer(empire_pb, true);
-        setResponseBody(empire_pb.build());
+        setResponseBody(empire_pb);
     }
 
     private BufferedImage mergeShieldImage(BufferedImage shieldImage) throws ImageReadException, IOException {

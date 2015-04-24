@@ -165,7 +165,7 @@ public abstract class BaseBuildRequest  {
         mNotes = pb.notes;
     }
 
-    public void toProtocolBuffer(BuildRequest.Builder pb) {
+    public void toProtocolBuffer(BuildRequest pb) {
         pb.key = mKey;
         pb.build_kind = BuildRequest.BUILD_KIND.valueOf(mDesignKind.toString());
         pb.design_name = mDesignID;

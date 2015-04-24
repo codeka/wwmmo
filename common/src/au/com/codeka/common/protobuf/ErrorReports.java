@@ -15,10 +15,13 @@ public final class ErrorReports extends Message {
   public static final List<ErrorReport> DEFAULT_REPORTS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = ErrorReport.class)
-  public final List<ErrorReport> reports;
+  public List<ErrorReport> reports;
+
+  public ErrorReports() {
+  }
 
   public ErrorReports(List<ErrorReport> reports) {
-    this.reports = immutableCopyOf(reports);
+    this.reports = copyOf(reports);
   }
 
   private ErrorReports(Builder builder) {

@@ -15,10 +15,13 @@ public final class Notifications extends Message {
   public static final List<Notification> DEFAULT_NOTIFICATIONS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = Notification.class)
-  public final List<Notification> notifications;
+  public List<Notification> notifications;
+
+  public Notifications() {
+  }
 
   public Notifications(List<Notification> notifications) {
-    this.notifications = immutableCopyOf(notifications);
+    this.notifications = copyOf(notifications);
   }
 
   private Notifications(Builder builder) {

@@ -100,9 +100,9 @@ public class BasePlanet {
         }
     }
 
-    public void toProtocolBuffer(Planet.Builder pb) {
+    public void toProtocolBuffer(Planet pb) {
         pb.index = mIndex;
-        pb.planet_type = Planet.PLANET_TYPE.values()[mPlanetType.mIndex + 1];
+        pb.planet_type = Planet.PLANET_TYPE.values()[mPlanetType.mIndex];
         pb.size = mSize;
         pb.population_congeniality = mPopulationCongeniality;
         pb.farming_congeniality = mFarmingCongeniality;

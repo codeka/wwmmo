@@ -14,7 +14,8 @@ import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.Design.Dependency;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.CashAuditRecord;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
@@ -56,7 +57,7 @@ public class BuildQueueController {
         for (Design.Dependency dependency : design.getDependencies()) {
             if (!dependency.isMet(colony)) {
                 throw new RequestException(400,
-                        Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
+                        GenericError.ErrorCode.CannotBuildDependencyNotMet,
                         String.format("Cannot build %s as level %d %s is required.",
                                       buildRequest.getDesign().getDisplayName(),
                                       dependency.getLevel(),
@@ -87,7 +88,7 @@ public class BuildQueueController {
 
                 if (numThisColony >= maxPerColony) {
                     throw new RequestException(400,
-                            Messages.GenericError.ErrorCode.CannotBuildMaxPerColonyReached,
+                            GenericError.ErrorCode.CannotBuildMaxPerColonyReached,
                             String.format("Cannot build %s, maximum per colony reached.",
                                           buildRequest.getDesign().getDisplayName()));
                 }
@@ -113,7 +114,7 @@ public class BuildQueueController {
                     Long numPerEmpire = stmt.selectFirstValue(Long.class);
                     if (numPerEmpire >= buildingDesign.getMaxPerEmpire()) {
                         throw new RequestException(400,
-                                Messages.GenericError.ErrorCode.CannotBuildMaxPerColonyReached,
+                                GenericError.ErrorCode.CannotBuildMaxPerColonyReached,
                                 String.format("Cannot build %s, maximum per empire reached.",
                                               buildRequest.getDesign().getDisplayName()));
                     }
@@ -135,7 +136,7 @@ public class BuildQueueController {
                 }
                 if (otherBuildRequest.getExistingBuildingID() == buildRequest.getExistingBuildingID()) {
                     throw new RequestException(400,
-                            Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
+                            GenericError.ErrorCode.CannotBuildDependencyNotMet,
                             String.format("Cannot upgrade %s, upgrade is already in progress.",
                                           buildRequest.getDesign().getDisplayName()));
                 }
@@ -149,7 +150,7 @@ public class BuildQueueController {
             }
             if (existingBuilding == null) {
                 throw new RequestException(400,
-                        Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
+                        GenericError.ErrorCode.CannotBuildDependencyNotMet,
                         String.format("Cannot upgrade %s, original building no longer exists.",
                                       buildRequest.getDesign().getDisplayName()));
             }
@@ -157,7 +158,7 @@ public class BuildQueueController {
             // make sure the existing building isn't already at the maximum level
             if (existingBuilding.getLevel() == buildingDesign.getUpgrades().size() + 1) {
                throw new RequestException(400,
-                        Messages.GenericError.ErrorCode.CannotBuildMaxLevelReached,
+                        GenericError.ErrorCode.CannotBuildMaxLevelReached,
                         String.format("Cannot update %s, already at maximum level.",
                                 buildRequest.getDesign().getDisplayName()));
             }
@@ -168,7 +169,7 @@ public class BuildQueueController {
             for (Design.Dependency dependency : dependencies) {
                 if (!dependency.isMet(colony)) {
                     throw new RequestException(400,
-                            Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
+                            GenericError.ErrorCode.CannotBuildDependencyNotMet,
                             String.format("Cannot upgrade %s as level %d %s is required.",
                                           buildRequest.getDesign().getDisplayName(),
                                           dependency.getLevel(),
@@ -192,7 +193,7 @@ public class BuildQueueController {
                 if ((int) otherBuildRequest.getExistingFleetID()
                         == (int) buildRequest.getExistingFleetID()) {
                     throw new RequestException(400,
-                            Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
+                            GenericError.ErrorCode.CannotBuildDependencyNotMet,
                             String.format("Cannot upgrade %s, upgrade is already in progress.",
                                     shipDesign.getDisplayName()));
                 } else {
@@ -209,7 +210,7 @@ public class BuildQueueController {
             }
             if (existingFleet == null) {
                 throw new RequestException(400,
-                        Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
+                        GenericError.ErrorCode.CannotBuildDependencyNotMet,
                         String.format("Cannot upgrade %s, original fleet no longer exists.",
                                 shipDesign.getDisplayName()));
             }
@@ -217,7 +218,7 @@ public class BuildQueueController {
             // make sure the existing fleet doesn't already have the upgrade
             if (existingFleet.getUpgrade(buildRequest.getUpgradeID()) != null) {
                 throw new RequestException(400,
-                        Messages.GenericError.ErrorCode.CannotBuildMaxLevelReached,
+                        GenericError.ErrorCode.CannotBuildMaxLevelReached,
                         String.format("Cannot update %s, already has upgrade.",
                                 shipDesign.getDisplayName()));
             }
@@ -292,13 +293,13 @@ public class BuildQueueController {
         float mineralsToUse = design.getBuildCost().getCostInMinerals() * progressToComplete;
         float cost = mineralsToUse * buildRequest.getCount();
 
-        Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder();
-        audit_record_pb.setEmpireId(buildRequest.getEmpireID());
-        audit_record_pb.setBuildDesignId(buildRequest.getDesignID());
-        audit_record_pb.setBuildCount(buildRequest.getCount());
-        audit_record_pb.setAccelerateAmount(accelerateAmount);
+        CashAuditRecord.Builder audit_record_pb = new CashAuditRecord.Builder();
+        audit_record_pb.empire_id = buildRequest.getEmpireID();
+        audit_record_pb.build_design_id = buildRequest.getDesignID();
+        audit_record_pb.build_count = buildRequest.getCount();
+        audit_record_pb.accelerate_amount = accelerateAmount;
         if (!new EmpireController().withdrawCash(buildRequest.getEmpireID(), cost, audit_record_pb)) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.InsufficientCash,
+            throw new RequestException(400, GenericError.ErrorCode.InsufficientCash,
                     "You don't have enough cash to accelerate this build.");
         }
         float finalProgress = buildRequest.getProgress(false) + progressToComplete;

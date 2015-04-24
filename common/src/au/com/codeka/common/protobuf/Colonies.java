@@ -19,10 +19,13 @@ public final class Colonies extends Message {
   public static final List<Colony> DEFAULT_COLONIES = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = Colony.class)
-  public final List<Colony> colonies;
+  public List<Colony> colonies;
+
+  public Colonies() {
+  }
 
   public Colonies(List<Colony> colonies) {
-    this.colonies = immutableCopyOf(colonies);
+    this.colonies = copyOf(colonies);
   }
 
   private Colonies(Builder builder) {

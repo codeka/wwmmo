@@ -19,22 +19,25 @@ public final class AllianceRequestVote extends Message {
   public static final Long DEFAULT_DATE = 0L;
 
   @ProtoField(tag = 1, type = INT32)
-  public final Integer id;
+  public Integer id;
 
   @ProtoField(tag = 2, type = INT32)
-  public final Integer alliance_id;
+  public Integer alliance_id;
 
   @ProtoField(tag = 3, type = INT32)
-  public final Integer alliance_request_id;
+  public Integer alliance_request_id;
 
   @ProtoField(tag = 4, type = INT32)
-  public final Integer empire_id;
+  public Integer empire_id;
 
   @ProtoField(tag = 5, type = INT32)
-  public final Integer votes;
+  public Integer votes;
 
   @ProtoField(tag = 6, type = INT64)
-  public final Long date;
+  public Long date;
+
+  public AllianceRequestVote() {
+  }
 
   public AllianceRequestVote(Integer id, Integer alliance_id, Integer alliance_request_id, Integer empire_id, Integer votes, Long date) {
     this.id = id;

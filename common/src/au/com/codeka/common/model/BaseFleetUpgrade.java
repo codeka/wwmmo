@@ -42,7 +42,7 @@ public class BaseFleetUpgrade {
         mExtra = pb.extra;
     }
 
-    public void toProtocolBuffer(FleetUpgrade.Builder pb) {
+    public void toProtocolBuffer(FleetUpgrade pb) {
         pb.upgrade_id = mUpgradeID;
         pb.extra = mExtra;
     }

@@ -23,10 +23,13 @@ public final class EmpireBuildingStatistics extends Message {
   public static final List<DesignCount> DEFAULT_COUNTS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = DesignCount.class)
-  public final List<DesignCount> counts;
+  public List<DesignCount> counts;
+
+  public EmpireBuildingStatistics() {
+  }
 
   public EmpireBuildingStatistics(List<DesignCount> counts) {
-    this.counts = immutableCopyOf(counts);
+    this.counts = copyOf(counts);
   }
 
   private EmpireBuildingStatistics(Builder builder) {
@@ -78,10 +81,13 @@ public final class EmpireBuildingStatistics extends Message {
     public static final Integer DEFAULT_NUM_BUILDINGS = 0;
 
     @ProtoField(tag = 1, type = STRING)
-    public final String design_id;
+    public String design_id;
 
     @ProtoField(tag = 2, type = INT32)
-    public final Integer num_buildings;
+    public Integer num_buildings;
+
+    public DesignCount() {
+    }
 
     public DesignCount(String design_id, Integer num_buildings) {
       this.design_id = design_id;

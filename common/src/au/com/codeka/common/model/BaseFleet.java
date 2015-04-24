@@ -184,13 +184,15 @@ public abstract class BaseFleet {
             mTimeDestroyed = new DateTime(pb.time_destroyed * 1000, DateTimeZone.UTC);
         }
         mUpgrades = new ArrayList<>();
-        for (FleetUpgrade upgrade_pb : pb.upgrades) {
-            mUpgrades.add(createUpgrade(upgrade_pb));
+        if (pb.upgrades != null) {
+            for (FleetUpgrade upgrade_pb : pb.upgrades) {
+                mUpgrades.add(createUpgrade(upgrade_pb));
+            }
         }
         mNotes = pb.notes;
     }
 
-    public void toProtocolBuffer(Fleet.Builder pb) {
+    public void toProtocolBuffer(Fleet pb) {
         pb.key = mKey;
         pb.empire_key = mEmpireKey;
         pb.alliance_id = mAllianceID;
@@ -212,9 +214,9 @@ public abstract class BaseFleet {
         if (mUpgrades != null) {
             pb.upgrades = new ArrayList<>();
             for (BaseFleetUpgrade baseFleetUpgrade : mUpgrades) {
-                FleetUpgrade.Builder upgrade_pb = new FleetUpgrade.Builder();
+                FleetUpgrade upgrade_pb = new FleetUpgrade();
                 baseFleetUpgrade.toProtocolBuffer(upgrade_pb);
-                pb.upgrades.add(upgrade_pb.build());
+                pb.upgrades.add(upgrade_pb);
             }
         }
         pb.notes = mNotes;

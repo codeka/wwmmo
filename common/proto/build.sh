@@ -4,5 +4,5 @@
 #
 
 java -jar wire-compiler-1.8.0-SNAPSHOT-jar-with-dependencies.jar \
-     --proto_path=. --java_out=../src *.proto
+     --mutable --proto_path=. --java_out=../src *.proto
 

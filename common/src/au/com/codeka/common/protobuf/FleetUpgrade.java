@@ -18,10 +18,13 @@ public final class FleetUpgrade extends Message {
   public static final String DEFAULT_EXTRA = "";
 
   @ProtoField(tag = 1, type = STRING)
-  public final String upgrade_id;
+  public String upgrade_id;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String extra;
+  public String extra;
+
+  public FleetUpgrade() {
+  }
 
   public FleetUpgrade(String upgrade_id, String extra) {
     this.upgrade_id = upgrade_id;

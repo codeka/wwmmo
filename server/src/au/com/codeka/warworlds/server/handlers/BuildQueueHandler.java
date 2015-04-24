@@ -4,7 +4,6 @@ import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.BuildQueueController;
@@ -18,7 +17,8 @@ import au.com.codeka.warworlds.server.model.Star;
 public class BuildQueueHandler extends RequestHandler {
     @Override
     protected void post() throws RequestException {
-        Messages.BuildRequest build_request_pb = getRequestBody(Messages.BuildRequest.class);
+        au.com.codeka.common.protobuf.BuildRequest build_request_pb =
+                getRequestBody(au.com.codeka.common.protobuf.BuildRequest.class);
         try {
             tryPost(build_request_pb);
         } catch (Exception e) {
@@ -26,16 +26,17 @@ public class BuildQueueHandler extends RequestHandler {
         }
     }
 
-    private void tryPost(Messages.BuildRequest build_request_pb) throws Exception {
+    private void tryPost(au.com.codeka.common.protobuf.BuildRequest build_request_pb)
+            throws Exception {
         try (Transaction t = DB.beginTransaction()) {
-            Star star = new StarController(t).getStar(Integer.parseInt(build_request_pb.getStarKey()));
+            Star star = new StarController(t).getStar(Integer.parseInt(build_request_pb.star_key));
             if (star == null) {
                 throw new RequestException(404);
             }
 
             Colony colony = null;
             for (BaseColony c : star.getColonies()) {
-                if (c.getKey().equals(build_request_pb.getColonyKey())) {
+                if (c.getKey().equals(build_request_pb.colony_key)) {
                     colony = (Colony) c;
                 }
             }
@@ -62,19 +63,22 @@ public class BuildQueueHandler extends RequestHandler {
 
             t.commit();
 
-            Messages.BuildRequest.Builder build_request_pb_builder = Messages.BuildRequest.newBuilder();
+            au.com.codeka.common.protobuf.BuildRequest build_request_pb_builder =
+                    new au.com.codeka.common.protobuf.BuildRequest();
             buildRequest.toProtocolBuffer(build_request_pb_builder);
-            setResponseBody(build_request_pb_builder.build());
+            setResponseBody(build_request_pb_builder);
         }
     }
 
     @Override
     protected void put() throws RequestException {
-        Messages.BuildRequest build_request_pb = getRequestBody(Messages.BuildRequest.class);
+        au.com.codeka.common.protobuf.BuildRequest build_request_pb =
+                getRequestBody(au.com.codeka.common.protobuf.BuildRequest.class);
         try (Transaction t = DB.beginTransaction()) {
 
             // the only thing you can change is the notes
-            new BuildQueueController(t).updateNotes(Integer.parseInt(build_request_pb.getKey()), build_request_pb.getNotes());
+            new BuildQueueController(t).updateNotes(Integer.parseInt(build_request_pb.key),
+                    build_request_pb.notes);
 
         } catch(Exception e) {
             throw new RequestException(e);

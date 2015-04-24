@@ -31,57 +31,60 @@ public final class Alliance extends Message {
   public static final Integer DEFAULT_NUM_PENDING_REQUESTS = 0;
 
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   /**
    * The name of the alliance
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String name;
+  public String name;
 
   /**
    * The time (in epoch form) the alliance was first created
    */
   @ProtoField(tag = 3, type = INT64)
-  public final Long time_created;
+  public Long time_created;
 
   /**
    * The key of the empire that created this alliance
    */
   @ProtoField(tag = 4, type = STRING)
-  public final String creator_empire_key;
+  public String creator_empire_key;
 
   /**
    * If this is our own alliance, it'll have the bank balance
    */
   @ProtoField(tag = 7, type = DOUBLE)
-  public final Double bank_balance;
+  public Double bank_balance;
 
   /**
    * The current number of members in the alliance
    */
   @ProtoField(tag = 5, type = INT32)
-  public final Integer num_members;
+  public Integer num_members;
 
   /**
    * If set, the actual collection of members
    */
   @ProtoField(tag = 6, label = REPEATED, messageType = AllianceMember.class)
-  public final List<AllianceMember> members;
+  public List<AllianceMember> members;
 
   /**
    * The date the alliance's image was last changed (so we know if
    * we need to re-fetch a cached version).
    */
   @ProtoField(tag = 8, type = INT64)
-  public final Long date_image_updated;
+  public Long date_image_updated;
 
   /**
    * Only for our own alliance, this'll be the number of pending requests
    * we have waiting for us.
    */
   @ProtoField(tag = 9, type = INT32)
-  public final Integer num_pending_requests;
+  public Integer num_pending_requests;
+
+  public Alliance() {
+  }
 
   public Alliance(String key, String name, Long time_created, String creator_empire_key, Double bank_balance, Integer num_members, List<AllianceMember> members, Long date_image_updated, Integer num_pending_requests) {
     this.key = key;
@@ -90,7 +93,7 @@ public final class Alliance extends Message {
     this.creator_empire_key = creator_empire_key;
     this.bank_balance = bank_balance;
     this.num_members = num_members;
-    this.members = immutableCopyOf(members);
+    this.members = copyOf(members);
     this.date_image_updated = date_image_updated;
     this.num_pending_requests = num_pending_requests;
   }

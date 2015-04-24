@@ -28,13 +28,13 @@ public abstract class BaseChatConversation {
         }
     }
 
-    public void toProtocolBuffer(ChatConversation.Builder pb) {
+    public void toProtocolBuffer(ChatConversation pb) {
         pb.id = mID;
         pb.participants = new ArrayList<>();
         for (BaseChatConversationParticipant participant : mParticipants) {
-            ChatConversationParticipant.Builder participant_pb = new ChatConversationParticipant.Builder();
+            ChatConversationParticipant participant_pb = new ChatConversationParticipant();
             participant.toProtocolBuffer(participant_pb);
-            pb.participants.add(participant_pb.build());
+            pb.participants.add(participant_pb);
         }
     }
 

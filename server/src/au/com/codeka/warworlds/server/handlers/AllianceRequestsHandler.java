@@ -2,7 +2,8 @@ package au.com.codeka.warworlds.server.handlers;
 
 import com.google.common.io.BaseEncoding;
 
-import au.com.codeka.common.protobuf.Messages;
+import java.util.ArrayList;
+
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
@@ -24,19 +25,22 @@ public class AllianceRequestsHandler extends RequestHandler {
         }
 
         int minID = 0;
-        Messages.AllianceRequests.Builder alliance_requests_pb = Messages.AllianceRequests.newBuilder();
+        au.com.codeka.common.protobuf.AllianceRequests.Builder alliance_requests_pb =
+                new au.com.codeka.common.protobuf.AllianceRequests.Builder();
+        alliance_requests_pb.requests = new ArrayList<>();
         for (AllianceRequest request : new AllianceController().getRequests(allianceID, false, cursor)) {
-            Messages.AllianceRequest.Builder alliance_request_pb = Messages.AllianceRequest.newBuilder();
+            au.com.codeka.common.protobuf.AllianceRequest alliance_request_pb =
+                    new au.com.codeka.common.protobuf.AllianceRequest();
             request.toProtocolBuffer(alliance_request_pb);
-            alliance_requests_pb.addRequests(alliance_request_pb);
+            alliance_requests_pb.requests.add(alliance_request_pb);
             if (minID == 0 || minID > request.getID()) {
                 minID = request.getID();
             }
         }
 
         if (minID != 0) {
-            alliance_requests_pb.setCursor(BaseEncoding.base64().encode(
-                    Integer.toString(minID).getBytes()));
+            alliance_requests_pb.cursor = BaseEncoding.base64().encode(
+                    Integer.toString(minID).getBytes());
         }
 
         setResponseBody(alliance_requests_pb.build());
@@ -46,11 +50,12 @@ public class AllianceRequestsHandler extends RequestHandler {
     protected void post() throws RequestException {
         int allianceID = Integer.parseInt(getUrlParameter("allianceid"));
         int empireID = getSession().getEmpireID();
-        Messages.AllianceRequest alliance_request_pb = getRequestBody(Messages.AllianceRequest.class);
-        if (alliance_request_pb.getAllianceId() != allianceID) {
+        au.com.codeka.common.protobuf.AllianceRequest alliance_request_pb =
+                getRequestBody(au.com.codeka.common.protobuf.AllianceRequest.class);
+        if (alliance_request_pb.alliance_id != allianceID) {
             throw new RequestException(400, "AllianceID does not match.");
         }
-        if (alliance_request_pb.getRequestEmpireId() != empireID) {
+        if (alliance_request_pb.request_empire_id != empireID) {
             throw new RequestException(400, "EmpireID does not match!");
         }
 

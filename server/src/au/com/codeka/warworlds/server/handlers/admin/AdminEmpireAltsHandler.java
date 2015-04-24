@@ -1,9 +1,13 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.squareup.wire.WireTypeAdapterFactory;
+
 import java.util.TreeMap;
 
-import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.common.protoformat.PbFormatter;
+import au.com.codeka.common.Wire;
+import au.com.codeka.common.protobuf.EmpireAltAccounts;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -27,8 +31,12 @@ public class AdminEmpireAltsHandler extends AdminHandler {
                 SqlResult res = stmt.select();
                 if (res.next()) {
                     byte[] blob = res.getBytes(1);
-                    Messages.EmpireAltAccounts pb = Messages.EmpireAltAccounts.parseFrom(blob);
-                    data.put("alts", PbFormatter.toJson(pb));
+                    EmpireAltAccounts pb = Wire.i.parseFrom(blob, EmpireAltAccounts.class);
+                    Gson gson = new GsonBuilder()
+                            .registerTypeAdapterFactory(new WireTypeAdapterFactory(Wire.i))
+                            .setPrettyPrinting()
+                            .create();
+                    data.put("alts", gson.toJson(pb));
                 }
             } catch(Exception e) {
                 // TODO: handle errors

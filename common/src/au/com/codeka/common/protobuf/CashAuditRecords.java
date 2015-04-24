@@ -15,10 +15,13 @@ public final class CashAuditRecords extends Message {
   public static final List<CashAuditRecord> DEFAULT_RECORDS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = CashAuditRecord.class)
-  public final List<CashAuditRecord> records;
+  public List<CashAuditRecord> records;
+
+  public CashAuditRecords() {
+  }
 
   public CashAuditRecords(List<CashAuditRecord> records) {
-    this.records = immutableCopyOf(records);
+    this.records = copyOf(records);
   }
 
   private CashAuditRecords(Builder builder) {

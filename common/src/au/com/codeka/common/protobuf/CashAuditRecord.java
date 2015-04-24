@@ -33,61 +33,64 @@ public final class CashAuditRecord extends Message {
   public static final String DEFAULT_ALLIANCE_NAME = "";
 
   @ProtoField(tag = 1, type = INT32)
-  public final Integer id;
+  public Integer id;
 
   @ProtoField(tag = 2, type = INT32)
-  public final Integer empire_id;
+  public Integer empire_id;
 
   @ProtoField(tag = 3, type = ENUM)
-  public final Reason reason;
+  public Reason reason;
 
   @ProtoField(tag = 4, type = FLOAT)
-  public final Float before_cash;
+  public Float before_cash;
 
   @ProtoField(tag = 5, type = FLOAT)
-  public final Float after_cash;
+  public Float after_cash;
 
   @ProtoField(tag = 16, type = INT64)
-  public final Long time;
+  public Long time;
 
   /**
    * these will be filled out if it's a "FleetMove" operation
    */
   @ProtoField(tag = 6, type = INT32)
-  public final Integer fleet_id;
+  public Integer fleet_id;
 
   @ProtoField(tag = 7, type = STRING)
-  public final String fleet_design_id;
+  public String fleet_design_id;
 
   @ProtoField(tag = 8, type = FLOAT)
-  public final Float num_ships;
+  public Float num_ships;
 
   @ProtoField(tag = 9, type = INT32)
-  public final Integer star_id;
+  public Integer star_id;
 
   @ProtoField(tag = 10, type = STRING)
-  public final String star_name;
+  public String star_name;
 
   @ProtoField(tag = 11, type = FLOAT)
-  public final Float move_distance;
+  public Float move_distance;
 
   /**
    * these will be filled out if it's a "BuildAccelerate" operation
    */
   @ProtoField(tag = 12, type = STRING)
-  public final String build_design_id;
+  public String build_design_id;
 
   @ProtoField(tag = 13, type = INT32)
-  public final Integer build_count;
+  public Integer build_count;
 
   @ProtoField(tag = 14, type = FLOAT)
-  public final Float accelerate_amount;
+  public Float accelerate_amount;
 
   /**
    * these will be filled out for the "CreateAlliance" operation
    */
   @ProtoField(tag = 15, type = STRING)
-  public final String alliance_name;
+  public String alliance_name;
+
+  public CashAuditRecord() {
+  }
 
   public CashAuditRecord(Integer id, Integer empire_id, Reason reason, Float before_cash, Float after_cash, Long time, Integer fleet_id, String fleet_design_id, Float num_ships, Integer star_id, String star_name, Float move_distance, String build_design_id, Integer build_count, Float accelerate_amount, String alliance_name) {
     this.id = id;

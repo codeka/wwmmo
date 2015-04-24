@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.SituationReport;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.Event;
 import au.com.codeka.warworlds.server.RequestContext;
@@ -73,18 +73,19 @@ public class FleetDestroyedEvent extends Event {
         CombatReport combatReport = (CombatReport) star.getCombatReport();
         if (fleetWasDestroyed && fleet.getEmpireKey() != null) {
             // send a notification that this fleet was destroyed
-            Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
-            sitrep_pb.setRealm(Configuration.i.getRealmName());
-            sitrep_pb.setEmpireKey(fleet.getEmpireKey());
-            sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
-            sitrep_pb.setStarKey(star.getKey());
-            sitrep_pb.setPlanetIndex(-1);
-            Messages.SituationReport.FleetDestroyedRecord.Builder fleet_destroyed_pb = Messages.SituationReport.FleetDestroyedRecord.newBuilder();
+            SituationReport.Builder sitrep_pb = new SituationReport.Builder();
+            sitrep_pb.realm = Configuration.i.getRealmName();
+            sitrep_pb.empire_key = fleet.getEmpireKey();
+            sitrep_pb.report_time = DateTime.now().getMillis() / 1000;
+            sitrep_pb.star_key = star.getKey();
+            sitrep_pb.planet_index = -1;
+            SituationReport.FleetDestroyedRecord.Builder fleet_destroyed_pb =
+                    new SituationReport.FleetDestroyedRecord.Builder();
             if (combatReport != null) {
-                fleet_destroyed_pb.setCombatReportKey(combatReport.getKey());
+                fleet_destroyed_pb.combat_report_key = combatReport.getKey();
             }
-            fleet_destroyed_pb.setFleetDesignId(fleet.getDesignID());
-            sitrep_pb.setFleetDestroyedRecord(fleet_destroyed_pb);
+            fleet_destroyed_pb.fleet_design_id = fleet.getDesignID();
+            sitrep_pb.fleet_destroyed_record = fleet_destroyed_pb.build();
             new SituationReportController().saveSituationReport(sitrep_pb.build());
         }
 
@@ -118,18 +119,19 @@ public class FleetDestroyedEvent extends Event {
                         !victoriousFleetSummary.getEmpireKey().isEmpty()) {
                     // if there's only one other empire, and only one fleet from the empire
                     // that was just destroyed, it means the other empire was victorious!
-                    Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
-                    sitrep_pb.setRealm(Configuration.i.getRealmName());
-                    sitrep_pb.setEmpireKey(victoriousFleetSummary.getEmpireKey());
-                    sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
-                    sitrep_pb.setStarKey(star.getKey());
-                    sitrep_pb.setPlanetIndex(-1);
-                    Messages.SituationReport.FleetVictoriousRecord.Builder fleet_victorious_pb = Messages.SituationReport.FleetVictoriousRecord.newBuilder();
-                    fleet_victorious_pb.setCombatReportKey(combatReport.getKey());
-                    fleet_victorious_pb.setFleetDesignId(victoriousFleetSummary.getDesignID()); // TODO: more than one?
-                    fleet_victorious_pb.setFleetKey(victoriousFleetSummary.getFleetKeys().get(0)); // TODO: more than one!
-                    fleet_victorious_pb.setNumShips(victoriousFleetSummary.getNumShips());
-                    sitrep_pb.setFleetVictoriousRecord(fleet_victorious_pb);
+                    SituationReport.Builder sitrep_pb = new SituationReport.Builder();
+                    sitrep_pb.realm = Configuration.i.getRealmName();
+                    sitrep_pb.empire_key = victoriousFleetSummary.getEmpireKey();
+                    sitrep_pb.report_time = DateTime.now().getMillis() / 1000;
+                    sitrep_pb.star_key = star.getKey();
+                    sitrep_pb.planet_index = -1;
+                    SituationReport.FleetVictoriousRecord.Builder fleet_victorious_pb =
+                            new SituationReport.FleetVictoriousRecord.Builder();
+                    fleet_victorious_pb.combat_report_key = combatReport.getKey();
+                    fleet_victorious_pb.fleet_design_id = victoriousFleetSummary.getDesignID(); // TODO: more than one?
+                    fleet_victorious_pb.fleet_key = victoriousFleetSummary.getFleetKeys().get(0); // TODO: more than one!
+                    fleet_victorious_pb.num_ships = victoriousFleetSummary.getNumShips();
+                    sitrep_pb.fleet_victorious_record = fleet_victorious_pb.build();
                     new SituationReportController().saveSituationReport(sitrep_pb.build());
                 }
             }

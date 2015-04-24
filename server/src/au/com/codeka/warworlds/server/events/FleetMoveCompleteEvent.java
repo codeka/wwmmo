@@ -12,7 +12,7 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.model.ShipEffect;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.SituationReport;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.Event;
 import au.com.codeka.warworlds.server.RequestContext;
@@ -104,27 +104,29 @@ public class FleetMoveCompleteEvent extends Event {
         new StarController().update(destStar);
 
         if (addSitrep) {
-            Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
-            sitrep_pb.setRealm(Configuration.i.getRealmName());
-            sitrep_pb.setEmpireKey(fleet.getEmpireKey());
-            sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
-            sitrep_pb.setStarKey(destStar.getKey());
-            sitrep_pb.setPlanetIndex(-1);
-            Messages.SituationReport.MoveCompleteRecord.Builder move_complete_pb = Messages.SituationReport.MoveCompleteRecord.newBuilder();
-            move_complete_pb.setFleetKey(fleet.getKey());
-            move_complete_pb.setFleetDesignId(fleet.getDesignID());
-            move_complete_pb.setNumShips(fleet.getNumShips());
+            SituationReport.Builder sitrep_pb = new SituationReport.Builder();
+            sitrep_pb.realm = Configuration.i.getRealmName();
+            sitrep_pb.empire_key = fleet.getEmpireKey();
+            sitrep_pb.report_time = DateTime.now().getMillis() / 1000;
+            sitrep_pb.star_key = destStar.getKey();
+            sitrep_pb.planet_index = -1;
+            SituationReport.MoveCompleteRecord.Builder move_complete_pb =
+                    new SituationReport.MoveCompleteRecord.Builder();
+            move_complete_pb.fleet_key = fleet.getKey();
+            move_complete_pb.fleet_design_id = fleet.getDesignID();
+            move_complete_pb.num_ships = fleet.getNumShips();
             for (ScoutReport scoutReport : destStar.getScoutReports()) {
-                move_complete_pb.setScoutReportKey(scoutReport.getKey());
+                move_complete_pb.scout_report_key = scoutReport.getKey();
             }
-            sitrep_pb.setMoveCompleteRecord(move_complete_pb);
+            sitrep_pb.move_complete_record = move_complete_pb.build();
             if (destStar.getCombatReport() != null && isFleetInCombatReport(fleet.getKey(), (CombatReport) destStar.getCombatReport())) {
-                Messages.SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb = Messages.SituationReport.FleetUnderAttackRecord.newBuilder();
-                fleet_under_attack_pb.setCombatReportKey(destStar.getCombatReport().getKey());
-                fleet_under_attack_pb.setFleetDesignId(fleet.getDesignID());
-                fleet_under_attack_pb.setFleetKey(fleet.getKey());
-                fleet_under_attack_pb.setNumShips(fleet.getNumShips());
-                sitrep_pb.setFleetUnderAttackRecord(fleet_under_attack_pb);
+                SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb =
+                        new SituationReport.FleetUnderAttackRecord.Builder();
+                fleet_under_attack_pb.combat_report_key = destStar.getCombatReport().getKey();
+                fleet_under_attack_pb.fleet_design_id = fleet.getDesignID();
+                fleet_under_attack_pb.fleet_key = fleet.getKey();
+                fleet_under_attack_pb.num_ships = fleet.getNumShips();
+                sitrep_pb.fleet_under_attack_record = fleet_under_attack_pb.build();
             }
     
             new SituationReportController().saveSituationReport(sitrep_pb.build());

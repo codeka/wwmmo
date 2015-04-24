@@ -18,10 +18,13 @@ public final class EmpireStar extends Message {
   public static final Integer DEFAULT_INDEX = 0;
 
   @ProtoField(tag = 1)
-  public final Star star;
+  public Star star;
 
   @ProtoField(tag = 2, type = INT32)
-  public final Integer index;
+  public Integer index;
+
+  public EmpireStar() {
+  }
 
   public EmpireStar(Star star, Integer index) {
     this.star = star;

@@ -22,14 +22,17 @@ public final class NotificationWrapper extends Message {
   public static final List<Notification> DEFAULT_NOTIFICATIONS = Collections.emptyList();
 
   @ProtoField(tag = 1, type = BYTES)
-  public final ByteString original_message;
+  public ByteString original_message;
 
   @ProtoField(tag = 2, label = REPEATED, messageType = Notification.class)
-  public final List<Notification> notifications;
+  public List<Notification> notifications;
+
+  public NotificationWrapper() {
+  }
 
   public NotificationWrapper(ByteString original_message, List<Notification> notifications) {
     this.original_message = original_message;
-    this.notifications = immutableCopyOf(notifications);
+    this.notifications = copyOf(notifications);
   }
 
   private NotificationWrapper(Builder builder) {

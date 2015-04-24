@@ -20,19 +20,22 @@ public final class AllianceMember extends Message {
   public static final Rank DEFAULT_RANK = Rank.CAPTAIN;
 
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String empire_key;
+  public String empire_key;
 
   @ProtoField(tag = 3, type = STRING)
-  public final String alliance_key;
+  public String alliance_key;
 
   @ProtoField(tag = 4, type = INT64)
-  public final Long time_joined;
+  public Long time_joined;
 
   @ProtoField(tag = 5, type = ENUM)
-  public final Rank rank;
+  public Rank rank;
+
+  public AllianceMember() {
+  }
 
   public AllianceMember(String key, String empire_key, String alliance_key, Long time_joined, Rank rank) {
     this.key = key;

@@ -10,6 +10,7 @@ dependencies {
     compile fileTree(dir: '../jetty/lib', include: '*.jar')
     compile 'com.squareup.okio:okio:1.3.0'
     compile 'com.squareup.wire:wire-runtime:1.7.0'
+    compile 'com.squareup.wire:wire-gson-support:1.7.0'
     compile project(':common')
 }
 

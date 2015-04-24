@@ -19,7 +19,7 @@ public class BaseChatConversationParticipant {
         mIsMuted = pb.is_muted;
     }
 
-    public void toProtocolBuffer(ChatConversationParticipant.Builder pb) {
+    public void toProtocolBuffer(ChatConversationParticipant pb) {
         pb.empire_id = mEmpireID;
         pb.is_muted = mIsMuted;
     }

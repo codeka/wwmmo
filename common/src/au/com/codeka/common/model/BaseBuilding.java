@@ -37,7 +37,7 @@ public class BaseBuilding {
         mNotes = pb.notes;
     }
 
-    public void toProtocolBuffer(Building.Builder pb) {
+    public void toProtocolBuffer(Building pb) {
         pb.key = mKey;
         pb.colony_key = mColonyKey;
         pb.design_name = mDesignID;

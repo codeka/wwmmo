@@ -2,7 +2,9 @@ package au.com.codeka.warworlds.server.handlers;
 
 import org.joda.time.DateTime;
 
-import au.com.codeka.common.protobuf.Messages;
+import java.util.ArrayList;
+
+import au.com.codeka.common.protobuf.ChatMessages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.ChatController;
@@ -84,12 +86,14 @@ public class ChatHandler extends RequestHandler {
             }
             SqlResult res = stmt.select();
 
-            Messages.ChatMessages.Builder chat_msgs_pb = Messages.ChatMessages.newBuilder();
+            ChatMessages.Builder chat_msgs_pb = new ChatMessages.Builder();
+            chat_msgs_pb.messages = new ArrayList<>();
             while (res.next()) {
                 ChatMessage msg = new ChatMessage(res);
-                Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
+                au.com.codeka.common.protobuf.ChatMessage chat_msg_pb =
+                        new au.com.codeka.common.protobuf.ChatMessage();
                 msg.toProtocolBuffer(chat_msg_pb, true);
-                chat_msgs_pb.addMessages(chat_msg_pb);
+                chat_msgs_pb.messages.add(chat_msg_pb);
             }
 
             setResponseBody(chat_msgs_pb.build());
@@ -100,12 +104,13 @@ public class ChatHandler extends RequestHandler {
 
     @Override
     protected void post() throws RequestException {
-        Messages.ChatMessage chat_msg_pb = getRequestBody(Messages.ChatMessage.class);
+        au.com.codeka.common.protobuf.ChatMessage chat_msg_pb =
+                getRequestBody(au.com.codeka.common.protobuf.ChatMessage.class);
 
-        if (chat_msg_pb.hasAllianceKey() && chat_msg_pb.getAllianceKey().length() > 0) {
+        if (chat_msg_pb.alliance_key != null && chat_msg_pb.alliance_key.length() > 0) {
             // confirm that if they've specified an alliance, that it's actually their
             // own alliance...
-            int allianceID = Integer.parseInt(chat_msg_pb.getAllianceKey());
+            int allianceID = Integer.parseInt(chat_msg_pb.alliance_key);
             if (allianceID != getSession().getAllianceID()) {
                 throw new RequestException(400);
             }
@@ -113,8 +118,8 @@ public class ChatHandler extends RequestHandler {
 
         // if it's not admin, add the right empire ID
         if (!getSession().isAdmin()) {
-            chat_msg_pb = Messages.ChatMessage.newBuilder(chat_msg_pb)
-                    .setEmpireKey(Integer.toString(getSession().getEmpireID()))
+            chat_msg_pb = new au.com.codeka.common.protobuf.ChatMessage.Builder(chat_msg_pb)
+                    .empire_key(Integer.toString(getSession().getEmpireID()))
                     .build();
         }
 
@@ -122,8 +127,8 @@ public class ChatHandler extends RequestHandler {
         msg.fromProtocolBuffer(chat_msg_pb);
         new ChatController().postMessage(msg);
 
-        Messages.ChatMessage.Builder chat_msg_builder = Messages.ChatMessage.newBuilder();
-        msg.toProtocolBuffer(chat_msg_builder, true);
-        setResponseBody(chat_msg_builder.build());
+        chat_msg_pb = new au.com.codeka.common.protobuf.ChatMessage();
+        msg.toProtocolBuffer(chat_msg_pb, true);
+        setResponseBody(chat_msg_pb);
     }
 }

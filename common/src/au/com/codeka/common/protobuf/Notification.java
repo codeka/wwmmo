@@ -18,10 +18,13 @@ public final class Notification extends Message {
   public static final String DEFAULT_VALUE = "";
 
   @ProtoField(tag = 1, type = STRING)
-  public final String name;
+  public String name;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String value;
+  public String value;
+
+  public Notification() {
+  }
 
   public Notification(String name, String value) {
     this.name = name;

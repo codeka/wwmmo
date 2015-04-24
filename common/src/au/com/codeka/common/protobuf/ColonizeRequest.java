@@ -20,7 +20,10 @@ public final class ColonizeRequest extends Message {
    * The index of the planet you want to colonize
    */
   @ProtoField(tag = 1, type = INT32)
-  public final Integer planet_index;
+  public Integer planet_index;
+
+  public ColonizeRequest() {
+  }
 
   public ColonizeRequest(Integer planet_index) {
     this.planet_index = planet_index;

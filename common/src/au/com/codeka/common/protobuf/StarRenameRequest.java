@@ -24,28 +24,31 @@ public final class StarRenameRequest extends Message {
   public static final String DEFAULT_DEPRECATED_PURCHASE_PRICE = "";
 
   @ProtoField(tag = 1, type = STRING)
-  public final String star_key;
+  public String star_key;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String old_name;
+  public String old_name;
 
   @ProtoField(tag = 3, type = STRING)
-  public final String new_name;
+  public String new_name;
 
   @ProtoField(tag = 4, type = STRING)
-  public final String DEPRECATED_purchase_order_id;
+  public String DEPRECATED_purchase_order_id;
 
   @ProtoField(tag = 5, type = INT64)
-  public final Long DEPRECATED_purchase_time;
+  public Long DEPRECATED_purchase_time;
 
   @ProtoField(tag = 6, type = STRING)
-  public final String DEPRECATED_purchase_developer_payload;
+  public String DEPRECATED_purchase_developer_payload;
 
   @ProtoField(tag = 7, type = STRING)
-  public final String DEPRECATED_purchase_price;
+  public String DEPRECATED_purchase_price;
 
   @ProtoField(tag = 8)
-  public final PurchaseInfo purchase_info;
+  public PurchaseInfo purchase_info;
+
+  public StarRenameRequest() {
+  }
 
   public StarRenameRequest(String star_key, String old_name, String new_name, String DEPRECATED_purchase_order_id, Long DEPRECATED_purchase_time, String DEPRECATED_purchase_developer_payload, String DEPRECATED_purchase_price, PurchaseInfo purchase_info) {
     this.star_key = star_key;

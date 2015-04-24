@@ -81,15 +81,15 @@ public abstract class BaseSector {
         }
     }
 
-    public void toProtocolBuffer(Sector.Builder pb) {
+    public void toProtocolBuffer(Sector pb) {
         pb.x = mX;
         pb.y = mY;
 
         pb.stars = new ArrayList<>();
         for (BaseStar star : mStars) {
-            Star.Builder star_pb = new Star.Builder();
+            Star star_pb = new Star();
             star.toProtocolBuffer(star_pb, true);
-            pb.stars.add(star_pb.build());
+            pb.stars.add(star_pb);
         }
     }
 }

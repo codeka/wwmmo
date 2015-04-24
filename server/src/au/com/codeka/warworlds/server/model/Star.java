@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import au.com.codeka.common.Wire;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
@@ -12,7 +13,6 @@ import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class Star extends BaseStar {
@@ -32,8 +32,8 @@ public class Star extends BaseStar {
         mName = name;
         mSize = size;
         mStarType = sStarTypes[starTypeID];
-        mColonies = new ArrayList<BaseColony>();
-        mFleets = new ArrayList<BaseFleet>();
+        mColonies = new ArrayList<>();
+        mFleets = new ArrayList<>();
     }
     public Star(SqlResult res) throws SQLException {
         mID = res.getInt("id");
@@ -50,11 +50,16 @@ public class Star extends BaseStar {
         mTimeEmptied = res.getDateTime("time_emptied");
 
         try {
-            Messages.Planets planets_pb = Messages.Planets.parseFrom(res.getBytes("planets"));
-            mPlanets = new BasePlanet[planets_pb.getPlanetsCount()];
-            for (int i = 0; i < planets_pb.getPlanetsCount(); i++) {
-                mPlanets[i] = new Planet();
-                mPlanets[i].fromProtocolBuffer(this, planets_pb.getPlanets(i));
+            au.com.codeka.common.protobuf.Planets planets_pb = Wire.i.parseFrom(
+                res.getBytes("planets"), au.com.codeka.common.protobuf.Planets.class);
+            if (planets_pb.planets != null) {
+                mPlanets = new BasePlanet[planets_pb.planets.size()];
+                for (int i = 0; i < planets_pb.planets.size(); i++) {
+                    mPlanets[i] = new Planet();
+                    mPlanets[i].fromProtocolBuffer(this, planets_pb.planets.get(i));
+                }
+            } else {
+                mPlanets = new BasePlanet[0];
             }
         } catch (IOException e) {
         }
@@ -62,8 +67,9 @@ public class Star extends BaseStar {
         try {
             byte[] extra = res.getBytes("extra");
             if (extra != null) {
-                Messages.Star.StarExtra star_extra_pb = Messages.Star.StarExtra.parseFrom(extra);
-                if (star_extra_pb.hasWormholeEmpireId()) {
+                au.com.codeka.common.protobuf.Star.StarExtra star_extra_pb =
+                    Wire.i.parseFrom(extra, au.com.codeka.common.protobuf.Star.StarExtra.class);
+                if (star_extra_pb.wormhole_empire_id != null) {
                     mWormholeExtra = new WormholeExtra();
                     mWormholeExtra.fromProtocolBuffer(star_extra_pb);
                 }
@@ -120,7 +126,7 @@ public class Star extends BaseStar {
     }
 
     @Override
-    protected BasePlanet createPlanet(Messages.Planet pb) {
+    protected BasePlanet createPlanet(au.com.codeka.common.protobuf.Planet pb) {
         Planet p = new Planet();
         if (pb != null) {
             p.fromProtocolBuffer(this, pb);
@@ -129,7 +135,7 @@ public class Star extends BaseStar {
     }
 
     @Override
-    protected BaseColony createColony(Messages.Colony pb) {
+    protected BaseColony createColony(au.com.codeka.common.protobuf.Colony pb) {
         Colony c = new Colony();
         if (pb != null) {
             c.fromProtocolBuffer( pb);
@@ -138,7 +144,7 @@ public class Star extends BaseStar {
     }
 
     @Override
-    protected BaseBuilding createBuilding(Messages.Building pb) {
+    protected BaseBuilding createBuilding(au.com.codeka.common.protobuf.Building pb) {
         Building b = new Building();
         if (pb != null) {
             b.fromProtocolBuffer( pb);
@@ -147,7 +153,7 @@ public class Star extends BaseStar {
     }
 
     @Override
-    protected BaseEmpirePresence createEmpirePresence(Messages.EmpirePresence pb) {
+    protected BaseEmpirePresence createEmpirePresence(au.com.codeka.common.protobuf.EmpirePresence pb) {
         EmpirePresence ep = new EmpirePresence();
         if (pb != null) {
             ep.fromProtocolBuffer( pb);
@@ -156,7 +162,7 @@ public class Star extends BaseStar {
     }
 
     @Override
-    protected BaseFleet createFleet(Messages.Fleet pb) {
+    protected BaseFleet createFleet(au.com.codeka.common.protobuf.Fleet pb) {
         Fleet f = new Fleet();
         if (pb != null) {
             f.fromProtocolBuffer( pb);
@@ -165,7 +171,7 @@ public class Star extends BaseStar {
     }
 
     @Override
-    protected BaseBuildRequest createBuildRequest(Messages.BuildRequest pb) {
+    protected BaseBuildRequest createBuildRequest(au.com.codeka.common.protobuf.BuildRequest pb) {
         BuildRequest br = new BuildRequest();
         if (pb != null) {
             br.fromProtocolBuffer( pb);
@@ -174,7 +180,7 @@ public class Star extends BaseStar {
     }
 
     @Override
-    public BaseCombatReport createCombatReport(Messages.CombatReport pb) {
+    public BaseCombatReport createCombatReport(au.com.codeka.common.protobuf.CombatReport pb) {
         CombatReport report = new CombatReport();
         if (pb != null) {
             report.fromProtocolBuffer(pb);
@@ -185,11 +191,11 @@ public class Star extends BaseStar {
 
     @Override
     public BaseStar clone() {
-        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+        au.com.codeka.common.protobuf.Star star_pb = new au.com.codeka.common.protobuf.Star();
         toProtocolBuffer(star_pb);
 
         Star clone = new Star();
-        clone.fromProtocolBuffer(star_pb.build());
+        clone.fromProtocolBuffer(star_pb);
         return clone;
     }
 }

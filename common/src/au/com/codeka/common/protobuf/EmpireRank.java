@@ -25,28 +25,31 @@ public final class EmpireRank extends Message {
   public static final Integer DEFAULT_TOTAL_POPULATION = 0;
 
   @ProtoField(tag = 1, type = STRING)
-  public final String empire_key;
+  public String empire_key;
 
   @ProtoField(tag = 2, type = INT32)
-  public final Integer rank;
+  public Integer rank;
 
   @ProtoField(tag = 3, type = INT32)
-  public final Integer last_rank;
+  public Integer last_rank;
 
   @ProtoField(tag = 4, type = INT32)
-  public final Integer total_stars;
+  public Integer total_stars;
 
   @ProtoField(tag = 5, type = INT32)
-  public final Integer total_colonies;
+  public Integer total_colonies;
 
   @ProtoField(tag = 6, type = INT32)
-  public final Integer total_ships;
+  public Integer total_ships;
 
   @ProtoField(tag = 7, type = INT32)
-  public final Integer total_buildings;
+  public Integer total_buildings;
 
   @ProtoField(tag = 8, type = INT32)
-  public final Integer total_population;
+  public Integer total_population;
+
+  public EmpireRank() {
+  }
 
   public EmpireRank(String empire_key, Integer rank, Integer last_rank, Integer total_stars, Integer total_colonies, Integer total_ships, Integer total_buildings, Integer total_population) {
     this.empire_key = empire_key;

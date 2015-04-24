@@ -9,7 +9,6 @@ import java.util.Random;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.BackgroundRunner;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
@@ -133,17 +132,18 @@ public class ChatController {
             @Override
             protected void doInBackground() {
                 // escape the HTML before sending the notification out
-                Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
+                au.com.codeka.common.protobuf.ChatMessage chat_msg_pb =
+                        new au.com.codeka.common.protobuf.ChatMessage();
                 chatmsg.toProtocolBuffer(chat_msg_pb, true);
 
                 String encoded = getEncodedMessage(chatmsg);
                 try {
-                    if (chat_msg_pb.hasConversationId()) {
+                    if (chat_msg_pb.conversation_id != null) {
                         new NotificationController().sendNotificationToConversation(
-                                chat_msg_pb.getConversationId(), "chat", encoded);
-                    } else if (chat_msg_pb.hasAllianceKey()) {
+                                chat_msg_pb.conversation_id, "chat", encoded);
+                    } else if (chat_msg_pb.alliance_key != null) {
                         new NotificationController().sendNotificationToOnlineAlliance(
-                                Integer.parseInt(chat_msg_pb.getAllianceKey()), "chat", encoded);
+                                Integer.parseInt(chat_msg_pb.alliance_key), "chat", encoded);
                     } else {
                         new NotificationController().sendNotificationToAllOnline(
                                 "chat", encoded);
@@ -174,10 +174,11 @@ public class ChatController {
 
     /** Encodes the given message, ready to be used in a notification. */
     private String getEncodedMessage(ChatMessage msg) {
-        Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
+        au.com.codeka.common.protobuf.ChatMessage chat_msg_pb =
+                new au.com.codeka.common.protobuf.ChatMessage();
         msg.toProtocolBuffer(chat_msg_pb, true);
 
-        return BaseEncoding.base64().encode(chat_msg_pb.build().toByteArray());
+        return BaseEncoding.base64().encode(chat_msg_pb.toByteArray());
     }
 
     /**

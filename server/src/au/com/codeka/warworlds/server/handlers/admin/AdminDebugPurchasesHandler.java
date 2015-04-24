@@ -1,10 +1,17 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.squareup.wire.Message;
+import com.squareup.wire.WireTypeAdapterFactory;
+
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.common.protoformat.PbFormatter;
+import au.com.codeka.common.Wire;
+import au.com.codeka.common.protobuf.EmpireChangeShieldRequest;
+import au.com.codeka.common.protobuf.EmpireRenameRequest;
+import au.com.codeka.common.protobuf.StarRenameRequest;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -44,27 +51,20 @@ public class AdminDebugPurchasesHandler extends AdminHandler {
     private static String getSkuExtra(SqlResult res) throws Exception {
         String skuName = res.getString("sku");
         if (skuName.equals("rename_empire")) {
-            return getRenameEmpireSkuExtra(res.getBytes("sku_extra"));
+            return toJson(res.getBytes("sku_extra"), EmpireRenameRequest.class);
         } else if (skuName.equals("decorate_empire")) {
-            return getDecorateEmpireSkuExtra(res.getBytes("sku_extra"));
+            return toJson(res.getBytes("sku_extra"), EmpireChangeShieldRequest.class);
         } else if (skuName.equals("star_rename")) {
-            return getStarRenameSkuExtra(res.getBytes("sku_extra"));
+            return toJson(res.getBytes("sku_extra"), StarRenameRequest.class);
         }
         return "{}";
     }
 
-    private static String getRenameEmpireSkuExtra(byte[] data) throws Exception {
-        Messages.EmpireRenameRequest pb = Messages.EmpireRenameRequest.parseFrom(data);
-        return PbFormatter.toJson(pb);
-    }
-
-    private static String getDecorateEmpireSkuExtra(byte[] data) throws Exception {
-        Messages.EmpireChangeShieldRequest pb = Messages.EmpireChangeShieldRequest.parseFrom(data);
-        return PbFormatter.toJson(pb);
-    }
-
-    private static String getStarRenameSkuExtra(byte[] data) throws Exception {
-        Messages.StarRenameRequest pb = Messages.StarRenameRequest.parseFrom(data);
-        return PbFormatter.toJson(pb);
+    private static String toJson(byte[] data, Class<? extends Message> clazz) throws Exception {
+        Gson gson = new GsonBuilder()
+            .registerTypeAdapterFactory(new WireTypeAdapterFactory(Wire.i))
+            .setPrettyPrinting()
+            .create();
+        return gson.toJson(Wire.i.parseFrom(data, clazz));
     }
 }

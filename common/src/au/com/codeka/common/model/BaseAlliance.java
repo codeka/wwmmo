@@ -91,7 +91,7 @@ public abstract class BaseAlliance {
         }
     }
 
-    public void toProtocolBuffer(Alliance.Builder pb) {
+    public void toProtocolBuffer(Alliance pb) {
         pb.key = mKey;
         pb.name = mName;
         pb.time_created = mTimeCreated.getMillis() / 1000;
@@ -106,9 +106,9 @@ public abstract class BaseAlliance {
         if (mMembers != null) {
             pb.members = new ArrayList<>();
             for (BaseAllianceMember member : mMembers) {
-                AllianceMember.Builder member_pb = new AllianceMember.Builder();
+                AllianceMember member_pb = new AllianceMember();
                 member.toProtocolBuffer(member_pb);
-                pb.members.add(member_pb.build());
+                pb.members.add(member_pb);
             }
         }
     }

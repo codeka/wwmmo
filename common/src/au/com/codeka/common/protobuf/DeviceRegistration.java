@@ -29,14 +29,14 @@ public final class DeviceRegistration extends Message {
    * but that's specific to C2DN and is kind a long and unweildy string).
    */
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   /**
    * The identifier of the device. You can have multiple accounts on one device, this
    * will then refer to the device itself.
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String device_id;
+  public String device_id;
 
   /**
    * The identifier of the GCM registration. When you complete the GCM registration
@@ -44,32 +44,32 @@ public final class DeviceRegistration extends Message {
    * we can send you notifications.
    */
   @ProtoField(tag = 3, type = STRING)
-  public final String gcm_registration_id;
+  public String gcm_registration_id;
 
   /**
    * The value of android.os.Build.MODEL for this device
    */
   @ProtoField(tag = 4, type = STRING)
-  public final String device_model;
+  public String device_model;
 
   /**
    * The value of android.os.Build.MANUFACTURER for this device
    */
   @ProtoField(tag = 5, type = STRING)
-  public final String device_manufacturer;
+  public String device_manufacturer;
 
   /**
    * The value of android.os.Build.DISPLAY for this device
    */
   @ProtoField(tag = 6, type = STRING)
-  public final String device_build;
+  public String device_build;
 
   /**
    * The value of android.os.Build.VERSION.RELEASE for this device (note that this can
    * change if you upgrade the OS without re-registering your device!)
    */
   @ProtoField(tag = 7, type = STRING)
-  public final String device_version;
+  public String device_version;
 
   /**
    * If set, this is the user that the device belongs to. This is usually only returned
@@ -77,7 +77,10 @@ public final class DeviceRegistration extends Message {
    * to yourself (i.e. if this is present, it's ignored anyway)
    */
   @ProtoField(tag = 8, type = STRING)
-  public final String user;
+  public String user;
+
+  public DeviceRegistration() {
+  }
 
   public DeviceRegistration(String key, String device_id, String gcm_registration_id, String device_model, String device_manufacturer, String device_build, String device_version, String user) {
     this.key = key;

@@ -2,7 +2,7 @@ package au.com.codeka.warworlds.server.handlers;
 
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.model.BaseChatMessage.MessageAction;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.ChatController;
@@ -19,7 +19,8 @@ public class ChatConversationParticipantsHandler extends RequestHandler {
 
     @Override
     protected void post() throws RequestException {
-        Messages.ChatConversationParticipant pb = getRequestBody(Messages.ChatConversationParticipant.class);
+        au.com.codeka.common.protobuf.ChatConversationParticipant pb =
+                getRequestBody(au.com.codeka.common.protobuf.ChatConversationParticipant.class);
         int conversationID = Integer.parseInt(getUrlParameter("conversationid"));
 
         try (Transaction t = DB.beginTransaction()) {
@@ -36,7 +37,7 @@ public class ChatConversationParticipantsHandler extends RequestHandler {
                 if (participant.getEmpireID() == getSession().getEmpireID()) {
                     isThisEmpireInConversation = true;
                 }
-                if (participant.getEmpireID() == pb.getEmpireId()) {
+                if (participant.getEmpireID() == pb.empire_id) {
                     isNewEmpireInConversation = true;
                 }
             }
@@ -48,11 +49,11 @@ public class ChatConversationParticipantsHandler extends RequestHandler {
 
             // the empire you want to add can't already be there either...
             if (isNewEmpireInConversation) {
-                throw new RequestException(400, Messages.GenericError.ErrorCode.EmpireAlreadyInConversation,
+                throw new RequestException(400, GenericError.ErrorCode.EmpireAlreadyInConversation,
                         "They're already part of this conversation.");
             }
 
-            new ChatController(t).addParticipant(conversation, pb.getEmpireId());
+            new ChatController(t).addParticipant(conversation, pb.empire_id);
 
             t.commit();
         } catch(Exception e) {
@@ -61,7 +62,7 @@ public class ChatConversationParticipantsHandler extends RequestHandler {
 
         // send a notification to the participants (including the new one!) that a new empire has been added.
         ChatMessage msg = new ChatMessage(getSession().getEmpireID(),
-                                          Integer.toString(pb.getEmpireId()),
+                                          Integer.toString(pb.empire_id),
                                           MessageAction.ParticipantAdded,
                                           conversationID);
         new ChatController().postMessage(msg);

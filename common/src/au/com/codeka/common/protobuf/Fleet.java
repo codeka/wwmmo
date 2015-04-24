@@ -46,26 +46,26 @@ public final class Fleet extends Message {
    * The unique key for this fleet
    */
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   /**
    * The key of the empire who owns this fleet
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String empire_key;
+  public String empire_key;
 
   /**
    * The ID of the alliance this fleet belongs to. If not specified, it means the
    * empire that owns this fleet does not belong to an alliance.
    */
   @ProtoField(tag = 18, type = INT32)
-  public final Integer alliance_id;
+  public Integer alliance_id;
 
   /**
    * The name of the ship design of the ship(s) in this fleet
    */
   @ProtoField(tag = 3, type = STRING)
-  public final String design_name;
+  public String design_name;
 
   /**
    * The number of ships in this fleet. This is a floating point number because of the way
@@ -73,48 +73,48 @@ public final class Fleet extends Message {
    * the user, however.
    */
   @ProtoField(tag = 4, type = FLOAT)
-  public final Float num_ships;
+  public Float num_ships;
 
   @ProtoField(tag = 5, type = ENUM)
-  public final FLEET_STATE state;
+  public FLEET_STATE state;
 
   /**
    * The time this fleet was moved into the current state (used to determine things like
    * distance between planets when moving, etc)
    */
   @ProtoField(tag = 6, type = INT64)
-  public final Long state_start_time;
+  public Long state_start_time;
 
   /**
    * The star this fleet is associated with. If moving, star_key is the star we're moving
    * FROM and destination_star_key is the star we're moving TO.
    */
   @ProtoField(tag = 7, type = STRING)
-  public final String star_key;
+  public String star_key;
 
   @ProtoField(tag = 8, type = STRING)
-  public final String destination_star_key;
+  public String destination_star_key;
 
   /**
    * If in attacking state, this is the target fleet or colony we're attacking
    */
   @ProtoField(tag = 9, type = STRING)
-  public final String target_fleet_key;
+  public String target_fleet_key;
 
   @ProtoField(tag = 10, type = STRING)
-  public final String target_colony_key;
+  public String target_colony_key;
 
   @ProtoField(tag = 11, type = ENUM)
-  public final FLEET_STANCE stance;
+  public FLEET_STANCE stance;
 
   /**
    * This is used internally by the server, it'll never appear in a response from the server.
    */
   @ProtoField(tag = 12, type = INT64)
-  public final Long time_destroyed;
+  public Long time_destroyed;
 
   @ProtoField(tag = 14, type = BOOL)
-  public final Boolean block_notification_on_destroy;
+  public Boolean block_notification_on_destroy;
 
   /**
    * This is the date/time of the last battle this fleet was victorious in,
@@ -122,25 +122,28 @@ public final class Fleet extends Message {
    * server)
    */
   @ProtoField(tag = 13, type = INT64)
-  public final Long last_victory;
+  public Long last_victory;
 
   /**
    * for moving fleets, this is the time we expect it to arrive
    */
   @ProtoField(tag = 15, type = INT64)
-  public final Long eta;
+  public Long eta;
 
   /**
    * a collection of upgrades to this fleet
    */
   @ProtoField(tag = 16, label = REPEATED, messageType = FleetUpgrade.class)
-  public final List<FleetUpgrade> upgrades;
+  public List<FleetUpgrade> upgrades;
 
   /**
    * notes the player has attached so that he can remember what the fleet was for.
    */
   @ProtoField(tag = 17, type = STRING)
-  public final String notes;
+  public String notes;
+
+  public Fleet() {
+  }
 
   public Fleet(String key, String empire_key, Integer alliance_id, String design_name, Float num_ships, FLEET_STATE state, Long state_start_time, String star_key, String destination_star_key, String target_fleet_key, String target_colony_key, FLEET_STANCE stance, Long time_destroyed, Boolean block_notification_on_destroy, Long last_victory, Long eta, List<FleetUpgrade> upgrades, String notes) {
     this.key = key;
@@ -159,7 +162,7 @@ public final class Fleet extends Message {
     this.block_notification_on_destroy = block_notification_on_destroy;
     this.last_victory = last_victory;
     this.eta = eta;
-    this.upgrades = immutableCopyOf(upgrades);
+    this.upgrades = copyOf(upgrades);
     this.notes = notes;
   }
 

@@ -3,7 +3,7 @@ package au.com.codeka.common.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.Message;
+import au.com.codeka.common.Wire;
 import au.com.codeka.common.protobuf.ScoutReport;
 import au.com.codeka.common.protobuf.Star;
 import okio.ByteString;
@@ -42,21 +42,21 @@ public abstract class BaseScoutReport {
         mStarKey = pb.star_key;
         Star star_pb;
         try {
-            star_pb = Message.wire.parseFrom(pb.star_pb.toByteArray(), Star.class);
+            star_pb = Wire.i.parseFrom(pb.star_pb.toByteArray(), Star.class);
             mStarSnapshot = createStar(star_pb);
         } catch (IOException e) {
             // Ignore.
         }
     }
 
-    public void toProtocolBuffer(ScoutReport.Builder pb) {
+    public void toProtocolBuffer(ScoutReport pb) {
         pb.key = mKey;
         pb.date = mReportDate.getMillis() / 1000;
         pb.empire_key = mEmpireKey;
         pb.star_key = mStarKey;
 
-        Star.Builder star_pb = new Star.Builder();
+        Star star_pb = new Star();
         mStarSnapshot.toProtocolBuffer(star_pb, false);
-        pb.star_pb = ByteString.of(star_pb.build().toByteArray());
+        pb.star_pb = ByteString.of(star_pb.toByteArray());
     }
 }

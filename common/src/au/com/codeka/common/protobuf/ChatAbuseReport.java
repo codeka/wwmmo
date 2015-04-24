@@ -17,7 +17,10 @@ public final class ChatAbuseReport extends Message {
   public static final Integer DEFAULT_CHAT_MSG_ID = 0;
 
   @ProtoField(tag = 1, type = INT32)
-  public final Integer chat_msg_id;
+  public Integer chat_msg_id;
+
+  public ChatAbuseReport() {
+  }
 
   public ChatAbuseReport(Integer chat_msg_id) {
     this.chat_msg_id = chat_msg_id;

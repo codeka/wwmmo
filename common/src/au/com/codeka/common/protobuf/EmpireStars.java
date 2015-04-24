@@ -17,13 +17,16 @@ public final class EmpireStars extends Message {
   public static final Integer DEFAULT_TOTAL_STARS = 0;
 
   @ProtoField(tag = 1, label = REPEATED, messageType = EmpireStar.class)
-  public final List<EmpireStar> stars;
+  public List<EmpireStar> stars;
 
   @ProtoField(tag = 2, type = INT32)
-  public final Integer total_stars;
+  public Integer total_stars;
+
+  public EmpireStars() {
+  }
 
   public EmpireStars(List<EmpireStar> stars, Integer total_stars) {
-    this.stars = immutableCopyOf(stars);
+    this.stars = copyOf(stars);
     this.total_stars = total_stars;
   }
 

@@ -31,27 +31,27 @@ public final class HelloResponse extends Message {
    * The current message of the day.
    */
   @ProtoField(tag = 1)
-  public final MessageOfTheDay motd;
+  public MessageOfTheDay motd;
 
   /**
    * If specified, the Empire you're currently logged in as (if not specified, it means
    * you haven't set up an empire yet, and you should do that before anything else...)
    */
   @ProtoField(tag = 2)
-  public final Empire empire;
+  public Empire empire;
 
   /**
    * The list of colonies your empire owns. Typically, you'll want to start the
    * starfield view centred on one of your own colonies...
    */
   @ProtoField(tag = 3, label = REPEATED, messageType = Colony.class)
-  public final List<Colony> colonies;
+  public List<Colony> colonies;
 
   /**
    * If true, it means we need to re-register with GCM (maybe because last time it failed)
    */
   @ProtoField(tag = 6, type = BOOL)
-  public final Boolean require_gcm_register;
+  public Boolean require_gcm_register;
 
   /**
    * If present and true, it means your empire was reset (probably because your last colony
@@ -61,49 +61,52 @@ public final class HelloResponse extends Message {
    * out of colonies.
    */
   @ProtoField(tag = 7, type = BOOL)
-  public final Boolean was_empire_reset;
+  public Boolean was_empire_reset;
 
   @ProtoField(tag = 10, type = STRING)
-  public final String empire_reset_reason;
+  public String empire_reset_reason;
 
   /**
    * Building statistics that details the number of buildings of each design your empire
    * has, once you've got it on the client, it can be kept track there...
    */
   @ProtoField(tag = 8)
-  public final EmpireBuildingStatistics building_statistics;
+  public EmpireBuildingStatistics building_statistics;
 
   /**
    * The collection of build requests. Once we've got the initial list from the server, the
    * client is able to track them itself.
    */
   @ProtoField(tag = 9, label = REPEATED, messageType = BuildRequest.class)
-  public final List<BuildRequest> build_requests;
+  public List<BuildRequest> build_requests;
 
   /**
    * If true, we'll force the ads to be removed. If false, or not specified, we'll check
    * whatever the In-App Purchase API has to say.
    */
   @ProtoField(tag = 11, type = BOOL)
-  public final Boolean force_remove_ads;
+  public Boolean force_remove_ads;
 
   /**
    * this is the list of all the stars this empire owns
    */
   @ProtoField(tag = 12, type = INT64, label = REPEATED)
-  public final List<Long> star_ids;
+  public List<Long> star_ids;
+
+  public HelloResponse() {
+  }
 
   public HelloResponse(MessageOfTheDay motd, Empire empire, List<Colony> colonies, Boolean require_gcm_register, Boolean was_empire_reset, String empire_reset_reason, EmpireBuildingStatistics building_statistics, List<BuildRequest> build_requests, Boolean force_remove_ads, List<Long> star_ids) {
     this.motd = motd;
     this.empire = empire;
-    this.colonies = immutableCopyOf(colonies);
+    this.colonies = copyOf(colonies);
     this.require_gcm_register = require_gcm_register;
     this.was_empire_reset = was_empire_reset;
     this.empire_reset_reason = empire_reset_reason;
     this.building_statistics = building_statistics;
-    this.build_requests = immutableCopyOf(build_requests);
+    this.build_requests = copyOf(build_requests);
     this.force_remove_ads = force_remove_ads;
-    this.star_ids = immutableCopyOf(star_ids);
+    this.star_ids = copyOf(star_ids);
   }
 
   private HelloResponse(Builder builder) {

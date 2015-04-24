@@ -15,10 +15,13 @@ public final class EmpireCashAudit extends Message {
   public static final List<EmpireCashAuditEntry> DEFAULT_ENTRIES = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = EmpireCashAuditEntry.class)
-  public final List<EmpireCashAuditEntry> entries;
+  public List<EmpireCashAuditEntry> entries;
+
+  public EmpireCashAudit() {
+  }
 
   public EmpireCashAudit(List<EmpireCashAuditEntry> entries) {
-    this.entries = immutableCopyOf(entries);
+    this.entries = copyOf(entries);
   }
 
   private EmpireCashAudit(Builder builder) {

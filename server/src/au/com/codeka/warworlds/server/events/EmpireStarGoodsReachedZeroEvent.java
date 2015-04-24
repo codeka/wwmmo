@@ -8,7 +8,7 @@ import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.SituationReport;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.Event;
 import au.com.codeka.warworlds.server.RequestContext;
@@ -86,21 +86,22 @@ public class EmpireStarGoodsReachedZeroEvent extends Event {
         for (BaseEmpirePresence baseEmpire : star.getEmpirePresences()) {
             EmpirePresence empire = (EmpirePresence) baseEmpire;
             if (empire.getTotalGoods() <= 0.0f) {
-                Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
-                sitrep_pb.setRealm(Configuration.i.getRealmName());
-                sitrep_pb.setEmpireKey(empire.getEmpireKey());
-                sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
-                sitrep_pb.setStarKey(star.getKey());
-                sitrep_pb.setPlanetIndex(-1);
-                Messages.SituationReport.StarRunOutOfGoodsRecord.Builder ran_out_of_goods_pb = Messages.SituationReport.StarRunOutOfGoodsRecord.newBuilder();
+                SituationReport.Builder sitrep_pb = new SituationReport.Builder();
+                sitrep_pb.realm = Configuration.i.getRealmName();
+                sitrep_pb.empire_key = empire.getEmpireKey();
+                sitrep_pb.report_time = DateTime.now().getMillis() / 1000;
+                sitrep_pb.star_key = star.getKey();
+                sitrep_pb.planet_index = -1;
+                SituationReport.StarRunOutOfGoodsRecord.Builder ran_out_of_goods_pb =
+                    new SituationReport.StarRunOutOfGoodsRecord.Builder();
                 for (BaseColony baseColony : star.getColonies()) {
                     Colony colony = (Colony) baseColony;
                     if (colony.getEmpireID() != null && colony.getEmpireID() == empire.getEmpireID()) {
-                        ran_out_of_goods_pb.setColonyKey(colony.getKey());
+                        ran_out_of_goods_pb.colony_key = colony.getKey();
                         break;
                     }
                 }
-                sitrep_pb.setStarRanOutOfGoodsRecord(ran_out_of_goods_pb);
+                sitrep_pb.star_ran_out_of_goods_record = ran_out_of_goods_pb.build();
 
                 new SituationReportController().saveSituationReport(sitrep_pb.build());
             }

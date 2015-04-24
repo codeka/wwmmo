@@ -11,7 +11,8 @@ import org.apache.commons.imaging.ImageFormat;
 import org.apache.commons.imaging.Imaging;
 import org.joda.time.DateTime;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.CashAuditRecord;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Alliance;
@@ -64,7 +65,7 @@ public abstract class AllianceRequestProcessor {
     public void onVote(AllianceController ctrl) throws Exception {
         if (mRequest.getState() != AllianceRequest.RequestState.PENDING) {
             throw new RequestException(400,
-                    Messages.GenericError.ErrorCode.CannotVoteOnNonPendingRequest,
+                    GenericError.ErrorCode.CannotVoteOnNonPendingRequest,
                     "Cannot vote on a request that is not PENDING.");
         }
 
@@ -202,9 +203,9 @@ public abstract class AllianceRequestProcessor {
         protected void onVotePassed(AllianceController ctrl) throws Exception {
             super.onVotePassed(ctrl);
 
-            Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder()
-                    .setEmpireId(mRequest.getRequestEmpireID())
-                    .setReason(Messages.CashAuditRecord.Reason.AllianceWithdraw);
+            CashAuditRecord.Builder audit_record_pb = new CashAuditRecord.Builder()
+                    .empire_id(mRequest.getRequestEmpireID())
+                    .reason(CashAuditRecord.Reason.AllianceWithdraw);
             if (!new EmpireController(ctrl.getDB().getTransaction()).adjustBalance(
                     mRequest.getRequestEmpireID(), -mRequest.getAmount(), audit_record_pb)) {
                 // if the empire didn't have enough cash, then don't proceed...
@@ -252,10 +253,11 @@ public abstract class AllianceRequestProcessor {
                 }
             }
 
-            Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder()
-                    .setEmpireId(mRequest.getRequestEmpireID())
-                    .setReason(Messages.CashAuditRecord.Reason.AllianceWithdraw);
-            new EmpireController(ctrl.getDB().getTransaction()).adjustBalance(mRequest.getRequestEmpireID(), mRequest.getAmount(), audit_record_pb);
+            CashAuditRecord.Builder audit_record_pb = new CashAuditRecord.Builder()
+                    .empire_id(mRequest.getRequestEmpireID())
+                    .reason(CashAuditRecord.Reason.AllianceWithdraw);
+            new EmpireController(ctrl.getDB().getTransaction()).adjustBalance(
+                mRequest.getRequestEmpireID(), mRequest.getAmount(), audit_record_pb);
 
             sql = "INSERT INTO alliance_bank_balance_audit (alliance_id, alliance_request_id," +
                      " empire_id, date, amount_before, amount_after) VALUES (?, ?, ?, ?, ?, ?)";

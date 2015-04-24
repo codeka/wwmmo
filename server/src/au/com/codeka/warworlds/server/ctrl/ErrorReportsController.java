@@ -1,8 +1,11 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import com.google.common.collect.Lists;
+
 import org.joda.time.DateTime;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.ErrorReport;
+import au.com.codeka.common.protobuf.ErrorReports;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
@@ -17,10 +20,10 @@ public class ErrorReportsController {
         db = new DataBase(trans);
     }
 
-    public void saveErrorReport(Messages.ErrorReport error_report_pb) {
+    public void saveErrorReport(ErrorReport error_report_pb) {
         try {
-            Messages.ErrorReports error_reports_pb = Messages.ErrorReports.newBuilder()
-                    .addReports(error_report_pb)
+            ErrorReports error_reports_pb = new ErrorReports.Builder()
+                    .reports(Lists.newArrayList(error_report_pb))
                     .build();
             db.saveErrorReports(error_reports_pb);
         } catch (Exception e) {
@@ -28,7 +31,7 @@ public class ErrorReportsController {
         }
     }
 
-    public void saveErrorReports(Messages.ErrorReports error_reports_pb) {
+    public void saveErrorReports(ErrorReports error_reports_pb) {
         try {
             db.saveErrorReports(error_reports_pb);
         } catch (Exception e) {
@@ -44,20 +47,16 @@ public class ErrorReportsController {
             super(trans);
         }
 
-        public void saveErrorReports(Messages.ErrorReports error_reports_pb) throws Exception {
+        public void saveErrorReports(ErrorReports error_reports_pb) throws Exception {
             String sql = "INSERT INTO error_reports (report_date, empire_id, message, exception_class, context, data) " +
                     " VALUES (?, ?, ?, ?, ?, ?)";
             try (SqlStmt stmt = DB.prepare(sql)) {
-                for (Messages.ErrorReport pb : error_reports_pb.getReportsList()) {
-                    stmt.setDateTime(1, new DateTime(pb.getReportTime()));
-                    if (pb.hasEmpireId()) {
-                        stmt.setInt(2, pb.getEmpireId());
-                    } else {
-                        stmt.setNull(2);
-                    }
-                    stmt.setString(3, pb.getMessage());
-                    stmt.setString(4, pb.getExceptionClass());
-                    stmt.setString(5, pb.getContext());
+                for (ErrorReport pb : error_reports_pb.reports) {
+                    stmt.setDateTime(1, new DateTime(pb.report_time));
+                    stmt.setInt(2, pb.empire_id);
+                    stmt.setString(3, pb.message);
+                    stmt.setString(4, pb.exception_class);
+                    stmt.setString(5, pb.context);
                     stmt.setBytes(6, pb.toByteArray());
                     stmt.update();
                 }

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import au.com.codeka.common.model.BaseChatConversation;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
-import au.com.codeka.warworlds.server.model.ChatConversationParticipant;
-import au.com.codeka.common.protobuf.Messages;
 
 public class ChatConversation extends BaseChatConversation {
     public ChatConversation(int conversationID) {
@@ -19,7 +17,7 @@ public class ChatConversation extends BaseChatConversation {
 
     @Override
     protected BaseChatConversationParticipant createChatConversationParticipant(
-            Messages.ChatConversationParticipant pb) {
+            au.com.codeka.common.protobuf.ChatConversationParticipant pb) {
         ChatConversationParticipant participant = new ChatConversationParticipant();
         if (pb != null) {
             participant.fromProtocolBuffer(pb);

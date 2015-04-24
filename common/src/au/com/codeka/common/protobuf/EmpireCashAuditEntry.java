@@ -26,25 +26,28 @@ public final class EmpireCashAuditEntry extends Message {
   public static final Long DEFAULT_TIME = 0L;
 
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String empire_key;
+  public String empire_key;
 
   @ProtoField(tag = 3, type = FLOAT)
-  public final Float difference;
+  public Float difference;
 
   @ProtoField(tag = 4, type = FLOAT)
-  public final Float old_cash;
+  public Float old_cash;
 
   @ProtoField(tag = 5, type = FLOAT)
-  public final Float new_cash;
+  public Float new_cash;
 
   @ProtoField(tag = 6, type = STRING)
-  public final String reason;
+  public String reason;
 
   @ProtoField(tag = 7, type = INT64)
-  public final Long time;
+  public Long time;
+
+  public EmpireCashAuditEntry() {
+  }
 
   public EmpireCashAuditEntry(String key, String empire_key, Float difference, Float old_cash, Float new_cash, String reason, Long time) {
     this.key = key;

@@ -21,13 +21,16 @@ public final class EmpireChangeShieldRequest extends Message {
   public static final ByteString DEFAULT_PNG_IMAGE = ByteString.EMPTY;
 
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   @ProtoField(tag = 2, type = BYTES)
-  public final ByteString png_image;
+  public ByteString png_image;
 
   @ProtoField(tag = 3)
-  public final PurchaseInfo purchase_info;
+  public PurchaseInfo purchase_info;
+
+  public EmpireChangeShieldRequest() {
+  }
 
   public EmpireChangeShieldRequest(String key, ByteString png_image, PurchaseInfo purchase_info) {
     this.key = key;

@@ -1,6 +1,6 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.ChatAbuseReport;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -22,10 +22,10 @@ public class ChatAbuseReportHandler extends RequestHandler {
             throw new RequestException(400, "This feature has been disabled.");
         }
 
-        Messages.ChatAbuseReport chat_abuse_report_pb = getRequestBody(Messages.ChatAbuseReport.class);
+        ChatAbuseReport chat_abuse_report_pb = getRequestBody(ChatAbuseReport.class);
 
         int chatMsgID = Integer.parseInt(getUrlParameter("msgid"));
-        if (chatMsgID != chat_abuse_report_pb.getChatMsgId()) {
+        if (chatMsgID != chat_abuse_report_pb.chat_msg_id) {
             throw new RequestException(400);
         }
 

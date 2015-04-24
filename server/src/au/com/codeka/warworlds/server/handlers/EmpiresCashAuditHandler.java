@@ -1,6 +1,10 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import au.com.codeka.common.protobuf.Messages;
+import java.util.ArrayList;
+
+import au.com.codeka.common.Wire;
+import au.com.codeka.common.protobuf.CashAuditRecord;
+import au.com.codeka.common.protobuf.CashAuditRecords;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.data.DB;
@@ -20,11 +24,13 @@ public class EmpiresCashAuditHandler extends RequestHandler {
             stmt.setInt(1, empireID);
             SqlResult res = stmt.select();
 
-            Messages.CashAuditRecords.Builder cash_audit_records_pb = Messages.CashAuditRecords.newBuilder();
+            CashAuditRecords cash_audit_records_pb = new CashAuditRecords();
+            cash_audit_records_pb.records = new ArrayList<>();
             while (res.next()) {
-                cash_audit_records_pb.addRecords(Messages.CashAuditRecord.parseFrom(res.getBytes(1)));
+                cash_audit_records_pb.records.add(
+                    Wire.i.parseFrom(res.getBytes(1), CashAuditRecord.class));
             }
-            setResponseBody(cash_audit_records_pb.build());
+            setResponseBody(cash_audit_records_pb);
         } catch(Exception e) {
             throw new RequestException(e);
         }

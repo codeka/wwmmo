@@ -95,7 +95,7 @@ public abstract class BaseAllianceRequest {
         }
     }
 
-    public void toProtocolBuffer(AllianceRequest.Builder pb) {
+    public void toProtocolBuffer(AllianceRequest pb) {
         pb.id = mID;
         pb.alliance_id = mAllianceID;
         pb.request_empire_id = mRequestEmpireID;
@@ -113,9 +113,9 @@ public abstract class BaseAllianceRequest {
         if (mVotes != null) {
             pb.vote = new ArrayList<>();
             for (BaseAllianceRequestVote vote : mVotes) {
-                AllianceRequestVote.Builder vote_pb = new AllianceRequestVote.Builder();
+                AllianceRequestVote vote_pb = new AllianceRequestVote();
                 vote.toProtocolBuffer(vote_pb);
-                pb.vote.add(vote_pb.build());
+                pb.vote.add(vote_pb);
             }
         }
     }

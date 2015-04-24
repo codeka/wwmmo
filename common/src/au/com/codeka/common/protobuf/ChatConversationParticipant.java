@@ -19,10 +19,13 @@ public final class ChatConversationParticipant extends Message {
   public static final Boolean DEFAULT_IS_MUTED = false;
 
   @ProtoField(tag = 1, type = INT32)
-  public final Integer empire_id;
+  public Integer empire_id;
 
   @ProtoField(tag = 2, type = BOOL)
-  public final Boolean is_muted;
+  public Boolean is_muted;
+
+  public ChatConversationParticipant() {
+  }
 
   public ChatConversationParticipant(Integer empire_id, Boolean is_muted) {
     this.empire_id = empire_id;

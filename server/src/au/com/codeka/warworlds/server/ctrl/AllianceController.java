@@ -9,7 +9,8 @@ import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.model.BaseAllianceRequest;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.CashAuditRecord;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -140,11 +141,11 @@ public class AllianceController {
     }
 
     public void createAlliance(Alliance alliance, Empire ownerEmpire) throws RequestException {
-        Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder()
-                .setEmpireId(ownerEmpire.getID())
-                .setAllianceName(alliance.getName());
+        CashAuditRecord.Builder audit_record_pb = new CashAuditRecord.Builder()
+                .empire_id(ownerEmpire.getID())
+                .alliance_name(alliance.getName());
         if (!new EmpireController().withdrawCash(ownerEmpire.getID(), 250000, audit_record_pb)) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.InsufficientCash,
+            throw new RequestException(400, GenericError.ErrorCode.InsufficientCash,
                                        "Insufficient cash to create a new alliance.");
         }
 

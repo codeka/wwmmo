@@ -29,39 +29,42 @@ public final class ChatMessage extends Message {
   public static final MessageAction DEFAULT_ACTION = MessageAction.Normal;
 
   @ProtoField(tag = 7, type = INT32)
-  public final Integer id;
+  public Integer id;
 
   @ProtoField(tag = 1, type = STRING)
-  public final String message;
+  public String message;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String empire_key;
+  public String empire_key;
 
   @ProtoField(tag = 3, type = INT64)
-  public final Long date_posted;
+  public Long date_posted;
 
   @ProtoField(tag = 4, type = STRING)
-  public final String alliance_key;
+  public String alliance_key;
 
   /**
    * if the message was auto-translated to english, this will be the english
    * translation.
    */
   @ProtoField(tag = 5, type = STRING)
-  public final String message_en;
+  public String message_en;
 
   @ProtoField(tag = 6, type = INT32)
-  public final Integer conversation_id;
+  public Integer conversation_id;
 
   /**
    * "profanity" level, 0 == not profane, 1 == somewhat profane, 2 == very profane. Used in
    * conjunction with client-side filtering of chat messages.
    */
   @ProtoField(tag = 9, type = INT32)
-  public final Integer profanity_level;
+  public Integer profanity_level;
 
   @ProtoField(tag = 8, type = ENUM)
-  public final MessageAction action;
+  public MessageAction action;
+
+  public ChatMessage() {
+  }
 
   public ChatMessage(Integer id, String message, String empire_key, Long date_posted, String alliance_key, String message_en, Integer conversation_id, Integer profanity_level, MessageAction action) {
     this.id = id;

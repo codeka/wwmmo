@@ -2,7 +2,7 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import org.joda.time.DateTime;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.HelloRequest;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
@@ -17,12 +17,12 @@ public class StatisticsController {
         db = new DataBase(trans);
     }
 
-    public void registerLogin(int empireID, Messages.HelloRequest hello_request_pb) throws RequestException {
+    public void registerLogin(int empireID, HelloRequest hello_request_pb) throws RequestException {
         try {
-            db.registerLogin(empireID, hello_request_pb.getDeviceModel(),
-                             hello_request_pb.getDeviceManufacturer(),
-                             hello_request_pb.getDeviceBuild(),
-                             hello_request_pb.getDeviceVersion());
+            db.registerLogin(empireID, hello_request_pb.device_model,
+                             hello_request_pb.device_manufacturer,
+                             hello_request_pb.device_build,
+                             hello_request_pb.device_version);
         } catch(Exception e) {
             throw new RequestException(e);
         }

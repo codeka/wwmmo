@@ -23,18 +23,21 @@ public final class EmpireAltAccounts extends Message {
   public static final List<DeviceInfo> DEFAULT_DEVICE = Collections.emptyList();
 
   @ProtoField(tag = 1, type = INT32)
-  public final Integer empire_id;
+  public Integer empire_id;
 
   @ProtoField(tag = 2, label = REPEATED, messageType = EmpireAltEmpire.class)
-  public final List<EmpireAltEmpire> alt_empire;
+  public List<EmpireAltEmpire> alt_empire;
 
   @ProtoField(tag = 3, label = REPEATED, messageType = DeviceInfo.class)
-  public final List<DeviceInfo> device;
+  public List<DeviceInfo> device;
+
+  public EmpireAltAccounts() {
+  }
 
   public EmpireAltAccounts(Integer empire_id, List<EmpireAltEmpire> alt_empire, List<DeviceInfo> device) {
     this.empire_id = empire_id;
-    this.alt_empire = immutableCopyOf(alt_empire);
-    this.device = immutableCopyOf(device);
+    this.alt_empire = copyOf(alt_empire);
+    this.device = copyOf(device);
   }
 
   private EmpireAltAccounts(Builder builder) {
@@ -111,16 +114,19 @@ public final class EmpireAltAccounts extends Message {
     public static final Integer DEFAULT_ALLIANCE_ID = 0;
 
     @ProtoField(tag = 1, type = INT32)
-    public final Integer empire_id;
+    public Integer empire_id;
 
     @ProtoField(tag = 2, type = STRING)
-    public final String empire_name;
+    public String empire_name;
 
     @ProtoField(tag = 3, type = STRING)
-    public final String user_email;
+    public String user_email;
 
     @ProtoField(tag = 4, type = INT32)
-    public final Integer alliance_id;
+    public Integer alliance_id;
+
+    public EmpireAltEmpire() {
+    }
 
     public EmpireAltEmpire(Integer empire_id, String empire_name, String user_email, Integer alliance_id) {
       this.empire_id = empire_id;
@@ -214,19 +220,22 @@ public final class EmpireAltAccounts extends Message {
     public static final String DEFAULT_DEVICE_VERSION = "";
 
     @ProtoField(tag = 1, type = STRING)
-    public final String device_id;
+    public String device_id;
 
     @ProtoField(tag = 2, type = STRING)
-    public final String device_manufacturer;
+    public String device_manufacturer;
 
     @ProtoField(tag = 3, type = STRING)
-    public final String device_model;
+    public String device_model;
 
     @ProtoField(tag = 4, type = STRING)
-    public final String device_build;
+    public String device_build;
 
     @ProtoField(tag = 5, type = STRING)
-    public final String device_version;
+    public String device_version;
+
+    public DeviceInfo() {
+    }
 
     public DeviceInfo(String device_id, String device_manufacturer, String device_model, String device_build, String device_version) {
       this.device_id = device_id;

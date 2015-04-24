@@ -1,9 +1,10 @@
 package au.com.codeka.warworlds.server.handlers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Stars;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.NewEmpireStarFinder;
@@ -28,9 +29,9 @@ public class StarsHandler extends RequestHandler {
 
       Star star = new StarController().getStar(starFinder.getStarID());
 
-      Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+      au.com.codeka.common.protobuf.Star star_pb = new au.com.codeka.common.protobuf.Star();
       star.toProtocolBuffer(star_pb);
-      setResponseBody(star_pb.build());
+      setResponseBody(star_pb);
     }
 
     String query = getRequest().getParameter("q");
@@ -44,11 +45,12 @@ public class StarsHandler extends RequestHandler {
 
       Star star = new StarController().getStar(starID);
 
-      Messages.Stars.Builder stars_pb = Messages.Stars.newBuilder();
-      Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+      Stars stars_pb = new Stars();
+      stars_pb.stars = new ArrayList<>();
+      au.com.codeka.common.protobuf.Star star_pb = new au.com.codeka.common.protobuf.Star();
       star.toProtocolBuffer(star_pb);
-      stars_pb.addStars(star_pb);
-      setResponseBody(stars_pb.build());
+      stars_pb.stars.add(star_pb);
+      setResponseBody(stars_pb);
     }
 
     String export = getRequest().getParameter("export");

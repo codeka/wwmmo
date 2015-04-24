@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -98,9 +97,10 @@ public class EmpiresSearchHandler extends RequestHandler {
     }
 
     StringBuilder etag = new StringBuilder();
-    Messages.Empires.Builder pb = Messages.Empires.newBuilder();
+    au.com.codeka.common.protobuf.Empires pb = new au.com.codeka.common.protobuf.Empires();
+    pb.empires = new ArrayList<>();
     for (Empire empire : empires) {
-      Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
+      au.com.codeka.common.protobuf.Empire empire_pb = new au.com.codeka.common.protobuf.Empire();
       boolean isTrusted = false;
       if (getSessionNoError() != null) {
         if (getSession().isAdmin() || getSession().getEmpireID() == empire.getID()) {
@@ -111,22 +111,22 @@ public class EmpiresSearchHandler extends RequestHandler {
       if (getSessionNoError() == null
           || empire.getID() != getSession().getEmpireID() && !getSession().isAdmin()) {
         // if it's not our empire....
-        empire_pb.setCash(0);
+        empire_pb.cash = 0.0f;
       }
       Double taxRate = taxRates.get(empire.getID());
       if (taxRate != null) {
         log.debug(String.format("Setting tax for empire %d to %f", empire.getID(), taxRate));
-        empire_pb.setTaxesCollectedPerHour(taxRate);
+        empire_pb.taxes_collected_per_hour = taxRate;
       } else {
         log.debug(String.format("No tax for empire %d", empire.getID()));
       }
-      pb.addEmpires(empire_pb);
+      pb.empires.add(empire_pb);
       etag.append(":");
-      etag.append(empire_pb.getKey());
+      etag.append(empire_pb.key);
     }
     etag.append(":");
 
     setCacheTime(24, etag.toString());
-    setResponseBody(pb.build());
+    setResponseBody(pb);
   }
 }

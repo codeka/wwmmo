@@ -306,7 +306,7 @@ public abstract class BaseStar {
         }
     }
 
-    public void toProtocolBuffer(Star.Builder pb) {
+    public void toProtocolBuffer(Star pb) {
         toProtocolBuffer(pb, false);
     }
 
@@ -314,7 +314,7 @@ public abstract class BaseStar {
      * Convert this star to a protocol buffer. If summary is true, we'll skip a bunch of
      * fields (fleets, build requests, empires, colonies, etc)
      */
-    public void toProtocolBuffer(Star.Builder pb, boolean summary) {
+    public void toProtocolBuffer(Star pb, boolean summary) {
         pb.key = mKey;
         pb.name = mName;
         pb.classification = Star.CLASSIFICATION.values()[mStarType.getType().ordinal()];
@@ -332,64 +332,64 @@ public abstract class BaseStar {
 
         pb.planets = new ArrayList<>();
         for (BasePlanet planet : mPlanets) {
-            Planet.Builder planet_pb = new Planet.Builder();
+            Planet planet_pb = new Planet();
             planet.toProtocolBuffer(planet_pb);
-            pb.planets.add(planet_pb.build());
+            pb.planets.add(planet_pb);
         }
 
         pb.colonies = new ArrayList<>();
         if (mColonies != null) for (BaseColony colony : mColonies) {
-            Colony.Builder colony_pb = new Colony.Builder();
+            Colony colony_pb = new Colony();
             colony.toProtocolBuffer(colony_pb);
-            pb.colonies.add(colony_pb.build());
+            pb.colonies.add(colony_pb);
         }
 
         pb.fleets = new ArrayList<>();
         if (mFleets != null) for (BaseFleet fleet : mFleets) {
-            Fleet.Builder fleet_pb = new Fleet.Builder();
+            Fleet fleet_pb = new Fleet();
             fleet.toProtocolBuffer(fleet_pb);
-            pb.fleets.add(fleet_pb.build());
+            pb.fleets.add(fleet_pb);
         }
 
         pb.empires = new ArrayList<>();
         if (mEmpires != null) for (BaseEmpirePresence empire : mEmpires) {
-            EmpirePresence.Builder empire_pb = new EmpirePresence.Builder();
+            EmpirePresence empire_pb = new EmpirePresence();
             empire.toProtocolBuffer(empire_pb);
-            pb.empires.add(empire_pb.build());
+            pb.empires.add(empire_pb);
         }
 
         if (!summary) {
             pb.build_requests = new ArrayList<>();
             if (mBuildRequests != null) for (BaseBuildRequest buildRequest : mBuildRequests) {
-                BuildRequest.Builder build_request_pb = new BuildRequest.Builder();
+                BuildRequest build_request_pb = new BuildRequest();
                 buildRequest.toProtocolBuffer(build_request_pb);
-                pb.build_requests.add(build_request_pb.build());
+                pb.build_requests.add(build_request_pb);
             }
 
             pb.buildings = new ArrayList<>();
             if (mColonies != null) for (BaseColony colony : mColonies) {
                 for (BaseBuilding building : colony.getBuildings()) {
-                    Building.Builder building_pb = new Building.Builder();
+                    Building building_pb = new Building();
                     building.toProtocolBuffer(building_pb);
-                    pb.buildings.add(building_pb.build());
+                    pb.buildings.add(building_pb);
                 }
             }
 
             if (mCombatReport != null) {
-                CombatReport.Builder combat_report_pb = new CombatReport.Builder();
+                CombatReport combat_report_pb = new CombatReport();
                 mCombatReport.toProtocolBuffer(combat_report_pb);
-                pb.current_combat_report = combat_report_pb.build();
+                pb.current_combat_report = combat_report_pb;
             }
         }
 
-        Star.StarExtra.Builder star_extra_pb = null;
+        Star.StarExtra star_extra_pb = null;
         if (mWormholeExtra != null) {
-            star_extra_pb = new Star.StarExtra.Builder();
+            star_extra_pb = new Star.StarExtra();
             mWormholeExtra.toProtocolBuffer(star_extra_pb);
         }
 
         if (star_extra_pb != null) {
-            pb.extra = star_extra_pb.build();
+            pb.extra = star_extra_pb;
         }
     }
 
@@ -558,7 +558,7 @@ public abstract class BaseStar {
             mEmpireID = pb.wormhole_empire_id;
         }
 
-        public void toProtocolBuffer(Star.StarExtra.Builder pb) {
+        public void toProtocolBuffer(Star.StarExtra pb) {
             pb.wormhole_dest_star_id = mDestWormholeID;
             if (mTuneCompleteTime != null) {
                 pb.wormhole_tune_complete_time = mTuneCompleteTime.getMillis() / 1000;

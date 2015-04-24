@@ -138,7 +138,7 @@ public abstract class BaseColony {
         }
     }
 
-    public void toProtocolBuffer(Colony.Builder pb) {
+    public void toProtocolBuffer(Colony pb) {
         pb.key = mKey;
         pb.planet_index = mPlanetIndex;
         pb.star_key = mStarKey;

@@ -21,10 +21,13 @@ public final class GenericError extends Message {
   public static final String DEFAULT_ERROR_MESSAGE = "";
 
   @ProtoField(tag = 1, type = INT32)
-  public final Integer error_code;
+  public Integer error_code;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String error_message;
+  public String error_message;
+
+  public GenericError() {
+  }
 
   public GenericError(Integer error_code, String error_message) {
     this.error_code = error_code;

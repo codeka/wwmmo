@@ -11,7 +11,7 @@ import org.joda.time.DateTime;
 
 import au.com.codeka.common.PointCloud;
 import au.com.codeka.common.Vector2;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.Planets;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -189,11 +189,12 @@ public class SectorGenerator {
 
             ArrayList<Planet> planets = generatePlanets(star);
             // serialize the planets to a protobuf for storage
-            Messages.Planets.Builder planets_pb = Messages.Planets.newBuilder();
+            Planets.Builder planets_pb = new Planets.Builder();
             for (Planet planet : planets) {
-                Messages.Planet.Builder planet_pb = Messages.Planet.newBuilder();
+                au.com.codeka.common.protobuf.Planet planet_pb =
+                        new au.com.codeka.common.protobuf.Planet();
                 planet.toProtocolBuffer(planet_pb);
-                planets_pb.addPlanets(planet_pb);
+                planets_pb.planets.add(planet_pb);
             }
 
             Planet[] planetArray = new Planet[planets.size()];

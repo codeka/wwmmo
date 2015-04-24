@@ -29,33 +29,33 @@ public final class HelloRequest extends Message {
    * The value of android.os.Build.MODEL for this device
    */
   @ProtoField(tag = 1, type = STRING)
-  public final String device_model;
+  public String device_model;
 
   /**
    * The value of android.os.Build.MANUFACTURER for this device
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String device_manufacturer;
+  public String device_manufacturer;
 
   /**
    * The value of android.os.Build.DISPLAY for this device
    */
   @ProtoField(tag = 3, type = STRING)
-  public final String device_build;
+  public String device_build;
 
   /**
    * The value of android.os.Build.VERSION.RELEASE for this device (note that this can
    * change if you upgrade the OS without re-registering your device!)
    */
   @ProtoField(tag = 4, type = STRING)
-  public final String device_version;
+  public String device_version;
 
   /**
    * The memory class of your device -- basically, how much memory can we assume is available
    * to the War Worlds app (in megabytes)
    */
   @ProtoField(tag = 5, type = INT32)
-  public final Integer memory_class;
+  public Integer memory_class;
 
   /**
    * If present and set to true, we'll occasionally respond to requests with a protocol buffer
@@ -63,14 +63,17 @@ public final class HelloRequest extends Message {
    * to wait for GCM.
    */
   @ProtoField(tag = 6, type = BOOL)
-  public final Boolean allow_inline_notfications;
+  public Boolean allow_inline_notfications;
 
   /**
    * If true, we'll NOT return the list of star_ids that you own. Newer clients don't need
    * it anymore, and it just wastes time/resources returning it.
    */
   @ProtoField(tag = 7, type = BOOL)
-  public final Boolean no_star_list;
+  public Boolean no_star_list;
+
+  public HelloRequest() {
+  }
 
   public HelloRequest(String device_model, String device_manufacturer, String device_build, String device_version, Integer memory_class, Boolean allow_inline_notfications, Boolean no_star_list) {
     this.device_model = device_model;

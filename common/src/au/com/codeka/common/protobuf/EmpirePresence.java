@@ -29,34 +29,37 @@ public final class EmpirePresence extends Message {
   public static final Long DEFAULT_GOODS_ZERO_TIME = 0L;
 
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String empire_key;
+  public String empire_key;
 
   @ProtoField(tag = 3, type = STRING)
-  public final String star_key;
+  public String star_key;
 
   @ProtoField(tag = 4, type = FLOAT)
-  public final Float total_goods;
+  public Float total_goods;
 
   @ProtoField(tag = 5, type = FLOAT)
-  public final Float total_minerals;
+  public Float total_minerals;
 
   @ProtoField(tag = 6, type = FLOAT)
-  public final Float goods_delta_per_hour;
+  public Float goods_delta_per_hour;
 
   @ProtoField(tag = 7, type = FLOAT)
-  public final Float minerals_delta_per_hour;
+  public Float minerals_delta_per_hour;
 
   @ProtoField(tag = 8, type = FLOAT)
-  public final Float max_goods;
+  public Float max_goods;
 
   @ProtoField(tag = 9, type = FLOAT)
-  public final Float max_minerals;
+  public Float max_minerals;
 
   @ProtoField(tag = 10, type = INT64)
-  public final Long goods_zero_time;
+  public Long goods_zero_time;
+
+  public EmpirePresence() {
+  }
 
   public EmpirePresence(String key, String empire_key, String star_key, Float total_goods, Float total_minerals, Float goods_delta_per_hour, Float minerals_delta_per_hour, Float max_goods, Float max_minerals, Long goods_zero_time) {
     this.key = key;

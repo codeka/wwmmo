@@ -7,7 +7,8 @@ import java.util.TreeMap;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.Wire;
+import au.com.codeka.common.protobuf.ErrorReport;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -84,28 +85,27 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
                 result.put("empire_name", res.getString("empire_name"));
                 result.put("empire_email", res.getString("empire_email"));
 
-                Messages.ErrorReport error_report_pb = Messages.ErrorReport.parseFrom(
-                        res.getBytes("data"));
-                result.put("android_version", error_report_pb.getAndroidVersion());
-                result.put("phone_model", error_report_pb.getPhoneModel());
-                result.put("app_version", error_report_pb.getAppVersion());
-                result.put("log_buffer", error_report_pb.getLogOutput());
-                result.put("stack_trace", error_report_pb.getStackTrace());
-                result.put("message", error_report_pb.getMessage());
-                result.put("report_time", new DateTime(error_report_pb.getReportTime()));
-                result.put("empire_id", error_report_pb.getEmpireId());
-                result.put("context", error_report_pb.getContext());
-                result.put("exception_class", error_report_pb.getExceptionClass());
-                result.put("heap_size", error_report_pb.getHeapSize());
-                result.put("heap_allocated", error_report_pb.getHeapAllocated());
-                result.put("heap_free", error_report_pb.getHeapFree());
-                result.put("total_run_time", error_report_pb.getTotalRunTime());
-                result.put("foreground_run_time", error_report_pb.getForegroundRunTime());
-                result.put("server_request_qs", error_report_pb.getServerRequestQs());
-                result.put("server_request_user_agent", error_report_pb.getServerRequestUserAgent());
+                ErrorReport error_report_pb = Wire.i.parseFrom(res.getBytes("data"), ErrorReport.class);
+                result.put("android_version", error_report_pb.android_version);
+                result.put("phone_model", error_report_pb.phone_model);
+                result.put("app_version", error_report_pb.app_version);
+                result.put("log_buffer", error_report_pb.log_output);
+                result.put("stack_trace", error_report_pb.stack_trace);
+                result.put("message", error_report_pb.message);
+                result.put("report_time", new DateTime(error_report_pb.report_time));
+                result.put("empire_id", error_report_pb.empire_id);
+                result.put("context", error_report_pb.context);
+                result.put("exception_class", error_report_pb.exception_class);
+                result.put("heap_size", error_report_pb.heap_size);
+                result.put("heap_allocated", error_report_pb.heap_allocated);
+                result.put("heap_free", error_report_pb.heap_free);
+                result.put("total_run_time", error_report_pb.total_run_time);
+                result.put("foreground_run_time", error_report_pb.foreground_run_time);
+                result.put("server_request_qs", error_report_pb.server_request_qs);
+                result.put("server_request_user_agent", error_report_pb.server_request_user_agent);
                 results.add(result);
 
-                cursor = error_report_pb.getReportTime() / 1000;
+                cursor = error_report_pb.report_time / 1000;
             }
             data.put("error_reports", results);
         } catch(Exception e) {

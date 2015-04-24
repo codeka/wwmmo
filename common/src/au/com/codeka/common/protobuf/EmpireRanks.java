@@ -17,13 +17,16 @@ public final class EmpireRanks extends Message {
   public static final Long DEFAULT_DATE = 0L;
 
   @ProtoField(tag = 1, label = REPEATED, messageType = EmpireRank.class)
-  public final List<EmpireRank> ranks;
+  public List<EmpireRank> ranks;
 
   @ProtoField(tag = 2, type = INT64)
-  public final Long date;
+  public Long date;
+
+  public EmpireRanks() {
+  }
 
   public EmpireRanks(List<EmpireRank> ranks, Long date) {
-    this.ranks = immutableCopyOf(ranks);
+    this.ranks = copyOf(ranks);
     this.date = date;
   }
 

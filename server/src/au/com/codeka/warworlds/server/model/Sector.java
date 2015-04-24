@@ -2,11 +2,8 @@ package au.com.codeka.warworlds.server.model;
 
 import java.sql.SQLException;
 
-import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseSector;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class Sector extends BaseSector {
@@ -46,29 +43,11 @@ public class Sector extends BaseSector {
     }
 
     @Override
-    protected BaseStar createStar(Messages.Star pb) {
+    protected BaseStar createStar(au.com.codeka.common.protobuf.Star pb) {
         Star s = new Star();
         if (pb != null) {
             s.fromProtocolBuffer(pb);
         }
         return s;
-    }
-
-    @Override
-    protected BaseColony createColony(Messages.Colony pb) {
-        Colony c = new Colony();
-        if (pb != null) {
-            c.fromProtocolBuffer(pb);
-        }
-        return c;
-    }
-
-    @Override
-    protected BaseFleet createFleet(Messages.Fleet pb) {
-        Fleet f = new Fleet();
-        if (pb != null) {
-            f.fromProtocolBuffer(pb);
-        }
-        return f;
     }
 }

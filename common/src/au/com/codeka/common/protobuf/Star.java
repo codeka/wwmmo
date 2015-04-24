@@ -43,103 +43,106 @@ public final class Star extends Message {
    * the identifier of the star, unique throughout the universe.
    */
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   /**
    * the sector this star is contained within
    */
   @ProtoField(tag = 11, type = INT64)
-  public final Long sector_x;
+  public Long sector_x;
 
   @ProtoField(tag = 12, type = INT64)
-  public final Long sector_y;
+  public Long sector_y;
 
   /**
    * the name of the star
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String name;
+  public String name;
 
   @ProtoField(tag = 3, type = ENUM)
-  public final CLASSIFICATION classification;
+  public CLASSIFICATION classification;
 
   /**
    * the apparent "size" of the star (which is really just a display thing)
    */
   @ProtoField(tag = 5, type = INT32)
-  public final Integer size;
+  public Integer size;
 
   /**
    * the offset from the left edge of the sector, in pixels
    */
   @ProtoField(tag = 6, type = INT32)
-  public final Integer offset_x;
+  public Integer offset_x;
 
   /**
    * the offset from the bottom edge of the sector, in pixels
    */
   @ProtoField(tag = 7, type = INT32)
-  public final Integer offset_y;
+  public Integer offset_y;
 
   /**
    * the collection of planets orbiting this star (may be empty, for example in the list
    * of stars in a sector)
    */
   @ProtoField(tag = 9, label = REPEATED, messageType = Planet.class)
-  public final List<Planet> planets;
+  public List<Planet> planets;
 
   /**
    * collection of colonies on our planet(s)
    */
   @ProtoField(tag = 10, label = REPEATED, messageType = Colony.class)
-  public final List<Colony> colonies;
+  public List<Colony> colonies;
 
   /**
    * collection of buildings in our colonies.
    */
   @ProtoField(tag = 13, label = REPEATED, messageType = Building.class)
-  public final List<Building> buildings;
+  public List<Building> buildings;
 
   /**
    * collection of EmpirePresences details the presences of the empire(s) in this solar system.
    */
   @ProtoField(tag = 14, label = REPEATED, messageType = EmpirePresence.class)
-  public final List<EmpirePresence> empires;
+  public List<EmpirePresence> empires;
 
   /**
    * collection of BuildRequests for colonies in this star
    */
   @ProtoField(tag = 15, label = REPEATED, messageType = BuildRequest.class)
-  public final List<BuildRequest> build_requests;
+  public List<BuildRequest> build_requests;
 
   /**
    * List of fleets located in this star
    */
   @ProtoField(tag = 16, label = REPEATED, messageType = Fleet.class)
-  public final List<Fleet> fleets;
+  public List<Fleet> fleets;
 
   /**
    * This is the time (in seconds since Unix epoch) since this star "became" empty -- that is,
    * after the colony was destroyed. This only has meaning if the star has no colonies currently.
    */
   @ProtoField(tag = 17, type = INT64)
-  public final Long time_emptied;
+  public Long time_emptied;
 
   /**
    * Time, that this star was last simulated
    */
   @ProtoField(tag = 18, type = INT64)
-  public final Long last_simulation;
+  public Long last_simulation;
 
   /**
    * If we're in the middle of combat, this will be the combat report for what's currently
    * going on.
    */
   @ProtoField(tag = 19)
-  public final CombatReport current_combat_report;
+  public CombatReport current_combat_report;
 
   @ProtoField(tag = 20)
-  public final StarExtra extra;
+  public StarExtra extra;
+
+  public Star() {
+  }
 
   public Star(String key, Long sector_x, Long sector_y, String name, CLASSIFICATION classification, Integer size, Integer offset_x, Integer offset_y, List<Planet> planets, List<Colony> colonies, List<Building> buildings, List<EmpirePresence> empires, List<BuildRequest> build_requests, List<Fleet> fleets, Long time_emptied, Long last_simulation, CombatReport current_combat_report, StarExtra extra) {
     this.key = key;
@@ -150,12 +153,12 @@ public final class Star extends Message {
     this.size = size;
     this.offset_x = offset_x;
     this.offset_y = offset_y;
-    this.planets = immutableCopyOf(planets);
-    this.colonies = immutableCopyOf(colonies);
-    this.buildings = immutableCopyOf(buildings);
-    this.empires = immutableCopyOf(empires);
-    this.build_requests = immutableCopyOf(build_requests);
-    this.fleets = immutableCopyOf(fleets);
+    this.planets = copyOf(planets);
+    this.colonies = copyOf(colonies);
+    this.buildings = copyOf(buildings);
+    this.empires = copyOf(empires);
+    this.build_requests = copyOf(build_requests);
+    this.fleets = copyOf(fleets);
     this.time_emptied = time_emptied;
     this.last_simulation = last_simulation;
     this.current_combat_report = current_combat_report;
@@ -449,21 +452,24 @@ public final class Star extends Message {
      * The following are used by wormholes to store their state.
      */
     @ProtoField(tag = 1, type = INT32)
-    public final Integer wormhole_dest_star_id;
+    public Integer wormhole_dest_star_id;
 
     @ProtoField(tag = 2, type = INT64)
-    public final Long wormhole_tune_complete_time;
+    public Long wormhole_tune_complete_time;
 
     @ProtoField(tag = 3, type = INT64, label = REPEATED)
-    public final List<Long> wormhole_tune_history;
+    public List<Long> wormhole_tune_history;
 
     @ProtoField(tag = 4, type = INT32)
-    public final Integer wormhole_empire_id;
+    public Integer wormhole_empire_id;
+
+    public StarExtra() {
+    }
 
     public StarExtra(Integer wormhole_dest_star_id, Long wormhole_tune_complete_time, List<Long> wormhole_tune_history, Integer wormhole_empire_id) {
       this.wormhole_dest_star_id = wormhole_dest_star_id;
       this.wormhole_tune_complete_time = wormhole_tune_complete_time;
-      this.wormhole_tune_history = immutableCopyOf(wormhole_tune_history);
+      this.wormhole_tune_history = copyOf(wormhole_tune_history);
       this.wormhole_empire_id = wormhole_empire_id;
     }
 

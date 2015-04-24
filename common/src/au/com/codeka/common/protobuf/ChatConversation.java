@@ -21,14 +21,17 @@ public final class ChatConversation extends Message {
   public static final List<ChatConversationParticipant> DEFAULT_PARTICIPANTS = Collections.emptyList();
 
   @ProtoField(tag = 1, type = INT32)
-  public final Integer id;
+  public Integer id;
 
   @ProtoField(tag = 2, label = REPEATED, messageType = ChatConversationParticipant.class)
-  public final List<ChatConversationParticipant> participants;
+  public List<ChatConversationParticipant> participants;
+
+  public ChatConversation() {
+  }
 
   public ChatConversation(Integer id, List<ChatConversationParticipant> participants) {
     this.id = id;
-    this.participants = immutableCopyOf(participants);
+    this.participants = copyOf(participants);
   }
 
   private ChatConversation(Builder builder) {

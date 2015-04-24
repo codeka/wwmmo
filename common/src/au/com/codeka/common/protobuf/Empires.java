@@ -15,10 +15,13 @@ public final class Empires extends Message {
   public static final List<Empire> DEFAULT_EMPIRES = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = Empire.class)
-  public final List<Empire> empires;
+  public List<Empire> empires;
+
+  public Empires() {
+  }
 
   public Empires(List<Empire> empires) {
-    this.empires = immutableCopyOf(empires);
+    this.empires = copyOf(empires);
   }
 
   private Empires(Builder builder) {

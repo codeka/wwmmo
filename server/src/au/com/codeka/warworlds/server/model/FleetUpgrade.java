@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class FleetUpgrade extends BaseFleetUpgrade {
@@ -84,7 +83,7 @@ public class FleetUpgrade extends BaseFleetUpgrade {
         }
 
         @Override
-        public void fromProtocolBuffer(BaseFleet fleet, Messages.FleetUpgrade pb) {
+        public void fromProtocolBuffer(BaseFleet fleet, au.com.codeka.common.protobuf.FleetUpgrade pb) {
             super.fromProtocolBuffer(fleet, pb);
             parseExtra();
         }

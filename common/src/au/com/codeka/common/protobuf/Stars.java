@@ -15,10 +15,13 @@ public final class Stars extends Message {
   public static final List<Star> DEFAULT_STARS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = Star.class)
-  public final List<Star> stars;
+  public List<Star> stars;
+
+  public Stars() {
+  }
 
   public Stars(List<Star> stars) {
-    this.stars = immutableCopyOf(stars);
+    this.stars = copyOf(stars);
   }
 
   private Stars(Builder builder) {

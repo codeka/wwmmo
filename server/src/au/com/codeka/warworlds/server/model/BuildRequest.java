@@ -7,7 +7,6 @@ import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class BuildRequest extends BaseBuildRequest {
@@ -97,7 +96,7 @@ public class BuildRequest extends BaseBuildRequest {
     }
 
     @Override
-    public void fromProtocolBuffer(Messages.BuildRequest pb) {
+    public void fromProtocolBuffer(au.com.codeka.common.protobuf.BuildRequest pb) {
         super.fromProtocolBuffer(pb);
 
         if (mKey != null) {

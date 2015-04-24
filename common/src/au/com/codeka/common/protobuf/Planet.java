@@ -29,35 +29,38 @@ public final class Planet extends Message {
    * in monotonically increasing order of distance (0, 1, 2, 3, etc)
    */
   @ProtoField(tag = 2, type = INT32)
-  public final Integer index;
+  public Integer index;
 
   @ProtoField(tag = 3, type = ENUM)
-  public final PLANET_TYPE planet_type;
+  public PLANET_TYPE planet_type;
 
   /**
    * The size of the planet. Certain planet_type's are predisposed to be certain sizes
    * (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
    */
   @ProtoField(tag = 4, type = INT32)
-  public final Integer size;
+  public Integer size;
 
   /**
    * How "congenial" is this planet to supporting population
    */
   @ProtoField(tag = 5, type = INT32)
-  public final Integer population_congeniality;
+  public Integer population_congeniality;
 
   /**
    * How "congenial" is this planet to supporting farming
    */
   @ProtoField(tag = 6, type = INT32)
-  public final Integer farming_congeniality;
+  public Integer farming_congeniality;
 
   /**
    * How "congenial" is this planet to supporting mining
    */
   @ProtoField(tag = 7, type = INT32)
-  public final Integer mining_congeniality;
+  public Integer mining_congeniality;
+
+  public Planet() {
+  }
 
   public Planet(Integer index, PLANET_TYPE planet_type, Integer size, Integer population_congeniality, Integer farming_congeniality, Integer mining_congeniality) {
     this.index = index;

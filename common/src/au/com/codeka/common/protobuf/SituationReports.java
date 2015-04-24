@@ -17,16 +17,19 @@ public final class SituationReports extends Message {
   public static final String DEFAULT_CURSOR = "";
 
   @ProtoField(tag = 1, label = REPEATED, messageType = SituationReport.class)
-  public final List<SituationReport> situation_reports;
+  public List<SituationReport> situation_reports;
 
   /**
    * a cursor used to fetch the remaining reports
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String cursor;
+  public String cursor;
+
+  public SituationReports() {
+  }
 
   public SituationReports(List<SituationReport> situation_reports, String cursor) {
-    this.situation_reports = immutableCopyOf(situation_reports);
+    this.situation_reports = copyOf(situation_reports);
     this.cursor = cursor;
   }
 

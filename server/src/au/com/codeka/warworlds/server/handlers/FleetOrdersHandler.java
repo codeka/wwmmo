@@ -13,7 +13,9 @@ import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.CashAuditRecord;
+import au.com.codeka.common.protobuf.FleetOrder;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.EventProcessor;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -35,7 +37,7 @@ public class FleetOrdersHandler extends RequestHandler {
 
     @Override
     protected void post() throws RequestException {
-        Messages.FleetOrder fleet_order_pb = getRequestBody(Messages.FleetOrder.class);
+        FleetOrder fleet_order_pb = getRequestBody(FleetOrder.class);
 
         try (Transaction t = DB.beginTransaction()) {
             Simulation sim = new Simulation();
@@ -64,41 +66,41 @@ public class FleetOrdersHandler extends RequestHandler {
     }
 
     private boolean orderFleet(Transaction t, Star star, Fleet fleet,
-                               Messages.FleetOrder fleet_order_pb,
+                               FleetOrder fleet_order_pb,
                                Simulation sim) throws RequestException {
-        if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.SET_STANCE) {
+        if (fleet_order_pb.order == FleetOrder.FLEET_ORDER.SET_STANCE) {
             orderFleetSetStance(star, fleet, fleet_order_pb, sim);
-        } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.SPLIT) {
+        } else if (fleet_order_pb.order == FleetOrder.FLEET_ORDER.SPLIT) {
             orderFleetSplit(star, fleet, fleet_order_pb, sim);
-        } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.MERGE) {
+        } else if (fleet_order_pb.order == FleetOrder.FLEET_ORDER.MERGE) {
             orderFleetMerge(t, star, fleet, fleet_order_pb, sim);
-        } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.MOVE) {
+        } else if (fleet_order_pb.order == FleetOrder.FLEET_ORDER.MOVE) {
             orderFleetMove(star, fleet, fleet_order_pb, sim);
             return true;
-        } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.BOOST) {
+        } else if (fleet_order_pb.order == FleetOrder.FLEET_ORDER.BOOST) {
             orderFleetBoost(star, fleet, fleet_order_pb, sim);
-        } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.ENTER_WORMHOLE) {
+        } else if (fleet_order_pb.order == FleetOrder.FLEET_ORDER.ENTER_WORMHOLE) {
             orderFleetEnterWormhole(star, fleet, sim);
         }
 
         return false;
     }
 
-    private void orderFleetSetStance(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) {
-        fleet.setStance(BaseFleet.Stance.fromNumber(fleet_order_pb.getStance().getNumber()));
+    private void orderFleetSetStance(Star star, Fleet fleet, FleetOrder fleet_order_pb, Simulation sim) {
+        fleet.setStance(BaseFleet.Stance.fromNumber(fleet_order_pb.stance.getValue()));
 
         // TODO: if we just set it to "aggressive" then assume we just arrived at the star
     }
 
-    private void orderFleetSplit(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
+    private void orderFleetSplit(Star star, Fleet fleet, FleetOrder fleet_order_pb, Simulation sim)
             throws RequestException {
         if (fleet.getState() != Fleet.State.IDLE) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
+            throw new RequestException(400, GenericError.ErrorCode.CannotOrderFleetNotIdle,
                                        "Cannot split a fleet that is not currently idle.");
         }
 
         float totalShips = fleet.getNumShips();
-        int leftShips = fleet_order_pb.getSplitLeft();
+        int leftShips = fleet_order_pb.split_left;
         float rightShips = totalShips - leftShips;
         if (rightShips < 1.0f || leftShips <= 0) {
             return; // can't split to less than 1
@@ -111,24 +113,24 @@ public class FleetOrdersHandler extends RequestHandler {
     private void orderFleetEnterWormhole(Star star, Fleet fleet, Simulation sim) throws RequestException {
         // make sure the star *is* a wormhole
         if (star.getStarType().getType() != Star.Type.Wormhole) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetNotOnWormhole,
+            throw new RequestException(400, GenericError.ErrorCode.FleetNotOnWormhole,
                     "Can only enter wormhole when orbiting wormhole.");
         }
 
         // also make sure the fleet is idle
         if (fleet.getState() != Fleet.State.IDLE) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
+            throw new RequestException(400, GenericError.ErrorCode.CannotOrderFleetNotIdle,
                                        "Cannot enter wormhole when fleet is not idle.");
         }
 
         // finally, make sure the womrhole has a destination AND the destination has been tuned
         Star.WormholeExtra wormholeExtra = star.getWormholeExtra();
         if (wormholeExtra == null || wormholeExtra.getDestWormholeID() == 0) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.WormholeNotTuned,
+            throw new RequestException(400, GenericError.ErrorCode.WormholeNotTuned,
                     "Cannot enter wormhole, destination has not been tuned.");
         }
         if (wormholeExtra.getTuneCompleteTime().isAfter(DateTime.now())) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.WormholeNotTuned,
+            throw new RequestException(400, GenericError.ErrorCode.WormholeNotTuned,
                     "Cannot enter wormhole, tuning is still in progress.");
         }
 
@@ -138,24 +140,24 @@ public class FleetOrdersHandler extends RequestHandler {
     }
 
     private void orderFleetMerge(Transaction t, Star star, Fleet fleet,
-                                 Messages.FleetOrder fleet_order_pb,
+                                 FleetOrder fleet_order_pb,
                                  Simulation sim) throws RequestException {
         if (fleet.getState() != Fleet.State.IDLE) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
+            throw new RequestException(400, GenericError.ErrorCode.CannotOrderFleetNotIdle,
                                        "Cannot merge a fleet that is not currently idle.");
         }
 
         ArrayList<BaseFleet> fleets = new ArrayList<BaseFleet>(star.getFleets());
         for (BaseFleet baseFleet : fleets) {
-            if (baseFleet.getKey().equals(fleet_order_pb.getMergeFleetKey())) {
+            if (baseFleet.getKey().equals(fleet_order_pb.merge_fleet_key)) {
                 Fleet otherFleet = (Fleet) baseFleet;
                 if (otherFleet.getState() != Fleet.State.IDLE) {
-                    throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
+                    throw new RequestException(400, GenericError.ErrorCode.CannotOrderFleetNotIdle,
                             "Cannot merge a fleet that is not currently idle.");
                 }
 
                 if (!otherFleet.getDesignID().equals(fleet.getDesignID())) {
-                    throw new RequestException(400, Messages.GenericError.ErrorCode.CannotMergeFleetDifferentDesign,
+                    throw new RequestException(400, GenericError.ErrorCode.CannotMergeFleetDifferentDesign,
                             "Cannot merge two fleets of a different design.");
                 }
 
@@ -163,7 +165,7 @@ public class FleetOrdersHandler extends RequestHandler {
                     if (baseBuildRequest.getExistingFleetID() != null
                             && (baseBuildRequest.getExistingFleetID() == fleet.getID()
                                     || baseBuildRequest.getExistingFleetID() == otherFleet.getID())) {
-                        throw new RequestException(400, Messages.GenericError.ErrorCode.CannotMergeFleetDifferentDesign,
+                        throw new RequestException(400, GenericError.ErrorCode.CannotMergeFleetDifferentDesign,
                                 "Cannot merge a fleet while it is being upgraded.");
                     }
                 }
@@ -217,16 +219,16 @@ public class FleetOrdersHandler extends RequestHandler {
         }
     }
 
-    private void orderFleetMove(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
+    private void orderFleetMove(Star star, Fleet fleet, FleetOrder fleet_order_pb, Simulation sim)
             throws RequestException {
         if (fleet.getState() != Fleet.State.IDLE) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
+            throw new RequestException(400, GenericError.ErrorCode.CannotOrderFleetNotIdle,
                                        "Cannot move a fleet that is not currently idle.");
         }
 
         Star srcStar = star;
         Star destStar;
-        if (fleet_order_pb.hasStarKey()) {
+        if (fleet_order_pb.star_key != null) {
             destStar = orderFleetMoveStar(star, fleet, fleet_order_pb, sim);
         } else {
             destStar = orderFleetMoveSpace(star, fleet, fleet_order_pb, sim);
@@ -237,18 +239,18 @@ public class FleetOrdersHandler extends RequestHandler {
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
         float fuelCost = design.getFuelCost(distanceInParsecs, fleet.getNumShips());
 
-        Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder()
-                .setEmpireId(getSession().getEmpireID())
-                .setReason(Messages.CashAuditRecord.Reason.FleetMove)
-                .setFleetDesignId(fleet.getDesignID())
-                .setFleetId(fleet.getID())
-                .setNumShips(fleet.getNumShips())
-                .setStarId(destStar.getID())
-                .setStarName(destStar.getName())
-                .setMoveDistance(distanceInParsecs);
+        CashAuditRecord.Builder audit_record_pb = new CashAuditRecord.Builder()
+                .empire_id(getSession().getEmpireID())
+                .reason(CashAuditRecord.Reason.FleetMove)
+                .fleet_design_id(fleet.getDesignID())
+                .fleet_id(fleet.getID())
+                .num_ships(fleet.getNumShips())
+                .star_id(destStar.getID())
+                .star_name(destStar.getName())
+                .move_distance(distanceInParsecs);
 
         if (!new EmpireController().withdrawCash(getSession().getEmpireID(), fuelCost, audit_record_pb)) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.InsufficientCash,
+            throw new RequestException(400, GenericError.ErrorCode.InsufficientCash,
                                        "Cannot move there, you do not have enough cash.");
         }
 
@@ -257,63 +259,63 @@ public class FleetOrdersHandler extends RequestHandler {
         fleet.move(now, destStar.getKey(), now.plusSeconds((int)(moveTimeInHours * 3600.0f)));
     }
 
-    private Star orderFleetMoveStar(Star srcStar, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
+    private Star orderFleetMoveStar(Star srcStar, Fleet fleet, FleetOrder fleet_order_pb, Simulation sim)
             throws RequestException {
         if (fleet.getDesign().hasEffect(EmptySpaceMoverShipEffect.class)) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveCannotMoveToStar,
+            throw new RequestException(400, GenericError.ErrorCode.FleetMoveCannotMoveToStar,
                     "This fleet cannot be moved to another star.");
         }
 
-        Star destStar = new StarController().getStar(Integer.parseInt(fleet_order_pb.getStarKey()));
+        Star destStar = new StarController().getStar(Integer.parseInt(fleet_order_pb.star_key));
 
         // you can't move to a marker star either....
         if (destStar.getStarType().getInternalName().equals("marker")) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveCannotMoveToEmptySpace,
+            throw new RequestException(400, GenericError.ErrorCode.FleetMoveCannotMoveToEmptySpace,
                     "This fleet can only be moved to stars.");
         }
 
         return destStar;
     }
 
-    private Star orderFleetMoveSpace(Star srcStar, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
+    private Star orderFleetMoveSpace(Star srcStar, Fleet fleet, FleetOrder fleet_order_pb, Simulation sim)
             throws RequestException {
         EmptySpaceMoverShipEffect emptySpaceMoverShipEffect = fleet.getDesign().getEffect(EmptySpaceMoverShipEffect.class);
         if (emptySpaceMoverShipEffect == null) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveCannotMoveToEmptySpace,
+            throw new RequestException(400, GenericError.ErrorCode.FleetMoveCannotMoveToEmptySpace,
                     "This fleet can only be moved to stars.");
         }
 
-        long sectorX = fleet_order_pb.getSectorX();
-        long sectorY = fleet_order_pb.getSectorY();
-        int offsetX = fleet_order_pb.getOffsetX();
-        int offsetY = fleet_order_pb.getOffsetY();
+        long sectorX = fleet_order_pb.sector_x;
+        long sectorY = fleet_order_pb.sector_y;
+        int offsetX = fleet_order_pb.offset_x;
+        int offsetY = fleet_order_pb.offset_y;
 
         // if you haven't given enough space, it's an error.
         float distance = Sector.distanceInParsecs(srcStar, sectorX, sectorY, offsetX, offsetY);
         if (distance < emptySpaceMoverShipEffect.getMinStarDistance()) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveTooCloseToStar,
+            throw new RequestException(400, GenericError.ErrorCode.FleetMoveTooCloseToStar,
                     "Cannot move there, too close to other stars.");
         }
 
         return new StarController().addMarkerStar(sectorX, sectorY, offsetX, offsetY);
     }
 
-    private void orderFleetBoost(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
+    private void orderFleetBoost(Star star, Fleet fleet, FleetOrder fleet_order_pb, Simulation sim)
             throws RequestException {
         FleetUpgrade.BoostFleetUpgrade boostFleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");
         if (boostFleetUpgrade == null) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetBoostNoUpgrade,
+            throw new RequestException(400, GenericError.ErrorCode.FleetBoostNoUpgrade,
                     "This fleet does not have the 'Warp Boost' upgrade.");
         }
 
         if (fleet.getState() != State.MOVING) {
             throw new RequestException(
-                    400, Messages.GenericError.ErrorCode.FleetBoostNotMoving, "Fleet is not moving.");
+                    400, GenericError.ErrorCode.FleetBoostNotMoving, "Fleet is not moving.");
         }
 
         if (boostFleetUpgrade.isBoosting()) {
             throw new RequestException(
-                    400, Messages.GenericError.ErrorCode.FleetBoostAlreadyBoosting, "Already boosting.");
+                    400, GenericError.ErrorCode.FleetBoostAlreadyBoosting, "Already boosting.");
         }
 
         boostFleetUpgrade.isBoosting(true);

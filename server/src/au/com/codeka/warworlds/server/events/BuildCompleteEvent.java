@@ -8,7 +8,8 @@ import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.BuildRequest;
+import au.com.codeka.common.protobuf.SituationReport;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.Event;
 import au.com.codeka.warworlds.server.RequestContext;
@@ -130,25 +131,27 @@ public class BuildCompleteEvent extends Event {
         new StarController().update(star);
 
         if (!disableNotification) {
-            Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
-            sitrep_pb.setRealm(Configuration.i.getRealmName());
-            sitrep_pb.setEmpireKey(Integer.toString(empireID));
-            sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
-            sitrep_pb.setStarKey(star.getKey());
-            sitrep_pb.setPlanetIndex(colony.getPlanetIndex());
-            Messages.SituationReport.BuildCompleteRecord.Builder build_complete_pb = Messages.SituationReport.BuildCompleteRecord.newBuilder();
-            build_complete_pb.setBuildKind(Messages.BuildRequest.BUILD_KIND.valueOf(designKind.getValue()));
-            build_complete_pb.setBuildRequestKey(Integer.toString(buildRequestID));
-            build_complete_pb.setDesignId(designID);
-            build_complete_pb.setCount(Math.round(count));
-            sitrep_pb.setBuildCompleteRecord(build_complete_pb);
+            SituationReport.Builder sitrep_pb = new SituationReport.Builder();
+            sitrep_pb.realm = Configuration.i.getRealmName();
+            sitrep_pb.empire_key = Integer.toString(empireID);
+            sitrep_pb.report_time = DateTime.now().getMillis() / 1000;
+            sitrep_pb.star_key = star.getKey();
+            sitrep_pb.planet_index = colony.getPlanetIndex();
+            SituationReport.BuildCompleteRecord.Builder build_complete_pb =
+                    new SituationReport.BuildCompleteRecord.Builder();
+            build_complete_pb.build_kind = BuildRequest.BUILD_KIND.valueOf(designKind.toString());
+            build_complete_pb.build_request_key = Integer.toString(buildRequestID);
+            build_complete_pb.design_id = designID;
+            build_complete_pb.count = Math.round(count);
+            sitrep_pb.build_complete_record = build_complete_pb.build();
             if (star.getCombatReport() != null && fleet != null) {
-                Messages.SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb = Messages.SituationReport.FleetUnderAttackRecord.newBuilder();
-                fleet_under_attack_pb.setCombatReportKey(star.getCombatReport().getKey());
-                fleet_under_attack_pb.setFleetDesignId(fleet.getDesignID());
-                fleet_under_attack_pb.setFleetKey(fleet.getKey());
-                fleet_under_attack_pb.setNumShips(fleet.getNumShips());
-                sitrep_pb.setFleetUnderAttackRecord(fleet_under_attack_pb);
+                SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb =
+                        new SituationReport.FleetUnderAttackRecord.Builder();
+                fleet_under_attack_pb.combat_report_key = star.getCombatReport().getKey();
+                fleet_under_attack_pb.fleet_design_id = fleet.getDesignID();
+                fleet_under_attack_pb.fleet_key = fleet.getKey();
+                fleet_under_attack_pb.num_ships = fleet.getNumShips();
+                sitrep_pb.fleet_under_attack_record = fleet_under_attack_pb.build();
             }
 
             new SituationReportController().saveSituationReport(sitrep_pb.build());

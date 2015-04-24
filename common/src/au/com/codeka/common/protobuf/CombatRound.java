@@ -30,34 +30,37 @@ public final class CombatRound extends Message {
   public static final List<FleetDamagedRecord> DEFAULT_FLEETS_DAMAGED = Collections.emptyList();
 
   @ProtoField(tag = 1, type = STRING)
-  public final String star_key;
+  public String star_key;
 
   @ProtoField(tag = 2, type = INT64)
-  public final Long round_time;
+  public Long round_time;
 
   @ProtoField(tag = 3, label = REPEATED, messageType = FleetSummary.class)
-  public final List<FleetSummary> fleets;
+  public List<FleetSummary> fleets;
 
   @ProtoField(tag = 4, label = REPEATED, messageType = FleetJoinedRecord.class)
-  public final List<FleetJoinedRecord> fleets_joined;
+  public List<FleetJoinedRecord> fleets_joined;
 
   @ProtoField(tag = 5, label = REPEATED, messageType = FleetTargetRecord.class)
-  public final List<FleetTargetRecord> fleets_targetted;
+  public List<FleetTargetRecord> fleets_targetted;
 
   @ProtoField(tag = 6, label = REPEATED, messageType = FleetAttackRecord.class)
-  public final List<FleetAttackRecord> fleets_attacked;
+  public List<FleetAttackRecord> fleets_attacked;
 
   @ProtoField(tag = 7, label = REPEATED, messageType = FleetDamagedRecord.class)
-  public final List<FleetDamagedRecord> fleets_damaged;
+  public List<FleetDamagedRecord> fleets_damaged;
+
+  public CombatRound() {
+  }
 
   public CombatRound(String star_key, Long round_time, List<FleetSummary> fleets, List<FleetJoinedRecord> fleets_joined, List<FleetTargetRecord> fleets_targetted, List<FleetAttackRecord> fleets_attacked, List<FleetDamagedRecord> fleets_damaged) {
     this.star_key = star_key;
     this.round_time = round_time;
-    this.fleets = immutableCopyOf(fleets);
-    this.fleets_joined = immutableCopyOf(fleets_joined);
-    this.fleets_targetted = immutableCopyOf(fleets_targetted);
-    this.fleets_attacked = immutableCopyOf(fleets_attacked);
-    this.fleets_damaged = immutableCopyOf(fleets_damaged);
+    this.fleets = copyOf(fleets);
+    this.fleets_joined = copyOf(fleets_joined);
+    this.fleets_targetted = copyOf(fleets_targetted);
+    this.fleets_attacked = copyOf(fleets_attacked);
+    this.fleets_damaged = copyOf(fleets_damaged);
   }
 
   private CombatRound(Builder builder) {
@@ -177,19 +180,22 @@ public final class CombatRound extends Message {
     public static final Float DEFAULT_NUM_SHIPS = 0F;
 
     @ProtoField(tag = 1, type = STRING, label = REPEATED)
-    public final List<String> fleet_keys;
+    public List<String> fleet_keys;
 
     @ProtoField(tag = 2, type = STRING)
-    public final String empire_key;
+    public String empire_key;
 
     @ProtoField(tag = 3, type = STRING)
-    public final String design_id;
+    public String design_id;
 
     @ProtoField(tag = 4, type = FLOAT)
-    public final Float num_ships;
+    public Float num_ships;
+
+    public FleetSummary() {
+    }
 
     public FleetSummary(List<String> fleet_keys, String empire_key, String design_id, Float num_ships) {
-      this.fleet_keys = immutableCopyOf(fleet_keys);
+      this.fleet_keys = copyOf(fleet_keys);
       this.empire_key = empire_key;
       this.design_id = design_id;
       this.num_ships = num_ships;
@@ -279,7 +285,10 @@ public final class CombatRound extends Message {
     public static final Integer DEFAULT_FLEET_INDEX = 0;
 
     @ProtoField(tag = 1, type = INT32)
-    public final Integer fleet_index;
+    public Integer fleet_index;
+
+    public FleetJoinedRecord() {
+    }
 
     public FleetJoinedRecord(Integer fleet_index) {
       this.fleet_index = fleet_index;
@@ -338,10 +347,13 @@ public final class CombatRound extends Message {
     public static final Integer DEFAULT_TARGET_INDEX = 0;
 
     @ProtoField(tag = 1, type = INT32)
-    public final Integer fleet_index;
+    public Integer fleet_index;
 
     @ProtoField(tag = 2, type = INT32)
-    public final Integer target_index;
+    public Integer target_index;
+
+    public FleetTargetRecord() {
+    }
 
     public FleetTargetRecord(Integer fleet_index, Integer target_index) {
       this.fleet_index = fleet_index;
@@ -416,13 +428,16 @@ public final class CombatRound extends Message {
     public static final Float DEFAULT_DAMAGE = 0F;
 
     @ProtoField(tag = 1, type = INT32)
-    public final Integer fleet_index;
+    public Integer fleet_index;
 
     @ProtoField(tag = 2, type = INT32)
-    public final Integer target_index;
+    public Integer target_index;
 
     @ProtoField(tag = 3, type = FLOAT)
-    public final Float damage;
+    public Float damage;
+
+    public FleetAttackRecord() {
+    }
 
     public FleetAttackRecord(Integer fleet_index, Integer target_index, Float damage) {
       this.fleet_index = fleet_index;
@@ -506,10 +521,13 @@ public final class CombatRound extends Message {
     public static final Float DEFAULT_DAMAGE = 0F;
 
     @ProtoField(tag = 1, type = INT32)
-    public final Integer fleet_index;
+    public Integer fleet_index;
 
     @ProtoField(tag = 2, type = FLOAT)
-    public final Float damage;
+    public Float damage;
+
+    public FleetDamagedRecord() {
+    }
 
     public FleetDamagedRecord(Integer fleet_index, Float damage) {
       this.fleet_index = fleet_index;

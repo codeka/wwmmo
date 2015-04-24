@@ -1,12 +1,13 @@
 package au.com.codeka.warworlds.server;
 
-import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.google.protobuf.Message;
+import com.squareup.wire.Message;
+import com.squareup.wire.WireTypeAdapterFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protoformat.PbFormatter;
+import au.com.codeka.common.Wire;
 import au.com.codeka.warworlds.server.ctrl.AdminController;
 import au.com.codeka.warworlds.server.data.SqlStateTranslater;
 import au.com.codeka.warworlds.server.model.BackendUser;
@@ -161,15 +162,11 @@ public class RequestHandler {
     return false;
   }
 
-  protected void setCacheTime(float hours) {
-    setCacheTime(hours, null);
-  }
-
   /**
    * Sets the required headers so that the client will know this response can be cached for the
    * given number of hours. The default response includes no caching headers.
    *
-   * @param hours
+   * @param hours Number of hours to cache for.
    * @param etag An optional value to include in the ETag header. This can be any string at all,
    *             and we will hash and base-64 encode it for you.
    */
@@ -223,7 +220,7 @@ public class RequestHandler {
     response.setContentType("application/x-protobuf");
     response.setHeader("Content-Type", "application/x-protobuf");
     try {
-      pb.writeTo(response.getOutputStream());
+      response.getOutputStream().write(pb.toByteArray());
     } catch (IOException e) {
       // Ignore.
     }
@@ -232,21 +229,26 @@ public class RequestHandler {
   private void setResponseBodyText(Message pb) {
     response.setContentType("text/plain");
     response.setCharacterEncoding("utf-8");
-    try {
-      PrintWriter writer = response.getWriter();
-      writer.write(PbFormatter.toJson(pb));
-      writer.flush();
-    } catch (IOException e) {
-      // Ignore.
-    }
+    writeJsonBody(pb, true);
   }
 
   private void setResponseBodyJson(Message pb) {
     response.setContentType("application/json");
     response.setCharacterEncoding("utf-8");
+    writeJsonBody(pb, false);
+  }
+
+  private void writeJsonBody(Message pb, boolean prettyPrint) {
     try {
+      GsonBuilder gsonBuilder = new GsonBuilder()
+          .registerTypeAdapterFactory(new WireTypeAdapterFactory(Wire.i));
+      if (prettyPrint) {
+        gsonBuilder.setPrettyPrinting();
+      }
+      Gson gson = gsonBuilder.create();
+
       PrintWriter writer = response.getWriter();
-      writer.write(PbFormatter.toJson(pb));
+      writer.write(gson.toJson(pb));
       writer.flush();
     } catch (IOException e) {
       // Ignore.
@@ -316,61 +318,33 @@ public class RequestHandler {
     return backendUser.isInRole(role);
   }
 
-  @SuppressWarnings({"unchecked"})
-  protected <T> T getRequestBody(Class<T> protoBuffFactory) {
+  protected <T extends Message> T getRequestBody(Class<T> protoBuffFactory)
+      throws RequestException {
     if (request.getHeader("Content-Type").equals("application/json")) {
       return getRequestBodyJson(protoBuffFactory);
     }
 
-    T result = null;
-    ServletInputStream ins = null;
-
+    InputStream ins = null;
     try {
       ins = request.getInputStream();
-      Method m = protoBuffFactory.getDeclaredMethod("parseFrom", InputStream.class);
-      result = (T) m.invoke(null, ins);
-    } catch (Exception e) {
-      // Ignore?
+      return Wire.i.parseFrom(ins, protoBuffFactory);
+    } catch (IOException e) {
+      throw new RequestException(e);
     } finally {
       if (ins != null) {
-        try {
-          ins.close();
-        } catch (IOException e) {
-          // Ignore?
-        }
+        try { ins.close(); } catch (IOException e) { /* Ignore. */ }
       }
     }
-
-    return result;
   }
 
-  @SuppressWarnings("unchecked")
   private <T> T getRequestBodyJson(Class<T> protoBuffFactory) {
-    String json;
-    InputStream ins;
     try {
-      ins = request.getInputStream();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(ins));
+      Gson gson = new GsonBuilder()
+          .registerTypeAdapterFactory(new WireTypeAdapterFactory(Wire.i))
+          .create();
 
-      StringBuilder sb = new StringBuilder();
-      String line;
-      while ((line = reader.readLine()) != null) {
-        sb.append(line);
-        sb.append(" ");
-      }
-
-      json = sb.toString();
-    } catch (Exception e) {
-      return null;
-    }
-
-    try {
-      Method m = protoBuffFactory.getDeclaredMethod("newBuilder");
-      Message.Builder builder = (Message.Builder) m.invoke(null);
-
-      PbFormatter.fromJson(json, builder);
-      return (T) builder.build();
-    } catch (Exception e) {
+      return gson.fromJson(new InputStreamReader(request.getInputStream()), protoBuffFactory);
+    } catch (IOException e) {
       return null;
     }
   }

@@ -18,7 +18,10 @@ public final class DeviceOnlineStatus extends Message {
   public static final Boolean DEFAULT_IS_ONLINE = false;
 
   @ProtoField(tag = 1, type = BOOL)
-  public final Boolean is_online;
+  public Boolean is_online;
+
+  public DeviceOnlineStatus() {
+  }
 
   public DeviceOnlineStatus(Boolean is_online) {
     this.is_online = is_online;

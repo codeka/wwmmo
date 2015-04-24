@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.server.handlers;
 
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.StarController;
@@ -14,18 +13,19 @@ import au.com.codeka.warworlds.server.model.Star;
 public class FleetHandler extends RequestHandler {
     @Override
     protected void put() throws RequestException {
-        Messages.Fleet fleet_pb = getRequestBody(Messages.Fleet.class);
+        au.com.codeka.common.protobuf.Fleet fleet_pb =
+                getRequestBody(au.com.codeka.common.protobuf.Fleet.class);
 
         // make sure the fleet in the pb is the same as the one referenced in the URL
-        if (!fleet_pb.getKey().equals(getUrlParameter("fleetid"))) {
+        if (!fleet_pb.key.equals(getUrlParameter("fleetid"))) {
             throw new RequestException(400, "Invalid fleet_id");
         }
-        if (!fleet_pb.getStarKey().equals(getUrlParameter("starid"))) {
+        if (!fleet_pb.star_key.equals(getUrlParameter("starid"))) {
             throw new RequestException(400, "Invalid star_id");
         }
 
         // you're only allowed to update fleets that you own
-        if (getSession().getEmpireID() != Integer.parseInt(fleet_pb.getEmpireKey())) {
+        if (getSession().getEmpireID() != Integer.parseInt(fleet_pb.empire_key)) {
             throw new RequestException(404, "No access to this fleet allowed.");
         }
 
@@ -39,7 +39,7 @@ public class FleetHandler extends RequestHandler {
             for (BaseFleet baseFleet : star.getFleets()) {
                 Fleet fleet = (Fleet) baseFleet;
                 if (fleet.getID() == fleetID && fleet.getEmpireID() == empireID) {
-                    fleet.setNotes(fleet_pb.getNotes());
+                    fleet.setNotes(fleet_pb.notes);
                     new StarController(t).update(star);
                     break;
                 }

@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.GenericError;
 
 /**
  * This exception is thrown when you want to pass an error back to the client.
@@ -13,7 +13,7 @@ public class RequestException extends Exception {
     private static final long serialVersionUID = 1L;
 
     private int mHttpErrorCode;
-    private Messages.GenericError mGenericError;
+    private GenericError mGenericError;
 
     public RequestException(int httpErrorCode) {
         super(String.format("HTTP Error: %d", httpErrorCode));
@@ -67,14 +67,14 @@ public class RequestException extends Exception {
         return null;
     }
 
-    public RequestException(int httpErrorCode, Messages.GenericError.ErrorCode errorCode, String errorMsg) {
+    public RequestException(int httpErrorCode, GenericError.ErrorCode errorCode, String errorMsg) {
         super(errorMsg);
 
         mHttpErrorCode = httpErrorCode;
-        mGenericError = Messages.GenericError.newBuilder()
-                                .setErrorCode(errorCode.getNumber())
-                                .setErrorMessage(errorMsg)
-                                .build();
+        mGenericError = new GenericError.Builder()
+                            .error_code(errorCode.getValue())
+                            .error_message(errorMsg)
+                            .build();
     }
 
     public void populate(HttpServletResponse response) {
@@ -85,11 +85,11 @@ public class RequestException extends Exception {
         return mHttpErrorCode;
     }
 
-    public Messages.GenericError getGenericError() {
+    public GenericError getGenericError() {
         if (mGenericError == null) {
-            mGenericError = Messages.GenericError.newBuilder()
-                    .setErrorCode(Messages.GenericError.ErrorCode.UnknownError.getNumber())
-                    .setErrorMessage(getMessage())
+            mGenericError = new GenericError.Builder()
+                    .error_code(GenericError.ErrorCode.UnknownError.getValue())
+                    .error_message(getMessage())
                     .build();
         }
         return mGenericError;

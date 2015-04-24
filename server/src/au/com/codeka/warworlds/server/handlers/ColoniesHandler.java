@@ -3,7 +3,7 @@ package au.com.codeka.warworlds.server.handlers;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.ColonyController;
@@ -23,7 +23,8 @@ import au.com.codeka.warworlds.server.model.Star;
 public class ColoniesHandler extends RequestHandler {
   @Override
   protected void post() throws RequestException {
-    Messages.ColonizeRequest colonize_request_pb = getRequestBody(Messages.ColonizeRequest.class);
+    au.com.codeka.common.protobuf.ColonizeRequest colonize_request_pb =
+        getRequestBody(au.com.codeka.common.protobuf.ColonizeRequest.class);
     Empire myEmpire = new EmpireController().getEmpire(getSession().getEmpireID());
 
     try (Transaction t = DB.beginTransaction()) {
@@ -33,13 +34,12 @@ public class ColoniesHandler extends RequestHandler {
       sim.simulate(star);
       new StarController(t).update(star);
 
-      int planetIndex = colonize_request_pb.getPlanetIndex();
-
       // make sure there's no colony already on this planet
+      int planetIndex = colonize_request_pb.planet_index;
       for (BaseColony colony : star.getColonies()) {
         if (colony.getPlanetIndex() == planetIndex) {
           throw new RequestException(400,
-              Messages.GenericError.ErrorCode.CannotColonizePlanetAlreadyHasColony,
+              GenericError.ErrorCode.CannotColonizePlanetAlreadyHasColony,
               "There is already a colony on this planet.");
         }
       }
@@ -77,7 +77,7 @@ public class ColoniesHandler extends RequestHandler {
 
       if (colonyShipFleet == null) {
         throw new RequestException(400,
-            Messages.GenericError.ErrorCode.CannotColonizePlanetNoColonyShips,
+            GenericError.ErrorCode.CannotColonizePlanetNoColonyShips,
             "No idle Colony Ship is available to colonize this planet.");
       }
 
@@ -92,9 +92,9 @@ public class ColoniesHandler extends RequestHandler {
       // and colonize the planet!
       Colony colony = new ColonyController(t).colonize(myEmpire, star, planetIndex, population);
 
-      Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
+      au.com.codeka.common.protobuf.Colony colony_pb = new au.com.codeka.common.protobuf.Colony();
       colony.toProtocolBuffer(colony_pb);
-      setResponseBody(colony_pb.build());
+      setResponseBody(colony_pb);
 
       t.commit();
     } catch (Exception e) {

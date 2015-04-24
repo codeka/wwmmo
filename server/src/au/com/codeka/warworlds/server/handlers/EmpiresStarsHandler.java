@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.EmpireStar;
+import au.com.codeka.common.protobuf.EmpireStars;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -65,18 +66,19 @@ public class EmpiresStarsHandler extends RequestHandler {
 
     List<Star> stars = new StarController().getStars(starIds);
 
-    Messages.Stars.Builder pb = Messages.Stars.newBuilder();
+    au.com.codeka.common.protobuf.Stars pb = new au.com.codeka.common.protobuf.Stars();
+    pb.stars = new ArrayList<>();
     for (Star star : stars) {
       if (!isAdmin()) {
         // no need to filter by buildings, these are -- by definition -- our stars anyway
         new StarController().sanitizeStar(star, empire.getID(), null, null);
       }
 
-      Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+      au.com.codeka.common.protobuf.Star star_pb = new au.com.codeka.common.protobuf.Star();
       star.toProtocolBuffer(star_pb);
-      pb.addStars(star_pb);
+      pb.stars.add(star_pb);
     }
-    setResponseBody(pb.build());
+    setResponseBody(pb);
   }
 
   /**
@@ -88,24 +90,25 @@ public class EmpiresStarsHandler extends RequestHandler {
     TreeMap<Integer, Integer> starIdMap = mapStarIdsToIndices(starIds, indices);
     List<Star> stars = new StarController().getStars(starIdMap.keySet());
 
-    Messages.EmpireStars.Builder pb = Messages.EmpireStars.newBuilder();
-    pb.setTotalStars(starIds.size());
+    EmpireStars pb = new EmpireStars();
+    pb.total_stars = starIds.size();
+    pb.stars = new ArrayList<>();
     for (Star star : stars) {
       if (!isAdmin()) {
         // no need to filter by buildings, these are -- by definition -- our stars anyway
         new StarController().sanitizeStar(star, empire.getID(), null, null);
       }
 
-      Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+      au.com.codeka.common.protobuf.Star star_pb = new au.com.codeka.common.protobuf.Star();
       star.toProtocolBuffer(star_pb);
 
-      Messages.EmpireStar.Builder empire_star_pb = Messages.EmpireStar.newBuilder();
-      empire_star_pb.setStar(star_pb);
-      empire_star_pb.setIndex(starIdMap.get(star.getID()));
-      pb.addStars(empire_star_pb);
+      EmpireStar empire_star_pb = new EmpireStar();
+      empire_star_pb.star = star_pb;
+      empire_star_pb.index = starIdMap.get(star.getID());
+      pb.stars.add(empire_star_pb);
     }
 
-    setResponseBody(pb.build());
+    setResponseBody(pb);
   }
 
   /**

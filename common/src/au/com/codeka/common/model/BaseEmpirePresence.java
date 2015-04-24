@@ -102,7 +102,7 @@ public abstract class BaseEmpirePresence {
         }
     }
 
-    public void toProtocolBuffer(EmpirePresence.Builder pb) {
+    public void toProtocolBuffer(EmpirePresence pb) {
         pb.key = mKey;
         pb.empire_key = mEmpireKey;
         pb.star_key = mStarKey;

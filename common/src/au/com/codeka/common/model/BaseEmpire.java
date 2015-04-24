@@ -8,7 +8,6 @@ import org.joda.time.DateTimeZone;
 import au.com.codeka.common.protobuf.Alliance;
 import au.com.codeka.common.protobuf.Empire;
 import au.com.codeka.common.protobuf.EmpireRank;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protobuf.Star;
 
 public abstract class BaseEmpire {
@@ -98,7 +97,7 @@ public abstract class BaseEmpire {
         mTaxCollectedPerHour = pb.taxes_collected_per_hour;
     }
 
-    public void toProtocolBuffer(Empire.Builder pb, boolean isTrusted) {
+    public void toProtocolBuffer(Empire pb, boolean isTrusted) {
         pb.key = mKey;
         pb.display_name = mDisplayName;
         pb.cash = mCash;
@@ -117,15 +116,14 @@ public abstract class BaseEmpire {
         }
 
         if (mHomeStar != null) {
-            Star.Builder star_pb = new Star.Builder();
+            Star star_pb = new Star();
             mHomeStar.toProtocolBuffer(star_pb, true);
-            pb.home_star = star_pb.build();
+            pb.home_star = star_pb;
         }
 
         if (mAlliance != null) {
-            Alliance.Builder alliance_pb = new Alliance.Builder();
-            mAlliance.toProtocolBuffer(alliance_pb);
-            pb.alliance = alliance_pb.build();
+            pb.alliance = new Alliance();
+            mAlliance.toProtocolBuffer(pb.alliance);
         }
 
         if (mRank != null) {

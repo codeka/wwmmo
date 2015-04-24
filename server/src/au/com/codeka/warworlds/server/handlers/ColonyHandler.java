@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.server.handlers;
 
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.Session;
@@ -40,16 +39,17 @@ public class ColonyHandler extends RequestHandler {
         sim.simulate(star);
 
         // adjust the colony's focus values based on what the post has
-        Messages.Colony colony_pb = getRequestBody(Messages.Colony.class);
+        au.com.codeka.common.protobuf.Colony colony_pb =
+            getRequestBody(au.com.codeka.common.protobuf.Colony.class);
 
-        float focusTotal = colony_pb.getFocusConstruction() +
-                           colony_pb.getFocusPopulation() +
-                           colony_pb.getFocusFarming() +
-                           colony_pb.getFocusMining();
-        colony.setConstructionFocus(colony_pb.getFocusConstruction() / focusTotal);
-        colony.setPopulationFocus(colony_pb.getFocusPopulation() / focusTotal);
-        colony.setFarmingFocus(colony_pb.getFocusFarming() / focusTotal);
-        colony.setMiningFocus(colony_pb.getFocusMining() / focusTotal);
+        float focusTotal = colony_pb.focus_construction +
+                           colony_pb.focus_population +
+                           colony_pb.focus_farming +
+                           colony_pb.focus_mining;
+        colony.setConstructionFocus(colony_pb.focus_construction / focusTotal);
+        colony.setPopulationFocus(colony_pb.focus_population / focusTotal);
+        colony.setFarmingFocus(colony_pb.focus_farming / focusTotal);
+        colony.setMiningFocus(colony_pb.focus_mining / focusTotal);
 
         new StarController().update(star);
     }

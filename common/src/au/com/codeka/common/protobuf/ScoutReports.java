@@ -15,10 +15,13 @@ public final class ScoutReports extends Message {
   public static final List<ScoutReport> DEFAULT_REPORTS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = ScoutReport.class)
-  public final List<ScoutReport> reports;
+  public List<ScoutReport> reports;
+
+  public ScoutReports() {
+  }
 
   public ScoutReports(List<ScoutReport> reports) {
-    this.reports = immutableCopyOf(reports);
+    this.reports = copyOf(reports);
   }
 
   private ScoutReports(Builder builder) {

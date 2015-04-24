@@ -22,19 +22,22 @@ public final class PurchaseInfo extends Message {
   public static final String DEFAULT_DEVELOPER_PAYLOAD = "";
 
   @ProtoField(tag = 1, type = STRING)
-  public final String sku;
+  public String sku;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String token;
+  public String token;
 
   @ProtoField(tag = 3, type = STRING)
-  public final String order_id;
+  public String order_id;
 
   @ProtoField(tag = 4, type = STRING)
-  public final String price;
+  public String price;
 
   @ProtoField(tag = 5, type = STRING)
-  public final String developer_payload;
+  public String developer_payload;
+
+  public PurchaseInfo() {
+  }
 
   public PurchaseInfo(String sku, String token, String order_id, String price, String developer_payload) {
     this.sku = sku;

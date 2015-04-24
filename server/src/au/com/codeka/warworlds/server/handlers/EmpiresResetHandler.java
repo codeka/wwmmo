@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.EmpireResetRequest;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -17,7 +17,7 @@ import au.com.codeka.warworlds.server.model.Star;
 public class EmpiresResetHandler extends RequestHandler {
     @Override
     protected void post() throws RequestException {
-        Messages.EmpireResetRequest reset_request_pb = getRequestBody(Messages.EmpireResetRequest.class);
+        EmpireResetRequest reset_request_pb = getRequestBody(EmpireResetRequest.class);
         int empireID = getSession().getEmpireID();
 
         // make sure they've purchased the right sku for the number of stars they have
@@ -34,15 +34,15 @@ public class EmpiresResetHandler extends RequestHandler {
             }
         }
 
-        if (numStarsWithColonies >= 5 && (!reset_request_pb.hasPurchaseInfo() || !reset_request_pb.getPurchaseInfo().hasSku())) {
+        if (numStarsWithColonies >= 5 && (reset_request_pb.purchase_info == null || reset_request_pb.purchase_info.sku == null)) {
             throw new RequestException(400, "You did not purchase the right SKU.");
         }
         if (numStarsWithColonies >= 10) {
-            if (!reset_request_pb.getPurchaseInfo().getSku().equals("reset_empire_big")) {
+            if (!reset_request_pb.purchase_info.sku.equals("reset_empire_big")) {
                 throw new RequestException(400, "You did not purchase the right SKU.");
             }
         } else if (numStarsWithColonies >= 5) {
-            if (!reset_request_pb.getPurchaseInfo().getSku().equals("reset_empire_small")) {
+            if (!reset_request_pb.purchase_info.sku.equals("reset_empire_small")) {
                 throw new RequestException(400, "You did not purchase the right SKU.");
             }
         }

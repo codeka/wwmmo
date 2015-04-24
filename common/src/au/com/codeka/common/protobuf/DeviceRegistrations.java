@@ -19,10 +19,13 @@ public final class DeviceRegistrations extends Message {
   public static final List<DeviceRegistration> DEFAULT_REGISTRATIONS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = DeviceRegistration.class)
-  public final List<DeviceRegistration> registrations;
+  public List<DeviceRegistration> registrations;
+
+  public DeviceRegistrations() {
+  }
 
   public DeviceRegistrations(List<DeviceRegistration> registrations) {
-    this.registrations = immutableCopyOf(registrations);
+    this.registrations = copyOf(registrations);
   }
 
   private DeviceRegistrations(Builder builder) {

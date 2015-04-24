@@ -15,10 +15,13 @@ public final class CombatReports extends Message {
   public static final List<CombatReport> DEFAULT_REPORTS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = CombatReport.class)
-  public final List<CombatReport> reports;
+  public List<CombatReport> reports;
+
+  public CombatReports() {
+  }
 
   public CombatReports(List<CombatReport> reports) {
-    this.reports = immutableCopyOf(reports);
+    this.reports = copyOf(reports);
   }
 
   private CombatReports(Builder builder) {

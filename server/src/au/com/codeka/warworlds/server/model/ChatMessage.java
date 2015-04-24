@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseChatMessage;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class ChatMessage extends BaseChatMessage {
@@ -71,7 +70,7 @@ public class ChatMessage extends BaseChatMessage {
     }
 
     @Override
-    public void fromProtocolBuffer(Messages.ChatMessage pb) {
+    public void fromProtocolBuffer(au.com.codeka.common.protobuf.ChatMessage pb) {
         super.fromProtocolBuffer(pb);
 
         if (mEmpireKey != null) {

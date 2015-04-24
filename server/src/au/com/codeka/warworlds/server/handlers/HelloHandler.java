@@ -5,7 +5,10 @@ import java.util.List;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.EmpireBuildingStatistics;
+import au.com.codeka.common.protobuf.HelloRequest;
+import au.com.codeka.common.protobuf.HelloResponse;
+import au.com.codeka.common.protobuf.MessageOfTheDay;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -29,28 +32,27 @@ public class HelloHandler extends RequestHandler {
       throw new RequestException(501);
     }
 
-    Messages.HelloRequest hello_request_pb = Messages.HelloRequest.newBuilder()
-        .setAllowInlineNotfications(false)
-        .setDeviceBuild("TEST_DEVICE_BUILD")
-        .setDeviceManufacturer("TEST_DEVICE_MANUFACTURER")
-        .setDeviceModel("TEST_DEVICE_MODEL")
-        .setDeviceVersion("TEST_DEVICE_VERSION")
-        .setMemoryClass(0)
+    HelloRequest hello_request_pb = new HelloRequest.Builder()
+        .allow_inline_notfications(false)
+        .device_build("TEST_DEVICE_BUILD")
+        .device_manufacturer("TEST_DEVICE_MANUFACTURER")
+        .device_model("TEST_DEVICE_MODEL")
+        .device_version("TEST_DEVICE_VERSION")
+        .memory_class(0)
         .build();
     processHello(hello_request_pb);
   }
 
   @Override
   protected void put() throws RequestException {
-    processHello(getRequestBody(Messages.HelloRequest.class));
+    processHello(getRequestBody(HelloRequest.class));
   }
 
-  private void processHello(Messages.HelloRequest hello_request_pb) throws RequestException {
-    Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder();
+  private void processHello(HelloRequest hello_request_pb) throws RequestException {
+    HelloResponse hello_response_pb = new HelloResponse();
 
     // damn, this is why things should never be marked "required" in protobufs!
-    hello_response_pb
-        .setMotd(Messages.MessageOfTheDay.newBuilder().setMessage("").setLastUpdate(""));
+    hello_response_pb.motd = new MessageOfTheDay.Builder().message("").last_update("").build();
 
     // fetch the empire we're interested in
     Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
@@ -68,11 +70,11 @@ public class HelloHandler extends RequestHandler {
             empire.getID(), empire.getDisplayName(), stats.getNumStars(), stats.getNumColonies(),
             stats.getNumFleets());
         new EmpireController().createEmpire(empire);
-        hello_response_pb.setWasEmpireReset(true);
+        hello_response_pb.was_empire_reset = true;
 
         String resetReason = new EmpireController().getResetReason(empire.getID());
         if (resetReason != null) {
-          hello_response_pb.setEmpireResetReason(resetReason);
+          hello_response_pb.empire_reset_reason = resetReason;
         }
       } else {
         log.info("Empire #%d [%s] has %d stars, %d colonies, and %d fleets.", empire.getID(),
@@ -80,9 +82,9 @@ public class HelloHandler extends RequestHandler {
             stats.getNumFleets());
       }
 
-      Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
+      au.com.codeka.common.protobuf.Empire empire_pb = new au.com.codeka.common.protobuf.Empire();
       empire.toProtocolBuffer(empire_pb, true);
-      hello_response_pb.setEmpire(empire_pb);
+      hello_response_pb.empire = empire_pb;
 
       // set up the initial building statistics
       String sql =
@@ -91,27 +93,29 @@ public class HelloHandler extends RequestHandler {
         stmt.setInt(1, empire.getID());
         SqlResult res = stmt.select();
 
-        Messages.EmpireBuildingStatistics.Builder build_stats_pb =
-            Messages.EmpireBuildingStatistics.newBuilder();
+        EmpireBuildingStatistics build_stats_pb = new EmpireBuildingStatistics();
+        build_stats_pb.counts = new ArrayList<>();
         while (res.next()) {
           String designID = res.getString(1);
           int num = res.getInt(2);
 
-          Messages.EmpireBuildingStatistics.DesignCount.Builder design_count_pb =
-              Messages.EmpireBuildingStatistics.DesignCount.newBuilder();
-          design_count_pb.setDesignId(designID);
-          design_count_pb.setNumBuildings(num);
-          build_stats_pb.addCounts(design_count_pb);
+          EmpireBuildingStatistics.DesignCount design_count_pb =
+              new EmpireBuildingStatistics.DesignCount();
+          design_count_pb.design_id = designID;
+          design_count_pb.num_buildings = num;
+          build_stats_pb.counts.add(design_count_pb);
         }
-        hello_response_pb.setBuildingStatistics(build_stats_pb);
+        hello_response_pb.building_statistics = build_stats_pb;
       } catch (Exception e) {
         throw new RequestException(e);
       }
 
       // if we're set to force ignore ads, make sure we pass that along
-      hello_response_pb.setForceRemoveAds(empire.getForceRemoveAds());
+      hello_response_pb.force_remove_ads = empire.getForceRemoveAds();
 
-      if (!hello_request_pb.hasNoStarList() || !hello_request_pb.getNoStarList()) {
+      if (hello_request_pb.no_star_list == null || !hello_request_pb.no_star_list) {
+        hello_response_pb.star_ids = new ArrayList<>();
+
         // grab all of the empire's stars (except markers and wormholes) and send across the
         // identifiers
         sql = "SELECT id, name" +
@@ -128,7 +132,7 @@ public class HelloHandler extends RequestHandler {
           SqlResult res = stmt.select();
 
           while (res.next()) {
-            hello_response_pb.addStarIds(res.getLong(1));
+            hello_response_pb.star_ids.add(res.getLong(1));
           }
         } catch (Exception e) {
           throw new RequestException(e);
@@ -136,7 +140,7 @@ public class HelloHandler extends RequestHandler {
       }
     }
 
-    setResponseBody(hello_response_pb.build());
+    setResponseBody(hello_response_pb);
   }
 
   /**

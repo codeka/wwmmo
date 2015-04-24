@@ -41,46 +41,46 @@ public final class Empire extends Message {
    * system. This won't be present in the initial "PUT"
    */
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   /**
    * The "display" name for the player, which is what other players see.
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String display_name;
+  public String display_name;
 
   /**
    * The player's Google Account identifier (which is actually unique of their email address)
    */
   @ProtoField(tag = 3, type = STRING)
-  public final String user;
+  public String user;
 
   /**
    * The player's email address
    */
   @ProtoField(tag = 4, type = STRING)
-  public final String email;
+  public String email;
 
   @ProtoField(tag = 5, type = ENUM)
-  public final EmpireState state;
+  public EmpireState state;
 
   /**
    * May not be set, but if it is this is all of the fleets owned by this empire
    */
   @ProtoField(tag = 6, label = REPEATED, messageType = Fleet.class)
-  public final List<Fleet> fleets;
+  public List<Fleet> fleets;
 
   /**
    * May not be set, but if it si this is all of the colonies owned by the empire
    */
   @ProtoField(tag = 7, label = REPEATED, messageType = Colony.class)
-  public final List<Colony> colonies;
+  public List<Colony> colonies;
 
   /**
    * May not be set, but if it is then this will be all the build requests currently in progress
    */
   @ProtoField(tag = 10, label = REPEATED, messageType = BuildRequest.class)
-  public final List<BuildRequest> build_requests;
+  public List<BuildRequest> build_requests;
 
   /**
    * If this is set, then it will be a list of the stars referenced by the fleets,
@@ -92,13 +92,13 @@ public final class Empire extends Message {
    * rate of change of cash, based on taxed income)
    */
   @ProtoField(tag = 9, type = FLOAT)
-  public final Float cash;
+  public Float cash;
 
   /**
    * if specified, contains the details of the empire's rank
    */
   @ProtoField(tag = 11)
-  public final EmpireRank rank;
+  public EmpireRank rank;
 
   /**
    * if specified, this is the empire's "home star", which is the star we should centre on when
@@ -106,32 +106,35 @@ public final class Empire extends Message {
    * have one, basically just a random star they control.
    */
   @ProtoField(tag = 12)
-  public final Star home_star;
+  public Star home_star;
 
   /**
    * if this empire is part of an alliance, this will contain the details of the alliance.
    */
   @ProtoField(tag = 13)
-  public final Alliance alliance;
+  public Alliance alliance;
 
   /**
    * if set, this is the last date/time the empire's shield was updated (so we can detect if we
    * need to re-download it)
    */
   @ProtoField(tag = 14, type = INT64)
-  public final Long shield_image_last_update;
+  public Long shield_image_last_update;
 
   /**
    * if set, this is the amount of taxes collected per hour for all stars in this empire combined.
    */
   @ProtoField(tag = 15, type = DOUBLE)
-  public final Double taxes_collected_per_hour;
+  public Double taxes_collected_per_hour;
 
   /**
    * the time we last saw this empire.
    */
   @ProtoField(tag = 16, type = INT64)
-  public final Long last_seen;
+  public Long last_seen;
+
+  public Empire() {
+  }
 
   public Empire(String key, String display_name, String user, String email, EmpireState state, List<Fleet> fleets, List<Colony> colonies, List<BuildRequest> build_requests, Float cash, EmpireRank rank, Star home_star, Alliance alliance, Long shield_image_last_update, Double taxes_collected_per_hour, Long last_seen) {
     this.key = key;
@@ -139,9 +142,9 @@ public final class Empire extends Message {
     this.user = user;
     this.email = email;
     this.state = state;
-    this.fleets = immutableCopyOf(fleets);
-    this.colonies = immutableCopyOf(colonies);
-    this.build_requests = immutableCopyOf(build_requests);
+    this.fleets = copyOf(fleets);
+    this.colonies = copyOf(colonies);
+    this.build_requests = copyOf(build_requests);
     this.cash = cash;
     this.rank = rank;
     this.home_star = home_star;

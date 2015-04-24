@@ -29,50 +29,53 @@ public final class SituationReport extends Message {
   public static final String DEFAULT_REALM = "";
 
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String empire_key;
+  public String empire_key;
 
   @ProtoField(tag = 3, type = INT64)
-  public final Long report_time;
+  public Long report_time;
 
   @ProtoField(tag = 4, type = STRING)
-  public final String star_key;
+  public String star_key;
 
   @ProtoField(tag = 5, type = INT32)
-  public final Integer planet_index;
+  public Integer planet_index;
 
   /**
    * This is the name of the realm the situation report was generated from. Used so that we can
    * fetch the correct star definitions, and display separate notifications for separate realms.
    */
   @ProtoField(tag = 14, type = STRING)
-  public final String realm;
+  public String realm;
 
   @ProtoField(tag = 6)
-  public final BuildCompleteRecord build_complete_record;
+  public BuildCompleteRecord build_complete_record;
 
   @ProtoField(tag = 7)
-  public final MoveCompleteRecord move_complete_record;
+  public MoveCompleteRecord move_complete_record;
 
   @ProtoField(tag = 8)
-  public final FleetUnderAttackRecord fleet_under_attack_record;
+  public FleetUnderAttackRecord fleet_under_attack_record;
 
   @ProtoField(tag = 9)
-  public final FleetDestroyedRecord fleet_destroyed_record;
+  public FleetDestroyedRecord fleet_destroyed_record;
 
   @ProtoField(tag = 10)
-  public final FleetVictoriousRecord fleet_victorious_record;
+  public FleetVictoriousRecord fleet_victorious_record;
 
   @ProtoField(tag = 11)
-  public final ColonyDestroyedRecord colony_destroyed_record;
+  public ColonyDestroyedRecord colony_destroyed_record;
 
   @ProtoField(tag = 12)
-  public final ColonyAttackedRecord colony_attacked_record;
+  public ColonyAttackedRecord colony_attacked_record;
 
   @ProtoField(tag = 13)
-  public final StarRunOutOfGoodsRecord star_ran_out_of_goods_record;
+  public StarRunOutOfGoodsRecord star_ran_out_of_goods_record;
+
+  public SituationReport() {
+  }
 
   public SituationReport(String key, String empire_key, Long report_time, String star_key, Integer planet_index, String realm, BuildCompleteRecord build_complete_record, MoveCompleteRecord move_complete_record, FleetUnderAttackRecord fleet_under_attack_record, FleetDestroyedRecord fleet_destroyed_record, FleetVictoriousRecord fleet_victorious_record, ColonyDestroyedRecord colony_destroyed_record, ColonyAttackedRecord colony_attacked_record, StarRunOutOfGoodsRecord star_ran_out_of_goods_record) {
     this.key = key;
@@ -271,16 +274,19 @@ public final class SituationReport extends Message {
     public static final String DEFAULT_BUILD_REQUEST_KEY = "";
 
     @ProtoField(tag = 1, type = ENUM)
-    public final BuildRequest.BUILD_KIND build_kind;
+    public BuildRequest.BUILD_KIND build_kind;
 
     @ProtoField(tag = 2, type = STRING)
-    public final String design_id;
+    public String design_id;
 
     @ProtoField(tag = 3, type = INT32)
-    public final Integer count;
+    public Integer count;
 
     @ProtoField(tag = 4, type = STRING)
-    public final String build_request_key;
+    public String build_request_key;
+
+    public BuildCompleteRecord() {
+    }
 
     public BuildCompleteRecord(BuildRequest.BUILD_KIND build_kind, String design_id, Integer count, String build_request_key) {
       this.build_kind = build_kind;
@@ -376,16 +382,19 @@ public final class SituationReport extends Message {
     public static final String DEFAULT_SCOUT_REPORT_KEY = "";
 
     @ProtoField(tag = 1, type = STRING)
-    public final String fleet_key;
+    public String fleet_key;
 
     @ProtoField(tag = 3, type = STRING)
-    public final String fleet_design_id;
+    public String fleet_design_id;
 
     @ProtoField(tag = 4, type = FLOAT)
-    public final Float num_ships;
+    public Float num_ships;
 
     @ProtoField(tag = 5, type = STRING)
-    public final String scout_report_key;
+    public String scout_report_key;
+
+    public MoveCompleteRecord() {
+    }
 
     public MoveCompleteRecord(String fleet_key, String fleet_design_id, Float num_ships, String scout_report_key) {
       this.fleet_key = fleet_key;
@@ -482,16 +491,19 @@ public final class SituationReport extends Message {
     public static final String DEFAULT_COMBAT_REPORT_KEY = "";
 
     @ProtoField(tag = 1, type = STRING)
-    public final String fleet_key;
+    public String fleet_key;
 
     @ProtoField(tag = 2, type = STRING)
-    public final String fleet_design_id;
+    public String fleet_design_id;
 
     @ProtoField(tag = 3, type = FLOAT)
-    public final Float num_ships;
+    public Float num_ships;
 
     @ProtoField(tag = 4, type = STRING)
-    public final String combat_report_key;
+    public String combat_report_key;
+
+    public FleetUnderAttackRecord() {
+    }
 
     public FleetUnderAttackRecord(String fleet_key, String fleet_design_id, Float num_ships, String combat_report_key) {
       this.fleet_key = fleet_key;
@@ -582,10 +594,13 @@ public final class SituationReport extends Message {
     public static final String DEFAULT_COMBAT_REPORT_KEY = "";
 
     @ProtoField(tag = 1, type = STRING)
-    public final String fleet_design_id;
+    public String fleet_design_id;
 
     @ProtoField(tag = 2, type = STRING)
-    public final String combat_report_key;
+    public String combat_report_key;
+
+    public FleetDestroyedRecord() {
+    }
 
     public FleetDestroyedRecord(String fleet_design_id, String combat_report_key) {
       this.fleet_design_id = fleet_design_id;
@@ -658,16 +673,19 @@ public final class SituationReport extends Message {
     public static final String DEFAULT_COMBAT_REPORT_KEY = "";
 
     @ProtoField(tag = 1, type = STRING)
-    public final String fleet_key;
+    public String fleet_key;
 
     @ProtoField(tag = 2, type = STRING)
-    public final String fleet_design_id;
+    public String fleet_design_id;
 
     @ProtoField(tag = 3, type = FLOAT)
-    public final Float num_ships;
+    public Float num_ships;
 
     @ProtoField(tag = 4, type = STRING)
-    public final String combat_report_key;
+    public String combat_report_key;
+
+    public FleetVictoriousRecord() {
+    }
 
     public FleetVictoriousRecord(String fleet_key, String fleet_design_id, Float num_ships, String combat_report_key) {
       this.fleet_key = fleet_key;
@@ -758,10 +776,13 @@ public final class SituationReport extends Message {
     public static final String DEFAULT_ENEMY_EMPIRE_KEY = "";
 
     @ProtoField(tag = 1, type = STRING)
-    public final String colony_key;
+    public String colony_key;
 
     @ProtoField(tag = 2, type = STRING)
-    public final String enemy_empire_key;
+    public String enemy_empire_key;
+
+    public ColonyDestroyedRecord() {
+    }
 
     public ColonyDestroyedRecord(String colony_key, String enemy_empire_key) {
       this.colony_key = colony_key;
@@ -833,13 +854,16 @@ public final class SituationReport extends Message {
     public static final Float DEFAULT_NUM_SHIPS = 0F;
 
     @ProtoField(tag = 1, type = STRING)
-    public final String colony_key;
+    public String colony_key;
 
     @ProtoField(tag = 2, type = STRING)
-    public final String enemy_empire_key;
+    public String enemy_empire_key;
 
     @ProtoField(tag = 3, type = FLOAT)
-    public final Float num_ships;
+    public Float num_ships;
+
+    public ColonyAttackedRecord() {
+    }
 
     public ColonyAttackedRecord(String colony_key, String enemy_empire_key, Float num_ships) {
       this.colony_key = colony_key;
@@ -919,7 +943,10 @@ public final class SituationReport extends Message {
     public static final String DEFAULT_COLONY_KEY = "";
 
     @ProtoField(tag = 1, type = STRING)
-    public final String colony_key;
+    public String colony_key;
+
+    public StarRunOutOfGoodsRecord() {
+    }
 
     public StarRunOutOfGoodsRecord(String colony_key) {
       this.colony_key = colony_key;

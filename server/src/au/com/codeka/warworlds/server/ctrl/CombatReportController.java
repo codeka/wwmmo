@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.Wire;
+import au.com.codeka.common.protobuf.CombatReport;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -17,7 +18,7 @@ public class CombatReportController {
         db = new DataBase(trans);
     }
 
-    public Messages.CombatReport fetchCombatReportPb(int combatReportID) throws RequestException {
+    public CombatReport fetchCombatReportPb(int combatReportID) throws RequestException {
         try {
             return db.fetchCombatReportPb(combatReportID);
         } catch(Exception e) {
@@ -33,13 +34,13 @@ public class CombatReportController {
             super(trans);
         }
 
-        public Messages.CombatReport fetchCombatReportPb(int combatReportID) throws Exception {
+        public CombatReport fetchCombatReportPb(int combatReportID) throws Exception {
             String sql = "SELECT rounds FROM combat_reports WHERE id = ?";
             try (SqlStmt stmt = DB.prepare(sql)) {
                 stmt.setInt(1, combatReportID);
                 SqlResult res = stmt.select();
                 while (res.next()) {
-                    return Messages.CombatReport.parseFrom(res.getBytes(1));
+                    return Wire.i.parseFrom(res.getBytes(1), CombatReport.class);
                 }
             }
 

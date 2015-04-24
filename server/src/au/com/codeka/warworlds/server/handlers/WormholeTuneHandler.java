@@ -1,13 +1,12 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.WormholeTuneRequest;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.ctrl.WormholeController;
-import au.com.codeka.warworlds.server.model.Alliance;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -21,12 +20,12 @@ public class WormholeTuneHandler extends RequestHandler {
             throw new RequestException(404);
         }
 
-        Messages.WormholeTuneRequest pb = getRequestBody(Messages.WormholeTuneRequest.class);
-        if (pb.getSrcStarId() != starID) {
+        WormholeTuneRequest pb = getRequestBody(WormholeTuneRequest.class);
+        if (pb.src_star_id != starID) {
             throw new RequestException(404);
         }
 
-        Star destWormhole = new StarController().getStar(pb.getDestStarId());
+        Star destWormhole = new StarController().getStar(pb.dest_star_id);
         if (destWormhole.getStarType().getType() != Star.Type.Wormhole) {
             throw new RequestException(400);
         }
@@ -52,8 +51,8 @@ public class WormholeTuneHandler extends RequestHandler {
         new WormholeController().tuneWormhole(srcWormhole, destWormhole);
 
         srcWormhole = new StarController().getStar(srcWormhole.getID());
-        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+        au.com.codeka.common.protobuf.Star star_pb = new au.com.codeka.common.protobuf.Star();
         srcWormhole.toProtocolBuffer(star_pb);
-        setResponseBody(star_pb.build());
+        setResponseBody(star_pb);
     }
 }

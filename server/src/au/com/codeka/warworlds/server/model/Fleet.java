@@ -10,7 +10,6 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class Fleet extends BaseFleet {
@@ -199,10 +198,10 @@ public class Fleet extends BaseFleet {
     }
 
     @Override
-    protected BaseFleetUpgrade createUpgrade(Messages.FleetUpgrade pb) {
+    protected BaseFleetUpgrade createUpgrade(au.com.codeka.common.protobuf.FleetUpgrade pb) {
         FleetUpgrade fleetUpgrade;
 
-        String upgradeID = pb.getUpgradeId();
+        String upgradeID = pb.upgrade_id;
         if (upgradeID.equals("boost")) {
             fleetUpgrade = new FleetUpgrade.BoostFleetUpgrade();
         } else {

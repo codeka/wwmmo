@@ -7,7 +7,10 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.Wire;
+import au.com.codeka.common.protobuf.BuildRequest;
+import au.com.codeka.common.protobuf.SituationReport;
+import au.com.codeka.common.protobuf.SituationReportFilter;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -25,15 +28,15 @@ public class SituationReportController {
         db = new DataBase(trans);
     }
 
-    public void saveSituationReport(Messages.SituationReport sitrep_pb) throws RequestException {
+    public void saveSituationReport(SituationReport sitrep_pb) throws RequestException {
         try {
             int sitrepID = db.saveSituationReport(sitrep_pb);
 
-            Messages.SituationReport new_sitrep_pb = Messages.SituationReport.newBuilder(sitrep_pb)
-                    .setKey(Integer.toString(sitrepID))
+            SituationReport new_sitrep_pb = new SituationReport.Builder(sitrep_pb)
+                    .key(Integer.toString(sitrepID))
                     .build();
 
-            int empireID = Integer.parseInt(new_sitrep_pb.getEmpireKey());
+            int empireID = Integer.parseInt(new_sitrep_pb.empire_key);
             String base64 = BaseEncoding.base64().encode(new_sitrep_pb.toByteArray());
             new NotificationController().sendNotificationToEmpire(empireID, "sitrep", base64);
         } catch (Exception e) {
@@ -41,8 +44,8 @@ public class SituationReportController {
         }
     }
 
-    public List<Messages.SituationReport> fetch(Integer empireID, Integer starID, DateTime before,
-                DateTime after, Messages.SituationReportFilter filter, int limit) throws RequestException {
+    public List<SituationReport> fetch(Integer empireID, Integer starID, DateTime before,
+                DateTime after, SituationReportFilter filter, int limit) throws RequestException {
         try {
             return db.fetch(empireID, starID, before, after, filter, limit);
         } catch(Exception e) {
@@ -50,33 +53,33 @@ public class SituationReportController {
         }
     }
 
-    private static int getEventKinds(Messages.SituationReport sitrep) {
+    private static int getEventKinds(SituationReport sitrep) {
         int kinds = 0;
-        if (sitrep.hasBuildCompleteRecord() && sitrep.getBuildCompleteRecord().getDesignId() != null) {
-            kinds += 1 << Messages.SituationReportFilter.BuildCompleteAny_VALUE;
-            if (sitrep.getBuildCompleteRecord().getBuildKind() == Messages.BuildRequest.BUILD_KIND.BUILDING) {
-                kinds += 1 << Messages.SituationReportFilter.BuildCompleteBuilding_VALUE;
+        if (sitrep.build_complete_record != null && sitrep.build_complete_record.design_id != null) {
+            kinds += 1 << SituationReportFilter.BuildCompleteAny.getValue();
+            if (sitrep.build_complete_record.build_kind == BuildRequest.BUILD_KIND.BUILDING) {
+                kinds += 1 << SituationReportFilter.BuildCompleteBuilding.getValue();
             } else {
-                kinds += 1 << Messages.SituationReportFilter.BuildCompleteShips_VALUE;
+                kinds += 1 << SituationReportFilter.BuildCompleteShips.getValue();
             }
         }
-        if (sitrep.hasMoveCompleteRecord() && sitrep.getMoveCompleteRecord().getFleetKey() != null) {
-            kinds += 1 << Messages.SituationReportFilter.MoveComplete_VALUE;
+        if (sitrep.move_complete_record != null && sitrep.move_complete_record.fleet_key != null) {
+            kinds += 1 << SituationReportFilter.MoveComplete.getValue();
         }
-        if (sitrep.hasFleetUnderAttackRecord() && sitrep.getFleetUnderAttackRecord().getFleetKey() != null) {
-            kinds += 1 << Messages.SituationReportFilter.FleetAttacked_VALUE;
+        if (sitrep.fleet_under_attack_record != null && sitrep.fleet_under_attack_record.fleet_key != null) {
+            kinds += 1 << SituationReportFilter.FleetAttacked.getValue();
         }
-        if (sitrep.hasFleetDestroyedRecord() && sitrep.getFleetDestroyedRecord().getFleetDesignId() != null) {
-            kinds += 1 << Messages.SituationReportFilter.FleetDestroyed_VALUE;
+        if (sitrep.fleet_destroyed_record != null && sitrep.fleet_destroyed_record.fleet_design_id != null) {
+            kinds += 1 << SituationReportFilter.FleetDestroyed.getValue();
         }
-        if (sitrep.hasFleetVictoriousRecord() && sitrep.getFleetVictoriousRecord().getFleetKey() != null) {
-            kinds += 1 << Messages.SituationReportFilter.FleetVictorious_VALUE;
+        if (sitrep.fleet_victorious_record != null && sitrep.fleet_victorious_record.fleet_key != null) {
+            kinds += 1 << SituationReportFilter.FleetVictorious.getValue();
         }
-        if (sitrep.hasColonyAttackedRecord() && sitrep.getColonyAttackedRecord().getColonyKey() != null) {
-            kinds += 1 << Messages.SituationReportFilter.ColonyAttacked_VALUE;
+        if (sitrep.colony_attacked_record != null && sitrep.colony_attacked_record.colony_key != null) {
+            kinds += 1 << SituationReportFilter.ColonyAttacked.getValue();
         }
-        if (sitrep.hasColonyDestroyedRecord() && sitrep.getColonyDestroyedRecord().getColonyKey() != null) {
-            kinds += 1 << Messages.SituationReportFilter.ColonyDestroyed_VALUE;
+        if (sitrep.colony_destroyed_record != null && sitrep.colony_destroyed_record.colony_key != null) {
+            kinds += 1 << SituationReportFilter.ColonyDestroyed.getValue();
         }
 
         return kinds;
@@ -90,13 +93,13 @@ public class SituationReportController {
             super(trans);
         }
 
-        public int saveSituationReport(Messages.SituationReport sitrep_pb) throws Exception {
+        public int saveSituationReport(SituationReport sitrep_pb) throws Exception {
             String sql = "INSERT INTO situation_reports (empire_id, star_id, report_time, report, event_kinds)" +
                         " VALUES (?, ?, ?, ?, ?)";
             try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setInt(1, Integer.parseInt(sitrep_pb.getEmpireKey()));
-                stmt.setInt(2, Integer.parseInt(sitrep_pb.getStarKey()));
-                stmt.setDateTime(3, new DateTime(sitrep_pb.getReportTime() * 1000, DateTimeZone.UTC));
+                stmt.setInt(1, Integer.parseInt(sitrep_pb.empire_key));
+                stmt.setInt(2, Integer.parseInt(sitrep_pb.star_key));
+                stmt.setDateTime(3, new DateTime(sitrep_pb.report_time * 1000, DateTimeZone.UTC));
                 stmt.setBytes(4, sitrep_pb.toByteArray());
                 stmt.setInt(5, getEventKinds(sitrep_pb));
                 stmt.update();
@@ -105,15 +108,15 @@ public class SituationReportController {
             }
         }
 
-        public List<Messages.SituationReport> fetch(Integer empireID, Integer starID, DateTime before,
-                DateTime after, Messages.SituationReportFilter filter, int limit) throws Exception {
+        public List<SituationReport> fetch(Integer empireID, Integer starID, DateTime before,
+                DateTime after, SituationReportFilter filter, int limit) throws Exception {
             String sql = "SELECT report, report_time" +
                         " FROM situation_reports" +
                         " WHERE report_time < ?" +
                         (after == null ? "" : " AND report_time > ?") +
                         (empireID == null ? "" : " AND empire_id = ?") +
                         (starID == null ? "" : " AND star_id = ?") +
-                        (filter == null || filter == Messages.SituationReportFilter.ShowAll ? "" : " AND event_kinds & ? > 0") +
+                        (filter == null || filter == SituationReportFilter.ShowAll ? "" : " AND event_kinds & ? > 0") +
                         " ORDER BY report_time DESC" +
                         " LIMIT "+limit;
             try (SqlStmt stmt = prepare(sql)) {
@@ -131,15 +134,15 @@ public class SituationReportController {
                     stmt.setInt(i, starID);
                     i++;
                 }
-                if (filter != null && filter != Messages.SituationReportFilter.ShowAll) {
-                    stmt.setInt(i, 1 << filter.getNumber());
+                if (filter != null && filter != SituationReportFilter.ShowAll) {
+                    stmt.setInt(i, 1 << filter.getValue());
                     i++;
                 }
                 SqlResult res = stmt.select();
 
-                ArrayList<Messages.SituationReport> reports = new ArrayList<Messages.SituationReport>();
+                ArrayList<SituationReport> reports = new ArrayList<>();
                 while (res.next()) {
-                    reports.add(Messages.SituationReport.parseFrom(res.getBytes(1)));
+                    reports.add(Wire.i.parseFrom(res.getBytes(1), SituationReport.class));
                 }
                 return reports;
             }

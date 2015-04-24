@@ -3,7 +3,10 @@ package au.com.codeka.warworlds.server.handlers;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import au.com.codeka.common.protobuf.Messages;
+import java.util.ArrayList;
+
+import au.com.codeka.common.protobuf.EmpireRank;
+import au.com.codeka.common.protobuf.EmpireRanks;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.data.DB;
@@ -28,8 +31,9 @@ public class RankingHistoryHandler extends RequestHandler {
             SqlResult res = stmt.select();
 
             int lastRank = 0;
-            Messages.EmpireRanks.Builder empire_ranks_pb = Messages.EmpireRanks.newBuilder();
-            empire_ranks_pb.setDate(new DateTime(year, month, 1, 0, 0, DateTimeZone.UTC).getMillis() / 1000);
+            EmpireRanks empire_ranks_pb = new EmpireRanks();
+            empire_ranks_pb.date = new DateTime(year, month, 1, 0, 0, DateTimeZone.UTC).getMillis() / 1000;
+            empire_ranks_pb.ranks = new ArrayList<>();
             while (res.next()) {
                 int rank = res.getInt(2);
                 if (rank == lastRank) {
@@ -37,18 +41,18 @@ public class RankingHistoryHandler extends RequestHandler {
                 }
                 lastRank = rank;
 
-                Messages.EmpireRank.Builder empire_rank_pb = Messages.EmpireRank.newBuilder();
-                empire_rank_pb.setEmpireKey(Integer.toString(res.getInt(1)));
-                empire_rank_pb.setRank(rank);
-                empire_rank_pb.setTotalStars(res.getInt(3));
-                empire_rank_pb.setTotalColonies(res.getInt(4));
-                empire_rank_pb.setTotalBuildings(res.getInt(5));
-                empire_rank_pb.setTotalShips(res.getInt(6));
-                empire_rank_pb.setTotalPopulation(res.getInt(7));
-                empire_ranks_pb.addRanks(empire_rank_pb);
+                EmpireRank empire_rank_pb = new EmpireRank();
+                empire_rank_pb.empire_key = Integer.toString(res.getInt(1));
+                empire_rank_pb.rank = rank;
+                empire_rank_pb.total_stars = res.getInt(3);
+                empire_rank_pb.total_colonies = res.getInt(4);
+                empire_rank_pb.total_buildings = res.getInt(5);
+                empire_rank_pb.total_ships = res.getInt(6);
+                empire_rank_pb.total_population = res.getInt(7);
+                empire_ranks_pb.ranks.add(empire_rank_pb);
             }
 
-            setResponseBody(empire_ranks_pb.build());
+            setResponseBody(empire_ranks_pb);
         } catch(Exception e) {
             throw new RequestException(e);
         }

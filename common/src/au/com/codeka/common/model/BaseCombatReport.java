@@ -71,7 +71,7 @@ public class BaseCombatReport {
         }
     }
 
-    public void toProtocolBuffer(CombatReport.Builder pb) {
+    public void toProtocolBuffer(CombatReport pb) {
         pb.key = mKey;
         pb.star_key = mStarKey;
         if (mStartTime != null) {

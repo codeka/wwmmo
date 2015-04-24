@@ -1,10 +1,8 @@
 package au.com.codeka.common;
 
-import com.squareup.wire.Wire;
-
 /**
  * Helper class for working with our protocol buffer messages.
  */
-public class Message {
-  public static final Wire wire = new Wire();
+public class Wire {
+  public static final com.squareup.wire.Wire i = new com.squareup.wire.Wire();
 }

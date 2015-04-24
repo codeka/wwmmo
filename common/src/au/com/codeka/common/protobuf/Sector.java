@@ -30,42 +30,45 @@ public final class Sector extends Message {
    * (1,1) is one sector up and to the right, and so on.
    */
   @ProtoField(tag = 1, type = INT64)
-  public final Long x;
+  public Long x;
 
   @ProtoField(tag = 2, type = INT64)
-  public final Long y;
+  public Long y;
 
   /**
    * number of colonies in this sector
    */
   @ProtoField(tag = 5, type = INT32)
-  public final Integer num_colonies;
+  public Integer num_colonies;
 
   /**
    * the collection of stars in this sector.
    */
   @ProtoField(tag = 3, label = REPEATED, messageType = Star.class)
-  public final List<Star> stars;
+  public List<Star> stars;
 
   /**
    * a collection of colonies in this sector (TODO: full colony details? probably not needed...)
    */
   @ProtoField(tag = 4, label = REPEATED, messageType = Colony.class)
-  public final List<Colony> colonies;
+  public List<Colony> colonies;
 
   /**
    * a collection of fleets in this sector
    */
   @ProtoField(tag = 6, label = REPEATED, messageType = Fleet.class)
-  public final List<Fleet> fleets;
+  public List<Fleet> fleets;
+
+  public Sector() {
+  }
 
   public Sector(Long x, Long y, Integer num_colonies, List<Star> stars, List<Colony> colonies, List<Fleet> fleets) {
     this.x = x;
     this.y = y;
     this.num_colonies = num_colonies;
-    this.stars = immutableCopyOf(stars);
-    this.colonies = immutableCopyOf(colonies);
-    this.fleets = immutableCopyOf(fleets);
+    this.stars = copyOf(stars);
+    this.colonies = copyOf(colonies);
+    this.fleets = copyOf(fleets);
   }
 
   private Sector(Builder builder) {

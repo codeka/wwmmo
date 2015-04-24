@@ -8,7 +8,6 @@ import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class Empire extends BaseEmpire {
@@ -74,7 +73,7 @@ public class Empire extends BaseEmpire {
     }
 
     @Override
-    protected BaseEmpireRank createEmpireRank(Messages.EmpireRank pb) {
+    protected BaseEmpireRank createEmpireRank(au.com.codeka.common.protobuf.EmpireRank pb) {
         EmpireRank er = new EmpireRank();
         if (pb != null) {
             er.fromProtocolBuffer(pb);
@@ -83,7 +82,7 @@ public class Empire extends BaseEmpire {
     }
 
     @Override
-    protected BaseStar createStar(Messages.Star pb) {
+    protected BaseStar createStar(au.com.codeka.common.protobuf.Star pb) {
         Star s = new Star();
         if (pb != null) {
             s.fromProtocolBuffer(pb);
@@ -92,7 +91,7 @@ public class Empire extends BaseEmpire {
     }
 
     @Override
-    protected BaseAlliance createAlliance(Messages.Alliance pb) {
+    protected BaseAlliance createAlliance(au.com.codeka.common.protobuf.Alliance pb) {
         Alliance a = new Alliance();
         if (pb != null) {
             a.fromProtocolBuffer(pb);

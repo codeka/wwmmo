@@ -19,10 +19,13 @@ public final class Sectors extends Message {
   public static final List<Sector> DEFAULT_SECTORS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = Sector.class)
-  public final List<Sector> sectors;
+  public List<Sector> sectors;
+
+  public Sectors() {
+  }
 
   public Sectors(List<Sector> sectors) {
-    this.sectors = immutableCopyOf(sectors);
+    this.sectors = copyOf(sectors);
   }
 
   private Sectors(Builder builder) {

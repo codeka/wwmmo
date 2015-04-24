@@ -14,10 +14,13 @@ public final class WormholeTuneRequest extends Message {
   public static final Integer DEFAULT_DEST_STAR_ID = 0;
 
   @ProtoField(tag = 1, type = INT32)
-  public final Integer src_star_id;
+  public Integer src_star_id;
 
   @ProtoField(tag = 2, type = INT32)
-  public final Integer dest_star_id;
+  public Integer dest_star_id;
+
+  public WormholeTuneRequest() {
+  }
 
   public WormholeTuneRequest(Integer src_star_id, Integer dest_star_id) {
     this.src_star_id = src_star_id;

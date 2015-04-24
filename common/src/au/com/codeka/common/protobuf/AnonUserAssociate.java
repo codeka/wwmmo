@@ -17,7 +17,10 @@ public final class AnonUserAssociate extends Message {
   public static final String DEFAULT_USER_EMAIL = "";
 
   @ProtoField(tag = 1, type = STRING)
-  public final String user_email;
+  public String user_email;
+
+  public AnonUserAssociate() {
+  }
 
   public AnonUserAssociate(String user_email) {
     this.user_email = user_email;

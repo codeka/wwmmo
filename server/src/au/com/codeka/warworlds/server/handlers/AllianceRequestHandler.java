@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
@@ -15,14 +14,15 @@ public class AllianceRequestHandler extends RequestHandler {
         int requestID = Integer.parseInt(getUrlParameter("requestid"));
         int empireID = getSession().getEmpireID();
 
-        Messages.AllianceRequestVote vote_pb = getRequestBody(Messages.AllianceRequestVote.class);
-        if (vote_pb.getAllianceRequestId() != requestID) {
+        au.com.codeka.common.protobuf.AllianceRequestVote vote_pb =
+                getRequestBody(au.com.codeka.common.protobuf.AllianceRequestVote.class);
+        if (vote_pb.alliance_request_id != requestID) {
             throw new RequestException(400, "RequestID does not match.");
         }
-        if (vote_pb.getAllianceId() != allianceID) {
+        if (vote_pb.alliance_id != allianceID) {
             throw new RequestException(400, "AllianceID does not match.");
         }
-        if (vote_pb.hasEmpireId() && vote_pb.getEmpireId() != empireID) {
+        if (vote_pb.empire_id == null || vote_pb.empire_id != empireID) {
             throw new RequestException(400, "EmpireID does not match.");
         }
 

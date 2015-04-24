@@ -15,10 +15,13 @@ public final class Fleets extends Message {
   public static final List<Fleet> DEFAULT_FLEETS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = Fleet.class)
-  public final List<Fleet> fleets;
+  public List<Fleet> fleets;
+
+  public Fleets() {
+  }
 
   public Fleets(List<Fleet> fleets) {
-    this.fleets = immutableCopyOf(fleets);
+    this.fleets = copyOf(fleets);
   }
 
   private Fleets(Builder builder) {

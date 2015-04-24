@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.SituationReport;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
@@ -78,14 +78,14 @@ public class ColonyController {
         float remainingShips = totalTroopCarriers - colonyDefence;
         float remainingPopulation = colony.getPopulation() - (totalTroopCarriers * 4.0f / colony.getDefenceBoost());
 
-        Messages.SituationReport.Builder sitrep_pb = null;
+        SituationReport.Builder sitrep_pb = null;
         if (colony.getEmpireID() != null) {
-            sitrep_pb = Messages.SituationReport.newBuilder();
-            sitrep_pb.setRealm(Configuration.i.getRealmName());
-            sitrep_pb.setEmpireKey(Integer.toString(colony.getEmpireID()));
-            sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
-            sitrep_pb.setStarKey(star.getKey());
-            sitrep_pb.setPlanetIndex(colony.getPlanetIndex());
+            sitrep_pb = new SituationReport.Builder();
+            sitrep_pb.realm = Configuration.i.getRealmName();
+            sitrep_pb.empire_key = Integer.toString(colony.getEmpireID());
+            sitrep_pb.report_time = DateTime.now().getMillis() / 1000;
+            sitrep_pb.star_key = star.getKey();
+            sitrep_pb.planet_index = colony.getPlanetIndex();
         }
 
         if (remainingPopulation <= 0.0f) {
@@ -122,10 +122,11 @@ public class ColonyController {
             }
 
             if (sitrep_pb != null) {
-                Messages.SituationReport.ColonyDestroyedRecord.Builder colony_destroyed_pb = Messages.SituationReport.ColonyDestroyedRecord.newBuilder();
-                colony_destroyed_pb.setColonyKey(colony.getKey());
-                colony_destroyed_pb.setEnemyEmpireKey(Integer.toString(empireID));
-                sitrep_pb.setColonyDestroyedRecord(colony_destroyed_pb);
+                SituationReport.ColonyDestroyedRecord.Builder colony_destroyed_pb =
+                        new SituationReport.ColonyDestroyedRecord.Builder();
+                colony_destroyed_pb.colony_key = colony.getKey();
+                colony_destroyed_pb.enemy_empire_key = Integer.toString(empireID);
+                sitrep_pb.colony_destroyed_record = colony_destroyed_pb.build();
             }
         } else {
             log.info("Fleets destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
@@ -136,11 +137,12 @@ public class ColonyController {
             }
 
             if (sitrep_pb != null) {
-                Messages.SituationReport.ColonyAttackedRecord.Builder colony_attacked_pb = Messages.SituationReport.ColonyAttackedRecord.newBuilder();
-                colony_attacked_pb.setColonyKey(colony.getKey());
-                colony_attacked_pb.setEnemyEmpireKey(Integer.toString(empireID));
-                colony_attacked_pb.setNumShips(totalTroopCarriers);
-                sitrep_pb.setColonyAttackedRecord(colony_attacked_pb);
+                SituationReport.ColonyAttackedRecord.Builder colony_attacked_pb =
+                        new SituationReport.ColonyAttackedRecord.Builder();
+                colony_attacked_pb.colony_key = colony.getKey();
+                colony_attacked_pb.enemy_empire_key = Integer.toString(empireID);
+                colony_attacked_pb.num_ships = totalTroopCarriers;
+                sitrep_pb.colony_attacked_record = colony_attacked_pb.build();
             }
         }
 

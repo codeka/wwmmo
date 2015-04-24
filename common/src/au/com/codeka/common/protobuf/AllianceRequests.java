@@ -17,13 +17,16 @@ public final class AllianceRequests extends Message {
   public static final String DEFAULT_CURSOR = "";
 
   @ProtoField(tag = 1, label = REPEATED, messageType = AllianceRequest.class)
-  public final List<AllianceRequest> requests;
+  public List<AllianceRequest> requests;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String cursor;
+  public String cursor;
+
+  public AllianceRequests() {
+  }
 
   public AllianceRequests(List<AllianceRequest> requests, String cursor) {
-    this.requests = immutableCopyOf(requests);
+    this.requests = copyOf(requests);
     this.cursor = cursor;
   }
 

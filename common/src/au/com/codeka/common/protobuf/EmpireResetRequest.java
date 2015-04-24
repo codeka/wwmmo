@@ -13,7 +13,10 @@ public final class EmpireResetRequest extends Message {
   private static final long serialVersionUID = 0L;
 
   @ProtoField(tag = 1)
-  public final PurchaseInfo purchase_info;
+  public PurchaseInfo purchase_info;
+
+  public EmpireResetRequest() {
+  }
 
   public EmpireResetRequest(PurchaseInfo purchase_info) {
     this.purchase_info = purchase_info;

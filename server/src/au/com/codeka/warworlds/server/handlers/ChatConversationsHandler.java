@@ -1,6 +1,9 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import au.com.codeka.common.protobuf.Messages;
+import java.util.ArrayList;
+
+import au.com.codeka.common.protobuf.ChatConversations;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.ChatController;
@@ -15,39 +18,43 @@ public class ChatConversationsHandler extends RequestHandler {
     protected void get() throws RequestException {
         int empireID = getSession().getEmpireID();
 
-        Messages.ChatConversations.Builder conversations_pb = Messages.ChatConversations.newBuilder();
+        ChatConversations.Builder conversations_pb = new ChatConversations.Builder();
+        conversations_pb.conversations = new ArrayList<>();
         for (ChatConversation conversation : new ChatController().getConversationsForEmpire(empireID)) {
-            Messages.ChatConversation.Builder conversation_pb = Messages.ChatConversation.newBuilder();
+            au.com.codeka.common.protobuf.ChatConversation conversation_pb =
+                    new au.com.codeka.common.protobuf.ChatConversation();
             conversation.toProtocolBuffer(conversation_pb);
-            conversations_pb.addConversations(conversation_pb);
+            conversations_pb.conversations.add(conversation_pb);
         }
         setResponseBody(conversations_pb.build());
     }
 
     @Override
     protected void post() throws RequestException {
-        Messages.ChatConversation pb = getRequestBody(Messages.ChatConversation.class);
+        au.com.codeka.common.protobuf.ChatConversation pb =
+                getRequestBody(au.com.codeka.common.protobuf.ChatConversation.class);
 
         int empireID1 = getSession().getEmpireID();
-        if (pb.getParticipantsCount() > 2 || pb.getParticipantsCount() < 1) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.InvalidConversation, "Cannot start new conversation.");
+        if (pb.participants.size() > 2 || pb.participants.size() < 1) {
+            throw new RequestException(400, GenericError.ErrorCode.InvalidConversation, "Cannot start new conversation.");
         }
         int empireID2 = 0;
-        if (pb.getParticipantsCount() > 1 && pb.getParticipants(0).getEmpireId() == empireID1) {
-            empireID2 = pb.getParticipants(1).getEmpireId();
-        } else if (pb.getParticipantsCount() > 1 && pb.getParticipants(1).getEmpireId() != empireID1) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.InvalidConversation, "Cannot start new conversation.");
+        if (pb.participants.size() > 1 && pb.participants.get(0).empire_id == empireID1) {
+            empireID2 = pb.participants.get(1).empire_id;
+        } else if (pb.participants.size() > 1 && pb.participants.get(1).empire_id != empireID1) {
+            throw new RequestException(400, GenericError.ErrorCode.InvalidConversation, "Cannot start new conversation.");
         } else {
-            empireID2 = pb.getParticipants(0).getEmpireId();
+            empireID2 = pb.participants.get(0).empire_id;
         }
 
         try (Transaction t = DB.beginTransaction()) {
 
             ChatConversation conversation = new ChatController(t).createConversation(empireID1, empireID2);
 
-            Messages.ChatConversation.Builder conversation_pb = Messages.ChatConversation.newBuilder();
+            au.com.codeka.common.protobuf.ChatConversation conversation_pb =
+                    new au.com.codeka.common.protobuf.ChatConversation();
             conversation.toProtocolBuffer(conversation_pb);
-            setResponseBody(conversation_pb.build());
+            setResponseBody(conversation_pb);
 
             t.commit();
         } catch(Exception e) {

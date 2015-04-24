@@ -20,10 +20,13 @@ public final class Planets extends Message {
   public static final List<Planet> DEFAULT_PLANETS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = Planet.class)
-  public final List<Planet> planets;
+  public List<Planet> planets;
+
+  public Planets() {
+  }
 
   public Planets(List<Planet> planets) {
-    this.planets = immutableCopyOf(planets);
+    this.planets = copyOf(planets);
   }
 
   private Planets(Builder builder) {

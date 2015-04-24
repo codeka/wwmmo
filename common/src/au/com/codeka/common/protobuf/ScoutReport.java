@@ -28,31 +28,34 @@ public final class ScoutReport extends Message {
    * the identifier of this scout report, generally not needed by clients
    */
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   /**
    * the identifier of the empire who owns this report
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String empire_key;
+  public String empire_key;
 
   /**
    * the identifier of the star this report is for
    */
   @ProtoField(tag = 3, type = STRING)
-  public final String star_key;
+  public String star_key;
 
   /**
    * the date (in Unix epoch format) this report was taken
    */
   @ProtoField(tag = 5, type = INT64)
-  public final Long date;
+  public Long date;
 
   /**
    * a serialized Star protobuf containing the "data" of this report.
    */
   @ProtoField(tag = 4, type = BYTES)
-  public final ByteString star_pb;
+  public ByteString star_pb;
+
+  public ScoutReport() {
+  }
 
   public ScoutReport(String key, String empire_key, String star_key, Long date, ByteString star_pb) {
     this.key = key;

@@ -85,7 +85,7 @@ public class BaseChatMessage {
         mProfanityLevel = pb.profanity_level == null ? 0 : pb.profanity_level;
     }
 
-    public void toProtocolBuffer(ChatMessage.Builder pb, boolean encodeHtml) {
+    public void toProtocolBuffer(ChatMessage pb, boolean encodeHtml) {
         pb.id = mID;
         if (encodeHtml) {
             pb.message = HtmlEscapers.htmlEscaper().escape(mMessage);

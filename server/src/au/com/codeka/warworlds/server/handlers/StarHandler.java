@@ -2,7 +2,7 @@ package au.com.codeka.warworlds.server.handlers;
 
 import java.util.ArrayList;
 
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.StarRenameRequest;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
@@ -37,25 +37,24 @@ public class StarHandler extends RequestHandler {
 
     setCacheTime(24, star.getLastSimulation().toString());
 
-    Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+    au.com.codeka.common.protobuf.Star star_pb = new au.com.codeka.common.protobuf.Star();
     star.toProtocolBuffer(star_pb);
-    setResponseBody(star_pb.build());
+    setResponseBody(star_pb);
   }
 
   @Override
   protected void put() throws RequestException {
-    Messages.StarRenameRequest star_rename_request_pb =
-        getRequestBody(Messages.StarRenameRequest.class);
-    if (!star_rename_request_pb.getStarKey().equals(getUrlParameter("starid"))) {
+    StarRenameRequest star_rename_request_pb = getRequestBody(StarRenameRequest.class);
+    if (!star_rename_request_pb.star_key.equals(getUrlParameter("starid"))) {
       throw new RequestException(404);
     }
     int starID = Integer.parseInt(getUrlParameter("starid"));
 
-    if (star_rename_request_pb.getNewName().trim().equals("")) {
+    if (star_rename_request_pb.new_name.trim().equals("")) {
       throw new RequestException(400);
     }
 
-    if (!star_rename_request_pb.hasPurchaseInfo()) {
+    if (star_rename_request_pb.purchase_info == null) {
       // if there's no purchase info then you must be renaming a wormhole, and it must be
       // one belonging to your alliance.
       Star star = new StarController().getStar(starID);
@@ -72,22 +71,22 @@ public class StarHandler extends RequestHandler {
 
     String sql = "UPDATE stars SET name = ? WHERE id = ?";
     try (SqlStmt stmt = DB.prepare(sql)) {
-      stmt.setString(1, star_rename_request_pb.getNewName().trim());
+      stmt.setString(1, star_rename_request_pb.new_name.trim());
       stmt.setInt(2, starID);
       stmt.update();
     } catch (Exception e) {
       throw new RequestException(e);
     }
 
-    if (star_rename_request_pb.hasPurchaseInfo()) {
+    if (star_rename_request_pb.purchase_info != null) {
       new PurchaseController()
-          .addPurchase(getSession().getEmpireID(), star_rename_request_pb.getPurchaseInfo(),
+          .addPurchase(getSession().getEmpireID(), star_rename_request_pb.purchase_info,
               star_rename_request_pb);
     }
 
     Star star = new StarController().getStar(starID);
-    Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+    au.com.codeka.common.protobuf.Star star_pb = new au.com.codeka.common.protobuf.Star();
     star.toProtocolBuffer(star_pb);
-    setResponseBody(star_pb.build());
+    setResponseBody(star_pb);
   }
 }

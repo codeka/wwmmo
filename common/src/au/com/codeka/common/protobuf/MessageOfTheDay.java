@@ -17,10 +17,13 @@ public final class MessageOfTheDay extends Message {
   public static final String DEFAULT_LAST_UPDATE = "";
 
   @ProtoField(tag = 1, type = STRING)
-  public final String message;
+  public String message;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String last_update;
+  public String last_update;
+
+  public MessageOfTheDay() {
+  }
 
   public MessageOfTheDay(String message, String last_update) {
     this.message = message;

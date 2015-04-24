@@ -32,58 +32,61 @@ public final class ErrorReport extends Message {
   public static final String DEFAULT_SERVER_REQUEST_USER_AGENT = "";
 
   @ProtoField(tag = 1, type = STRING)
-  public final String android_version;
+  public String android_version;
 
   @ProtoField(tag = 2, type = STRING)
-  public final String phone_model;
+  public String phone_model;
 
   @ProtoField(tag = 3, type = STRING)
-  public final String package_name;
+  public String package_name;
 
   @ProtoField(tag = 4, type = STRING)
-  public final String app_version;
+  public String app_version;
 
   @ProtoField(tag = 5, type = STRING)
-  public final String stack_trace;
+  public String stack_trace;
 
   @ProtoField(tag = 6, type = STRING)
-  public final String message;
+  public String message;
 
   @ProtoField(tag = 7, type = INT64)
-  public final Long report_time;
+  public Long report_time;
 
   @ProtoField(tag = 8, type = INT32)
-  public final Integer empire_id;
+  public Integer empire_id;
 
   @ProtoField(tag = 9, type = STRING)
-  public final String context;
+  public String context;
 
   @ProtoField(tag = 10, type = STRING)
-  public final String exception_class;
+  public String exception_class;
 
   @ProtoField(tag = 11, type = INT64)
-  public final Long heap_size;
+  public Long heap_size;
 
   @ProtoField(tag = 12, type = INT64)
-  public final Long heap_allocated;
+  public Long heap_allocated;
 
   @ProtoField(tag = 13, type = INT64)
-  public final Long heap_free;
+  public Long heap_free;
 
   @ProtoField(tag = 14, type = INT64)
-  public final Long total_run_time;
+  public Long total_run_time;
 
   @ProtoField(tag = 15, type = INT64)
-  public final Long foreground_run_time;
+  public Long foreground_run_time;
 
   @ProtoField(tag = 16, type = STRING)
-  public final String log_output;
+  public String log_output;
 
   @ProtoField(tag = 17, type = STRING)
-  public final String server_request_qs;
+  public String server_request_qs;
 
   @ProtoField(tag = 18, type = STRING)
-  public final String server_request_user_agent;
+  public String server_request_user_agent;
+
+  public ErrorReport() {
+  }
 
   public ErrorReport(String android_version, String phone_model, String package_name, String app_version, String stack_trace, String message, Long report_time, Integer empire_id, String context, String exception_class, Long heap_size, Long heap_allocated, Long heap_free, Long total_run_time, Long foreground_run_time, String log_output, String server_request_qs, String server_request_user_agent) {
     this.android_version = android_version;

@@ -19,10 +19,13 @@ public final class BuildQueue extends Message {
   public static final List<BuildRequest> DEFAULT_REQUESTS = Collections.emptyList();
 
   @ProtoField(tag = 1, label = REPEATED, messageType = BuildRequest.class)
-  public final List<BuildRequest> requests;
+  public List<BuildRequest> requests;
+
+  public BuildQueue() {
+  }
 
   public BuildQueue(List<BuildRequest> requests) {
-    this.requests = immutableCopyOf(requests);
+    this.requests = copyOf(requests);
   }
 
   private BuildQueue(Builder builder) {

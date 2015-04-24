@@ -43,7 +43,7 @@ public class BaseAllianceMember {
         }
     }
 
-    public void toProtocolBuffer(AllianceMember.Builder pb) {
+    public void toProtocolBuffer(AllianceMember pb) {
         pb.key = mKey;
         pb.alliance_key = mAllianceKey;
         pb.empire_key = mEmpireKey;

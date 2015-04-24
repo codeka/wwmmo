@@ -39,29 +39,29 @@ public final class Colony extends Message {
    * The key of this colony, which you can use to refer to it directly.
    */
   @ProtoField(tag = 1, type = STRING)
-  public final String key;
+  public String key;
 
   /**
    * The key of the empire that owns this colony.
    */
   @ProtoField(tag = 2, type = STRING)
-  public final String empire_key;
+  public String empire_key;
 
   /**
    * The key of the planet and star this colony belongs to.
    */
   @ProtoField(tag = 4, type = STRING)
-  public final String star_key;
+  public String star_key;
 
   @ProtoField(tag = 14, type = INT32)
-  public final Integer planet_index;
+  public Integer planet_index;
 
   /**
    * In the backend, population is actually stored as a floating point value, but
    * we don't care about that kind of accuracy.
    */
   @ProtoField(tag = 5, type = FLOAT)
-  public final Float population;
+  public Float population;
 
   /**
    * Time, in seconds since Unix epoch, that this colony was last simulated (i.e.
@@ -69,63 +69,66 @@ public final class Colony extends Message {
    * NOT_USED_ANY_MORE
    */
   @ProtoField(tag = 6, type = INT64)
-  public final Long DEPRECATED_last_simulation;
+  public Long DEPRECATED_last_simulation;
 
   /**
    * The "focus" of this colony. These numbers must add up to 1.0 and represent
    * the percentage of the population that is focused on the given task.
    */
   @ProtoField(tag = 7, type = FLOAT)
-  public final Float focus_population;
+  public Float focus_population;
 
   @ProtoField(tag = 8, type = FLOAT)
-  public final Float focus_farming;
+  public Float focus_farming;
 
   @ProtoField(tag = 9, type = FLOAT)
-  public final Float focus_mining;
+  public Float focus_mining;
 
   @ProtoField(tag = 10, type = FLOAT)
-  public final Float focus_construction;
+  public Float focus_construction;
 
   /**
    * After simulating, these will contain the delta values (i.e. how much do the goods
    * or whatever changed in this colony) per hour.
    */
   @ProtoField(tag = 11, type = FLOAT)
-  public final Float delta_population;
+  public Float delta_population;
 
   @ProtoField(tag = 12, type = FLOAT)
-  public final Float delta_goods;
+  public Float delta_goods;
 
   @ProtoField(tag = 13, type = FLOAT)
-  public final Float delta_minerals;
+  public Float delta_minerals;
 
   /**
    * Amount of uncollected taxes this colony has generated
    */
   @ProtoField(tag = 15, type = FLOAT)
-  public final Float uncollected_taxes;
+  public Float uncollected_taxes;
 
   /**
    * The colony's defence bonus, which when multiplied by one quarter of
    * the population gives the colony's total defence score.
    */
   @ProtoField(tag = 16, type = FLOAT)
-  public final Float defence_bonus;
+  public Float defence_bonus;
 
   /**
    * When all bonuses and what-not are applies, what is this colony's maximum
    * population?
    */
   @ProtoField(tag = 17, type = FLOAT)
-  public final Float max_population;
+  public Float max_population;
 
   /**
    * If set, this is the time the "cooldown" period ends. While in cooldown, the colony will
    * not lose population
    */
   @ProtoField(tag = 18, type = INT64)
-  public final Long cooldown_end_time;
+  public Long cooldown_end_time;
+
+  public Colony() {
+  }
 
   public Colony(String key, String empire_key, String star_key, Integer planet_index, Float population, Long DEPRECATED_last_simulation, Float focus_population, Float focus_farming, Float focus_mining, Float focus_construction, Float delta_population, Float delta_goods, Float delta_minerals, Float uncollected_taxes, Float defence_bonus, Float max_population, Long cooldown_end_time) {
     this.key = key;

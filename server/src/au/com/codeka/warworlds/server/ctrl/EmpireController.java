@@ -16,7 +16,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.protobuf.CashAuditRecord;
+import au.com.codeka.common.protobuf.GenericError;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -179,17 +180,17 @@ public class EmpireController {
   }
 
   public boolean withdrawCash(int empireId, float amount,
-      Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
+      CashAuditRecord.Builder audit_record_pb) throws RequestException {
     return adjustBalance(empireId, -amount, audit_record_pb);
   }
 
   public void depositCash(int empireId, float amount,
-      Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
+      CashAuditRecord.Builder audit_record_pb) throws RequestException {
     adjustBalance(empireId, amount, audit_record_pb);
   }
 
   public boolean adjustBalance(int empireId, float amount,
-      Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
+      CashAuditRecord.Builder audit_record_pb) throws RequestException {
     if (Float.isNaN(amount)) {
       throw new RequestException(500, "Amount is NaN!");
     }
@@ -215,9 +216,9 @@ public class EmpireController {
         return false;
       }
 
-      audit_record_pb.setBeforeCash((float) cashBefore);
-      audit_record_pb.setAfterCash((float) (cashBefore + amount));
-      audit_record_pb.setTime(DateTime.now().getMillis() / 1000);
+      audit_record_pb.before_cash((float) cashBefore);
+      audit_record_pb.after_cash((float) (cashBefore + amount));
+      audit_record_pb.time(DateTime.now().getMillis() / 1000);
 
       stmt = t.prepare("UPDATE empires SET cash = cash + ? WHERE id = ?");
       stmt.setDouble(1, amount);
@@ -252,7 +253,7 @@ public class EmpireController {
 
   public void createEmpire(Empire empire) throws RequestException {
     if (empire.getDisplayName().trim().equals("")) {
-      throw new RequestException(400, Messages.GenericError.ErrorCode.CannotCreateEmpireBlankName,
+      throw new RequestException(400, GenericError.ErrorCode.CannotCreateEmpireBlankName,
           "You must give your empire a name.");
     }
 
@@ -470,18 +471,12 @@ public class EmpireController {
         }
       } catch (SQLException e) {
         if (SqlStateTranslater.isConstraintViolation(e)) {
-          // this can actually be one of two things, either the empire name is
-          // already taken,
-          // or the user's email address is not actually unique. The former is
-          // far more likey
+          // this can actually be one of two things, either the empire name is already taken,
+          // or the user's email address is not actually unique. The former is far more likely
           // than the latter, though
-          throw new RequestException(
-              400,
-              Messages.GenericError.ErrorCode.EmpireNameExists,
-              String
-                  .format(
-                      "The empire name you've chosen, '%s' already exists. Please choose a different name.",
-                      empire.getDisplayName()));
+          throw new RequestException(400, GenericError.ErrorCode.EmpireNameExists,
+              String.format("The empire name you've chosen, '%s' already exists. "
+                  +" Please choose a different name.", empire.getDisplayName()));
         } else {
           throw new RequestException(e);
         }
