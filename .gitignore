@@ -27,3 +27,8 @@ local.properties
 # build artifacts go.
 /build
 /*/build/
+
+
+#Ignore generated android code
+** gen/
+gen/
