@@ -11,9 +11,9 @@
 
     <!-- Only this application can receive the messages and registration result -->
     <permission
-        android:name="au.com.codeka.warworlds.permission.C2D_MESSAGE"
+        android:name="${applicationId}.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
-    <uses-permission android:name="au.com.codeka.warworlds.permission.C2D_MESSAGE" />
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
 
     <!-- Permission to register and receive data messages -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
