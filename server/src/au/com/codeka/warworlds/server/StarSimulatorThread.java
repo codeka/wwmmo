@@ -74,6 +74,9 @@ public class StarSimulatorThread {
       }
 
       if (waitTimeMs > 0) {
+        if (waitTimeMs > WAIT_TIME_ERROR) {
+          waitTimeMs = WAIT_TIME_ERROR;
+        }
         log.info(String
             .format("Waiting %d seconds before simulating next star.", waitTimeMs / 1000));
         try {
