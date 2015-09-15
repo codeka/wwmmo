@@ -524,20 +524,32 @@ public class StarController {
             }
 
             if (needDelete) {
-                ArrayList<BaseColony> toRemove = new ArrayList<BaseColony>();
+                ArrayList<BaseColony> toRemove = new ArrayList<>();
+                for (BaseColony colony : star.getColonies()) {
+                    if (colony.getPopulation() > MIN_POPULATION) {
+                      continue;
+                    }
+                    toRemove.add(colony);
+                }
+
+                sql = "DELETE FROM build_requests WHERE colony_id = ?";
+                try (SqlStmt stmt = prepare(sql)) {
+                    for (BaseColony colony : toRemove) {
+                        stmt.setInt(1, ((Colony) colony).getID());
+                        stmt.update();
+                    }
+                }
+
                 sql = "DELETE FROM colonies WHERE id = ?";
                 try (SqlStmt stmt = prepare(sql)) {
-                    for (BaseColony colony : star.getColonies()) {
-                        if (colony.getPopulation() > MIN_POPULATION) {
-                            continue;
-                        }
+                    for (BaseColony colony : toRemove) {
                         stmt.setInt(1, ((Colony) colony).getID());
                         stmt.update();
                         toRemove.add(colony);
                     }
-
-                    star.getColonies().removeAll(toRemove);
                 }
+
+                star.getColonies().removeAll(toRemove);
             }
         }
 

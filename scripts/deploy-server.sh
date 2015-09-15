@@ -12,5 +12,5 @@ pushd $ROOTPATH > /dev/null
 popd > /dev/null
 
 # copy the file from the build location to the server
-scp $DISTPATH dean@game.war-worlds.com:/home/dean
+scp $DISTPATH wwmmo@213.163.74.8:/home/wwmmo
 
