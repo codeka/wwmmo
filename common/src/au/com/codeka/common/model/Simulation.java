@@ -78,12 +78,16 @@ public class Simulation {
         DateTime startTime = getSimulateStartTime(star);
         if (startTime == null) {
             // Nothing worth simulating...
+            sNumSimulations --;
             return;
         }
 
-        // if the start time is in the future, actually start it now.
+        // if the start time is far in the future, don't do anything, if it's only a little bit
+        // in the future then just simulate it from now.
         if (startTime.isAfter(now.plusSeconds(30))) {
-            throw new IllegalStateException("Start time is too far in the future");
+            star.setLastSimulation(startTime);
+            sNumSimulations --;
+            return;
         }
         if (startTime.isAfter(now)) {
             startTime = now.minusSeconds(1);
