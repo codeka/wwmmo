@@ -154,8 +154,6 @@ public class TexturedMesh extends Shape {
     // ===========================================================
     protected static float[] buildVertexList(float[] pVertexX, float[] pVertexY)
     {
-        assert( pVertexX.length == pVertexY.length );
-
         float[] bufferData = new float[TexturedMesh.VERTEX_SIZE * pVertexX.length];
         updateVertexList(pVertexX, pVertexY, bufferData);
         return bufferData;

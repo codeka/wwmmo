@@ -38,7 +38,7 @@ public class CombatReportController {
             try (SqlStmt stmt = DB.prepare(sql)) {
                 stmt.setInt(1, combatReportID);
                 SqlResult res = stmt.select();
-                while (res.next()) {
+                if (res.next()) {
                     return Messages.CombatReport.parseFrom(res.getBytes(1));
                 }
             }

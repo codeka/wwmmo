@@ -174,11 +174,9 @@ public class SqlStmt implements AutoCloseable {
         logStatement();
         mStmt.execute();
 
-        do {
-            SqlResult res = new SqlResult(mStmt.getResultSet());
-            mResults.add(res);
-            return res;
-        } while (mStmt.getMoreResults());
+        SqlResult res = new SqlResult(mStmt.getResultSet());
+        mResults.add(res);
+        return res;
     }
 
     private void logStatement() {

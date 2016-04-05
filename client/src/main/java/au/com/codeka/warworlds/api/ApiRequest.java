@@ -93,7 +93,11 @@ public class ApiRequest {
       try {
         Method m = responseClass.getDeclaredMethod("parseFrom", byte[].class);
         responseProto = (Message) m.invoke(null, new Object[] {responseBytes});
-      } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+      } catch (NoSuchMethodException e) {
+        log.error("Unexpected error parsing response.", e);
+      } catch (InvocationTargetException e) { // These must be split out to support < KITKAT
+        log.error("Unexpected error parsing response.", e);
+      } catch (IllegalAccessException e) { // These must be split out to support < KITKAT
         log.error("Unexpected error parsing response.", e);
       }
     } else if (responseProto == null) {

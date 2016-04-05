@@ -147,8 +147,8 @@ public class AllianceActivity extends TabFragmentActivity {
         }
 
         @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
+        public void onAttach(Context context) {
+            super.onAttach(context);
             AllianceManager.eventBus.register(mEventHandler);
             ShieldManager.eventBus.register(mEventHandler);
         }
@@ -323,8 +323,8 @@ public class AllianceActivity extends TabFragmentActivity {
         private boolean mFetching;
 
         @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
+        public void onAttach(Context context) {
+            super.onAttach(context);
             AllianceManager.eventBus.register(mEventHandler);
             ShieldManager.eventBus.register(mEventHandler);
         }

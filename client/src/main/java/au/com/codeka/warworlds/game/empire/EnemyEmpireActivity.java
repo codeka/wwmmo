@@ -100,7 +100,7 @@ public class EnemyEmpireActivity extends BaseActivity {
 
     @Override
     protected void onStop() {
-        super.onStart();
+        super.onStop();
         ShieldManager.eventBus.unregister(mEventHandler);
         EmpireManager.eventBus.unregister(mEventHandler);
     }

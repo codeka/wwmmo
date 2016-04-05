@@ -82,7 +82,7 @@ public class PurchaseManager {
                                 try {
                                     SharedPreferences prefs = Util.getSharedPreferences();
                                     prefs.edit().putString("au.com.codeka.warworlds.PurchaseInventory", inv.toJson())
-                                         .commit();
+                                         .apply();
                                 } catch (JSONException e) {
                                     // ignore... for now
                                 }

@@ -43,6 +43,8 @@ public class PlanetDetailsView extends FrameLayout {
 
     @Override
     public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
         if (isInEditMode()) {
             return;
         }

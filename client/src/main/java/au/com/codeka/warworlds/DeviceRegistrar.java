@@ -98,6 +98,6 @@ public class DeviceRegistrar {
     final SharedPreferences settings = Util.getSharedPreferences();
     SharedPreferences.Editor editor = settings.edit();
     editor.remove("DeviceRegistrar.registrationKey");
-    editor.commit();
+    editor.apply();
   }
 }

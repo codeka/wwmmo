@@ -63,7 +63,7 @@ public class GlobalOptions {
 
         mPreferences.edit()
                     .putString("GlobalOptions.StarfieldDetail", detail.toString())
-                    .commit();
+                    .apply();
     }
 
     public boolean uniqueStarsAndPlanets() {
@@ -76,7 +76,7 @@ public class GlobalOptions {
     public void autoTranslateChatMessages(boolean value) {
         mPreferences.edit()
                     .putBoolean("GlobalOptions.AutoTranslateChatMessages", value)
-                    .commit();
+                    .apply();
     }
 
     public ChatProfanityFilterLevel chatProfanityFilterLevel() {
@@ -87,7 +87,7 @@ public class GlobalOptions {
     public void chatProfanityFilterLevel(ChatProfanityFilterLevel level) {
         mPreferences.edit()
                     .putString("GlobalOptions.ChatProfanityFilterLevel", level.toString())
-                    .commit();
+                    .apply();
     }
 
     public AutoSendCrashReport getAutoSendCrashReport() {
@@ -99,7 +99,7 @@ public class GlobalOptions {
     public void setAutoSendCrashReport(AutoSendCrashReport value) {
         mPreferences.edit()
                     .putString("GlobalOptions.AutoSendCrashReports", value.toString())
-                    .commit();
+                    .apply();
     }
 
     public boolean notificationsEnabled() {
@@ -160,7 +160,7 @@ public class GlobalOptions {
         String name = "GlobalOptions.MutedConversations["+RealmContext.i.getCurrentRealm().getID()+"]";
         mPreferences.edit()
                     .putString(name, sb.toString())
-                    .commit();
+                    .apply();
     }
 
     public boolean isConversationMuted(int convID) {
