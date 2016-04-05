@@ -47,7 +47,7 @@ public class Point2D {
     }
 
     public float scalarLength() {
-        return FloatMath.sqrt(x*x + y*y);
+        return (float) Math.sqrt(x*x + y*y);
     }
 
     public float distanceTo(Point2D other) {
@@ -57,8 +57,8 @@ public class Point2D {
     }
 
     public void rotate(float radians) {
-        float nx = (float)(x*FloatMath.cos(radians) - y*FloatMath.sin(radians));
-        float ny = (float)(y*FloatMath.cos(radians) + x*FloatMath.sin(radians));
+        float nx = (float)(x*Math.cos(radians) - y*Math.sin(radians));
+        float ny = (float)(y*Math.cos(radians) + x*Math.sin(radians));
         x = nx;
         y = ny;
     }

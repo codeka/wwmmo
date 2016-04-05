@@ -11,11 +11,11 @@ repositories {
 
 dependencies {
   compile fileTree(include: '*.jar', dir: 'libs')
-  compile 'com.google.android.gms:play-services-base:6.5.87'
-  compile 'com.google.android.gms:play-services-ads:6.5.87'
-  compile 'com.android.support:multidex:1.0.0'
-  compile 'com.android.support:support-v4:21.0.3'
-  compile 'com.android.support:appcompat-v7:21.0.3'
+  compile 'com.google.android.gms:play-services-base:8.4.0'
+  compile 'com.google.android.gms:play-services-ads:8.4.0'
+  compile 'com.android.support:multidex:1.0.1'
+  compile 'com.android.support:support-v4:23.2.1'
+  compile 'com.android.support:appcompat-v7:23.2.1'
   compile 'com.squareup.okhttp:okhttp:2.2.0'
   compile project(':common')
   compile project(':control-field')
@@ -23,13 +23,16 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    // TODO: remove the dependency on this.
+    useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         multiDexEnabled true
         minSdkVersion 9
-        targetSdkVersion 21
+        targetSdkVersion 23
     }
 
     packagingOptions {
@@ -43,6 +46,10 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    dexOptions {
+        javaMaxHeapSize "2g"
     }
 
     signingConfigs {
