@@ -10,6 +10,7 @@ import android.widget.TextView;
 import au.com.codeka.Cash;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.RequestManager;
+import au.com.codeka.warworlds.api.RequestManagerState;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -60,22 +61,17 @@ public class InfobarView extends FrameLayout {
   };
 
   /** Must be run on the UI thread. */
-  private void refresh() {
+  private void refresh(RequestManagerState requestManagerState) {
     if (isInEditMode()) {
       return;
     }
 
     ProgressBar working = (ProgressBar) view.findViewById(R.id.working);
-
-    // We will always have one busy request for the notification long-poll,
-    // but
-    // that one doesn't really count.
-    //TODO
-    //if (state.numInProgressRequests > 1) {
-   //   working.setVisibility(View.VISIBLE);
-    //} else {
+    if (requestManagerState.numInflightRequests > 0) {
+      working.setVisibility(View.VISIBLE);
+    } else {
       working.setVisibility(View.GONE);
-    //}
+    }
   }
 
   @Override
@@ -87,6 +83,7 @@ public class InfobarView extends FrameLayout {
     handler = new Handler();
 
     EmpireManager.eventBus.register(eventHandler);
+    RequestManager.eventBus.register(eventHandler);
 
     refreshEmpire(EmpireManager.i.getEmpire());
   }
@@ -98,6 +95,7 @@ public class InfobarView extends FrameLayout {
       return;
     }
 
+    RequestManager.eventBus.unregister(eventHandler);
     EmpireManager.eventBus.unregister(eventHandler);
   }
 
@@ -119,14 +117,18 @@ public class InfobarView extends FrameLayout {
     }
 
     // set up the initial state
-    //TODO
-    //refresh(RequestManager.getCurrentState());
+    refresh(RequestManager.i.getCurrentState());
   }
 
   private Object eventHandler = new Object() {
     @EventHandler
     public void onEmpireUpdated(Empire empire) {
       refreshEmpire(empire);
+    }
+
+    @EventHandler(thread = EventHandler.UI_THREAD)
+    public void onRequestManagerStateChanged(RequestManagerState requestManagerState) {
+      refresh(requestManagerState);
     }
   };
 }

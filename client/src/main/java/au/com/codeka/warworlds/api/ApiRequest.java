@@ -107,6 +107,10 @@ public class ApiRequest {
     return (T) responseProto;
   }
 
+  public String url() {
+    return url;
+  }
+
   /**
    * Returns the body of the response, as a String. If the Content-Type isn't text/* then null is
    * returned instead.

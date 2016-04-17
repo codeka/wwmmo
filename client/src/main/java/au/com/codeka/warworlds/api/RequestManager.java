@@ -30,6 +30,7 @@ import au.com.codeka.warworlds.eventbus.EventBus;
  */
 public class RequestManager {
   public static final RequestManager i = new RequestManager();
+  public static final EventBus eventBus = new EventBus();
 
   private static final Log log = new Log("RequestManager");
   private static final boolean DBG = true;
@@ -76,6 +77,10 @@ public class RequestManager {
     }
   }
 
+  public RequestManagerState getCurrentState() {
+    return calculateState();
+  }
+
   /**
    * Enqueues the given request to send to the server. The request's callbacks will be called
    * when the request actually completes.
@@ -87,6 +92,7 @@ public class RequestManager {
       } else {
         waitingRequests.push(apiRequest);
       }
+      updateState();
     }
   }
 
@@ -152,6 +158,7 @@ public class RequestManager {
           enqueueRequest(nextRequest);
         }
       }
+      updateState();
     }
   }
 
@@ -160,6 +167,7 @@ public class RequestManager {
     if (DBG) log.info(">> %s", apiRequest);
     apiRequest.getTiming().onRequestSent();
     httpClient.newCall(apiRequest.buildOkRequest()).enqueue(responseCallback);
+    updateState();
   }
 
   private Callback responseCallback = new Callback() {
@@ -174,4 +182,23 @@ public class RequestManager {
       handleResponse(request, response);
     }
   };
+
+  private void updateState() {
+    eventBus.publish(calculateState());
+  }
+
+  private RequestManagerState calculateState() {
+    int numInflightRequests;
+
+    synchronized (lock) {
+      numInflightRequests = inFlightRequests.size();
+      for (ApiRequest request : inFlightRequests) {
+        if (request.url().contains("/notifications")) {
+          numInflightRequests--;
+        }
+      }
+    }
+
+    return new RequestManagerState(numInflightRequests);
+  }
 }
