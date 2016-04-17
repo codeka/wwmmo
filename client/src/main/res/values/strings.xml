@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">War Worlds</string>
+    <string name="app_name_debug">War Worlds (dev)</string>
 
     <!--  Some common button labels -->
     <string name="cancel">Cancel</string>

@@ -62,11 +62,13 @@ android {
     }
 
     buildTypes {
-		debug {
-			debuggable true
-			applicationIdSuffix ".debug"
-		}
+        debug {
+            debuggable true
+            manifestPlaceholders = [ applicationLabel: "@string/app_name_debug" ]
+            applicationIdSuffix ".debug"
+        }
         release {
+            manifestPlaceholders = [ applicationLabel: "@string/app_name" ]
             signingConfig signingConfigs.release
         }
     }
