@@ -124,6 +124,10 @@ public class Star extends BaseStar {
   }
 
   public int getID() {
+    if (mKey.isEmpty()) {
+      // Shouldn't happen, but sometimes it does?
+      return 0;
+    }
     return Integer.parseInt(mKey);
   }
 
