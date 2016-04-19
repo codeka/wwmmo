@@ -1,2 +1,2 @@
-include ':server', ':client'
+include ':server', ':client', ':common'
 

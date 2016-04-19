@@ -27,5 +27,37 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="common" exported="" />
+    <orderEntry type="library" exported="" name="cdi-core-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="cdi-servlet-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="cdi-websocket-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-alpn-server-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-annotations-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-client-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-continuation-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-deploy-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-gcloud-session-manager-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-http-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-infinispan-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-io-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-jaas-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-jaspi-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-jmx-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-jndi-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-nosql-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-plus-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-proxy-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-quickstart-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-rewrite-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-schemas-3.1" level="project" />
+    <orderEntry type="library" exported="" name="jetty-security-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-server-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-servlet-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-servlets-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-util-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-webapp-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="jetty-xml-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="servlet-api-3.1" level="project" />
+    <orderEntry type="library" exported="" name="server.server" level="project" />
   </component>
 </module>
