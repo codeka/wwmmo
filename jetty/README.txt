@@ -6,57 +6,63 @@ and Servlet Container from the eclipse foundation
 
   http://www.eclipse.org/jetty/
 
-Jetty is open source and is dual licensed using the apache 2.0 and
-eclipse public license 1.0.   You may choose either license when distributing
-jetty.
-
-
-
-BUILDING JETTY
-==============
-Jetty uses maven 2 as its build system.  Maven will fetch
-the dependancies, build the server and assemble a runnable
-version:
-
-  mvn install
-
+Jetty is open source and is dual licensed using the Apache 2.0 and
+Eclipse Public License 1.0.   You may choose either license when
+distributing Jetty.
 
 
 RUNNING JETTY
 =============
 The run directory is either the top-level of a binary release
-or jetty-distribution/target/assembly-prep directory when built from
+or jetty-distribution/target/distribution directory when built from
 source.
 
 To run with the default options:
 
-  java -jar start.jar
+  $ cd demo-base
+  $ java -jar ../start.jar
 
 To see the available options and the default arguments
 provided by the start.ini file:
 
-  java -jar start.jar --help
+  $ java -jar /path/to/start.jar --help
 
 
-Most start options can be configured in the start.ini file or they can be appended to the start line.
+Many Jetty features can be enabled by using the --module command
+For example:
 
-To run with extra configuration file(s) appended, eg SSL
+  $ cd mybase
+  $ java -jar /path/to/start.jar --module=https,deploy
 
-  java -jar start.jar etc/jetty-https.xml
+Will enable the https and deploy modules (and their transitive
+dependencies) temporarily for this specific run of Jetty.
 
-To run with properties 
+To see what modules are available
 
-  java -jar start.jar jetty.port=8081
+  $ java -jar /path/to/start.jar --list-modules
 
-To run with extra configuration file(s) prepended, eg logging & jmx
 
-  java -jar start.jar --pre=etc/jetty-logging.xml --pre=etc/jetty-jmx.xml 
 
-To run without the args from start.ini 
+JETTY BASE
+==========
 
-  java -jar start.jar --ini OPTIONS=Server,websocket etc/jetty.xml etc/jetty-deploy.xml etc/jetty-ssl.xml
+The jetty.base property is a property that can be defined on the
+command line (defaults to what your java 'user.dir' property points to)
+Jetty's start.jar mechanism will configure your jetty instance from
+the configuration present in this jetty.base directory.
 
-to list the know OPTIONS:
+Example setup:
 
-  java -jar start.jar --list-options
+# Create the base directory
+  
+  $ mkdir mybase
+  $ cd mybase
+  
+# Initialize the base directory's start.ini and needed directories
+
+  $ java -jar /path/to/jetty-dist/start.jar --add-to-start=http,deploy
+  
+# Run this base directory configuration
+ 
+  $ java -jar /path/to/jetty-dist/start.jar
 
