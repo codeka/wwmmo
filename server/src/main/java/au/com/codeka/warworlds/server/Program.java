@@ -2,7 +2,10 @@ package au.com.codeka.warworlds.server;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.io.IOException;
 
@@ -11,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.server.websock.GameWebSocketServlet;
 
 public class Program {
   private static final Log log = new Log("Runner");
@@ -52,24 +56,23 @@ public class Program {
     //starSimulatorThreadManager.start();
 
     int port = 8080;//Configuration.i.getListenPort();
-    Server server = new Server(port);
-    server.setHandler(new RequestRouter());
+
+    Server server = new Server();
+    ServerConnector connector = new ServerConnector(server);
+    connector.setPort(port);
+    server.addConnector(connector);
+
+    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+    context.setContextPath("/");
+    server.setHandler(context);
+
+    ServletHolder holderEvents = new ServletHolder("conn", GameWebSocketServlet.class);
+    context.addServlet(holderEvents, "/conn");
+
     server.start();
     log.info("Server started on http://localhost:%d/", port);
     server.join();
 
     //starSimulatorThreadManager.stop();
-  }
-
-  public static class RequestRouter extends AbstractHandler {
-    @Override
-    public void handle(
-        String s,
-        Request request,
-        HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse)
-        throws IOException, ServletException {
-      log.info(request.getRequestURI());
-    }
   }
 }

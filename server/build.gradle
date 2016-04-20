@@ -1,7 +1,12 @@
 apply plugin: 'java'
 
+repositories {
+  mavenCentral()
+}
+
 dependencies {
   compile fileTree(dir: '../jetty/lib', include: ['*.jar'])
+  compile fileTree(dir: '../jetty/lib/websocket', include: ['*.jar'])
   compile fileTree(dir: 'libs', include: ['*.jar'])
   compile project(':common')
 }

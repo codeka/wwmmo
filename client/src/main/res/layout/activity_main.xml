@@ -11,6 +11,7 @@
     tools:context="au.com.codeka.warworlds.client.MainActivity">
 
   <TextView
+      android:id="@+id/msg"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="Hello World!"/>

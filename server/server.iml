@@ -58,6 +58,14 @@
     <orderEntry type="library" exported="" name="jetty-webapp-9.3.8.v20160314" level="project" />
     <orderEntry type="library" exported="" name="jetty-xml-9.3.8.v20160314" level="project" />
     <orderEntry type="library" exported="" name="servlet-api-3.1" level="project" />
+    <orderEntry type="library" exported="" name="javax-websocket-client-impl-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="javax-websocket-server-impl-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="javax.websocket-api-1.0" level="project" />
+    <orderEntry type="library" exported="" name="websocket-api-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="websocket-client-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="websocket-common-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="websocket-server-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="websocket-servlet-9.3.8.v20160314" level="project" />
     <orderEntry type="library" exported="" name="server.server" level="project" />
   </component>
 </module>
