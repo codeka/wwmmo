@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:baselineAligned="false">
+
+  <ImageView
+      android:id="@+id/title_icon"
+      android:layout_width="50dp"
+      android:layout_height="50dp"
+      android:layout_margin="5dp"
+      android:src="@drawable/app_icon"/>
+
+  <TextView
+      android:id="@+id/title"
+      style="@style/TitleText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentEnd="true"
+      android:layout_alignParentRight="true"
+      android:layout_alignParentTop="true"
+      android:layout_toEndOf="@+id/title_icon"
+      android:layout_toRightOf="@+id/title_icon"
+      android:text="@string/app_name"/>
+
+  <Button
+      android:id="@+id/start_btn"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:layout_alignParentBottom="true"
+      android:layout_marginBottom="5dp"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp"
+      android:layout_marginTop="5dp"
+      android:text="@string/start"/>
+
+  <LinearLayout
+      android:id="@+id/button_wrapper"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_above="@+id/start_btn"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp"
+      android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/help_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:text="@string/how_to_play"/>
+
+    <Button
+        android:id="@+id/privacy_policy_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:text="@string/privacy_policy"/>
+  </LinearLayout>
+
+  <au.com.codeka.warworlds.client.ctrl.TransparentWebView
+      android:id="@+id/welcome"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_above="@id/button_wrapper"
+      android:layout_below="@id/title"
+      android:layout_marginBottom="10dp"
+      android:layout_marginLeft="@dimen/tablet_margin"
+      android:layout_marginRight="@dimen/tablet_margin"
+      android:layout_marginTop="10dp"/>
+</RelativeLayout>

@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
@@ -11,6 +12,7 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 
 import java.io.IOException;
 
+import au.com.codeka.warworlds.client.welcome.WarmWelcomeFragment;
 import au.com.codeka.warworlds.common.Log;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,7 +23,14 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    TextView tv = Preconditions.checkNotNull((TextView) findViewById(R.id.msg));
+    if (savedInstanceState == null) {
+      WarmWelcomeFragment warmWelcomeFragment = new WarmWelcomeFragment();
+      getSupportFragmentManager()
+          .beginTransaction()
+          .add(R.id.fragment_container, warmWelcomeFragment)
+          .commit();
+    }
+
     WebSocketFactory factory = new WebSocketFactory();
     try {
       WebSocket ws = factory.createSocket("ws://192.168.1.3:8080/conn");
@@ -29,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
       //ws.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
       ws.connectAsynchronously();
     } catch (IOException e) {
-      tv.setText(e.getMessage());
+      //tv.setText(e.getMessage());
     }
   }
 }

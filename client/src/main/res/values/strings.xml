@@ -1,3 +1,7 @@
 <resources>
   <string name="app_name">War Worlds</string>
+
+  <string name="start">Start</string>
+  <string name="how_to_play">How to Play</string>
+  <string name="privacy_policy">Privacy Policy</string>
 </resources>

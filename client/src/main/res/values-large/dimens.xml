@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <dimen name="tablet_margin">80dp</dimen>
+  <dimen name="tablet_margin_5dp">80dp</dimen>
+  <dimen name="tablet_margin_10dp">80dp</dimen>
+</resources>

@@ -1,11 +1,77 @@
-<resources>
-
-  <!-- Base application theme. -->
-  <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-    <!-- Customize your theme here. -->
-    <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-    <item name="colorAccent">@color/colorAccent</item>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+  <style name="Button" parent="android:style/Widget.Button">
+    <item name="android:background">@drawable/button_bg</item>
+    <item name="android:textColor">#ffffff</item>
   </style>
 
+  <style name="ImageButton" parent="android:style/Widget.ImageButton">
+    <item name="android:background">@drawable/button_bg</item>
+    <item name="android:textColor">#ffffff</item>
+  </style>
+
+  <style name="Spinner" parent="android:style/Widget.Spinner">
+    <item name="android:background">@drawable/spinner_bg</item>
+    <item name="android:textColor">#ffffff</item>
+    <item name="android:layout_marginTop">6dp</item>
+    <item name="android:layout_marginBottom">6dp</item>
+    <item name="android:layout_marginLeft">2dp</item>
+    <item name="android:layout_marginRight">2dp</item>
+  </style>
+
+  <style name="Dialog">
+    <item name="android:background">@drawable/dialog_bg</item>
+  </style>
+
+  <style name="BottomPane">
+    <item name="android:background">@drawable/bottom_pane_bg</item>
+  </style>
+
+  <style name="TopPane">
+    <item name="android:background">@drawable/top_pane_bg</item>
+  </style>
+
+  <style name="ActionBar" parent="Widget.AppCompat.ActionBar">
+    <item name="android:background">@drawable/top_pane_bg</item>
+    <item name="background">@drawable/top_pane_bg</item>
+    <item name="android:layout_marginBottom">-10dp</item>
+  </style>
+
+  <style name="RightPane">
+    <item name="android:background">@drawable/right_pane_bg</item>
+  </style>
+
+  <style name="TitleText" parent="android:style/TextAppearance">
+    <item name="android:textSize">42sp</item>
+    <item name="android:textStyle">bold</item>
+    <item name="android:textColor">#fff</item>
+    <item name="android:shadowColor">#000</item>
+    <item name="android:shadowDx">2.0</item>
+    <item name="android:shadowDy">2.0</item>
+    <item name="android:shadowRadius">1.0</item>
+  </style>
+
+  <style name="WarWorlds" parent="@style/Theme.AppCompat">
+    <item name="android:windowBackground">@color/default_background</item>
+
+    <item name="buttonStyle">@style/Button</item>
+    <item name="android:buttonStyle">@style/Button</item>
+    <item name="imageButtonStyle">@style/ImageButton</item>
+    <item name="android:imageButtonStyle">@style/ImageButton</item>
+    <item name="spinnerStyle">@style/Spinner</item>
+    <item name="android:spinnerStyle">@style/Spinner</item>
+
+    <item name="actionBarStyle">@style/ActionBar</item>
+
+    <!-- Make the action bar overlay the window, instead of pushing everything down. We then
+         have to manually push things down that we don't want hidden by it. This makes our
+         little offset in the top pane image look right and not have an ugly gray
+         background. -->
+    <item name="windowActionBarOverlay">true</item>
+  </style>
+
+  <style name="WarWorlds.NoActionBar" parent="WarWorlds">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+  </style>
 </resources>
