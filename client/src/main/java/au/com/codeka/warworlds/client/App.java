@@ -13,6 +13,7 @@ public class App extends Application {
   public void onCreate() {
     super.onCreate();
     LogImpl.setup();
+    //Util.setup(context);
     log.info("App.onCreate() complete.");
   }
 }

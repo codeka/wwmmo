@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal"
+    android:baselineAligned="false" >
+
+    <ImageView
+        android:id="@+id/title_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:src="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/title_icon"
+        android:layout_toEndOf="@+id/title_icon"
+        android:text="@string/app_name"
+        style="@style/TitleText" />
+
+    <Button
+        android:id="@+id/website_btn"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_marginEnd="@dimen/tablet_margin_5dp"
+        android:layout_below="@+id/title_icon"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:text="@string/website" />
+
+    <Button
+        android:id="@+id/help_btn"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginStart="@dimen/tablet_margin_5dp"
+        android:layout_below="@+id/title_icon"
+        android:layout_toLeftOf="@id/website_btn"
+        android:layout_toStartOf="@id/website_btn"
+        android:text="@string/how_to_play" />
+
+    <TextView
+        android:id="@+id/empire_name"
+        android:layout_width="135dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/website_btn"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_marginEnd="@dimen/tablet_margin_5dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ImageView
+        android:id="@+id/empire_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/website_btn"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_toLeftOf="@id/empire_name"
+        android:layout_toStartOf="@id/empire_name" />
+
+    <TextView
+        android:id="@+id/realm_name"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/help_btn"
+        android:layout_toLeftOf="@+id/empire_icon"
+        android:layout_toStartOf="@+id/empire_icon"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginStart="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:text="@string/realm_label"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/reauth_btn"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_marginEnd="@dimen/tablet_margin_5dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/empire_name"
+        android:text="@string/switch_user" />
+    
+    <Button
+        android:id="@+id/realm_select_btn"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginStart="@dimen/tablet_margin_5dp"
+        android:layout_toLeftOf="@+id/reauth_btn"
+        android:layout_toStartOf="@+id/reauth_btn"
+        android:layout_below="@id/realm_name"
+        android:text="@string/switch_realm" />
+
+    <Button
+        android:id="@+id/options_btn"
+        android:layout_width="330dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:text="@string/options" />
+
+    <Button
+        android:id="@+id/start_game_btn"
+        android:layout_width="330dp"
+        android:layout_height="40dp"
+        android:layout_above="@id/options_btn"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:text="@string/start_game" />
+
+    <TextView
+        android:id="@+id/connection_status"
+        android:layout_width="330dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/start_game_btn"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_marginEnd="@dimen/tablet_margin_5dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="center" />
+
+    <au.com.codeka.warworlds.client.ctrl.TransparentWebView
+        android:id="@+id/motd"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/title_icon"
+        android:layout_toLeftOf="@+id/start_game_btn"
+        android:layout_toStartOf="@+id/start_game_btn"
+        android:layout_marginLeft="@dimen/tablet_margin"
+        android:layout_marginStart="@dimen/tablet_margin"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp" />
+
+</RelativeLayout>
