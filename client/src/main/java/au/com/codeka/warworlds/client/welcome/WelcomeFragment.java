@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,7 @@ import java.text.DecimalFormat;
 import java.util.Locale;
 
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.common.Log;
 
@@ -26,7 +26,7 @@ import au.com.codeka.warworlds.common.Log;
  * The "Welcome" activity is what you see when you first start the game, it has a view for showing
  * news, letting you change your empire and so on.
  */
-public class WelcomeFragment extends Fragment {
+public class WelcomeFragment extends BaseFragment {
   private static final Log log = new Log("WelcomeFragment");
   private Button startGameButton;
   private TextView connectionStatus;
