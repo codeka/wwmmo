@@ -1,17 +1,21 @@
 package au.com.codeka.warworlds.client.activity;
 
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.transition.TransitionInflater;
+import android.view.View;
 
 import com.google.common.base.Preconditions;
 
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.common.Log;
 
 /**
  * Manages transitions between fragments in a {@link BaseFragmentActivity}.
  */
 public class FragmentTransitionManager {
+  private static final Log log = new Log("FragmentTransitionManager");
   private final BaseFragmentActivity activity;
   private final int fragmentContainerId;
 
@@ -24,23 +28,39 @@ public class FragmentTransitionManager {
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
   public void replaceFragment(Class<? extends BaseFragment> fragmentClass) {
+    replaceFragment(fragmentClass, null);
+  }
+
+  /** Replace the current fragment stack with a new instance of the given fragment class. */
+  public void replaceFragment(Class<? extends BaseFragment> fragmentClass,
+      @Nullable SharedViewHolder sharedViews) {
     BaseFragment fragment = createFragment(fragmentClass);
+    FragmentTransaction trans = activity.getSupportFragmentManager().beginTransaction();
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       fragment.setSharedElementEnterTransition(Transitions.transform());
       fragment.setSharedElementReturnTransition(Transitions.transform());
       fragment.setEnterTransition(Transitions.fade());
       fragment.setExitTransition(Transitions.fade());
+    } else {
+      trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+      trans.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
-    FragmentTransaction trans = activity.getSupportFragmentManager().beginTransaction();
+    if (sharedViews != null) {
+      for (SharedViewHolder.SharedView sharedView : sharedViews.getSharedViews()) {
+        View v = activity.findViewById(sharedView.getViewId());
+        if (v == null) {
+          log.warning("No shared view with id #%d for transition to '%s' in %s.",
+              sharedView.getViewId(), sharedView.getTransitionName(),
+              fragmentClass.getSimpleName());
+          continue;
+        }
+        trans.addSharedElement(v, sharedView.getTransitionName());
+      }
+    }
+
     if (currFragment != null) {
-     // trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-     // trans.setCustomAnimations(R.anim.grow_fade_in, R.anim.shrink_fade_out);
-      trans.addSharedElement(activity.findViewById(R.id.help_btn), "help_btn_trans");
-      trans.addSharedElement(activity.findViewById(R.id.title), "title_trans");
-      trans.addSharedElement(activity.findViewById(R.id.privacy_policy_btn), "website_btn_trans");
-      trans.addSharedElement(activity.findViewById(R.id.start_btn), "start_btn_trans");
-      trans.addSharedElement(activity.findViewById(R.id.title_icon), "title_icon_trans");
       trans.replace(fragmentContainerId, fragment);
       trans.addToBackStack(null);
     } else {

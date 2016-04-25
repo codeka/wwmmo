@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
+import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
@@ -42,7 +43,15 @@ public class WarmWelcomeFragment extends BaseFragment {
             .commit();
 
         // and move to the Welcome fragment
-        getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
+        getFragmentTransitionManager().replaceFragment(
+            WelcomeFragment.class,
+            SharedViewHolder.builder()
+                .addSharedView(R.id.help_btn, "help_btn")
+                .addSharedView(R.id.privacy_policy_btn, "website_btn")
+                .addSharedView(R.id.start_btn, "start_btn")
+                .addSharedView(R.id.title_icon, "title_icon")
+                .addSharedView(R.id.title, "title")
+                .build());
       }
     });
 
