@@ -29,11 +29,11 @@ public class MainActivity extends BaseFragmentActivity {
     createFragmentTransitionManager(R.id.fragment_container);
 
     if (savedInstanceState == null) {
-      if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
+     // if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
         getFragmentTransitionManager().replaceFragment(WarmWelcomeFragment.class);
-      } else {
-        getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
-      }
+     // } else {
+     //   getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
+     // }
     }
 
     WebSocketFactory factory = new WebSocketFactory();

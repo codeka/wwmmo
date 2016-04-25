@@ -22,14 +22,18 @@ public class WarmWelcomeFragment extends BaseFragment {
   @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
-    View rootView = inflater.inflate(R.layout.frag_warm_welcome, container, false);
-    ViewBackgroundGenerator.setBackground(rootView);
+    return inflater.inflate(R.layout.frag_warm_welcome, container, false);
+  }
 
-    TransparentWebView welcome = (TransparentWebView) rootView.findViewById(R.id.welcome);
+  @Override
+  public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    ViewBackgroundGenerator.setBackground(view);
+
+    TransparentWebView welcome = (TransparentWebView) view.findViewById(R.id.welcome);
     String msg = TransparentWebView.getHtmlFile(getContext(), "html/warm-welcome.html");
     welcome.loadHtml("html/skeleton.html", msg);
 
-    rootView.findViewById(R.id.start_btn).setOnClickListener(new View.OnClickListener() {
+    view.findViewById(R.id.start_btn).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         // save the fact that we've finished the warm welcome
@@ -42,7 +46,7 @@ public class WarmWelcomeFragment extends BaseFragment {
       }
     });
 
-    rootView.findViewById(R.id.help_btn).setOnClickListener(new View.OnClickListener() {
+    view.findViewById(R.id.help_btn).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         Intent i = new Intent(Intent.ACTION_VIEW);
@@ -51,7 +55,7 @@ public class WarmWelcomeFragment extends BaseFragment {
       }
     });
 
-    rootView.findViewById(R.id.privacy_policy_btn).setOnClickListener(new View.OnClickListener() {
+    view.findViewById(R.id.privacy_policy_btn).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         Intent i = new Intent(Intent.ACTION_VIEW);
@@ -59,7 +63,5 @@ public class WarmWelcomeFragment extends BaseFragment {
         startActivity(i);
       }
     });
-
-    return rootView;
   }
 }

@@ -34,21 +34,25 @@ public class WelcomeFragment extends BaseFragment {
   private TextView realmName;
 
   @Override
+  @Nullable
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
-    View rootView = inflater.inflate(R.layout.frag_welcome, container, false);
-    ViewBackgroundGenerator.setBackground(rootView);
+    return inflater.inflate(R.layout.frag_welcome, container, false);
+  }
 
-    startGameButton =
-        (Button) Preconditions.checkNotNull(rootView.findViewById(R.id.start_game_btn));
+  @Override
+  public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+    ViewBackgroundGenerator.setBackground(view);
+
+    startGameButton = (Button) Preconditions.checkNotNull(view.findViewById(R.id.start_btn));
+    realmName = (TextView) Preconditions.checkNotNull(view.findViewById(R.id.realm_name));
     connectionStatus =
-        (TextView) Preconditions.checkNotNull(rootView.findViewById(R.id.connection_status));
-    realmName =
-        (TextView) Preconditions.checkNotNull(rootView.findViewById(R.id.realm_name));
+        (TextView) Preconditions.checkNotNull(view.findViewById(R.id.connection_status));
     final Button realmSelectButton =
-        (Button) Preconditions.checkNotNull(rootView.findViewById(R.id.realm_select_btn));
+        (Button) Preconditions.checkNotNull(view.findViewById(R.id.realm_select_btn));
     final Button optionsButton =
-        (Button) Preconditions.checkNotNull(rootView.findViewById(R.id.options_btn));
+        (Button) Preconditions.checkNotNull(view.findViewById(R.id.options_btn));
 
     refreshWelcomeMessage();
 
@@ -72,7 +76,7 @@ public class WelcomeFragment extends BaseFragment {
       }
     });
 
-    Preconditions.checkNotNull(rootView.findViewById(R.id.help_btn)).setOnClickListener(
+    Preconditions.checkNotNull(view.findViewById(R.id.help_btn)).setOnClickListener(
         new View.OnClickListener() {
           @Override
           public void onClick(View v) {
@@ -82,7 +86,7 @@ public class WelcomeFragment extends BaseFragment {
           }
         });
 
-    Preconditions.checkNotNull(rootView.findViewById(R.id.website_btn)).setOnClickListener(
+    Preconditions.checkNotNull(view.findViewById(R.id.website_btn)).setOnClickListener(
         new View.OnClickListener() {
           @Override
           public void onClick(View v) {
@@ -92,15 +96,13 @@ public class WelcomeFragment extends BaseFragment {
           }
         });
 
-    Preconditions.checkNotNull(rootView.findViewById(R.id.reauth_btn)).setOnClickListener(
+    Preconditions.checkNotNull(view.findViewById(R.id.reauth_btn)).setOnClickListener(
         new View.OnClickListener() {
           @Override
           public void onClick(View v) {
             onReauthClick();
           }
         });
-
-    return rootView;
   }
 
   @Override

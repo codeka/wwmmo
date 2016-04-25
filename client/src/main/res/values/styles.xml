@@ -51,7 +51,7 @@
     <item name="android:shadowRadius">1.0</item>
   </style>
 
-  <style name="WarWorlds" parent="@style/Theme.AppCompat">
+  <style name="WarWorlds.Base" parent="Theme.AppCompat">
     <item name="android:windowBackground">@color/default_background</item>
 
     <item name="buttonStyle">@style/Button</item>
@@ -62,12 +62,17 @@
     <item name="android:spinnerStyle">@style/Spinner</item>
 
     <item name="actionBarStyle">@style/ActionBar</item>
-
     <!-- Make the action bar overlay the window, instead of pushing everything down. We then
          have to manually push things down that we don't want hidden by it. This makes our
          little offset in the top pane image look right and not have an ugly gray
          background. -->
     <item name="windowActionBarOverlay">true</item>
+  </style>
+
+  <style name="WarWorlds" parent="WarWorlds.Base">
+  </style>
+
+  <style name="WarWorlds.ActionBar" parent="WarWorlds">
   </style>
 
   <style name="WarWorlds.NoActionBar" parent="WarWorlds">
