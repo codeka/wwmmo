@@ -1,22 +1,16 @@
 package au.com.codeka.warworlds.client;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
 import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 
 import java.io.IOException;
 
 import au.com.codeka.warworlds.client.activity.BaseFragmentActivity;
-import au.com.codeka.warworlds.client.util.GameSettings;
+import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.welcome.WarmWelcomeFragment;
-import au.com.codeka.warworlds.client.welcome.WelcomeFragment;
 import au.com.codeka.warworlds.common.Log;
 
 public class MainActivity extends BaseFragmentActivity {
@@ -27,6 +21,10 @@ public class MainActivity extends BaseFragmentActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     createFragmentTransitionManager(R.id.fragment_container);
+
+    RenderSurfaceView renderSurfaceView =
+        (RenderSurfaceView) Preconditions.checkNotNull(findViewById(R.id.render_surface));
+    renderSurfaceView.setRenderer();
 
     if (savedInstanceState == null) {
      // if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
