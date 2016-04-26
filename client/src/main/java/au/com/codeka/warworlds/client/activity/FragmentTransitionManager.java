@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.client.activity;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
-import android.transition.TransitionInflater;
 import android.view.View;
 
 import com.google.common.base.Preconditions;

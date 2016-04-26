@@ -14,11 +14,26 @@ import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
+import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
+import au.com.codeka.warworlds.client.util.BackgroundRunner;
+import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.common.Log;
 
@@ -28,10 +43,15 @@ import au.com.codeka.warworlds.common.Log;
  */
 public class WelcomeFragment extends BaseFragment {
   private static final Log log = new Log("WelcomeFragment");
+
+  /** URL of RSS content to fetch and display in the motd view. */
+  private static final String MOTD_RSS = "http://www.war-worlds.com/forum/announcements/rss";
+
   private Button startGameButton;
   private TextView connectionStatus;
 //  private HelloWatcher helloWatcher;
   private TextView realmName;
+  private TransparentWebView motdView;
 
   @Override
   @Nullable
@@ -47,6 +67,7 @@ public class WelcomeFragment extends BaseFragment {
 
     startGameButton = (Button) Preconditions.checkNotNull(view.findViewById(R.id.start_btn));
     realmName = (TextView) Preconditions.checkNotNull(view.findViewById(R.id.realm_name));
+    motdView = (TransparentWebView) Preconditions.checkNotNull(view.findViewById(R.id.motd));
     connectionStatus =
         (TextView) Preconditions.checkNotNull(view.findViewById(R.id.connection_status));
     final Button realmSelectButton =
@@ -191,25 +212,23 @@ public class WelcomeFragment extends BaseFragment {
         .create().show();*/
   }
 
-  private void refreshWelcomeMessage() {/*
+  private void refreshWelcomeMessage() {
     new BackgroundRunner<Document>() {
       @Override
       protected Document doInBackground() {
-        String url = (String) Util.getProperties().get("welcome.rss");
         try {
           // we have to use the built-in one because our special version assume all requests go
           // to the game server...
-          HttpClient httpClient = new DefaultHttpClient();
-          HttpGet get = new HttpGet(url);
-          get.addHeader(HTTP.USER_AGENT, "wwmmo/" + Util.getVersion());
-          HttpResponse response = httpClient.execute(new HttpGet(url));
-          if (response.getStatusLine().getStatusCode() == 200) {
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setValidating(false);
-
-            DocumentBuilder builder = builderFactory.newDocumentBuilder();
-            return builder.parse(response.getEntity().getContent());
+          InputStream ins = UrlFetcher.fetchStream(MOTD_RSS);
+          if (ins == null) {
+            return null;
           }
+
+          DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+          builderFactory.setValidating(false);
+
+          DocumentBuilder builder = builderFactory.newDocumentBuilder();
+          return builder.parse(ins);
         } catch (Exception e) {
           log.error("Error fetching MOTD.", e);
         }
@@ -221,8 +240,7 @@ public class WelcomeFragment extends BaseFragment {
       protected void onComplete(Document rss) {
         SimpleDateFormat inputFormat =
             new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-        SimpleDateFormat outputFormat =
-            new SimpleDateFormat("dd MMM yyyy h:mm a", Locale.US);
+        SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy h:mm a", Locale.US);
 
         StringBuilder motd = new StringBuilder();
         if (rss != null) {
@@ -257,10 +275,9 @@ public class WelcomeFragment extends BaseFragment {
           }
         }
 
-        TransparentWebView motdView = (TransparentWebView) findViewById(R.id.motd);
         motdView.loadHtml("html/skeleton.html", motd.toString());
       }
-    }.execute();*/
+    }.execute();
   }
 
   @Override
