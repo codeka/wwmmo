@@ -18,7 +18,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -32,6 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
+import au.com.codeka.warworlds.client.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.client.util.BackgroundRunner;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
@@ -47,7 +47,7 @@ public class WelcomeFragment extends BaseFragment {
   /** URL of RSS content to fetch and display in the motd view. */
   private static final String MOTD_RSS = "http://www.war-worlds.com/forum/announcements/rss";
 
-  private Button startGameButton;
+  private Button startButton;
   private TextView connectionStatus;
 //  private HelloWatcher helloWatcher;
   private TextView realmName;
@@ -65,7 +65,7 @@ public class WelcomeFragment extends BaseFragment {
     super.onViewCreated(view, savedInstanceState);
     ViewBackgroundGenerator.setBackground(view);
 
-    startGameButton = (Button) Preconditions.checkNotNull(view.findViewById(R.id.start_btn));
+    startButton = (Button) Preconditions.checkNotNull(view.findViewById(R.id.start_btn));
     realmName = (TextView) Preconditions.checkNotNull(view.findViewById(R.id.realm_name));
     motdView = (TransparentWebView) Preconditions.checkNotNull(view.findViewById(R.id.motd));
     connectionStatus =
@@ -90,10 +90,9 @@ public class WelcomeFragment extends BaseFragment {
       }
     });
 
-    startGameButton.setOnClickListener(new View.OnClickListener() {
+    startButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        //final Intent intent = new Intent(context, StarfieldActivity.class);
-        //startActivity(intent);
+        getFragmentTransitionManager().replaceFragment(StarfieldFragment.class);
       }
     });
 
@@ -130,7 +129,7 @@ public class WelcomeFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    startGameButton.setEnabled(false);
+    startButton.setEnabled(false);
     realmName.setText(String.format(
         Locale.getDefault(),
         getString(R.string.realm_label),
@@ -161,7 +160,7 @@ public class WelcomeFragment extends BaseFragment {
               formatter.format(maxMemoryBytes), "0.1" /*Util.getVersion()*/,
               /*Util.isDebug() ?*/ " (debug)" /*: " (rel)"*/);
           connectionStatus.setText(msg);
-          startGameButton.setEnabled(true);
+          startButton.setEnabled(true);
 /*
           MyEmpire empire = EmpireManager.i.getEmpire();
           if (empire != null) {
