@@ -8,6 +8,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 /** A {@link Sprite} is basically a quad + texture. */
+// TODO: use instancing or something to make this faster.
 public class Sprite {
   private static final String vertexShaderCode =
       "attribute vec4 vPosition;" +
@@ -89,7 +90,7 @@ public class Sprite {
     GLES20.glUniform4fv(colorHandle, 1, color, 0);
 
     // Draw the triangle
-    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, VERTEX_COUNT);
+    GLES20.glDrawElements(GLES20.GL_TRIANGLES, SQUARE_INDICES.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
     // Disable vertex array
     GLES20.glDisableVertexAttribArray(posHandle);
