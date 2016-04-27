@@ -58,6 +58,8 @@ public class RenderSurfaceView extends GLSurfaceView {
     private final boolean multiSampling;
     private DeviceInfo deviceInfo;
 
+    private Sprite sprite;
+
     public Renderer() {
       this.multiSampling = true;
     }
@@ -66,6 +68,7 @@ public class RenderSurfaceView extends GLSurfaceView {
     public void onSurfaceCreated(final GL10 _, final EGLConfig eglConfig) {
       deviceInfo = new DeviceInfo();
       GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+      sprite = new Sprite();
     }
 
     @Override
@@ -76,6 +79,7 @@ public class RenderSurfaceView extends GLSurfaceView {
     @Override
     public void onDrawFrame(final GL10 _) {
       GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+      sprite.draw();
     }
   }
 }
