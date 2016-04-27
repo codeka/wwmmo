@@ -35,8 +35,8 @@ public class TextureBitmap {
       InputStream ins = context.getAssets().open(fileName);
       Bitmap bmp = BitmapFactory.decodeStream(ins);
       GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandleBuffer[0]);
-      GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-      GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+      GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+      GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
       GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
     } catch (IOException e) {
       GLES20.glDeleteBuffers(1, textureHandleBuffer, 0);

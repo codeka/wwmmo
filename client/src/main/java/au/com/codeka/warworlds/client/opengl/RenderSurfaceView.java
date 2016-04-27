@@ -48,8 +48,15 @@ public class RenderSurfaceView extends GLSurfaceView {
     public void onSurfaceCreated(final GL10 _, final EGLConfig eglConfig) {
       deviceInfo = new DeviceInfo();
       GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-      sprite = new Sprite(new SpriteTemplate(
-          new SpriteShader(), textureManager.loadTexture("stars/stars_small.png")));
+      GLES20.glEnable(GLES20.GL_BLEND);
+      GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
+      sprite = new Sprite(new SpriteTemplate.Builder()
+          .shader(new SpriteShader())
+          .texture(textureManager.loadTexture("stars/stars_small.png"))
+          .uvTopLeft(new Vector2(0.25f, 0.5f))
+          .uvBottomRight(new Vector2(0.5f, 0.75f))
+          .build());
     }
 
     @Override
