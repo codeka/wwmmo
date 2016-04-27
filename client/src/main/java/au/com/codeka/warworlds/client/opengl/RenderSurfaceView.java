@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.client.opengl;
 
 import android.content.Context;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -62,16 +63,19 @@ public class RenderSurfaceView extends GLSurfaceView {
     }
 
     @Override
-    public void onSurfaceCreated(final GL10 pGL, final EGLConfig pEGLConfig) {
+    public void onSurfaceCreated(final GL10 _, final EGLConfig eglConfig) {
       deviceInfo = new DeviceInfo();
+      GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     }
 
     @Override
-    public void onSurfaceChanged(final GL10 pGL, final int pWidth, final int pHeight) {
+    public void onSurfaceChanged(final GL10 _, final int width, final int height) {
+      GLES20.glViewport(0, 0, width, height);
     }
 
     @Override
-    public void onDrawFrame(final GL10 pGL) {
+    public void onDrawFrame(final GL10 _) {
+      GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
     }
   }
 }
