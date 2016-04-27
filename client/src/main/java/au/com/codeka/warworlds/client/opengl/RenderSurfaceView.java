@@ -23,30 +23,6 @@ public class RenderSurfaceView extends GLSurfaceView {
     super(context, attrs);
     setEGLContextClientVersion(2);
   }
-/*
-  public ConfigChooser getConfigChooser() throws IllegalStateException {
-    if (this.mConfigChooser == null) {
-      throw new IllegalStateException(ConfigChooser.class.getSimpleName() + " not yet set.");
-    }
-    return this.mConfigChooser;
-  }
-*/
-
-/*
-  @Override
-  protected void onMeasure(final int pWidthMeasureSpec, final int pHeightMeasureSpec) {
-    if (isInEditMode()) {
-      super.onMeasure(pWidthMeasureSpec, pHeightMeasureSpec);
-      return;
-    }
-    this.mEngineRenderer.mEngine.getEngineOptions().getResolutionPolicy().onMeasure(this, pWidthMeasureSpec, pHeightMeasureSpec);
-  }
-*//*
-  @Override
-  public void onResolutionChanged(final int pWidth, final int pHeight) {
-    this.setMeasuredDimension(pWidth, pHeight);
-  }
-*/
 
   public void setRenderer() {
     getHolder().setFormat(android.graphics.PixelFormat.RGBA_8888);
@@ -58,22 +34,22 @@ public class RenderSurfaceView extends GLSurfaceView {
 
   public static class Renderer implements GLSurfaceView.Renderer {
     private final boolean multiSampling;
-    private final Context context;
     private DeviceInfo deviceInfo;
+    private final TextureManager textureManager;
 
     private Sprite sprite;
 
     public Renderer(Context context) {
       this.multiSampling = true;
-      this.context = Preconditions.checkNotNull(context);
+      this.textureManager = new TextureManager(context);
     }
 
     @Override
     public void onSurfaceCreated(final GL10 _, final EGLConfig eglConfig) {
       deviceInfo = new DeviceInfo();
       GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-      sprite = new Sprite();
-      sprite.loadTexture(context, "stars/stars_small.png");
+      sprite = new Sprite(new SpriteTemplate(
+          new SpriteShader(), textureManager.loadTexture("stars/stars_small.png")));
     }
 
     @Override
