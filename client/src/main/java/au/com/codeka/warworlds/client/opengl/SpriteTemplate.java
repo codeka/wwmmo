@@ -27,8 +27,8 @@ public class SpriteTemplate {
 
   private static final short SQUARE_INDICES[] = { 0, 1, 2, 0, 2, 3 };
 
-  private final FloatBuffer vertexBuffer;
-  private final FloatBuffer uvBuffer;
+  private final FloatBuffer positionBuffer;
+  private final FloatBuffer texCoordBuffer;
   private final ShortBuffer indexBuffer;
   private final SpriteShader shader;
   private final TextureBitmap texture;
@@ -41,15 +41,15 @@ public class SpriteTemplate {
     // (# of coordinate values * 4 bytes per float)
     ByteBuffer bb = ByteBuffer.allocateDirect(SQUARE_COORDS.length * 4);
     bb.order(ByteOrder.nativeOrder());
-    vertexBuffer = bb.asFloatBuffer();
-    vertexBuffer.put(SQUARE_COORDS);
-    vertexBuffer.position(0);
+    positionBuffer = bb.asFloatBuffer();
+    positionBuffer.put(SQUARE_COORDS);
+    positionBuffer.position(0);
 
     bb = ByteBuffer.allocateDirect(SQUARE_UVS.length * 4);
     bb.order(ByteOrder.nativeOrder());
-    uvBuffer = bb.asFloatBuffer();
-    uvBuffer.put(SQUARE_UVS);
-    uvBuffer.position(0);
+    texCoordBuffer = bb.asFloatBuffer();
+    texCoordBuffer.put(SQUARE_UVS);
+    texCoordBuffer.position(0);
 
     // initialize byte buffer for the draw list
     // (# of coordinate values * 2 bytes per short)
@@ -64,9 +64,9 @@ public class SpriteTemplate {
     shader.begin();
     texture.bind();
     GLES20.glVertexAttribPointer(
-        shader.getPositionHandle(), 3, GLES20.GL_FLOAT, false, 0, vertexBuffer);
+        shader.getPositionHandle(), 3, GLES20.GL_FLOAT, false, 0, positionBuffer);
     GLES20.glVertexAttribPointer(
-        shader.getTexCoordHandle(), 2, GLES20.GL_FLOAT, false, 0, uvBuffer);
+        shader.getTexCoordHandle(), 2, GLES20.GL_FLOAT, false, 0, texCoordBuffer);
 
     GLES20.glDrawElements(
         GLES20.GL_TRIANGLES, SQUARE_INDICES.length, GLES20.GL_UNSIGNED_SHORT, indexBuffer);
