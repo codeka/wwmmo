@@ -6,6 +6,8 @@ import android.opengl.GLSurfaceView;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
+import com.google.common.base.Preconditions;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -49,19 +51,21 @@ public class RenderSurfaceView extends GLSurfaceView {
   public void setRenderer() {
     getHolder().setFormat(android.graphics.PixelFormat.RGBA_8888);
 
-    renderer = new Renderer();
+    renderer = new Renderer(getContext());
     setRenderer(renderer);
     setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
   }
 
   public static class Renderer implements GLSurfaceView.Renderer {
     private final boolean multiSampling;
+    private final Context context;
     private DeviceInfo deviceInfo;
 
     private Sprite sprite;
 
-    public Renderer() {
+    public Renderer(Context context) {
       this.multiSampling = true;
+      this.context = Preconditions.checkNotNull(context);
     }
 
     @Override
@@ -69,6 +73,7 @@ public class RenderSurfaceView extends GLSurfaceView {
       deviceInfo = new DeviceInfo();
       GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
       sprite = new Sprite();
+      sprite.loadTexture(context, "stars/stars_small.png");
     }
 
     @Override
