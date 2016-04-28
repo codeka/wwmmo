@@ -61,13 +61,14 @@ public class SpriteTemplate {
     indexBuffer.position(0);
   }
 
-  public void draw() {
+  public void draw(float[] mvpMatrix) {
     shader.begin();
     texture.bind();
     GLES20.glVertexAttribPointer(
         shader.getPositionHandle(), 3, GLES20.GL_FLOAT, false, 0, positionBuffer);
     GLES20.glVertexAttribPointer(
         shader.getTexCoordHandle(), 2, GLES20.GL_FLOAT, false, 0, texCoordBuffer);
+    GLES20.glUniformMatrix4fv(shader.getMvpMatrixHandle(), 1, false, mvpMatrix, 0);
 
     GLES20.glDrawElements(
         GLES20.GL_TRIANGLES, SQUARE_INDICES.length, GLES20.GL_UNSIGNED_SHORT, indexBuffer);

@@ -12,12 +12,13 @@ public class SpriteShader {
   private static final Log log = new Log("Sprite");
 
   private final String vertexShaderCode = TextUtils.join("\n", new String[] {
+      "uniform mat4 uMvpMatrix;",
       "attribute vec4 aPosition;",
       "attribute vec2 aTexCoord;",
       "varying vec2 vTexCoord;",
       "void main() {",
       "  vTexCoord = aTexCoord;",
-      "  gl_Position = aPosition;",
+      "  gl_Position = uMvpMatrix * aPosition;",
       "}",
   });
 
@@ -33,6 +34,7 @@ public class SpriteShader {
   private final int shaderProgram;
   private final int posHandle;
   private final int texCoordHandle;
+  private final int mvpMatrixHandle;
   private final int texSamplerHandle;
 
   public SpriteShader() {
@@ -58,6 +60,7 @@ public class SpriteShader {
 
     posHandle = GLES20.glGetAttribLocation(shaderProgram, "aPosition");
     texCoordHandle = GLES20.glGetAttribLocation(shaderProgram, "aTexCoord");
+    mvpMatrixHandle = GLES20.glGetUniformLocation(shaderProgram, "uMvpMatrix");
     texSamplerHandle = GLES20.glGetUniformLocation(shaderProgram, "uTexture");
   }
 
@@ -80,5 +83,9 @@ public class SpriteShader {
 
   public int getTexCoordHandle() {
     return texCoordHandle;
+  }
+
+  public int getMvpMatrixHandle() {
+    return mvpMatrixHandle;
   }
 }

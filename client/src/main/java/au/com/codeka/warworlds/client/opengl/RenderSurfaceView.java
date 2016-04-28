@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.client.opengl;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
@@ -67,7 +68,10 @@ public class RenderSurfaceView extends GLSurfaceView {
     @Override
     public void onDrawFrame(final GL10 _) {
       GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-      sprite.draw();
+      float[] vpMatrix = new float[16];
+      Matrix.setIdentityM(vpMatrix, 0);
+      Matrix.orthoM(vpMatrix, 0, -10, 10, -10, 10, 10, -10);
+      sprite.draw(vpMatrix);
     }
   }
 }

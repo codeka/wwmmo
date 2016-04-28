@@ -11,7 +11,7 @@ public class Sprite extends SceneObject {
   }
 
   @Override
-  protected void drawImpl() {
-    tmpl.draw();
+  protected void drawImpl(float[] mvpMatrix) {
+    tmpl.draw(mvpMatrix);
   }
 }
