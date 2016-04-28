@@ -10,7 +10,9 @@ import java.io.IOException;
 
 import au.com.codeka.warworlds.client.activity.BaseFragmentActivity;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
+import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.welcome.WarmWelcomeFragment;
+import au.com.codeka.warworlds.client.welcome.WelcomeFragment;
 import au.com.codeka.warworlds.common.Log;
 
 public class MainActivity extends BaseFragmentActivity {
@@ -27,11 +29,11 @@ public class MainActivity extends BaseFragmentActivity {
     renderSurfaceView.setRenderer();
 
     if (savedInstanceState == null) {
-     // if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
+     if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
         getFragmentTransitionManager().replaceFragment(WarmWelcomeFragment.class);
-     // } else {
-     //   getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
-     // }
+     } else {
+        getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
+     }
     }
 
     WebSocketFactory factory = new WebSocketFactory();
