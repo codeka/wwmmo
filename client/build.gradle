@@ -40,6 +40,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.google.guava:guava:19.0'
     compile 'com.neovisionaries:nv-websocket-client:1.25'
-    //compile 'org.mapdb:mapdb:3.0.0-M6'
     compile project(':common')
 }
