@@ -18,6 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -28,11 +29,12 @@ import java.util.Locale;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
+import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.client.starfield.StarfieldFragment;
-import au.com.codeka.warworlds.client.concurrency.BackgroundRunner;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.common.Log;
@@ -211,39 +213,43 @@ public class WelcomeFragment extends BaseFragment {
         .create().show();*/
   }
 
+  private void updateWelcomeMessage(String html) {
+    motdView.loadHtml("html/skeleton.html", html);
+  }
+
   private void refreshWelcomeMessage() {
-    new BackgroundRunner<Document>() {
+    App.i.getTaskRunner().runTask(new Runnable() {
       @Override
-      protected Document doInBackground() {
+      public void run() {
+        // we have to use the built-in one because our special version assume all requests go
+        // to the game server...
+        InputStream ins;
         try {
-          // we have to use the built-in one because our special version assume all requests go
-          // to the game server...
-          InputStream ins = UrlFetcher.fetchStream(MOTD_RSS);
-          if (ins == null) {
-            return null;
-          }
-
-          DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-          builderFactory.setValidating(false);
-
-          DocumentBuilder builder = builderFactory.newDocumentBuilder();
-          return builder.parse(ins);
-        } catch (Exception e) {
-          log.error("Error fetching MOTD.", e);
+          ins = UrlFetcher.fetchStream(MOTD_RSS);
+        } catch (IOException e) {
+          log.warning("Error loading MOTD: %s", MOTD_RSS, e);
+          return;
         }
 
-        return null;
-      }
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setValidating(false);
 
-      @Override
-      protected void onComplete(Document rss) {
+        Document doc;
+        try {
+          DocumentBuilder builder = builderFactory.newDocumentBuilder();
+          doc = builder.parse(ins);
+        } catch (Exception e) {
+          log.warning("Error parsing MOTD: %s", MOTD_RSS, e);
+          return;
+        }
+
         SimpleDateFormat inputFormat =
             new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
         SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy h:mm a", Locale.US);
 
-        StringBuilder motd = new StringBuilder();
-        if (rss != null) {
-          NodeList itemNodes = rss.getElementsByTagName("item");
+        final StringBuilder motd = new StringBuilder();
+        if (doc != null) {
+          NodeList itemNodes = doc.getElementsByTagName("item");
           for (int i = 0; i < itemNodes.getLength(); i++) {
             Element itemElem = (Element) itemNodes.item(i);
             String title = itemElem.getElementsByTagName("title").item(0).getTextContent();
@@ -274,9 +280,14 @@ public class WelcomeFragment extends BaseFragment {
           }
         }
 
-        motdView.loadHtml("html/skeleton.html", motd.toString());
+        App.i.getTaskRunner().runTask(new Runnable() {
+          @Override
+          public void run() {
+            updateWelcomeMessage(motd.toString());
+          }
+        }, Threads.UI);
       }
-    }.execute();
+    }, Threads.BACKGROUND);
   }
 
   @Override

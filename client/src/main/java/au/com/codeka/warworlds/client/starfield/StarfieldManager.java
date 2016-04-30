@@ -26,14 +26,14 @@ public class StarfieldManager {
   }
 
   public void pushScene(Scene scene) {
-    Threads.checkOnThread(Threads.UI_THREAD);
+    Threads.checkOnThread(Threads.UI);
 
     sceneStack.push(scene);
     updateRendererScene();
   }
 
   public void popScene() {
-    Threads.checkOnThread(Threads.UI_THREAD);
+    Threads.checkOnThread(Threads.UI);
 
     sceneStack.pop();
     updateRendererScene();

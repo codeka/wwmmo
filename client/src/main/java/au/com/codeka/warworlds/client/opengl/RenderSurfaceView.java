@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
@@ -12,6 +13,7 @@ import com.google.common.base.Preconditions;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import au.com.codeka.warworlds.client.concurrency.TaskQueue;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 
 /** GLSurfaceView upon which we do all of our rendering. */
@@ -32,7 +34,7 @@ public class RenderSurfaceView extends GLSurfaceView {
 
     renderer = new Renderer(getContext());
     setRenderer(renderer);
-    setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+    setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
   }
 
   /**
@@ -56,10 +58,12 @@ public class RenderSurfaceView extends GLSurfaceView {
     private DeviceInfo deviceInfo;
     private final TextureManager textureManager;
     @Nullable private Scene scene;
+    private TaskQueue taskQueue;
 
     public Renderer(Context context) {
       this.multiSampling = true;
       this.textureManager = new TextureManager(context);
+      this.taskQueue = new TaskQueue(50 /* numQueuedItems */);
     }
 
     public void setScene(@Nullable Scene scene) {
@@ -74,8 +78,6 @@ public class RenderSurfaceView extends GLSurfaceView {
 
     @Override
     public void onSurfaceCreated(final GL10 _, final EGLConfig eglConfig) {
-      Threads.GL_THREAD.setThread(Thread.currentThread());
-
       deviceInfo = new DeviceInfo();
       GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
       GLES20.glEnable(GLES20.GL_BLEND);
@@ -89,6 +91,11 @@ public class RenderSurfaceView extends GLSurfaceView {
 
     @Override
     public void onDrawFrame(final GL10 _) {
+      Threads.GL.setThread(Thread.currentThread(), taskQueue);
+
+      // Empty the task queue
+      taskQueue.runAllTasks();
+
       GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
       float[] projMatrix = new float[16];
       Matrix.orthoM(projMatrix, 0, -10, 10, -10, 10, 10, -10);

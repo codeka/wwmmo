@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.client.opengl;
 
-import android.graphics.Point;
 import android.opengl.GLES20;
 
 import java.nio.ByteBuffer;
@@ -64,7 +63,7 @@ public class SpriteTemplate {
   }
 
   public void draw(float[] mvpMatrix) {
-    Threads.checkOnThread(Threads.GL_THREAD);
+    Threads.checkOnThread(Threads.GL);
 
     shader.begin();
     texture.bind();

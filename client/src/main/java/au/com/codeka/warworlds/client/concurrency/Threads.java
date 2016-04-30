@@ -1,6 +1,6 @@
 package au.com.codeka.warworlds.client.concurrency;
 
-import android.os.Looper;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -11,12 +11,20 @@ import com.google.common.base.Preconditions;
  * on a particular thread.
  */
 public enum Threads {
-  UI_THREAD(true),
+  /**
+   * The main UI thread.
+   */
+  UI,
 
   /**
    * The OpenGL render thread. We assume there is only one of these in the whole process.
    */
-  GL_THREAD(false);
+  GL,
+
+  /**
+   * A special "class" of thread that actually represents a pool of background workers.
+   */
+  BACKGROUND;
 
   public static void checkOnThread(Threads thread) {
     Preconditions.checkState(thread.isCurrentThread(), "Unexpectedly not on " + thread);
@@ -26,28 +34,53 @@ public enum Threads {
     Preconditions.checkState(thread.isCurrentThread(), "Unexpectedly on " + thread);
   }
 
-  private boolean isUiThread;
+  private boolean isInitialized;
+  @Nullable private Handler handler;
+  @Nullable private TaskQueue taskQueue;
   @Nullable private Thread thread;
+  @Nullable private ThreadPool threadPool;
 
-  Threads(boolean isUiThread) {
-    this.isUiThread = isUiThread;
+  public void setThread(@NonNull Thread thread, @NonNull TaskQueue taskQueue) {
+    Preconditions.checkState(!isInitialized || this.taskQueue == taskQueue);
+    this.thread = thread;
+    this.taskQueue = taskQueue;
+    this.isInitialized = true;
   }
 
-  /** Set the thread we represent. */
-  public void setThread(@NonNull Thread thread) {
-    Preconditions.checkState(!isUiThread);
-    Preconditions.checkState(this.thread == null);
+  public void setThread(@NonNull Thread thread, @NonNull Handler handler) {
+    Preconditions.checkState(!isInitialized);
     this.thread = thread;
+    this.handler = handler;
+    this.isInitialized = true;
+  }
+
+  public void setThreadPool(@NonNull ThreadPool threadPool) {
+    Preconditions.checkState(!isInitialized);
+    this.threadPool = threadPool;
+    this.isInitialized = true;
   }
 
   public boolean isCurrentThread() {
-    if (isUiThread) {
-      return Looper.getMainLooper().getThread() == Thread.currentThread();
-    } else if (this.thread != null) {
-      return this.thread == Thread.currentThread();
+    Preconditions.checkState(isInitialized);
+
+    if (thread != null) {
+      return thread == Thread.currentThread();
+    } else if (threadPool != null) {
+      return threadPool.isThread(this);
     } else {
-      // TODO: what else could it be?
-      return false;
+      throw new IllegalStateException("thread is null and threadPool is null");
+    }
+  }
+
+  public void runTask(Runnable runnable) {
+    if (handler != null) {
+      handler.post(runnable);
+    } else if (threadPool != null) {
+      threadPool.runTask(runnable);
+    } else if (taskQueue != null) {
+      taskQueue.postTask(runnable);
+    } else {
+      throw new IllegalStateException("Cannot run task, no handler, taskQueue or threadPool!");
     }
   }
 }

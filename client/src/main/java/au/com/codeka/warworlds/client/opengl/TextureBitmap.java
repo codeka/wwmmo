@@ -13,7 +13,7 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.InputStream;
 
-import au.com.codeka.warworlds.client.concurrency.BackgroundRunner;
+import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.common.Log;
 
@@ -59,13 +59,17 @@ public class TextureBitmap {
     }
 
     public void load() {
-      // TODO: do this on a background thread
-      try {
-        InputStream ins = context.getAssets().open(fileName);
-        bitmap = BitmapFactory.decodeStream(ins);
-      } catch (IOException e) {
-        log.warning("Error loading texture '%s'", fileName, e);
-      }
+      App.i.getTaskRunner().runTask(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            InputStream ins = context.getAssets().open(fileName);
+            bitmap = BitmapFactory.decodeStream(ins);
+          } catch (IOException e) {
+            log.warning("Error loading texture '%s'", fileName, e);
+          }
+        }
+      }, Threads.BACKGROUND);
     }
 
     boolean isLoaded() {
