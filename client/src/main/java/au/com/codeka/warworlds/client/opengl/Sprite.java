@@ -8,22 +8,22 @@ import com.google.common.base.Preconditions;
 public class Sprite extends SceneObject {
   private final DimensionResolver dimensionResolver;
   private final SpriteTemplate tmpl;
-  private float width;
-  private float height;
+  private float widthPx;
+  private float heightPx;
 
   public Sprite(DimensionResolver dimensionResolver, SpriteTemplate tmpl) {
     this.dimensionResolver = Preconditions.checkNotNull(dimensionResolver);
     this.tmpl = Preconditions.checkNotNull(tmpl);
-    this.width = 1.0f;
-    this.height = 1.0f;
+    this.widthPx = 1.0f;
+    this.heightPx = 1.0f;
   }
 
   public void setSizeDp(float widthDp, float heightDp) {
     float widthPx = dimensionResolver.dp2px(widthDp);
     float heightPx = dimensionResolver.dp2px(heightDp);
-    Matrix.scaleM(matrix, 0, widthPx / this.width, heightPx / this.height, 1.0f);
-    this.width = widthPx;
-    this.height = heightPx;
+    Matrix.scaleM(matrix, 0, widthPx / this.widthPx, heightPx / this.heightPx, 1.0f);
+    this.widthPx = widthPx;
+    this.heightPx = heightPx;
   }
 
   @Override
