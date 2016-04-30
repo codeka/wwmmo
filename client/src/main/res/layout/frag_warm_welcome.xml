@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:baselineAligned="false">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false">
 
   <ImageView
       android:id="@+id/title_icon"
@@ -23,10 +24,10 @@
       android:layout_alignParentTop="true"
       android:layout_toEndOf="@+id/title_icon"
       android:layout_toRightOf="@+id/title_icon"
-      android:text="@string/app_name"/>
+      android:text="@string/app_name" />
 
   <Button
-      android:id="@+id/start_btn"
+      android:id="@+id/next_btn"
       android:transitionName="start_btn"
       android:layout_width="match_parent"
       android:layout_height="40dp"
@@ -35,13 +36,13 @@
       android:layout_marginLeft="@dimen/tablet_margin_5dp"
       android:layout_marginRight="@dimen/tablet_margin_5dp"
       android:layout_marginTop="5dp"
-      android:text="@string/start"/>
+      android:text="@string/next"/>
 
   <LinearLayout
       android:id="@+id/button_wrapper"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_above="@+id/start_btn"
+      android:layout_above="@+id/next_btn"
       android:layout_marginLeft="@dimen/tablet_margin_5dp"
       android:layout_marginRight="@dimen/tablet_margin_5dp"
       android:orientation="horizontal">

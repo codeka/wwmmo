@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.client.activity.BaseFragmentActivity;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.util.GameSettings;
+import au.com.codeka.warworlds.client.welcome.CreateEmpireFragment;
 import au.com.codeka.warworlds.client.welcome.WarmWelcomeFragment;
 import au.com.codeka.warworlds.client.welcome.WelcomeFragment;
 import au.com.codeka.warworlds.common.Log;
@@ -34,11 +35,13 @@ public class MainActivity extends BaseFragmentActivity {
     starfieldManager.pushScene(starfieldManager.sceneBuilder().build());
 
     if (savedInstanceState == null) {
-     if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
+      if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
         getFragmentTransitionManager().replaceFragment(WarmWelcomeFragment.class);
-     } else {
+      } else if (GameSettings.i.getString(GameSettings.Key.COOKIE).isEmpty()) {
+        getFragmentTransitionManager().replaceFragment(CreateEmpireFragment.class);
+      } else {
         getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
-     }
+      }
     }
   }
 

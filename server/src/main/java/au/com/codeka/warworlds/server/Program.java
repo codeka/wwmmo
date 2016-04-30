@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.server.account.AccountsServlet;
 import au.com.codeka.warworlds.server.websock.GameWebSocketServlet;
 
 public class Program {
@@ -66,8 +67,8 @@ public class Program {
     context.setContextPath("/");
     server.setHandler(context);
 
-    ServletHolder holderEvents = new ServletHolder("conn", GameWebSocketServlet.class);
-    context.addServlet(holderEvents, "/conn");
+    context.addServlet(new ServletHolder("conn", GameWebSocketServlet.class), "/conn");
+    context.addServlet(new ServletHolder("accounts", AccountsServlet.class), "/accounts");
 
     server.start();
     log.info("Server started on http://localhost:%d/", port);

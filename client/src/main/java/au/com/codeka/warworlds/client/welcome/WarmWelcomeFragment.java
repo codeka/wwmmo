@@ -34,7 +34,7 @@ public class WarmWelcomeFragment extends BaseFragment {
     String msg = TransparentWebView.getHtmlFile(getContext(), "html/warm-welcome.html");
     welcome.loadHtml("html/skeleton.html", msg);
 
-    view.findViewById(R.id.start_btn).setOnClickListener(new View.OnClickListener() {
+    view.findViewById(R.id.next_btn).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         // save the fact that we've finished the warm welcome
@@ -42,15 +42,12 @@ public class WarmWelcomeFragment extends BaseFragment {
             .setBoolean(GameSettings.Key.WARM_WELCOME_SEEN, true)
             .commit();
 
-        // and move to the Welcome fragment
         getFragmentTransitionManager().replaceFragment(
-            WelcomeFragment.class,
+            CreateEmpireFragment.class,
             SharedViewHolder.builder()
-                .addSharedView(R.id.help_btn, "help_btn")
-                .addSharedView(R.id.privacy_policy_btn, "website_btn")
-                .addSharedView(R.id.start_btn, "start_btn")
                 .addSharedView(R.id.title_icon, "title_icon")
                 .addSharedView(R.id.title, "title")
+                .addSharedView(R.id.next_btn, "done_btn")
                 .build());
       }
     });

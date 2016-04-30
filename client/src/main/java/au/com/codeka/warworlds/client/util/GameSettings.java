@@ -19,6 +19,9 @@ public class GameSettings {
   }
 
   public enum Key {
+    /** The cookie used to authenicate with the server. */
+    COOKIE("Cookie", ValueType.STRING, ""),
+
     /** Set to true after you've seen the warm welcome, so we don't show it again. */
     WARM_WELCOME_SEEN("WarmWelcomeSeen", ValueType.BOOLEAN, false);
 
@@ -53,7 +56,9 @@ public class GameSettings {
     }
 
     @Override
-    public void finalize() {
+    public void finalize() throws Throwable {
+      super.finalize();
+
       if (!committed) {
         // TODO: log, or something?
         commit();
