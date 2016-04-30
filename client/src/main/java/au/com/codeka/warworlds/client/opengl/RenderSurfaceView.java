@@ -82,7 +82,7 @@ public class RenderSurfaceView extends GLSurfaceView {
     }
 
     @Override
-    public void onSurfaceCreated(final GL10 _, final EGLConfig eglConfig) {
+    public void onSurfaceCreated(final GL10 ignored, final EGLConfig eglConfig) {
       deviceInfo = new DeviceInfo();
       GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       GLES20.glEnable(GLES20.GL_BLEND);
@@ -90,14 +90,14 @@ public class RenderSurfaceView extends GLSurfaceView {
     }
 
     @Override
-    public void onSurfaceChanged(final GL10 _, final int width, final int height) {
+    public void onSurfaceChanged(final GL10 ignored, final int width, final int height) {
       log.debug("Surface size set to %dx%d", width, height);
       GLES20.glViewport(0, 0, width, height);
       Matrix.orthoM(projMatrix, 0, -width / 2, width / 2, -height / 2, height / 2, 10, -10);
     }
 
     @Override
-    public void onDrawFrame(final GL10 _) {
+    public void onDrawFrame(final GL10 ignored) {
       Threads.GL.setThread(Thread.currentThread(), taskQueue);
 
       // Empty the task queue
