@@ -10,7 +10,7 @@ import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 
 /**
- * This is the main fragment that shows the starfield, lets you navigating around, select stars
+ * This is the main fragment that shows the starfield, lets you navigate around, select stars
  * and fleets and so on.
  */
 public class StarfieldFragment extends BaseFragment {

@@ -8,6 +8,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import au.com.codeka.warworlds.client.concurrency.Threads;
+
 /**
  * A {@link SpriteTemplate} describes a sprite's characteristics (texture, bounds within the texture
  * and so on). You would use it to add an actual {@link Sprite} to a {@link Scene}.
@@ -62,6 +64,8 @@ public class SpriteTemplate {
   }
 
   public void draw(float[] mvpMatrix) {
+    Threads.checkOnThread(Threads.GL_THREAD);
+
     shader.begin();
     texture.bind();
     GLES20.glVertexAttribPointer(

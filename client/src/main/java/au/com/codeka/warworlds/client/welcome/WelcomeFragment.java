@@ -32,7 +32,7 @@ import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.client.starfield.StarfieldFragment;
-import au.com.codeka.warworlds.client.util.BackgroundRunner;
+import au.com.codeka.warworlds.client.concurrency.BackgroundRunner;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.common.Log;

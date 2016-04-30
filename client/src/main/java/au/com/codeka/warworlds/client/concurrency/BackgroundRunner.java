@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.util;
+package au.com.codeka.warworlds.client.concurrency;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;

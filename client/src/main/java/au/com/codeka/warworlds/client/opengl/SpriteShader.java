@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.client.opengl;
 import android.opengl.GLES20;
 import android.text.TextUtils;
 
+import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.common.Log;
 
 /**
@@ -31,13 +32,19 @@ public class SpriteShader {
       "}",
   });
 
-  private final int shaderProgram;
-  private final int posHandle;
-  private final int texCoordHandle;
-  private final int mvpMatrixHandle;
-  private final int texSamplerHandle;
+  private int shaderProgram;
+  private int posHandle;
+  private int texCoordHandle;
+  private int mvpMatrixHandle;
+  private int texSamplerHandle;
 
   public SpriteShader() {
+  }
+
+  private void ensureCreated() {
+    if (shaderProgram != 0) {
+      return;
+    }
     shaderProgram = GLES20.glCreateProgram();
 
     int shader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
@@ -65,6 +72,7 @@ public class SpriteShader {
   }
 
   public void begin() {
+    ensureCreated();
     GLES20.glUseProgram(shaderProgram);
 
     GLES20.glEnableVertexAttribArray(posHandle);
