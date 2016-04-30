@@ -28,6 +28,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common" exported="" />
+    <orderEntry type="library" exported="" name="joda-time-2.3" level="project" />
     <orderEntry type="library" exported="" name="mapdb-3.0.0-M6" level="project" />
     <orderEntry type="library" exported="" name="kotlin-stdlib-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="kotlin-test-1.0.1" level="project" />

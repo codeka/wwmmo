@@ -56,7 +56,8 @@ public class CreateEmpireFragment extends BaseFragment {
       @Override
       public void run() {
         HttpRequest request = new HttpRequest.Builder()
-            .url("http://192.168.1.3:8080/account")
+            .url("http://192.168.1.3:8080/accounts")
+            .method(HttpRequest.Method.POST)
             .header("Content-Type", "application/x-protobuf")
             .body(new NewAccountRequest.Builder()
                 .empire_name(empireName)

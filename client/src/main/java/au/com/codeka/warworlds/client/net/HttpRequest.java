@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.net;
 
+import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 
 import java.io.IOException;
@@ -7,11 +8,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 
+import au.com.codeka.warworlds.common.Log;
+
 /**
  * Simple wrapper around {@link HttpURLConnection} that lets us make HTTP requests more
  * easily.
  */
 public class HttpRequest {
+  private final static Log log = new Log("HttpRequest");
+
   public enum Method {
     GET,
     POST,
@@ -19,11 +24,16 @@ public class HttpRequest {
     DELETE
   }
 
+  private final String url;
   private HttpURLConnection conn;
   private IOException exception;
   private byte[] body;
 
   private HttpRequest(Builder builder) {
+    this.url = Preconditions.checkNotNull(builder.url);
+    log.info("HTTP %s %s (%d bytes)", builder.method, builder.url,
+        builder.body == null ? 0 : builder.body.length);
+
     try {
       URL url = new URL(builder.url);
       conn = (HttpURLConnection) url.openConnection();
@@ -36,6 +46,7 @@ public class HttpRequest {
         conn.getOutputStream().write(builder.body);
       }
     } catch (IOException e) {
+      log.warning("Error fetching '%s'", builder.url, e);
       this.exception = e;
     }
   }
@@ -48,6 +59,7 @@ public class HttpRequest {
     try {
       return conn.getResponseCode();
     } catch(IOException e) {
+      log.warning("Error fetching '%s'", url, e);
       exception = e;
       return -1;
     }
@@ -66,6 +78,7 @@ public class HttpRequest {
       try {
         body = ByteStreams.toByteArray(conn.getInputStream());
       } catch (IOException e) {
+        log.warning("Error fetching '%s'", url, e);
         exception = e;
         return null;
       }

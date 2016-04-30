@@ -8,6 +8,7 @@ dependencies {
   compile fileTree(dir: '../jetty/lib', include: ['*.jar'])
   compile fileTree(dir: '../jetty/lib/websocket', include: ['*.jar'])
   compile fileTree(dir: 'libs', include: ['*.jar'])
+  compile 'joda-time:joda-time:2.3'
   compile 'org.mapdb:mapdb:3.0.0-M6'
   compile project(':common')
 }
