@@ -1,0 +1,34 @@
+package au.com.codeka.warworlds.common.proto;
+
+import "common.proto";
+import "empire.proto";
+
+// Wrapper class for all the packets.
+message Packet {
+  optional HelloRequestPacket hello_request = 1;
+  optional HelloResponsePacket hello_response = 2;
+}
+
+//
+// The "hello" request when you first join the game contains some info about yourself which we
+// record for posterity.
+//
+message HelloRequestPacket {
+}
+
+
+//
+// The "hello" message is returned when you first connect to the game.
+//
+message HelloResponsePacket {
+  // If specified, the Empire you're currently logged in as (if not specified, it means
+  // you haven't set up an empire yet, and you should do that before anything else...)
+  optional Empire empire = 1;
+
+  // If true, it means we need to re-register with GCM (maybe because last time it failed)
+  optional bool require_gcm_register = 2;
+
+  // If true, we'll force the ads to be removed. If false, or not specified, we'll check
+  // whatever the In-App Purchase API has to say.
+  optional bool force_remove_ads = 3;
+}

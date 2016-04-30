@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 
 import au.com.codeka.warworlds.client.concurrency.TaskRunner;
 import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.client.net.Server;
 import au.com.codeka.warworlds.common.Log;
 
 /**
@@ -17,12 +18,14 @@ public class App extends Application {
 
   private static final Log log = new Log("App");
   private final TaskRunner taskRunner;
+  private final Server server;
 
   public App() {
     Preconditions.checkState(i == null);
     i = this;
 
     taskRunner = new TaskRunner();
+    server = new Server();
   }
 
   @Override
@@ -31,6 +34,8 @@ public class App extends Application {
     LogImpl.setup();
 
     Threads.UI.setThread(Thread.currentThread(), new Handler());
+
+    server.connect();
 
     log.info("App.onCreate() complete.");
   }

@@ -15,3 +15,8 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+
+# Make sure we don't optimize our protocol buffers.
+-keep class com.squareup.wire.** { *; }
+-keep class au.com.codeka.warworlds.common.proto.** { *; }

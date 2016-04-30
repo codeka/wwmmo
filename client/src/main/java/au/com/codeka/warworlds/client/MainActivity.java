@@ -4,10 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketFactory;
-
-import java.io.IOException;
 
 import au.com.codeka.warworlds.client.activity.BaseFragmentActivity;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
@@ -43,16 +39,6 @@ public class MainActivity extends BaseFragmentActivity {
      } else {
         getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
      }
-    }
-
-    WebSocketFactory factory = new WebSocketFactory();
-    try {
-      WebSocket ws = factory.createSocket("ws://192.168.1.3:8080/conn");
-      ws.addListener(new ServerWebSocketListener());
-      //ws.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
-      ws.connectAsynchronously();
-    } catch (IOException e) {
-      //tv.setText(e.getMessage());
     }
   }
 

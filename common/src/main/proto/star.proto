@@ -1,0 +1,139 @@
+package au.com.codeka.warworlds.common.proto;
+
+import "common.proto";
+
+//
+// Represents a "sector" of space, containing a number of stars and whatnot.
+message Sector {
+  // these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
+  // (1,1) is one sector up and to the right, and so on.
+  optional int64 x = 1;
+  optional int64 y = 2;
+
+  // number of colonies in this sector
+  optional int32 num_colonies = 5;
+
+  // the collection of stars in this sector.
+  repeated Star stars = 3;
+
+  // a collection of all the colonies in this sector
+//  repeated Colony colonies = 4;
+
+  // a collection of fleets in this sector
+//  repeated Fleet fleets = 6;
+}
+
+//
+// Represents a single star within a sector. The star can have a few planets, though this
+// is optional (we don't always return the list of planets with a star).
+//
+message Star {
+  // the identifier of the star, unique throughout the universe.
+  optional string key = 1;
+
+  // the sector this star is contained within
+  optional int64 sector_x = 11;
+  optional int64 sector_y = 12;
+
+  // the name of the star
+  optional string name = 2;
+
+  // the classification of this star. The order of these enum values
+  // must correspond to the order of the StarTypes defined in sector.py
+  enum CLASSIFICATION {
+    BLUE = 0;
+    WHITE = 1;
+    YELLOW = 2;
+    ORANGE = 3;
+    RED = 4;
+    NEUTRON = 5;
+    BLACKHOLE = 6;
+    MARKER = 7;
+    WORMHOLE = 8;
+  }
+  optional CLASSIFICATION classification = 3;
+
+  // the apparent "size" of the star (which is really just a display thing)
+  optional int32 size = 5;
+
+  // the offset from the left edge of the sector, in pixels
+  optional int32 offset_x = 6;
+
+  // the offset from the bottom edge of the sector, in pixels
+  optional int32 offset_y = 7;
+
+  // the collection of planets orbiting this star (may be empty, for example in the list
+  // of stars in a sector)
+  repeated Planet planets = 9;
+
+  // collection of colonies on our planet(s)
+//  repeated Colony colonies = 10;
+
+  // collection of buildings in our colonies.
+//  repeated Building buildings = 13;
+
+  // collection of EmpirePresences details the presences of the empire(s) in this solar system.
+//  repeated EmpirePresence empires = 14;
+
+  // collection of BuildRequests for colonies in this star
+//  repeated BuildRequest build_requests = 15;
+
+  // List of fleets located in this star
+//  repeated Fleet fleets = 16;
+
+  // This is the time (in seconds since Unix epoch) since this star "became" empty -- that is,
+  // after the colony was destroyed. This only has meaning if the star has no colonies currently.
+  optional int64 time_emptied = 17;
+
+  // Time, that this star was last simulated
+  optional int64 last_simulation = 18;
+
+  // These are extra details stored with the star that define the properties needed by wormholes.
+  message Wormhole {
+    optional int64 dest_star_id = 1;
+    optional int64 tune_complete_time = 2;
+    repeated int64 tune_history = 3;
+    optional int64 empire_id = 4;
+  }
+  optional Wormhole wormhole = 20;
+}
+
+
+// Represents a planet in the star system. A planet orbits a Star which in turn belongs
+// to a Sector.
+message Planet {
+  // The "index" of the planet represents how far it is from the sun. Planets are always
+  // in monotonically increasing order of distance (0, 1, 2, 3, etc)
+  optional int32 index = 2;
+
+  // The various different "kinds" of planets. Planets are spawned in increasing order
+  // of probability (so "terran" is most likely, "gas giant" least likely).
+  enum PLANET_TYPE {
+    GASGIANT = 1;
+    RADIATED = 2;
+    INFERNO = 3;
+    ASTEROIDS = 4;
+    WATER = 5;
+    TOXIC = 6;
+    DESERT = 7;
+    SWAMP = 8;
+    TERRAN = 9;
+  }
+  optional PLANET_TYPE planet_type = 3;
+
+  // The size of the planet. Certain planet_type's are predisposed to be certain sizes
+  // (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
+  optional int32 size = 4;
+
+  // How "congenial" is this planet to supporting population
+  optional int32 population_congeniality = 5;
+
+  // How "congenial" is this planet to supporting farming
+  optional int32 farming_congeniality = 6;
+
+  // How "congenial" is this planet to supporting mining
+  optional int32 mining_congeniality = 7;
+
+  // How "congenial" is this planet to the production of energy?
+  optional int32 energy_congeniality = 8;
+}
