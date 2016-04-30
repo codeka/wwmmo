@@ -15,9 +15,11 @@ import javax.microedition.khronos.opengles.GL10;
 
 import au.com.codeka.warworlds.client.concurrency.TaskQueue;
 import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.common.Log;
 
 /** GLSurfaceView upon which we do all of our rendering. */
 public class RenderSurfaceView extends GLSurfaceView {
+  private static Log log = new Log("RenderSurfaceView");
   @Nullable private Renderer renderer;
 
   public RenderSurfaceView(final Context context) {
@@ -56,14 +58,17 @@ public class RenderSurfaceView extends GLSurfaceView {
   public static class Renderer implements GLSurfaceView.Renderer {
     private final boolean multiSampling;
     private DeviceInfo deviceInfo;
+    private final DimensionResolver dimensionResolver;
     private final TextureManager textureManager;
     @Nullable private Scene scene;
     private TaskQueue taskQueue;
+    float[] projMatrix = new float[16];
 
     public Renderer(Context context) {
       this.multiSampling = true;
       this.textureManager = new TextureManager(context);
       this.taskQueue = new TaskQueue(50 /* numQueuedItems */);
+      this.dimensionResolver = new DimensionResolver(context);
     }
 
     public void setScene(@Nullable Scene scene) {
@@ -73,20 +78,22 @@ public class RenderSurfaceView extends GLSurfaceView {
     }
 
     public Scene createScene() {
-      return new Scene(textureManager);
+      return new Scene(dimensionResolver, textureManager);
     }
 
     @Override
     public void onSurfaceCreated(final GL10 _, final EGLConfig eglConfig) {
       deviceInfo = new DeviceInfo();
-      GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+      GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       GLES20.glEnable(GLES20.GL_BLEND);
       GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     @Override
     public void onSurfaceChanged(final GL10 _, final int width, final int height) {
+      log.debug("Surface size set to %dx%d", width, height);
       GLES20.glViewport(0, 0, width, height);
+      Matrix.orthoM(projMatrix, 0, -width / 2, width / 2, -height / 2, height / 2, 10, -10);
     }
 
     @Override
@@ -97,8 +104,6 @@ public class RenderSurfaceView extends GLSurfaceView {
       taskQueue.runAllTasks();
 
       GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-      float[] projMatrix = new float[16];
-      Matrix.orthoM(projMatrix, 0, -10, 10, -10, 10, 10, -10);
 
       Scene currScene = null;
       synchronized (this) {
