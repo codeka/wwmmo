@@ -27,6 +27,7 @@ public class GameSocket extends WebSocketAdapter {
 
   public GameSocket(String cookie, Account account) {
     empire = EmpireManager.i.getEmpire(account.empire_id);
+    log.debug("Connection '%s' empire: %s", cookie, empire);
   }
 
   @Override

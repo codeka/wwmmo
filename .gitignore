@@ -15,7 +15,7 @@
 # Make sure keystore.jks never gets added to source control, it's SEKRET!
 keystore.jks
 
-server/src/main/data/store.db*
+server/src/main/data/store/*
 server/src/main/data/config-debug.json
 client/signing.properties
 

@@ -33,7 +33,7 @@ public class AccountsServlet extends ProtobufHttpServlet {
 
     // Reserve for ourselves an entry in the empire name map. If this fails, it meas there's already
     // an empire with the given name
-    if (!DataStore.i.empireNames().putIfAbsentBoolean(req.empire_name, -1L)) {
+    if (!DataStore.i.uniqueEmpireNames().putIfNotExist(req.empire_name, -1L)) {
       log.info("Could not create new account, empire name already exists: '%s'", req.empire_name);
       writeProtobuf(response,
           new NewAccountResponse.Builder()

@@ -1,51 +1,65 @@
 package au.com.codeka.warworlds.server.store;
 
-import org.mapdb.Atomic;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.HTreeMap;
-import org.mapdb.Serializer;
-import org.mapdb.serializer.SerializerCharArray;
+import com.sleepycat.je.Database;
+import com.sleepycat.je.DatabaseConfig;
+import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.Environment;
+import com.sleepycat.je.EnvironmentConfig;
+import com.sleepycat.util.RuntimeExceptionWrapper;
 
+import java.io.File;
+
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
 
 /** Wraps our reference to MapDB's data store objects. */
 public class DataStore {
+  private static final Log log = new Log("DataStore");
   public static final DataStore i = new DataStore();
 
-  private final DB db;
-  private final HTreeMap<String, Long> empireNames;
-  private final HTreeMap<Long, Empire> empires;
-  private final HTreeMap<String, Account> accounts;
+  private Environment env;
+  private UniqueNameStore uniqueEmpireNames;
+  private ProtobufStore<Empire> empires;
+  private AccountsStore accounts;
 
   private DataStore() {
-    db = DBMaker
-        .fileDB("data/store.db")
-        .transactionEnable()
-        .closeOnJvmShutdown()
-        .make();
+    try {
+      EnvironmentConfig envConfig = new EnvironmentConfig();
+      envConfig.setAllowCreate(true);
+      env = new Environment(new File("data/store"), envConfig);
 
-    empireNames = db.hashMap("EmpireNames", Serializer.STRING, Serializer.LONG).createOrOpen();
-    empires = db.hashMap(
-        "Empires", Serializer.LONG, new ProtobufSerializer<>(Empire.class)).createOrOpen();
-    accounts = db.hashMap(
-        "Accounts", Serializer.STRING, new ProtobufSerializer<>(Account.class)).createOrOpen();
+      DatabaseConfig dbConfig = new DatabaseConfig();
+      dbConfig.setAllowCreate(true);
+      Database db = env.openDatabase(null, "empires", dbConfig);
+      empires = new ProtobufStore<>(db, Empire.class);
+
+      db = env.openDatabase(null, "empireNames", dbConfig);
+      uniqueEmpireNames = new UniqueNameStore(db);
+
+      db = env.openDatabase(null, "accounts", dbConfig);
+      accounts = new AccountsStore(db);
+    } catch (DatabaseException e) {
+      log.error("Error creating databases.", e);
+      throw new RuntimeException(e);
+    }
   }
 
-  public Atomic.Long idGenerator(String name) {
-    return db.atomicLong(name).createOrOpen();
+  public void close() {
+    accounts.close();
+    empires.close();
+    env.close();
   }
 
-  public HTreeMap<String, Long> empireNames() {
-    return empireNames;
+  public UniqueNameStore uniqueEmpireNames() {
+    return uniqueEmpireNames;
   }
 
-  public HTreeMap<Long, Empire> empires() {
+  public ProtobufStore<Empire> empires() {
     return empires;
   }
 
-  public HTreeMap<String, Account> accounts() {
+  public AccountsStore accounts() {
     return accounts;
   }
 }

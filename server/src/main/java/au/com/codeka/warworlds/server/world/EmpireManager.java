@@ -1,13 +1,11 @@
 package au.com.codeka.warworlds.server.world;
 
-import org.mapdb.Atomic;
-import org.mapdb.HTreeMap;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.store.ProtobufStore;
 
 /**
  * Manages empires, keeps them loaded and ensure they get saved to the data store at the right time.
@@ -15,12 +13,10 @@ import au.com.codeka.warworlds.server.store.DataStore;
 public class EmpireManager {
   public static final EmpireManager i = new EmpireManager();
 
-  private Atomic.Long idGenerator;
-  private HTreeMap<Long, Empire> empires;
+  private ProtobufStore<Empire> empires;
   private final Map<Long, WatchableObject<Empire>> watchedEmpires;
 
   private EmpireManager() {
-    idGenerator = DataStore.i.idGenerator("EmpireID");
     empires = DataStore.i.empires();
     watchedEmpires = new HashMap<>();
   }
@@ -36,7 +32,7 @@ public class EmpireManager {
   }
 
   public WatchableObject<Empire> createEmpire(String name) {
-    long id = idGenerator.incrementAndGet();
+    long id = empires.nextIdentifier();
     Empire empire = new Empire.Builder()
         .display_name(name)
         .id(id)

@@ -1,21 +1,19 @@
 package au.com.codeka.warworlds.server.store;
 
+import com.sleepycat.je.DatabaseEntry;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
 
-import org.jetbrains.annotations.NotNull;
-import org.mapdb.DataInput2;
-import org.mapdb.DataOutput2;
-import org.mapdb.Serializer;
-
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.reflect.Field;
+
+import au.com.codeka.warworlds.common.Log;
 
 /**
  * A mapdb serializer for serializing protocol buffer messages.
  */
-public class ProtobufSerializer<M extends Message<?, ?>> implements Serializer<M>, Serializable {
+public class ProtobufSerializer<M extends Message<?, ?>> {
+  private static final Log log = new Log("ProtobufSerializer");
   private ProtoAdapter<M> protoAdapter;
 
   public ProtobufSerializer(Class<M> cls) {
@@ -27,15 +25,16 @@ public class ProtobufSerializer<M extends Message<?, ?>> implements Serializer<M
     }
   }
 
-  @Override
-  public void serialize(@NotNull DataOutput2 out, @NotNull M value) throws IOException {
-    out.write(value.encode());
+  public DatabaseEntry serialize(M value) {
+    return new DatabaseEntry(value.encode());
   }
 
-  @Override
-  public M deserialize(@NotNull DataInput2 input, int available) throws IOException {
-    byte[] buffer = new byte[available];
-    input.readFully(buffer);
-    return protoAdapter.decode(buffer);
+  public M deserialize(DatabaseEntry entry) {
+    try {
+      return protoAdapter.decode(entry.getData());
+    } catch (IOException e) {
+      log.error("Exception deserializing protobuf.", e);
+      return null;
+    }
   }
 }

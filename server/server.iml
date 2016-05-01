@@ -29,17 +29,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common" exported="" />
     <orderEntry type="library" exported="" name="joda-time-2.3" level="project" />
-    <orderEntry type="library" exported="" name="mapdb-3.0.0-M6" level="project" />
-    <orderEntry type="library" exported="" name="kotlin-stdlib-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="kotlin-test-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="eclipse-collections-api-7.0.1" level="project" />
-    <orderEntry type="library" exported="" name="eclipse-collections-7.0.1" level="project" />
-    <orderEntry type="library" exported="" name="eclipse-collections-forkjoin-7.0.1" level="project" />
-    <orderEntry type="library" exported="" name="guava-19.0" level="project" />
-    <orderEntry type="library" exported="" name="lz4-1.3.0" level="project" />
-    <orderEntry type="library" exported="" name="elsa-3.0.0-M2" level="project" />
     <orderEntry type="library" exported="" name="wire-runtime-2.1.2" level="project" />
-    <orderEntry type="library" exported="" name="kotlin-runtime-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="okio-1.5.0" level="project" />
     <orderEntry type="library" exported="" name="cdi-core-9.3.8.v20160314" level="project" />
     <orderEntry type="library" exported="" name="cdi-servlet-9.3.8.v20160314" level="project" />
@@ -79,6 +69,8 @@
     <orderEntry type="library" exported="" name="websocket-common-9.3.8.v20160314" level="project" />
     <orderEntry type="library" exported="" name="websocket-server-9.3.8.v20160314" level="project" />
     <orderEntry type="library" exported="" name="websocket-servlet-9.3.8.v20160314" level="project" />
+    <orderEntry type="library" exported="" name="je-6.4.25" level="project" />
     <orderEntry type="library" exported="" name="wire-compiler-2.1.2-jar-with-dependencies" level="project" />
+    <orderEntry type="library" exported="" name="server.server" level="project" />
   </component>
 </module>
