@@ -18,6 +18,7 @@ import java.util.Queue;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Packet;
 
@@ -37,16 +38,26 @@ public class Server {
   /** A lock used to guard access to the web socket/queue. */
   private final Object lock = new Object();
 
+  /** The cookie we use to authenticate. Null if we don't have a cookie yet. */
+  @Nullable private String cookie;
+
   private int reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS;
 
   /** Connect to the server. */
   public void connect() {
-    String url = "ws://192.168.1.3:8080/conn";
+    cookie = GameSettings.i.getString(GameSettings.Key.COOKIE);
+    if (cookie.isEmpty()) {
+      log.warning("No cookie yet, not connecting.");
+      return;
+    }
+
+    String url = "ws://192.168.11.100:8080/conn";
     log.info("Attempting to connect to: %s", url);
 
     WebSocketFactory factory = new WebSocketFactory();
     try {
       WebSocket newWebSocket = factory.createSocket(url);
+      newWebSocket.addHeader("X-Cookie", cookie);
       newWebSocket.addListener(webSocketListener);
       //ws.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
       newWebSocket.connectAsynchronously();
@@ -101,7 +112,7 @@ public class Server {
   }
 
   private void onPacket(Packet pkt) {
-    // TODO
+    log.debug("Packet: %s", pkt);
   }
 
   private WebSocketListener webSocketListener = new WebSocketAdapter() {

@@ -9,10 +9,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
+import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.NewAccountRequest;
 import au.com.codeka.warworlds.common.proto.NewAccountResponse;
 import au.com.codeka.warworlds.server.ProtobufHttpServlet;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.world.EmpireManager;
+import au.com.codeka.warworlds.server.world.WatchableObject;
 
 /** Accounts servlet for creating new accounts on the server. */
 public class AccountsServlet extends ProtobufHttpServlet {
@@ -39,12 +42,15 @@ public class AccountsServlet extends ProtobufHttpServlet {
       return;
     }
 
-    // Generate a cookie for the user to authenticate with in the future
+    // Generate a cookie for the user to authenticate with in the future.
     String cookie = generateCookie();
+
+    // Create the empire itself.
+    WatchableObject<Empire> empire = EmpireManager.i.createEmpire(req.empire_name);
 
     // Make a new account with all the details.
     Account acct = new Account.Builder()
-        .empire_id(1234L)
+        .empire_id(empire.get().id)
         .build();
     DataStore.i.accounts().put(cookie, acct);
 

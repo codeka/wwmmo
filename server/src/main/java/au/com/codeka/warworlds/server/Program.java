@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.account.AccountsServlet;
+import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.websock.GameWebSocketServlet;
 
 public class Program {

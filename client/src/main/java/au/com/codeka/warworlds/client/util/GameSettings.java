@@ -46,7 +46,14 @@ public class GameSettings {
     }
 
     public Editor setBoolean(Key key, boolean value) {
+      Preconditions.checkState(key.valueType == ValueType.BOOLEAN);
       editor.putBoolean(key.name, value);
+      return this;
+    }
+
+    public Editor setString(Key key, String value) {
+      Preconditions.checkState(key.valueType == ValueType.STRING);
+      editor.putString(key.name, value);
       return this;
     }
 

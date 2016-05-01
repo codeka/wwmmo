@@ -47,4 +47,8 @@ public class App extends Application {
   public TaskRunner getTaskRunner() {
     return taskRunner;
   }
+
+  public Server getServer() {
+    return server;
+  }
 }

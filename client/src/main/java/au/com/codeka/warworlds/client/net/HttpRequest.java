@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.net;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
+import com.squareup.wire.Message;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

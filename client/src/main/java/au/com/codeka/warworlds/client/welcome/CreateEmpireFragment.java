@@ -19,14 +19,20 @@ import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.net.HttpRequest;
+import au.com.codeka.warworlds.client.net.Server;
+import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.NewAccountRequest;
+import au.com.codeka.warworlds.common.proto.NewAccountResponse;
 
 /**
  * This fragment is shown when you don't have a cookie saved. We'll want to either let you create
  * a new empire, or sign in with an existing account (if you have one).
  */
 public class CreateEmpireFragment extends BaseFragment {
+  private static final Log log = new Log("CreateEmpireFragment");
+
   @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
@@ -63,8 +69,16 @@ public class CreateEmpireFragment extends BaseFragment {
                 .empire_name(empireName)
                 .build().encode())
             .build();
-        byte[] respBytes = request.getBody();
-        if (respBytes == null) {
+        NewAccountResponse resp = null;
+        try {
+          final byte[] respBytes = request.getBody();
+          if (respBytes != null) {
+            resp = NewAccountResponse.ADAPTER.decode(respBytes);
+          }
+        } catch (IOException e) {
+          log.warning("Error decoding new account response.", e);
+        }
+        if (resp == null) {
           // TODO: report the error
           App.i.getTaskRunner().runTask(new Runnable() {
             @Override
@@ -73,10 +87,11 @@ public class CreateEmpireFragment extends BaseFragment {
             }
           }, Threads.UI);
         } else {
+          final NewAccountResponse finalResponse = resp;
           App.i.getTaskRunner().runTask(new Runnable() {
             @Override
             public void run() {
-              onRegisterSuccess(rootView);
+              onRegisterSuccess(finalResponse);
             }
           }, Threads.UI);
         }
@@ -90,9 +105,15 @@ public class CreateEmpireFragment extends BaseFragment {
     rootView.findViewById(R.id.progress).setVisibility(View.GONE);
   }
 
-  private void onRegisterSuccess(View rootView) {
-    // TODO: save the cookie
-    // TODO: tell Server we can now connect.
+  private void onRegisterSuccess(NewAccountResponse resp) {
+    // Save the cookie.
+    GameSettings.i.edit()
+        .setString(GameSettings.Key.COOKIE, resp.cookie)
+        .commit();
+
+    // Tell the Server we can now connect.
+    App.i.getServer().connect();
+
     getFragmentTransitionManager().replaceFragment(
         WelcomeFragment.class,
         SharedViewHolder.builder()
