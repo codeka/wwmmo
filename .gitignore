@@ -15,7 +15,8 @@
 # Make sure keystore.jks never gets added to source control, it's SEKRET!
 keystore.jks
 
-server/data/config-debug.json
+server/src/main/data/store.db
+server/src/main/data/config-debug.json
 client/signing.properties
 
 # Android Studio/gradle files and directories

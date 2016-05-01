@@ -18,7 +18,8 @@ public class AccountsServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     NewAccountRequest req = NewAccountRequest.ADAPTER.decode(request.getInputStream());
-    // TODO: do it!
-    log.debug("Creating new account: %s", req.empire_name);
+    log.info("Creating new account: %s", req.empire_name);
+
+
   }
 }
