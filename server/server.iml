@@ -80,6 +80,5 @@
     <orderEntry type="library" exported="" name="websocket-server-9.3.8.v20160314" level="project" />
     <orderEntry type="library" exported="" name="websocket-servlet-9.3.8.v20160314" level="project" />
     <orderEntry type="library" exported="" name="wire-compiler-2.1.2-jar-with-dependencies" level="project" />
-    <orderEntry type="library" exported="" name="server.server" level="project" />
   </component>
 </module>

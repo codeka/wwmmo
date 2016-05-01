@@ -10,3 +10,9 @@ message NewAccountResponse {
   optional string cookie = 1;
   optional string message = 2;
 }
+
+// This is the account object that's stored in the data store. It links to your empire and other
+// details about your account.
+message Account {
+  optional int64 empire_id = 1;
+}
