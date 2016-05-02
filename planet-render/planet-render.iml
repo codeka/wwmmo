@@ -36,6 +36,5 @@
     <orderEntry type="library" exported="" name="joda-time-2.1" level="project" />
     <orderEntry type="library" exported="" name="jsr305-1.3.9" level="project" />
     <orderEntry type="library" exported="" name="protobuf-java-2.5.0" level="project" />
-    <orderEntry type="library" exported="" name="planet-render.planet-render" level="project" />
   </component>
 </module>
