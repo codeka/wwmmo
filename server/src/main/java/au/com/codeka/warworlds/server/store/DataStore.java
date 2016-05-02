@@ -27,10 +27,13 @@ public class DataStore {
     try {
       EnvironmentConfig envConfig = new EnvironmentConfig();
       envConfig.setAllowCreate(true);
+      envConfig.setTransactional(true);
       env = new Environment(new File("data/store"), envConfig);
 
       DatabaseConfig dbConfig = new DatabaseConfig();
       dbConfig.setAllowCreate(true);
+      dbConfig.setTransactional(true);
+
       Database db = env.openDatabase(null, "empires", dbConfig);
       empires = new ProtobufStore<>(db, Empire.class);
 
@@ -46,6 +49,7 @@ public class DataStore {
   }
 
   public void close() {
+    uniqueEmpireNames.close();
     accounts.close();
     empires.close();
     env.close();

@@ -42,6 +42,7 @@ public class Program {
     } catch (Exception e) {
       log.error("Exception on main thread, aborting.", e);
     } finally {
+      log.info("Shutting down.");
       DataStore.i.close();
     }
   }
