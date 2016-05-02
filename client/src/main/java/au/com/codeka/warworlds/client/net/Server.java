@@ -64,6 +64,7 @@ public class Server {
       WebSocket newWebSocket = factory.createSocket(url);
       newWebSocket.addHeader("X-Cookie", cookie);
       newWebSocket.addListener(webSocketListener);
+      newWebSocket.setPingInterval(15000); // ping every 15 seconds.
       //ws.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
       newWebSocket.connectAsynchronously();
     } catch (IOException e) {
