@@ -14,6 +14,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.BuildConfig;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.SharedViewHolder;
@@ -62,7 +63,7 @@ public class CreateEmpireFragment extends BaseFragment {
       @Override
       public void run() {
         HttpRequest request = new HttpRequest.Builder()
-            .url("http://192.168.11.100:8080/accounts")
+            .url(BuildConfig.SERVER_URL + "accounts")
             .method(HttpRequest.Method.POST)
             .header("Content-Type", "application/x-protobuf")
             .body(new NewAccountRequest.Builder()

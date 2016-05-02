@@ -30,13 +30,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.BuildConfig;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
+import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
+import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
 
 /**
@@ -51,7 +54,6 @@ public class WelcomeFragment extends BaseFragment {
 
   private Button startButton;
   private TextView connectionStatus;
-//  private HelloWatcher helloWatcher;
   private TextView realmName;
   private TransparentWebView motdView;
 
@@ -137,13 +139,13 @@ public class WelcomeFragment extends BaseFragment {
         getString(R.string.realm_label),
         "Main" /*RealmContext.i.getCurrentRealm().getDisplayName()*/));
 
+    updateServerState(App.i.getServer().getCurrState());
+    App.i.getEventBus().register(eventHandler);
+
     //final TextView empireName = (TextView) Preconditions.checkNotNull()findViewById(R.id.empire_name);
     //final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
     //empireName.setText("");
     //empireIcon.setImageBitmap(null);
-
- //   helloWatcher = new HelloWatcher();
-    //ServerGreeter.addHelloWatcher(helloWatcher);
 
     //ShieldManager.eventBus.register(eventHandler);
 
@@ -152,17 +154,6 @@ public class WelcomeFragment extends BaseFragment {
  //     public void onHelloComplete(boolean success, ServerGreeter.ServerGreeting greeting) {
 //        if (success) {
           // we'll display a bit of debugging info along with the 'connected' message
-          long maxMemoryBytes = Runtime.getRuntime().maxMemory();
-          int memoryClass = ((ActivityManager) getActivity()
-              .getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
-
-          DecimalFormat formatter = new DecimalFormat("#,##0");
-          String msg = String.format(Locale.ENGLISH,
-              "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s", memoryClass,
-              formatter.format(maxMemoryBytes), "0.1" /*Util.getVersion()*/,
-              /*Util.isDebug() ?*/ " (debug)" /*: " (rel)"*/);
-          connectionStatus.setText(msg);
-          startButton.setEnabled(true);
 /*
           MyEmpire empire = EmpireManager.i.getEmpire();
           if (empire != null) {
@@ -179,6 +170,12 @@ public class WelcomeFragment extends BaseFragment {
 //        }
 //      }
 //    });
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    App.i.getEventBus().unregister(eventHandler);
   }
 
   private void onReauthClick() {
@@ -221,8 +218,6 @@ public class WelcomeFragment extends BaseFragment {
     App.i.getTaskRunner().runTask(new Runnable() {
       @Override
       public void run() {
-        // we have to use the built-in one because our special version assume all requests go
-        // to the game server...
         InputStream ins;
         try {
           ins = UrlFetcher.fetchStream(MOTD_RSS);
@@ -290,15 +285,33 @@ public class WelcomeFragment extends BaseFragment {
     }, Threads.BACKGROUND);
   }
 
-  @Override
-  public void onPause() {
-    super.onPause();
-    //ServerGreeter.removeHelloWatcher(helloWatcher);
-    //ShieldManager.eventBus.unregister(eventHandler);
+  private void updateServerState(ServerStateEvent event) {
+    if (event.getState() == ServerStateEvent.ConnectionState.CONNECTED) {
+      long maxMemoryBytes = Runtime.getRuntime().maxMemory();
+      int memoryClass = ((ActivityManager) getActivity()
+          .getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
+
+      DecimalFormat formatter = new DecimalFormat("#,##0");
+      String msg = String.format(Locale.ENGLISH,
+          "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s", memoryClass,
+          formatter.format(maxMemoryBytes), "0.1" /*Util.getVersion()*/,
+              BuildConfig.DEBUG ? " (debug)" : " (rel)");
+      connectionStatus.setText(msg);
+      startButton.setEnabled(true);
+    } else {
+      String msg = String.format("%s - %s", event.getUrl(), event.getState());
+      connectionStatus.setText(msg);
+      startButton.setEnabled(false);
+    }
   }
-/*
+
   private Object eventHandler = new Object() {
     @EventHandler
+    public void onServerStateUpdated(ServerStateEvent event) {
+      updateServerState(event);
+    }
+
+/*    @EventHandler
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
       // if it's the same as our empire, we'll need to update the icon we're currently showing.
       MyEmpire empire = EmpireManager.i.getEmpire();
@@ -306,9 +319,9 @@ public class WelcomeFragment extends BaseFragment {
         ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
         empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
       }
-    }
+    }*/
   };
-*//*
+/*
   private class HelloWatcher implements ServerGreeter.HelloWatcher {
     private int numRetries = 0;
 

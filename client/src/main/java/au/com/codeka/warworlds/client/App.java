@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.client.concurrency.TaskRunner;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.net.Server;
 import au.com.codeka.warworlds.client.store.DataStore;
+import au.com.codeka.warworlds.client.util.eventbus.EventBus;
 import au.com.codeka.warworlds.common.Log;
 
 /**
@@ -21,6 +22,7 @@ public class App extends Application {
   private final TaskRunner taskRunner;
   private final Server server;
   private final DataStore dataStore;
+  private final EventBus eventBus;
 
   public App() {
     Preconditions.checkState(i == null);
@@ -29,6 +31,7 @@ public class App extends Application {
     taskRunner = new TaskRunner();
     server = new Server();
     dataStore = new DataStore();
+    eventBus = new EventBus();
   }
 
   @Override
@@ -50,5 +53,9 @@ public class App extends Application {
 
   public Server getServer() {
     return server;
+  }
+
+  public EventBus getEventBus() {
+    return eventBus;
   }
 }

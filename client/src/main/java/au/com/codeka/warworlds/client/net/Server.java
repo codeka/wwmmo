@@ -17,8 +17,10 @@ import java.util.Map;
 import java.util.Queue;
 
 import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.BuildConfig;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.util.GameSettings;
+import au.com.codeka.warworlds.client.util.eventbus.EventBus;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Packet;
 
@@ -28,6 +30,9 @@ public class Server {
 
   private static final int DEFAULT_RECONNECT_TIME_MS = 1000;
   private static final int MAX_RECONNECT_TIME_MS = 30000;
+
+  private final String url = BuildConfig.WEBSOCKET_URL;
+  private ServerStateEvent currState;
 
   /** The WebSocket we're connected to. Will be null if we're not connected. */
   @Nullable private WebSocket ws;
@@ -51,8 +56,8 @@ public class Server {
       return;
     }
 
-    String url = "ws://192.168.11.100:8080/conn";
     log.info("Attempting to connect to: %s", url);
+    updateState(ServerStateEvent.ConnectionState.CONNECTING);
 
     WebSocketFactory factory = new WebSocketFactory();
     try {
@@ -65,6 +70,10 @@ public class Server {
       log.error("Error connecting to server, will try again.", e);
       onDisconnect();
     }
+  }
+
+  public ServerStateEvent getCurrState() {
+    return currState;
   }
 
   private void send(Packet pkt) {
@@ -83,6 +92,7 @@ public class Server {
     synchronized (lock) {
       this.ws = ws;
       reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS;
+      updateState(ServerStateEvent.ConnectionState.CONNECTED);
 
       Preconditions.checkNotNull(queuedPackets);
       while (!queuedPackets.isEmpty()) {
@@ -98,6 +108,7 @@ public class Server {
       queuedPackets = new ArrayDeque<>();
     }
 
+    updateState(ServerStateEvent.ConnectionState.DISCONNECTED);
     App.i.getTaskRunner().runTask(new Runnable() {
       @Override
       public void run() {
@@ -113,6 +124,11 @@ public class Server {
 
   private void onPacket(Packet pkt) {
     log.debug("Packet: %s", pkt);
+  }
+
+  private void updateState(ServerStateEvent.ConnectionState state) {
+    currState = new ServerStateEvent(url, state);
+    App.i.getEventBus().publish(currState);
   }
 
   private WebSocketListener webSocketListener = new WebSocketAdapter() {

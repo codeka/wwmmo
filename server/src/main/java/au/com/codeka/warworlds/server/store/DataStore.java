@@ -5,12 +5,10 @@ import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.util.RuntimeExceptionWrapper;
 
 import java.io.File;
 
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
 
 /** Wraps our reference to MapDB's data store objects. */

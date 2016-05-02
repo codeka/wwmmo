@@ -1,44 +1,51 @@
 apply plugin: 'com.android.application'
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+  compileSdkVersion 23
+  buildToolsVersion "23.0.3"
 
-    defaultConfig {
-        applicationId "au.com.codeka.warworlds2"
-        minSdkVersion 10
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+  defaultConfig {
+    applicationId "au.com.codeka.warworlds2"
+    minSdkVersion 10
+    targetSdkVersion 23
+    versionCode 1
+    versionName "1.0"
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+      buildConfigField "String", "WEBSOCKET_URL", "\"wss://game.war-worlds.com/conn\""
+      buildConfigField "String", "SERVER_URL", "\"https://game.war-worlds.com/\""
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+    debug {
+      buildConfigField "String", "WEBSOCKET_URL", "\"ws://192.168.11.100:8080/conn\""
+      buildConfigField "String", "SERVER_URL", "\"http://192.168.11.100:8080/\""
     }
-    dexOptions {
-        incremental true
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
-    packagingOptions {
-        // These get added twice from different dependencies, so just ignore them.
-        exclude 'LICENSE-EPL-1.0.txt'
-        exclude 'LICENSE-EDL-1.0.txt'
-    }
+  }
+  dexOptions {
+    incremental true
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_7
+    targetCompatibility JavaVersion.VERSION_1_7
+  }
+  packagingOptions {
+    // These get added twice from different dependencies, so just ignore them.
+    exclude 'LICENSE-EPL-1.0.txt'
+    exclude 'LICENSE-EDL-1.0.txt'
+  }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.google.guava:guava:19.0'
-    compile 'com.neovisionaries:nv-websocket-client:1.25'
-    compile project(':common')
+  compile fileTree(include: ['*.jar'], dir: 'libs')
+  compile 'com.android.support:appcompat-v7:23.3.0'
+  compile 'com.google.guava:guava:19.0'
+  compile 'com.neovisionaries:nv-websocket-client:1.25'
+  compile project(':common')
 }
