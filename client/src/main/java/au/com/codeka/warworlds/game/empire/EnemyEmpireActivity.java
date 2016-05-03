@@ -84,8 +84,8 @@ public class EnemyEmpireActivity extends BaseActivity {
                     if (mEmpire != null) {
                         // Make sure it's update to date as well.
                         EmpireManager.i.refreshEmpire(mEmpireID, true);
+                        refresh();
                     }
-                    refresh();
                 }
             }
         });
