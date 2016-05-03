@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ImageHelper;
@@ -46,6 +48,7 @@ import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
 public class AllianceActivity extends TabFragmentActivity {
+  private final static Log log = new Log("AllianceActivity");
   private Context context = this;
 
   @Override
@@ -451,6 +454,10 @@ public class AllianceActivity extends TabFragmentActivity {
           } else {
             empire = empires.get(request.getRequestEmpireID());
           }
+          if (empire == null) {
+            log.error("Empire for %d not found!", request.getTargetEmpireID());
+            continue;
+          }
           mEntries.add(new ItemEntry(empire, request));
         }
 
@@ -540,8 +547,13 @@ public class AllianceActivity extends TabFragmentActivity {
         TextView message = (TextView) view.findViewById(R.id.message);
         ImageView pngImage = (ImageView) view.findViewById(R.id.png_image);
 
-        empireName.setText(entry.empire.getDisplayName());
-        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), entry.empire));
+        if (entry.empire == null) {
+          empireName.setText("...");
+          empireIcon.setImageBitmap(null);
+        } else {
+          empireName.setText(entry.empire.getDisplayName());
+          empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), entry.empire));
+        }
         requestDescription.setText(String.format(Locale.ENGLISH, "%s requested %s",
             entry.request.getDescription(),
             TimeFormatter.create().format(entry.request.getRequestDate())));
@@ -584,10 +596,11 @@ public class AllianceActivity extends TabFragmentActivity {
       }
 
       public class ItemEntry {
-        public Empire empire;
+        // May be null if we have to refresh the empire.
+        @Nullable public Empire empire;
         public AllianceRequest request;
 
-        public ItemEntry(Empire empire, AllianceRequest request) {
+        public ItemEntry(@Nullable Empire empire, AllianceRequest request) {
           this.empire = empire;
           this.request = request;
         }
