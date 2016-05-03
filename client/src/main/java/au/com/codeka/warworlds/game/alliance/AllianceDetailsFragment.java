@@ -143,7 +143,9 @@ public class AllianceDetailsFragment extends Fragment
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            refreshAlliance();
+                            if (mAlliance != null) {
+                                refreshAlliance();
+                            }
                         }
                     }, 250);
                 }
@@ -210,6 +212,9 @@ public class AllianceDetailsFragment extends Fragment
     }
 
     private void refreshAlliance() {
+        if (mAlliance == null) {
+            return;
+        }
         mRefreshPosted = false;
 
         TextView allianceName = (TextView) mView.findViewById(R.id.alliance_name);

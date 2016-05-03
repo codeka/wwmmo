@@ -21,6 +21,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.DesignKind;
@@ -41,6 +43,7 @@ import au.com.codeka.warworlds.model.Star;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ShipUpgradeDialog extends DialogFragment {
+    private final Log log = new Log("ShipUpgradeDialog");
     private View mView;
     private Star mStar;
     private Colony mColony;
@@ -62,6 +65,7 @@ public class ShipUpgradeDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        super.onCreateDialog(savedInstanceState);
         fetchArguments();
 
         final Activity activity = getActivity();
@@ -97,6 +101,7 @@ public class ShipUpgradeDialog extends DialogFragment {
             }
         }
         if (upgrades.size() > 0) {
+            log.debug("%d updates available.", upgrades.size());
             upgradeListAdapter.setup(upgrades);
 
             // select the first one by default
@@ -114,6 +119,7 @@ public class ShipUpgradeDialog extends DialogFragment {
                 }
             });
         } else {
+            log.debug("No upgrades available.");
             upgradesList.setVisibility(View.GONE);
             upgradesNone.setVisibility(View.VISIBLE);
         }
@@ -194,7 +200,7 @@ public class ShipUpgradeDialog extends DialogFragment {
         private ShipDesign.Upgrade mSelectedEntry;
 
         public void setup(List<ShipDesign.Upgrade> upgrades) {
-            mEntries = new ArrayList<ShipDesign.Upgrade>(upgrades);
+            mEntries = new ArrayList<>(upgrades);
             notifyDataSetChanged();
         }
 

@@ -68,8 +68,15 @@ public class ApiRequest {
   /** Builds the OkHttp request for this request. */
   Request buildOkRequest() {
     Realm realm = RealmContext.i.getCurrentRealm();
+    String urlPlus = url;
+    if (urlPlus.indexOf('?') >= 0) {
+      urlPlus += "&";
+    } else {
+      urlPlus += "?";
+    }
+    urlPlus += "t=" + System.currentTimeMillis();
     Request.Builder builder = new Request.Builder()
-        .url(realm.getBaseUrl().resolve(url).toString())
+        .url(realm.getBaseUrl().resolve(urlPlus).toString())
         .method(method, convertRequestBody())
         .addHeader("User-Agent", "wwmmo/" + Util.getVersion());
     if (skipCache) {

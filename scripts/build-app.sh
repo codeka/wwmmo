@@ -13,7 +13,7 @@ pushd $ROOTPATH > /dev/null
 popd > /dev/null
 
 # Assumes ANDROID_HOME is set to your Android SDK directory
-BUILDTOOLS_DIR=`ls $ANDROID_HOME/build-tools/ | sort -V | tail -1`
+#BUILDTOOLS_DIR=`ls $ANDROID_HOME/build-tools/ | sort -V | tail -1`
 VERSIONCODE=`$ANDROID_HOME/build-tools/$BUILDTOOLS_DIR/aapt dump badging $APKPATH | egrep -o "versionCode='[0-9]+'" | egrep -o "[0-9]+"`
 
 cp $APKPATH $ROOTPATH/../apk/warworlds-$VERSIONCODE.apk

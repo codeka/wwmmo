@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
@@ -21,6 +22,7 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
  * Manages stuff about your empire (e.g. colonising planets and what-not).
  */
 public class EmpireManager {
+  private static final Log log = new Log("EmpireManager");
   public static final EmpireManager i = new EmpireManager();
 
   public static final EventBus eventBus = new EventBus();
@@ -202,6 +204,9 @@ public class EmpireManager {
             MyEmpire myEmpire = new MyEmpire();
             myEmpire.fromProtocolBuffer(pb);
             newEmpire = myEmpire;
+            if (EmpireManager.this.myEmpire.getAlliance() != null && myEmpire.getAlliance() == null) {
+              log.warning("Old myEmpire has an alliance, new myEmpire does not!!");
+            }
             EmpireManager.this.myEmpire = myEmpire;
           } else {
             newEmpire.fromProtocolBuffer(pb);
