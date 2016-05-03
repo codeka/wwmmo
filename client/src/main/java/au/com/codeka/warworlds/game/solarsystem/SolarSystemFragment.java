@@ -100,6 +100,9 @@ public class SolarSystemFragment extends Fragment {
                 if (mStar == null) {
                     return; // can happen before the star loads
                 }
+                if (mColony == null) {
+                    return; // shouldn't happen, the button should be hidden.
+                }
 
                 Intent intent = new Intent(getActivity(), BuildActivity.class);
                 intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
