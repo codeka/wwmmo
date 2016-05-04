@@ -30,7 +30,7 @@ public final class Star extends Message<Star, Star.Builder> {
 
   private static final long serialVersionUID = 0L;
 
-  public static final String DEFAULT_KEY = "";
+  public static final Long DEFAULT_ID = 0L;
 
   public static final Long DEFAULT_SECTOR_X = 0L;
 
@@ -55,9 +55,9 @@ public final class Star extends Message<Star, Star.Builder> {
    */
   @WireField(
       tag = 1,
-      adapter = "com.squareup.wire.ProtoAdapter#STRING"
+      adapter = "com.squareup.wire.ProtoAdapter#INT64"
   )
-  public final String key;
+  public final Long id;
 
   /**
    * the sector this star is contained within
@@ -162,13 +162,13 @@ public final class Star extends Message<Star, Star.Builder> {
   )
   public final Wormhole wormhole;
 
-  public Star(String key, Long sector_x, Long sector_y, String name, CLASSIFICATION classification, Integer size, Integer offset_x, Integer offset_y, List<Planet> planets, Long time_emptied, Long last_simulation, Wormhole wormhole) {
-    this(key, sector_x, sector_y, name, classification, size, offset_x, offset_y, planets, time_emptied, last_simulation, wormhole, ByteString.EMPTY);
+  public Star(Long id, Long sector_x, Long sector_y, String name, CLASSIFICATION classification, Integer size, Integer offset_x, Integer offset_y, List<Planet> planets, Long time_emptied, Long last_simulation, Wormhole wormhole) {
+    this(id, sector_x, sector_y, name, classification, size, offset_x, offset_y, planets, time_emptied, last_simulation, wormhole, ByteString.EMPTY);
   }
 
-  public Star(String key, Long sector_x, Long sector_y, String name, CLASSIFICATION classification, Integer size, Integer offset_x, Integer offset_y, List<Planet> planets, Long time_emptied, Long last_simulation, Wormhole wormhole, ByteString unknownFields) {
+  public Star(Long id, Long sector_x, Long sector_y, String name, CLASSIFICATION classification, Integer size, Integer offset_x, Integer offset_y, List<Planet> planets, Long time_emptied, Long last_simulation, Wormhole wormhole, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
-    this.key = key;
+    this.id = id;
     this.sector_x = sector_x;
     this.sector_y = sector_y;
     this.name = name;
@@ -185,7 +185,7 @@ public final class Star extends Message<Star, Star.Builder> {
   @Override
   public Builder newBuilder() {
     Builder builder = new Builder();
-    builder.key = key;
+    builder.id = id;
     builder.sector_x = sector_x;
     builder.sector_y = sector_y;
     builder.name = name;
@@ -207,7 +207,7 @@ public final class Star extends Message<Star, Star.Builder> {
     if (!(other instanceof Star)) return false;
     Star o = (Star) other;
     return Internal.equals(unknownFields(), o.unknownFields())
-        && Internal.equals(key, o.key)
+        && Internal.equals(id, o.id)
         && Internal.equals(sector_x, o.sector_x)
         && Internal.equals(sector_y, o.sector_y)
         && Internal.equals(name, o.name)
@@ -226,7 +226,7 @@ public final class Star extends Message<Star, Star.Builder> {
     int result = super.hashCode;
     if (result == 0) {
       result = unknownFields().hashCode();
-      result = result * 37 + (key != null ? key.hashCode() : 0);
+      result = result * 37 + (id != null ? id.hashCode() : 0);
       result = result * 37 + (sector_x != null ? sector_x.hashCode() : 0);
       result = result * 37 + (sector_y != null ? sector_y.hashCode() : 0);
       result = result * 37 + (name != null ? name.hashCode() : 0);
@@ -246,7 +246,7 @@ public final class Star extends Message<Star, Star.Builder> {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    if (key != null) builder.append(", key=").append(key);
+    if (id != null) builder.append(", id=").append(id);
     if (sector_x != null) builder.append(", sector_x=").append(sector_x);
     if (sector_y != null) builder.append(", sector_y=").append(sector_y);
     if (name != null) builder.append(", name=").append(name);
@@ -262,7 +262,7 @@ public final class Star extends Message<Star, Star.Builder> {
   }
 
   public static final class Builder extends Message.Builder<Star, Builder> {
-    public String key;
+    public Long id;
 
     public Long sector_x;
 
@@ -293,8 +293,8 @@ public final class Star extends Message<Star, Star.Builder> {
     /**
      * the identifier of the star, unique throughout the universe.
      */
-    public Builder key(String key) {
-      this.key = key;
+    public Builder id(Long id) {
+      this.id = id;
       return this;
     }
 
@@ -392,7 +392,7 @@ public final class Star extends Message<Star, Star.Builder> {
 
     @Override
     public Star build() {
-      return new Star(key, sector_x, sector_y, name, classification, size, offset_x, offset_y, planets, time_emptied, last_simulation, wormhole, buildUnknownFields());
+      return new Star(id, sector_x, sector_y, name, classification, size, offset_x, offset_y, planets, time_emptied, last_simulation, wormhole, buildUnknownFields());
     }
   }
 
@@ -649,7 +649,7 @@ public final class Star extends Message<Star, Star.Builder> {
 
     @Override
     public int encodedSize(Star value) {
-      return (value.key != null ? ProtoAdapter.STRING.encodedSizeWithTag(1, value.key) : 0)
+      return (value.id != null ? ProtoAdapter.INT64.encodedSizeWithTag(1, value.id) : 0)
           + (value.sector_x != null ? ProtoAdapter.INT64.encodedSizeWithTag(11, value.sector_x) : 0)
           + (value.sector_y != null ? ProtoAdapter.INT64.encodedSizeWithTag(12, value.sector_y) : 0)
           + (value.name != null ? ProtoAdapter.STRING.encodedSizeWithTag(2, value.name) : 0)
@@ -666,7 +666,7 @@ public final class Star extends Message<Star, Star.Builder> {
 
     @Override
     public void encode(ProtoWriter writer, Star value) throws IOException {
-      if (value.key != null) ProtoAdapter.STRING.encodeWithTag(writer, 1, value.key);
+      if (value.id != null) ProtoAdapter.INT64.encodeWithTag(writer, 1, value.id);
       if (value.sector_x != null) ProtoAdapter.INT64.encodeWithTag(writer, 11, value.sector_x);
       if (value.sector_y != null) ProtoAdapter.INT64.encodeWithTag(writer, 12, value.sector_y);
       if (value.name != null) ProtoAdapter.STRING.encodeWithTag(writer, 2, value.name);
@@ -687,7 +687,7 @@ public final class Star extends Message<Star, Star.Builder> {
       long token = reader.beginMessage();
       for (int tag; (tag = reader.nextTag()) != -1;) {
         switch (tag) {
-          case 1: builder.key(ProtoAdapter.STRING.decode(reader)); break;
+          case 1: builder.id(ProtoAdapter.INT64.decode(reader)); break;
           case 11: builder.sector_x(ProtoAdapter.INT64.decode(reader)); break;
           case 12: builder.sector_y(ProtoAdapter.INT64.decode(reader)); break;
           case 2: builder.name(ProtoAdapter.STRING.decode(reader)); break;

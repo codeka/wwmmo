@@ -29,7 +29,7 @@ message Sector {
 //
 message Star {
   // the identifier of the star, unique throughout the universe.
-  optional string key = 1;
+  optional int64 id = 1;
 
   // the sector this star is contained within
   optional int64 sector_x = 11;
