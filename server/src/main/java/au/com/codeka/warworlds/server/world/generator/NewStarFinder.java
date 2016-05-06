@@ -1,0 +1,246 @@
+package au.com.codeka.warworlds.server.world.generator;
+
+import java.util.ArrayList;
+
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Planet;
+import au.com.codeka.warworlds.common.proto.Sector;
+import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.server.world.SectorManager;
+import au.com.codeka.warworlds.server.world.generator.SectorGenerator;
+
+/**
+ * Find a star which is suitable for a new empire.
+ * <p>When a new player joins the game, we want to find a star for their initial colony. We need to
+ * choose a star that's close to other players, but not <i>too</i> close as to make them an easy
+ * target.
+ *
+ * <p>Before looking for a brand new star, we'll first look through the abandoned stars for an
+ * appropriate one.
+ */
+public class NewStarFinder {
+  private final Log log = new Log("NewStarFinder");
+  private long starID;
+  private int planetIndex;
+
+  public long getStarID() {
+    return starID;
+  }
+  public int getPlanetIndex() {
+    return planetIndex;
+  }
+
+  public boolean findStarForNewEmpire() {
+    if (findAbandonedStar()) {
+      return true;
+    }
+
+    if (!findStar()) {
+      // Expand the universe then try again.
+      new SectorGenerator().expandUniverse();
+      return findStar();
+    }
+
+    return true;
+  }
+
+  /**
+   * Look for abandoned stars. We look for stars which are far enough from established empires, but still
+   * near the centre of the universe and not *too* far...
+   */
+  private boolean findAbandonedStar() {/*
+    String sql = "SELECT star_id, empire_id" +
+        " FROM abandoned_stars" +
+        " WHERE distance_to_non_abandoned_empire > 200" +
+        " ORDER BY (distance_to_non_abandoned_empire + distance_to_centre) ASC" +
+        " LIMIT 10";
+    try (SqlStmt stmt = DB.prepare(sql)) {
+      SqlResult res = stmt.select();
+
+      List<Pair<Integer, Integer>> stars = new ArrayList<Pair<Integer, Integer>>();
+      while (res.next()) {
+        int starID = res.getInt(1);
+        int empireID = res.getInt(2);
+        stars.add(new Pair<Integer, Integer>(starID, empireID));
+      }
+
+      if (stars.size() > 0) {
+        Pair<Integer, Integer> starDetails = stars.get(new Random().nextInt(stars.size()));
+
+        // we need to reset the empire on this star so that they move to a different star if the log in again.
+        new EmpireController().resetEmpire(starDetails.two, "You have not logged in for a while and your star was reclaimed.");
+
+        starID = starDetails.one;
+        findPlanetOnStar(new StarController().getStar(starID));
+
+        // the star is no longer abandoned!
+        sql = "DELETE FROM abandoned_stars WHERE star_id = ?";
+        try (SqlStmt stmt2 = DB.prepare(sql)) {
+          stmt2.setInt(1, starID);
+          stmt2.update();
+        }
+        return true;
+      }
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+
+    */return false;
+  }
+
+  private boolean findStar() {
+    ArrayList<Long> sectorIds = findSectors();
+    for (long sectorId : sectorIds) {
+      Sector sector = SectorManager.i.getSector(sectorId);
+      Star star = findHighestScoreStar(sector);
+      if (star == null) {
+        continue;
+      }
+
+      // if we get here, then we've found the star. Also find which planet to put the colony on.
+      starID = star.id;
+      findPlanetOnStar(star);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  /** Find the planet with the highest population congeniality. That's the one. */
+  private void findPlanetOnStar(Star star) {
+    int highestPopulationCongeniality = 0;
+    for (Planet planet : star.planets) {
+      if (planet.population_congeniality > highestPopulationCongeniality) {
+        highestPopulationCongeniality = planet.population_congeniality;
+        planetIndex = planet.index;
+      }
+    }
+  }
+
+  private Star findHighestScoreStar(Sector sector) {
+    double highestScore = 5.0; // scores lower than 5.0 don't count
+    Star highestScoreStar = null;
+
+    for (Star star : sector.stars) {
+      // ignore colonized stars, they're no good
+      if (isColonized(star)) {
+        continue;
+      }
+
+      // similarly, colonies with fleets are right out
+      boolean hasFleets = false;/*
+      for (BaseFleet fleet : star.getFleets()) {
+        if (fleet.getEmpireKey() != null) {
+          hasFleets = true;
+          break;
+        }
+      }
+      */if (hasFleets) {
+        continue;
+      }
+
+      double score = scoreStar(sector, star);
+      if (score > highestScore) {
+        highestScore = score;
+        highestScoreStar = (Star) star;
+      }
+    }
+
+    return highestScoreStar;
+  }
+
+  private boolean isColonized(Star star) {/*
+    for (BaseColony colony : star.getColonies()) {
+      if (colony.getEmpireKey() != null) {
+        return true;
+      }
+    }
+    */return false;
+  }
+
+  private double scoreStar(Sector sector, Star star) {
+    int centre = SectorManager.SECTOR_SIZE / 2;
+    double distanceToCentre = Math.sqrt((star.offset_x - centre) * (star.offset_x - centre) +
+        (star.offset_y - centre) * (star.offset_y - centre));
+    // 0..10 (0 means the star is on the edge of the sector, 10 means it's the very centre)
+    double distanceToCentreScore = (centre - distanceToCentre) / (centre / 10.0);
+    if (distanceToCentreScore < 1.0) {
+      distanceToCentreScore = 1.0;
+    }
+
+    // figure out the distance to the closest colonized star and give it a score based on that
+    // basically, we want to be about 400 pixels away, no closer but a litter further away is
+    // OK as well
+    double distanceToOtherColonyScore = 1.0;
+    double distanceToOtherColony = 0.0;
+    Star otherColony = null;
+    for (Star otherStar : sector.stars) {
+      if (otherStar.id.equals(star.id)) {
+        continue;
+      }
+      if (isColonized(otherStar)) {
+        double distanceToColony = Math.sqrt(
+            (star.offset_x - otherStar.offset_x) * (star.offset_x - otherStar.offset_x)
+                + (star.offset_y - otherStar.offset_y) * (star.offset_y - otherStar.offset_y));
+        if (otherColony == null || distanceToColony < distanceToOtherColony) {
+          otherColony = otherStar;
+          distanceToOtherColony = distanceToColony;
+        }
+      }
+    }
+    if (otherColony != null) {
+      if (distanceToOtherColony < 500.0) {
+        distanceToOtherColonyScore = 0.0;
+      } else {
+        distanceToOtherColonyScore = 500.0 / distanceToOtherColony;
+        distanceToOtherColonyScore *= distanceToOtherColonyScore;
+      }
+    }
+
+    double numTerranPlanets = 0.0;
+    double populationCongeniality = 0.0;
+    double farmingCongeniality = 0.0;
+    double miningCongeniality = 0.0;
+    double energyCongeniality = 0.0;
+    for (Planet planet : star.planets) {
+      if (planet.planet_type.equals(Planet.PLANET_TYPE.TERRAN)
+          || planet.planet_type.equals(Planet.PLANET_TYPE.SWAMP)
+          || planet.planet_type.equals(Planet.PLANET_TYPE.WATER)) {
+        numTerranPlanets ++;
+      }
+      populationCongeniality += planet.population_congeniality;
+      farmingCongeniality += planet.farming_congeniality;
+      miningCongeniality += planet.mining_congeniality;
+      energyCongeniality += planet.energy_congeniality;
+    }
+    double planetScore = 0.0;
+    if (numTerranPlanets >= 2) {
+      planetScore = numTerranPlanets;
+    }
+    if (numTerranPlanets == 0) {
+      return 0.0;
+    }
+
+    double congenialityScore = (populationCongeniality / numTerranPlanets)
+        + (farmingCongeniality / numTerranPlanets)
+        + (miningCongeniality / numTerranPlanets)
+        + (energyCongeniality / numTerranPlanets);
+    congenialityScore /= 100.0;
+
+    double score = (distanceToCentreScore * planetScore * congenialityScore *
+        distanceToOtherColonyScore);
+
+    log.info("Star[%s] score=%.2f distance_to_centre_score=%.2f planet_score=%.2f "
+        + "num_terran_planets=%.0f congeniality_score=%.2f distance_to_colony_score=%.2f "
+        + "distance_to_nearest_colony=%.2f",
+        star.name, score, distanceToCentreScore, planetScore, numTerranPlanets, congenialityScore,
+        distanceToOtherColonyScore, distanceToOtherColony);
+    return score;
+  }
+
+  private ArrayList<Long> findSectors() {
+    return new ArrayList<>();
+  }
+}
+
