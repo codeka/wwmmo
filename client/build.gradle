@@ -24,8 +24,8 @@ android {
       buildConfigField "String", "SERVER_URL", "\"https://game.war-worlds.com/\""
     }
     debug {
-      buildConfigField "String", "WEBSOCKET_URL", "\"ws://192.168.11.100:8080/conn\""
-      buildConfigField "String", "SERVER_URL", "\"http://192.168.11.100:8080/\""
+      buildConfigField "String", "WEBSOCKET_URL", "\"ws://192.168.1.3:8080/conn\""
+      buildConfigField "String", "SERVER_URL", "\"http://192.168.1.3:8080/\""
     }
   }
   dexOptions {
