@@ -1,12 +1,10 @@
 package au.com.codeka.warworlds.common;
 
-import au.com.codeka.common.ObjectPool;
-
 /**
  * Helper class that represents an ARGB colour.
  */
 public class Colour implements ObjectPool.Pooled {
-    public static ObjectPool<Colour> pool = new ObjectPool<Colour>(1000, new ColourCreator());
+    public static final ObjectPool<Colour> pool = new ObjectPool<>(1000, new ColourCreator());
 
     public double a;
     public double r;
