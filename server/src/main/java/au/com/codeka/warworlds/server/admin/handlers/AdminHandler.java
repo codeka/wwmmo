@@ -36,7 +36,7 @@ public class AdminHandler extends RequestHandler {
     TEMPLATE_ENGINE.getConfiguration().setResourceLocater(
         new FileResourceLocater(
             TEMPLATE_ENGINE.getConfiguration(),
-            new File("data/tmpl").getAbsolutePath()));
+            new File("data/admin/tmpl").getAbsolutePath()));
     TEMPLATE_ENGINE.getConfiguration().setEncoding("utf-8");
 
     TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new NumberFilter());
@@ -47,13 +47,9 @@ public class AdminHandler extends RequestHandler {
 
   @Override
   public void onBeforeHandle() {
-    if (!(this instanceof AdminLoginHandler)) {
-      // if we're not the Login handler and we're not yet authed, auth now
-      if (getSessionNoError() == null) {
-        // if they're not authenticated yet, we'll have to redirect them to the authentication
-        // page first.
-        authenticate();
-      }
+    if (requiresSession() && getSessionNoError() == null) {
+      // If we require a session, make sure we're authenticated.
+      authenticate();
     }
   }
 
@@ -67,6 +63,10 @@ public class AdminHandler extends RequestHandler {
     } catch (Exception e2) {
       setResponseText(e2.toString());
     }
+  }
+
+  protected boolean requiresSession() {
+    return true;
   }
 
   protected void render(String path, Map<String, Object> data) throws RequestException {
@@ -108,7 +108,7 @@ public class AdminHandler extends RequestHandler {
     }
 
     String finalUrl = requestUrl.getPath();
-    String redirectUrl = requestUrl.resolve("/realms/" + getRealm() + "/admin/login").toString();
+    String redirectUrl = requestUrl.resolve("/admin/login").toString();
     try {
       redirectUrl += "?continue=" + URLEncoder.encode(finalUrl, "utf-8");
     } catch (UnsupportedEncodingException e) {

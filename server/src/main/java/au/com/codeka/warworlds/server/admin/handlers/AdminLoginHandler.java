@@ -19,12 +19,20 @@ import javax.servlet.http.Cookie;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.admin.RequestException;
+import au.com.codeka.warworlds.server.admin.Session;
+import au.com.codeka.warworlds.server.admin.SessionManager;
 
 public class AdminLoginHandler extends AdminHandler {
   private static final Log log = new Log("AdminLoginHandler");
 
   private static final String CLIENT_ID =
       "1021675369049-sumlr2cihs72j4okvfl8hl72keognhsa.apps.googleusercontent.com";
+
+  /** We don't require a session, because we're *creating* a session. */
+  @Override
+  protected boolean requiresSession() {
+    return false;
+  }
 
   @Override
   protected void get() throws RequestException {
@@ -64,12 +72,10 @@ public class AdminLoginHandler extends AdminHandler {
       throw new RequestException(e);
     }
 
-    // TODO: record the login.
-    // TODO: generate a cookie.
-    String cookieValue = "12345";
-    log.info("Got cookie: %s for %s", cookieValue, emailAddr);
+    Session session =  SessionManager.i.authenticate(emailAddr);
+    log.info("Got cookie: %s for %s", session.getCookie(), emailAddr);
 
-    Cookie cookie = new Cookie("SESSION", cookieValue);
+    Cookie cookie = new Cookie("SESSION", session.getCookie());
     cookie.setHttpOnly(true);
     cookie.setPath("/admin");
 

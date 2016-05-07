@@ -47,6 +47,7 @@ public class RequestHandler {
   }
 
   /** Gets the "extra" option that was passed in the route configuration. */
+  @Nullable
   protected String getExtraOption() {
     return extraOption;
   }

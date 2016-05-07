@@ -1,15 +1,14 @@
 package au.com.codeka.warworlds.server.admin;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-
-import org.eclipse.jetty.http.HttpParser;
-import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -20,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.admin.handlers.AdminLoginHandler;
+import au.com.codeka.warworlds.server.admin.handlers.DashboardHandler;
+import au.com.codeka.warworlds.server.admin.handlers.FileHandler;
 
 /**
  * The {@link AdminServlet} is the root of all requests for the admin backend.
@@ -27,17 +28,23 @@ import au.com.codeka.warworlds.server.admin.handlers.AdminLoginHandler;
 public class AdminServlet extends GenericServlet {
   private static final Log log = new Log("AdminServlet");
   private static final ArrayList<Route> ROUTES = Lists.newArrayList(
-      new Route("/login", AdminLoginHandler.class)//,
+      new Route("/", DashboardHandler.class),
+      new Route("/login", AdminLoginHandler.class),
 //      new Route("admin/(?<path>actions/move-star)", AdminActionsMoveStarHandler.class, "admin/"),
 //      new Route("admin/(?<path>actions/reset-empire)", AdminActionsResetEmpireHandler.class, "admin/"),
 //      new Route("admin/alliance/(?<allianceid>[0-9]+)/details", AdminAllianceDetailsHandler.class)
+      new Route("/(?<path>.*)", FileHandler.class)
   );
 
   @Override
   public void service(ServletRequest request, ServletResponse response)
       throws IOException, ServletException {
     String path = ((HttpServletRequest) request).getPathInfo();
+    if (path == null) {
+      path = "/";
+    }
     log.info("path: %s", path);
+
     for (Route route : ROUTES) {
       Matcher matcher = route.pattern.matcher(path);
       if (matcher.matches()) {
@@ -55,8 +62,8 @@ public class AdminServlet extends GenericServlet {
     RequestHandler handler;
     try {
       handler = (RequestHandler) route.handlerClass.newInstance();
-    } catch (InstantiationException | IllegalAccessException e) {
-      return; // TODO: error
+    } catch (Exception e) {
+      return; // should never happen.
     }
 
     Session session = null;
@@ -66,13 +73,7 @@ public class AdminServlet extends GenericServlet {
         if (cookie.getName().equals("SESSION")) {
           sessionCookieValue = cookie.getValue();
           log.info("Got SESSION cookie: %s", sessionCookieValue);
-          //try {
-            //session = new SessionController().getSession(
-            //    sessionCookieValue, impersonate);
-            session = new Session(sessionCookieValue, "dean@codeka.com.au", DateTime.now());
-          //} catch (RequestException e) {
-          //  log.error("Error getting session: cookie=" + sessionCookieValue, e);
-          //}
+          session = SessionManager.i.getSession(sessionCookieValue);
         }
       }
       if (sessionCookieValue.equals("")) {
@@ -92,12 +93,12 @@ public class AdminServlet extends GenericServlet {
     public Class<?> handlerClass;
     public String extraOption;
 
-    public Route(String pattern, Class<?> handlerClass) {
+    public Route(@Nonnull String pattern, Class<?> handlerClass) {
       this(pattern, handlerClass, null);
     }
 
-    public Route(String pattern, Class<?> handlerClass, String extraOption) {
-      this.pattern = Pattern.compile(pattern);
+    public Route(@Nonnull String pattern, Class<?> handlerClass, String extraOption) {
+      this.pattern = Pattern.compile(Preconditions.checkNotNull(pattern));
       this.handlerClass = handlerClass;
       this.extraOption = extraOption;
     }
