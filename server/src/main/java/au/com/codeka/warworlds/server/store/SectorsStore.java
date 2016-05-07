@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.store;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
@@ -161,7 +162,7 @@ public class SectorsStore {
       List<SectorCoord> coords;
       DatabaseEntry value = new DatabaseEntry();
       if (db.get(trans, EMPTY_SECTORS_KEY, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-        coords = sectorCoordArraySerializer.deserialize(value).coords;
+        coords = new ArrayList<>(sectorCoordArraySerializer.deserialize(value).coords);
       } else {
         coords = new ArrayList<>();
       }
@@ -191,20 +192,23 @@ public class SectorsStore {
         bounds = sectorCoordArraySerializer.deserialize(value).coords;
         Preconditions.checkState(bounds.size() == 2,
             "Expected universe bounds to be size==2, found size==%d", bounds.size());
+
+        bounds = Lists.newArrayList(
+            new SectorCoord.Builder()
+                .x(bounds.get(0).x - 1)
+                .y(bounds.get(0).y - 1)
+                .build(),
+            new SectorCoord.Builder()
+                .x(bounds.get(1).x + 1)
+                .y(bounds.get(1).y + 1)
+                .build());
+
       } else {
-        bounds = new ArrayList<>();
-        bounds.add(new SectorCoord.Builder().x(0L).y(0L).build());
-        bounds.add(new SectorCoord.Builder().x(0L).y(0L).build());
+        bounds = Lists.newArrayList(
+            new SectorCoord.Builder().x(0L).y(0L).build(),
+            new SectorCoord.Builder().x(0L).y(0L).build());
       }
 
-      bounds.set(0, new SectorCoord.Builder()
-          .x(bounds.get(0).x - 1)
-          .y(bounds.get(0).y - 1)
-          .build());
-      bounds.set(1, new SectorCoord.Builder()
-          .x(bounds.get(1).x + 1)
-          .y(bounds.get(1).y + 1)
-          .build());
       value = sectorCoordArraySerializer.serialize(
           new SectorCoordArray.Builder().coords(bounds).build());
       db.put(trans, UNIVERSE_BOUNDS_KEY, value);
@@ -214,7 +218,7 @@ public class SectorsStore {
       value = new DatabaseEntry();
       if (db.get(trans, UNGENERATED_SECTORS_KEY, value, LockMode.DEFAULT)
           == OperationStatus.SUCCESS) {
-        coords = sectorCoordArraySerializer.deserialize(value).coords;
+        coords = new ArrayList<>(sectorCoordArraySerializer.deserialize(value).coords);
       } else {
         coords = new ArrayList<>();
       }
@@ -251,7 +255,7 @@ public class SectorsStore {
       DatabaseEntry value = new DatabaseEntry();
       if (db.get(trans, UNGENERATED_SECTORS_KEY, value, LockMode.DEFAULT)
           == OperationStatus.SUCCESS) {
-        coords = sectorCoordArraySerializer.deserialize(value).coords;
+        coords = new ArrayList<>(sectorCoordArraySerializer.deserialize(value).coords);
       } else {
         return;
       }

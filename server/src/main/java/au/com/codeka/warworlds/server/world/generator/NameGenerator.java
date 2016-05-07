@@ -98,11 +98,18 @@ public class NameGenerator {
   private String tryGenerate(Vocabulary vocab, Random rand) {
     StringBuilder word = new StringBuilder();
     word.append(vocab.getLetter("  ", rand));
+    if (Character.isWhitespace(word.charAt(0))) {
+      return null;
+    }
     word.append(vocab.getLetter(" "+word.charAt(0), rand));
+    if (Character.isWhitespace(word.charAt(1))) {
+      return null;
+    }
     while (true) {
       try {
+
         char ch = vocab.getLetter(word.substring(word.length() - 2, word.length()), rand);
-        if (ch == ' ') {
+        if (Character.isWhitespace(ch)) {
           break;
         } else {
           word.append(ch);
@@ -191,7 +198,7 @@ public class NameGenerator {
     public char getLetter(String lastLetters, Random rand) {
       TreeMap<Character, Integer> frequencies = letterFrequencies.get(lastLetters);
       if (frequencies == null) {
-        throw new RuntimeException("No frequencies for letters: '"+lastLetters+"'");
+        throw new RuntimeException("No frequencies for letters: '"+lastLetters+"' ");
       }
       int maxFrequency = 0;
       for (int frequency : frequencies.values()) {

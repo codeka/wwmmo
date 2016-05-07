@@ -31,8 +31,6 @@ public final class Planet extends Message<Planet, Planet.Builder> {
 
   public static final PLANET_TYPE DEFAULT_PLANET_TYPE = PLANET_TYPE.GASGIANT;
 
-  public static final Integer DEFAULT_SIZE = 0;
-
   public static final Integer DEFAULT_POPULATION_CONGENIALITY = 0;
 
   public static final Integer DEFAULT_FARMING_CONGENIALITY = 0;
@@ -58,20 +56,10 @@ public final class Planet extends Message<Planet, Planet.Builder> {
   public final PLANET_TYPE planet_type;
 
   /**
-   * The size of the planet. Certain planet_type's are predisposed to be certain sizes
-   * (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
-   */
-  @WireField(
-      tag = 4,
-      adapter = "com.squareup.wire.ProtoAdapter#INT32"
-  )
-  public final Integer size;
-
-  /**
    * How "congenial" is this planet to supporting population
    */
   @WireField(
-      tag = 5,
+      tag = 4,
       adapter = "com.squareup.wire.ProtoAdapter#INT32"
   )
   public final Integer population_congeniality;
@@ -80,7 +68,7 @@ public final class Planet extends Message<Planet, Planet.Builder> {
    * How "congenial" is this planet to supporting farming
    */
   @WireField(
-      tag = 6,
+      tag = 5,
       adapter = "com.squareup.wire.ProtoAdapter#INT32"
   )
   public final Integer farming_congeniality;
@@ -89,7 +77,7 @@ public final class Planet extends Message<Planet, Planet.Builder> {
    * How "congenial" is this planet to supporting mining
    */
   @WireField(
-      tag = 7,
+      tag = 6,
       adapter = "com.squareup.wire.ProtoAdapter#INT32"
   )
   public final Integer mining_congeniality;
@@ -98,20 +86,19 @@ public final class Planet extends Message<Planet, Planet.Builder> {
    * How "congenial" is this planet to the production of energy?
    */
   @WireField(
-      tag = 8,
+      tag = 7,
       adapter = "com.squareup.wire.ProtoAdapter#INT32"
   )
   public final Integer energy_congeniality;
 
-  public Planet(Integer index, PLANET_TYPE planet_type, Integer size, Integer population_congeniality, Integer farming_congeniality, Integer mining_congeniality, Integer energy_congeniality) {
-    this(index, planet_type, size, population_congeniality, farming_congeniality, mining_congeniality, energy_congeniality, ByteString.EMPTY);
+  public Planet(Integer index, PLANET_TYPE planet_type, Integer population_congeniality, Integer farming_congeniality, Integer mining_congeniality, Integer energy_congeniality) {
+    this(index, planet_type, population_congeniality, farming_congeniality, mining_congeniality, energy_congeniality, ByteString.EMPTY);
   }
 
-  public Planet(Integer index, PLANET_TYPE planet_type, Integer size, Integer population_congeniality, Integer farming_congeniality, Integer mining_congeniality, Integer energy_congeniality, ByteString unknownFields) {
+  public Planet(Integer index, PLANET_TYPE planet_type, Integer population_congeniality, Integer farming_congeniality, Integer mining_congeniality, Integer energy_congeniality, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
     this.index = index;
     this.planet_type = planet_type;
-    this.size = size;
     this.population_congeniality = population_congeniality;
     this.farming_congeniality = farming_congeniality;
     this.mining_congeniality = mining_congeniality;
@@ -123,7 +110,6 @@ public final class Planet extends Message<Planet, Planet.Builder> {
     Builder builder = new Builder();
     builder.index = index;
     builder.planet_type = planet_type;
-    builder.size = size;
     builder.population_congeniality = population_congeniality;
     builder.farming_congeniality = farming_congeniality;
     builder.mining_congeniality = mining_congeniality;
@@ -140,7 +126,6 @@ public final class Planet extends Message<Planet, Planet.Builder> {
     return Internal.equals(unknownFields(), o.unknownFields())
         && Internal.equals(index, o.index)
         && Internal.equals(planet_type, o.planet_type)
-        && Internal.equals(size, o.size)
         && Internal.equals(population_congeniality, o.population_congeniality)
         && Internal.equals(farming_congeniality, o.farming_congeniality)
         && Internal.equals(mining_congeniality, o.mining_congeniality)
@@ -154,7 +139,6 @@ public final class Planet extends Message<Planet, Planet.Builder> {
       result = unknownFields().hashCode();
       result = result * 37 + (index != null ? index.hashCode() : 0);
       result = result * 37 + (planet_type != null ? planet_type.hashCode() : 0);
-      result = result * 37 + (size != null ? size.hashCode() : 0);
       result = result * 37 + (population_congeniality != null ? population_congeniality.hashCode() : 0);
       result = result * 37 + (farming_congeniality != null ? farming_congeniality.hashCode() : 0);
       result = result * 37 + (mining_congeniality != null ? mining_congeniality.hashCode() : 0);
@@ -169,7 +153,6 @@ public final class Planet extends Message<Planet, Planet.Builder> {
     StringBuilder builder = new StringBuilder();
     if (index != null) builder.append(", index=").append(index);
     if (planet_type != null) builder.append(", planet_type=").append(planet_type);
-    if (size != null) builder.append(", size=").append(size);
     if (population_congeniality != null) builder.append(", population_congeniality=").append(population_congeniality);
     if (farming_congeniality != null) builder.append(", farming_congeniality=").append(farming_congeniality);
     if (mining_congeniality != null) builder.append(", mining_congeniality=").append(mining_congeniality);
@@ -181,8 +164,6 @@ public final class Planet extends Message<Planet, Planet.Builder> {
     public Integer index;
 
     public PLANET_TYPE planet_type;
-
-    public Integer size;
 
     public Integer population_congeniality;
 
@@ -206,15 +187,6 @@ public final class Planet extends Message<Planet, Planet.Builder> {
 
     public Builder planet_type(PLANET_TYPE planet_type) {
       this.planet_type = planet_type;
-      return this;
-    }
-
-    /**
-     * The size of the planet. Certain planet_type's are predisposed to be certain sizes
-     * (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
-     */
-    public Builder size(Integer size) {
-      this.size = size;
       return this;
     }
 
@@ -252,7 +224,7 @@ public final class Planet extends Message<Planet, Planet.Builder> {
 
     @Override
     public Planet build() {
-      return new Planet(index, planet_type, size, population_congeniality, farming_congeniality, mining_congeniality, energy_congeniality, buildUnknownFields());
+      return new Planet(index, planet_type, population_congeniality, farming_congeniality, mining_congeniality, energy_congeniality, buildUnknownFields());
     }
   }
 
@@ -320,11 +292,10 @@ public final class Planet extends Message<Planet, Planet.Builder> {
     public int encodedSize(Planet value) {
       return (value.index != null ? ProtoAdapter.INT32.encodedSizeWithTag(2, value.index) : 0)
           + (value.planet_type != null ? PLANET_TYPE.ADAPTER.encodedSizeWithTag(3, value.planet_type) : 0)
-          + (value.size != null ? ProtoAdapter.INT32.encodedSizeWithTag(4, value.size) : 0)
-          + (value.population_congeniality != null ? ProtoAdapter.INT32.encodedSizeWithTag(5, value.population_congeniality) : 0)
-          + (value.farming_congeniality != null ? ProtoAdapter.INT32.encodedSizeWithTag(6, value.farming_congeniality) : 0)
-          + (value.mining_congeniality != null ? ProtoAdapter.INT32.encodedSizeWithTag(7, value.mining_congeniality) : 0)
-          + (value.energy_congeniality != null ? ProtoAdapter.INT32.encodedSizeWithTag(8, value.energy_congeniality) : 0)
+          + (value.population_congeniality != null ? ProtoAdapter.INT32.encodedSizeWithTag(4, value.population_congeniality) : 0)
+          + (value.farming_congeniality != null ? ProtoAdapter.INT32.encodedSizeWithTag(5, value.farming_congeniality) : 0)
+          + (value.mining_congeniality != null ? ProtoAdapter.INT32.encodedSizeWithTag(6, value.mining_congeniality) : 0)
+          + (value.energy_congeniality != null ? ProtoAdapter.INT32.encodedSizeWithTag(7, value.energy_congeniality) : 0)
           + value.unknownFields().size();
     }
 
@@ -332,11 +303,10 @@ public final class Planet extends Message<Planet, Planet.Builder> {
     public void encode(ProtoWriter writer, Planet value) throws IOException {
       if (value.index != null) ProtoAdapter.INT32.encodeWithTag(writer, 2, value.index);
       if (value.planet_type != null) PLANET_TYPE.ADAPTER.encodeWithTag(writer, 3, value.planet_type);
-      if (value.size != null) ProtoAdapter.INT32.encodeWithTag(writer, 4, value.size);
-      if (value.population_congeniality != null) ProtoAdapter.INT32.encodeWithTag(writer, 5, value.population_congeniality);
-      if (value.farming_congeniality != null) ProtoAdapter.INT32.encodeWithTag(writer, 6, value.farming_congeniality);
-      if (value.mining_congeniality != null) ProtoAdapter.INT32.encodeWithTag(writer, 7, value.mining_congeniality);
-      if (value.energy_congeniality != null) ProtoAdapter.INT32.encodeWithTag(writer, 8, value.energy_congeniality);
+      if (value.population_congeniality != null) ProtoAdapter.INT32.encodeWithTag(writer, 4, value.population_congeniality);
+      if (value.farming_congeniality != null) ProtoAdapter.INT32.encodeWithTag(writer, 5, value.farming_congeniality);
+      if (value.mining_congeniality != null) ProtoAdapter.INT32.encodeWithTag(writer, 6, value.mining_congeniality);
+      if (value.energy_congeniality != null) ProtoAdapter.INT32.encodeWithTag(writer, 7, value.energy_congeniality);
       writer.writeBytes(value.unknownFields());
     }
 
@@ -355,11 +325,10 @@ public final class Planet extends Message<Planet, Planet.Builder> {
             }
             break;
           }
-          case 4: builder.size(ProtoAdapter.INT32.decode(reader)); break;
-          case 5: builder.population_congeniality(ProtoAdapter.INT32.decode(reader)); break;
-          case 6: builder.farming_congeniality(ProtoAdapter.INT32.decode(reader)); break;
-          case 7: builder.mining_congeniality(ProtoAdapter.INT32.decode(reader)); break;
-          case 8: builder.energy_congeniality(ProtoAdapter.INT32.decode(reader)); break;
+          case 4: builder.population_congeniality(ProtoAdapter.INT32.decode(reader)); break;
+          case 5: builder.farming_congeniality(ProtoAdapter.INT32.decode(reader)); break;
+          case 6: builder.mining_congeniality(ProtoAdapter.INT32.decode(reader)); break;
+          case 7: builder.energy_congeniality(ProtoAdapter.INT32.decode(reader)); break;
           default: {
             FieldEncoding fieldEncoding = reader.peekFieldEncoding();
             Object value = fieldEncoding.rawProtoAdapter().decode(reader);
