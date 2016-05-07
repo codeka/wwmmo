@@ -3,9 +3,12 @@ package au.com.codeka.warworlds.server.world;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.ProtobufStore;
+import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
 
 /**
  * Manages empires, keeps them loaded and ensure they get saved to the data store at the right time.
@@ -31,11 +34,27 @@ public class EmpireManager {
     }
   }
 
+  /**
+   * Create a new {@link Empire}, and return it as a {@link WatchableObject}.
+   * @param name The name to give this new empire. We assume you've already confirmed that the name
+   *             is unique.
+   *
+   * @return The new empire, or null if there was an error creating the empire.
+   */
+  @Nullable
   public WatchableObject<Empire> createEmpire(String name) {
+    NewStarFinder newStarFinder = new NewStarFinder();
+    if (!newStarFinder.findStarForNewEmpire()) {
+      return null;
+    }
+
+    // TODO: Create a colony on the star.
+
     long id = empires.nextIdentifier();
     Empire empire = new Empire.Builder()
         .display_name(name)
         .id(id)
+        .home_star(newStarFinder.getStar())
         .build();
     empires.put(id, empire);
 
@@ -49,7 +68,7 @@ public class EmpireManager {
       if (watchableEmpire != null) {
         watchableEmpire.set(empire);
       } else {
-        watchableEmpire = new WatchableObject<>(empire.id, empire);
+        watchableEmpire = new WatchableObject<>(empire);
         watchedEmpires.put(watchableEmpire.get().id, watchableEmpire);
       }
     }

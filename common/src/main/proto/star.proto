@@ -4,6 +4,7 @@ import "common.proto";
 
 //
 // Represents a "sector" of space, containing a number of stars and whatnot.
+//
 message Sector {
   // these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
   // (1,1) is one sector up and to the right, and so on.
@@ -21,6 +22,17 @@ message Sector {
 
   // a collection of fleets in this sector
 //  repeated Fleet fleets = 6;
+}
+
+message SectorCoord {
+  optional int64 x = 1;
+  optional int64 y = 2;
+}
+
+// An array of (x,y) coordinates. This is used to store the list of empty sectors, as well
+// as a list of "to-be-generated" sectors.
+message SectorCoordArray {
+  repeated SectorCoord coords = 1;
 }
 
 //

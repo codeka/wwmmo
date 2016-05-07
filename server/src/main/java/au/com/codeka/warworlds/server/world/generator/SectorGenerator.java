@@ -1,15 +1,19 @@
 package au.com.codeka.warworlds.server.world.generator;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.PointCloud;
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Sector;
+import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.SectorManager;
 
 /**
@@ -17,6 +21,8 @@ import au.com.codeka.warworlds.server.world.SectorManager;
  * out for new players (or when a player creeps up on the edge of the universe).
  */
 public class SectorGenerator {
+  private static final Log log = new Log("SectorGenerator");
+
   private Random random;
 
   private static final double STAR_DENSITY = 0.18;
@@ -90,13 +96,13 @@ public class SectorGenerator {
   };
 
   public Sector generate(long x, long y) {
+    log.info("Generating sector (%d, %d)...", x, y);
     random = new Random((x * 73649274L) ^ y ^ System.currentTimeMillis());
 
     Sector sector = new Sector.Builder()
         .x(x)
         .y(y)
         .build();
-    // TODO: get ID
 
     ArrayList<Vector2> points = new PointCloud.PoissonGenerator()
         .generate(STAR_DENSITY, STAR_RANDOMNESS, random);
@@ -106,37 +112,18 @@ public class SectorGenerator {
       sector.stars.add(star);
     }
 
+    DataStore.i.sectors().createSector(sector);
     return sector;
   }
 
-  /**
-   * Expands the universe by one sector.
-   */
+  /** Expands the universe by (at least) one sector. */
   public void expandUniverse() {
-    TreeMap<Long, Set<Long>> existingSectors = new TreeMap<>();
-    long minX = 0, minY = 0, maxX = 0, maxY = 0;
-    // TODO: calculate the current bounds of the universe
+    final int NUM_TO_GENERATE = 50;
 
-    int numGenerated = 0;
-    while (numGenerated < 50) {
-      for (long x = minX; x <= maxX; x++) {
-        for (long y = minY; y <= maxY; y++) {
-          Set<Long> xs = existingSectors.get(y);
-          if (xs == null || !xs.contains(x)) {
-            generate(x, y);
-            numGenerated ++;
-            if (numGenerated > 50) {
-              return;
-            }
-          }
-        }
-      }
-
-      // if we get here, we ran out of coordinates
-      minX --;
-      maxX ++;
-      minY --;
-      maxY ++;
+    List<SectorCoord> coords = DataStore.i.sectors().getUngeneratedSectors(NUM_TO_GENERATE);
+    for (int i = 0; i < NUM_TO_GENERATE; i++) {
+      SectorCoord coord = coords.remove(coords.size() - 1);
+      generate(coord.x, coord.y);
     }
   }
 
@@ -145,6 +132,7 @@ public class SectorGenerator {
     ArrayList<Planet> planets = generatePlanets(classification);
 
     return new Star.Builder()
+        .id(DataStore.i.stars().nextIdentifier())
         .classification(classification)
         .name(new NameGenerator().generate(random))
         .offset_x((int) ((SectorManager.SECTOR_SIZE - 64) * point.x) + 32)

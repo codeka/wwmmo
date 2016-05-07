@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Sector;
+import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.SectorManager;
+import au.com.codeka.warworlds.server.world.WatchableObject;
 import au.com.codeka.warworlds.server.world.generator.SectorGenerator;
 
 /**
@@ -20,11 +23,11 @@ import au.com.codeka.warworlds.server.world.generator.SectorGenerator;
  */
 public class NewStarFinder {
   private final Log log = new Log("NewStarFinder");
-  private long starID;
+  private Star star;
   private int planetIndex;
 
-  public long getStarID() {
-    return starID;
+  public Star getStar() {
+    return star;
   }
   public int getPlanetIndex() {
     return planetIndex;
@@ -89,22 +92,21 @@ public class NewStarFinder {
   }
 
   private boolean findStar() {
-    ArrayList<Long> sectorIds = findSectors();
-    for (long sectorId : sectorIds) {
-      Sector sector = SectorManager.i.getSector(sectorId);
-      Star star = findHighestScoreStar(sector);
-      if (star == null) {
-        continue;
-      }
-
-      // if we get here, then we've found the star. Also find which planet to put the colony on.
-      starID = star.id;
-      findPlanetOnStar(star);
-
-      return true;
+    SectorCoord coord = DataStore.i.sectors().getEmptySector();
+    if (coord == null) {
+      return false;
     }
 
-    return false;
+    WatchableObject<Sector> sector = SectorManager.i.getSector(coord);
+    Star star = findHighestScoreStar(sector.get());
+    if (star == null) {
+      return false;
+    }
+
+    // if we get here, then we've found the star. Also find which planet to put the colony on.
+    this.star = star;
+    findPlanetOnStar(star);
+    return true;
   }
 
   /** Find the planet with the highest population congeniality. That's the one. */
@@ -147,6 +149,9 @@ public class NewStarFinder {
       }
     }
 
+    if (highestScoreStar == null) {
+      log.error("Highest score star is still null!");
+    }
     return highestScoreStar;
   }
 
@@ -237,10 +242,6 @@ public class NewStarFinder {
         star.name, score, distanceToCentreScore, planetScore, numTerranPlanets, congenialityScore,
         distanceToOtherColonyScore, distanceToOtherColony);
     return score;
-  }
-
-  private ArrayList<Long> findSectors() {
-    return new ArrayList<>();
   }
 }
 

@@ -10,6 +10,8 @@ import java.io.File;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.Sector;
+import au.com.codeka.warworlds.common.proto.Star;
 
 /** Wraps our reference to MapDB's data store objects. */
 public class DataStore {
@@ -17,9 +19,11 @@ public class DataStore {
   public static final DataStore i = new DataStore();
 
   private Environment env;
-  private UniqueNameStore uniqueEmpireNames;
-  private ProtobufStore<Empire> empires;
   private AccountsStore accounts;
+  private ProtobufStore<Empire> empires;
+  private SectorsStore sectors;
+  private ProtobufStore<Star> stars;
+  private UniqueNameStore uniqueEmpireNames;
 
   private DataStore() {
     try {
@@ -32,14 +36,20 @@ public class DataStore {
       dbConfig.setAllowCreate(true);
       dbConfig.setTransactional(true);
 
-      Database db = env.openDatabase(null, "empires", dbConfig);
+      Database db = env.openDatabase(null, "accounts", dbConfig);
+      accounts = new AccountsStore(db);
+
+      db = env.openDatabase(null, "empires", dbConfig);
       empires = new ProtobufStore<>(db, Empire.class);
 
-      db = env.openDatabase(null, "empireNames", dbConfig);
-      uniqueEmpireNames = new UniqueNameStore(db);
+      db = env.openDatabase(null, "stars", dbConfig);
+      stars = new ProtobufStore<>(db, Star.class);
 
-      db = env.openDatabase(null, "accounts", dbConfig);
-      accounts = new AccountsStore(db);
+      db = env.openDatabase(null, "sectors", dbConfig);
+      sectors = new SectorsStore(db, stars);
+
+      db = env.openDatabase(null, "uniqueEmpireNames", dbConfig);
+      uniqueEmpireNames = new UniqueNameStore(db);
     } catch (DatabaseException e) {
       log.error("Error creating databases.", e);
       throw new RuntimeException(e);
@@ -53,15 +63,23 @@ public class DataStore {
     env.close();
   }
 
-  public UniqueNameStore uniqueEmpireNames() {
-    return uniqueEmpireNames;
+  public AccountsStore accounts() {
+    return accounts;
   }
 
   public ProtobufStore<Empire> empires() {
     return empires;
   }
 
-  public AccountsStore accounts() {
-    return accounts;
+  public SectorsStore sectors() {
+    return sectors;
+  }
+
+  public ProtobufStore<Star> stars() {
+    return stars;
+  }
+
+  public UniqueNameStore uniqueEmpireNames() {
+    return uniqueEmpireNames;
   }
 }
