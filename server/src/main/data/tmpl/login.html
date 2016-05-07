@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>War Worlds &bull; Login</title>
+    <meta name="viewport" content="width=device-width" />
+
+    <script>
+    (function() {
+       var po = document.createElement('script');
+       po.type = 'text/javascript'; po.async = true;
+       po.src = 'https://apis.google.com/js/client:plusone.js?onload=render';
+       var s = document.getElementsByTagName('script')[0];
+       s.parentNode.insertBefore(po, s);
+    })();
+
+    function render() {
+      // Additional params including the callback, the rest of the params will
+      // come from the page-level configuration.
+      var args = {
+        "callback": complete,
+        "clientid": "{{client_id}}",
+        "scope": "email",
+        "cookiepolicy": "single_host_origin"
+      };
+      gapi.signin.render('customGPlusBtn', args);
+    }
+
+    function complete(authResult) {
+      if (authResult['status']['signed_in']) {
+        document.getElementById("auth-result").value = JSON.stringify(authResult);
+        document.getElementById("success").submit();
+      } else {
+        // Update the app to reflect a signed out user
+        // Possible error values:
+        //   "user_signed_out" - User is signed-out
+        //   "access_denied" - User denied access to your app
+        //   "immediate_failed" - Could not automatically log in the user
+        document.getElementById("error").innerHTML = authResult['error'];
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <div style="margin: 100pt auto; width: 112px;"><div id="customGPlusBtn"></div></div>
+    <div id="error" style="text-align: center;"></div>
+    <form id="success" method="post">
+      <input type="hidden" name="auth-result" id="auth-result">
+    </form>
+  </body>
+</html>
