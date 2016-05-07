@@ -47,6 +47,14 @@ public class AccountsServlet extends ProtobufHttpServlet {
 
     // Create the empire itself.
     WatchableObject<Empire> empire = EmpireManager.i.createEmpire(req.empire_name);
+    if (empire == null) {
+      // Some kind of unexpected error creating the empire.
+      writeProtobuf(response,
+          new NewAccountResponse.Builder()
+              .message("An error occured while creating your empire, please try again.")
+              .build());
+      return;
+    }
 
     // Make a new account with all the details.
     Account acct = new Account.Builder()
@@ -59,7 +67,6 @@ public class AccountsServlet extends ProtobufHttpServlet {
             .cookie(cookie)
             .build());
   }
-
 
   /** Generates a cookie, which is basically just a long-ish string of random bytes. */
   private String generateCookie() {
