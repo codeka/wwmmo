@@ -4,16 +4,16 @@ import com.google.api.client.util.ByteStreams;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.admin.RequestException;
-import au.com.codeka.warworlds.server.admin.RequestHandler;
 
 /** Simple handler for handling static files (and 'templated' HTML files with no templated data). */
-public class FileHandler extends RequestHandler {
+public class FileHandler extends AdminHandler {
   private final Log log = new Log("AdminGenericHandler");
 
   @Override
@@ -40,10 +40,12 @@ public class FileHandler extends RequestHandler {
     getResponse().setHeader("Content-Type", contentType);
 
     try {
-      OutputStream outs = getResponse().getOutputStream();
       InputStream ins = new FileInputStream(new File("data/admin/static/" + path));
+      OutputStream outs = getResponse().getOutputStream();
       ByteStreams.copy(ins, outs);
       ins.close();
+    } catch (FileNotFoundException e) {
+      throw new RequestException(404, e.getMessage());
     } catch (IOException e) {
       log.error("Error sending static file!", e);
     }

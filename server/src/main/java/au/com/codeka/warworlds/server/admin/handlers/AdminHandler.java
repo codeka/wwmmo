@@ -61,6 +61,7 @@ public class AdminHandler extends RequestHandler {
       data.put("stack_trace", Throwables.getStackTraceAsString(e));
       render("exception.html", data);
     } catch (Exception e2) {
+      log.error("Error loading exception.html template.", e2);
       setResponseText(e2.toString());
     }
   }
@@ -86,6 +87,7 @@ public class AdminHandler extends RequestHandler {
       getResponse().getWriter().write(TEMPLATE_ENGINE.process(path, data));
     } catch (CarrotException | IOException e) {
       log.error("Error rendering template!", e);
+      throw new RequestException(e);
     }
   }
 
