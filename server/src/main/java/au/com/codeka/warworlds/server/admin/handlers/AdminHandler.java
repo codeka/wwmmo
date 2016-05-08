@@ -26,6 +26,8 @@ import au.com.codeka.warworlds.server.admin.Session;
 
 import com.google.common.base.Throwables;
 
+import javax.annotation.Nullable;
+
 public class AdminHandler extends RequestHandler {
   private final Log log = new Log("AdminHandler");
 
@@ -70,7 +72,7 @@ public class AdminHandler extends RequestHandler {
     return true;
   }
 
-  protected void render(String path, Map<String, Object> data) throws RequestException {
+  protected void render(String path, @Nullable Map<String, Object> data) throws RequestException {
     if (data == null) {
       data = new TreeMap<>();
     }

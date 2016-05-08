@@ -273,6 +273,14 @@ button, a.button, input[type=submit], input[type=button] {
     background: #aaa;
 }
 
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 /* popup-container is the same size as the main content area. */
 #popup-scrim {
     display: none;

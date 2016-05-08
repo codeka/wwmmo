@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.admin.handlers.AdminLoginHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DashboardHandler;
+import au.com.codeka.warworlds.server.admin.handlers.DebugStarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.FileHandler;
 
 /**
@@ -30,9 +31,7 @@ public class AdminServlet extends GenericServlet {
   private static final ArrayList<Route> ROUTES = Lists.newArrayList(
       new Route("/", DashboardHandler.class),
       new Route("/login", AdminLoginHandler.class),
-//      new Route("admin/(?<path>actions/move-star)", AdminActionsMoveStarHandler.class, "admin/"),
-//      new Route("admin/(?<path>actions/reset-empire)", AdminActionsResetEmpireHandler.class, "admin/"),
-//      new Route("admin/alliance/(?<allianceid>[0-9]+)/details", AdminAllianceDetailsHandler.class)
+      new Route("/debug/starfield", DebugStarfieldHandler.class),
       new Route("/(?<path>.*)", FileHandler.class)
   );
 
@@ -43,7 +42,6 @@ public class AdminServlet extends GenericServlet {
     if (path == null) {
       path = "/";
     }
-    log.info("path: %s", path);
 
     for (Route route : ROUTES) {
       Matcher matcher = route.pattern.matcher(path);

@@ -1,0 +1,41 @@
+
+#starfield {
+  width: 512px;
+  height: 512px;
+  border: solid 1px red;
+  background: #000;
+  position: relative;
+}
+
+.starfield-star {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  background: url(../img/stars_small.png);
+  transform: rotate(45deg) scale(0.5);
+  cursor: pointer;
+}
+.starfield-label {
+  position: absolute;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  transform: translate(-50%, 16px);
+  font-size: 10pt;
+  cursor: pointer;
+  -webkit-user-select: none;
+}
+
+.star-blackhole { background-position: 0px -128px; }
+.star-blue { background-position: -64px -128px; }
+.star-yellow { background-position: -128px -128px; }
+.star-orange { background-position: 0px -192px; }
+.star-red { background-position: -64px -192px; }
+.star-white { background-position: -128px -192px; }
+.star-neutron { width: 128px; height: 128px; margin: -64px 0 0 -64px; }
+
+#search {
+  width: 492px;
+  margin-top: 10px;
+}

@@ -1,0 +1,18 @@
+{% extends "skeleton.html" %}
+{% block title %}Starfield{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="/admin/css/starfield.css">
+  <script type="text/javascript" src="/admin/js/starfield.js"></script>
+{% endblock %}
+{% block content %}
+  <h1>Starfield</h1>
+  <div id="starfield"></div>
+  <fieldset id="search">
+    <legend>Search</legend>
+    <div id="xy">
+      <input name="x" type="number" value="0">,
+      <input name="y" type="number" value="0">
+      <button>Jump</button>
+    </div>
+  </fieldset>
+{% endblock %}
