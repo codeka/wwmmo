@@ -70,7 +70,6 @@ public class AdminServlet extends GenericServlet {
       for (Cookie cookie : request.getCookies()) {
         if (cookie.getName().equals("SESSION")) {
           sessionCookieValue = cookie.getValue();
-          log.info("Got SESSION cookie: %s", sessionCookieValue);
           session = SessionManager.i.getSession(sessionCookieValue);
         }
       }
