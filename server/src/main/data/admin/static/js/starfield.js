@@ -1,5 +1,9 @@
 
 $(function() {
+  var starHtmlTemplate = [
+    "<h1>{%= name %}</h1>",
+  ].join("\n");
+
   function renderSector(sector) {
     var container = $("#starfield");
     container.empty();
@@ -29,7 +33,8 @@ $(function() {
   }
 
   function showStar(star) {
-    alert(JSON.stringify(star));
+    var html = $("#star-details-tmpl").applyTemplate(star);
+    $("#star-details").html(html);
   }
 
   $("#xy button").on("click", function() {

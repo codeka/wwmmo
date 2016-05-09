@@ -2,17 +2,27 @@
 {% block title %}Starfield{% endblock %}
 {% block head %}
   <link rel="stylesheet" href="/admin/css/starfield.css">
+  <script type="text/javascript" src="/admin/js/tmpl.js"></script>
   <script type="text/javascript" src="/admin/js/starfield.js"></script>
 {% endblock %}
 {% block content %}
   <h1>Starfield</h1>
-  <div id="starfield"></div>
-  <fieldset id="search">
-    <legend>Search</legend>
-    <div id="xy">
-      <input name="x" type="number" value="0">,
-      <input name="y" type="number" value="0">
-      <button>Jump</button>
-    </div>
-  </fieldset>
+  <div class="left-column">
+    <div id="starfield"></div>
+    <fieldset id="search">
+      <legend>Search</legend>
+      <div id="xy">
+        <input name="x" type="number" value="0">,
+        <input name="y" type="number" value="0">
+        <button>Jump</button>
+      </div>
+    </fieldset>
+  </div>
+  <div class="right-column">
+    <div id="star-details"></div>
+    <script id="star-details-tmpl" type="text/html">
+      <div class="star-big star-big-<%= classification.toLowerCase() %>"></div>
+      <h1><%= name %></h1>
+    </script>
+  </div>
 {% endblock %}
