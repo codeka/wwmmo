@@ -1,6 +1,2 @@
-include ':common'
-include ':control-field'
-include ':planet-render'
-include ':planet-render-test'
-include ':client'
-include ':server'
+include ':server', ':client', ':common'
+

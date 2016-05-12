@@ -1,137 +1,51 @@
-import java.util.regex.Pattern
-
 apply plugin: 'com.android.application'
-
-Properties props = new Properties()
-props.load(new FileInputStream(file('signing.properties')))
 
 repositories {
   mavenCentral()
 }
 
-dependencies {
-  compile fileTree(include: '*.jar', dir: 'libs')
-  compile 'com.google.android.gms:play-services-base:8.4.0'
-  compile 'com.google.android.gms:play-services-ads:8.4.0'
-  compile 'com.android.support:multidex:1.0.1'
-  compile 'com.android.support:support-v4:23.2.1'
-  compile 'com.android.support:appcompat-v7:23.2.1'
-  compile 'com.squareup.okhttp:okhttp:2.2.0'
-  compile project(':common')
-  compile project(':control-field')
-  compile project(':planet-render')
-}
-
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+  compileSdkVersion 23
+  buildToolsVersion "23.0.3"
 
-    // TODO: remove the dependency on this.
-    useLibrary 'org.apache.http.legacy'
+  defaultConfig {
+    applicationId "au.com.codeka.warworlds2"
+    minSdkVersion 10
+    targetSdkVersion 23
+    versionCode 1
+    versionName "1.0"
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-    defaultConfig {
-        multiDexEnabled true
-        minSdkVersion 9
-        targetSdkVersion 23
+      buildConfigField "String", "WEBSOCKET_URL", "\"wss://game.war-worlds.com/conn\""
+      buildConfigField "String", "SERVER_URL", "\"https://game.war-worlds.com/\""
     }
-
-    packagingOptions {
-        // Don't include NOTICE.txt or LICENSE.txt, many libraries define both and the duplicates
-        // confuse the build process.
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/LICENSE.txt'
+    debug {
+      buildConfigField "String", "WEBSOCKET_URL", "\"ws://192.168.11.100:8080/conn\""
+      buildConfigField "String", "SERVER_URL", "\"http://192.168.11.100:8080/\""
     }
-
-    // Make sure we're using Java 1.7 source compatibility
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
-
-    dexOptions {
-        javaMaxHeapSize "2g"
-    }
-
-    signingConfigs {
-        release {
-            storeFile file(props['keystore'])
-            storePassword props['password']
-            keyAlias props['alias']
-            keyPassword props['password']
-        }
-    }
-
-    buildTypes {
-        debug {
-            debuggable true
-            manifestPlaceholders = [ applicationLabel: "@string/app_name_debug" ]
-            applicationIdSuffix ".debug"
-        }
-        release {
-            manifestPlaceholders = [ applicationLabel: "@string/app_name" ]
-            signingConfig signingConfigs.release
-        }
-    }
+  }
+  dexOptions {
+    incremental true
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_7
+    targetCompatibility JavaVersion.VERSION_1_7
+  }
+  packagingOptions {
+    // These get added twice from different dependencies, so just ignore them.
+    exclude 'LICENSE-EPL-1.0.txt'
+    exclude 'LICENSE-EDL-1.0.txt'
+  }
 }
 
-// This is a task which will increment the build # in AndroidManifest.xml
-task('incrementVersionCode') << {
-    def manifestFile = file("src/main/AndroidManifest.xml")
-
-    // First do the versionCode element, increment the new build #
-    def pattern = Pattern.compile("versionCode=\"(\\d+)\"")
-    def manifestText = manifestFile.getText()
-    def matcher = pattern.matcher(manifestText)
-    matcher.find()
-
-    def versionCode = Integer.parseInt(matcher.group(1)) + 1
-    manifestText = matcher.replaceAll("versionCode=\"" + versionCode + "\"")
-
-    // Now do versionName with the same build #.
-    pattern = Pattern.compile("versionName=\"([0-9]+)\\.([0-9]+)\\.[0-9]+\"")
-    matcher = pattern.matcher(manifestText)
-    manifestText = matcher.replaceAll("versionName=\"\$1.\$2." + versionCode + "\"")
-
-    manifestFile.write(manifestText)
-}
-
-// This is a task which makes sure the warworlds.properties file is sanitized for release builds
-task('resetReleaseWarworldsPropertiesFile') << {
-    def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
-    def content = warworldsPropertiesFile.getText()
-
-    // make sure on_behalf_of is commented out
-    content = content.replaceAll("#?user.on_behalf_of\\s*=.*", "#user.on_behalf_of=nobody")
-
-    // make sure debug is set to 'false'
-    content = content.replaceAll("debug\\s*=.*", "debug=false")
-
-    // change all of the in-app purchase fields to their defaults
-    content = content.replaceAll("iap\\.([^=]+)=.*", "iap.\$1=\$1")
-
-    // make sure the welcome.rss field is pointing to the live server
-    content = content.replaceAll("welcome.rss=.*\$",
-            "welcome.rss=http://www.war-worlds.com/forum/announcements/rss")
-
-    warworldsPropertiesFile.write(content)
-}
-
-// This is a task which makes sure the warworlds.properties file is sanitized for debug builds
-task('resetDebugWarworldsPropertiesFile') << {
-    def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
-    def content = warworldsPropertiesFile.getText()
-
-    // make sure debug is set to 'true'
-    content = content.replaceAll("debug\\s*=.*", "debug=true")
-
-    warworldsPropertiesFile.write(content)
-}
-
-tasks.whenTaskAdded { task ->
-    if (task.name == 'generateReleaseBuildConfig') {
-        task.dependsOn 'incrementVersionCode'
-        task.dependsOn 'resetReleaseWarworldsPropertiesFile'
-    } else if (task.name == 'generateDebugBuildConfig') {
-        task.dependsOn 'resetDebugWarworldsPropertiesFile'
-    }
+dependencies {
+  compile fileTree(include: ['*.jar'], dir: 'libs')
+  compile 'com.android.support:appcompat-v7:23.3.0'
+  compile 'com.google.guava:guava:19.0'
+  compile 'com.neovisionaries:nv-websocket-client:1.25'
+  compile project(':common')
 }

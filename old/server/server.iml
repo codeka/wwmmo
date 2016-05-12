@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":server" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="code" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="android-gradle" name="Android-Gradle">
+      <configuration>
+        <option name="GRADLE_PROJECT_PATH" value=":server" />
+      </configuration>
+    </facet>
+    <facet type="java-gradle" name="Java-Gradle">
+      <configuration>
+        <option name="BUILD_FOLDER_PATH" value="$MODULE_DIR$/build" />
+        <option name="BUILDABLE" value="true" />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/build/classes/main" />
+    <output-test url="file://$MODULE_DIR$/build/classes/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="common" exported="" />
+    <orderEntry type="library" exported="" name="carrot-template" level="project" />
+    <orderEntry type="library" exported="" name="commons-imaging-1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="gcm-server" level="project" />
+    <orderEntry type="library" exported="" name="google-api-client-1.19.0" level="project" />
+    <orderEntry type="library" exported="" name="google-api-client-gson-1.19.0" level="project" />
+    <orderEntry type="library" exported="" name="google-api-services-oauth2-v2-rev80-1.19.0" level="project" />
+    <orderEntry type="library" exported="" name="google-http-client-1.19.0" level="project" />
+    <orderEntry type="library" exported="" name="google-http-client-gson-1.19.0" level="project" />
+    <orderEntry type="library" exported="" name="google-oauth-client-1.19.0" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.1" level="project" />
+    <orderEntry type="library" exported="" name="guava-18.0" level="project" />
+    <orderEntry type="library" exported="" name="HikariCP-java6-2.1.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="javassist" level="project" />
+    <orderEntry type="library" exported="" name="json-simple-1.1.1" level="project" />
+    <orderEntry type="library" exported="" name="jsr305-1.3.9" level="project" />
+    <orderEntry type="library" exported="" name="postgresql-9.3-1101.jdbc41" level="project" />
+    <orderEntry type="library" exported="" name="proguard" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-api-1.7.5" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-jdk14-1.7.5" level="project" />
+    <orderEntry type="library" exported="" name="jetty-annotations-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-client-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-continuation-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-deploy-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-http-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-io-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-jaas-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-jmx-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-jndi-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-plus-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-proxy-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-rewrite-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-security-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-server-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-servlet-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-servlets-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-util-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-webapp-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="jetty-xml-9.0.1.v20130408" level="project" />
+    <orderEntry type="library" exported="" name="servlet-api-3.0" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.1" level="project" />
+    <orderEntry type="library" exported="" name="guava-18.0" level="project" />
+    <orderEntry type="library" exported="" name="jcl-over-slf4j-1.7.5" level="project" />
+    <orderEntry type="library" exported="" name="joda-convert-1.2" level="project" />
+    <orderEntry type="library" exported="" name="joda-time-2.1" level="project" />
+    <orderEntry type="library" exported="" name="jsr305-1.3.9" level="project" />
+    <orderEntry type="library" exported="" name="protobuf-java-2.5.0" level="project" />
+  </component>
+</module>

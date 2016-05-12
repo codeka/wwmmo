@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:baselineAligned="false" >
+
+  <ImageView
+      android:id="@+id/title_icon"
+      android:transitionName="title_icon"
+      android:layout_width="50dp"
+      android:layout_height="50dp"
+      android:layout_margin="5dp"
+      android:src="@drawable/app_icon" />
+
+  <TextView
+      android:id="@+id/title"
+      android:transitionName="title"
+      style="@style/TitleText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentEnd="true"
+      android:layout_alignParentRight="true"
+      android:layout_alignParentTop="true"
+      android:layout_toEndOf="@+id/title_icon"
+      android:layout_toRightOf="@+id/title_icon"
+      android:text="@string/app_name" />
+
+  <TextView
+      android:id="@+id/welcome"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/title"
+      android:layout_marginTop="@dimen/tablet_margin_10dp"
+      android:layout_marginLeft="@dimen/tablet_margin"
+      android:layout_marginRight="@dimen/tablet_margin"
+      android:padding="4dp"
+      android:shadowColor="#000"
+      android:shadowDx="2.0"
+      android:shadowDy="2.0"
+      android:shadowRadius="1.0"
+      android:text="@string/create_empire_welcome"
+      android:textAppearance="?android:attr/textAppearanceMedium" />
+
+  <TextView
+      android:id="@+id/setup_name"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/welcome"
+      android:layout_marginTop="20dp"
+      android:layout_marginLeft="@dimen/tablet_margin"
+      android:layout_marginRight="@dimen/tablet_margin"
+      android:padding="4dp"
+      android:text="@string/create_empire_name"
+      android:textAppearance="?android:attr/textAppearanceMedium" />
+
+  <EditText
+      android:id="@+id/empire_name"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/setup_name"
+      android:layout_marginTop="5dp"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp"
+      android:layout_marginBottom="5dp"
+      android:hint="@string/create_empire_hint"
+      android:imeOptions="actionDone"
+      android:inputType="textCapWords" >
+
+      <requestFocus />
+  </EditText>
+
+  <Button
+      android:id="@+id/switch_account_btn"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:layout_below="@id/empire_name"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp"
+      android:layout_marginBottom="10dp"
+      android:text="@string/create_empire_switch_account_btn"/>
+
+  <Button
+      android:id="@+id/done_btn"
+      android:transitionName="done_btn"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp"
+      android:layout_marginBottom="10dp"
+      android:layout_alignParentBottom="true"
+      android:text="@string/done" />
+
+  <ProgressBar
+      android:id="@+id/progress"
+      style="?android:attr/progressBarStyleLarge"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/setup_name"
+      android:layout_centerHorizontal="true"
+      android:visibility="gone" />
+
+</RelativeLayout>
