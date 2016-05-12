@@ -40,49 +40,49 @@ public class SectorGenerator {
      * Planet type bonuses. The bonuses for each entry need to be added to get the "final" bonus
      */
     static int[][] PlanetTypeSlotBonuses = {
-      // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
-        {-20,      10,       20,      -20,       -20,   0,     10,     0,     -10}, // close to sun
-        {-10,      0,        10,      -20,       0,     0,     0,      0,     -10},
-        {0,        -10,      -10,     0,         0,     0,     0,      0,     20},
-        {10,       -10,      -20,     0,         10,    0,     -10,    10,    25},
-        {20,       -20,      -30,     -10,       10,    0,     -20,    10,    30},
-        {20,       -20,      -40,     -10,       0,     0,     -30,    0,     5},
-        {30,       -20,      -40,     -10,       0,     0,     -30,    0,     0}    // far from sun
+            // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
+            {-20,      10,       20,      -20,       -20,   0,     10,     0,     -10}, // close to sun
+            {-10,      0,        10,      -20,       0,     0,     0,      0,     -10},
+            {0,        -10,      -10,     0,         0,     0,     0,      0,     20},
+            {10,       -10,      -20,     0,         10,    0,     -10,    10,    25},
+            {20,       -20,      -30,     -10,       10,    0,     -20,    10,    30},
+            {20,       -20,      -40,     -10,       0,     0,     -30,    0,     5},
+            {30,       -20,      -40,     -10,       0,     0,     -30,    0,     0}    // far from sun
     };
     static int[][] PlanetTypeStarBonuses = {
-        // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
-        {-10,      0,        0,       -10,       10,    -10,   0,      10,    40},  // blue
-        {-10,      -5,       -10,     -10,       20,    -10,   0,      20,    50},  // white
-        {-10,      -5,       -20,     -10,       30,    -10,   0,      30,    60},  // yellow
-        {-20,      -15,      -30,     -10,       30,    -5,    0,      40,    70},  // orange
-        {-20,      -15,      -40,     -10,       20,    -5,    0,      40,    80},  // red
-        {-30,      20,       10,      -10,       -10,   0,     -10,    -10,   -30}, // neutron
-        {-30,      30,       20,      -10,       -20,   0,     -10,    -10,   -30}, // black hole
+            // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
+            {-10,      0,        0,       -10,       10,    -10,   0,      10,    40},  // blue
+            {-10,      -5,       -10,     -10,       20,    -10,   0,      20,    50},  // white
+            {-10,      -5,       -20,     -10,       30,    -10,   0,      30,    60},  // yellow
+            {-20,      -15,      -30,     -10,       30,    -5,    0,      40,    70},  // orange
+            {-20,      -15,      -40,     -10,       20,    -5,    0,      40,    80},  // red
+            {-30,      20,       10,      -10,       -10,   0,     -10,    -10,   -30}, // neutron
+            {-30,      30,       20,      -10,       -20,   0,     -10,    -10,   -30}, // black hole
     };
-    
+
     /**
      * Planet size is a normalized random number with the following bonus added. Each planet
      * type has a different size "distribution"
      */
     static int[] PlanetSizeBonuses = {
-     // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
-        30,       -10,      0,       0,         10,    -10,   0,      0,     0
+            // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
+            30,       -10,      0,       0,         10,    -10,   0,      0,     0
     };
 
     // Planet population is calculated based on the size of the planet (usually, the bigger
     // the planet, the higher the potential population) but also the following bonuses are
     // applied.
     static double[] PlanetPopulationBonuses = {
-     // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
-        0.4,      0.4,      0.4,     0.0,       0.9,   0.6,   0.9,    0.6,   1.0
+            // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
+            0.4,      0.4,      0.4,     0.0,       0.9,   0.6,   0.9,    0.6,   1.0
     };
     static double[] PlanetFarmingBonuses = {
-     // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
-        0.4,      0.2,      0.2,     0.0,       1.0,   0.4,   0.6,    0.8,   1.2
+            // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
+            0.4,      0.2,      0.2,     0.0,       1.0,   0.4,   0.6,    0.8,   1.2
     };
     static double[] PlanetMiningBonuses = {
-     // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
-        0.8,      1.2,      1.0,     1.5,       0.8,   0.4,   0.6,    0.6,   0.8
+            // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
+            0.8,      1.2,      1.0,     1.5,       0.8,   0.4,   0.6,    0.6,   0.8
     };
 
     public Sector generate(long x, long y) throws RequestException {
@@ -103,7 +103,7 @@ public class SectorGenerator {
             double density = 0.18;
             double randomness = 0.11;
             ArrayList<Vector2> points = new PointCloud.PoissonGenerator()
-                                            .generate(density, randomness, mRandom);
+                    .generate(density, randomness, mRandom);
 
             for (Vector2 point : points) {
                 Star star = generateStar(sector, point);
@@ -180,7 +180,10 @@ public class SectorGenerator {
         int x = (int) ((Sector.SECTOR_SIZE - 64) * point.x) + 32;
         int y = (int) ((Sector.SECTOR_SIZE - 64) * point.y) + 32;
         int starTypeID = select(StarTypeBonuses);
-        String name = new NameGenerator().generate(mRandom);
+        String name;
+        do {
+            name = new NameGenerator().generate(mRandom);
+        }while(!isUniqueStarName(name));
         int size = mRandom.nextInt(8) + 16;
 
         String sql = "INSERT INTO stars (sector_id, x, y, size, name, star_type, planets, last_simulation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -216,6 +219,30 @@ public class SectorGenerator {
         }
     }
 
+    /**
+     * Take proposed name and check it against the DB to see if the name is already in use
+     * @param name Proposed name of the star
+     * @return true if the name is unique, else false
+     */
+    private boolean isUniqueStarName(String name) throws RequestException {
+        //the reset script deletes all records in the stars table so we know the names present
+        //are relevent to this iteration only
+
+        String sql = "SELECT COUNT(1) FROM stars WHERE name = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setString(1, name);
+            SqlResult results = stmt.select();
+
+            if(results.next()) {
+                return results.getInt(1) == 0;
+            }else{
+                return true;
+            }
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
     private ArrayList<Planet> generatePlanets(Star star) {
         int numPlanets = 0;
         while (numPlanets < 2) {
@@ -227,7 +254,7 @@ public class SectorGenerator {
             int[] bonuses = new int[PlanetTypeSlotBonuses[0].length];
             for (int i = 0; i < bonuses.length; i++) {
                 bonuses[i] = PlanetTypeSlotBonuses[planetIndex][i] +
-                             PlanetTypeStarBonuses[star.getStarType().getType().ordinal()][i];
+                        PlanetTypeStarBonuses[star.getStarType().getType().ordinal()][i];
             }
             int planetType = select(bonuses);
 
@@ -241,10 +268,10 @@ public class SectorGenerator {
             double miningMultiplier = PlanetMiningBonuses[planetType];
 
             Planet planet = new Planet(star, planetIndex + 1,
-                                       planetType, size,
-                                       (int)(normalRandom(1000) * populationMultiplier),
-                                       (int)(normalRandom(100) * farmingMultiplier),
-                                       (int)(normalRandom(100) * miningMultiplier));
+                    planetType, size,
+                    (int)(normalRandom(1000) * populationMultiplier),
+                    (int)(normalRandom(100) * farmingMultiplier),
+                    (int)(normalRandom(100) * miningMultiplier));
             planets.add(planet);
         }
 
