@@ -1,8 +1,11 @@
 package au.com.codeka.warworlds.server.world;
 
+import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.squareup.wire.Message;
 
 import java.util.ArrayList;
+
+import javax.annotation.Nonnull;
 
 /**
  * A watchable object is any object that's encapsulated in a protocol buffer, which listeners can
@@ -15,15 +18,14 @@ public class WatchableObject<T extends Message> {
     void onUpdate(WatchableObject<T> object);
   }
 
-  private final ArrayList<Watcher> watchers = new ArrayList<>();
-  private final long id;
+  private final ArrayList<Watcher<T>> watchers = new ArrayList<>();
   private T object;
 
-  public WatchableObject(long id, T object) {
-    this.id = id;
-    this.object = object;
+  public WatchableObject(T object) {
+    this.object = Preconditions.checkNotNull(object);
   }
 
+  @Nonnull
   public T get() {
     return object;
   }
@@ -31,19 +33,19 @@ public class WatchableObject<T extends Message> {
   public void set(T obj) {
     this.object = obj;
     synchronized (watchers) {
-      for (Watcher watcher : watchers) {
+      for (Watcher<T> watcher : watchers) {
         watcher.onUpdate(this);
       }
     }
   }
 
-  public void addWatcher(Watcher watcher) {
+  public void addWatcher(Watcher<T> watcher) {
     synchronized (watchers) {
       watchers.add(watcher);
     }
   }
 
-  public void removeWatcher(Watcher watcher) {
+  public void removeWatcher(Watcher<T> watcher) {
     synchronized (watchers) {
       watchers.remove(watcher);
     }

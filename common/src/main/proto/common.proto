@@ -16,3 +16,8 @@ message PurchaseInfo {
   optional string price = 4;
   optional string developer_payload = 5;
 }
+
+// An array of identifiers.
+message IdentifierArray {
+  repeated int64 ids = 1;
+}

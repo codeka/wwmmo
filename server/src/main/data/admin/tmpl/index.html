@@ -1,0 +1,47 @@
+{% extends "skeleton.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+{% endblock %}
+{% block content %}
+  <h1>Active Empires</h1>
+  <div id="graph" style="width: 100%; margin: 0 auto;"></div>
+  <script type="text/javascript">
+    // keep the width/height ratio of the graph nice
+    var ratio = 0.4;
+    $("#graph").css("height", $("#graph").width() * ratio);
+
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var dataTable = new google.visualization.DataTable();
+      dataTable.addColumn("date", "Date");
+      dataTable.addColumn("number", "1-day actives");
+      dataTable.addColumn("number", "7-day actives");
+      dataTable.addColumn("number", "New Signups");
+      dataTable.addRows([
+      {% for entry in graph_data %}
+        [new Date({{entry.year}}, {{entry.month|add:'1'}}, {{entry.day}}), {{entry.oneda|default:'0'}}, {{entry.sevenda|default:'0'}}, {{entry.signups|default:'0'}}],
+      {% endfor %}
+      ]);
+
+      var dataView = new google.visualization.DataView(dataTable);
+
+      var width = $("#graph").width();
+      var height = $("#graph").height();
+      var options = {
+        "chartArea": {left: 50, top: 10, width: width - 100, height: height - 80},
+        "backgroundColor": {fill: "transparent"},
+        "series": {
+          0: { "type": "line", "targetAxisIndex": 0 },
+          1: { "type": "line", "targetAxisIndex": 0 },
+          2: { "type": "line", "targetAxisIndex": 1 },
+        }
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById("graph"));
+      chart.draw(dataView, options);
+    }
+  </script>
+{% endblock %}

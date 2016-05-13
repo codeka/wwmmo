@@ -7,6 +7,8 @@ import com.squareup.wire.ProtoAdapter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.Log;
 
 /**
@@ -34,7 +36,7 @@ public class ProtobufSerializer<M extends Message<?, ?>> {
       return protoAdapter.decode(entry.getData());
     } catch (IOException e) {
       log.error("Exception deserializing protobuf.", e);
-      return null;
+      throw new RuntimeException(e);
     }
   }
 }

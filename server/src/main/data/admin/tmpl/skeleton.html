@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>War Worlds &bull; {% block title %}Backend{% endblock %}</title>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="/admin/css/site.css">
+    <link rel="stylesheet" href="/admin/css/site-mobile.css" media="only screen and (max-width: 900px)" />
+    <link rel="icon" href="/admin/favicon.ico" />
+    <script src="//code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script>window.realm = "{{realm}}";</script>
+    <script src="/admin/js/main.js"></script>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <section id="header"><div class="header-bg">
+      <div id="navmenu-toggle">≡</div>
+      <img src="/admin/img/logo.png" width="38" height="38" alt="Logo" />
+      <h1>War Worlds</h1>
+    {% if num_backend_users|equal:0 %}
+      <div class="no-backend-users-warning">
+        You have no backend users defined, that's <em>really bad</em>, and you should
+        <a href="/admin/users">create one now</a>.
+      </div>
+    {% endif %}
+    </div></section>
+
+    <section id="navmenu"><div class="navmenu-bg">
+      <div class="user-details">
+        <div>{{ logged_in_user }}</div>
+      </div>
+      <ul>
+        <li><a href="/admin">Dashboard</a>
+        <li><a href="/admin/users">Users</a>
+        {% if backend_user|isinrole:ChatRead %}
+        <li><span><span>Chat</span></span>
+          <ul>
+            <li><a href="/admin/chat">Messages</a>
+            <li><a href="/admin/chat/profanity">Profanity Filter</a>
+            <li><a href="/admin/chat/sinbin">Sinbin</a>
+          </ul>
+        {% endif %}
+        <li><span><span>Actions</span></span>
+          <ul>
+            <li><a href="/admin/actions/move-star">Move Star</a>
+            <li><a href="/admin/actions/create-fleet">Create Fleet</a>
+            <li><a href="/admin/actions/reset-empire">Reset Empire</a>
+          </ul>
+        <li><span><span>Empires</span></span>
+          <ul>
+            <li><a href="/admin/empire/search">Search</a>
+            <li><a href="/admin/empire/shields">Shields</a>
+            <li><a href="/admin/empire/alts">Alt Accounts</a>
+            <li><a href="/admin/empire/ban">Ban Empire</a>
+          </ul>
+        <li><span><span>Alliances</span></span>
+          <ul>
+            <li><a href="/admin/alliance/search">Search</a>
+          </ul>
+        <li><span><span>Debug</span></span>
+          <ul>
+            <li><a href="/admin/debug/starfield">Starfield</a>
+            <li><a href="/admin/debug/colonies">Colonies</a>
+            <li><a href="/admin/debug/reports">Reports</a>
+            <li><a href="/admin/debug/purchases">Purchases</a>
+            <li><a href="/admin/debug/error-reports">Error Reports</a>
+          </ul>
+      </ul>
+    </div></section>
+
+    <div id="maincontent">{% block content %}{% endblock %}</div>
+    <div id="popup-scrim"></div>
+  </body>
+</html>

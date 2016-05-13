@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
+import com.neovisionaries.ws.client.WebSocketExtension;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketListener;
@@ -65,7 +66,7 @@ public class Server {
       newWebSocket.addHeader("X-Cookie", cookie);
       newWebSocket.addListener(webSocketListener);
       newWebSocket.setPingInterval(15000); // ping every 15 seconds.
-      //ws.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
+      newWebSocket.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
       newWebSocket.connectAsynchronously();
     } catch (IOException e) {
       log.error("Error connecting to server, will try again.", e);

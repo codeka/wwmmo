@@ -1,15 +1,19 @@
 package au.com.codeka.warworlds.server.world.generator;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.PointCloud;
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Sector;
+import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.SectorManager;
 
 /**
@@ -17,6 +21,8 @@ import au.com.codeka.warworlds.server.world.SectorManager;
  * out for new players (or when a player creeps up on the edge of the universe).
  */
 public class SectorGenerator {
+  private static final Log log = new Log("SectorGenerator");
+
   private Random random;
 
   private static final double STAR_DENSITY = 0.18;
@@ -60,15 +66,6 @@ public class SectorGenerator {
       { -30,       30,       20,      -10,       -20,     0,   -10,    -10,   -30},  // black hole
   };
 
-  /**
-   * Planet size is a normalized random number with the following bonus added. Each planet
-   * type has a different size "distribution"
-   */
-  private static final int[] PLANET_SIZE_BONUSES = {
-      // #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
-          30,      -10,       0,       0,         10,   -10,    0,      0,     0
-  };
-
   // Planet population is calculated based on the size of the planet (usually, the bigger
   // the planet, the higher the potential population) but also the following bonuses are
   // applied.
@@ -90,68 +87,58 @@ public class SectorGenerator {
   };
 
   public Sector generate(long x, long y) {
+    log.info("Generating sector (%d, %d)...", x, y);
     random = new Random((x * 73649274L) ^ y ^ System.currentTimeMillis());
+
+    SectorCoord coord = new SectorCoord.Builder().x(x).y(y).build();
+    ArrayList<Vector2> points = new PointCloud.PoissonGenerator()
+        .generate(STAR_DENSITY, STAR_RANDOMNESS, random);
+
+    ArrayList<Star> stars = new ArrayList<>();
+    for (Vector2 point : points) {
+      Star star = generateStar(coord, point);
+      //log.debug("  '%s'", star.name);
+      //for (Planet p : star.planets) {
+      //  log.debug("    %s p=%d m=%d f=%d e=%d", p.planet_type, p.population_congeniality,
+      //      p.mining_congeniality, p.farming_congeniality, p.energy_congeniality);
+      //}
+      stars.add(star);
+    }
 
     Sector sector = new Sector.Builder()
         .x(x)
         .y(y)
+        .stars(stars)
         .build();
-    // TODO: get ID
-
-    ArrayList<Vector2> points = new PointCloud.PoissonGenerator()
-        .generate(STAR_DENSITY, STAR_RANDOMNESS, random);
-
-    for (Vector2 point : points) {
-      Star star = generateStar(sector, point);
-      sector.stars.add(star);
-    }
+    DataStore.i.sectors().createSector(sector);
 
     return sector;
   }
 
-  /**
-   * Expands the universe by one sector.
-   */
+  /** Expands the universe by (at least) one sector. */
   public void expandUniverse() {
-    TreeMap<Long, Set<Long>> existingSectors = new TreeMap<>();
-    long minX = 0, minY = 0, maxX = 0, maxY = 0;
-    // TODO: calculate the current bounds of the universe
+    final int NUM_TO_GENERATE = 50;
 
-    int numGenerated = 0;
-    while (numGenerated < 50) {
-      for (long x = minX; x <= maxX; x++) {
-        for (long y = minY; y <= maxY; y++) {
-          Set<Long> xs = existingSectors.get(y);
-          if (xs == null || !xs.contains(x)) {
-            generate(x, y);
-            numGenerated ++;
-            if (numGenerated > 50) {
-              return;
-            }
-          }
-        }
-      }
-
-      // if we get here, we ran out of coordinates
-      minX --;
-      maxX ++;
-      minY --;
-      maxY ++;
+    List<SectorCoord> coords = DataStore.i.sectors().getUngeneratedSectors(NUM_TO_GENERATE);
+    for (int i = 0; i < NUM_TO_GENERATE; i++) {
+      SectorCoord coord = coords.remove(coords.size() - 1);
+      generate(coord.x, coord.y);
     }
   }
 
-  private Star generateStar(Sector sector, Vector2 point) {
+  private Star generateStar(SectorCoord sectorCoord, Vector2 point) {
     Star.CLASSIFICATION classification = Star.CLASSIFICATION.fromValue(select(STAR_TYPE_BONUSES));
     ArrayList<Planet> planets = generatePlanets(classification);
 
     return new Star.Builder()
+        .id(DataStore.i.stars().nextIdentifier())
         .classification(classification)
         .name(new NameGenerator().generate(random))
         .offset_x((int) ((SectorManager.SECTOR_SIZE - 64) * point.x) + 32)
         .offset_y((int) ((SectorManager.SECTOR_SIZE - 64) * point.y) + 32)
         .planets(planets)
-        .sector_x(sector.x)
-        .sector_y(sector.y)
+        .sector_x(sectorCoord.x)
+        .sector_y(sectorCoord.y)
         .size(random.nextInt(8) + 16)
         .build();
   }
@@ -171,26 +158,19 @@ public class SectorGenerator {
       }
       int planetType = select(bonuses);
 
-      int size = normalRandom(100) + PLANET_SIZE_BONUSES[planetType];
-      size = (int)(10 + (size / 2.5));
-
       double populationMultiplier = PLANET_POPULATION_BONUSES[planetType];
-      populationMultiplier *= (size * 2.0) / 50.0;
-
       double farmingMultiplier = PLANET_FARMING_BONUSES[planetType];
       double miningMultiplier = PLANET_MINING_BONUSES[planetType];
       double energyMultipler = PLANET_ENERGY_BONUSES[planetType];
 
-      Planet planet = new Planet.Builder()
+      planets.add(new Planet.Builder()
           .index(planetIndex + 1)
-          .planet_type(Planet.PLANET_TYPE.fromValue(planetType))
-          .size(size)
+          .planet_type(Planet.PLANET_TYPE.fromValue(planetType + 1))
           .population_congeniality((int) (normalRandom(1000) * populationMultiplier))
           .farming_congeniality((int) (normalRandom(100) * farmingMultiplier))
           .mining_congeniality((int) (normalRandom(100) * miningMultiplier))
           .energy_congeniality((int) (normalRandom(100) * energyMultipler))
-          .build();
-      planets.add(planet);
+          .build());
     }
 
     return planets;
