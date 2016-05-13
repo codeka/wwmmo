@@ -36,3 +36,10 @@ $(function() {
 function formatNumber(n) {
   return (1 * n).toLocaleString({"useGrouping": true});
 }
+
+// helper to convert a string to title case.
+function toTitleCase(str) {
+  return str.replace(/\w\S*/g, function(txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}

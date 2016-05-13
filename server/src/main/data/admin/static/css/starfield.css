@@ -69,3 +69,34 @@
   width: 492px;
   margin-top: 10px;
 }
+
+.planets {
+  margin-top: 100px;
+}
+
+.planet {
+  clear: left;
+  height: 64px;
+}
+
+.planet-icon {
+  background: url(../img/planets.png);
+  width: 64px;
+  height: 64px;
+  float: left;
+}
+
+.planet-icon-0 { background-position-x: 0; }
+.planet-icon-1 { background-position-x: -64px; }
+.planet-icon-2 { background-position-x: -128px; }
+.planet-icon-3 { background-position-x: -192px; }
+
+.planet-icon-asteroids { background-position-y: 0; }
+.planet-icon-desert { background-position-y: -64px; }
+.planet-icon-gasgiant { background-position-y: -128px; }
+.planet-icon-inferno { background-position-y: -192px; }
+.planet-icon-radiated { background-position-y: -256px; }
+.planet-icon-swamp { background-position-y: -320px; }
+.planet-icon-terran { background-position-y: -384px; }
+.planet-icon-toxic { background-position-y: -448px; }
+.planet-icon-water { background-position-y: -512px; }
