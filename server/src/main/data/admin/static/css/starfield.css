@@ -1,4 +1,9 @@
 
+body {
+  background: #000;
+  color: #fff;
+}
+
 .left-column {
   width: 524px;
   float: left;
@@ -11,7 +16,7 @@
 #starfield {
   width: 512px;
   height: 512px;
-  border: solid 1px red;
+  border: dotted 1px white;
   background: #000;
   position: relative;
 }
@@ -74,6 +79,10 @@
   margin-top: 100px;
 }
 
+.planets h2 {
+  margin: 0;
+}
+
 .planet {
   clear: left;
   height: 64px;
@@ -100,3 +109,34 @@
 .planet-icon-terran { background-position-y: -384px; }
 .planet-icon-toxic { background-position-y: -448px; }
 .planet-icon-water { background-position-y: -512px; }
+
+.planets .planet-details {
+  float: left;
+}
+
+.planets ul {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.planets ul li {
+  float: left;
+  margin-right: 10pt;
+}
+
+.congeniality {
+  display: inline-block;
+  width: 50px;
+  border: solid 1px white;
+  height: 8px;
+  line-height: 6px;
+  margin-bottom: 3px;
+}
+
+.congeniality span {
+  display: inline-block;
+  background: #0f0;
+  height: 8px;
+}

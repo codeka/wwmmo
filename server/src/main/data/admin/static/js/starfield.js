@@ -39,7 +39,7 @@ $(function() {
 
   $("#xy button").on("click", function() {
     $.ajax({
-      method: "POST",
+      type: "POST",
       data: {
         "action": "xy",
         "x": $("#xy input[name=x]").val(),

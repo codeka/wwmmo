@@ -27,7 +27,15 @@
         <% for (var i in planets) { %>
           <div class="planet">
             <div class="planet-icon planet-icon-<%= planets[i].planet_type.toLowerCase() %> planet-icon-<%= Math.floor(Math.random() * 4) %>"></div>
-            <h2><%= toTitleCase(planets[i].planet_type) %></h2>
+            <div class="planet-details">
+              <h2><%= toTitleCase(planets[i].planet_type) %></h2>
+              <ul>
+                <li>Population: <span class="congeniality"><span style="width: <%= Math.min(100, planets[i].population_congeniality / 10) %>%"></span></span> <%= planets[i].population_congeniality %></li>
+                <li>Farming: <span class="congeniality"><span style="width: <%= Math.min(100, planets[i].farming_congeniality) %>%"></span></span> <%= planets[i].farming_congeniality %></li>
+                <li>Mining: <span class="congeniality"><span style="width: <%= Math.min(100, planets[i].mining_congeniality) %>%"></span></span> <%= planets[i].mining_congeniality %></li>
+                <li>Energy: <span class="congeniality"><span style="width: <%= Math.min(100, planets[i].energy_congeniality) %>%"></span></span> <%= planets[i].energy_congeniality %></li>
+              </ul>
+            </div>
           </div>
         <% } %>
       </div>
