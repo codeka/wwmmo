@@ -28,6 +28,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common" exported="" />
+    <orderEntry type="library" exported="" name="carrot-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="joda-time-2.3" level="project" />
     <orderEntry type="library" exported="" name="google-api-client-1.19.1" level="project" />
     <orderEntry type="library" exported="" name="google-api-client-gson-1.19.1" level="project" />
@@ -85,7 +86,6 @@
     <orderEntry type="library" exported="" name="websocket-common-9.3.8.v20160314" level="project" />
     <orderEntry type="library" exported="" name="websocket-server-9.3.8.v20160314" level="project" />
     <orderEntry type="library" exported="" name="websocket-servlet-9.3.8.v20160314" level="project" />
-    <orderEntry type="library" exported="" name="carrot" level="project" />
     <orderEntry type="library" exported="" name="je-6.4.25" level="project" />
     <orderEntry type="library" exported="" name="wire-compiler-2.1.2-jar-with-dependencies" level="project" />
     <orderEntry type="library" exported="" name="server.server" level="project" />
