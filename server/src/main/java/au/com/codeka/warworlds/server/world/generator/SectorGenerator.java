@@ -164,7 +164,7 @@ public class SectorGenerator {
       double energyMultipler = PLANET_ENERGY_BONUSES[planetType];
 
       planets.add(new Planet.Builder()
-          .index(planetIndex + 1)
+          .index(planetIndex)
           .planet_type(Planet.PLANET_TYPE.fromValue(planetType + 1))
           .population_congeniality((int) (normalRandom(1000) * populationMultiplier))
           .farming_congeniality((int) (normalRandom(100) * farmingMultiplier))

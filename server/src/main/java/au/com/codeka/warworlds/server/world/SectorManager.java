@@ -56,16 +56,16 @@ public class SectorManager {
     @Override
     public void onUpdate(WatchableObject<Star> object) {
       WatchableObject<Sector> sector = sectors.get(coord);
-      List<Star> stars = sector.get().stars;
-      for (int i = 0; i < stars.size(); i++) {
-        if (stars.get(i).id.equals(object.get().id)) {
-          stars.remove(i);
+      Sector.Builder newSector = sector.get().newBuilder();
+      for (int i = 0; i < newSector.stars.size(); i++) {
+        if (newSector.stars.get(i).id.equals(object.get().id)) {
+          newSector.stars.remove(i);
           break;
         }
       }
-      stars.add(object.get());
+      newSector.stars.add(object.get());
 
-      sector.set(sector.get().newBuilder().stars(stars).build());
+      sector.set(newSector.build());
     }
   }
 }

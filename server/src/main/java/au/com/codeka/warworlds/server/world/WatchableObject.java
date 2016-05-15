@@ -21,6 +21,12 @@ public class WatchableObject<T extends Message> {
   private final ArrayList<Watcher<T>> watchers = new ArrayList<>();
   private T object;
 
+  /**
+   * An {@link Object} that you must use to lock access to this {@link WatchableObject}, when you
+   * want to modify it.
+   */
+  public final Object lock = new Object();
+
   public WatchableObject(T object) {
     this.object = Preconditions.checkNotNull(object);
   }

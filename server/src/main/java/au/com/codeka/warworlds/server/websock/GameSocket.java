@@ -69,6 +69,7 @@ public class GameSocket extends WebSocketAdapter {
   }
 
   private void sendMessage(Message<?, ?> msg) {
+    log.debug(">> %s", msg.toString());
     try {
       getRemote().sendBytes(ByteBuffer.wrap(msg.encode()));
     } catch (IOException e) {

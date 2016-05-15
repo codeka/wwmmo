@@ -41,6 +41,7 @@ public abstract class BaseStore<K, V> {
       if (seq == null) {
         SequenceConfig seqConfig = new SequenceConfig();
         seqConfig.setAllowCreate(true);
+        seqConfig.setInitialValue(100);
         seq = db.openSequence(null, new DatabaseEntry("ids".getBytes()), seqConfig);
       }
     }

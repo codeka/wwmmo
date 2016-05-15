@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.common.proto;
 
 import "common.proto";
+import "colony.proto";
+import "fleet.proto";
 
 //
 // Represents a "sector" of space, containing a number of stars and whatnot.
@@ -16,12 +18,6 @@ message Sector {
 
   // the collection of stars in this sector.
   repeated Star stars = 3;
-
-  // a collection of all the colonies in this sector
-//  repeated Colony colonies = 4;
-
-  // a collection of fleets in this sector
-//  repeated Fleet fleets = 6;
 }
 
 message SectorCoord {
@@ -78,20 +74,14 @@ message Star {
   // of stars in a sector)
   repeated Planet planets = 9;
 
-  // collection of colonies on our planet(s)
-//  repeated Colony colonies = 10;
-
-  // collection of buildings in our colonies.
-//  repeated Building buildings = 13;
-
-  // collection of EmpirePresences details the presences of the empire(s) in this solar system.
-//  repeated EmpirePresence empires = 14;
+  // collection of EmpireStorages details the presences of the empire(s) in this solar system.
+  repeated EmpireStorage empire_stores = 14;
 
   // collection of BuildRequests for colonies in this star
 //  repeated BuildRequest build_requests = 15;
 
   // List of fleets located in this star
-//  repeated Fleet fleets = 16;
+  repeated Fleet fleets = 16;
 
   // This is the time (in seconds since Unix epoch) since this star "became" empty -- that is,
   // after the colony was destroyed. This only has meaning if the star has no colonies currently.
@@ -144,4 +134,58 @@ message Planet {
 
   // How "congenial" is this planet to the production of energy?
   optional int32 energy_congeniality = 7;
+
+  // Colony on this planet (if there is one).
+  optional Colony colony = 8;
+}
+
+// Represents the details of an empire's stored goods in a star. For example, keeps track of stored
+// food, energy, minerals, etc, etc.
+message EmpireStorage {
+  optional int64 empire_id = 1;
+
+  optional float total_goods = 2;
+  optional float total_minerals = 3;
+  optional float total_energy = 4;
+
+  optional float goods_delta_per_hour = 5;
+  optional float minerals_delta_per_hour = 6;
+  optional float energy_delta_per_hour = 7;
+
+  optional float max_goods = 8;
+  optional float max_minerals = 9;
+  optional float max_energy = 10;
+
+  optional int64 goods_zero_time = 11;
+}
+
+// Every edit to a star is performed as an atomic modification. Colonizing a planet, adjusting focus
+// of a colony, etc. This is to ensure edits happen in a deterministic fashion and we can control
+// the locking and synchronization better.
+message StarModification {
+  enum MODIFICATION_TYPE {
+    // Do not use.
+    UNKNOWN = 0;
+
+    // Colonize a planet on the star.
+    // empire_id and planet_index are required.
+    COLONIZE = 1;
+
+    // Adjust a colony's focus.
+    // empire_id, colony_id and focus are required.
+    ADJUST_FOCUS = 2;
+
+    // Create a new fleet, ignored if sent from client.
+    // empire_id, design_id and count are required.
+    CREATE_FLEET = 3;
+  }
+  optional MODIFICATION_TYPE type = 1;
+
+  optional int64 empire_id = 2;
+  optional int32 planet_index = 3;
+  optional int64 colony_id = 4;
+
+  optional ColonyFocus focus = 5;
+  optional string design_id = 6;
+  optional int32 count = 7;
 }

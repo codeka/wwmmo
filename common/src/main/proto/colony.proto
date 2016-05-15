@@ -1,0 +1,60 @@
+package au.com.codeka.warworlds.common.proto;
+
+import "common.proto";
+
+// Represents a colony that's on a planet.
+message Colony {
+  // The ID of this colony, so that it can be referred to by other entities.
+  optional int64 id = 1;
+
+  // The ID of the empire that owns this colony.
+  optional int64 empire_id = 2;
+
+  // The population of the colony.
+  optional float population = 3;
+
+  // The "focus" of this colony.
+  optional ColonyFocus focus = 4;
+
+  // After simulating, these will contain the delta values (i.e. how much do the goods or whatever
+  // changed in this colony) per hour.
+  optional float delta_population = 5;
+  optional float delta_goods = 6;
+  optional float delta_minerals = 7;
+  optional float delta_energy = 8;
+
+  // The colony's defence bonus, which when multiplied by one quarter of the population gives the
+  //colony's total defence score.
+  optional float defence_bonus = 9;
+
+  // When all bonuses and what-not are applies, what is this colony's maximum population?
+  optional float max_population = 10;
+
+  // If set, this is the time the "cooldown" period ends. While in cooldown, the colony will not
+  //lose population
+  optional int64 cooldown_end_time = 11;
+
+  // collection of buildings in this colony.
+  repeated Building buildings = 12;
+}
+
+// The "focus" of the colony. The values here should all add up to 1.0.
+message ColonyFocus {
+  optional float population = 4;
+  optional float farming = 5;
+  optional float mining = 6;
+  optional float construction = 7;
+  optional float energy = 8;
+}
+
+// Represents a completed building in a colony.
+message Building {
+  // The name of the design of this building (defined in data/buildings.xml)
+  optional string design_id = 1;
+
+  // The level of this building
+  optional int32 level = 2;
+
+  // Not as useful for buildings (compared to fleets, say), but notes the player can attach.
+  optional string notes = 3;
+}

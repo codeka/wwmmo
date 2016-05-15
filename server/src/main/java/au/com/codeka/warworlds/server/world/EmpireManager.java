@@ -1,11 +1,15 @@
 package au.com.codeka.warworlds.server.world;
 
+import com.google.common.collect.Lists;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.ProtobufStore;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
@@ -48,9 +52,41 @@ public class EmpireManager {
       return null;
     }
 
-    // TODO: Create a colony on the star.
-
     long id = empires.nextIdentifier();
+
+    WatchableObject<Star> star = StarManager.i.getStar(newStarFinder.getStar().id);
+    StarManager.i.modifyStar(star, Lists.newArrayList(
+        new StarModification.Builder()
+            .empire_id(id)
+            .type(StarModification.MODIFICATION_TYPE.COLONIZE)
+            .planet_index(newStarFinder.getPlanetIndex())
+            .build(),
+        new StarModification.Builder()
+            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+            .empire_id(id)
+            .design_id("colony")
+            .count(2)
+            .build(),
+        new StarModification.Builder()
+            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+            .empire_id(id)
+            .design_id("fighter")
+            .count(50)
+            .build(),
+        new StarModification.Builder()
+            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+            .empire_id(id)
+            .design_id("troopcarrier")
+            .count(200)
+            .build(),
+        new StarModification.Builder()
+            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+            .empire_id(id)
+            .design_id("scout")
+            .count(10)
+            .build()
+    ));
+
     Empire empire = new Empire.Builder()
         .display_name(name)
         .id(id)
