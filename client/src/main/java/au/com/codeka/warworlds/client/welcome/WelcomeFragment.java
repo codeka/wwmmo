@@ -40,7 +40,9 @@ import au.com.codeka.warworlds.client.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
+import au.com.codeka.warworlds.client.world.EmpireManager;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Empire;
 
 /**
  * The "Welcome" activity is what you see when you first start the game, it has a view for showing
@@ -55,6 +57,7 @@ public class WelcomeFragment extends BaseFragment {
   private Button startButton;
   private TextView connectionStatus;
   private TextView realmName;
+  private TextView empireName;
   private TransparentWebView motdView;
 
   @Override
@@ -72,6 +75,7 @@ public class WelcomeFragment extends BaseFragment {
     startButton = (Button) Preconditions.checkNotNull(view.findViewById(R.id.start_btn));
     realmName = (TextView) Preconditions.checkNotNull(view.findViewById(R.id.realm_name));
     motdView = (TransparentWebView) Preconditions.checkNotNull(view.findViewById(R.id.motd));
+    empireName = (TextView) Preconditions.checkNotNull(view.findViewById(R.id.empire_name));
     connectionStatus =
         (TextView) Preconditions.checkNotNull(view.findViewById(R.id.connection_status));
     final Button realmSelectButton =
@@ -142,10 +146,10 @@ public class WelcomeFragment extends BaseFragment {
     updateServerState(App.i.getServer().getCurrState());
     App.i.getEventBus().register(eventHandler);
 
-    //final TextView empireName = (TextView) Preconditions.checkNotNull()findViewById(R.id.empire_name);
-    //final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
-    //empireName.setText("");
-    //empireIcon.setImageBitmap(null);
+    Empire myEmpire = EmpireManager.i.getMyEmpire();
+    if (myEmpire != null) {
+      refreshEmpireDetails(myEmpire);
+    }
 
     //ShieldManager.eventBus.register(eventHandler);
 
@@ -170,6 +174,11 @@ public class WelcomeFragment extends BaseFragment {
 //        }
 //      }
 //    });
+  }
+
+  private void refreshEmpireDetails(Empire empire) {
+    empireName.setText(empire.display_name);
+    //empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
   }
 
   @Override
@@ -311,6 +320,14 @@ public class WelcomeFragment extends BaseFragment {
       updateServerState(event);
     }
 
+    @EventHandler
+    public void onEmpireUpdated(Empire empire) {
+      Empire myEmpire = EmpireManager.i.getMyEmpire();
+      if (myEmpire != null && myEmpire.id.equals(empire.id)) {
+        refreshEmpireDetails(empire);
+      }
+    }
+
 /*    @EventHandler
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
       // if it's the same as our empire, we'll need to update the icon we're currently showing.
@@ -321,30 +338,4 @@ public class WelcomeFragment extends BaseFragment {
       }
     }*/
   };
-/*
-  private class HelloWatcher implements ServerGreeter.HelloWatcher {
-    private int numRetries = 0;
-
-    @Override
-    public void onRetry(final int retries) {
-      numRetries = retries + 1;
-      connectionStatus.setText(String.format("Retrying (#%d)...", numRetries));
-    }
-
-    @Override
-    public void onAuthenticating() {
-      if (numRetries > 0) {
-        return;
-      }
-      connectionStatus.setText("Authenticating...");
-    }
-
-    @Override
-    public void onConnecting() {
-      if (numRetries > 0) {
-        return;
-      }
-      connectionStatus.setText("Connecting...");
-    }
-  }*/
 }

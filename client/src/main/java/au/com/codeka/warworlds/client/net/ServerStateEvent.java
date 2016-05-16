@@ -8,6 +8,7 @@ public class ServerStateEvent {
     UNKNOWN,
     DISCONNECTED,
     CONNECTING,
+    WAITING_FOR_HELLO,
     CONNECTED
   }
 

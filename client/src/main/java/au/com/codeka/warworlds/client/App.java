@@ -58,4 +58,6 @@ public class App extends Application {
   public EventBus getEventBus() {
     return eventBus;
   }
+
+  public DataStore getDataStore() { return dataStore; }
 }

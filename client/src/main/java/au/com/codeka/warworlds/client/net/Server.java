@@ -21,7 +21,7 @@ import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.BuildConfig;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.util.GameSettings;
-import au.com.codeka.warworlds.client.util.eventbus.EventBus;
+import au.com.codeka.warworlds.client.world.EmpireManager;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Packet;
 
@@ -44,14 +44,11 @@ public class Server {
   /** A lock used to guard access to the web socket/queue. */
   private final Object lock = new Object();
 
-  /** The cookie we use to authenticate. Null if we don't have a cookie yet. */
-  @Nullable private String cookie;
-
   private int reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS;
 
   /** Connect to the server. */
   public void connect() {
-    cookie = GameSettings.i.getString(GameSettings.Key.COOKIE);
+    String cookie = GameSettings.i.getString(GameSettings.Key.COOKIE);
     if (cookie.isEmpty()) {
       log.warning("No cookie yet, not connecting.");
       return;
@@ -94,7 +91,8 @@ public class Server {
     synchronized (lock) {
       this.ws = ws;
       reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS;
-      updateState(ServerStateEvent.ConnectionState.CONNECTED);
+      // We are now in the "waiting for hello" state as we wait for the HelloResponse packet.
+      updateState(ServerStateEvent.ConnectionState.WAITING_FOR_HELLO);
 
       Preconditions.checkNotNull(queuedPackets);
       while (!queuedPackets.isEmpty()) {
@@ -125,6 +123,19 @@ public class Server {
   }
 
   private void onPacket(Packet pkt) {
+    if (currState.getState().equals(ServerStateEvent.ConnectionState.WAITING_FOR_HELLO)) {
+      if (pkt.hello_response != null) {
+        // Now we're connected!
+        updateState(ServerStateEvent.ConnectionState.CONNECTED);
+        EmpireManager.i.onHello(pkt.hello_response.empire);
+      } else {
+        // Any other packet is unexpected in this state!
+        log.warning("Unknown packet received while waiting for hello_response.");
+      }
+      return;
+    }
+
+    // TODO: what next?
     log.debug("Packet: %s", pkt);
   }
 
