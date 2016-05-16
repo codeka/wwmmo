@@ -3,6 +3,7 @@
 {% block head %}
   <link rel="stylesheet" href="/admin/css/starfield.css">
   <script type="text/javascript" src="/admin/js/tmpl.js"></script>
+  <script type="text/javascript" src="/admin/js/empirestore.js"></script>
   <script type="text/javascript" src="/admin/js/starfield.js"></script>
 {% endblock %}
 {% block content %}
@@ -37,6 +38,13 @@
               </ul>
             </div>
           </div>
+          <% if (planets[i].colony) { %>
+            <div class="colony">
+              <img src="/admin/img/shield.png" data-empireid="<%= planets[i].colony.empire_id %>" width="64" height="64">
+              <span data-empireid="<%= planets[i].colony.empire_id %>">...</span>
+            </div>
+            <% empireStore.getEmpire(planets[i].colony.empire_id); %>
+          <% } %>
         <% } %>
       </div>
     </script>
