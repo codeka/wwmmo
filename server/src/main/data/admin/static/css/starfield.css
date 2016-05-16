@@ -25,6 +25,7 @@
   transform: rotate(45deg) scale(0.5);
   cursor: pointer;
 }
+
 .starfield-label {
   position: absolute;
   color: #fff;
@@ -121,7 +122,7 @@
   margin-right: 10pt;
 }
 
-.congeniality {
+.planet .congeniality {
   display: inline-block;
   width: 50px;
   border: solid 1px white;
@@ -130,8 +131,17 @@
   margin-bottom: 3px;
 }
 
-.congeniality span {
+.planet .congeniality span {
   display: inline-block;
   background: #0f0;
   height: 8px;
+}
+
+.colony {
+  height: 64px;
+  margin-left: 64px;
+}
+
+.colony img {
+  float: left;
 }

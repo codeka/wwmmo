@@ -41,7 +41,7 @@
           <% if (planets[i].colony) { %>
             <div class="colony">
               <img src="/admin/img/shield.png" data-empireid="<%= planets[i].colony.empire_id %>" width="64" height="64">
-              <span data-empireid="<%= planets[i].colony.empire_id %>">...</span>
+              <h2><span data-empireid="<%= planets[i].colony.empire_id %>">...</span></h2>
             </div>
             <% empireStore.getEmpire(planets[i].colony.empire_id); %>
           <% } %>
