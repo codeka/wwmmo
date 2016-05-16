@@ -11,6 +11,8 @@ import java.nio.ByteBuffer;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.HelloResponsePacket;
+import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.EmpireManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
@@ -36,7 +38,10 @@ public class GameSocket extends WebSocketAdapter {
     this.session = sess;
     log.info("Socket Connected: %s", sess);
 
-    sendMessage(empire.get());
+    sendMessage(new Packet.Builder().hello_response(
+        new HelloResponsePacket.Builder()
+            .empire(empire.get())
+            .build()));
   }
 
   @Override
@@ -68,10 +73,14 @@ public class GameSocket extends WebSocketAdapter {
     cause.printStackTrace(System.err);
   }
 
-  private void sendMessage(Message<?, ?> msg) {
-    log.debug(">> %s", msg.toString());
+  private void sendMessage(Packet.Builder pktBuilder) {
+    sendMessage(pktBuilder.build());
+  }
+
+  private void sendMessage(Packet pkt) {
+    log.debug(">> %s", pkt.toString());
     try {
-      getRemote().sendBytes(ByteBuffer.wrap(msg.encode()));
+      getRemote().sendBytes(ByteBuffer.wrap(pkt.encode()));
     } catch (IOException e) {
       log.error("Error sending message to client.", e);
     }
