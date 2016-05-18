@@ -30,9 +30,7 @@ public class MainActivity extends BaseFragmentActivity {
         (RenderSurfaceView) Preconditions.checkNotNull(findViewById(R.id.render_surface));
     renderSurfaceView.setRenderer();
     starfieldManager = new StarfieldManager(renderSurfaceView);
-
-    // TODO: move this to starfield view?
-    starfieldManager.pushScene(starfieldManager.sceneBuilder().build());
+    starfieldManager.create();
 
     if (savedInstanceState == null) {
       if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
@@ -49,6 +47,7 @@ public class MainActivity extends BaseFragmentActivity {
   public void onDestroy() {
     super.onDestroy();
 
+    starfieldManager.destroy();
     starfieldManager = null;
   }
 }

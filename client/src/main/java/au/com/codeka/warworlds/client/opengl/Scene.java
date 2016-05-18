@@ -8,27 +8,28 @@ import com.google.common.base.Preconditions;
 public class Scene {
   private final DimensionResolver dimensionResolver;
   private final TextureManager textureManager;
-
-  private Sprite sprite;
+  private final SceneObject rootObject;
 
   public Scene(DimensionResolver dimensionResolver, TextureManager textureManager) {
     this.dimensionResolver = Preconditions.checkNotNull(dimensionResolver);
     this.textureManager = Preconditions.checkNotNull(textureManager);
-
-    sprite = createSprite(new SpriteTemplate.Builder()
-        .shader(new SpriteShader())
-        .texture(textureManager.loadTexture("stars/stars_small.png"))
-        .uvTopLeft(new Vector2(0.25f, 0.5f))
-        .uvBottomRight(new Vector2(0.5f, 0.75f))
-        .build());
-    sprite.setSizeDp(40.0f, 40.0f);
+    this.rootObject = new SceneObject();
   }
 
   public Sprite createSprite(SpriteTemplate tmpl) {
     return new Sprite(dimensionResolver, tmpl);
   }
 
+  public TextureManager getTextureManager() {
+    return textureManager;
+  }
+
+  /** Gets the root {@link SceneObject} that you should add all your sprites and stuff to. */
+  public SceneObject getRootObject() {
+    return rootObject;
+  }
+
   public void draw(float[] projMatrix) {
-    sprite.draw(projMatrix);
+    rootObject.draw(projMatrix);
   }
 }
