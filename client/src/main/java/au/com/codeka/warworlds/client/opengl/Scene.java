@@ -10,10 +10,14 @@ public class Scene {
   private final TextureManager textureManager;
   private final SceneObject rootObject;
 
+  // All modifications to the scene (adding children, modifying children, etc) should happen while
+  // synchronized on this lock.
+  public final Object lock = new Object();
+
   public Scene(DimensionResolver dimensionResolver, TextureManager textureManager) {
     this.dimensionResolver = Preconditions.checkNotNull(dimensionResolver);
     this.textureManager = Preconditions.checkNotNull(textureManager);
-    this.rootObject = new SceneObject();
+    this.rootObject = new SceneObject(this);
   }
 
   public Sprite createSprite(SpriteTemplate tmpl) {

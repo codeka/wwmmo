@@ -83,7 +83,9 @@ public class Server {
       if (queuedPackets != null) {
         queuedPackets.add(pkt);
       } else if (ws != null) {
-        ws.sendBinary(pkt.encode());
+        byte[] bytes = pkt.encode();
+        log.debug(">> %s (%d bytes)", getDebugPacketType(pkt), bytes.length);
+        ws.sendBinary(bytes);
       } else {
         throw new IllegalStateException("One of queuedPackets or ws should be non-null.");
       }
@@ -147,6 +149,30 @@ public class Server {
     App.i.getEventBus().publish(currState);
   }
 
+  /**
+   * Useful for debugging, gets the "name" of the given packet, which is actually the name of the
+   * type of the first non-null field in the packet.
+   */
+  private String getDebugPacketType(Packet pkt) {
+    if (!log.isDebugEnabled()) {
+      return "Packet";
+    }
+
+    for (Field field : pkt.getClass().getFields()) {
+      if (field.isAnnotationPresent(WireField.class)) {
+        try {
+          if (field.get(pkt) != null) {
+            return field.getType().getSimpleName();
+          }
+        } catch (IllegalAccessException e) {
+          // Ignore. (though should never happen)
+        }
+      }
+    }
+
+    return "UKNOWN_PACKET";
+  }
+
   private WebSocketListener webSocketListener = new WebSocketAdapter() {
     @Override
     public void onConnected(WebSocket ws, Map<String, List<String>> headers) throws Exception {
@@ -171,7 +197,9 @@ public class Server {
     @Override
     public void onBinaryMessage(WebSocket ws, byte[] binary) throws Exception {
       log.debug("onBinaryMessage(%d bytes)", binary.length);
-      onPacket(Packet.ADAPTER.decode(binary));
+      Packet pkt = Packet.ADAPTER.decode(binary);
+      log.debug("<< %s (%d bytes)", getDebugPacketType(pkt), binary.length);
+      onPacket(pkt);
     }
   };
 }

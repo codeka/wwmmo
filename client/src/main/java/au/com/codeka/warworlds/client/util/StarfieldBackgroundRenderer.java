@@ -178,7 +178,6 @@ public class StarfieldBackgroundRenderer {
 
       InputStream ins = null;
       try {
-        log.info("Loading '%s'...", fullPath);
         ins = assetMgr.open(fullPath);
 
         BitmapFactory.Options opts = new BitmapFactory.Options();

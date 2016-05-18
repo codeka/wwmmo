@@ -7,6 +7,9 @@ import java.util.ArrayList;
 
 /** Base class for any "object" within a {@link Scene}. */
 public class SceneObject {
+  /** The scene we belong to, or null if we're not part of a scene. */
+  @Nullable private Scene scene;
+
   /** Children array will be null until you add the first child. */
   @Nullable private ArrayList<SceneObject> children;
 
@@ -14,6 +17,11 @@ public class SceneObject {
   protected final float[] matrix = new float[16];
 
   public SceneObject() {
+    this(null);
+  }
+
+  public SceneObject(@Nullable Scene scene) {
+    this.scene = scene;
     Matrix.setIdentityM(matrix, 0);
   }
 
@@ -22,11 +30,13 @@ public class SceneObject {
       children = new ArrayList<>();
     }
     children.add(child);
+    child.scene = scene;
   }
 
   public void removeChild(SceneObject child) {
     if (children != null) {
       children.remove(child);
+      child.scene = null;
     }
   }
 

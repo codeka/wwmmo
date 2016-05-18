@@ -2,6 +2,9 @@ package au.com.codeka.warworlds.client.starfield;
 
 import com.google.common.base.Preconditions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
@@ -32,6 +35,8 @@ public class StarfieldManager {
   private long centerSectorX;
   private long centerSectorY;
   private int sectorRadius;
+
+  private final Map<Long, Sprite> starSprites = new HashMap<>();
 
   public StarfieldManager(RenderSurfaceView renderSurfaceView) {
     this.scene = renderSurfaceView.createScene();
@@ -84,15 +89,29 @@ public class StarfieldManager {
     // Shouldn't be null after we're connected to the server.
     Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
     warpTo(myEmpire.home_star);
+  }
 
-    Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
-        .shader(new SpriteShader())
-        .texture(scene.getTextureManager().loadTexture("stars/stars_small.png"))
-        .uvTopLeft(new Vector2(0.25f, 0.5f))
-        .uvBottomRight(new Vector2(0.5f, 0.75f))
-        .build());
-    sprite.setSizeDp(40.0f, 40.0f);
-    scene.getRootObject().addChild(sprite);
+  /** Called when a star is updated, we may need to update the sprite for it. */
+  private void updateStar(Star star) {
+    Sprite sprite = starSprites.get(star.id);
+    if (sprite == null) {
+      sprite = scene.createSprite(new SpriteTemplate.Builder()
+          .shader(new SpriteShader())
+          .texture(scene.getTextureManager().loadTexture("stars/stars_small.png"))
+          .uvTopLeft(new Vector2(0.25f, 0.5f))
+          .uvBottomRight(new Vector2(0.5f, 0.75f))
+          .build());
+      sprite.setSizeDp(40.0f, 40.0f);
+      float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
+      float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
+      log.debug("Adding star at %.3f, %.3f", x, y);
+      sprite.translateDp(x, y);
+      synchronized (scene.lock) {
+        scene.getRootObject().addChild(sprite);
+      }
+      starSprites.put(star.id, sprite);
+    }
+    // TODO: update the sprite with label, kind, etc...
   }
 
   private final Object eventListener = new Object() {
@@ -106,7 +125,15 @@ public class StarfieldManager {
     @EventHandler
     public void onStarUpdatedPacket(StarUpdatedPacket pkt) {
       for (Star star : pkt.stars) {
-        log.debug("Got updated star: %d %s", star.id, star.name);
+        // Make sure this star is one that we're tracking.
+        if (star.sector_x < centerSectorX - sectorRadius
+            || star.sector_x > centerSectorX + sectorRadius
+            || star.sector_y < centerSectorY - sectorRadius
+            || star.sector_y > centerSectorY + sectorRadius) {
+          continue;
+        }
+
+        updateStar(star);
       }
     }
   };

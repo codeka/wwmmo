@@ -53,7 +53,7 @@ public class ProtobufStore<M extends Message<?, ?>> {
       ContentValues values = new ContentValues();
       values.put("key", id);
       values.put("value", serializer.serialize(value));
-      db.insert(name, null, values);
+      db.insertWithOnConflict(name, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     } finally {
       db.close();
     }

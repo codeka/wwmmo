@@ -26,6 +26,13 @@ public class Sprite extends SceneObject {
     this.heightPx = heightPx;
   }
 
+  public void translateDp(float xDp, float yDp) {
+//    float xPx = dimensionResolver.dp2px(xDp);
+//    float yPx = dimensionResolver.dp2px(yDp);
+//    Matrix.translateM(matrix, 0, xPx, yPx, 0.0f);
+    Matrix.translateM(matrix, 0, xDp / 100.0f, yDp / 100.0f, 0.0f);
+  }
+
   @Override
   protected void drawImpl(float[] mvpMatrix) {
     tmpl.draw(mvpMatrix);

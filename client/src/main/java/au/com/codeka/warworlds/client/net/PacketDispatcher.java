@@ -16,11 +16,9 @@ import au.com.codeka.warworlds.common.proto.Packet;
  */
 public class PacketDispatcher {
   private static final Log log = new Log("PacketDispatcher");
-  private final EventBus eventBus;
   private final Collection<Field> pktFields;
 
   public PacketDispatcher() {
-    eventBus = App.i.getEventBus();
     pktFields = new ArrayList<>();
     for (Field field : Packet.class.getFields()) {
       if (field.isAnnotationPresent(WireField.class)) {
@@ -34,7 +32,7 @@ public class PacketDispatcher {
       try {
         Object value = field.get(pkt);
         if (value != null) {
-          eventBus.publish(value);
+          App.i.getEventBus().publish(value);
         }
       } catch (IllegalAccessException e) {
         // Should never happen.
