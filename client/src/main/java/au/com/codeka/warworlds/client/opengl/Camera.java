@@ -7,12 +7,27 @@ import android.opengl.Matrix;
  */
 public class Camera {
   private final float[] projMatrix = new float[16];
+  private final float[] viewMatrix = new float[16];
+  private final float[] viewProjMatrix = new float[16];
+
+  public Camera() {
+    Matrix.setIdentityM(viewMatrix, 0);
+  }
 
   public void onSurfaceChanged(float width, float height) {
     Matrix.orthoM(projMatrix, 0, -width / 2, width / 2, -height / 2, height / 2, 10, -10);
   }
 
   public float[] getViewProjMatrix() {
-    return projMatrix;
+    Matrix.multiplyMM(viewProjMatrix, 0, projMatrix, 0, viewMatrix, 0);
+    return viewProjMatrix;
+  }
+
+  public void translate(float x, float y) {
+    Matrix.translateM(viewMatrix, 0, x, y, 0.0f);
+  }
+
+  public void zoom(float factor) {
+    Matrix.scaleM(viewMatrix, 0, factor, factor, 1.0f);
   }
 }

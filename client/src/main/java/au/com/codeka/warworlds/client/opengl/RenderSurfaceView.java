@@ -66,8 +66,8 @@ public class RenderSurfaceView extends GLSurfaceView {
     private DeviceInfo deviceInfo;
     private final DimensionResolver dimensionResolver;
     private final TextureManager textureManager;
+    private final Camera camera;
     @Nullable private Scene scene;
-    private Camera camera;
     private TaskQueue taskQueue;
 
     public Renderer(Context context) {
@@ -75,6 +75,7 @@ public class RenderSurfaceView extends GLSurfaceView {
       this.textureManager = new TextureManager(context);
       this.taskQueue = new TaskQueue(50 /* numQueuedItems */);
       this.dimensionResolver = new DimensionResolver(context);
+      this.camera = new Camera();
     }
 
     public void setScene(@Nullable Scene scene) {
@@ -90,7 +91,6 @@ public class RenderSurfaceView extends GLSurfaceView {
     @Override
     public void onSurfaceCreated(final GL10 ignored, final EGLConfig eglConfig) {
       deviceInfo = new DeviceInfo();
-      camera = new Camera();
       GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       GLES20.glEnable(GLES20.GL_BLEND);
       GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);

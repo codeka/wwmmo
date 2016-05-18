@@ -44,7 +44,7 @@ public class StarfieldManager {
   public StarfieldManager(RenderSurfaceView renderSurfaceView) {
     this.scene = renderSurfaceView.createScene();
     this.camera = renderSurfaceView.getCamera();
-    gestureDetector = new StarfieldGestureDetector(renderSurfaceView);
+    gestureDetector = new StarfieldGestureDetector(renderSurfaceView, gestureListener);
     renderSurfaceView.setScene(scene);
   }
 
@@ -144,6 +144,24 @@ public class StarfieldManager {
 
         updateStar(star);
       }
+    }
+  };
+
+  private final StarfieldGestureDetector.Callback gestureListener =
+      new StarfieldGestureDetector.Callback() {
+    @Override
+    public void onScroll(float dx, float dy) {
+      camera.translate(-dx, dy);
+    }
+
+    @Override
+    public void onFling(float vx, float vy) {
+
+    }
+
+    @Override
+    public void onScale(float factor) {
+      camera.zoom(factor);
     }
   };
 }
