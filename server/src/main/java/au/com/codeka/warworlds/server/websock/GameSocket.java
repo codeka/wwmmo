@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.websock;
 
-import com.squareup.wire.Message;
-
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
@@ -11,11 +9,12 @@ import java.nio.ByteBuffer;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.common.proto.HelloResponsePacket;
+import au.com.codeka.warworlds.common.proto.HelloPacket;
 import au.com.codeka.warworlds.common.proto.Packet;
-import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.EmpireManager;
+import au.com.codeka.warworlds.server.world.Player;
 import au.com.codeka.warworlds.server.world.WatchableObject;
+import okio.ByteString;
 
 /**
  * Represents a socket connection to a single client, receives messages from them and sends messages
@@ -26,9 +25,11 @@ public class GameSocket extends WebSocketAdapter {
 
   private Session session;
   private final WatchableObject<Empire> empire;
+  private final Player player;
 
   public GameSocket(String cookie, Account account) {
     empire = EmpireManager.i.getEmpire(account.empire_id);
+    player = new Player(this, empire);
     log.debug("Connection '%s' empire: %s", cookie, empire);
   }
 
@@ -38,8 +39,8 @@ public class GameSocket extends WebSocketAdapter {
     this.session = sess;
     log.info("Socket Connected: %s", sess);
 
-    sendMessage(new Packet.Builder().hello_response(
-        new HelloResponsePacket.Builder()
+    send(new Packet.Builder().hello(
+        new HelloPacket.Builder()
             .empire(empire.get())
             .build()));
   }
@@ -47,18 +48,14 @@ public class GameSocket extends WebSocketAdapter {
   @Override
   public void onWebSocketBinary(byte[] payload, int offset, int len) {
     super.onWebSocketBinary(payload, offset, len);
-    log.info("Received BINARY message: %d bytes", len);
-  }
-
-  @Override
-  public void onWebSocketText(String text) {
-    super.onWebSocketText(text);
-    log.info("Received TEXT message: %s", text);
+    Packet pkt;
     try {
-      getRemote().sendString("Reply: " + text);
+      pkt = Packet.ADAPTER.decode(ByteString.of(payload, offset, len));
     } catch (IOException e) {
-      log.error("Error", e);
+      log.error("Error decoding %d bytes into Packet.", len, e);
+      return;
     }
+    player.onPacket(pkt);
   }
 
   @Override
@@ -73,11 +70,11 @@ public class GameSocket extends WebSocketAdapter {
     cause.printStackTrace(System.err);
   }
 
-  private void sendMessage(Packet.Builder pktBuilder) {
-    sendMessage(pktBuilder.build());
+  public void send(Packet.Builder pktBuilder) {
+    send(pktBuilder.build());
   }
 
-  private void sendMessage(Packet pkt) {
+  public void send(Packet pkt) {
     log.debug(">> %s", pkt.toString());
     try {
       getRemote().sendBytes(ByteBuffer.wrap(pkt.encode()));

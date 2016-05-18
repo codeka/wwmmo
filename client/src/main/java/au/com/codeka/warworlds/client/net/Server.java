@@ -10,8 +10,10 @@ import com.neovisionaries.ws.client.WebSocketExtension;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketListener;
+import com.squareup.wire.WireField;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ public class Server {
   private static final int MAX_RECONNECT_TIME_MS = 30000;
 
   private final String url = BuildConfig.WEBSOCKET_URL;
+  private final PacketDispatcher packetDispatcher = new PacketDispatcher();
   private ServerStateEvent currState;
 
   /** The WebSocket we're connected to. Will be null if we're not connected. */
@@ -75,7 +78,7 @@ public class Server {
     return currState;
   }
 
-  private void send(Packet pkt) {
+  public void send(Packet pkt) {
     synchronized (lock) {
       if (queuedPackets != null) {
         queuedPackets.add(pkt);
@@ -124,10 +127,10 @@ public class Server {
 
   private void onPacket(Packet pkt) {
     if (currState.getState().equals(ServerStateEvent.ConnectionState.WAITING_FOR_HELLO)) {
-      if (pkt.hello_response != null) {
+      if (pkt.hello != null) {
         // Now we're connected!
+        EmpireManager.i.onHello(pkt.hello.empire);
         updateState(ServerStateEvent.ConnectionState.CONNECTED);
-        EmpireManager.i.onHello(pkt.hello_response.empire);
       } else {
         // Any other packet is unexpected in this state!
         log.warning("Unknown packet received while waiting for hello_response.");
@@ -135,8 +138,8 @@ public class Server {
       return;
     }
 
-    // TODO: what next?
-    log.debug("Packet: %s", pkt);
+    // Dispatch the packet to the event bus.
+    packetDispatcher.dispatch(pkt);
   }
 
   private void updateState(ServerStateEvent.ConnectionState state) {
