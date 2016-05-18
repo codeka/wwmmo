@@ -1,16 +1,7 @@
-*.class
-
-# Package Files #
-*.war
-*.ear
-
-# Python files
-*.pyc
 
 # Temp files
 *~
-
-.gitignore
+*.class
 
 # Make sure keystore.jks never gets added to source control, it's SEKRET!
 keystore.jks
@@ -23,6 +14,7 @@ client/signing.properties
 .gradle
 .idea/
 local.properties
+captures/
 
 # Ignore build directory in top-level folder and the first child. This is where
 # build artifacts go.

@@ -27,11 +27,17 @@ public enum Threads {
   BACKGROUND;
 
   public static void checkOnThread(Threads thread) {
-    Preconditions.checkState(thread.isCurrentThread(), "Unexpectedly not on " + thread);
+    // Note: We don't use Preconditions.checkState because we want a nice error message and don't
+    // want to allocate the string for the message every time.
+    if (!thread.isCurrentThread()) {
+      throw new IllegalStateException("Unexpectedly not on " + thread);
+    }
   }
 
   public static void checkNotOnThread(Threads thread) {
-    Preconditions.checkState(thread.isCurrentThread(), "Unexpectedly on " + thread);
+    if(thread.isCurrentThread()) {
+      throw new IllegalStateException("Unexpectedly on " + thread);
+    }
   }
 
   private boolean isInitialized;

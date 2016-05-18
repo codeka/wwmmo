@@ -15,6 +15,7 @@ public class SceneObject {
 
   /** Matrix transform that transforms this scene object into world space. */
   protected final float[] matrix = new float[16];
+  protected final float[] modelViewProjMatrix = new float[16];
 
   public SceneObject() {
     this(null);
@@ -23,6 +24,7 @@ public class SceneObject {
   public SceneObject(@Nullable Scene scene) {
     this.scene = scene;
     Matrix.setIdentityM(matrix, 0);
+    Matrix.setIdentityM(modelViewProjMatrix, 0);
   }
 
   public void addChild(SceneObject child) {
@@ -59,13 +61,12 @@ public class SceneObject {
   }
 
   public void draw(float[] viewProjMatrix) {
-    float[] result = new float[16]; // TODO: don't allocate memory
-    Matrix.multiplyMM(result, 0, viewProjMatrix, 0, matrix, 0);
+    Matrix.multiplyMM(modelViewProjMatrix, 0, viewProjMatrix, 0, matrix, 0);
 
-    drawImpl(result);
+    drawImpl(modelViewProjMatrix);
     if (children != null) {
-      for (SceneObject child : children) {
-        child.draw(result);
+      for (int i = 0; i < children.size(); i++) {
+        children.get(i).draw(modelViewProjMatrix);
       }
     }
   }

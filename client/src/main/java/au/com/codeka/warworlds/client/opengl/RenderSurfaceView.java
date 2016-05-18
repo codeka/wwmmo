@@ -112,10 +112,7 @@ public class RenderSurfaceView extends GLSurfaceView {
 
       GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-      Scene currScene;
-      synchronized (this) {
-        currScene = this.scene;
-      }
+      Scene currScene = this.scene;
       if (currScene != null) {
         synchronized (currScene.lock) {
           currScene.draw(camera);
