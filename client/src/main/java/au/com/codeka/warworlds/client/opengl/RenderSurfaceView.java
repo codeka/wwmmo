@@ -55,14 +55,20 @@ public class RenderSurfaceView extends GLSurfaceView {
     return renderer.createScene();
   }
 
+  /** Gets the {@link Camera} you can use to scroll around the view, etc. */
+  public Camera getCamera() {
+    Preconditions.checkState(renderer != null);
+    return renderer.camera;
+  }
+
   public static class Renderer implements GLSurfaceView.Renderer {
     private final boolean multiSampling;
     private DeviceInfo deviceInfo;
     private final DimensionResolver dimensionResolver;
     private final TextureManager textureManager;
     @Nullable private Scene scene;
+    private Camera camera;
     private TaskQueue taskQueue;
-    float[] projMatrix = new float[16];
 
     public Renderer(Context context) {
       this.multiSampling = true;
@@ -84,6 +90,7 @@ public class RenderSurfaceView extends GLSurfaceView {
     @Override
     public void onSurfaceCreated(final GL10 ignored, final EGLConfig eglConfig) {
       deviceInfo = new DeviceInfo();
+      camera = new Camera();
       GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       GLES20.glEnable(GLES20.GL_BLEND);
       GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
@@ -93,7 +100,7 @@ public class RenderSurfaceView extends GLSurfaceView {
     public void onSurfaceChanged(final GL10 ignored, final int width, final int height) {
       log.debug("Surface size set to %dx%d", width, height);
       GLES20.glViewport(0, 0, width, height);
-      Matrix.orthoM(projMatrix, 0, -width / 2, width / 2, -height / 2, height / 2, 10, -10);
+      camera.onSurfaceChanged(width, height);
     }
 
     @Override
@@ -111,7 +118,7 @@ public class RenderSurfaceView extends GLSurfaceView {
       }
       if (currScene != null) {
         synchronized (currScene.lock) {
-          currScene.draw(projMatrix);
+          currScene.draw(camera);
         }
       }
     }

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
+import au.com.codeka.warworlds.client.opengl.Camera;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.opengl.Scene;
 import au.com.codeka.warworlds.client.opengl.Sprite;
@@ -28,8 +29,10 @@ import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
  * move-fleet view, etc.
  */
 public class StarfieldManager {
-  private static final Log log= new Log("StarfieldManager");
+  private static final Log log = new Log("StarfieldManager");
   private final Scene scene;
+  private final Camera camera;
+  private final StarfieldGestureDetector gestureDetector;
   private boolean initialized;
 
   private long centerSectorX;
@@ -40,6 +43,8 @@ public class StarfieldManager {
 
   public StarfieldManager(RenderSurfaceView renderSurfaceView) {
     this.scene = renderSurfaceView.createScene();
+    this.camera = renderSurfaceView.getCamera();
+    gestureDetector = new StarfieldGestureDetector(renderSurfaceView);
     renderSurfaceView.setScene(scene);
   }
 
@@ -49,9 +54,13 @@ public class StarfieldManager {
       // If we're already connected, then call onConnected now.
       onConnected();
     }
+
+    gestureDetector.create();
   }
 
   public void destroy() {
+    gestureDetector.destroy();
+
     App.i.getEventBus().unregister(eventListener);
   }
 

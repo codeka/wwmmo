@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.client.opengl;
 
+import android.support.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 
 /**
@@ -33,7 +35,7 @@ public class Scene {
     return rootObject;
   }
 
-  public void draw(float[] projMatrix) {
-    rootObject.draw(projMatrix);
+  public void draw(Camera camera) {
+    rootObject.draw(camera.getViewProjMatrix());
   }
 }
