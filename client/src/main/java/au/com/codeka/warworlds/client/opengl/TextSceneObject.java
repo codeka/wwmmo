@@ -20,6 +20,7 @@ public class TextSceneObject extends SceneObject {
   private final TextTexture textTexture;
 
   private String text;
+  private float textWidth;
   private boolean dirty;
   private FloatBuffer positionBuffer;
   private FloatBuffer texCoordBuffer;
@@ -30,6 +31,16 @@ public class TextSceneObject extends SceneObject {
     this.textTexture = Preconditions.checkNotNull(textTexture);
     this.text = text;
     this.dirty = true;
+  }
+
+  public float getTextWidth() {
+    if (dirty) {
+      // If it's dirty, we'll have to measure the text ourselves... we can't create the buffers
+      // since that must happen on the GL thread.
+      return measureText();
+    }
+
+    return textWidth;
   }
 
   @Override
@@ -51,6 +62,15 @@ public class TextSceneObject extends SceneObject {
     GLES20.glDrawElements(
         GLES20.GL_TRIANGLES, indexBuffer.limit(), GLES20.GL_UNSIGNED_SHORT, indexBuffer);
     shader.end();
+  }
+
+  private float measureText() {
+    float width = 0.0f;
+    for (int i = 0; i < text.length(); i++) {
+      Rect bounds = textTexture.getCharBounds(text.charAt(i));
+      width += bounds.width();
+    }
+    return width;
   }
 
   private void createBuffers() {
@@ -96,15 +116,6 @@ public class TextSceneObject extends SceneObject {
       indices[(i * 6) + 3] = (short) ((i * 4) + 1);
       indices[(i * 6) + 4] = (short) ((i * 4) + 3);
       indices[(i * 6) + 5] = (short) ((i * 4) + 2);
-    }
-
-    // Go through and shift everything 1/2 a width to the left, so that the text is nicely centered
-    for (int i = 0; i < text.length(); i++) {
-      positions[(i * 12)] -= offsetX / 2.0f;
-      positions[(i * 12) + 3] -= offsetX / 2.0f;
-      positions[(i * 12) + 6] -= offsetX / 2.0f;
-      positions[(i * 12) + 9] -= offsetX / 2.0f;
-
     }
 
     ByteBuffer bb = ByteBuffer.allocateDirect(positions.length * 4);
