@@ -63,7 +63,6 @@ public class TextSceneObject extends SceneObject {
     // # of chars * 2 triangles * 3 verts per triangle
     short[] indices = new short[text.length() * 2 * 3];
 
-    float posScale = 0.02f;
     float offsetX = 0;
     for (int i = 0; i < text.length(); i++) {
       char ch = text.charAt(i);
@@ -71,16 +70,16 @@ public class TextSceneObject extends SceneObject {
       positions[(i * 12)] = offsetX;
       positions[(i * 12) + 1] = 0.0f;
       positions[(i * 12) + 2] = 0.0f;
-      positions[(i * 12) + 3] = offsetX + bounds.width() * posScale;
+      positions[(i * 12) + 3] = offsetX + bounds.width();
       positions[(i * 12) + 4] = 0.0f;
       positions[(i * 12) + 5] = 0.0f;
       positions[(i * 12) + 6] = offsetX;
-      positions[(i * 12) + 7] = bounds.height() * posScale;
+      positions[(i * 12) + 7] = bounds.height();
       positions[(i * 12) + 8] = 0.0f;
-      positions[(i * 12) + 9] = offsetX + bounds.width() * posScale;
-      positions[(i * 12) + 10] = bounds.height() * posScale;
+      positions[(i * 12) + 9] = offsetX + bounds.width();
+      positions[(i * 12) + 10] = bounds.height();
       positions[(i * 12) + 11] = 0.0f;
-      offsetX += bounds.width() * posScale;
+      offsetX += bounds.width();
 
       uvs[(i * 8)] = (float) bounds.left / textTexture.getWidth();
       uvs[(i * 8) + 1] = (float) bounds.bottom / textTexture.getHeight();

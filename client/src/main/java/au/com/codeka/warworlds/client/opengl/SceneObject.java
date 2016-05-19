@@ -60,6 +60,10 @@ public class SceneObject {
     return children.get(index);
   }
 
+  public void translate(float x, float y) {
+    Matrix.translateM(matrix, 0, x, y, 0.0f);
+  }
+
   public void draw(float[] viewProjMatrix) {
     Matrix.multiplyMM(modelViewProjMatrix, 0, viewProjMatrix, 0, matrix, 0);
 

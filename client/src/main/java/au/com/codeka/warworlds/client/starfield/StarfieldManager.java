@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.opengl.Camera;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.opengl.Scene;
+import au.com.codeka.warworlds.client.opengl.SceneObject;
 import au.com.codeka.warworlds.client.opengl.Sprite;
 import au.com.codeka.warworlds.client.opengl.SpriteShader;
 import au.com.codeka.warworlds.client.opengl.SpriteTemplate;
@@ -40,7 +41,7 @@ public class StarfieldManager {
   private long centerSectorY;
   private int sectorRadius;
 
-  private final Map<Long, Sprite> starSprites = new HashMap<>();
+  private final Map<Long, SceneObject> starSceneObjects = new HashMap<>();
 
   public StarfieldManager(RenderSurfaceView renderSurfaceView) {
     this.scene = renderSurfaceView.createScene();
@@ -103,27 +104,30 @@ public class StarfieldManager {
 
   /** Called when a star is updated, we may need to update the sprite for it. */
   private void updateStar(Star star) {
-    Sprite sprite = starSprites.get(star.id);
-    if (sprite == null) {
-      sprite = scene.createSprite(new SpriteTemplate.Builder()
+    SceneObject container = starSceneObjects.get(star.id);
+    if (container == null) {
+      container = new SceneObject();
+
+      float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
+      float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
+      container.translate(x, y);
+
+      Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
           .shader(scene.getSpriteShader())
           .texture(scene.getTextureManager().loadTexture("stars/stars_small.png"))
           .uvTopLeft(new Vector2(0.25f, 0.5f))
           .uvBottomRight(new Vector2(0.5f, 0.75f))
           .build());
-      sprite.setSizeDp(40.0f, 40.0f);
-      float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
-      float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
-      log.debug("Adding star at %.3f, %.3f", x, y);
-      sprite.translateDp(x, y);
+      sprite.setSizeDp(20.0f, 20.0f);
+      container.addChild(sprite);
 
       TextSceneObject text = scene.createText(star.name);
+      container.addChild(text);
 
       synchronized (scene.lock) {
-        scene.getRootObject().addChild(sprite);
-        sprite.addChild(text);
+        scene.getRootObject().addChild(container);
       }
-      starSprites.put(star.id, sprite);
+      starSceneObjects.put(star.id, container);
     }
     // TODO: update the sprite with label, kind, etc...
   }
