@@ -112,13 +112,20 @@ public class StarfieldManager {
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
       container.translate(x, y);
 
+      Vector2 uvTopLeft = getStarUvTopLeft(star);
       Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
           .shader(scene.getSpriteShader())
           .texture(scene.getTextureManager().loadTexture("stars/stars_small.png"))
-          .uvTopLeft(new Vector2(0.25f, 0.5f))
-          .uvBottomRight(new Vector2(0.5f, 0.75f))
+          .uvTopLeft(uvTopLeft)
+          .uvBottomRight(new Vector2(
+              uvTopLeft.x + (star.classification == Star.CLASSIFICATION.NEUTRON ? 0.5f : 0.25f),
+              uvTopLeft.y + (star.classification == Star.CLASSIFICATION.NEUTRON ? 0.5f : 0.25f)))
           .build());
-      sprite.setSizeDp(20.0f, 20.0f);
+      if (star.classification == Star.CLASSIFICATION.NEUTRON) {
+        sprite.setSizeDp(60.0f, 60.0f);
+      } else {
+        sprite.setSizeDp(20.0f, 20.0f);
+      }
       container.addChild(sprite);
 
       TextSceneObject text = scene.createText(star.name);
@@ -131,6 +138,30 @@ public class StarfieldManager {
       starSceneObjects.put(star.id, container);
     }
     // TODO: update the sprite with label, kind, etc...
+  }
+
+  private Vector2 getStarUvTopLeft(Star star) {
+    switch (star.classification) {
+      case BLACKHOLE:
+        return new Vector2(0.0f, 0.5f);
+      case BLUE:
+        return new Vector2(0.25f, 0.5f);
+      case NEUTRON:
+        return new Vector2(0.0f, 0.0f);
+      case ORANGE:
+        return new Vector2(0.0f, 0.75f);
+      case RED:
+        return new Vector2(0.25f, 0.75f);
+      case WHITE:
+        return new Vector2(0.5f, 0.75f);
+      case WORMHOLE:
+        return new Vector2(0.0f, 0.0f);
+      case YELLOW:
+        return new Vector2(0.5f, 0.5f);
+      default:
+        // Shouldn't happen!
+        return new Vector2(0.5f, 0.0f);
+    }
   }
 
   private final Object eventListener = new Object() {
