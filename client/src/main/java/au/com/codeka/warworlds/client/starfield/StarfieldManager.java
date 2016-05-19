@@ -166,7 +166,7 @@ public class StarfieldManager {
 
     @Override
     public void onFling(float vx, float vy) {
-
+      camera.fling(vx, -vy);
     }
 
     @Override

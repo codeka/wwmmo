@@ -92,7 +92,7 @@ public class TextTexture extends Texture {
       ensureChar(ch);
       bounds = characters.get(ch);
     }
-    log.debug("'%c' bounds: %d %d %d %d", ch, bounds.left, bounds.top, bounds.right, bounds.bottom);
+
     return bounds;
   }
 

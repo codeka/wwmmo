@@ -109,6 +109,7 @@ public class RenderSurfaceView extends GLSurfaceView {
 
       // Empty the task queue
       taskQueue.runAllTasks();
+      camera.onDraw();
 
       GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
