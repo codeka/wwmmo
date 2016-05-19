@@ -12,6 +12,9 @@ public class Scene {
   private final TextureManager textureManager;
   private final SceneObject rootObject;
 
+  private final SpriteShader spriteShader;
+  private final TextTexture textTexture;
+
   // All modifications to the scene (adding children, modifying children, etc) should happen while
   // synchronized on this lock.
   public final Object lock = new Object();
@@ -20,10 +23,20 @@ public class Scene {
     this.dimensionResolver = Preconditions.checkNotNull(dimensionResolver);
     this.textureManager = Preconditions.checkNotNull(textureManager);
     this.rootObject = new SceneObject(this);
+    this.spriteShader = new SpriteShader();
+    this.textTexture = new TextTexture();
+  }
+
+  public SpriteShader getSpriteShader() {
+    return spriteShader;
   }
 
   public Sprite createSprite(SpriteTemplate tmpl) {
     return new Sprite(dimensionResolver, tmpl);
+  }
+
+  public TextSceneObject createText(String text) {
+    return new TextSceneObject(spriteShader, textTexture, text);
   }
 
   public TextureManager getTextureManager() {

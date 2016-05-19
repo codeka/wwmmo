@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.client.opengl.Scene;
 import au.com.codeka.warworlds.client.opengl.Sprite;
 import au.com.codeka.warworlds.client.opengl.SpriteShader;
 import au.com.codeka.warworlds.client.opengl.SpriteTemplate;
+import au.com.codeka.warworlds.client.opengl.TextSceneObject;
 import au.com.codeka.warworlds.client.opengl.Vector2;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.world.EmpireManager;
@@ -105,7 +106,7 @@ public class StarfieldManager {
     Sprite sprite = starSprites.get(star.id);
     if (sprite == null) {
       sprite = scene.createSprite(new SpriteTemplate.Builder()
-          .shader(new SpriteShader())
+          .shader(scene.getSpriteShader())
           .texture(scene.getTextureManager().loadTexture("stars/stars_small.png"))
           .uvTopLeft(new Vector2(0.25f, 0.5f))
           .uvBottomRight(new Vector2(0.5f, 0.75f))
@@ -115,8 +116,12 @@ public class StarfieldManager {
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
       log.debug("Adding star at %.3f, %.3f", x, y);
       sprite.translateDp(x, y);
+
+      TextSceneObject text = scene.createText(star.name);
+
       synchronized (scene.lock) {
         scene.getRootObject().addChild(sprite);
+        sprite.addChild(text);
       }
       starSprites.put(star.id, sprite);
     }

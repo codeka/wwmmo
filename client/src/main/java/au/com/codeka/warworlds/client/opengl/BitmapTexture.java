@@ -18,35 +18,35 @@ import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.common.Log;
 
 /** Represents a texture image. */
-public class TextureBitmap {
+public class BitmapTexture extends Texture {
   private static final Log log = new Log("TextureBitmap");
 
   @Nullable private Loader loader;
-  private int id;
 
-  private TextureBitmap(@NonNull Loader loader) {
+  private BitmapTexture(@NonNull Loader loader) {
     this.loader = loader;
     this.loader.load();
   }
 
+  @Override
   public void bind() {
     if (loader != null) {
       if (loader.isLoaded()) {
-        id = loader.createGlTexture();
+        setTextureId(loader.createGlTexture());
         loader = null;
       }
     }
 
-    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, id);
+    super.bind();
   }
 
   @Nullable
-  public static TextureBitmap load(Context context, String fileName) {
-    return new TextureBitmap(new Loader(context, fileName));
+  public static BitmapTexture load(Context context, String fileName) {
+    return new BitmapTexture(new Loader(context, fileName));
   }
 
   /**
-   * Handles loading a texture into a {@link TextureBitmap}.
+   * Handles loading a texture into a {@link BitmapTexture}.
    */
   private static class Loader {
     private Context context;
