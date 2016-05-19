@@ -68,16 +68,16 @@ public class TextSceneObject extends SceneObject {
       char ch = text.charAt(i);
       Rect bounds = textTexture.getCharBounds(ch);
       positions[(i * 12)] = offsetX;
-      positions[(i * 12) + 1] = 0.0f;
+      positions[(i * 12) + 1] = -bounds.height() / 2.0f;
       positions[(i * 12) + 2] = 0.0f;
       positions[(i * 12) + 3] = offsetX + bounds.width();
-      positions[(i * 12) + 4] = 0.0f;
+      positions[(i * 12) + 4] = -bounds.height() / 2.0f;
       positions[(i * 12) + 5] = 0.0f;
       positions[(i * 12) + 6] = offsetX;
-      positions[(i * 12) + 7] = bounds.height();
+      positions[(i * 12) + 7] = bounds.height() / 2.0f;
       positions[(i * 12) + 8] = 0.0f;
       positions[(i * 12) + 9] = offsetX + bounds.width();
-      positions[(i * 12) + 10] = bounds.height();
+      positions[(i * 12) + 10] = bounds.height() / 2.0f;
       positions[(i * 12) + 11] = 0.0f;
       offsetX += bounds.width();
 
@@ -96,6 +96,15 @@ public class TextSceneObject extends SceneObject {
       indices[(i * 6) + 3] = (short) ((i * 4) + 1);
       indices[(i * 6) + 4] = (short) ((i * 4) + 3);
       indices[(i * 6) + 5] = (short) ((i * 4) + 2);
+    }
+
+    // Go through and shift everything 1/2 a width to the left, so that the text is nicely centered
+    for (int i = 0; i < text.length(); i++) {
+      positions[(i * 12)] -= offsetX / 2.0f;
+      positions[(i * 12) + 3] -= offsetX / 2.0f;
+      positions[(i * 12) + 6] -= offsetX / 2.0f;
+      positions[(i * 12) + 9] -= offsetX / 2.0f;
+
     }
 
     ByteBuffer bb = ByteBuffer.allocateDirect(positions.length * 4);
