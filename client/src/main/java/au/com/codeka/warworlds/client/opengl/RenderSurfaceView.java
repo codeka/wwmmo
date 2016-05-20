@@ -61,6 +61,12 @@ public class RenderSurfaceView extends GLSurfaceView {
     return renderer.camera;
   }
 
+  /** Gets the {@link FrameCounter}, used to count FPS. */
+  public FrameCounter getFrameCounter() {
+    Preconditions.checkState(renderer != null);
+    return renderer.frameCounter;
+  }
+
   public static class Renderer implements GLSurfaceView.Renderer {
     private final boolean multiSampling;
     private DeviceInfo deviceInfo;
@@ -69,6 +75,7 @@ public class RenderSurfaceView extends GLSurfaceView {
     private final Camera camera;
     @Nullable private Scene scene;
     private TaskQueue taskQueue;
+    private FrameCounter frameCounter;
 
     public Renderer(Context context) {
       this.multiSampling = true;
@@ -76,6 +83,7 @@ public class RenderSurfaceView extends GLSurfaceView {
       this.taskQueue = new TaskQueue(50 /* numQueuedItems */);
       this.dimensionResolver = new DimensionResolver(context);
       this.camera = new Camera();
+      this.frameCounter = new FrameCounter();
     }
 
     public void setScene(@Nullable Scene scene) {
@@ -106,6 +114,7 @@ public class RenderSurfaceView extends GLSurfaceView {
     @Override
     public void onDrawFrame(final GL10 ignored) {
       Threads.GL.setThread(Thread.currentThread(), taskQueue);
+      frameCounter.onFrame();
 
       // Empty the task queue
       taskQueue.runAllTasks();

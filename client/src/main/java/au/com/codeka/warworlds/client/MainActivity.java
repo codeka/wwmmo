@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import com.google.common.base.Preconditions;
 
 import au.com.codeka.warworlds.client.activity.BaseFragmentActivity;
+import au.com.codeka.warworlds.client.ctrl.DebugView;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.util.GameSettings;
@@ -31,6 +32,9 @@ public class MainActivity extends BaseFragmentActivity {
     renderSurfaceView.setRenderer();
     starfieldManager = new StarfieldManager(renderSurfaceView);
     starfieldManager.create();
+
+    DebugView debugView = (DebugView) Preconditions.checkNotNull(findViewById(R.id.debug_view));
+    debugView.setFrameCounter(renderSurfaceView.getFrameCounter());
 
     if (savedInstanceState == null) {
       if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
