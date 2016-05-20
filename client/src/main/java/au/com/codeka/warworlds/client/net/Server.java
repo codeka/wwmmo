@@ -84,7 +84,12 @@ public class Server {
         queuedPackets.add(pkt);
       } else if (ws != null) {
         byte[] bytes = pkt.encode();
-        log.debug(">> %s (%d bytes)", getDebugPacketType(pkt), bytes.length);
+
+        String packetName = getDebugPacketType(pkt);
+        App.i.getEventBus().publish(new ServerPacketEvent(
+            pkt, bytes, ServerPacketEvent.Direction.Sent, packetName));
+        log.debug(">> %s (%d bytes)", packetName, bytes.length);
+
         ws.sendBinary(bytes);
       } else {
         throw new IllegalStateException("One of queuedPackets or ws should be non-null.");
@@ -198,7 +203,12 @@ public class Server {
     public void onBinaryMessage(WebSocket ws, byte[] binary) throws Exception {
       log.debug("onBinaryMessage(%d bytes)", binary.length);
       Packet pkt = Packet.ADAPTER.decode(binary);
-      log.debug("<< %s (%d bytes)", getDebugPacketType(pkt), binary.length);
+
+      String packetName = getDebugPacketType(pkt);
+      App.i.getEventBus().publish(new ServerPacketEvent(pkt, binary,
+          ServerPacketEvent.Direction.Received, packetName));
+      log.debug("<< %s (%d bytes)", packetName, binary.length);
+
       onPacket(pkt);
     }
   };

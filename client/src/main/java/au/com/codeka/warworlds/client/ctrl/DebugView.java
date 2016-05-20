@@ -23,8 +23,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.net.ServerPacketEvent;
 import au.com.codeka.warworlds.client.opengl.FrameCounter;
+import au.com.codeka.warworlds.client.util.NumberFormatter;
+import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 
 /**
  * This is a view that's displayed over the top of the activity and shows up a little bit of
@@ -66,6 +70,8 @@ public class DebugView extends FrameLayout {
       handler = new Handler();
       isAttached = true;
 
+      App.i.getEventBus().register(eventListener);
+
       queueRefresh();
     }
   }
@@ -76,6 +82,7 @@ public class DebugView extends FrameLayout {
 
     if (!isInEditMode()) {
       isAttached = false;
+      App.i.getEventBus().unregister(eventListener);
     }
   }
 
@@ -109,7 +116,7 @@ public class DebugView extends FrameLayout {
 
     long old = SystemClock.elapsedRealtime() - 5000;
     for (int i = 0; i < messages.size(); i++) {
-      if (messages.get(i).millis > 0 && messages.get(i).createTime < old) {
+      if (messages.get(i).createTime < old) {
         messages.remove(i);
         i--;
       }
@@ -195,7 +202,6 @@ public class DebugView extends FrameLayout {
 
   private static class MessageInfo {
     public long createTime;
-    public long millis;
     public String msg;
 
     public MessageInfo(String msg) {
@@ -205,31 +211,28 @@ public class DebugView extends FrameLayout {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder();
-      if (msg != null) {
-        sb.append(msg);
-      }
-/*      if (request != null) {
-        String url = request.url().getPath();
-        String realmUrl = RealmContext.i.getCurrentRealm().getBaseUrl().getPath().toString();
-        if (url.startsWith(realmUrl)) {
-          url = url.substring(realmUrl.length());
-        }
-        if (request.url().getQuery() != null) {
-          url += "?" + request.url().getQuery();
-        }
-
-        if (millis == 0) {
-          sb.append(">> ");
-          sb.append(url);
-        } else {
-          sb.append("<< ");
-          sb.append(millis);
-          sb.append("ms ");
-          sb.append(url);
-        }
-      }*/
-      return sb.toString();
+      return msg;
     }
   }
+
+  private final Object eventListener = new Object() {
+    @EventHandler
+    public void onServerPacketEvent(ServerPacketEvent event) {
+      StringBuilder sb = new StringBuilder();
+      switch(event.getDirection()) {
+        case Sent:
+          sb.append(">> ");
+          break;
+        case Received:
+          sb.append("<< ");
+          break;
+      }
+      sb.append(event.getPacketName());
+      sb.append(" (");
+      sb.append(NumberFormatter.format(event.getBytes().length));
+      sb.append(" bytes)");
+
+      messages.add(new MessageInfo(sb.toString()));
+    }
+  };
 }
