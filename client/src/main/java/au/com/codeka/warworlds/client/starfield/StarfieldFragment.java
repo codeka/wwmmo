@@ -101,6 +101,20 @@ public class StarfieldFragment extends BaseFragment {
     if (isPortrait()) {
       bottomPane.getLayoutParams().height = (int) px;
     } else {
+      RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) allianceBtn.getLayoutParams();
+      if (isOpen) {
+        // NB: removeRule is not available until API level 17 :/
+        lp.addRule(RelativeLayout.BELOW, 0);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 1);
+        lp.topMargin =
+            (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 34, r.getDisplayMetrics());
+      } else {
+        lp.addRule(RelativeLayout.BELOW, R.id.empire_btn);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        lp.topMargin =
+            (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, r.getDisplayMetrics());
+      }
+
       bottomPane.getLayoutParams().width = (int) px;
     }
     bottomPane.requestLayout();
