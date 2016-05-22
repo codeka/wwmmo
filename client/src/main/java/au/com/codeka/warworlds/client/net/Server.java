@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.net;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
@@ -36,7 +37,8 @@ public class Server {
 
   private final String url = BuildConfig.WEBSOCKET_URL;
   private final PacketDispatcher packetDispatcher = new PacketDispatcher();
-  private ServerStateEvent currState;
+  @NonNull private ServerStateEvent currState =
+      new ServerStateEvent("", ServerStateEvent.ConnectionState.DISCONNECTED);
 
   /** The WebSocket we're connected to. Will be null if we're not connected. */
   @Nullable private WebSocket ws;
@@ -74,6 +76,7 @@ public class Server {
     }
   }
 
+  @NonNull
   public ServerStateEvent getCurrState() {
     return currState;
   }
