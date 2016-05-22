@@ -7,8 +7,11 @@ import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
 
+import au.com.codeka.warworlds.common.Log;
+
 /** Base class for any "object" within a {@link Scene}. */
 public class SceneObject {
+  private final static Log log = new Log("SceneObject");
   private final DimensionResolver dimensionResolver;
 
   /** The scene we belong to, or null if we're not part of a scene. */
@@ -21,8 +24,12 @@ public class SceneObject {
   protected final float[] matrix = new float[16];
   protected final float[] modelViewProjMatrix = new float[16];
 
+  /** Temporary 4-component vector. */
+  private final float[] vec8 = new float[8];
+
   private float widthPx;
   private float heightPx;
+  private float clipRadius;
 
   public SceneObject(DimensionResolver dimensionResolver) {
     this(dimensionResolver, null);
@@ -70,6 +77,14 @@ public class SceneObject {
     return children.get(index);
   }
 
+  /**
+   * If non-zero, assume this object is the given radius and refrain from drawing if a circle at
+   * our center and with the given radius would be off-screen.
+   */
+  public void setClipRadius(float radius) {
+    clipRadius = radius;
+  }
+
   public void setSize(float widthDp, float heightDp) {
     float widthPx = dimensionResolver.dp2px(widthDp);
     float heightPx = dimensionResolver.dp2px(heightDp);
@@ -86,6 +101,27 @@ public class SceneObject {
 
   public void draw(float[] viewProjMatrix) {
     Matrix.multiplyMM(modelViewProjMatrix, 0, viewProjMatrix, 0, matrix, 0);
+
+    if (clipRadius > 0.0f) {
+      vec8[4] = clipRadius;
+      vec8[5] = 0.0f;
+      vec8[6] = 0.0f;
+      vec8[7] = 1.0f;
+      Matrix.multiplyMV(vec8, 0, modelViewProjMatrix, 0, vec8, 4);
+      float transformedRadius = vec8[0];
+
+      vec8[4] = 0.0f;
+      vec8[5] = 0.0f;
+      vec8[6] = 0.0f;
+      vec8[7] = 1.0f;
+      Matrix.multiplyMV(vec8, 0, modelViewProjMatrix, 0, vec8, 4);
+      transformedRadius -= vec8[0];
+      if (vec8[0] < -1.0f - transformedRadius || vec8[0] > 1.0f + transformedRadius
+          || vec8[1] < -1.0f - transformedRadius || vec8[1] > 1.0f + transformedRadius) {
+        // it's outside of the frustum, clip
+        return;
+      }
+    }
 
     drawImpl(modelViewProjMatrix);
     if (children != null) {

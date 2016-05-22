@@ -112,6 +112,7 @@ public class StarfieldManager {
     SceneObject container = starSceneObjects.get(star.id);
     if (container == null) {
       container = new SceneObject(scene.getDimensionResolver());
+      container.setClipRadius(80.0f);
 
       float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
