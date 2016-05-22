@@ -3,9 +3,7 @@ package au.com.codeka.warworlds.common;
 /**
  * Helper class that represents a 3-dimensional vector.
  */
-public class Vector3 implements ObjectPool.Pooled {
-  public static final ObjectPool<Vector3> pool = new ObjectPool<>(250, new Vector3Creator());
-
+public class Vector3 {
   public double x;
   public double y;
   public double z;
@@ -13,14 +11,12 @@ public class Vector3 implements ObjectPool.Pooled {
   public Vector3() {
   }
 
-  public Vector3(double x, double y, double z) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
+  public Vector3(Vector3 copy) {
+    reset(copy);
   }
 
-  @Override
-  public void reset() {
+  public Vector3(double x, double y, double z) {
+    reset(x, y, z);
   }
 
   public Vector3 reset(double x, double y, double z) {
@@ -98,7 +94,7 @@ public class Vector3 implements ObjectPool.Pooled {
   }
 
   public static Vector3 cross(Vector3 a, Vector3 b) {
-    return Vector3.pool.borrow().reset(
+    return new Vector3(
         (a.y * b.z) - (a.z * b.y),
         (a.z * b.x) - (a.x * b.z),
         (a.x * b.y) - (a.y * b.x));
@@ -108,12 +104,5 @@ public class Vector3 implements ObjectPool.Pooled {
     result.x += (n * (rhs.x - result.x));
     result.y += (n * (rhs.y - result.y));
     result.z += (n * (rhs.z - result.z));
-  }
-
-  static class Vector3Creator implements ObjectPool.PooledCreator {
-    @Override
-    public ObjectPool.Pooled create() {
-      return new Vector3();
-    }
   }
 }

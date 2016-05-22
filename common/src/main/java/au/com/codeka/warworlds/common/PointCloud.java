@@ -52,9 +52,9 @@ public class PointCloud {
         numPoints = 25;
       }
 
-      ArrayList<Vector2> points = new ArrayList<Vector2>(numPoints);
+      ArrayList<Vector2> points = new ArrayList<>(numPoints);
       for (int i = 0; i < numPoints; i++) {
-        points.add(Vector2.pool.borrow().reset(rand.nextDouble(), rand.nextDouble()));
+        points.add(new Vector2(rand.nextDouble(), rand.nextDouble()));
       }
       return points;
     }
@@ -66,9 +66,9 @@ public class PointCloud {
    */
   public static class PoissonGenerator {
     public ArrayList<Vector2> generate(double density, double randomness, Random rand) {
-      ArrayList<Vector2> points = new ArrayList<Vector2>(30); // give us some initial capacity
-      ArrayList<Vector2> unprocessed = new ArrayList<Vector2>(50); // give us some initial capacity
-      unprocessed.add(Vector2.pool.borrow().reset(rand.nextDouble(), rand.nextDouble()));
+      ArrayList<Vector2> points = new ArrayList<>(30); // give us some initial capacity
+      ArrayList<Vector2> unprocessed = new ArrayList<>(50); // give us some initial capacity
+      unprocessed.add(new Vector2(rand.nextDouble(), rand.nextDouble()));
 
       // we want minDistance to be small when density is high and big when density is small.
       double minDistance = 0.001 + ((1.0 / density) * 0.03);
@@ -86,7 +86,6 @@ public class PointCloud {
 
         // if there's another point too close to this one, ignore it
         if (inNeighbourhood(points, point, minDistance)) {
-          Vector2.pool.release(point);
           continue;
         }
 
@@ -97,11 +96,9 @@ public class PointCloud {
         for (int i = 0; i < packing; i++) {
           Vector2 newPoint = generatePointAround(rand, point, minDistance);
           if (newPoint.x < 0.0 || newPoint.x > 1.0) {
-            Vector2.pool.release(newPoint);
             continue;
           }
           if (newPoint.y < 0.0 || newPoint.y > 1.0) {
-            Vector2.pool.release(newPoint);
             continue;
           }
 
@@ -119,10 +116,9 @@ public class PointCloud {
       double radius = minDistance * (1.0 + rand.nextDouble());
       double angle = 2.0 * Math.PI * rand.nextDouble();
 
-      Vector2 pt = Vector2.pool.borrow();
-      pt.x = point.x + radius * Math.cos(angle);
-      pt.y = point.y + radius * Math.sin(angle);
-      return pt;
+      return new Vector2(
+          point.x + radius * Math.cos(angle),
+          point.y + radius * Math.sin(angle));
     }
 
     /**
@@ -131,7 +127,7 @@ public class PointCloud {
      * @param points      The list of points we've already generated.
      * @param point       The point we've just generated and need to check.
      * @param minDistance The minimum distance we accept as being valid.
-     * @return
+     * @return Whether the given point is within the neighbourhood of the existing points.
      */
     private boolean inNeighbourhood(List<Vector2> points, Vector2 point, double minDistance) {
       final int n = points.size();

@@ -1,2 +1,2 @@
-include ':server', ':client', ':common'
+include ':server', ':client', ':common', ':planet-render'
 

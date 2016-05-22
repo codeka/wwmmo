@@ -10,74 +10,73 @@ import java.util.List;
  * having additional points in the middle.
  */
 public class ColourGradient {
-    private List<Node> mNodes;
+  private List<Node> nodes;
 
-    public ColourGradient() {
-        mNodes = new ArrayList<Node>();
+  public ColourGradient() {
+    nodes = new ArrayList<>();
+  }
+
+  /**
+   * Adds a node at the specified location on the gradient, with the specified colour.
+   *
+   * @param n      A value between 0 and 1.
+   * @param colour The colour to return at that point.
+   */
+  public void addNode(double n, Colour colour) {
+    int index;
+    for (index = 0; index < nodes.size() - 1; index++) {
+      if (nodes.get(index).n > n) {
+        break;
+      }
     }
 
-    /**
-     * Adds a node at the specified location on the gradient, with the specified colour.
-     * 
-     * @param n A value between 0 and 1.
-     * @param colour The colour to return at that point.
-     */
-    public void addNode(double n, Colour colour) {
-        int index;
-        for (index = 0; index < mNodes.size() - 1; index++) {
-            if (mNodes.get(index).n > n) {
-                break;
-            }
-        }
+    if (nodes.size() > 0) {
+      index++;
+    }
+    nodes.add(index, new Node(n, colour));
+  }
 
-        if (mNodes.size() > 0) {
-            index++;
-        }
-        mNodes.add(index, new Node(n, colour));
+  /**
+   * Gets the {@link Colour} at the corresponding point on the gradient.
+   */
+  public Colour getColour(double n) {
+    if (nodes.size() == 0) {
+      return new Colour(Colour.TRANSPARENT);
     }
 
-    /**
-     * Gets the \c Colour at the corresponding point on the gradient.
-     */
-    public Colour getColour(double n) {
-        if (mNodes.size() == 0) {
-            return Colour.pool.borrow().reset(Colour.TRANSPARENT);
-        }
-
-        // if the value they gave us is less that our first node, return it's colour.
-        if (mNodes.get(0).n > n) {
-            return Colour.pool.borrow().reset(mNodes.get(0).colour);
-        }
-
-        final int last = mNodes.size() - 1;
-        for (int i = 0; i < last; i++) {
-            Node lhs = mNodes.get(i);
-            Node rhs = mNodes.get(i + 1);
-            if (rhs.n > n) {
-                double factor = (n - lhs.n) / (rhs.n - lhs.n);
-
-                Colour c = Colour.pool.borrow().reset(lhs.colour);
-                Colour.interpolate(c, rhs.colour, factor);
-                return c;
-            }
-        }
-
-        // if we get here, it's because the n they gave us is bigger than all
-        // nodes we've got
-        return Colour.pool.borrow().reset(mNodes.get(mNodes.size() - 1).colour);
+    // if the value they gave us is less that our first node, return it's colour.
+    if (nodes.get(0).n > n) {
+      return new Colour(nodes.get(0).colour);
     }
 
-    /**
-     * A node on the \c ColourGradient. We represent a value between 0 and 1, and the
-     * corresponding colour.
-     */
-    class Node {
-        public double n;
-        public Colour colour;
+    final int last = nodes.size() - 1;
+    for (int i = 0; i < last; i++) {
+      Node lhs = nodes.get(i);
+      Node rhs = nodes.get(i + 1);
+      if (rhs.n > n) {
+        double factor = (n - lhs.n) / (rhs.n - lhs.n);
 
-        public Node(double n, Colour colour) {
-            this.n = n;
-            this.colour = colour;
-        }
+        Colour c = new Colour(lhs.colour);
+        Colour.interpolate(c, rhs.colour, factor);
+        return c;
+      }
     }
+
+    // if we get here, it's because the n they gave us is bigger than all nodes we've got
+    return new Colour(nodes.get(nodes.size() - 1).colour);
+  }
+
+  /**
+   * A node on the {@link ColourGradient}. We represent a value between 0 and 1, and the
+   * corresponding colour.
+   */
+  class Node {
+    public double n;
+    public Colour colour;
+
+    public Node(double n, Colour colour) {
+      this.n = n;
+      this.colour = colour;
+    }
+  }
 }

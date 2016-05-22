@@ -5,9 +5,7 @@ import java.util.Locale;
 /**
  * Represents a 2-dimensional vector.
  */
-public class Vector2 implements ObjectPool.Pooled {
-  public static final ObjectPool<Vector2> pool = new ObjectPool<>(250, new Vector2Creator());
-
+public class Vector2 {
   public double x;
   public double y;
 
@@ -23,10 +21,6 @@ public class Vector2 implements ObjectPool.Pooled {
   public Vector2(Vector2 other) {
     this.x = other.x;
     this.y = other.y;
-  }
-
-  @Override
-  public void reset() {
   }
 
   public Vector2 reset(double x, double y) {
@@ -155,12 +149,5 @@ public class Vector2 implements ObjectPool.Pooled {
   public static float angleBetweenCcw(Vector2 a, Vector2 b) {
     return (float) Math.atan2(a.x * b.x + a.y * b.y,
         a.x * b.y - a.y * b.x);
-  }
-
-  static class Vector2Creator implements ObjectPool.PooledCreator {
-    @Override
-    public ObjectPool.Pooled create() {
-      return new Vector2();
-    }
   }
 }

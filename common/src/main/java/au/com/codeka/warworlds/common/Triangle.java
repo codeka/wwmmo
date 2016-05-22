@@ -191,7 +191,7 @@ public class Triangle {
       yc = m1 * (xc - mx1) + my1;
     }
 
-    centre = Vector2.pool.borrow().reset(xc, yc);
+    centre = new Vector2(xc, yc);
     radius = centre.distanceTo(v2);
   }
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<planet version="1" ambient="0.6" size="1" northFrom="-1 0 0" northTo="0 1 0">
+  <texture generator="perlin-noise" noisiness="0.8" scaleX="1.2" scaleY="0.6">
+    <colour>
+      <node n="0.0" colour="ff3333ff" />
+      <node n="0.3" colour="ff6666ff" />
+      <node n="1.0" colour="ffcccccc" />
+    </colour>
+    <perlin persistence="0.5" startOctave="6" endOctave="8" interpolation="linear" />
+  </texture>
+  <atmosphere>
+    <star size="15" points="5" baseWidth="1" noisiness="0.2" rotation="90">
+      <colour>
+        <node n="0.0" colour="ffffffff" />
+        <node n="0.4" colour="ffffffff" />
+        <node n="0.9" colour="000000ff" />
+      </colour>
+      <perlin persistence="0.5" startOctave="3" endOctave="6" interpolation="linear" />
+    </star>
+    <inner blend="alpha">
+      <colour>
+        <node n="0.0" colour="ff000000" />
+        <node n="1" colour="99999999" />
+      </colour>
+    </inner>
+  </atmosphere>
+  <warp generator="spiral" factor="90" />
+</planet>

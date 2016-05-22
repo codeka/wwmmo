@@ -22,10 +22,8 @@ public class Voronoi {
   // maps from points to a list of the neighbouring points
   protected HashMap<Vector2, List<Vector2>> pointNeighbours;
 
-  final static double EPSILON = 0.000000001;
-
   /**
-   * Constructs a \c Voronoi diagram from the given {@link PointCloud}. You must call
+   * Constructs a {@link Voronoi} diagram from the given {@link PointCloud}. You must call
    * {@link #generate()} to actually generate the triangulation/voronoi.
    */
   public Voronoi(PointCloud pc) {
@@ -42,7 +40,7 @@ public class Voronoi {
 
     // first, create a "super triangle" that encompasses the whole point cloud. This is
     // easy because the point cloud is confined to the range (0,0)-(1,1) so we just add
-    // two triangles to encompass that (plus a little bit of leway)
+    // two triangles to encompass that (plus a little bit of leeway)
     List<Triangle> superTriangles = createSuperTriangles(points, newTriangles);
 
     // go through the vertices and add them...
@@ -335,10 +333,10 @@ public class Voronoi {
       }
     }
 
-    points.add(Vector2.pool.borrow().reset(minX - 0.1, minY - 0.1));
-    points.add(Vector2.pool.borrow().reset(minX - 0.1, maxY + 0.1));
-    points.add(Vector2.pool.borrow().reset(maxX + 0.1, maxY + 0.1));
-    points.add(Vector2.pool.borrow().reset(maxX + 0.1, minY - 0.1));
+    points.add(new Vector2(minX - 0.1, minY - 0.1));
+    points.add(new Vector2(minX - 0.1, maxY + 0.1));
+    points.add(new Vector2(maxX + 0.1, maxY + 0.1));
+    points.add(new Vector2(maxX + 0.1, minY - 0.1));
 
     ArrayList<Triangle> superTriangles = new ArrayList<>();
     superTriangles.add(new Triangle(points, points.size() - 4, points.size() - 3, points.size() - 2));
