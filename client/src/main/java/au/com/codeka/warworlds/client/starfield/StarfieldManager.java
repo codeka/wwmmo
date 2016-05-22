@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
@@ -84,6 +85,11 @@ public class StarfieldManager {
             .right(centerSectorX + sectorRadius)
             .build())
         .build());
+    for (long sy = centerSectorY - sectorRadius; sy <= centerSectorY + sectorRadius; sy ++) {
+      for (long sx = centerSectorX - sectorRadius; sx <= centerSectorX + sectorRadius; sx ++) {
+        createSectorBackground(sx, sy);
+      }
+    }
   }
 
   /**
@@ -114,7 +120,7 @@ public class StarfieldManager {
       Vector2 uvTopLeft = getStarUvTopLeft(star);
       Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
           .shader(scene.getSpriteShader())
-          .texture(scene.getTextureManager().loadTexture("stars/stars_small.png"))
+          .texture(scene.getTextureManager().loadTexture("stars/stars.png"))
           .uvTopLeft(uvTopLeft)
           .uvBottomRight(new Vector2(
               uvTopLeft.x + (star.classification == Star.CLASSIFICATION.NEUTRON ? 0.5f : 0.25f),
@@ -139,6 +145,37 @@ public class StarfieldManager {
       starSceneObjects.put(star.id, container);
     }
     // TODO: update the sprite with label, kind, etc...
+  }
+
+  private void createSectorBackground(long sectorX, long sectorY) {
+    SceneObject container = new SceneObject(scene.getDimensionResolver());
+    Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
+        .shader(scene.getSpriteShader())
+        .texture(scene.getTextureManager().loadTexture("stars/starfield.png"))
+        .build());
+    sprite.setSize(1024.0f, 1024.0f);
+    container.addChild(sprite);
+
+    Random rand = new Random(sectorX ^ sectorY * 41378L + 728247L);
+    for (int i = 0; i < 20; i++) {
+      int x = rand.nextInt(4);
+      int y = rand.nextInt(4);
+      sprite = scene.createSprite(new SpriteTemplate.Builder()
+          .shader(scene.getSpriteShader())
+          .texture(scene.getTextureManager().loadTexture("stars/gas.png"))
+          .uvTopLeft(new Vector2(0.25f * x, 0.25f * y))
+          .uvBottomRight(new Vector2(0.25f * x + 0.25f, 0.25f * y + 0.25f))
+          .build());
+      sprite.translate((rand.nextFloat() - 0.5f) * 1024.0f, (rand.nextFloat() - 0.5f) * 1024.0f);
+      float size = 300.0f + rand.nextFloat() * 200.0f;
+      sprite.setSize(size, size);
+      container.addChild(sprite);
+    }
+
+    container.translate((centerSectorX - sectorX) * 1024.0f, (centerSectorY - sectorY) * 1024.0f);
+    synchronized (scene.lock) {
+      scene.getRootObject().addChild(container);
+    }
   }
 
   private Vector2 getStarUvTopLeft(Star star) {

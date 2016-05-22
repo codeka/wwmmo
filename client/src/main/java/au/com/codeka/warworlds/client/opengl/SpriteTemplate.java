@@ -108,6 +108,12 @@ public class SpriteTemplate {
     }
 
     public SpriteTemplate build() {
+      if (uvTopLeft == null) {
+        uvTopLeft = new Vector2(0.0f, 0.0f);
+      }
+      if (uvBottomRight == null) {
+        uvBottomRight = new Vector2(1.0f, 1.0f);
+      }
       return new SpriteTemplate(shader, texture, uvTopLeft, uvBottomRight);
     }
   }
