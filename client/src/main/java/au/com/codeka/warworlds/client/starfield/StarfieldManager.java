@@ -128,8 +128,9 @@ public class StarfieldManager {
       container.addChild(sprite);
 
       TextSceneObject text = scene.createText(star.name);
+      text.translate(0.0f, -24.0f);
       text.setTextSize(16);
-      text.translate(-text.getTextWidth() / 2.0f, -15.0f);
+      text.translate(-text.getTextWidth() / 2.0f, 0.0f);
       container.addChild(text);
 
       synchronized (scene.lock) {
