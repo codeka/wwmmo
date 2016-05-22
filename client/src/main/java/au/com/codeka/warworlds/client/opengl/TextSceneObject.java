@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.opengl;
 
 import android.graphics.Rect;
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 
 import com.google.common.base.Preconditions;
 
@@ -16,6 +17,7 @@ import au.com.codeka.warworlds.client.concurrency.Threads;
  * A {@link SceneObject} that represents a piece of text.
  */
 public class TextSceneObject extends SceneObject {
+  private final DimensionResolver dimensionResolver;
   private final SpriteShader shader;
   private final TextTexture textTexture;
 
@@ -26,21 +28,33 @@ public class TextSceneObject extends SceneObject {
   private FloatBuffer texCoordBuffer;
   private ShortBuffer indexBuffer;
 
-  public TextSceneObject(SpriteShader shader, TextTexture textTexture, String text) {
+  public TextSceneObject(
+      DimensionResolver dimensionResolver,
+      SpriteShader shader,
+      TextTexture textTexture,
+      String text) {
+    super(dimensionResolver);
+    this.dimensionResolver = Preconditions.checkNotNull(dimensionResolver);
     this.shader = Preconditions.checkNotNull(shader);
     this.textTexture = Preconditions.checkNotNull(textTexture);
     this.text = text;
     this.dirty = true;
   }
 
+  public void setTextSize(float dp) {
+    float px = dimensionResolver.dp2px(dp);
+    float scale = px / textTexture.getTextHeight();
+    Matrix.scaleM(matrix, 0, scale, scale, 1.0f);
+  }
+
   public float getTextWidth() {
     if (dirty) {
       // If it's dirty, we'll have to measure the text ourselves... we can't create the buffers
       // since that must happen on the GL thread.
-      return measureText();
+      textWidth = measureText();
     }
 
-    return textWidth;
+    return dimensionResolver.px2dp(textWidth);
   }
 
   @Override
@@ -117,6 +131,7 @@ public class TextSceneObject extends SceneObject {
       indices[(i * 6) + 4] = (short) ((i * 4) + 3);
       indices[(i * 6) + 5] = (short) ((i * 4) + 2);
     }
+    textWidth = offsetX;
 
     ByteBuffer bb = ByteBuffer.allocateDirect(positions.length * 4);
     bb.order(ByteOrder.nativeOrder());

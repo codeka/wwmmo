@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.opengl;
 
-import android.support.annotation.Nullable;
-
 import com.google.common.base.Preconditions;
 
 /**
@@ -22,7 +20,7 @@ public class Scene {
   public Scene(DimensionResolver dimensionResolver, TextureManager textureManager) {
     this.dimensionResolver = Preconditions.checkNotNull(dimensionResolver);
     this.textureManager = Preconditions.checkNotNull(textureManager);
-    this.rootObject = new SceneObject(this);
+    this.rootObject = new SceneObject(dimensionResolver, this);
     this.spriteShader = new SpriteShader();
     this.textTexture = new TextTexture();
   }
@@ -31,12 +29,16 @@ public class Scene {
     return spriteShader;
   }
 
+  public DimensionResolver getDimensionResolver() {
+    return dimensionResolver;
+  }
+
   public Sprite createSprite(SpriteTemplate tmpl) {
     return new Sprite(dimensionResolver, tmpl);
   }
 
   public TextSceneObject createText(String text) {
-    return new TextSceneObject(spriteShader, textTexture, text);
+    return new TextSceneObject(dimensionResolver, spriteShader, textTexture, text);
   }
 
   public TextureManager getTextureManager() {

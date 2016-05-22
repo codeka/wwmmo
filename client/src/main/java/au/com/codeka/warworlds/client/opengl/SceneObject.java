@@ -3,10 +3,14 @@ package au.com.codeka.warworlds.client.opengl;
 import android.opengl.Matrix;
 import android.support.annotation.Nullable;
 
+import com.google.common.base.Preconditions;
+
 import java.util.ArrayList;
 
 /** Base class for any "object" within a {@link Scene}. */
 public class SceneObject {
+  private final DimensionResolver dimensionResolver;
+
   /** The scene we belong to, or null if we're not part of a scene. */
   @Nullable private Scene scene;
 
@@ -17,12 +21,18 @@ public class SceneObject {
   protected final float[] matrix = new float[16];
   protected final float[] modelViewProjMatrix = new float[16];
 
-  public SceneObject() {
-    this(null);
+  private float widthPx;
+  private float heightPx;
+
+  public SceneObject(DimensionResolver dimensionResolver) {
+    this(dimensionResolver, null);
   }
 
-  public SceneObject(@Nullable Scene scene) {
+  public SceneObject(DimensionResolver dimensionResolver, @Nullable Scene scene) {
+    this.dimensionResolver = Preconditions.checkNotNull(dimensionResolver);
     this.scene = scene;
+    this.widthPx = 1.0f;
+    this.heightPx = 1.0f;
     Matrix.setIdentityM(matrix, 0);
     Matrix.setIdentityM(modelViewProjMatrix, 0);
   }
@@ -60,8 +70,18 @@ public class SceneObject {
     return children.get(index);
   }
 
-  public void translate(float x, float y) {
-    Matrix.translateM(matrix, 0, x, y, 0.0f);
+  public void setSize(float widthDp, float heightDp) {
+    float widthPx = dimensionResolver.dp2px(widthDp);
+    float heightPx = dimensionResolver.dp2px(heightDp);
+    Matrix.scaleM(matrix, 0, widthPx / this.widthPx, heightPx / this.heightPx, 1.0f);
+    this.widthPx = widthPx;
+    this.heightPx = heightPx;
+  }
+
+  public void translate(float xDp, float yDp) {
+    float xPx = dimensionResolver.dp2px(xDp);
+    float yPx = dimensionResolver.dp2px(yDp);
+    Matrix.translateM(matrix, 0, xPx, yPx, 0.0f);
   }
 
   public void draw(float[] viewProjMatrix) {

@@ -12,7 +12,6 @@ import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.opengl.Scene;
 import au.com.codeka.warworlds.client.opengl.SceneObject;
 import au.com.codeka.warworlds.client.opengl.Sprite;
-import au.com.codeka.warworlds.client.opengl.SpriteShader;
 import au.com.codeka.warworlds.client.opengl.SpriteTemplate;
 import au.com.codeka.warworlds.client.opengl.TextSceneObject;
 import au.com.codeka.warworlds.client.opengl.Vector2;
@@ -106,7 +105,7 @@ public class StarfieldManager {
   private void updateStar(Star star) {
     SceneObject container = starSceneObjects.get(star.id);
     if (container == null) {
-      container = new SceneObject();
+      container = new SceneObject(scene.getDimensionResolver());
 
       float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
@@ -122,14 +121,15 @@ public class StarfieldManager {
               uvTopLeft.y + (star.classification == Star.CLASSIFICATION.NEUTRON ? 0.5f : 0.25f)))
           .build());
       if (star.classification == Star.CLASSIFICATION.NEUTRON) {
-        sprite.setSizeDp(60.0f, 60.0f);
+        sprite.setSize(90.0f, 90.0f);
       } else {
-        sprite.setSizeDp(20.0f, 20.0f);
+        sprite.setSize(40.0f, 40.0f);
       }
       container.addChild(sprite);
 
       TextSceneObject text = scene.createText(star.name);
-      text.translate(-text.getTextWidth() / 2.0f, -20.0f);
+      text.setTextSize(16);
+      text.translate(-text.getTextWidth() / 2.0f, -15.0f);
       container.addChild(text);
 
       synchronized (scene.lock) {

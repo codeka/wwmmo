@@ -17,4 +17,8 @@ public class DimensionResolver {
   public float dp2px(float dp) {
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
   }
+
+  public float px2dp(float px) {
+    return px / displayMetrics.density;
+  }
 }

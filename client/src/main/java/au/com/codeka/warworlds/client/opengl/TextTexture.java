@@ -23,7 +23,8 @@ public class TextTexture extends Texture {
   private static final int BITMAP_HEIGHT = 512;
 
   /** The height of the text. */
-  private static final int TEXT_HEIGHT = 16;
+  private static final int TEXT_HEIGHT = 28;
+  private static final int ROW_HEIGHT = 32;
 
   private final Bitmap bitmap;
   private final Canvas canvas;
@@ -58,8 +59,10 @@ public class TextTexture extends Texture {
         final int[] textureHandleBuffer = new int[1];
         GLES20.glGenTextures(1, textureHandleBuffer, 0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandleBuffer[0]);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(
+            GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(
+            GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         id = textureHandleBuffer[0];
         setTextureId(id);
       }
@@ -76,6 +79,10 @@ public class TextTexture extends Texture {
 
   public int getHeight() {
     return BITMAP_HEIGHT;
+  }
+
+  public float getTextHeight() {
+    return TEXT_HEIGHT;
   }
 
   /** Ensures that we have cached all the characters needed to draw every character in the string.*/
@@ -105,13 +112,16 @@ public class TextTexture extends Texture {
     int charWidth = (int) Math.ceil(paint.measureText(str));
     if (currRowOffsetX + charWidth > BITMAP_WIDTH) {
       currRowOffsetX = 0;
-      currRowOffsetY += TEXT_HEIGHT;
+      currRowOffsetY += ROW_HEIGHT;
     }
 
-    canvas.drawText(str, currRowOffsetX, currRowOffsetY + TEXT_HEIGHT, paint);
+    canvas.drawText(str,
+        currRowOffsetX,
+        currRowOffsetY + TEXT_HEIGHT - paint.descent() + (ROW_HEIGHT - TEXT_HEIGHT),
+        paint);
 
     Rect bounds = new Rect(currRowOffsetX, currRowOffsetY,
-        currRowOffsetX + charWidth, currRowOffsetY + TEXT_HEIGHT);
+        currRowOffsetX + charWidth, currRowOffsetY + ROW_HEIGHT);
     characters.put(ch, bounds);
 
     currRowOffsetX += charWidth;

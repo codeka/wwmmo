@@ -23,7 +23,7 @@ public class Camera {
   }
 
   public void onSurfaceChanged(float width, float height) {
-    Matrix.orthoM(projMatrix, 0, -width / 2, width / 2, -height / 2, height / 2, 10, -10);
+    Matrix.orthoM(projMatrix, 0, -width, width, -height, height, 10, -10);
     zoomAmount = 1.0f;
     flinging = false;
     zoom(2.0f);
