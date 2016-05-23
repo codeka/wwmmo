@@ -35,9 +35,8 @@ import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
  * move-fleet view, etc.
  */
 public class StarfieldManager {
-
   public interface TapListener {
-    void onStarTapped(Star star);
+    void onStarTapped(@Nullable Star star);
   }
 
   private static final Log log = new Log("StarfieldManager");
@@ -128,6 +127,7 @@ public class StarfieldManager {
       container = new SceneObject(scene.getDimensionResolver());
       container.setClipRadius(80.0f);
       container.setTapTargetRadius(80.0f);
+      container.setTag(star);
 
       float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
@@ -273,7 +273,7 @@ public class StarfieldManager {
         Vector3 tap = new Vector3(x, y, 0.0f);
         for (int i = 0; i < scene.getRootObject().getNumChildren(); i++) {
           SceneObject so = scene.getRootObject().getChild(i);
-          if (so == null || so.getTapTargetRadius() == 0.0f) {
+          if (so == null || so.getTapTargetRadius() == null) {
             continue;
           }
           so.project(camera.getViewProjMatrix(), outVec);
@@ -282,7 +282,7 @@ public class StarfieldManager {
               (-outVec[1] + 1.0f) * 0.5f * camera.getScreenHeight(),
               0.0f);
           if (Vector3.distanceBetween(pos, tap) < so.getTapTargetRadius()) {
-            log.debug("Tapped a star: %s", ((TextSceneObject) so.getChild(1)).getText());
+            star = (Star) so.getTag();
           }
         }
       }

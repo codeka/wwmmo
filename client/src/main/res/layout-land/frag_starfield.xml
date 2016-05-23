@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_toLeftOf="@+id/bottom_pane"
+        android:layout_toStartOf="@+id/bottom_pane"
         android:layout_alignParentTop="true" />
 
     <View
@@ -21,7 +22,8 @@
         android:layout_height="50dp"
         android:layout_width="fill_parent"
         android:layout_above="@+id/infobar"
-        android:layout_toLeftOf="@+id/bottom_pane" />
+        android:layout_toLeftOf="@+id/bottom_pane"
+        android:layout_toStartOf="@+id/bottom_pane" />
 
     <View
         android:id="@+id/infobar"
@@ -29,8 +31,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/bottom_pane"
+        android:layout_toStartOf="@+id/bottom_pane"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <RelativeLayout
         android:id="@+id/bottom_pane"
@@ -38,9 +42,10 @@
         android:layout_width="200dp"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:baselineAligned="false">
 
-        <View
+        <au.com.codeka.warworlds.client.starfield.SelectionDetailsView
             android:id="@+id/selection_details"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -61,7 +66,8 @@
                 android:layout_marginRight="4dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
-                android:text="Sit. Rep." />
+                android:layout_alignParentStart="true"
+                android:text="@string/sitrep" />
 
             <Button
                 android:id="@+id/empire_btn"
@@ -73,7 +79,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_below="@+id/sitrep_btn"
                 android:layout_alignParentLeft="true"
-                android:text="Empire" />
+                android:layout_alignParentStart="true"
+                android:text="@string/empire" />
 
             <Button android:id="@+id/alliance_btn"
                     style="@style/Button"
@@ -83,8 +90,9 @@
                     android:layout_marginRight="4dp"
                     android:layout_marginTop="34dp"
                     android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
-                    android:text="Alliance" />
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/alliance" />
         </RelativeLayout>
     </RelativeLayout>
 

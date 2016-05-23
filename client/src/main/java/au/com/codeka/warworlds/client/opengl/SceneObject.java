@@ -31,8 +31,9 @@ public class SceneObject {
 
   private float widthPx;
   private float heightPx;
-  private float clipRadius;
-  private float tapTargetRadius;
+  @Nullable private Float clipRadius;
+  @Nullable private Float tapTargetRadius;
+  private Object tag;
 
   public SceneObject(DimensionResolver dimensionResolver) {
     this(dimensionResolver, null);
@@ -96,8 +97,25 @@ public class SceneObject {
     tapTargetRadius = radius;
   }
 
-  public float getTapTargetRadius() {
+  /**
+   * Gets the tap target radius, or <code>null</code> if it hasn't been set yet.
+   */
+  @Nullable
+  public Float getTapTargetRadius() {
     return tapTargetRadius;
+  }
+
+  /**
+   * Sets this {@link SceneObject}'s "tag", which is just an arbitrary object we'll hang onto for
+   * you.
+   */
+  public void setTag(Object o) {
+    tag = o;
+  }
+
+  /** Gets the "tag" you previously set in {@link #setTag}. */
+  public Object getTag() {
+    return tag;
   }
 
   public void setSize(float widthDp, float heightDp) {
@@ -117,7 +135,7 @@ public class SceneObject {
   public void draw(float[] viewProjMatrix) {
     Matrix.multiplyMM(modelViewProjMatrix, 0, viewProjMatrix, 0, matrix, 0);
 
-    if (clipRadius > 0.0f) {
+    if (clipRadius != null) {
       clipVector[4] = clipRadius;
       clipVector[5] = 0.0f;
       clipVector[6] = 0.0f;

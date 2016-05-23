@@ -13,6 +13,10 @@
   <string name="cancel">Cancel</string>
   <string name="done">Done</string>
   <string name="next">Next</string>
+  <string name="empire">Empire</string>
+  <string name="sitrep">Sit. Rep.</string>
+  <string name="alliance">Alliance</string>
+  <string name="boost">Boost</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to

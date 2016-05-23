@@ -26,6 +26,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:src="@drawable/app_icon" />
 
@@ -35,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/star_icon"
-            android:text="Star Name"
+            android:layout_toEndOf="@+id/star_icon"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView android:id="@+id/star_kind"
@@ -43,18 +44,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/star_name"
             android:layout_toRightOf="@+id/star_icon"
-            android:text="Kind"
+            android:layout_toEndOf="@+id/star_icon"
             android:textSize="12sp"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <Button android:id="@+id/rename_btn"
-            style="@style/Button"
-            android:layout_width="75dp"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/view_btn"
-            android:layout_alignTop="@id/view_btn"
-            android:layout_marginRight="10dp"
-            android:text="Rename" />
 
         <Button
             android:id="@+id/view_btn"
@@ -64,6 +56,17 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:text="View" />
+
+        <Button android:id="@+id/rename_btn"
+                style="@style/Button"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/view_btn"
+                android:layout_toStartOf="@id/view_btn"
+                android:layout_alignTop="@id/view_btn"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="Rename" />
 
         <Button
             android:id="@+id/scout_report_btn"
@@ -135,7 +138,7 @@
             <ScrollView android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
-                <au.com.codeka.warworlds.ctrl.FleetListSimple
+                <au.com.codeka.warworlds.client.ctrl.FleetListSimple
                     android:id="@+id/fleet_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -144,7 +147,7 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <au.com.codeka.warworlds.game.starfield.FleetInfoView
+    <au.com.codeka.warworlds.client.starfield.FleetInfoView
         android:id="@+id/selected_fleet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

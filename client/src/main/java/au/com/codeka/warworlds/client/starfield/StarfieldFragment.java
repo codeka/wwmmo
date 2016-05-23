@@ -40,22 +40,22 @@ public class StarfieldFragment extends BaseFragment {
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+    final SelectionDetailsView selectionDetailsView =
+        (SelectionDetailsView) view.findViewById(R.id.selection_details);
     bottomPane = (ViewGroup) view.findViewById(R.id.bottom_pane);
     allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
 
     hideBottomPane(false);
     ((MainActivity) getActivity()).getStarfieldManager().setTapListener(
         new StarfieldManager.TapListener() {
-      boolean expanded = false;
-
       @Override
-      public void onStarTapped(Star star) {
-        if (expanded) {
+      public void onStarTapped(@Nullable Star star) {
+        if (star == null) {
           hideBottomPane(false);
         } else {
           showBottomPane();
+          selectionDetailsView.showStar(star);
         }
-        expanded = !expanded;
       }
     });
   }
