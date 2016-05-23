@@ -24,12 +24,15 @@ public class SceneObject {
   protected final float[] matrix = new float[16];
   protected final float[] modelViewProjMatrix = new float[16];
 
-  /** Temporary 4-component vector. */
-  private final float[] vec8 = new float[8];
+  /**
+   * Temporary 4-component vector used in clipping calculations, must be called inside scene lock.
+   */
+  private final float[] clipVector = new float[8];
 
   private float widthPx;
   private float heightPx;
   private float clipRadius;
+  private float tapTargetRadius;
 
   public SceneObject(DimensionResolver dimensionResolver) {
     this(dimensionResolver, null);
@@ -85,6 +88,18 @@ public class SceneObject {
     clipRadius = radius;
   }
 
+  /**
+   * Sets the tap-target radius, in dp, of this {@link SceneObject}. If you set this to a non-zero
+   * value, then this {@link SceneObject} will be considered a tap target that you can tap on.
+   */
+  public void setTapTargetRadius(float radius) {
+    tapTargetRadius = radius;
+  }
+
+  public float getTapTargetRadius() {
+    return tapTargetRadius;
+  }
+
   public void setSize(float widthDp, float heightDp) {
     float widthPx = dimensionResolver.dp2px(widthDp);
     float heightPx = dimensionResolver.dp2px(heightDp);
@@ -103,21 +118,17 @@ public class SceneObject {
     Matrix.multiplyMM(modelViewProjMatrix, 0, viewProjMatrix, 0, matrix, 0);
 
     if (clipRadius > 0.0f) {
-      vec8[4] = clipRadius;
-      vec8[5] = 0.0f;
-      vec8[6] = 0.0f;
-      vec8[7] = 1.0f;
-      Matrix.multiplyMV(vec8, 0, modelViewProjMatrix, 0, vec8, 4);
-      float transformedRadius = vec8[0];
+      clipVector[4] = clipRadius;
+      clipVector[5] = 0.0f;
+      clipVector[6] = 0.0f;
+      clipVector[7] = 1.0f;
+      Matrix.multiplyMV(clipVector, 0, modelViewProjMatrix, 0, clipVector, 4);
+      float transformedRadius = clipVector[0];
 
-      vec8[4] = 0.0f;
-      vec8[5] = 0.0f;
-      vec8[6] = 0.0f;
-      vec8[7] = 1.0f;
-      Matrix.multiplyMV(vec8, 0, modelViewProjMatrix, 0, vec8, 4);
-      transformedRadius -= vec8[0];
-      if (vec8[0] < -1.0f - transformedRadius || vec8[0] > 1.0f + transformedRadius
-          || vec8[1] < -1.0f - transformedRadius || vec8[1] > 1.0f + transformedRadius) {
+      project(modelViewProjMatrix, clipVector, 0);
+      transformedRadius -= clipVector[0];
+      if (clipVector[0] < -1.0f - transformedRadius || clipVector[0] > 1.0f + transformedRadius
+          || clipVector[1] < -1.0f - transformedRadius || clipVector[1] > 1.0f + transformedRadius) {
         // it's outside of the frustum, clip
         return;
       }
@@ -129,6 +140,23 @@ public class SceneObject {
         children.get(i).draw(modelViewProjMatrix);
       }
     }
+  }
+
+  /**
+   * Projects this {@link SceneObject}, given the view-proj matrix and returns the clip-space
+   * coords in <code>outVec</code>.
+   */
+  public void project(float[] viewProjMatrix, float[] outVec) {
+    Matrix.multiplyMM(modelViewProjMatrix, 0, viewProjMatrix, 0, matrix, 0);
+    project(modelViewProjMatrix, outVec, 0);
+  }
+
+  private void project(float[] modelViewProjMatrix, float[] outVec, int offset) {
+    clipVector[4] = 0.0f;
+    clipVector[5] = 0.0f;
+    clipVector[6] = 0.0f;
+    clipVector[7] = 1.0f;
+    Matrix.multiplyMV(outVec, offset, modelViewProjMatrix, 0, clipVector, 4);
   }
 
   /** Sub classes should implement this to actually draw this {@link SceneObject}. */

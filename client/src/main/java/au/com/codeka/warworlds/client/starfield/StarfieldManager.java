@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.client.starfield;
 
+import android.support.annotation.Nullable;
+import android.view.View;
+
 import com.google.common.base.Preconditions;
 
 import java.util.HashMap;
@@ -19,6 +22,7 @@ import au.com.codeka.warworlds.client.opengl.Vector2;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.world.EmpireManager;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.Vector3;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -31,11 +35,17 @@ import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
  * move-fleet view, etc.
  */
 public class StarfieldManager {
+
+  public interface TapListener {
+    void onStarTapped(Star star);
+  }
+
   private static final Log log = new Log("StarfieldManager");
   private final Scene scene;
   private final Camera camera;
   private final StarfieldGestureDetector gestureDetector;
   private boolean initialized;
+  @Nullable private TapListener tapListener;
 
   private long centerSectorX;
   private long centerSectorY;
@@ -64,6 +74,10 @@ public class StarfieldManager {
     gestureDetector.destroy();
 
     App.i.getEventBus().unregister(eventListener);
+  }
+
+  public void setTapListener(@Nullable TapListener tapListener) {
+    this.tapListener = tapListener;
   }
 
   public void warpTo(Star star) {
@@ -113,6 +127,7 @@ public class StarfieldManager {
     if (container == null) {
       container = new SceneObject(scene.getDimensionResolver());
       container.setClipRadius(80.0f);
+      container.setTapTargetRadius(80.0f);
 
       float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
@@ -242,6 +257,37 @@ public class StarfieldManager {
     @Override
     public void onScale(float factor) {
       camera.zoom(factor);
+    }
+
+    @Override
+    public void onTap(float x, float y) {
+      if (tapListener == null) {
+        return;
+      }
+      Star star = null;
+
+      // Work out which star (if any) you tapped on.
+      synchronized (scene) {
+        float[] outVec = new float[4];
+        Vector3 pos = new Vector3();
+        Vector3 tap = new Vector3(x, y, 0.0f);
+        for (int i = 0; i < scene.getRootObject().getNumChildren(); i++) {
+          SceneObject so = scene.getRootObject().getChild(i);
+          if (so == null || so.getTapTargetRadius() == 0.0f) {
+            continue;
+          }
+          so.project(camera.getViewProjMatrix(), outVec);
+          pos.reset(
+              (outVec[0] + 1.0f) * 0.5f * camera.getScreenWidth(),
+              (-outVec[1] + 1.0f) * 0.5f * camera.getScreenHeight(),
+              0.0f);
+          if (Vector3.distanceBetween(pos, tap) < so.getTapTargetRadius()) {
+            log.debug("Tapped a star: %s", ((TextSceneObject) so.getChild(1)).getText());
+          }
+        }
+      }
+
+      tapListener.onStarTapped(star);
     }
   };
 }

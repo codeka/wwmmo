@@ -16,6 +16,8 @@ public class Camera {
   private float flingY;
   private float flingFactor;
   private DecelerateInterpolator decelerateInterpolator;
+  private float screenWidth;
+  private float screenHeight;
 
   public Camera() {
     decelerateInterpolator = new DecelerateInterpolator(1.0f);
@@ -26,7 +28,17 @@ public class Camera {
     Matrix.orthoM(projMatrix, 0, -width, width, -height, height, 10, -10);
     zoomAmount = 1.0f;
     flinging = false;
+    screenWidth = width;
+    screenHeight = height;
     zoom(2.0f);
+  }
+
+  public float getScreenWidth() {
+    return screenWidth;
+  }
+
+  public float getScreenHeight() {
+    return screenHeight;
   }
 
   public void onDraw() {

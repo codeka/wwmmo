@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -16,9 +15,11 @@ import com.transitionseverywhere.AutoTransition;
 import com.transitionseverywhere.Transition;
 import com.transitionseverywhere.TransitionManager;
 
+import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Star;
 
 /**
  * This is the main fragment that shows the starfield, lets you navigate around, select stars
@@ -36,7 +37,6 @@ public class StarfieldFragment extends BaseFragment {
     return inflater.inflate(R.layout.frag_starfield, container, false);
   }
 
-
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
@@ -44,18 +44,18 @@ public class StarfieldFragment extends BaseFragment {
     allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
 
     hideBottomPane(false);
-    view.setOnTouchListener(new View.OnTouchListener() {
+    ((MainActivity) getActivity()).getStarfieldManager().setTapListener(
+        new StarfieldManager.TapListener() {
       boolean expanded = false;
+
       @Override
-      public boolean onTouch(View v, MotionEvent event) {
-        log.debug("onTouch()");
+      public void onStarTapped(Star star) {
         if (expanded) {
           hideBottomPane(false);
         } else {
           showBottomPane();
         }
         expanded = !expanded;
-        return false;
       }
     });
   }

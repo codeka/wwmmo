@@ -47,6 +47,10 @@ public class TextSceneObject extends SceneObject {
     Matrix.scaleM(matrix, 0, scale, scale, 1.0f);
   }
 
+  public String getText() {
+    return text;
+  }
+
   public float getTextWidth() {
     if (dirty) {
       // If it's dirty, we'll have to measure the text ourselves... we can't create the buffers

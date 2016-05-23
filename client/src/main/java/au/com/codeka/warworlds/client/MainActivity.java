@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.client;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
@@ -45,6 +46,11 @@ public class MainActivity extends BaseFragmentActivity {
         getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
       }
     }
+  }
+
+  @NonNull
+  public StarfieldManager getStarfieldManager() {
+    return Preconditions.checkNotNull(starfieldManager);
   }
 
   @Override

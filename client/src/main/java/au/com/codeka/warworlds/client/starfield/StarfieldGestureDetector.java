@@ -37,6 +37,14 @@ public class StarfieldGestureDetector {
      * @param factor The scaling factor (1.0 == no scale, < 1.0 = shrink, &gt; 1.0 = grow).
      */
     void onScale(float factor);
+
+    /**
+     * Called when you tap the view, other than when performing one of the other gestures.
+     *
+     * @param x The x-coordinate that you tapped.
+     * @param y The y-coordinate that you tapped.
+     */
+    void onTap(float x, float y);
   }
 
   private final View view;
@@ -66,7 +74,14 @@ public class StarfieldGestureDetector {
     @Override
     public boolean onTouch(View v, MotionEvent event) {
       scaleGestureDetector.onTouchEvent(event);
-      gestureDetector.onTouchEvent(event);
+      if (gestureDetector.onTouchEvent(event)) {
+        return true;
+      }
+
+      if (event.getAction() == MotionEvent.ACTION_DOWN) {
+        callback.onTap(event.getX(), event.getY());
+      }
+
       return true;
     }
   };
