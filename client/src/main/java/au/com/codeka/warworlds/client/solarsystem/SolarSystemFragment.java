@@ -44,6 +44,7 @@ public class SolarSystemFragment extends BaseFragment {
   private boolean isFirstRefresh;
   private long starID;
 
+  SolarSystemView solarSystemView;
   TextView planetName;
   TextView storedGoods;
   TextView deltaGoods;
@@ -72,8 +73,7 @@ public class SolarSystemFragment extends BaseFragment {
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-//    mSolarSystemSurfaceView = (SolarSystemSurfaceView) mView.findViewById(R.id.solarsystem_view);
-//    mProgressBar = (ProgressBar) mView.findViewById(R.id.progress_bar);
+    solarSystemView = (SolarSystemView) view.findViewById(R.id.solarsystem_view);
     final Button buildButton = (Button) view.findViewById(R.id.solarsystem_colony_build);
     final Button focusButton = (Button) view.findViewById(R.id.solarsystem_colony_focus);
     final Button sitrepButton = (Button) view.findViewById(R.id.sitrep_btn);
@@ -184,42 +184,12 @@ public class SolarSystemFragment extends BaseFragment {
     log.info("Getting star: %d", starID);
     star = StarManager.i.getStar(starID);
     onStarFetched(star);
-
-/*    // this will, on HONEYCOMB+ re-centre the progress back over the solarsystem. It looks better...
-    int sdk = android.os.Build.VERSION.SDK_INT;
-    if (sdk >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-      solarSystemSurfaceViewOnLayoutChangedListener = new View.OnLayoutChangeListener() {
-        @Override
-        public void onLayoutChange(View v, int left, int top, int right,
-            int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-          int containerWidth = right - left;
-          int containerHeight = bottom - top;
-          int progressWidth = (int)(50 * mSolarSystemSurfaceView.getPixelScale());
-          int progressHeight = progressWidth;
-
-          RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mProgressBar.getLayoutParams();
-          lp.leftMargin = (containerWidth / 2) - (progressWidth / 2);
-          lp.topMargin = (containerHeight / 2) - (progressHeight / 2);
-          mProgressBar.setLayoutParams(lp);
-        }
-      };
-
-      mSolarSystemSurfaceView.addOnLayoutChangeListener(
-          (View.OnLayoutChangeListener) solarSystemSurfaceViewOnLayoutChangedListener);
-    }*/
   }
 
-  @SuppressLint("NewApi")
   @Override
   public void onPause() {
     super.onPause();
     App.i.getEventBus().unregister(eventHandler);
-
-   /* int sdk = android.os.Build.VERSION.SDK_INT;
-    if (sdk >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-      mSolarSystemSurfaceView.removeOnLayoutChangeListener(
-          (View.OnLayoutChangeListener) solarSystemSurfaceViewOnLayoutChangedListener);
-    }*/
   }
 
   private Object eventHandler = new Object() {
@@ -247,7 +217,7 @@ public class SolarSystemFragment extends BaseFragment {
       selectedPlanetIndex = -1;
     }
 
-    //mSolarSystemSurfaceView.setStar(star);
+    solarSystemView.setStar(star);
     if (selectedPlanetIndex >= 0) {
       log.debug("Selecting planet #%d", selectedPlanetIndex);
       //mSolarSystemSurfaceView.selectPlanet(selectedPlanetIndex);
