@@ -37,6 +37,10 @@ public class Image {
     return argb;
   }
 
+  public Colour getPixelColour(int x, int y) {
+    return new Colour(argb[y * width + x]);
+  }
+
   public void setPixelColour(int x, int y, Colour c) {
     if (x < 0 || x >= width)
       return;

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<planet version="1">
+  <texture generator="perlin-noise" scaleX="0.5" scaleY="0.5">
+      <perlin persistence="0.5" startOctave="4" endOctave="6" interpolation="cosine" />
+      <colour>
+        <node n="0.0" colour="ffff004d" />
+        <node n="0.3" colour="ff5600ff" />
+        <node n="0.6" colour="ff8a2109" />
+        <node n="1.0" colour="ff5600ff" />
+      </colour>
+  </texture>
+  <atmosphere>
+    <outer size="8" noisiness="0.7">
+      <colour>
+        <node n="0.0" colour="ffa019de" />
+        <node n="0.8" colour="00a019de" />
+      </colour>
+      <perlin persistence="0.6" startOctave="3" endOctave="8" interpolation="linear" />
+    </outer>
+    <inner sunStartShadow="1" sunShadowFactor="0.3">
+      <colour>
+        <node n="0.0" colour="00a019de" />
+        <node n="0.6" colour="60a019de" />
+      </colour>
+    </inner>
+  </atmosphere>
+</planet>
+

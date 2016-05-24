@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<planets version="1">
+  <planet originFrom="8.0 8.5 40.0" originTo="-7.0 6.0 50.0" size="6">
+    <texture generator="voronoi-map" noisiness="0.3">
+        <voronoi>
+          <point-cloud generator="poisson" density="0.7" randomness="0.9" />
+        </voronoi>
+        <perlin persistence="0.5" startOctave="7" endOctave="16" interpolation="cosine" />
+        <colour>
+          <node n="0.0" colour="ff626262" />
+          <node n="0.4" colour="ff727272" />
+          <node n="0.7" colour="ff828282" />
+          <node n="1.0" colour="ff474747" />
+        </colour>
+    </texture>
+    <warp generator="perlin-noise" factor="0.5">
+        <perlin persistence="0.3" startOctave="1" endOctave="3" interpolation="cosine" />
+    </warp>
+  </planet>
+  <planet originFrom="-8.0 -8.5 40.0" originTo="7.0 -6.0 50.0" size="7">
+    <texture generator="perlin-noise" noisiness="0.3">
+        <perlin persistence="0.5" startOctave="3" endOctave="6" interpolation="cosine" />
+        <colour>
+          <node n="0.0" colour="ff626262" />
+          <node n="0.4" colour="ff727272" />
+          <node n="0.7" colour="ff828282" />
+          <node n="1.0" colour="ff474747" />
+        </colour>
+    </texture>
+    <warp generator="perlin-noise" factor="0.5">
+        <perlin persistence="0.3" startOctave="1" endOctave="3" interpolation="cosine" />
+    </warp>
+  </planet>
+</planets>
+
