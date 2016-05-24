@@ -18,8 +18,11 @@ public class StarManager {
   private final ProtobufStore<Star> stars;
 
   private StarManager() {
-    App.i.getEventBus().register(eventListener);
     stars = App.i.getDataStore().stars();
+  }
+
+  public void create() {
+    App.i.getEventBus().register(eventListener);
   }
 
   /** Gets the star with the given ID. Might return null if don't have that star cached yet. */

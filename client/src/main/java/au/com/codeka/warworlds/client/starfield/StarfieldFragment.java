@@ -18,7 +18,12 @@ import com.transitionseverywhere.TransitionManager;
 import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
+import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
+import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
+import au.com.codeka.warworlds.client.solarsystem.SolarSystemFragment;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Fleet;
+import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -44,6 +49,41 @@ public class StarfieldFragment extends BaseFragment {
         (SelectionDetailsView) view.findViewById(R.id.selection_details);
     bottomPane = (ViewGroup) view.findViewById(R.id.bottom_pane);
     allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
+
+    selectionDetailsView.setHandlers(
+        new PlanetListSimple.PlanetSelectedHandler() { // planetSelectHandler
+          @Override
+          public void onPlanetSelected(Planet planet) {
+
+          }
+        }, new FleetListSimple.FleetSelectedHandler() { // fleetSelectHandler
+          @Override
+          public void onFleetSelected(Fleet fleet) {
+
+          }
+        }, new View.OnClickListener() { // renameClickListener
+          @Override
+          public void onClick(View v) {
+
+          }
+        }, new View.OnClickListener() { // viewClickListener
+          @Override
+          public void onClick(View v) {
+            Star star = selectionDetailsView.getStar();
+            getFragmentTransitionManager().replaceFragment(
+                SolarSystemFragment.class, SolarSystemFragment.createArguments(star.id));
+          }
+        }, new View.OnClickListener() { // intelClickListener
+          @Override
+          public void onClick(View v) {
+
+          }
+        }, new SelectionDetailsView.ZoomToStarHandler() { // zoomToStarHandler
+          @Override
+          public void onZoomToStar(Star star) {
+
+          }
+        });
 
     hideBottomPane(false);
     ((MainActivity) getActivity()).getStarfieldManager().setTapListener(

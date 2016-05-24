@@ -15,7 +15,10 @@
   <string name="next">Next</string>
   <string name="empire">Empire</string>
   <string name="sitrep">Sit. Rep.</string>
+  <string name="view">View</string>
   <string name="alliance">Alliance</string>
+  <string name="build">Build</string>
+  <string name="focus">Focus</string>
   <string name="boost">Boost</string>
 
   <string name="create_empire_welcome">

@@ -70,6 +70,10 @@ public class SelectionDetailsView extends FrameLayout {
     App.i.getEventBus().unregister(eventListener);
   }
 
+  public Star getStar() {
+    return star;
+  }
+
   /** Called to set the handlers for when the user selects a planet/fleet from our lists, etc. */
   public void setHandlers(
       PlanetListSimple.PlanetSelectedHandler planetSelectedHandler,

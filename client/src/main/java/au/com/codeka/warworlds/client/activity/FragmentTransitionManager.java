@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.client.activity;
 
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -27,13 +28,24 @@ public class FragmentTransitionManager {
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
   public void replaceFragment(Class<? extends BaseFragment> fragmentClass) {
-    replaceFragment(fragmentClass, null);
+    replaceFragment(fragmentClass, null, null);
+  }
+
+  /** Replace the current fragment stack with a new instance of the given fragment class. */
+  public void replaceFragment(Class<? extends BaseFragment> fragmentClass, @Nullable Bundle args) {
+    replaceFragment(fragmentClass, args, null);
   }
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
   public void replaceFragment(Class<? extends BaseFragment> fragmentClass,
       @Nullable SharedViewHolder sharedViews) {
-    BaseFragment fragment = createFragment(fragmentClass);
+    replaceFragment(fragmentClass, null, sharedViews);
+  }
+
+  /** Replace the current fragment stack with a new instance of the given fragment class. */
+  public void replaceFragment(Class<? extends BaseFragment> fragmentClass,
+      @Nullable Bundle args, @Nullable SharedViewHolder sharedViews) {
+    BaseFragment fragment = createFragment(fragmentClass, args);
     FragmentTransaction trans = activity.getSupportFragmentManager().beginTransaction();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -69,9 +81,11 @@ public class FragmentTransitionManager {
     currFragment = fragment;
   }
 
-  private <T extends BaseFragment> T createFragment(Class<T> fragmentClass) {
+  private <T extends BaseFragment> T createFragment(Class<T> fragmentClass, @Nullable Bundle args) {
     try {
-      return fragmentClass.newInstance();
+      T fragment = fragmentClass.newInstance();
+      fragment.setArguments(args);
+      return fragment;
     } catch (Exception e) {
       throw new RuntimeException("Fragment class does not have zero-arg constructor: "
           + fragmentClass.getName());
