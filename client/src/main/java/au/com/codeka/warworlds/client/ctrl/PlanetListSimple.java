@@ -14,8 +14,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.world.EmpireManager;
+import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -118,18 +121,19 @@ public class PlanetListSimple extends LinearLayout {
       spacer.setBackgroundColor(0x33ffffff);
       addView(spacer);
     }
-    for (Planet planet : planets) {
-      View rowView = getPlanetRowView(inflater, planet);
+    for (int i = 0; i < planets.size(); i++) {
+      View rowView = getPlanetRowView(inflater, planets.get(i), i);
       addView(rowView);
     }
   }
 
-  private View getPlanetRowView(LayoutInflater inflater, Planet planet) {
+  private View getPlanetRowView(LayoutInflater inflater, Planet planet, int planetIndex) {
     View view = inflater.inflate(R.layout.ctrl_planet_list_simple_row, this, false);
 
     final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
-    //final PlanetImageManager pim = PlanetImageManager.getInstance();
-
+    Picasso.with(getContext())
+        .load(ImageHelper.getPlanetImageUrl(getContext(), star, planetIndex, 32, 32))
+        .into(icon);
     //Sprite sprite = pim.getSprite(planet);
     //icon.setImageDrawable(new SpriteDrawable(sprite));
 

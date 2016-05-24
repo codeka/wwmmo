@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
+import com.squareup.picasso.Picasso;
 
 import java.util.Locale;
 
@@ -19,6 +20,7 @@ import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.world.EmpireManager;
+import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.client.world.StarManager;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -147,8 +149,9 @@ public class SelectionDetailsView extends FrameLayout {
     starName.setText(star.name);
     starKind.setText(String.format(Locale.ENGLISH, "%s %s", star.classification,
         /*star.getCoordinateString()*/"[1,2]"));
-    //Sprite starImage = StarImageManager.getInstance().getSprite(star, 80, true);
-    //starIcon.setImageDrawable(new SpriteDrawable(starImage));
+    Picasso.with(getContext())
+        .load(ImageHelper.getStarImageUrl(getContext(), star, 40, 40))
+        .into(starIcon);
   }
 
   private void refreshWormholeDetails() {

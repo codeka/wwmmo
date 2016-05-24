@@ -148,7 +148,7 @@ public class RendererServlet extends HttpServlet {
       cacheFile.getParentFile().mkdirs();
     }
 
-    Random rand = new Random(starId);
+    Random rand = new Random(starId + planetIndex);
     File templateFile = getTemplateFile(rand, "planet", planet.planet_type.toString());
     long startTime = System.nanoTime();
     if (!generateImage(cacheFile, templateFile, width, height, factor, rand)) {

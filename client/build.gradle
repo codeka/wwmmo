@@ -48,5 +48,6 @@ dependencies {
   compile 'com.android.support:appcompat-v7:23.3.0'
   compile 'com.google.guava:guava:19.0'
   compile 'com.neovisionaries:nv-websocket-client:1.25'
+  compile 'com.squareup.picasso:picasso:2.5.2'
   compile project(':common')
 }
