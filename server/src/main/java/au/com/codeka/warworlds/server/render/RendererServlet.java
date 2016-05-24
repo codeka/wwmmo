@@ -1,17 +1,11 @@
 package au.com.codeka.warworlds.server.render;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.awt.image.RenderedImage;
-import java.awt.image.renderable.RenderedImageFactory;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
@@ -30,11 +24,10 @@ import javax.servlet.http.HttpServletResponse;
 import au.com.codeka.warworlds.common.Colour;
 import au.com.codeka.warworlds.common.Image;
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.planetrender.PlanetRenderer;
-import au.com.codeka.warworlds.common.planetrender.Template;
-import au.com.codeka.warworlds.common.planetrender.TemplateException;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.planetrender.PlanetRenderer;
+import au.com.codeka.warworlds.planetrender.Template;
 import au.com.codeka.warworlds.server.world.StarManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 
@@ -191,17 +184,11 @@ public class RendererServlet extends HttpServlet {
       return false;
     }
 
-    Image img = new Image(width, height, Colour.TRANSPARENT);
-    renderer.render(img);
 
-    BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        bufferedImage.setRGB(x, y, img.getPixelColour(x, y).toArgb());
-      }
-    }
+    BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    renderer.render(img);
     try {
-      ImageIO.write(bufferedImage, "png", cacheFile);
+      ImageIO.write(img, "png", cacheFile);
     } catch (IOException e) {
       log.warning("Error writing image.", e);
       return false;

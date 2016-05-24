@@ -17,4 +17,5 @@ dependencies {
   compile 'com.google.guava:guava:19.0'
   compile 'com.squareup.wire:wire-gson-support:2.1.2'
   compile project(':common')
+  compile project(':planet-render')
 }
