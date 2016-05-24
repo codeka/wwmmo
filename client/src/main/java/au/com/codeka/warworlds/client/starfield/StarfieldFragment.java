@@ -18,6 +18,7 @@ import com.transitionseverywhere.TransitionManager;
 import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
+import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
 import au.com.codeka.warworlds.client.solarsystem.SolarSystemFragment;
@@ -71,7 +72,11 @@ public class StarfieldFragment extends BaseFragment {
           public void onClick(View v) {
             Star star = selectionDetailsView.getStar();
             getFragmentTransitionManager().replaceFragment(
-                SolarSystemFragment.class, SolarSystemFragment.createArguments(star.id));
+                SolarSystemFragment.class,
+                SolarSystemFragment.createArguments(star.id),
+                SharedViewHolder.builder()
+                    .addSharedView(R.id.bottom_pane, "bottom_pane")
+                    .build());
           }
         }, new View.OnClickListener() { // intelClickListener
           @Override
