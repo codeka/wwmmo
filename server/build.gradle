@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin:'application'
 
 repositories {
   mavenCentral()
@@ -19,3 +20,18 @@ dependencies {
   compile project(':common')
   compile project(':planet-render')
 }
+
+mainClassName = "au.com.codeka.warworlds.server.Program"
+
+task dataFiles {
+  // want to include more than just a single directory
+  FileTree data = fileTree(dir: "src/main/data/")
+  data.exclude "store/*"
+  data.exclude "cache/*"
+  outputs.dir data
+}
+
+applicationDistribution.from(dataFiles) {
+  into "data"
+}
+
