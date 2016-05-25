@@ -46,6 +46,19 @@ public class SolarSystemView extends RelativeLayout {
       planetInfos[i] = planetInfo;
     }
 
+    ImageView sunImageView = new ImageView(getContext());
+
+    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+        (int)(256 * getContext().getResources().getDisplayMetrics().density),
+        (int)(256 * getContext().getResources().getDisplayMetrics().density));
+    lp.topMargin = -lp.height / 2;
+    lp.leftMargin = -lp.width / 2;
+    sunImageView.setLayoutParams(lp);
+    addView(sunImageView);
+    Picasso.with(getContext())
+        .load(ImageHelper.getStarImageUrl(getContext(), star, 256, 256))
+        .into(sunImageView);
+
     placePlanets();
   }
 
