@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.client.solarsystem;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -20,12 +22,17 @@ import au.com.codeka.warworlds.common.proto.Star;
  */
 public class SolarSystemView extends RelativeLayout {
   private static final Log log = new Log("SolarSystemView");
+  private final Paint orbitPaint;
   private Star star;
   private PlanetInfo[] planetInfos;
 
   public SolarSystemView(Context context, AttributeSet attrs) {
     super(context, attrs);
-    ViewBackgroundGenerator.setBackground(this);
+    ViewBackgroundGenerator.setBackground(this, onBackgroundDrawHandler);
+
+    orbitPaint = new Paint();
+    orbitPaint.setARGB(255, 255, 255, 255);
+    orbitPaint.setStyle(Paint.Style.STROKE);
   }
 
   public void setStar(Star star) {
@@ -40,7 +47,19 @@ public class SolarSystemView extends RelativeLayout {
     }
 
     placePlanets();
-    //redraw();
+  }
+
+  private float getDistanceFromSun(int planetIndex) {
+    int width = getWidth();
+    if (width == 0) {
+      return 0.0f;
+    }
+
+    width -= (int)(16 * getContext().getResources().getDisplayMetrics().density);
+    float planetStart = 150 * getContext().getResources().getDisplayMetrics().density;
+    float distanceBetweenPlanets = width - planetStart;
+    distanceBetweenPlanets /= planetInfos.length;
+    return planetStart + (distanceBetweenPlanets * planetIndex) + (distanceBetweenPlanets / 2.0f);
   }
 
   private void placePlanets() {
@@ -48,7 +67,6 @@ public class SolarSystemView extends RelativeLayout {
       return;
     }
     int width = getWidth();
-    log.info("width == %d", width);
     if (width == 0) {
       this.post(new Runnable() {
         @Override
@@ -59,20 +77,14 @@ public class SolarSystemView extends RelativeLayout {
       return;
     }
 
-    width -= (int)(60 * getContext().getResources().getDisplayMetrics().density);
-    float planetStart = 150 * getContext().getResources().getDisplayMetrics().density;
-    float distanceBetweenPlanets = width - planetStart;
-    distanceBetweenPlanets /= planetInfos.length;
-
     for (int i = 0; i < planetInfos.length; i++) {
       PlanetInfo planetInfo = planetInfos[i];
 
-      float distanceFromSun =
-          planetStart + (distanceBetweenPlanets * i) + (distanceBetweenPlanets / 2.0f);
+      float distanceFromSun = getDistanceFromSun(i);
       float x = distanceFromSun;
       float y = 0;
 
-      float angle = (0.5f/(planetInfos.length));
+      float angle = (0.5f/(planetInfos.length + 1));
       angle = (float) ((angle*(planetInfos.length - i - 1)*Math.PI) + angle*Math.PI);
 
       Vector2 centre = new Vector2(x, y);
@@ -83,15 +95,15 @@ public class SolarSystemView extends RelativeLayout {
       planetInfo.imageView = new ImageView(getContext());
 
       RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-          (int)(50 * getContext().getResources().getDisplayMetrics().density),
-          (int)(50 * getContext().getResources().getDisplayMetrics().density));
-      lp.topMargin = (int) centre.y;
-      lp.leftMargin = (int) centre.x;
+          (int)(64 * getContext().getResources().getDisplayMetrics().density),
+          (int)(64 * getContext().getResources().getDisplayMetrics().density));
+      lp.topMargin = (int) centre.y - (lp.height / 2);
+      lp.leftMargin = (int) centre.x - (lp.width / 2);
       planetInfo.imageView.setLayoutParams(lp);
       addView(planetInfo.imageView);
 
       Picasso.with(getContext())
-          .load(ImageHelper.getPlanetImageUrl(getContext(), star, i, 50, 50))
+          .load(ImageHelper.getPlanetImageUrl(getContext(), star, i, 64, 64))
           .into(planetInfo.imageView);
 
       if (planetInfo.planet.colony != null) {
@@ -123,6 +135,17 @@ public class SolarSystemView extends RelativeLayout {
     //  mSelectionView.setLayoutParams(params);
     //}
   }
+
+  private final ViewBackgroundGenerator.OnDrawHandler onBackgroundDrawHandler =
+      new ViewBackgroundGenerator.OnDrawHandler() {
+    @Override
+    public void onDraw(Canvas canvas) {
+      for (int i = 0; i < planetInfos.length; i++) {
+        float radius = getDistanceFromSun(i);
+        canvas.drawCircle(0.0f, 0.0f, radius, orbitPaint);
+      }
+    }
+  };
 
   /** This class contains info about the planets we need to render and interact with. */
   private static class PlanetInfo {

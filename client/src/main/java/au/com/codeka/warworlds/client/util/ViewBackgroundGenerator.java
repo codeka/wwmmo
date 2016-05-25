@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -18,8 +19,22 @@ import android.view.WindowManager;
  * (such as the startup activity, account activities, etc).
  */
 public class ViewBackgroundGenerator {
-  /** Sets the background of the given {@link View} to our custom bitmap. */
+  public interface OnDrawHandler {
+    void onDraw(Canvas canvas);
+  }
+
   public static void setBackground(View view) {
+    setBackground(view, (OnDrawHandler) null);
+  }
+
+  /**
+   * Sets the background of the given {@link View} to our custom bitmap.
+   *
+   * @param view The view to set the background on.
+   * @param onDrawHandler An optional {@link OnDrawHandler} that we'll call when we draw the
+   *                      background.
+   */
+  public static void setBackground(View view, @Nullable OnDrawHandler onDrawHandler) {
     WindowManager wm = (WindowManager) view.getContext().getSystemService(Context.WINDOW_SERVICE);
     Display display = wm.getDefaultDisplay();
     android.util.DisplayMetrics metrics = new DisplayMetrics();
@@ -27,7 +42,8 @@ public class ViewBackgroundGenerator {
 
     StarfieldBackgroundRenderer renderer =
         new StarfieldBackgroundRenderer(view.getContext(), new long[]{new Random().nextLong()});
-    BackgroundDrawable drawable = new BackgroundDrawable(renderer, metrics.heightPixels);
+    BackgroundDrawable drawable = new BackgroundDrawable(
+        renderer, metrics.heightPixels, onDrawHandler);
     setBackground(view, drawable);
   }
 
@@ -43,20 +59,25 @@ public class ViewBackgroundGenerator {
   }
 
   public static class BackgroundDrawable extends Drawable {
-    private StarfieldBackgroundRenderer renderer;
-    private int baseSize;
+    private final StarfieldBackgroundRenderer renderer;
+    private final int baseSize;
+    @Nullable private final OnDrawHandler onDrawHandler;
 
-    public BackgroundDrawable(StarfieldBackgroundRenderer renderer, int deviceHeight) {
+    public BackgroundDrawable(
+        StarfieldBackgroundRenderer renderer,
+        int deviceHeight,
+        @Nullable OnDrawHandler onDrawHandler) {
       this.renderer = renderer;
-      baseSize = 1024;
-      if (deviceHeight > baseSize) {
-        baseSize = deviceHeight;
-      }
+      this.onDrawHandler = onDrawHandler;
+      baseSize = Math.max(deviceHeight, 1024);
     }
 
     @Override
     public void draw(Canvas canvas) {
       renderer.drawBackground(canvas, 0, 0, baseSize, baseSize);
+      if (onDrawHandler != null) {
+        onDrawHandler.onDraw(canvas);
+      }
     }
 
     @Override
