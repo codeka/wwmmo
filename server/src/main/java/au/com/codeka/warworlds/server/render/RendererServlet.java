@@ -98,6 +98,11 @@ public class RendererServlet extends HttpServlet {
 
     Random rand = new Random(starId);
     File templateFile = getTemplateFile(rand, "star", star.get().classification.toString());
+    if (templateFile == null) {
+      response.setStatus(500);
+      return;
+    }
+
     long startTime = System.nanoTime();
     if (!generateImage(cacheFile, templateFile, width, height, factor, rand)) {
       response.setStatus(500);
