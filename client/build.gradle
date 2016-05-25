@@ -4,6 +4,10 @@ repositories {
   mavenCentral()
 }
 
+Properties signingProps = new Properties()
+signingProps.load(new FileInputStream(file('signing.properties')))
+
+
 android {
   compileSdkVersion 23
   buildToolsVersion "23.0.3"
@@ -12,13 +16,22 @@ android {
     applicationId "au.com.codeka.warworlds2"
     minSdkVersion 10
     targetSdkVersion 23
-    versionCode 1
     versionName "1.0"
+    versionCode 1
+  }
+  signingConfigs {
+    release {
+      storeFile file(signingProps['keystore'])
+      storePassword signingProps['password']
+      keyAlias signingProps['alias']
+      keyPassword signingProps['password']
+    }
   }
   buildTypes {
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      signingConfig signingConfigs.release
 
       buildConfigField "String", "WEBSOCKET_URL", "\"ws://wwmmo.codeka.com.au/conn\""
       buildConfigField "String", "SERVER_URL", "\"http://wwmmo.codeka.com.au/\""
@@ -50,4 +63,25 @@ dependencies {
   compile 'com.neovisionaries:nv-websocket-client:1.25'
   compile 'com.squareup.picasso:picasso:2.5.2'
   compile project(':common')
+}
+
+def deployPath = file("${rootDir}/../deploy/${project.name}")
+
+def publish = project.tasks.create("publishAll")
+android.applicationVariants.all { variant ->
+  variant.outputs.each { output ->
+
+    if (variant.versionName) {
+      version "${variant.versionName}.${variant.versionCode}"
+    } else {
+      version "$variant.versionCode"
+    }
+
+    def task = project.tasks.create("publish${variant.name.capitalize()}", Copy)
+    task.from(output.outputFile)
+    task.into(deployPath)
+    task.rename('.*', "wwmmo2-${variant.name}-${version}.apk")
+    task.dependsOn variant.assemble
+    publish.dependsOn task
+  }
 }
