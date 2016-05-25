@@ -1,9 +1,19 @@
-apply plugin: 'java'
-apply plugin:'application'
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'org.hidetake:gradle-ssh-plugin:2.2.0'
+  }
+}
 
 repositories {
   mavenCentral()
 }
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'org.hidetake.ssh'
 
 dependencies {
   compile fileTree(dir: '../jetty/lib', include: ['*.jar'])
@@ -35,3 +45,23 @@ applicationDistribution.from(dataFiles) {
   into "data"
 }
 
+ssh.settings {
+  knownHosts = file('../../known_hosts')
+}
+
+remotes {
+  prod {
+    host = 'wwmmo.codeka.com.au'
+    user = 'wwmmo'
+    identity = file('../../wwmmo2.id_rsa')
+  }
+}
+
+task deploy(dependsOn: 'distZip') << {
+  ssh.run {
+    session(remotes.prod) {
+      put file("${buildDir}/distributions/server.zip"), '/home/wwmmo/server.zip'
+//      execute 'sudo service tomcat restart'
+    }
+  }
+}
