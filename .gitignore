@@ -10,6 +10,7 @@ server/src/main/data/cache/*
 server/src/main/data/store/*
 server/src/main/data/config-debug.json
 client/signing.properties
+client/*.apk
 
 # Android Studio/gradle files and directories
 .gradle

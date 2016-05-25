@@ -20,8 +20,8 @@ android {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-      buildConfigField "String", "WEBSOCKET_URL", "\"wss://game.war-worlds.com/conn\""
-      buildConfigField "String", "SERVER_URL", "\"https://game.war-worlds.com/\""
+      buildConfigField "String", "WEBSOCKET_URL", "\"ws://wwmmo.codeka.com.au/conn\""
+      buildConfigField "String", "SERVER_URL", "\"http://wwmmo.codeka.com.au/\""
     }
     debug {
       buildConfigField "String", "WEBSOCKET_URL", "\"ws://192.168.1.3:8080/conn\""
