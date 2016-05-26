@@ -94,7 +94,7 @@ public class WelcomeFragment extends BaseFragment {
     optionsButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        //startActivity(new Intent(context, GlobalOptionsActivity.class));
+        getFragmentTransitionManager().replaceFragment(GameSettingsFragment.class);
       }
     });
 

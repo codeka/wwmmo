@@ -66,16 +66,6 @@ android {
   }
 }
 
-dependencies {
-  compile fileTree(include: ['*.jar'], dir: 'libs')
-  compile "com.andkulikov:transitionseverywhere:1.6.3"
-  compile 'com.android.support:appcompat-v7:23.3.0'
-  compile 'com.google.guava:guava:19.0'
-  compile 'com.neovisionaries:nv-websocket-client:1.25'
-  compile 'com.squareup.picasso:picasso:2.5.2'
-  compile project(':common')
-}
-
 def deployPath = file("${rootDir}/../deploy/${project.name}")
 
 def publish = project.tasks.create("publishAll")
@@ -101,4 +91,15 @@ def getVersionCodeFromGit() {
   // Same as running:
   // git rev-list <checked out branch name> | wc -l
   return Grgit.open().log().size()
+}
+
+dependencies {
+  compile fileTree(include: ['*.jar'], dir: 'libs')
+  compile "com.andkulikov:transitionseverywhere:1.6.3"
+  compile 'com.android.support:appcompat-v7:23.3.0'
+  compile 'com.android.support:preference-v7:23.3.0'
+  compile 'com.google.guava:guava:19.0'
+  compile 'com.neovisionaries:nv-websocket-client:1.25'
+  compile 'com.squareup.picasso:picasso:2.5.2'
+  compile project(':common')
 }

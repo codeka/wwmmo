@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context="au.com.codeka.warworlds.client.MainActivity">
 
+  <android.support.v7.widget.Toolbar
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:elevation="4dp"
+      android:visibility="gone" />
+
   <au.com.codeka.warworlds.client.opengl.RenderSurfaceView
       android:id="@+id/render_surface"
       android:layout_width="match_parent"

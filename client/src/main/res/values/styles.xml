@@ -51,6 +51,10 @@
     <item name="android:shadowRadius">1.0</item>
   </style>
 
+  <style name="WarWorlds.PreferenceThemeOverlay" parent="@style/PreferenceThemeOverlay">
+    <item name="android:background">@color/default_background</item>
+  </style>
+
   <style name="WarWorlds.Base" parent="Theme.AppCompat">
     <item name="android:windowBackground">@color/default_background</item>
 
@@ -60,6 +64,7 @@
     <item name="android:imageButtonStyle">@style/ImageButton</item>
     <item name="spinnerStyle">@style/Spinner</item>
     <item name="android:spinnerStyle">@style/Spinner</item>
+    <item name="preferenceTheme">@style/WarWorlds.PreferenceThemeOverlay</item>
 
     <item name="actionBarStyle">@style/ActionBar</item>
     <!-- Make the action bar overlay the window, instead of pushing everything down. We then

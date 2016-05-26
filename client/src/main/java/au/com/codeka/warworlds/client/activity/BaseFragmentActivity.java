@@ -23,6 +23,12 @@ public class BaseFragmentActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
   }
 
+  @Override
+  public boolean onSupportNavigateUp() {
+    getSupportFragmentManager().popBackStack();
+    return true;
+  }
+
   public FragmentTransitionManager getFragmentTransitionManager() {
     return transitionManager;
   }

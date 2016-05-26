@@ -30,4 +30,7 @@
   </string>
   <string name="create_empire_hint">Player name</string>
   <string name="create_empire_switch_account_btn">I already have an empire</string>
+
+  <string name="pref_category_chat">Chat</string>
+  <string name="pref_chat_profanity_filter">Filter profanity</string>
 </resources>

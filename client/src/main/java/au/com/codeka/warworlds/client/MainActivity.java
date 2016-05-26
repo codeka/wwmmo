@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.client;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.Toolbar;
 
 import com.google.common.base.Preconditions;
 
@@ -27,6 +28,9 @@ public class MainActivity extends BaseFragmentActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     createFragmentTransitionManager(R.id.fragment_container);
+
+    setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+    Preconditions.checkNotNull(getSupportActionBar()).hide();
 
     RenderSurfaceView renderSurfaceView =
         (RenderSurfaceView) Preconditions.checkNotNull(findViewById(R.id.render_surface));

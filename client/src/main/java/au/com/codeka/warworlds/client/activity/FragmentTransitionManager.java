@@ -3,12 +3,12 @@ package au.com.codeka.warworlds.client.activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 
 import com.google.common.base.Preconditions;
 
-import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.common.Log;
 
 /**
@@ -19,7 +19,7 @@ public class FragmentTransitionManager {
   private final BaseFragmentActivity activity;
   private final int fragmentContainerId;
 
-  private BaseFragment currFragment;
+  private Fragment currFragment;
 
   public FragmentTransitionManager(BaseFragmentActivity activity, int fragmentContainerId) {
     this.activity = Preconditions.checkNotNull(activity);
@@ -27,25 +27,25 @@ public class FragmentTransitionManager {
   }
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
-  public void replaceFragment(Class<? extends BaseFragment> fragmentClass) {
+  public void replaceFragment(Class<? extends Fragment> fragmentClass) {
     replaceFragment(fragmentClass, null, null);
   }
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
-  public void replaceFragment(Class<? extends BaseFragment> fragmentClass, @Nullable Bundle args) {
+  public void replaceFragment(Class<? extends Fragment> fragmentClass, @Nullable Bundle args) {
     replaceFragment(fragmentClass, args, null);
   }
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
-  public void replaceFragment(Class<? extends BaseFragment> fragmentClass,
+  public void replaceFragment(Class<? extends Fragment> fragmentClass,
       @Nullable SharedViewHolder sharedViews) {
     replaceFragment(fragmentClass, null, sharedViews);
   }
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
-  public void replaceFragment(Class<? extends BaseFragment> fragmentClass,
+  public void replaceFragment(Class<? extends Fragment> fragmentClass,
       @Nullable Bundle args, @Nullable SharedViewHolder sharedViews) {
-    BaseFragment fragment = createFragment(fragmentClass, args);
+    Fragment fragment = createFragment(fragmentClass, args);
     FragmentTransaction trans = activity.getSupportFragmentManager().beginTransaction();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -81,7 +81,7 @@ public class FragmentTransitionManager {
     currFragment = fragment;
   }
 
-  private <T extends BaseFragment> T createFragment(Class<T> fragmentClass, @Nullable Bundle args) {
+  private <T extends Fragment> T createFragment(Class<T> fragmentClass, @Nullable Bundle args) {
     try {
       T fragment = fragmentClass.newInstance();
       fragment.setArguments(args);
