@@ -65,20 +65,6 @@
         android:layout_alignParentEnd="true"
         android:text="@string/website" />
 
-    <TextView
-        android:id="@+id/realm_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/help_btn"
-        android:layout_toLeftOf="@+id/separator"
-        android:layout_toStartOf="@+id/separator"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="@dimen/tablet_margin_5dp"
-        android:layout_marginStart="@dimen/tablet_margin_5dp"
-        android:text="@string/realm_label"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
     <ImageView
         android:id="@+id/empire_icon"
         android:layout_width="20dp"
@@ -99,7 +85,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Button
-        android:id="@+id/realm_select_btn"
+        android:id="@+id/options_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -112,8 +98,8 @@
         android:layout_toStartOf="@+id/separator"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/realm_name"
-        android:text="@string/switch_realm" />
+        android:layout_below="@id/empire_name"
+        android:text="@string/options" />
 
     <Button
         android:id="@+id/reauth_btn"
@@ -133,22 +119,11 @@
         android:text="@string/switch_user" />
 
     <Button
-        android:id="@+id/options_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="@dimen/tablet_margin_5dp"
-        android:layout_marginRight="@dimen/tablet_margin_5dp"
-        android:layout_alignParentBottom="true"
-        android:text="@string/options" />
-
-    <Button
         android:id="@+id/start_btn"
         android:transitionName="start_btn"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_above="@id/options_btn"
+        android:layout_alignParentBottom="true"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"

@@ -56,7 +56,6 @@ public class WelcomeFragment extends BaseFragment {
 
   private Button startButton;
   private TextView connectionStatus;
-  private TextView realmName;
   private TextView empireName;
   private TransparentWebView motdView;
 
@@ -73,23 +72,14 @@ public class WelcomeFragment extends BaseFragment {
     ViewBackgroundGenerator.setBackground(view);
 
     startButton = (Button) Preconditions.checkNotNull(view.findViewById(R.id.start_btn));
-    realmName = (TextView) Preconditions.checkNotNull(view.findViewById(R.id.realm_name));
     motdView = (TransparentWebView) Preconditions.checkNotNull(view.findViewById(R.id.motd));
     empireName = (TextView) Preconditions.checkNotNull(view.findViewById(R.id.empire_name));
     connectionStatus =
         (TextView) Preconditions.checkNotNull(view.findViewById(R.id.connection_status));
-    final Button realmSelectButton =
-        (Button) Preconditions.checkNotNull(view.findViewById(R.id.realm_select_btn));
     final Button optionsButton =
         (Button) Preconditions.checkNotNull(view.findViewById(R.id.options_btn));
 
     refreshWelcomeMessage();
-
-    realmSelectButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        //startActivity(new Intent(context, RealmSelectActivity.class));
-      }
-    });
 
     optionsButton.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -138,11 +128,6 @@ public class WelcomeFragment extends BaseFragment {
     super.onResume();
 
     startButton.setEnabled(false);
-    realmName.setText(String.format(
-        Locale.getDefault(),
-        getString(R.string.realm_label),
-        "Main" /*RealmContext.i.getCurrentRealm().getDisplayName()*/));
-
     updateServerState(App.i.getServer().getCurrState());
     App.i.getEventBus().register(eventHandler);
 
