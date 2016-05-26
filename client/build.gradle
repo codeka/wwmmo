@@ -1,12 +1,23 @@
-apply plugin: 'com.android.application'
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath 'org.ajoberstar:grgit:1.5.0'
+  }
+}
 
 repositories {
   mavenCentral()
 }
 
+import org.ajoberstar.grgit.Grgit
+apply plugin: 'com.android.application'
+
 Properties signingProps = new Properties()
 signingProps.load(new FileInputStream(file('signing.properties')))
-
 
 android {
   compileSdkVersion 23
@@ -16,8 +27,8 @@ android {
     applicationId "au.com.codeka.warworlds2"
     minSdkVersion 10
     targetSdkVersion 23
+    versionCode getVersionCodeFromGit()
     versionName "1.0"
-    versionCode 1
   }
   signingConfigs {
     release {
@@ -74,7 +85,7 @@ android.applicationVariants.all { variant ->
     if (variant.versionName) {
       version "${variant.versionName}.${variant.versionCode}"
     } else {
-      version "$variant.versionCode"
+      version "${variant.versionCode}"
     }
 
     def task = project.tasks.create("publish${variant.name.capitalize()}", Copy)
@@ -84,4 +95,10 @@ android.applicationVariants.all { variant ->
     task.dependsOn variant.assemble
     publish.dependsOn task
   }
+}
+
+def getVersionCodeFromGit() {
+  // Same as running:
+  // git rev-list <checked out branch name> | wc -l
+  return Grgit.open().log().size()
 }
