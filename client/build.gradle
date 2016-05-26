@@ -67,6 +67,8 @@ android {
 def deployPath = file("${rootDir}/../deploy/${project.name}")
 
 def publish = project.tasks.create("publishAll")
+def deploy = project.tasks.create("deploy")
+
 android.applicationVariants.all { variant ->
   variant.outputs.each { output ->
 
@@ -82,6 +84,9 @@ android.applicationVariants.all { variant ->
     task.rename('.*', "wwmmo2-${variant.name}-${version}.apk")
     task.dependsOn variant.assemble
     publish.dependsOn task
+    if (variant.name == "release") {
+      deploy.dependsOn task
+    }
   }
 }
 

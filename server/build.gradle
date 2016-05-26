@@ -43,10 +43,7 @@ applicationDistribution.from(dataFiles) {
   into "data"
 }
 
-task createStartScripts(type: CreateStartScripts) {
-  mainClassName = "au.com.codeka.warworlds.server.Program"
-}
-
+mainClassName = "au.com.codeka.warworlds.server.Program"
 
 ssh.settings {
   knownHosts = file('../../known_hosts')
