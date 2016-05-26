@@ -158,7 +158,13 @@ public class GameSettings {
       = new SharedPreferences.OnSharedPreferenceChangeListener() {
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String keyName) {
-      Key key = Key.valueOf(keyName);
+      Key key;
+      try {
+        key = Key.valueOf(keyName);
+      } catch (IllegalArgumentException e) {
+        // This will happen if the setting isn't one of ours. Ignore.
+        return;
+      }
       for (SettingChangeHandler handler : settingChangeHandlers) {
         handler.onSettingChanged(key);
       }
