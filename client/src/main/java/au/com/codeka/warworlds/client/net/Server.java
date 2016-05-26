@@ -35,7 +35,6 @@ public class Server {
   private static final int DEFAULT_RECONNECT_TIME_MS = 1000;
   private static final int MAX_RECONNECT_TIME_MS = 30000;
 
-  private final String url = BuildConfig.WEBSOCKET_URL;
   private final PacketDispatcher packetDispatcher = new PacketDispatcher();
   @NonNull private ServerStateEvent currState =
       new ServerStateEvent("", ServerStateEvent.ConnectionState.DISCONNECTED);
@@ -58,13 +57,24 @@ public class Server {
       log.warning("No cookie yet, not connecting.");
       return;
     }
+    GameSettings.i.addSettingChangedHandler(new GameSettings.SettingChangeHandler() {
+      @Override
+      public void onSettingChanged(GameSettings.Key key) {
+        if (key == GameSettings.Key.SERVER) {
+          // If you change SERVER, we'll want to clear the cookie.
+          GameSettings.i.edit()
+             .setString(GameSettings.Key.COOKIE, "")
+             .commit();
+        }
+      }
+    });
 
-    log.info("Attempting to connect to: %s", url);
+    log.info("Attempting to connect to: %s", ServerUrl.getWebSocketUrl());
     updateState(ServerStateEvent.ConnectionState.CONNECTING);
 
     WebSocketFactory factory = new WebSocketFactory();
     try {
-      WebSocket newWebSocket = factory.createSocket(url);
+      WebSocket newWebSocket = factory.createSocket(ServerUrl.getWebSocketUrl());
       newWebSocket.addHeader("X-Cookie", cookie);
       newWebSocket.addListener(webSocketListener);
       newWebSocket.setPingInterval(15000); // ping every 15 seconds.
@@ -153,7 +163,7 @@ public class Server {
   }
 
   private void updateState(ServerStateEvent.ConnectionState state) {
-    currState = new ServerStateEvent(url, state);
+    currState = new ServerStateEvent(ServerUrl.getWebSocketUrl(), state);
     App.i.getEventBus().publish(currState);
   }
 

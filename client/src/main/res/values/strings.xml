@@ -33,4 +33,7 @@
 
   <string name="pref_category_chat">Chat</string>
   <string name="pref_chat_profanity_filter">Filter profanity</string>
+
+  <string name="pref_category_debug">Debug</string>
+  <string name="pref_server_url">Server URL</string>
 </resources>

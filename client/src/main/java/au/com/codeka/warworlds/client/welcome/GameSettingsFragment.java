@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
+import au.com.codeka.warworlds.client.BuildConfig;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.util.GameSettings;
 
@@ -56,13 +57,36 @@ implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     ListPreference chatProfanityFilterPref = new ListPreference(getContext());
     chatProfanityFilterPref.setKey(GameSettings.Key.CHAT_PROFANITY_FILTER.toString());
-    chatProfanityFilterPref.setPersistent(true);
     chatProfanityFilterPref.setTitle(R.string.pref_chat_profanity_filter);
     populateListPreference(
         chatProfanityFilterPref,
         GameSettings.ChatProfanityFilter.values(),
         CHAT_PROFANITY_FILTER_DISPLAY);
     category.addPreference(chatProfanityFilterPref);
+
+    if (BuildConfig.DEBUG) {
+      category = new PreferenceCategory(getContext(), null);
+      category.setTitle(R.string.pref_category_debug);
+      getPreferenceManager().getPreferenceScreen().addPreference(category);
+
+      ListPreference serverUrlPref = new ListPreference(getContext());
+      serverUrlPref.setKey(GameSettings.Key.SERVER.toString());
+      serverUrlPref.setTitle(R.string.pref_server_url);
+      String[] urls = {
+          "http://wwmmo.codeka.com.au/",
+          "http://10.0.2.2:8080/",
+          "http://192.168.1.3:8080/"
+      };
+      String[] displayUrls = {
+          "wwmmo.codeka.com.au",
+          "10.0.2.2:8080",
+          "192.168.1.3:8080"
+      };
+      serverUrlPref.setEntries(displayUrls);
+      serverUrlPref.setEntryValues(urls);
+      category.addPreference(serverUrlPref);
+
+    }
   }
 
   @Override
@@ -115,5 +139,10 @@ implements SharedPreferences.OnSharedPreferenceChangeListener {
     GameSettings.ChatProfanityFilter filter = GameSettings.i.getEnum(
         GameSettings.Key.CHAT_PROFANITY_FILTER, GameSettings.ChatProfanityFilter.class);
     p.setSummary(CHAT_PROFANITY_FILTER_DISPLAY.get(filter));
+
+    if (BuildConfig.DEBUG) {
+      p = findPreference(GameSettings.Key.SERVER.name());
+      p.setSummary(GameSettings.i.getString(GameSettings.Key.SERVER));
+    }
   }
 }

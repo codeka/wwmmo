@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.net.HttpRequest;
 import au.com.codeka.warworlds.client.net.Server;
+import au.com.codeka.warworlds.client.net.ServerUrl;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.common.Log;
@@ -63,7 +64,7 @@ public class CreateEmpireFragment extends BaseFragment {
       @Override
       public void run() {
         HttpRequest request = new HttpRequest.Builder()
-            .url(BuildConfig.SERVER_URL + "accounts")
+            .url(ServerUrl.getUrl() + "accounts")
             .method(HttpRequest.Method.POST)
             .header("Content-Type", "application/x-protobuf")
             .body(new NewAccountRequest.Builder()

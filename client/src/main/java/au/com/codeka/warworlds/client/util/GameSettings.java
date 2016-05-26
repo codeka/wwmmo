@@ -9,7 +9,10 @@ import android.support.v7.preference.PreferenceManager;
 
 import com.google.common.base.Preconditions;
 
+import java.util.ArrayList;
+
 import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.BuildConfig;
 
 /** Wrapper class around our {@link SharedPreferences} instance. */
 public class GameSettings {
@@ -33,10 +36,13 @@ public class GameSettings {
     CHAT_AUTO_TRANSLATE(ValueType.BOOLEAN, false),
 
     /** How much we should filter chat message which contain profanity. */
-    CHAT_PROFANITY_FILTER(ValueType.ENUM, ChatProfanityFilter.class, ChatProfanityFilter.AllowAll),
+    CHAT_PROFANITY_FILTER(ChatProfanityFilter.AllowAll),
 
     /** The cookie used to authenicate with the server. */
     COOKIE(ValueType.STRING, ""),
+
+    /** The base URL of the server. */
+    SERVER(ValueType.STRING, BuildConfig.DEFAULT_SERVER),
 
     /** Set to true after you've seen the warm welcome, so we don't show it again. */
     WARM_WELCOME_SEEN(ValueType.BOOLEAN, false);
@@ -51,14 +57,15 @@ public class GameSettings {
       this.defValue = defValue;
     }
 
-    Key(
-        ValueType valueType,
-        @NonNull Class<? extends Enum> enumType,
-        Object defValue) {
-      this.valueType = valueType;
-      this.enumType = enumType;
+    Key(Enum defValue) {
+      this.valueType = ValueType.ENUM;
+      this.enumType = defValue.getClass();
       this.defValue = defValue;
     }
+  }
+
+  public interface SettingChangeHandler {
+    void onSettingChanged(Key key);
   }
 
   public class Editor {
@@ -106,9 +113,19 @@ public class GameSettings {
   }
 
   private SharedPreferences sharedPreferences;
+  private final ArrayList<SettingChangeHandler> settingChangeHandlers = new ArrayList<>();
 
   private GameSettings() {
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.i);
+    sharedPreferences.registerOnSharedPreferenceChangeListener(onPrefChangedListener);
+  }
+
+  public void addSettingChangedHandler(SettingChangeHandler handler) {
+    settingChangeHandlers.add(handler);
+  }
+
+  public void removeSettingChangedHandler(SettingChangeHandler handler) {
+    settingChangeHandlers.remove(handler);
   }
 
   public boolean getBoolean(Key key) {sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.i);
@@ -136,4 +153,15 @@ public class GameSettings {
   public Editor edit() {
     return new Editor(sharedPreferences);
   }
+
+  private final SharedPreferences.OnSharedPreferenceChangeListener onPrefChangedListener
+      = new SharedPreferences.OnSharedPreferenceChangeListener() {
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String keyName) {
+      Key key = Key.valueOf(keyName);
+      for (SettingChangeHandler handler : settingChangeHandlers) {
+        handler.onSettingChanged(key);
+      }
+    }
+  };
 }

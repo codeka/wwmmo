@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import au.com.codeka.warworlds.client.BuildConfig;
+import au.com.codeka.warworlds.client.net.ServerUrl;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -31,7 +32,7 @@ public class ImageHelper {
     }
 
     return String.format(Locale.ENGLISH, "%srender/star/%d/%dx%d/%s.png",
-        BuildConfig.SERVER_URL, star.id, width, height, dpi);
+        ServerUrl.getUrl(), star.id, width, height, dpi);
   }
 
 
@@ -43,6 +44,6 @@ public class ImageHelper {
     }
 
     return String.format(Locale.ENGLISH, "%srender/planet/%d/%d/%dx%d/%s.png",
-        BuildConfig.SERVER_URL, star.id, planetIndex, width, height, dpi);
+        ServerUrl.getUrl(), star.id, planetIndex, width, height, dpi);
   }
 }
