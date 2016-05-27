@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.world.generator;
 import java.util.ArrayList;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
@@ -131,14 +132,14 @@ public class NewStarFinder {
       }
 
       // similarly, colonies with fleets are right out
-      boolean hasFleets = false;/*
-      for (BaseFleet fleet : star.getFleets()) {
-        if (fleet.getEmpireKey() != null) {
+      boolean hasFleets = false;
+      for (Fleet fleet : star.fleets) {
+        if (fleet.empire_id != null) {
           hasFleets = true;
           break;
         }
       }
-      */if (hasFleets) {
+      if (hasFleets) {
         continue;
       }
 
@@ -155,13 +156,14 @@ public class NewStarFinder {
     return highestScoreStar;
   }
 
-  private boolean isColonized(Star star) {/*
-    for (BaseColony colony : star.getColonies()) {
-      if (colony.getEmpireKey() != null) {
+  private boolean isColonized(Star star) {
+    for (Planet planet : star.planets) {
+      // It's counted as colonized only if it's colonized by a non-native empire.
+      if (planet.colony != null && planet.colony.empire_id != null) {
         return true;
       }
     }
-    */return false;
+    return false;
   }
 
   private double scoreStar(Sector sector, Star star) {
