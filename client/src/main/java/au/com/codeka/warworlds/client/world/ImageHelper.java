@@ -10,6 +10,7 @@ import java.util.Map;
 
 import au.com.codeka.warworlds.client.BuildConfig;
 import au.com.codeka.warworlds.client.net.ServerUrl;
+import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -35,7 +36,6 @@ public class ImageHelper {
         ServerUrl.getUrl(), star.id, width, height, dpi);
   }
 
-
   public static String getPlanetImageUrl(
       Context context, Star star, int planetIndex, int width, int height) {
     String dpi = BUCKET_NAMES.get(context.getResources().getDisplayMetrics().densityDpi);
@@ -46,4 +46,16 @@ public class ImageHelper {
     return String.format(Locale.ENGLISH, "%srender/planet/%d/%d/%dx%d/%s.png",
         ServerUrl.getUrl(), star.id, planetIndex, width, height, dpi);
   }
+
+  public static String getEmpireImageUrl(
+      Context context, Empire empire, int width, int height) {
+    String dpi = BUCKET_NAMES.get(context.getResources().getDisplayMetrics().densityDpi);
+    if (dpi == null) {
+      dpi = "hdpi";
+    }
+
+    return String.format(Locale.ENGLISH, "%srender/empire/%d/%dx%d/%s.png",
+        ServerUrl.getUrl(), empire.id, width, height, dpi);
+  }
+
 }

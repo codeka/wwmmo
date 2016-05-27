@@ -10,9 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
+import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -41,6 +43,7 @@ import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.world.EmpireManager;
+import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
 
@@ -57,6 +60,7 @@ public class WelcomeFragment extends BaseFragment {
   private Button startButton;
   private TextView connectionStatus;
   private TextView empireName;
+  private ImageView empireIcon;
   private TransparentWebView motdView;
 
   @Override
@@ -74,6 +78,7 @@ public class WelcomeFragment extends BaseFragment {
     startButton = (Button) Preconditions.checkNotNull(view.findViewById(R.id.start_btn));
     motdView = (TransparentWebView) Preconditions.checkNotNull(view.findViewById(R.id.motd));
     empireName = (TextView) Preconditions.checkNotNull(view.findViewById(R.id.empire_name));
+    empireIcon = (ImageView) Preconditions.checkNotNull(view.findViewById(R.id.empire_icon));
     connectionStatus =
         (TextView) Preconditions.checkNotNull(view.findViewById(R.id.connection_status));
     final Button optionsButton =
@@ -136,20 +141,7 @@ public class WelcomeFragment extends BaseFragment {
       refreshEmpireDetails(myEmpire);
     }
 
-    //ShieldManager.eventBus.register(eventHandler);
-
-//    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-//      @Override
- //     public void onHelloComplete(boolean success, ServerGreeter.ServerGreeting greeting) {
-//        if (success) {
-          // we'll display a bit of debugging info along with the 'connected' message
 /*
-          MyEmpire empire = EmpireManager.i.getEmpire();
-          if (empire != null) {
-            empireName.setText(empire.getDisplayName());
-            empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
-          }
-*//*
           String currAccountName = prefs.getString("AccountName", null);
           if (currAccountName != null && currAccountName.endsWith("@anon.war-worlds.com")) {
             Button reauthButton = (Button) findViewById(R.id.reauth_btn);
@@ -163,7 +155,9 @@ public class WelcomeFragment extends BaseFragment {
 
   private void refreshEmpireDetails(Empire empire) {
     empireName.setText(empire.display_name);
-    //empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
+    Picasso.with(getContext())
+        .load(ImageHelper.getEmpireImageUrl(getContext(), empire, 20, 20))
+        .into(empireIcon);
   }
 
   @Override

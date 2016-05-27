@@ -3,7 +3,19 @@ package au.com.codeka.warworlds.server.render;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.color.ColorSpace;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferInt;
+import java.awt.image.Raster;
+import java.awt.image.SinglePixelPackedSampleModel;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,10 +36,12 @@ import javax.servlet.http.HttpServletResponse;
 import au.com.codeka.warworlds.common.Colour;
 import au.com.codeka.warworlds.common.Image;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.planetrender.PlanetRenderer;
 import au.com.codeka.warworlds.planetrender.Template;
+import au.com.codeka.warworlds.server.world.EmpireManager;
 import au.com.codeka.warworlds.server.world.StarManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 
@@ -43,6 +57,9 @@ public class RendererServlet extends HttpServlet {
 
   private static final Pattern PLANET_URL_PATTERN = Pattern.compile(
       "^/planet/(?<star>[0-9]+)/(?<planet>[0-9]+)/(?<width>[0-9]+)x(?<height>[0-9]+)/(?<bucket>[a-z]+dpi)\\.png$");
+
+  private static final Pattern EMPIRE_URL_PATTERN = Pattern.compile(
+      "^/empire/(?<empire>[0-9]+)/(?<width>[0-9]+)x(?<height>[0-9]+)/(?<bucket>[a-z]+dpi)\\.png$");
 
   private static final Map<String, Float> BUCKET_FACTORS = ImmutableMap.<String, Float>builder()
       .put("ldpi", 0.75f)
@@ -61,6 +78,8 @@ public class RendererServlet extends HttpServlet {
       handleStar(request, response);
     } else if (path.startsWith("/planet/")) {
       handlePlanet(request, response);
+    } else if (path.startsWith("/empire/")) {
+      handleEmpire(request, response);
     } else {
       log.warning("Unknown render request: %s", path);
       response.setStatus(404);
@@ -167,6 +186,90 @@ public class RendererServlet extends HttpServlet {
     serveCachedFile(cacheFile, response);
   }
 
+  private void handleEmpire(HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
+    Matcher matcher = EMPIRE_URL_PATTERN.matcher(request.getPathInfo());
+    if (!matcher.matches()) {
+      log.warning("Invalid empire URL: %s", request.getPathInfo());
+      response.setStatus(404);
+      return;
+    }
+
+    long empireId = Long.parseLong(matcher.group("empire"));
+    int width = Integer.parseInt(matcher.group("width"));
+    int height = Integer.parseInt(matcher.group("height"));
+    String bucket = matcher.group("bucket");
+    Float factor = BUCKET_FACTORS.get(bucket);
+    if (factor == null) {
+      log.warning("Invalid bucket: %s", request.getPathInfo());
+      response.setStatus(404);
+      return;
+    }
+
+    File cacheFile = new File(String.format(Locale.ENGLISH,
+        "data/cache/empire/%d/%dx%d/%s.png", empireId, width, height, bucket));
+    if (cacheFile.exists()) {
+      serveCachedFile(cacheFile, response);
+      return;
+    } else {
+      cacheFile.getParentFile().mkdirs();
+    }
+    width = (int) (width * factor);
+    height = (int) (height * factor);
+
+    // TODO: if they have a custom one, use that
+    //WatchableObject<Empire> empire = EmpireManager.i.getEmpire(empireId);
+
+    BufferedImage shieldImage = new BufferedImage(128, 128, ColorSpace.TYPE_RGB);
+    Graphics2D g = shieldImage.createGraphics();
+    g.setPaint(getShieldColour(empireId));
+    g.fillRect(0, 0, 128, 128);
+
+    // Merge the shield image with the outline image.
+    shieldImage = mergeShieldImage(shieldImage);
+
+    // Resize the image if required.
+    if (width != 128 || height != 128) {
+      int w = shieldImage.getWidth();
+      int h = shieldImage.getHeight();
+      BufferedImage after = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+      AffineTransform at = new AffineTransform();
+      at.scale((float) width / w, (float) height / h);
+      AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
+      shieldImage = scaleOp.filter(shieldImage, after);
+    }
+
+    ImageIO.write(shieldImage, "png", cacheFile);
+    serveCachedFile(cacheFile, response);
+  }
+
+  public Color getShieldColour(long empireID) {
+    Random rand = new Random(empireID ^ 7438274364563846L);
+    return new Color(rand.nextInt(100) + 100,
+        rand.nextInt(100) + 100,
+        rand.nextInt(100) + 100);
+  }
+
+  private BufferedImage mergeShieldImage(BufferedImage shieldImage) throws IOException {
+    BufferedImage finalImage = ImageIO.read(new File("data/renderer/empire/shield.png"));
+    int width = finalImage.getWidth();
+    int height = finalImage.getHeight();
+
+    float fx = (float) shieldImage.getWidth() / (float) width;
+    float fy = (float) shieldImage.getHeight() / (float) height;
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        int pixel = finalImage.getRGB(x, y);
+        if ((pixel & 0xffffff) == 0xff00ff) {
+          pixel = shieldImage.getRGB((int) (x * fx), (int) (y * fy));
+          finalImage.setRGB(x, y, pixel);
+        }
+      }
+    }
+
+    return finalImage;
+  }
+
   private boolean generateImage(
       File cacheFile, File templateFile, int width, int height, float factor, Random rand) {
     width = (int) Math.ceil(width * factor);
@@ -188,7 +291,6 @@ public class RendererServlet extends HttpServlet {
       log.warning("Unknown template: %s", tmpl.getTemplate().getClass().getSimpleName());
       return false;
     }
-
 
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     renderer.render(img);
