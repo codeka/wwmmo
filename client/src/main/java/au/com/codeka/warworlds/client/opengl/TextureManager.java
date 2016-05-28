@@ -35,4 +35,19 @@ public class TextureManager {
     cache.put(name, new WeakReference<>(bmp));
     return bmp;
   }
+
+  /** Loads a texture from the given URL. */
+  public BitmapTexture loadTextureUrl(String url) {
+    WeakReference<BitmapTexture> ref = cache.get(url);
+    if (ref != null) {
+      BitmapTexture bmp = ref.get();
+      if (bmp != null) {
+        return bmp;
+      }
+    }
+
+    BitmapTexture bmp = BitmapTexture.loadUrl(context, url);
+    cache.put(url, new WeakReference<>(bmp));
+    return bmp;
+  }
 }

@@ -1,13 +1,15 @@
 package au.com.codeka.warworlds.client.starfield;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
-import android.view.View;
 
 import com.google.common.base.Preconditions;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
@@ -18,13 +20,16 @@ import au.com.codeka.warworlds.client.opengl.SceneObject;
 import au.com.codeka.warworlds.client.opengl.Sprite;
 import au.com.codeka.warworlds.client.opengl.SpriteTemplate;
 import au.com.codeka.warworlds.client.opengl.TextSceneObject;
-import au.com.codeka.warworlds.client.opengl.Vector2;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.world.EmpireManager;
+import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.Vector3;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Packet;
+import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
@@ -43,6 +48,7 @@ public class StarfieldManager {
   private final Scene scene;
   private final Camera camera;
   private final StarfieldGestureDetector gestureDetector;
+  private final Context context;
   private boolean initialized;
   @Nullable private TapListener tapListener;
 
@@ -55,6 +61,7 @@ public class StarfieldManager {
   public StarfieldManager(RenderSurfaceView renderSurfaceView) {
     this.scene = renderSurfaceView.createScene();
     this.camera = renderSurfaceView.getCamera();
+    this.context = renderSurfaceView.getContext();
     gestureDetector = new StarfieldGestureDetector(renderSurfaceView, gestureListener);
     renderSurfaceView.setScene(scene);
   }
@@ -155,12 +162,102 @@ public class StarfieldManager {
       text.translate(-text.getTextWidth() / 2.0f, 0.0f);
       container.addChild(text);
 
+      attachEmpireFleetIcons(scene, container, star);
+
       synchronized (scene.lock) {
         scene.getRootObject().addChild(container);
       }
       starSceneObjects.put(star.id, container);
     }
-    // TODO: update the sprite with label, kind, etc...
+  }
+
+  /** Attach the empire labels and fleet counts to the given sprite container for the given star. */
+  private void attachEmpireFleetIcons(Scene scene, SceneObject container, Star star) {
+    Map<Long, EmpireIconInfo> empires = new TreeMap<>();
+    for (Planet planet : star.planets) {
+      if (planet.colony == null || planet.colony.empire_id == null) {
+        continue;
+      }
+
+      Empire empire = EmpireManager.i.getEmpire(planet.colony.empire_id);
+      if (empire != null) {
+        EmpireIconInfo iconInfo = empires.get(empire.id);
+        if (iconInfo == null) {
+          iconInfo = new EmpireIconInfo(empire);
+          empires.put(empire.id, iconInfo);
+        }
+        iconInfo.numColonies += 1;
+      }
+    }
+
+    for (Fleet fleet : star.fleets) {
+      if (fleet.empire_id == null || fleet.state == Fleet.FLEET_STATE.MOVING) {
+        // Ignore native feets, and moving fleets, which we'll draw them separately.
+        continue;
+      }
+
+      Empire empire = EmpireManager.i.getEmpire(fleet.empire_id);
+      if (empire != null) {
+        EmpireIconInfo iconInfo = empires.get(empire.id);
+        if (iconInfo == null) {
+          iconInfo = new EmpireIconInfo(empire);
+          empires.put(empire.id, iconInfo);
+        }
+        if (fleet.design_id.equals("fighter")) {
+          iconInfo.numFighterShips += (int) Math.ceil(fleet.num_ships);
+        } else {
+          iconInfo.numNonFighterShips += (int) Math.ceil(fleet.num_ships);
+        }
+      }
+    }
+
+    int i = 0;
+    for (Map.Entry<Long, EmpireIconInfo> entry : empires.entrySet()) {
+      long empireID = entry.getKey();
+      EmpireIconInfo iconInfo = entry.getValue();
+
+      Vector2 pt = new Vector2(0, 30.0f);
+      pt.rotate(-(float) (Math.PI / 4.0) * (i + 1));
+
+      // Add the empire's icon
+      Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
+          .shader(scene.getSpriteShader())
+          .texture(scene.getTextureManager().loadTextureUrl(
+              ImageHelper.getEmpireImageUrlExactDimens(context, iconInfo.empire, 64, 64)))
+          .build());
+      sprite.translate((float) pt.x + 10.0f, (float) pt.y);
+      sprite.setSize(20.0f, 20.0f);
+      container.addChild(sprite);
+
+      // Add the counts.
+      String text;
+      if (iconInfo.numFighterShips == 0 && iconInfo.numNonFighterShips == 0) {
+        text = String.format(Locale.ENGLISH, "%d", iconInfo.numColonies);
+      } else if (iconInfo.numColonies == 0) {
+        text = String.format(Locale.ENGLISH, "[%d, %d]",
+            iconInfo.numFighterShips, iconInfo.numNonFighterShips);
+      } else {
+        text = String.format(Locale.ENGLISH, "%d ● [%d, %d]",
+            iconInfo.numColonies, iconInfo.numFighterShips, iconInfo.numNonFighterShips);
+      }
+      TextSceneObject empireCounts = scene.createText(text);
+      float offset = ((empireCounts.getTextWidth() * 0.666f) / 2.0f) + 14.0f;
+      empireCounts.translate((float) pt.x + offset, (float) pt.y);
+      container.addChild(empireCounts);
+
+      i++;
+    }
+  }
+
+  private static final class EmpireIconInfo {
+    public final Empire empire;
+    public int numColonies;
+    public int numFighterShips;
+    public int numNonFighterShips;
+
+    public EmpireIconInfo(Empire empire) {
+      this.empire = empire;
+    }
   }
 
   private void createSectorBackground(long sectorX, long sectorY) {

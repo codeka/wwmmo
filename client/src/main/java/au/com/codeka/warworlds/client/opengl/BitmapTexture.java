@@ -3,12 +3,15 @@ package au.com.codeka.warworlds.client.opengl;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +45,12 @@ public class BitmapTexture extends Texture {
 
   @Nullable
   public static BitmapTexture load(Context context, String fileName) {
-    return new BitmapTexture(new Loader(context, fileName));
+    return new BitmapTexture(new Loader(context, fileName, null /* url */));
+  }
+
+  @Nullable
+  public static BitmapTexture loadUrl(Context context, String url) {
+    return new BitmapTexture(new Loader(context, null /* fileName */, url));
   }
 
   /**
@@ -51,25 +59,34 @@ public class BitmapTexture extends Texture {
   private static class Loader {
     private Context context;
     private String fileName;
+    private String url;
     private Bitmap bitmap;
 
-    public Loader(Context context, String fileName) {
+    public Loader(Context context, @Nullable String fileName, @Nullable String url) {
       this.context = Preconditions.checkNotNull(context);
-      this.fileName = Preconditions.checkNotNull(fileName);
+      Preconditions.checkState(fileName != null || url != null);
+      this.fileName = fileName;
+      this.url = url;
     }
 
     public void load() {
-      App.i.getTaskRunner().runTask(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            InputStream ins = context.getAssets().open(fileName);
-            bitmap = BitmapFactory.decodeStream(ins);
-          } catch (IOException e) {
-            log.warning("Error loading texture '%s'", fileName, e);
+      if (fileName != null) {
+        App.i.getTaskRunner().runTask(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              InputStream ins = context.getAssets().open(fileName);
+              bitmap = BitmapFactory.decodeStream(ins);
+            } catch (IOException e) {
+              log.warning("Error loading texture '%s'", fileName, e);
+            }
           }
-        }
-      }, Threads.BACKGROUND);
+        }, Threads.BACKGROUND);
+      } else {
+        Picasso.with(context)
+            .load(url)
+            .into(picassoTarget);
+      }
     }
 
     boolean isLoaded() {
@@ -87,5 +104,26 @@ public class BitmapTexture extends Texture {
       GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
       return textureHandleBuffer[0];
     }
+
+    /**
+     * This is our callback for when Picasso finishes loading an image.
+     *
+     * We need to keep a strong reference to this, otherwise it gets GC'd before Picasso returns.
+     */
+    private final Target picassoTarget = new Target() {
+      @Override
+      public void onBitmapLoaded(Bitmap loadedBitmap, Picasso.LoadedFrom from) {
+        bitmap = loadedBitmap;
+      }
+
+      @Override
+      public void onBitmapFailed(Drawable errorDrawable) {
+        log.warning("Error loading bitmap: %s", url);
+      }
+
+      @Override
+      public void onPrepareLoad(Drawable placeHolderDrawable) {
+      }
+    };
   }
 }

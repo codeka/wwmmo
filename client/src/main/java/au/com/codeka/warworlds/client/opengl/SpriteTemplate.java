@@ -8,6 +8,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.common.Vector2;
 
 /**
  * A {@link SpriteTemplate} describes a sprite's characteristics (texture, bounds within the texture
@@ -42,10 +43,10 @@ public class SpriteTemplate {
     positionBuffer.position(0);
 
     float[] uvs = new float[] {
-        uvTopLeft.x, uvTopLeft.y, // top left
-        uvTopLeft.x, uvBottomRight.y, // bottom left
-        uvBottomRight.x, uvBottomRight.y, // bottom right
-        uvBottomRight.x, uvTopLeft.y, // top right
+        (float) uvTopLeft.x, (float) uvTopLeft.y, // top left
+        (float) uvTopLeft.x, (float) uvBottomRight.y, // bottom left
+        (float) uvBottomRight.x, (float) uvBottomRight.y, // bottom right
+        (float) uvBottomRight.x, (float) uvTopLeft.y, // top right
     };
     bb = ByteBuffer.allocateDirect(uvs.length * 4);
     bb.order(ByteOrder.nativeOrder());

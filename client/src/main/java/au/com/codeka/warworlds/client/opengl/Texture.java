@@ -21,6 +21,10 @@ public class Texture {
   public void bind() {
     if (id != -1) {
       GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, id);
+    } else {
+      // Binding 0 means we'll get a black texture, but it's better than whatever random texture
+      // was bound before. TODO: bind an explicitly transparent texture?
+      GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
     }
   }
 }

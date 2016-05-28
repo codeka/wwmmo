@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.client.opengl;
 import android.opengl.GLES20;
 import android.text.TextUtils;
 
-import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.common.Log;
 
 /**

@@ -31,5 +31,13 @@ public class EmpireManager {
   public Empire getMyEmpire() {
     return myEmpire;
   }
+
+  public Empire getEmpire(long id) {
+    if (myEmpire != null && myEmpire.id.equals(id)) {
+      return myEmpire;
+    }
+    // TODO
+    return null;
+  }
 }
 

@@ -58,4 +58,11 @@ public class ImageHelper {
         ServerUrl.getUrl(), empire.id, width, height, dpi);
   }
 
+  /** Gets the URL for fetching an empire's logo, with exact pixel dimensions (a.k.a. mdpi). */
+  public static String getEmpireImageUrlExactDimens(
+      Context context, Empire empire, int width, int height) {
+    return String.format(Locale.ENGLISH, "%srender/empire/%d/%dx%d/mdpi.png",
+        ServerUrl.getUrl(), empire.id, width, height);
+  }
+
 }
