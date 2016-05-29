@@ -1,15 +1,29 @@
 package au.com.codeka.warworlds.client.opengl;
 
 import android.opengl.Matrix;
+import android.support.annotation.Nullable;
 import android.view.animation.DecelerateInterpolator;
 
 /**
  * The {@link Camera} can be used to draw a {@link Scene}, scroll and zoom around.
  */
 public class Camera {
+  public interface CameraUpdateListener {
+    /**
+     * Called when the camera is translated.
+     *
+     * @param x The total distance the camera is translated away from the origin in the X direction.
+     * @param y The total distance the camera is translated away from the origin in the Y direction.
+     * @param dx The delta the camera has moved in the X direction.
+     * @param dy The delta the camera has moved in the Y direction.
+     */
+    void onCameraTranslate(float x, float y, float dx, float dy);
+  }
+
   private final float[] projMatrix = new float[16];
   private final float[] viewMatrix = new float[16];
   private final float[] viewProjMatrix = new float[16];
+  private final float[] translateHelper = new float[16];
   private float zoomAmount;
   private boolean flinging;
   private float flingX;
@@ -18,10 +32,17 @@ public class Camera {
   private DecelerateInterpolator decelerateInterpolator;
   private float screenWidth;
   private float screenHeight;
+  private float translateX;
+  private float translateY;
+  @Nullable private CameraUpdateListener listener;
 
   public Camera() {
     decelerateInterpolator = new DecelerateInterpolator(1.0f);
     Matrix.setIdentityM(viewMatrix, 0);
+  }
+
+  public void setCameraUpdateListener(CameraUpdateListener listener) {
+    this.listener = listener;
   }
 
   public void onSurfaceChanged(float width, float height) {
@@ -60,7 +81,26 @@ public class Camera {
   }
 
   public void translate(float x, float y) {
-    Matrix.translateM(viewMatrix, 0, x / zoomAmount, y / zoomAmount, 0.0f);
+    translate(x, y, false);
+  }
+
+  /**
+   * Translate by the given amount.
+   *
+   * @param x Amount to translate in X direction.
+   * @param y Amount to translate in Y direction.
+   * @param silent If true, we will not call the listener.
+   */
+  public void translate(float x, float y, boolean silent) {
+    x /= zoomAmount;
+    y /= zoomAmount;
+    translateX += x;
+    translateY += y;
+    Matrix.translateM(viewMatrix, 0, x, y, 0.0f);
+    if (listener != null && !silent) {
+      Matrix.invertM(translateHelper, 0, viewMatrix, 0);
+      listener.onCameraTranslate(-translateHelper[12], -translateHelper[13], x, y);
+    }
   }
 
   public void fling(float x, float y) {

@@ -2,9 +2,11 @@ package au.com.codeka.warworlds.client.starfield;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 
 import com.google.common.base.Preconditions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.opengl.Camera;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
@@ -56,7 +59,16 @@ public class StarfieldManager {
   private long centerSectorY;
   private int sectorRadius;
 
+  // The following are the top/left/right/bottom of the rectangle of sectors that we're currently
+  // listening to for updates. Generally this will be the same as centreSectorX,centreSectorY +
+  // sectorRadius, but not always (in particular, just before you call updateSectorBounds())
+  private long sectorLeft;
+  private long sectorTop;
+  private long sectorRight;
+  private long sectorBottom;
+
   private final Map<Long, SceneObject> starSceneObjects = new HashMap<>();
+  private final Map<Pair<Long,Long>, ArrayList<SceneObject>> sectorSceneObjects = new HashMap<>();
 
   public StarfieldManager(RenderSurfaceView renderSurfaceView) {
     this.scene = renderSurfaceView.createScene();
@@ -73,11 +85,13 @@ public class StarfieldManager {
       onConnected();
     }
 
+    camera.setCameraUpdateListener(cameraUpdateListener);
     gestureDetector.create();
   }
 
   public void destroy() {
     gestureDetector.destroy();
+    camera.setCameraUpdateListener(null);
 
     App.i.getEventBus().unregister(eventListener);
   }
@@ -87,7 +101,7 @@ public class StarfieldManager {
   }
 
   public void warpTo(Star star) {
-    warpTo(star.sector_x, star.sector_y, star.offset_x - 512.0f,star.offset_y - 512.0f);
+    warpTo(star.sector_x, star.sector_y, star.offset_x - 512.0f, star.offset_y - 512.0f);
   }
 
   public void warpTo(long sectorX, long sectorY, float offsetX, float offsetY) {
@@ -95,21 +109,8 @@ public class StarfieldManager {
     centerSectorY = sectorY;
     sectorRadius = 1;
 
-    // Now tell the server we want to watch these new sectors, it'll send us back all the stars we
-    // don't have yet.
-    App.i.getServer().send(new Packet.Builder()
-        .watch_sectors(new WatchSectorsPacket.Builder()
-            .top(centerSectorY - sectorRadius)
-            .left(centerSectorX - sectorRadius)
-            .bottom(centerSectorY + sectorRadius)
-            .right(centerSectorX + sectorRadius)
-            .build())
-        .build());
-    for (long sy = centerSectorY - sectorRadius; sy <= centerSectorY + sectorRadius; sy ++) {
-      for (long sx = centerSectorX - sectorRadius; sx <= centerSectorX + sectorRadius; sx ++) {
-        createSectorBackground(sx, sy);
-      }
-    }
+    updateSectorBounds(centerSectorX - sectorRadius, centerSectorY - sectorRadius,
+        centerSectorX + sectorRadius, centerSectorY + sectorRadius);
   }
 
   /**
@@ -127,6 +128,66 @@ public class StarfieldManager {
     warpTo(myEmpire.home_star);
   }
 
+  /**
+   * Update the sector "bounds", that is the area of the universe that we're currently looking at.
+   * We'll need to remove stars that have gone out of bounds, add a background for stars that are
+   * now in-bounds, and ask the server to keep us updated of the new stars.
+   */
+  private void updateSectorBounds(long left, long top, long right, long bottom) {
+    // Remove the objects that are now out of bounds.
+    for (long sy = sectorTop; sy <= sectorBottom; sy++) {
+      for (long sx = sectorLeft; sx <= sectorRight; sx++) {
+        if (sy < top || sy > bottom || sx < left || sx > right) {
+          removeSector(Pair.create(sx, sy));
+        }
+      }
+    }
+
+    // Create the background for all of the new sectors.
+    for (long sy = top; sy <= bottom; sy ++) {
+      for (long sx = left; sx <= right; sx ++) {
+        if (sy < sectorTop || sy > sectorBottom || sx < sectorLeft || sx > sectorRight) {
+          createSectorBackground(sx, sy);
+        }
+      }
+    }
+
+    // Tell the server we want to watch these new sectors, it'll send us back all the stars we
+    // don't have yet.
+    if (first == true) {
+      App.i.getServer().send(new Packet.Builder()
+          .watch_sectors(new WatchSectorsPacket.Builder()
+              .top(top).left(left).bottom(bottom).right(right).build())
+          .build());
+      first = false;
+    }
+
+    sectorTop = top;
+    sectorLeft = left;
+    sectorBottom = bottom;
+    sectorRight = right;
+  }
+boolean first = true;
+  /**
+   * This is called when the camera moves to a new (x,y) coord. We'll want to check whether we
+   * need to re-caculate the bounds and warp the camera back to the center.
+   *
+   * @param x The distance the camera has translated from the origin in the X direction.
+   * @param y The distance the camera has translated from the origin in the Y direction.
+   */
+  private void onCameraTranslate(float x, float y) {
+    long newCentreX = centerSectorX + Math.round(scene.getDimensionResolver().px2dp(x / 1024.0f));
+    long newCentreY = centerSectorY + Math.round(scene.getDimensionResolver().px2dp(y / 1024.0f));
+    long top = newCentreY - sectorRadius;
+    long left = newCentreX - sectorRadius;
+    long bottom = newCentreY + sectorRadius;
+    long right = newCentreX + sectorRadius;
+    if (top != sectorTop || left != sectorLeft || bottom != sectorBottom || right != sectorRight) {
+      log.info("onCameraTranslate: bounds=%d,%d - %d,%d", left, top, right, bottom);
+      updateSectorBounds(left, top, right, bottom);
+    }
+  }
+
   /** Called when a star is updated, we may need to update the sprite for it. */
   private void updateStar(Star star) {
     SceneObject container = starSceneObjects.get(star.id);
@@ -135,6 +196,7 @@ public class StarfieldManager {
       container.setClipRadius(80.0f);
       container.setTapTargetRadius(80.0f);
       container.setTag(star);
+      addSectorSceneObject(Pair.create(star.sector_x, star.sector_y), container);
 
       float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
@@ -286,8 +348,37 @@ public class StarfieldManager {
     }
 
     container.translate((centerSectorX - sectorX) * 1024.0f, (centerSectorY - sectorY) * 1024.0f);
+    addSectorSceneObject(Pair.create(sectorX, sectorY), container);
     synchronized (scene.lock) {
       scene.getRootObject().addChild(container);
+    }
+  }
+
+  private void addSectorSceneObject(Pair<Long, Long> sectorCoord, SceneObject obj) {
+    synchronized (sectorSceneObjects) {
+      ArrayList<SceneObject> objects = sectorSceneObjects.get(sectorCoord);
+      if (objects == null) {
+        objects = new ArrayList<>();
+        sectorSceneObjects.put(sectorCoord, objects);
+      }
+      objects.add(obj);
+    }
+  }
+
+  /** Remove all objects in the given sector from the scene. */
+  private void removeSector(Pair<Long, Long> sectorCoord) {
+    ArrayList<SceneObject> objects;
+    synchronized (sectorSceneObjects) {
+      objects = sectorSceneObjects.remove(sectorCoord);
+    }
+    if (objects == null) {
+      return;
+    }
+
+    synchronized (scene.lock) {
+      for (SceneObject obj : objects) {
+        scene.getRootObject().removeChild(obj);
+      }
     }
   }
 
@@ -327,10 +418,8 @@ public class StarfieldManager {
     public void onStarUpdatedPacket(StarUpdatedPacket pkt) {
       for (Star star : pkt.stars) {
         // Make sure this star is one that we're tracking.
-        if (star.sector_x < centerSectorX - sectorRadius
-            || star.sector_x > centerSectorX + sectorRadius
-            || star.sector_y < centerSectorY - sectorRadius
-            || star.sector_y > centerSectorY + sectorRadius) {
+        if (star.sector_x < sectorLeft || star.sector_x > sectorRight
+            || star.sector_y < sectorTop || star.sector_y > sectorBottom) {
           continue;
         }
 
@@ -385,6 +474,19 @@ public class StarfieldManager {
       }
 
       tapListener.onStarTapped(star);
+    }
+  };
+
+  private final Camera.CameraUpdateListener cameraUpdateListener
+      = new Camera.CameraUpdateListener() {
+    @Override
+    public void onCameraTranslate(final float x, final float y, float dx, float dy) {
+      App.i.getTaskRunner().runTask(new Runnable() {
+        @Override
+        public void run() {
+          StarfieldManager.this.onCameraTranslate(x, y);
+        }
+      }, Threads.BACKGROUND);
     }
   };
 }
