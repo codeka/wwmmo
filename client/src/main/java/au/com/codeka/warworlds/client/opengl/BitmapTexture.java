@@ -83,9 +83,14 @@ public class BitmapTexture extends Texture {
           }
         }, Threads.BACKGROUND);
       } else {
-        Picasso.with(context)
-            .load(url)
-            .into(picassoTarget);
+        App.i.getTaskRunner().runTask(new Runnable() {
+          @Override
+          public void run() {
+            Picasso.with(context)
+                .load(url)
+                .into(picassoTarget);
+          }
+        }, Threads.UI);
       }
     }
 

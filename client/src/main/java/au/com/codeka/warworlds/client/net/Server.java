@@ -93,21 +93,24 @@ public class Server {
   }
 
   public void send(Packet pkt) {
+    byte[] bytes = null;
     synchronized (lock) {
       if (queuedPackets != null) {
         queuedPackets.add(pkt);
       } else if (ws != null) {
-        byte[] bytes = pkt.encode();
+        bytes = pkt.encode();
 
         String packetName = getDebugPacketType(pkt);
         App.i.getEventBus().publish(new ServerPacketEvent(
             pkt, bytes, ServerPacketEvent.Direction.Sent, packetName));
         log.debug(">> %s (%d bytes)", packetName, bytes.length);
-
-        ws.sendBinary(bytes);
       } else {
         throw new IllegalStateException("One of queuedPackets or ws should be non-null.");
       }
+    }
+
+    if (bytes != null) {
+      ws.sendBinary(bytes);
     }
   }
 
@@ -215,7 +218,6 @@ public class Server {
 
     @Override
     public void onBinaryMessage(WebSocket ws, byte[] binary) throws Exception {
-      log.debug("onBinaryMessage(%d bytes)", binary.length);
       Packet pkt = Packet.ADAPTER.decode(binary);
 
       String packetName = getDebugPacketType(pkt);
@@ -226,19 +228,16 @@ public class Server {
       onPacket(pkt);
     }
 
-
     @Override
     public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
       log.warning("onError()", cause);
     }
-
 
     @Override
     public void onFrameError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame)
         throws Exception {
       log.warning("onFrameError()", cause);
     }
-
 
     @Override
     public void onMessageError(WebSocket websocket, WebSocketException cause,

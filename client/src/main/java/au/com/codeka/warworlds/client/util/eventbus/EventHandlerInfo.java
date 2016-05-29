@@ -68,7 +68,10 @@ class EventHandlerInfo {
       }
     };
 
-    if (callOnThread.isCurrentThread()) {
+    // If it's meant to run on the current thread (and *not* a background thread) then just run it
+    // directly. If it's meant to run on a background thread, we'll want it to run on a *different*
+    // background thread.
+    if (callOnThread.isCurrentThread() && callOnThread != Threads.BACKGROUND) {
       runnable.run();
     } else {
       callOnThread.runTask(runnable);

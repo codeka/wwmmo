@@ -411,7 +411,7 @@ public class StarfieldManager {
       }
     }
 
-    @EventHandler
+    @EventHandler(thread = Threads.BACKGROUND)
     public void onStarUpdatedPacket(StarUpdatedPacket pkt) {
       for (Star star : pkt.stars) {
         // Make sure this star is one that we're tracking.
