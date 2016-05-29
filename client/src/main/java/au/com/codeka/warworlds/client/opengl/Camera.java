@@ -100,7 +100,7 @@ public class Camera {
     translateX += x;
     translateY += y;
     if (listener != null && !silent) {
-      listener.onCameraTranslate(translateX, translateY, x, y);
+      listener.onCameraTranslate(-translateX, translateY, x, y);
     }
   }
 
