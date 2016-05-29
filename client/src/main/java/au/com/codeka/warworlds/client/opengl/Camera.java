@@ -99,7 +99,7 @@ public class Camera {
     Matrix.translateM(viewMatrix, 0, x, y, 0.0f);
     if (listener != null && !silent) {
       Matrix.invertM(translateHelper, 0, viewMatrix, 0);
-      listener.onCameraTranslate(-translateHelper[12], -translateHelper[13], x, y);
+      listener.onCameraTranslate(translateHelper[12], -translateHelper[13], x, y);
     }
   }
 

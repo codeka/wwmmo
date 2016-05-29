@@ -154,20 +154,17 @@ public class StarfieldManager {
 
     // Tell the server we want to watch these new sectors, it'll send us back all the stars we
     // don't have yet.
-    if (first == true) {
-      App.i.getServer().send(new Packet.Builder()
-          .watch_sectors(new WatchSectorsPacket.Builder()
-              .top(top).left(left).bottom(bottom).right(right).build())
-          .build());
-      first = false;
-    }
+    App.i.getServer().send(new Packet.Builder()
+        .watch_sectors(new WatchSectorsPacket.Builder()
+            .top(top).left(left).bottom(bottom).right(right).build())
+        .build());
 
     sectorTop = top;
     sectorLeft = left;
     sectorBottom = bottom;
     sectorRight = right;
   }
-boolean first = true;
+
   /**
    * This is called when the camera moves to a new (x,y) coord. We'll want to check whether we
    * need to re-caculate the bounds and warp the camera back to the center.
@@ -200,7 +197,7 @@ boolean first = true;
 
       float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
-      container.translate(x, y);
+      container.translate(x, -y);
 
       Vector2 uvTopLeft = getStarUvTopLeft(star);
       Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()

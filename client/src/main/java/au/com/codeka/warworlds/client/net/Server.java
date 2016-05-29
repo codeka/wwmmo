@@ -78,7 +78,8 @@ public class Server {
       newWebSocket.addHeader("X-Cookie", cookie);
       newWebSocket.addListener(webSocketListener);
       newWebSocket.setPingInterval(15000); // ping every 15 seconds.
-      newWebSocket.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
+      // TODO: re-enable this, but it seems broken when packets get fragmented.
+      //newWebSocket.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
       newWebSocket.connectAsynchronously();
     } catch (IOException e) {
       log.error("Error connecting to server, will try again.", e);
@@ -172,7 +173,7 @@ public class Server {
    * type of the first non-null field in the packet.
    */
   private String getDebugPacketType(Packet pkt) {
-    if (!log.isDebugEnabled()) {
+    if (!BuildConfig.DEBUG) {
       return "Packet";
     }
 
@@ -224,5 +225,43 @@ public class Server {
 
       onPacket(pkt);
     }
+
+
+    @Override
+    public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
+      log.warning("onError()", cause);
+    }
+
+
+    @Override
+    public void onFrameError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame)
+        throws Exception {
+      log.warning("onFrameError()", cause);
+    }
+
+
+    @Override
+    public void onMessageError(WebSocket websocket, WebSocketException cause,
+        List<WebSocketFrame> frames) throws Exception {
+      log.warning("onMessageError()", cause);
+    }
+
+    @Override
+    public void onMessageDecompressionError(WebSocket websocket, WebSocketException cause,
+        byte[] compressed) throws Exception {
+      log.warning("onMessageDecompressionError(%d bytes)", compressed.length, cause);
+    }
+
+    @Override
+    public void onSendError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame)
+        throws Exception {
+      log.warning("onSendError()", cause);
+    }
+
+    @Override
+    public void onUnexpectedError(WebSocket websocket, WebSocketException cause) throws Exception {
+      log.warning("onUnexpectedError()", cause);
+    }
+
   };
 }

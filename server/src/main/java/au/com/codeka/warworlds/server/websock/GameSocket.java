@@ -72,7 +72,7 @@ public class GameSocket extends WebSocketAdapter {
   @Override
   public void onWebSocketError(Throwable cause) {
     super.onWebSocketError(cause);
-    cause.printStackTrace(System.err);
+    log.warning("Error", cause);
   }
 
   public void send(Packet.Builder pktBuilder) {
