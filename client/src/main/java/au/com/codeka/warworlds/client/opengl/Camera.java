@@ -76,6 +76,9 @@ public class Camera {
   }
 
   public float[] getViewProjMatrix() {
+    Matrix.setIdentityM(viewMatrix, 0);
+    Matrix.scaleM(viewMatrix, 0, zoomAmount, zoomAmount, 1.0f);
+    Matrix.translateM(viewMatrix, 0, translateX, translateY, 0.0f);
     Matrix.multiplyMM(viewProjMatrix, 0, projMatrix, 0, viewMatrix, 0);
     return viewProjMatrix;
   }
@@ -96,10 +99,8 @@ public class Camera {
     y /= zoomAmount;
     translateX += x;
     translateY += y;
-    Matrix.translateM(viewMatrix, 0, x, y, 0.0f);
     if (listener != null && !silent) {
-      Matrix.invertM(translateHelper, 0, viewMatrix, 0);
-      listener.onCameraTranslate(translateHelper[12], -translateHelper[13], x, y);
+      listener.onCameraTranslate(translateX, translateY, x, y);
     }
   }
 
@@ -112,6 +113,5 @@ public class Camera {
 
   public void zoom(float factor) {
     zoomAmount *= factor;
-    Matrix.scaleM(viewMatrix, 0, factor, factor, 1.0f);
   }
 }
