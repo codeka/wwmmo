@@ -18,6 +18,9 @@ public class ProtobufStore<M extends Message<?, ?>> {
     this.name = Preconditions.checkNotNull(name);
     this.helper = Preconditions.checkNotNull(helper);
     this.serializer = new ProtobufSerializer<>(protoClass);
+
+    this.helper.getWritableDatabase();
+    this.helper.setWriteAheadLoggingEnabled(true);
   }
 
   public void onCreate(SQLiteDatabase db) {

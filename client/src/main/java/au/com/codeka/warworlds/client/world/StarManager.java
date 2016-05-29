@@ -6,6 +6,7 @@ import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.store.ProtobufStore;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
 
@@ -13,6 +14,7 @@ import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
  * Manages the {@link Star}s we keep cached and stuff.
  */
 public class StarManager {
+  private static final Log log = new Log("StarManager");
   public static final StarManager i = new StarManager();
 
   private final ProtobufStore<Star> stars;
@@ -38,9 +40,13 @@ public class StarManager {
      */
     @EventHandler(thread = Threads.BACKGROUND)
     public void onStarUpdatedPacket(StarUpdatedPacket pkt) {
+      log.info("Stars updating, saving to database.");
+      long startTime = System.nanoTime();
       for (Star star : pkt.stars) {
         stars.put(star.id, star);
       }
+      long endTime = System.nanoTime();
+      log.info("Updated %d stars in DB in %d ms", pkt.stars.size(), (endTime - startTime) / 1000000L);
     }
   };
 }
