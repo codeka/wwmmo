@@ -29,19 +29,15 @@ public class ProtobufStore<M extends Message<?, ?>> {
 
   public M get(long id) {
     SQLiteDatabase db = helper.getReadableDatabase();
+    Cursor cursor = db.query(false, name, new String[] {"value"},
+        "key = ?", new String[] {Long.toString(id)},
+        null, null, null, null);
     try {
-      Cursor cursor = db.query(false, name, new String[] {"value"},
-          "key = ?", new String[] {Long.toString(id)},
-          null, null, null, null);
-      try {
-        if (cursor.moveToFirst()) {
-          return serializer.deserialize(cursor.getBlob(0));
-        }
-      } finally {
-        cursor.close();
+      if (cursor.moveToFirst()) {
+        return serializer.deserialize(cursor.getBlob(0));
       }
     } finally {
-      db.close();
+      cursor.close();
     }
 
     return null;
@@ -49,13 +45,9 @@ public class ProtobufStore<M extends Message<?, ?>> {
 
   public void put(long id, M value) {
     SQLiteDatabase db = helper.getWritableDatabase();
-    try {
-      ContentValues values = new ContentValues();
-      values.put("key", id);
-      values.put("value", serializer.serialize(value));
-      db.insertWithOnConflict(name, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-    } finally {
-      db.close();
-    }
+    ContentValues values = new ContentValues();
+    values.put("key", id);
+    values.put("value", serializer.serialize(value));
+    db.insertWithOnConflict(name, null, values, SQLiteDatabase.CONFLICT_REPLACE);
   }
 }
