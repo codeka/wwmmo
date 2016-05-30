@@ -16,13 +16,13 @@ public class ServerPacketEvent {
   private final Packet packet;
   private final byte[] bytes;
   private final Direction direction;
-  private final String packetName;
+  private final String packetDebug;
 
-  public ServerPacketEvent(Packet packet, byte[] bytes, Direction direction, String packetName) {
+  public ServerPacketEvent(Packet packet, byte[] bytes, Direction direction, String packetDebug) {
     this.packet = Preconditions.checkNotNull(packet);
     this.bytes = Preconditions.checkNotNull(bytes);
     this.direction = Preconditions.checkNotNull(direction);
-    this.packetName = Preconditions.checkNotNull(packetName);
+    this.packetDebug = Preconditions.checkNotNull(packetDebug);
   }
 
   /** @return The actual {@link Packet} that was sent/received. */
@@ -40,8 +40,8 @@ public class ServerPacketEvent {
     return direction;
   }
 
-  /** @return The "name" of the packet, useful for debugging. */
-  public String getPacketName() {
-    return packetName;
+  /** @return The a debug string for the packet, useful for debugging. */
+  public String getPacketDebug() {
+    return packetDebug;
   }
 }

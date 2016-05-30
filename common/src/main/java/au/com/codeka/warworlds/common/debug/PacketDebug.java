@@ -31,14 +31,20 @@ public class PacketDebug {
     sb.append(" bytes)");
 
     if (pkt.watch_sectors != null) {
-      sb.append(" ");
+      sb.append(" : [");
       sb.append(pkt.watch_sectors.left);
       sb.append(",");
       sb.append(pkt.watch_sectors.top);
-      sb.append(" - ");
+      sb.append("] [");
       sb.append(pkt.watch_sectors.right);
       sb.append(",");
       sb.append(pkt.watch_sectors.bottom);
+      sb.append("]");
+    }
+    if (pkt.star_updated != null) {
+      sb.append(" : ");
+      sb.append(pkt.star_updated.stars.size());
+      sb.append(" stars");
     }
 
     return sb.toString();

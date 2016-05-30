@@ -7,7 +7,6 @@ import com.google.common.base.Preconditions;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
-import com.neovisionaries.ws.client.WebSocketExtension;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.neovisionaries.ws.client.WebSocketListener;
@@ -26,6 +25,7 @@ import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.world.EmpireManager;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.debug.PacketDebug;
 import au.com.codeka.warworlds.common.proto.Packet;
 
 /** Represents our connection to the server. */
@@ -100,10 +100,10 @@ public class Server {
       } else if (ws != null) {
         bytes = pkt.encode();
 
-        String packetName = getDebugPacketType(pkt);
+        String packetDebug = PacketDebug.getPacketDebug(pkt, bytes);
         App.i.getEventBus().publish(new ServerPacketEvent(
-            pkt, bytes, ServerPacketEvent.Direction.Sent, packetName));
-        log.debug(">> %s (%d bytes)", packetName, bytes.length);
+            pkt, bytes, ServerPacketEvent.Direction.Sent, packetDebug));
+        log.debug(">> %s", packetDebug);
       } else {
         throw new IllegalStateException("One of queuedPackets or ws should be non-null.");
       }
@@ -171,30 +171,6 @@ public class Server {
     App.i.getEventBus().publish(currState);
   }
 
-  /**
-   * Useful for debugging, gets the "name" of the given packet, which is actually the name of the
-   * type of the first non-null field in the packet.
-   */
-  private String getDebugPacketType(Packet pkt) {
-    if (!BuildConfig.DEBUG) {
-      return "Packet";
-    }
-
-    for (Field field : pkt.getClass().getFields()) {
-      if (field.isAnnotationPresent(WireField.class)) {
-        try {
-          if (field.get(pkt) != null) {
-            return field.getType().getSimpleName();
-          }
-        } catch (IllegalAccessException e) {
-          // Ignore. (though should never happen)
-        }
-      }
-    }
-
-    return "UKNOWN_PACKET";
-  }
-
   private WebSocketListener webSocketListener = new WebSocketAdapter() {
     @Override
     public void onConnected(WebSocket ws, Map<String, List<String>> headers) throws Exception {
@@ -220,10 +196,10 @@ public class Server {
     public void onBinaryMessage(WebSocket ws, byte[] binary) throws Exception {
       Packet pkt = Packet.ADAPTER.decode(binary);
 
-      String packetName = getDebugPacketType(pkt);
+      String packetDebug = PacketDebug.getPacketDebug(pkt, binary);
       App.i.getEventBus().publish(new ServerPacketEvent(pkt, binary,
-          ServerPacketEvent.Direction.Received, packetName));
-      log.debug("<< %s (%d bytes)", packetName, binary.length);
+          ServerPacketEvent.Direction.Received, packetDebug));
+      log.debug("<< %s (%d bytes)", packetDebug, binary.length);
 
       onPacket(pkt);
     }

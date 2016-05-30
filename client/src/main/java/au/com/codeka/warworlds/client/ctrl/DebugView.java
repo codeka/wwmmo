@@ -227,10 +227,7 @@ public class DebugView extends FrameLayout {
           sb.append("<< ");
           break;
       }
-      sb.append(event.getPacketName());
-      sb.append(" (");
-      sb.append(NumberFormatter.format(event.getBytes().length));
-      sb.append(" bytes)");
+      sb.append(event.getPacketDebug());
 
       messages.add(new MessageInfo(sb.toString()));
     }

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import au.com.codeka.warworlds.client.App;
-import au.com.codeka.warworlds.client.util.eventbus.EventBus;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Packet;
 

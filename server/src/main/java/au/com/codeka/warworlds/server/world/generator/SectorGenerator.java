@@ -97,11 +97,11 @@ public class SectorGenerator {
     ArrayList<Star> stars = new ArrayList<>();
     for (Vector2 point : points) {
       Star star = generateStar(coord, point);
-      //log.debug("  '%s'", star.name);
-      //for (Planet p : star.planets) {
-      //  log.debug("    %s p=%d m=%d f=%d e=%d", p.planet_type, p.population_congeniality,
-      //      p.mining_congeniality, p.farming_congeniality, p.energy_congeniality);
-      //}
+      log.debug("  '%s'", star.name);
+      for (Planet p : star.planets) {
+        log.debug("    %s p=%d m=%d f=%d e=%d", p.planet_type, p.population_congeniality,
+            p.mining_congeniality, p.farming_congeniality, p.energy_congeniality);
+      }
       stars.add(star);
     }
 
