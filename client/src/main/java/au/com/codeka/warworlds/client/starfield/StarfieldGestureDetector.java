@@ -78,7 +78,7 @@ public class StarfieldGestureDetector {
         return true;
       }
 
-      if (event.getAction() == MotionEvent.ACTION_DOWN) {
+      if (event.getAction() == MotionEvent.ACTION_UP) {
         callback.onTap(event.getX(), event.getY());
       }
 
