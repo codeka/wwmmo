@@ -37,6 +37,15 @@
   -webkit-user-select: none;
 }
 
+.starfield-empire {
+  position: absolute;
+  color: #fff;
+  white-space: nowrap;
+  font-size: 10pt;
+  cursor: pointer;
+  -webkit-user-select: none;
+}
+
 .star-blackhole { background-position: 0px -128px; }
 .star-blue { background-position: -64px -128px; }
 .star-yellow { background-position: -128px -128px; }
@@ -46,6 +55,11 @@
 .star-neutron { width: 128px; height: 128px; margin: -64px 0 0 -64px; }
 
 #star-details h1 {
+  margin-left: 128px;
+  margin-bottom: 0px;
+}
+
+#star-details div.details {
   margin-left: 128px;
 }
 
@@ -72,7 +86,7 @@
 }
 
 .planets {
-  margin-top: 100px;
+  margin-top: 80px;
 }
 
 .planets h2 {
@@ -85,26 +99,10 @@
 }
 
 .planet-icon {
-  background: url(../img/planets.png);
   width: 64px;
   height: 64px;
   float: left;
 }
-
-.planet-icon-0 { background-position-x: 0; }
-.planet-icon-1 { background-position-x: -64px; }
-.planet-icon-2 { background-position-x: -128px; }
-.planet-icon-3 { background-position-x: -192px; }
-
-.planet-icon-asteroids { background-position-y: 0; }
-.planet-icon-desert { background-position-y: -64px; }
-.planet-icon-gasgiant { background-position-y: -128px; }
-.planet-icon-inferno { background-position-y: -192px; }
-.planet-icon-radiated { background-position-y: -256px; }
-.planet-icon-swamp { background-position-y: -320px; }
-.planet-icon-terran { background-position-y: -384px; }
-.planet-icon-toxic { background-position-y: -448px; }
-.planet-icon-water { background-position-y: -512px; }
 
 .planets .planet-details {
   float: left;
@@ -138,10 +136,16 @@
 }
 
 .colony {
-  height: 64px;
+  height: 24px;
   margin-left: 64px;
+  margin-bottom: 10px;
 }
 
 .colony img {
   float: left;
+  margin-right: 8px;
+}
+
+.fleets {
+  margin-left: 64px;
 }

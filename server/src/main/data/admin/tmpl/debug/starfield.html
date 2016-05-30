@@ -24,10 +24,11 @@
     <script id="star-details-tmpl" type="text/html">
       <div class="star-big star-big-<%= classification.toLowerCase() %>"></div>
       <h1><%= name %></h1>
+      <div class="details"><%= id %> [<%= sector_x %>,<%= sector_y %>] (<%= offset_x %>,<%= offset_y %>)</div>
       <div class="planets">
         <% for (var i in planets) { %>
           <div class="planet">
-            <div class="planet-icon planet-icon-<%= planets[i].planet_type.toLowerCase() %> planet-icon-<%= Math.floor(Math.random() * 4) %>"></div>
+            <div class="planet-icon"><img src="/render/planet/<%= id %>/<%= i %>/64x64/mdpi.png" width="64" height="64"></div>
             <div class="planet-details">
               <h2><%= toTitleCase(planets[i].planet_type) %></h2>
               <ul>
@@ -40,11 +41,16 @@
           </div>
           <% if (planets[i].colony) { %>
             <div class="colony">
-              <img src="/admin/img/shield.png" data-empireid="<%= planets[i].colony.empire_id %>" width="64" height="64">
+              <img src="/render/empire/<%= planets[i].colony.empire_id %>/24x24/mdpi.png" width="24" height="24">
               <h2><span data-empireid="<%= planets[i].colony.empire_id %>">...</span></h2>
             </div>
             <% empireStore.getEmpire(planets[i].colony.empire_id); %>
           <% } %>
+        <% } %>
+      </div>
+      <div class="fleets">
+        <% for (var i in fleets ) { %>
+          <div class="fleet">Fleet.</div>
         <% } %>
       </div>
     </script>
