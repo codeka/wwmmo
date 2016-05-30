@@ -49,7 +49,6 @@ public class DataStore {
       starStore = new ProtobufStore<>("stars", Star.class, this);
 
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-        getWritableDatabase();
         setWriteAheadLoggingEnabled(true);
       }
     }
