@@ -1,16 +1,13 @@
 package au.com.codeka.warworlds.server.websock;
 
-import com.squareup.wire.WireField;
-
-import org.eclipse.jetty.util.Fields;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.debug.PacketDebug;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.HelloPacket;
@@ -59,7 +56,7 @@ public class GameSocket extends WebSocketAdapter {
       log.error("Error decoding %d bytes into Packet.", len, e);
       return;
     }
-    log.debug("<< %s (%d bytes)", getPacketType(pkt), len);
+    log.debug("<< %s", PacketDebug.getPacketDebug(pkt, payload));
     player.onPacket(pkt);
   }
 
@@ -81,7 +78,7 @@ public class GameSocket extends WebSocketAdapter {
 
   public void send(Packet pkt) {
     byte[] bytes = pkt.encode();
-    log.debug(">> %s (%d bytes)", getPacketType(pkt), bytes.length);
+    log.debug(">> %s", PacketDebug.getPacketDebug(pkt, bytes));
 
     try {
       getRemote().sendBytes(ByteBuffer.wrap(bytes));
@@ -90,23 +87,5 @@ public class GameSocket extends WebSocketAdapter {
     }
   }
 
-  private String getPacketType(Packet pkt) {
-    if (!log.isDebugEnabled()) {
-      return "Packet";
-    }
 
-    for (Field field : pkt.getClass().getFields()) {
-      if (field.isAnnotationPresent(WireField.class)) {
-        try {
-          if (field.get(pkt) != null) {
-            return field.getType().getSimpleName();
-          }
-        } catch (IllegalAccessException e) {
-          // Ignore. (though should never happen)
-        }
-      }
-    }
-
-    return "UKNOWN_PACKET";
-  }
 }
