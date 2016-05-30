@@ -47,6 +47,11 @@ public class DataStore {
       super(applicationContext, "objects.db", null, 1);
       empireStore = new ProtobufStore<>("empires", Empire.class, this);
       starStore = new ProtobufStore<>("stars", Star.class, this);
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+        getWritableDatabase();
+        setWriteAheadLoggingEnabled(true);
+      }
     }
 
     /**

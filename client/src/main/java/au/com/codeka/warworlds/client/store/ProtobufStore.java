@@ -4,9 +4,12 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 
 import com.google.common.base.Preconditions;
 import com.squareup.wire.Message;
+
+import java.util.Map;
 
 /** Class for storing protos in a sqlite key-value store, keyed by a long id. */
 public class ProtobufStore<M extends Message<?, ?>> {
@@ -18,9 +21,6 @@ public class ProtobufStore<M extends Message<?, ?>> {
     this.name = Preconditions.checkNotNull(name);
     this.helper = Preconditions.checkNotNull(helper);
     this.serializer = new ProtobufSerializer<>(protoClass);
-
-    this.helper.getWritableDatabase();
-    this.helper.setWriteAheadLoggingEnabled(true);
   }
 
   public void onCreate(SQLiteDatabase db) {
@@ -52,5 +52,22 @@ public class ProtobufStore<M extends Message<?, ?>> {
     values.put("key", id);
     values.put("value", serializer.serialize(value));
     db.insertWithOnConflict(name, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+  }
+
+  /** Puts all of the given values into the data store in a single transaction. */
+  public void putAll(Map<Long, M> values) {
+    SQLiteDatabase db = helper.getWritableDatabase();
+    db.beginTransaction();
+    try {
+      ContentValues contentValues = new ContentValues();
+      for (Map.Entry<Long, M> kvp : values.entrySet()) {
+        contentValues.put("key", kvp.getKey());
+        contentValues.put("value", serializer.serialize(kvp.getValue()));
+        db.insertWithOnConflict(name, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+      }
+      db.setTransactionSuccessful();
+    } finally {
+      db.endTransaction();
+    }
   }
 }

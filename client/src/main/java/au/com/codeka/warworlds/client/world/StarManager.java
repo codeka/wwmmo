@@ -2,6 +2,9 @@ package au.com.codeka.warworlds.client.world;
 
 import android.support.annotation.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.store.ProtobufStore;
@@ -42,9 +45,11 @@ public class StarManager {
     public void onStarUpdatedPacket(StarUpdatedPacket pkt) {
       log.info("Stars updating, saving to database.");
       long startTime = System.nanoTime();
+      Map<Long, Star> values = new HashMap<>();
       for (Star star : pkt.stars) {
-        stars.put(star.id, star);
+        values.put(star.id, star);
       }
+      stars.putAll(values);
       long endTime = System.nanoTime();
       log.info("Updated %d stars in DB in %d ms", pkt.stars.size(), (endTime - startTime) / 1000000L);
     }
