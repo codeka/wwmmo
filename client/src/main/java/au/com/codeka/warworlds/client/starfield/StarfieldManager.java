@@ -344,7 +344,7 @@ public class StarfieldManager {
       container.addChild(sprite);
     }
 
-    container.translate((centerSectorX - sectorX) * 1024.0f, (centerSectorY - sectorY) * 1024.0f);
+    container.translate(-(centerSectorX - sectorX) * 1024.0f, (centerSectorY - sectorY) * 1024.0f);
     addSectorSceneObject(Pair.create(sectorX, sectorY), container);
     synchronized (scene.lock) {
       scene.getRootObject().addChild(container);
@@ -374,6 +374,10 @@ public class StarfieldManager {
 
     synchronized (scene.lock) {
       for (SceneObject obj : objects) {
+        Star star = (Star) obj.getTag();
+        if (star != null) {
+          starSceneObjects.remove(star.id);
+        }
         scene.getRootObject().removeChild(obj);
       }
     }
