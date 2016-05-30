@@ -104,6 +104,18 @@ public class Camera {
     }
   }
 
+  /**
+   * Simliar to {@link #translate(float, float, boolean)} except that we translate to an absolute
+   * X,Y coordinate.
+   *
+   * @param x The X-coordinate you want to warp to.
+   * @param y The Y-coordinate you want to warp to.
+   */
+  public void warpTo(float x, float y) {
+    translateX = x;
+    translateY = y;
+  }
+
   public void fling(float x, float y) {
     flinging = true;
     flingX = x;

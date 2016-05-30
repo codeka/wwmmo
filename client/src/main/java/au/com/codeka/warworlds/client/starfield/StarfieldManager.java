@@ -111,6 +111,11 @@ public class StarfieldManager {
 
     updateSectorBounds(centerSectorX - sectorRadius, centerSectorY - sectorRadius,
         centerSectorX + sectorRadius, centerSectorY + sectorRadius);
+
+    log.info("WarpTo: %.2f %.2f", offsetX, offsetY);
+    camera.warpTo(
+        scene.getDimensionResolver().dp2px(-offsetX),
+        scene.getDimensionResolver().dp2px(offsetY));
   }
 
   /**
