@@ -5,6 +5,7 @@
   <script type="text/javascript" src="/admin/js/tmpl.js"></script>
   <script type="text/javascript" src="/admin/js/empirestore.js"></script>
   <script type="text/javascript" src="/admin/js/starfield.js"></script>
+  <script type="text/javascript" src="/admin/js/designs.js"></script>
 {% endblock %}
 {% block content %}
   <h1>Starfield</h1>
@@ -50,7 +51,12 @@
       </div>
       <div class="fleets">
         <% for (var i in fleets ) { %>
-          <div class="fleet">Fleet.</div>
+          <% var design = Designs.get(fleets[i].design_id); %>
+          <% if (design != null) { %>
+            <div class="fleet">Fleet: <%= design.display_name %></div>
+          <% } else { %>
+            <div class="fleet error">Unknown design: <%= fleets[i].design_id %></div>
+          <% } %>
         <% } %>
       </div>
     </script>

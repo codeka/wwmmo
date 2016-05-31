@@ -1,0 +1,70 @@
+package au.com.codeka.warworlds.common.proto;
+
+import "common.proto";
+
+message Design {
+  optional string id = 1;
+
+  optional string display_name = 2;
+
+  optional string description = 3;
+
+  message BuildCost {
+    optional int32 minerals = 1;
+    optional int32 population = 2;
+    optional int32 max_count = 3;
+  }
+  optional BuildCost build_cost = 4;
+
+  optional string image_url = 5;
+
+  enum DesignKind {
+    UNKNOWN = 0;
+    BUILDING = 1;
+    SHIP = 2;
+  }
+  optional DesignKind design_kind = 6;
+
+  message Dependency {
+    optional string id = 1;
+    optional int32 level = 2;
+  }
+  repeated Dependency dependencies = 7;
+
+  message Effect {
+    optional string name = 1;
+    optional int32 level = 2;
+  }
+  repeated Effect effect = 8;
+
+  optional int32 max_per_colony = 9;
+
+  optional int32 max_per_empire = 10;
+
+  optional bool show_in_solar_system = 11;
+
+  message Upgrade {
+    optional string id = 1;
+    optional string display_name = 2;
+    optional string description = 3;
+    optional BuildCost build_cost = 4;
+    optional string image_url = 5;
+    repeated Dependency dependencies = 6;
+    repeated Effect effects = 7;
+  }
+  repeated Upgrade upgrades = 12;
+
+  optional float speed_px_per_hour = 13;
+
+  optional float fuel_cost_per_px = 14;
+
+  optional float base_attack = 15;
+
+  optional float base_defence = 16;
+
+  optional int32 combat_priority = 17;
+}
+
+message Designs {
+  repeated Design designs = 1;
+}

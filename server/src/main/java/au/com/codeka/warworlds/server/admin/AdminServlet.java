@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.admin.handlers.AdminLoginHandler;
+import au.com.codeka.warworlds.server.admin.handlers.AjaxDesignsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxEmpireHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxStarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DashboardHandler;
@@ -35,6 +36,7 @@ public class AdminServlet extends GenericServlet {
       new Route("/login", AdminLoginHandler.class),
       new Route("/debug/starfield", DebugStarfieldHandler.class),
       new Route("/ajax/empire", AjaxEmpireHandler.class),
+      new Route("/ajax/designs", AjaxDesignsHandler.class),
       new Route("/ajax/starfield", AjaxStarfieldHandler.class),
       new Route("/(?<path>.*)", FileHandler.class)
   );
