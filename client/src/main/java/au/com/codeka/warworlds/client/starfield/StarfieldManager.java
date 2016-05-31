@@ -460,6 +460,7 @@ public class StarfieldManager {
 
       // Work out which star (if any) you tapped on.
       synchronized (scene) {
+        SceneObject selected = null;
         float[] outVec = new float[4];
         Vector3 pos = new Vector3();
         Vector3 tap = new Vector3(x, y, 0.0f);
@@ -474,8 +475,17 @@ public class StarfieldManager {
               (-outVec[1] + 1.0f) * 0.5f * camera.getScreenHeight(),
               0.0f);
           if (Vector3.distanceBetween(pos, tap) < so.getTapTargetRadius()) {
-            star = (Star) so.getTag();
+            selected = so;
           }
+        }
+
+        if (selected != null) {
+          SelectionIndicatorSceneObject selectionIndicatorSceneObject =
+              new SelectionIndicatorSceneObject(scene.getDimensionResolver());
+          selectionIndicatorSceneObject.setSize(100, 100);
+          selected.addChild(selectionIndicatorSceneObject);
+          log.info("HERE");
+          star = (Star) selected.getTag();
         }
       }
 
