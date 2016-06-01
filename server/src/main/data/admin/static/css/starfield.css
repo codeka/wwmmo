@@ -147,5 +147,24 @@
 }
 
 .fleets {
+  height: 64px;
   margin-left: 64px;
+}
+
+.fleet {
+  height: 64px;
+}
+
+.fleet-icon {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  float: left;
+}
+
+.fleet-icon img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

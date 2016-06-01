@@ -52,11 +52,10 @@
       <div class="fleets">
         <% for (var i in fleets ) { %>
           <% var design = Designs.get(fleets[i].design_id); %>
-          <% if (design != null) { %>
-            <div class="fleet">Fleet: <%= design.display_name %></div>
-          <% } else { %>
-            <div class="fleet error">Unknown design: <%= fleets[i].design_id %></div>
-          <% } %>
+          <div class="fleet">
+            <div class="fleet-icon"><img src="/admin/img/sprites/<%= design.image_url %>" /></div>
+            <%= design.display_name %>
+          </div>
         <% } %>
       </div>
     </script>

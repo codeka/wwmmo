@@ -33,7 +33,7 @@ public class DesignHelper {
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().name("fighter").build()))
           .fuel_cost_per_px(35.0f)
-          .image_url("colonyship.png")
+          .image_url("colony.png")
           .speed_px_per_hour(32.0f)
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
@@ -119,7 +119,7 @@ public class DesignHelper {
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().name("fighter").build()))
           .fuel_cost_per_px(16.0f)
-          .image_url("scout.png")
+          .image_url("fighter.png")
           .speed_px_per_hour(128.0f)
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
@@ -188,7 +188,7 @@ public class DesignHelper {
               new Design.Effect.Builder().name("fighter").build(),
               new Design.Effect.Builder().name("wormhole-generator").build()))
           .fuel_cost_per_px(512.0f)
-          .image_url("scout.png")
+          .image_url("wormhole-generator.png")
           .speed_px_per_hour(8.0f)
           .build()
   )).build();
