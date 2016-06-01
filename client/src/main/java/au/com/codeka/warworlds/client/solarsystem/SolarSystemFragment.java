@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
@@ -18,6 +19,8 @@ import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
+import au.com.codeka.warworlds.client.util.NumberFormatter;
+import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.world.EmpireManager;
 import au.com.codeka.warworlds.client.world.StarManager;
@@ -44,15 +47,26 @@ public class SolarSystemFragment extends BaseFragment {
   private boolean isFirstRefresh;
   private long starID;
 
-  SolarSystemView solarSystemView;
-  TextView planetName;
-  TextView storedGoods;
-  TextView deltaGoods;
-  View storedGoodsIcon;
-  TextView storedMinerals;
-  TextView deltaMinerals;
-  View storedMineralsIcon;
-  FleetListSimple fleetList;
+  private SolarSystemView solarSystemView;
+  private TextView planetName;
+  private TextView storedGoods;
+  private TextView deltaGoods;
+  private View storedGoodsIcon;
+  private TextView storedMinerals;
+  private TextView deltaMinerals;
+  private View storedMineralsIcon;
+  private FleetListSimple fleetList;
+  private View congenialityContainer;
+  private ProgressBar populationCongenialityProgressBar;
+  private TextView populationCongenialityTextView;
+  private ProgressBar farmingCongenialityProgressBar;
+  private TextView farmingCongenialityTextView;
+  private ProgressBar miningCongenialityProgressBar;
+  private TextView miningCongenialityTextView;
+  private Button emptyViewButton;
+  private View colonyDetailsContainer;
+  private View enemyColonyDetailsContainer;
+  private TextView populationCountTextView;
 
   // needs to be Object so we can do a version check before instantiating the class
   Object solarSystemSurfaceViewOnLayoutChangedListener;
@@ -78,7 +92,6 @@ public class SolarSystemFragment extends BaseFragment {
     final Button focusButton = (Button) view.findViewById(R.id.solarsystem_colony_focus);
     final Button sitrepButton = (Button) view.findViewById(R.id.sitrep_btn);
     final Button planetViewButton = (Button) view.findViewById(R.id.enemy_empire_view);
-    final Button emptyViewButton = (Button) view.findViewById(R.id.empty_view_btn);
     planetName = (TextView) view.findViewById(R.id.planet_name);
     storedGoods = (TextView) view.findViewById(R.id.stored_goods);
     deltaGoods = (TextView) view.findViewById(R.id.delta_goods);
@@ -87,6 +100,24 @@ public class SolarSystemFragment extends BaseFragment {
     deltaMinerals = (TextView) view.findViewById(R.id.delta_minerals);
     storedMineralsIcon = view.findViewById(R.id.stored_minerals_icon);
     fleetList = (FleetListSimple) view.findViewById(R.id.fleet_list);
+    congenialityContainer = view.findViewById(R.id.congeniality_container);
+    populationCongenialityProgressBar = (ProgressBar) view.findViewById(
+        R.id.solarsystem_population_congeniality);
+    populationCongenialityTextView = (TextView) view.findViewById(
+        R.id.solarsystem_population_congeniality_value);
+    farmingCongenialityProgressBar = (ProgressBar) view.findViewById(
+        R.id.solarsystem_farming_congeniality);
+    farmingCongenialityTextView = (TextView) view.findViewById(
+        R.id.solarsystem_farming_congeniality_value);
+    miningCongenialityProgressBar = (ProgressBar) view.findViewById(
+        R.id.solarsystem_mining_congeniality);
+    miningCongenialityTextView = (TextView) view.findViewById(
+        R.id.solarsystem_mining_congeniality_value);
+    emptyViewButton = (Button) view.findViewById(R.id.empty_view_btn);
+    colonyDetailsContainer = view.findViewById(R.id.solarsystem_colony_details);
+    enemyColonyDetailsContainer = view.findViewById(R.id.enemy_colony_details);
+    populationCountTextView = (TextView) view.findViewById(R.id.population_count);
+
     //final SelectionView selectionView = (SelectionView) mView.findViewById(R.id.selection);
     //mSolarSystemSurfaceView.setSelectionView(selectionView);
 
@@ -95,14 +126,13 @@ public class SolarSystemFragment extends BaseFragment {
       isFirstRefresh = savedInstanceState.getBoolean("au.com.codeka.warworlds.IsFirstRefresh");
     }
 
-    //mSolarSystemSurfaceView.addPlanetSelectedListener(
-    //    new SolarSystemSurfaceView.OnPlanetSelectedListener() {
-    //      @Override
-    //      public void onPlanetSelected(Planet planet) {
-    //        SolarSystemFragment.this.planet = planet;
-    //        refreshSelectedPlanet();
-    //      }
-    //    });
+    solarSystemView.setPlanetSelectedHandler(new SolarSystemView.PlanetSelectedHandler() {
+        @Override
+        public void onPlanetSelected(Planet planet) {
+          SolarSystemFragment.this.planet = planet;
+          refreshSelectedPlanet();
+        }
+      });
 
     buildButton.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -336,19 +366,18 @@ public class SolarSystemFragment extends BaseFragment {
       return;
     }
 
-    //Vector2 planetCentre = mSolarSystemSurfaceView.getPlanetCentre(planet);
+    Vector2 planetCentre = solarSystemView.getPlanetCentre(planet);
 
-    String name = star.name+" "/*+RomanNumeralFormatter.format(planet.getIndex())*/;
+    String name = star.name + " " + RomanNumeralFormatter.format(star.planets.indexOf(planet) + 1);
     planetName.setText(name);
-/*
-    View congenialityContainer = mView.findViewById(R.id.congeniality_container);
+
     if (planetCentre == null) {
       // this is probably because the SolarSystemView probably hasn't rendered yet. We'll
       // just ignore this then cause it'll fire an onPlanetSelected when it finishes
       // drawing.
       congenialityContainer.setVisibility(View.GONE);
     } else {
-      float pixelScale = mSolarSystemSurfaceView.getPixelScale();
+      float pixelScale = getResources().getDisplayMetrics().density;
       double x = planetCentre.x * pixelScale;
       double y = planetCentre.y * pixelScale;
 
@@ -363,7 +392,8 @@ public class SolarSystemFragment extends BaseFragment {
         offsetY = -(20 * pixelScale);
       }
 
-      RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) congenialityContainer.getLayoutParams();
+      RelativeLayout.LayoutParams params =
+          (RelativeLayout.LayoutParams) congenialityContainer.getLayoutParams();
       params.leftMargin = (int) (x - offsetX);
       params.topMargin = (int) (y - offsetY);
       if (params.topMargin < (40 * pixelScale)) {
@@ -372,39 +402,22 @@ public class SolarSystemFragment extends BaseFragment {
 
       congenialityContainer.setLayoutParams(params);
       congenialityContainer.setVisibility(View.VISIBLE);
-    }*/
-/*
-    ProgressBar populationCongenialityProgressBar = (ProgressBar) mView.findViewById(
-        R.id.solarsystem_population_congeniality);
-    TextView populationCongenialityTextView = (TextView) mView.findViewById(
-        R.id.solarsystem_population_congeniality_value);
-    populationCongenialityTextView.setText(Integer.toString(
-        planet.getPopulationCongeniality()));
+    }
+
+    populationCongenialityTextView.setText(NumberFormatter.format(planet.population_congeniality));
     populationCongenialityProgressBar.setProgress(
-        (int) (populationCongenialityProgressBar.getMax() * (planet.getPopulationCongeniality() / 1000.0)));
+        (int) (populationCongenialityProgressBar.getMax()
+            * (planet.population_congeniality / 1000.0)));
 
-    ProgressBar farmingCongenialityProgressBar = (ProgressBar) mView.findViewById(
-        R.id.solarsystem_farming_congeniality);
-    TextView farmingCongenialityTextView = (TextView) mView.findViewById(
-        R.id.solarsystem_farming_congeniality_value);
-    farmingCongenialityTextView.setText(Integer.toString(
-        planet.getFarmingCongeniality()));
+    farmingCongenialityTextView.setText(NumberFormatter.format(planet.farming_congeniality));
     farmingCongenialityProgressBar.setProgress(
-        (int)(farmingCongenialityProgressBar.getMax() * (planet.getFarmingCongeniality() / 100.0)));
+        (int)(farmingCongenialityProgressBar.getMax() * (planet.farming_congeniality / 100.0)));
 
-    ProgressBar miningCongenialityProgressBar = (ProgressBar) mView.findViewById(
-        R.id.solarsystem_mining_congeniality);
-    TextView miningCongenialityTextView = (TextView) mView.findViewById(
-        R.id.solarsystem_mining_congeniality_value);
-    miningCongenialityTextView.setText(Integer.toString(
-        planet.getMiningCongeniality()));
+    miningCongenialityTextView.setText(NumberFormatter.format(planet.mining_congeniality));
     miningCongenialityProgressBar.setProgress(
-        (int)(miningCongenialityProgressBar.getMax() * (planet.getMiningCongeniality() / 100.0)));
+        (int)(miningCongenialityProgressBar.getMax() * (planet.mining_congeniality / 100.0)));
 
-    Button emptyViewButton = (Button) mView.findViewById(R.id.empty_view_btn);
-    final View colonyDetailsContainer = mView.findViewById(R.id.solarsystem_colony_details);
-    final View enemyColonyDetailsContainer = mView.findViewById(R.id.enemy_colony_details);
-    if (mColony == null) {
+    if (planet.colony == null) {
       emptyViewButton.setVisibility(View.VISIBLE);
       colonyDetailsContainer.setVisibility(View.GONE);
       enemyColonyDetailsContainer.setVisibility(View.GONE);
@@ -415,10 +428,10 @@ public class SolarSystemFragment extends BaseFragment {
       colonyDetailsContainer.setVisibility(View.GONE);
       enemyColonyDetailsContainer.setVisibility(View.GONE);
 
-      Empire colonyEmpire = EmpireManager.i.getEmpire(mColony.getEmpireID());
+      Empire colonyEmpire = EmpireManager.i.getEmpire(planet.colony.empire_id);
       if (colonyEmpire != null) {
-        Empire thisEmpire = EmpireManager.i.getEmpire();
-        if (thisEmpire.getKey().equals(colonyEmpire.getKey())) {
+        Empire myEmpire = EmpireManager.i.getMyEmpire();
+        if (myEmpire != null && myEmpire.id.equals(colonyEmpire.id)) {
           colonyDetailsContainer.setVisibility(View.VISIBLE);
           refreshColonyDetails();
         } else {
@@ -426,33 +439,27 @@ public class SolarSystemFragment extends BaseFragment {
           refreshEnemyColonyDetails(colonyEmpire);
         }
       }
-    }*/
+    }
   }
 
   private void refreshUncolonizedDetails() {
-    //final TextView populationCountTextView = (TextView) mView.findViewById(
-   //     R.id.population_count);
-   // populationCountTextView.setText("Uncolonized");
+    populationCountTextView.setText("Uncolonized");
   }
 
-  private void refreshColonyDetails() {/*
-    final TextView populationCountTextView = (TextView) mView.findViewById(
-        R.id.population_count);
-    populationCountTextView.setText(String.format("Pop: %d / %d",
-        (int) mColony.getPopulation(), (int) mColony.getMaxPopulation()));
+  private void refreshColonyDetails() {
+   // populationCountTextView.setText(String.format(Locale.US, "Pop: %d / %d",
+   //     Math.round(planet.colony.population), Math.round(planet.colony.max_population)));
 
-    final ColonyFocusView colonyFocusView = (ColonyFocusView) mView.findViewById(
-        R.id.colony_focus_view);
-    colonyFocusView.refresh(star, mColony);
-  */}
+//    final ColonyFocusView colonyFocusView = (ColonyFocusView) mView.findViewById(
+//        R.id.colony_focus_view);
+//    colonyFocusView.refresh(star, mColony);
+  }
 
-  private void refreshEnemyColonyDetails(Empire empire) {/*
-    final TextView populationCountTextView = (TextView) mView.findViewById(
-        R.id.population_count);
-    populationCountTextView.setText(String.format("Population: %d",
-        (int) mColony.getPopulation()));
+  private void refreshEnemyColonyDetails(Empire empire) {
+    populationCountTextView.setText(String.format(Locale.US, "Population: %d",
+        Math.round(planet.colony.population)));
 
-    ImageView enemyIcon = (ImageView) mView.findViewById(R.id.enemy_empire_icon);
+/*    ImageView enemyIcon = (ImageView) mView.findViewById(R.id.enemy_empire_icon);
     TextView enemyName = (TextView) mView.findViewById(R.id.enemy_empire_name);
     TextView enemyDefence = (TextView) mView.findViewById(R.id.enemy_empire_defence);
 

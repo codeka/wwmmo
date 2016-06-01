@@ -3,7 +3,9 @@ package au.com.codeka.warworlds.client.solarsystem;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -21,10 +23,16 @@ import au.com.codeka.warworlds.common.proto.Star;
  * The view which displays the star and planets.
  */
 public class SolarSystemView extends RelativeLayout {
+  public interface PlanetSelectedHandler {
+    void onPlanetSelected(Planet planet);
+  }
+
   private static final Log log = new Log("SolarSystemView");
   private final Paint orbitPaint;
   private Star star;
   private PlanetInfo[] planetInfos;
+  @Nullable private Planet selectedPlanet;
+  @Nullable private PlanetSelectedHandler planetSelectedHandler;
 
   public SolarSystemView(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -33,6 +41,19 @@ public class SolarSystemView extends RelativeLayout {
     orbitPaint = new Paint();
     orbitPaint.setARGB(255, 255, 255, 255);
     orbitPaint.setStyle(Paint.Style.STROKE);
+  }
+
+  public void setPlanetSelectedHandler(@Nullable PlanetSelectedHandler handler) {
+    planetSelectedHandler = handler;
+  }
+
+  public Vector2 getPlanetCentre(Planet planet) {
+    for (PlanetInfo planetInfo : planetInfos) {
+      if (planetInfo.planet == planet) {
+        return planetInfo.centre;
+      }
+    }
+    throw new IllegalStateException("No planetInfo found for the given planet!");
   }
 
   public void setStar(Star star) {
@@ -113,6 +134,8 @@ public class SolarSystemView extends RelativeLayout {
       lp.topMargin = (int) centre.y - (lp.height / 2);
       lp.leftMargin = (int) centre.x - (lp.width / 2);
       planetInfo.imageView.setLayoutParams(lp);
+      planetInfo.imageView.setTag(planetInfo);
+      planetInfo.imageView.setOnClickListener(planetOnClickListener);
       addView(planetInfo.imageView);
 
       Picasso.with(getContext())
@@ -133,6 +156,7 @@ public class SolarSystemView extends RelativeLayout {
       //}
     }
 
+    selectedPlanet = null; // TODO: select a default one?
     updateSelection();
   }
 
@@ -147,7 +171,20 @@ public class SolarSystemView extends RelativeLayout {
     //  params.topMargin = (int) (getTop() + mSelectedPlanet.centre.y - (params.height / 2));
     //  mSelectionView.setLayoutParams(params);
     //}
+
+    if (planetSelectedHandler != null) {
+      planetSelectedHandler.onPlanetSelected(selectedPlanet);
+    }
   }
+
+  private final View.OnClickListener planetOnClickListener = new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      PlanetInfo planetInfo = (PlanetInfo) v.getTag();
+      selectedPlanet = planetInfo.planet;
+      updateSelection();
+    }
+  };
 
   private final ViewBackgroundGenerator.OnDrawHandler onBackgroundDrawHandler =
       new ViewBackgroundGenerator.OnDrawHandler() {
