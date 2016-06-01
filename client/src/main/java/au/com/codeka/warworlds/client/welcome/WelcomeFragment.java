@@ -40,6 +40,7 @@ import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
+import au.com.codeka.warworlds.client.util.Version;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.world.EmpireManager;
@@ -281,9 +282,8 @@ public class WelcomeFragment extends BaseFragment {
 
       DecimalFormat formatter = new DecimalFormat("#,##0");
       String msg = String.format(Locale.ENGLISH,
-          "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s", memoryClass,
-          formatter.format(maxMemoryBytes), "0.1" /*Util.getVersion()*/,
-              BuildConfig.DEBUG ? " (debug)" : " (rel)");
+          "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s", memoryClass,
+          formatter.format(maxMemoryBytes), Version.string());
       connectionStatus.setText(msg);
       startButton.setEnabled(true);
     } else {
