@@ -10,6 +10,6 @@ import au.com.codeka.warworlds.common.Colour;
  */
 public class SelectionIndicatorSceneObject extends BaseIndicatorSceneObject {
   public SelectionIndicatorSceneObject(DimensionResolver dimensionResolver) {
-    super(dimensionResolver, Colour.WHITE);
+    super(dimensionResolver, Colour.WHITE, 5.0f);
   }
 }

@@ -69,6 +69,7 @@ public class StarfieldManager {
 
   private final Map<Long, SceneObject> starSceneObjects = new HashMap<>();
   private final Map<Pair<Long,Long>, ArrayList<SceneObject>> sectorSceneObjects = new HashMap<>();
+  private final SelectionIndicatorSceneObject selectionIndicatorSceneObject;
 
   public StarfieldManager(RenderSurfaceView renderSurfaceView) {
     this.scene = renderSurfaceView.createScene();
@@ -76,6 +77,7 @@ public class StarfieldManager {
     this.context = renderSurfaceView.getContext();
     gestureDetector = new StarfieldGestureDetector(renderSurfaceView, gestureListener);
     renderSurfaceView.setScene(scene);
+    selectionIndicatorSceneObject = new SelectionIndicatorSceneObject(scene.getDimensionResolver());
   }
 
   public void create() {
@@ -480,12 +482,11 @@ public class StarfieldManager {
         }
 
         if (selected != null) {
-          SelectionIndicatorSceneObject selectionIndicatorSceneObject =
-              new SelectionIndicatorSceneObject(scene.getDimensionResolver());
-          selectionIndicatorSceneObject.setSize(100, 100);
+          selectionIndicatorSceneObject.setSize(60, 60);
           selected.addChild(selectionIndicatorSceneObject);
-          log.info("HERE");
           star = (Star) selected.getTag();
+        } else if (selectionIndicatorSceneObject.getParent() != null) {
+          selectionIndicatorSceneObject.getParent().removeChild(selectionIndicatorSceneObject);
         }
       }
 

@@ -17,6 +17,9 @@ public class SceneObject {
   /** The scene we belong to, or null if we're not part of a scene. */
   @Nullable private Scene scene;
 
+  /** Our parent {@link SceneObject}, if any. */
+  @Nullable private SceneObject parent;
+
   /** Children array will be null until you add the first child. */
   @Nullable private ArrayList<SceneObject> children;
 
@@ -49,18 +52,29 @@ public class SceneObject {
   }
 
   public void addChild(SceneObject child) {
+    if (child.parent != null) {
+      child.parent.removeChild(child);
+    }
     if (children == null) {
       children = new ArrayList<>();
     }
     children.add(child);
     child.scene = scene;
+    child.parent = this;
   }
 
   public void removeChild(SceneObject child) {
+    Preconditions.checkState(child.parent == this);
     if (children != null) {
       children.remove(child);
       child.scene = null;
+      child.parent = null;
     }
+  }
+
+  @Nullable
+  public SceneObject getParent() {
+    return parent;
   }
 
   public int getNumChildren() {

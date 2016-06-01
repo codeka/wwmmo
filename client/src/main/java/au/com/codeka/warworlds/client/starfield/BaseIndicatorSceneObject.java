@@ -34,9 +34,10 @@ public class BaseIndicatorSceneObject extends SceneObject {
   };
   private static final short SQUARE_INDICES[] = { 0, 1, 2, 0, 2, 3 };
 
-  public BaseIndicatorSceneObject(DimensionResolver dimensionResolver, Colour colour) {
+  public BaseIndicatorSceneObject(
+      DimensionResolver dimensionResolver, Colour colour, float lineThickness) {
     super(dimensionResolver);
-    this.shader = new IndicatorShader(colour);
+    this.shader = new IndicatorShader(colour, lineThickness);
 
     // initialize vertex byte buffer for shape coordinates
     // (# of coordinate values * 4 bytes per float)
@@ -86,12 +87,15 @@ public class BaseIndicatorSceneObject extends SceneObject {
   /** {@link Shader} for the indicator entity. */
   private static class IndicatorShader extends Shader {
     private final float[] color;
+    private final float lineThickness;
 
     private int posHandle;
     private int texCoordHandle;
     private int colourHandle;
+    private int lineThicknessHandle;
 
-    public IndicatorShader(Colour colour) {
+    public IndicatorShader(Colour colour, float lineThickness) {
+      this.lineThickness = lineThickness;
       this.color = new float[] {
           (float) colour.r,
           (float) colour.g,
@@ -122,16 +126,20 @@ public class BaseIndicatorSceneObject extends SceneObject {
 
     @Override
     protected String getFragmentShaderCode() {
-      log.info("HERE 1");
       return TextUtils.join("\n", new String[]{
           "precision mediump float;",
           "varying vec2 vTexCoord;",
           "uniform vec3 uColour;",
+          "uniform float uLineThickness;",
           "void main() {",
           "   float dist = distance(vTexCoord, vec2(0.5, 0.5));",
-          "   if (dist > 0.5) { dist = 0.0; }",
-          "   else if (dist > 0.495) { dist = 0.66; }",
-          "   else { dist *= 0.3; }",
+          "   if (dist > 0.5) {",
+          "     dist = 0.0;",
+          "   } else if (dist > 0.5 - (uLineThickness * 0.005)) {",
+          "     dist = 0.66;",
+          "   } else {",
+          "     dist *= 0.3;",
+          "   }",
           "   gl_FragColor = vec4(uColour, dist);",
           "}"});
     }
@@ -141,6 +149,7 @@ public class BaseIndicatorSceneObject extends SceneObject {
       posHandle = getAttributeLocation("aPosition");
       texCoordHandle = getAttributeLocation("aTexCoord");
       colourHandle = getUniformLocation("uColour");
+      lineThicknessHandle = getUniformLocation("uLineThickness");
     }
 
     @Override
@@ -148,6 +157,7 @@ public class BaseIndicatorSceneObject extends SceneObject {
       GLES20.glEnableVertexAttribArray(posHandle);
       GLES20.glEnableVertexAttribArray(texCoordHandle);
       GLES20.glUniform3fv(colourHandle, 1, color, 0);
+      GLES20.glUniform1f(lineThicknessHandle, lineThickness);
     }
 
     @Override
