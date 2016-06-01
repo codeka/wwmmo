@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.common;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import au.com.codeka.warworlds.common.proto.Design;
@@ -9,6 +10,22 @@ import au.com.codeka.warworlds.common.proto.Designs;
  * Helper class for working with ship and building designs.
  */
 public class DesignHelper {
+
+  public static String getDesignName(Design design, boolean plural) {
+    return design.display_name + (plural ? "s" : "");
+  }
+
+  /** Gets the {@link Design} with the given identifier. */
+  public static Design getDesign(String id) {
+    for (Design design : designs.designs) {
+      if (design.id.equals(id)) {
+        return design;
+      }
+    }
+
+    throw new IllegalStateException("No design with id=" + id + " found.");
+  }
+
   /** The list of all designs in the game. */
   public static final Designs designs = new Designs.Builder().designs(Lists.newArrayList(
       new Design.Builder()

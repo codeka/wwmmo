@@ -12,26 +12,36 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.common.base.CaseFormat;
+import com.squareup.picasso.Picasso;
 
 import au.com.codeka.warworlds.client.world.StarManager;
-import au.com.codeka.warworlds.common.designs.ShipDesign;
+import au.com.codeka.warworlds.common.DesignHelper;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 
 public class FleetListHelper {
   public static void populateFleetNameRow(
-      Context context, LinearLayout row, Fleet fleet, ShipDesign design) {
+      Context context, LinearLayout row, Fleet fleet, Design design) {
     populateFleetNameRow(context, row, fleet, design, 0);
   }
 
+  public static void setDesignIcon(Design design, ImageView imageView) {
+    Picasso.with(imageView.getContext())
+        .load("file:///android_asset/sprites/" + design.image_url)
+        .into(imageView);
+  }
+
   public static void populateFleetNameRow(
-      Context context, LinearLayout row, Fleet fleet, ShipDesign design, float textSize) {
+      Context context, LinearLayout row, Fleet fleet, Design design, float textSize) {
     if (fleet == null) {
-      String text = String.format(Locale.ENGLISH, "%s", design.getDisplayName(false));
+      String text = String.format(Locale.ENGLISH, "%s",
+          DesignHelper.getDesignName(design, false /* plural */));
       addTextToRow(context, row, text, textSize);
     } else /*if (fleet.upgrades.size() == 0) */ {
       String text = String.format(Locale.ENGLISH, "%d × %s",
-          (int) Math.ceil(fleet.num_ships), design.getDisplayName(fleet.num_ships > 1));
+          (int) Math.ceil(fleet.num_ships),
+          DesignHelper.getDesignName(design, fleet.num_ships > 1 /* plural */));
       addTextToRow(context, row, text, textSize);
     } /*else {
       String text = String.format(Locale.ENGLISH, "%d ×", (int) Math.ceil(fleet.getNumShips()));

@@ -4,15 +4,17 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.common.designs.ShipDesign;
+import au.com.codeka.warworlds.common.DesignHelper;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 
@@ -78,13 +80,13 @@ public class FleetListSimple extends LinearLayout {
 
   private View getRowView(LayoutInflater inflater, Fleet fleet) {
     View view = inflater.inflate(R.layout.ctrl_fleet_list_simple_row, this, false);
-    ShipDesign design = new ShipDesign();//(ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+    Design design = DesignHelper.getDesign(fleet.design_id);
 
     ImageView icon = (ImageView) view.findViewById(R.id.fleet_icon);
     LinearLayout row1 = (LinearLayout) view.findViewById(R.id.ship_row1);
     LinearLayout row2 = (LinearLayout) view.findViewById(R.id.ship_row2);
 
-    //icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+    FleetListHelper.setDesignIcon(design, icon);
 
     row1.removeAllViews();
     row2.removeAllViews();

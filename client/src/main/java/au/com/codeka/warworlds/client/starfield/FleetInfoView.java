@@ -16,7 +16,8 @@ import java.util.Locale;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ctrl.FleetListHelper;
 import au.com.codeka.warworlds.client.world.StarManager;
-import au.com.codeka.warworlds.common.designs.ShipDesign;
+import au.com.codeka.warworlds.common.DesignHelper;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -82,7 +83,7 @@ public class FleetInfoView extends FrameLayout {
     empireName.setText("");
     empireIcon.setImageBitmap(null);
 
-    ShipDesign design = new ShipDesign();// (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+    Design design = DesignHelper.getDesign(fleet.design_id);
     Empire empire = null;//EmpireManager.i.getEmpire(fleet.getEmpireID());
     if (empire != null) {
       empireName.setText(empire.display_name);
