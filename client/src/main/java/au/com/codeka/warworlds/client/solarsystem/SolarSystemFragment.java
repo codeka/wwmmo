@@ -63,6 +63,8 @@ public class SolarSystemFragment extends BaseFragment {
   private TextView farmingCongenialityTextView;
   private ProgressBar miningCongenialityProgressBar;
   private TextView miningCongenialityTextView;
+  private ProgressBar energyCongenialityProgressBar;
+  private TextView energyCongenialityTextView;
   private Button emptyViewButton;
   private View colonyDetailsContainer;
   private View enemyColonyDetailsContainer;
@@ -113,6 +115,10 @@ public class SolarSystemFragment extends BaseFragment {
         R.id.solarsystem_mining_congeniality);
     miningCongenialityTextView = (TextView) view.findViewById(
         R.id.solarsystem_mining_congeniality_value);
+    energyCongenialityProgressBar = (ProgressBar) view.findViewById(
+        R.id.solarsystem_energy_congeniality);
+    energyCongenialityTextView = (TextView) view.findViewById(
+        R.id.solarsystem_energy_congeniality_value);
     emptyViewButton = (Button) view.findViewById(R.id.empty_view_btn);
     colonyDetailsContainer = view.findViewById(R.id.solarsystem_colony_details);
     enemyColonyDetailsContainer = view.findViewById(R.id.enemy_colony_details);
@@ -378,12 +384,12 @@ public class SolarSystemFragment extends BaseFragment {
       congenialityContainer.setVisibility(View.GONE);
     } else {
       float pixelScale = getResources().getDisplayMetrics().density;
-      double x = planetCentre.x * pixelScale;
-      double y = planetCentre.y * pixelScale;
+      double x = planetCentre.x;
+      double y = planetCentre.y;
 
-      // hard-coded size of the congeniality container: 85x34 dp
+      // hard-coded size of the congeniality container: 85x64 dp
       float offsetX = (85 + 20) * pixelScale;
-      float offsetY = (34 + 20) * pixelScale;
+      float offsetY = (64 + 20) * pixelScale;
 
       if (x - offsetX < 0) {
         offsetX  = -(20 * pixelScale);
@@ -416,6 +422,10 @@ public class SolarSystemFragment extends BaseFragment {
     miningCongenialityTextView.setText(NumberFormatter.format(planet.mining_congeniality));
     miningCongenialityProgressBar.setProgress(
         (int)(miningCongenialityProgressBar.getMax() * (planet.mining_congeniality / 100.0)));
+
+    energyCongenialityTextView.setText(NumberFormatter.format(planet.energy_congeniality));
+    energyCongenialityProgressBar.setProgress(
+        (int)(miningCongenialityProgressBar.getMax() * (planet.energy_congeniality / 100.0)));
 
     if (planet.colony == null) {
       emptyViewButton.setVisibility(View.VISIBLE);
