@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.client.solarsystem;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,12 +11,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
+import com.transitionseverywhere.TransitionManager;
 
 import java.util.Locale;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
+import au.com.codeka.warworlds.client.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.client.util.NumberFormatter;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
@@ -65,13 +66,12 @@ public class SolarSystemFragment extends BaseFragment {
   private TextView miningCongenialityTextView;
   private ProgressBar energyCongenialityProgressBar;
   private TextView energyCongenialityTextView;
+  private ViewGroup bottomLeftPane;
   private Button emptyViewButton;
   private View colonyDetailsContainer;
   private View enemyColonyDetailsContainer;
   private TextView populationCountTextView;
-
-  // needs to be Object so we can do a version check before instantiating the class
-  Object solarSystemSurfaceViewOnLayoutChangedListener;
+  private ColonyFocusView colonyFocusView;
 
   public static Bundle createArguments(long starID) {
     Bundle args = new Bundle();
@@ -119,10 +119,12 @@ public class SolarSystemFragment extends BaseFragment {
         R.id.solarsystem_energy_congeniality);
     energyCongenialityTextView = (TextView) view.findViewById(
         R.id.solarsystem_energy_congeniality_value);
+    bottomLeftPane = (ViewGroup) view.findViewById(R.id.bottom_left_pane);
     emptyViewButton = (Button) view.findViewById(R.id.empty_view_btn);
     colonyDetailsContainer = view.findViewById(R.id.solarsystem_colony_details);
     enemyColonyDetailsContainer = view.findViewById(R.id.enemy_colony_details);
     populationCountTextView = (TextView) view.findViewById(R.id.population_count);
+    colonyFocusView = (ColonyFocusView) view.findViewById(R.id.colony_focus_view);
 
     //final SelectionView selectionView = (SelectionView) mView.findViewById(R.id.selection);
     //mSolarSystemSurfaceView.setSelectionView(selectionView);
@@ -259,7 +261,6 @@ public class SolarSystemFragment extends BaseFragment {
       //mSolarSystemSurfaceView.selectPlanet(selectedPlanetIndex);
     } else {
       log.debug("No planet selected");
-      //mSolarSystemSurfaceView.redraw();
     }
 
     this.star = star;
@@ -427,6 +428,7 @@ public class SolarSystemFragment extends BaseFragment {
     energyCongenialityProgressBar.setProgress(
         (int)(miningCongenialityProgressBar.getMax() * (planet.energy_congeniality / 100.0)));
 
+    TransitionManager.beginDelayedTransition(bottomLeftPane);
     if (planet.colony == null) {
       emptyViewButton.setVisibility(View.VISIBLE);
       colonyDetailsContainer.setVisibility(View.GONE);
@@ -457,12 +459,10 @@ public class SolarSystemFragment extends BaseFragment {
   }
 
   private void refreshColonyDetails() {
-   // populationCountTextView.setText(String.format(Locale.US, "Pop: %d / %d",
-   //     Math.round(planet.colony.population), Math.round(planet.colony.max_population)));
+    populationCountTextView.setText(String.format(Locale.US, "Pop: %d / %d",
+        Math.round(planet.colony.population), Math.round(100.0/*planet.colony.max_population*/)));
 
-//    final ColonyFocusView colonyFocusView = (ColonyFocusView) mView.findViewById(
-//        R.id.colony_focus_view);
-//    colonyFocusView.refresh(star, mColony);
+    colonyFocusView.refresh(star, planet.colony);
   }
 
   private void refreshEnemyColonyDetails(Empire empire) {

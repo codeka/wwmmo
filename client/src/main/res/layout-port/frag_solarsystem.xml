@@ -143,12 +143,7 @@
                     android:layout_below="@id/population_count"
                     android:visibility="gone">
 
-                    <!--au.com.codeka.warworlds.ctrl.ColonyFocusView
-                        android:id="@+id/colony_focus_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true" /-->
-                    <View
+                    <au.com.codeka.warworlds.client.ctrl.ColonyFocusView
                         android:id="@+id/colony_focus_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

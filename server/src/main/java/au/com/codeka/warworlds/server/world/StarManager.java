@@ -96,6 +96,8 @@ public class StarManager {
                     .build())
                 .id(store.nextIdentifier())
                 .population(100.0f)
+                .max_population(1000.0f)
+                .defence_bonus(1.0f)
                 .build())
             .build());
     star.set(starBuilder.build());
