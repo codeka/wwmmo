@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.solarsystem;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
+import com.squareup.wire.Wire;
 import com.transitionseverywhere.TransitionManager;
 
 import java.util.Locale;
@@ -32,6 +34,7 @@ import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.ColonyHelper;
 
 /**
  * This is a fragment which displays details about a single solar system.
@@ -299,7 +302,7 @@ public class SolarSystemFragment extends BaseFragment {
     Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
     EmpireStorage storage = null;
     for (EmpireStorage s : star.empire_stores) {
-      if (s.empire_id.equals(myEmpire.id)) {
+      if (s.empire_id != null && s.empire_id.equals(myEmpire.id)) {
         storage = s;
         break;
       }
@@ -324,23 +327,23 @@ public class SolarSystemFragment extends BaseFragment {
       storedMinerals.setText(String.format(Locale.ENGLISH, "%d / %d",
           Math.round(storage.total_minerals), Math.round(storage.max_minerals)));
 
-      if (storage.goods_delta_per_hour > 0) {
+      if (Wire.get(storage.goods_delta_per_hour, 0.0f) >= 0) {
         deltaGoods.setTextColor(Color.GREEN);
         deltaGoods.setText(String.format(Locale.ENGLISH, "+%d/hr",
-            Math.round(storage.goods_delta_per_hour)));
+            Math.round(Wire.get(storage.goods_delta_per_hour, 0.0f))));
       } else {
         deltaGoods.setTextColor(Color.RED);
         deltaGoods.setText(String.format(Locale.ENGLISH, "%d/hr",
-            Math.round(storage.goods_delta_per_hour)));
+            Math.round(Wire.get(storage.goods_delta_per_hour, 0.0f))));
       }
-      if (storage.minerals_delta_per_hour >= 0) {
+      if (Wire.get(storage.minerals_delta_per_hour, 0.0f) >= 0) {
         deltaMinerals.setTextColor(Color.GREEN);
         deltaMinerals.setText(String.format(Locale.ENGLISH, "+%d/hr",
-            Math.round(storage.minerals_delta_per_hour)));
+            Math.round(Wire.get(storage.minerals_delta_per_hour, 0.0f))));
       } else {
         deltaMinerals.setTextColor(Color.RED);
         deltaMinerals.setText(String.format(Locale.ENGLISH, "%d/hr",
-            Math.round(storage.minerals_delta_per_hour)));
+            Math.round(Wire.get(storage.minerals_delta_per_hour, 0.0f))));
       }
     }
   }
@@ -459,8 +462,16 @@ public class SolarSystemFragment extends BaseFragment {
   }
 
   private void refreshColonyDetails() {
-    populationCountTextView.setText(String.format(Locale.US, "Pop: %d / %d",
-        Math.round(planet.colony.population), Math.round(100.0/*planet.colony.max_population*/)));
+    StringBuilder pop = new StringBuilder();
+    pop.append("Pop: ");
+    pop.append(Math.round(planet.colony.population));
+    pop.append(" <small>");
+    pop.append(String.format(Locale.US, "(%s%d / hr)",
+        Wire.get(planet.colony.delta_population, 0.0f) < 0 ? "-" : "+",
+        Math.abs(Math.round(Wire.get(planet.colony.delta_population, 0.0f)))));
+    pop.append("</small> / ");
+    pop.append(ColonyHelper.getMaxPopulation(planet));
+    populationCountTextView.setText(Html.fromHtml(pop.toString()));
 
     colonyFocusView.refresh(star, planet.colony);
   }

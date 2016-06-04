@@ -30,7 +30,7 @@ public class ColonyFocusView extends FrameLayout {
     }
     TextView defenceTextView = (TextView) findViewById(R.id.colony_defence);
     defenceTextView.setText(String.format(Locale.US, "Defence: %d", defence));
-
+/*
     ProgressBar populationFocus =
         (ProgressBar) findViewById(R.id.solarsystem_colony_population_focus);
     populationFocus.setProgress((int) (100.0f * colony.focus.population));
@@ -43,7 +43,7 @@ public class ColonyFocusView extends FrameLayout {
       deltaPopulation = "<font color=\"#ffff00\">" + deltaPopulation + "</font>";
     }
     populationValue.setText(Html.fromHtml(deltaPopulation));
-
+*/
     ProgressBar farmingFocus = (ProgressBar) findViewById(R.id.solarsystem_colony_farming_focus);
     farmingFocus.setProgress((int) (100.0f * colony.focus.farming));
     TextView farmingValue = (TextView) findViewById(R.id.solarsystem_colony_farming_value);

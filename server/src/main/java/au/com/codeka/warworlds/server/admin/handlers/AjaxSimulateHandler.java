@@ -16,7 +16,7 @@ public class AjaxSimulateHandler extends AjaxHandler {
     Long id = Long.parseLong (getRequest().getParameter("id"));
     long startTime = System.nanoTime();
     WatchableObject<Star> star = StarManager.i.getStar(id);
-    resp.loadTime = System.nanoTime() - startTime;
+    resp.loadTime = (System.nanoTime() - startTime) / 1000000L;
     Star.Builder starBuilder = star.get().newBuilder();
     final StringBuilder logMessages = new StringBuilder();
     new Simulation(new Simulation.LogHandler() {
@@ -31,9 +31,9 @@ public class AjaxSimulateHandler extends AjaxHandler {
         logMessages.append("\n");
       }
     }).simulate(starBuilder);
-    resp.simulateTime = System.nanoTime() - startTime;
+    resp.simulateTime = (System.nanoTime() - startTime) / 1000000L;
     star.set(starBuilder.build());
-    resp.saveTime = System.nanoTime() - startTime;
+    resp.saveTime = (System.nanoTime() - startTime) / 1000000L;
     resp.logMessages = logMessages.toString();
 
     setResponseGson(resp);

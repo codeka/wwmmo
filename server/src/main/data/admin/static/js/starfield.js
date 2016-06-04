@@ -80,8 +80,8 @@ $(function() {
       },
       method: "POST",
       success: function(data) {
-        $("#simulate-result")
-        alert(JSON.stringify(data));
+        var html = $("#simulate-result-tmpl").applyTemplate(data);
+        $("#simulate-result").html(html);
       }
     })
   }

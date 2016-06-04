@@ -64,7 +64,12 @@
       </div>
     </script>
     <script id="simulate-result-tmpl" type="text/html">
-      
+      <h3>Timing</h3>
+      <div>Load: <%= loadTime %>ms</div>
+      <div>Simulate: <%= simulateTime %>ms</div>
+      <div>Save: <%= saveTime %>ms</div>
+      <h3>Logs</h3>
+      <div style="white-space: pre-line;"><%= logMessages %></div>
     </script>
   </div>
 {% endblock %}

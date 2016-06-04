@@ -11,9 +11,11 @@ import java.util.HashMap;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
+import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
+import au.com.codeka.warworlds.common.sim.Simulation;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.ProtobufStore;
 
@@ -79,8 +81,8 @@ public class StarManager {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.COLONIZE));
 
-    // TODO: simulate star
     Star.Builder starBuilder = star.get().newBuilder();
+    new Simulation().simulate(starBuilder);
     starBuilder.planets.set(
         modification.planet_index,
         starBuilder.planets.get(modification.planet_index).newBuilder()
@@ -88,18 +90,32 @@ public class StarManager {
                 .cooldown_end_time(DateTime.now().plusMinutes(15).getMillis())
                 .empire_id(modification.empire_id)
                 .focus(new ColonyFocus.Builder()
-                    .construction(0.2f)
-                    .energy(0.2f)
-                    .farming(0.2f)
-                    .mining(0.2f)
-                    .population(0.2f)
+                    .construction(0.1f)
+                    .energy(0.3f)
+                    .farming(0.3f)
+                    .mining(0.3f)
                     .build())
                 .id(store.nextIdentifier())
                 .population(100.0f)
-                .max_population(1000.0f)
                 .defence_bonus(1.0f)
                 .build())
             .build());
+
+    // if there's no storage for this empire, add one with some defaults now.
+    boolean hasStorage = false;
+    for (EmpireStorage storage : starBuilder.empire_stores) {
+      if (storage.empire_id != null && storage.empire_id.equals(modification.empire_id)) {
+        hasStorage = true;
+      }
+    }
+    if (!hasStorage) {
+      starBuilder.empire_stores.add(new EmpireStorage.Builder()
+          .empire_id(modification.empire_id)
+          .total_goods(100.0f).total_minerals(100.0f).total_energy(1000.0f)
+          .max_goods(1000.0f).max_minerals(1000.0f).max_energy(1000.0f)
+          .build());
+    }
+
     star.set(starBuilder.build());
   }
 

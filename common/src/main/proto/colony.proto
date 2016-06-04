@@ -27,24 +27,20 @@ message Colony {
   //colony's total defence score.
   optional float defence_bonus = 9;
 
-  // When all bonuses and what-not are applies, what is this colony's maximum population?
-  optional float max_population = 10;
-
   // If set, this is the time the "cooldown" period ends. While in cooldown, the colony will not
   //lose population
-  optional int64 cooldown_end_time = 11;
+  optional int64 cooldown_end_time = 10;
 
   // collection of buildings in this colony.
-  repeated Building buildings = 12;
+  repeated Building buildings = 11;
 }
 
 // The "focus" of the colony. The values here should all add up to 1.0.
 message ColonyFocus {
-  optional float population = 4;
-  optional float farming = 5;
-  optional float mining = 6;
-  optional float construction = 7;
-  optional float energy = 8;
+  optional float farming = 1;
+  optional float mining = 2;
+  optional float construction = 3;
+  optional float energy = 4;
 }
 
 // Represents a completed building in a colony.

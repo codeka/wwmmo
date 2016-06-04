@@ -88,6 +88,7 @@ public class Simulation {
         if (predictionStar == null) {
           // Create the prediction star so that we can start predicting.
           predictionStar = star.build().newBuilder();
+          log("Begin prediction");
         }
         simulateStepForAllEmpires(now, predictionStar, empireIds);
       } else {
@@ -200,7 +201,8 @@ public class Simulation {
       storage = star.empire_stores.get(i).newBuilder();
     }
     if (storage == null) {
-      storage = new EmpireStorage.Builder();
+      log("No storage found for this empire!");
+      return;
     }
 
     float dt = Time.toHours(STEP_TIME);
@@ -210,8 +212,11 @@ public class Simulation {
 
     for (int i = 0; i < star.planets.size(); i++) {
       Planet planet = star.planets.get(i);
+      if (planet.colony == null) {
+        continue;
+      }
       Colony.Builder colony = planet.colony.newBuilder();
-      if (colony == null || !equalEmpire(colony.empire_id, empireId)) {
+      if (!equalEmpire(colony.empire_id, empireId)) {
         continue;
       }
 
@@ -434,8 +439,11 @@ public class Simulation {
     // now loop through the colonies and update the population/goods counter
     for (int i = 0; i < star.planets.size(); i++) {
       Planet planet = star.planets.get(i);
+      if (planet.colony == null) {
+        continue;
+      }
       Colony.Builder colony = planet.colony.newBuilder();
-      if (colony == null || !equalEmpire(colony.empire_id, empireId)) {
+      if (!equalEmpire(colony.empire_id, empireId)) {
         continue;
       }
 
@@ -451,16 +459,17 @@ public class Simulation {
       colony.delta_population(populationIncrease);
       float populationIncreaseThisTurn = populationIncrease * dt;
 
-      if (colony.cooldown_end_time < now) {
+      if (colony.cooldown_end_time != null && colony.cooldown_end_time < now) {
         log("    Colony is no longer in cooldown period.");
         colony.cooldown_end_time = null;
       }
 
+      int maxPopulation = ColonyHelper.getMaxPopulation(planet);
       float newPopulation = colony.population + populationIncreaseThisTurn;
       if (newPopulation < 1.0f) {
         newPopulation = 0.0f;
-      } else if (newPopulation > colony.max_population) {
-        newPopulation = colony.max_population;
+      } else if (newPopulation > maxPopulation) {
+        newPopulation = maxPopulation;
       }
       if (newPopulation < 100.0f && colony.cooldown_end_time != null) {
         newPopulation = 100.0f;

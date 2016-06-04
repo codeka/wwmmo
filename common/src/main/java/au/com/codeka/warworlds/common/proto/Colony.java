@@ -43,8 +43,6 @@ public final class Colony extends Message<Colony, Colony.Builder> {
 
   public static final Float DEFAULT_DEFENCE_BONUS = 0.0f;
 
-  public static final Float DEFAULT_MAX_POPULATION = 0.0f;
-
   public static final Long DEFAULT_COOLDOWN_END_TIME = 0L;
 
   /**
@@ -122,20 +120,11 @@ public final class Colony extends Message<Colony, Colony.Builder> {
   public final Float defence_bonus;
 
   /**
-   * When all bonuses and what-not are applies, what is this colony's maximum population?
-   */
-  @WireField(
-      tag = 10,
-      adapter = "com.squareup.wire.ProtoAdapter#FLOAT"
-  )
-  public final Float max_population;
-
-  /**
    * If set, this is the time the "cooldown" period ends. While in cooldown, the colony will not
    * lose population
    */
   @WireField(
-      tag = 11,
+      tag = 10,
       adapter = "com.squareup.wire.ProtoAdapter#INT64"
   )
   public final Long cooldown_end_time;
@@ -144,17 +133,17 @@ public final class Colony extends Message<Colony, Colony.Builder> {
    * collection of buildings in this colony.
    */
   @WireField(
-      tag = 12,
+      tag = 11,
       adapter = "au.com.codeka.warworlds.common.proto.Building#ADAPTER",
       label = WireField.Label.REPEATED
   )
   public final List<Building> buildings;
 
-  public Colony(Long id, Long empire_id, Float population, ColonyFocus focus, Float delta_population, Float delta_goods, Float delta_minerals, Float delta_energy, Float defence_bonus, Float max_population, Long cooldown_end_time, List<Building> buildings) {
-    this(id, empire_id, population, focus, delta_population, delta_goods, delta_minerals, delta_energy, defence_bonus, max_population, cooldown_end_time, buildings, ByteString.EMPTY);
+  public Colony(Long id, Long empire_id, Float population, ColonyFocus focus, Float delta_population, Float delta_goods, Float delta_minerals, Float delta_energy, Float defence_bonus, Long cooldown_end_time, List<Building> buildings) {
+    this(id, empire_id, population, focus, delta_population, delta_goods, delta_minerals, delta_energy, defence_bonus, cooldown_end_time, buildings, ByteString.EMPTY);
   }
 
-  public Colony(Long id, Long empire_id, Float population, ColonyFocus focus, Float delta_population, Float delta_goods, Float delta_minerals, Float delta_energy, Float defence_bonus, Float max_population, Long cooldown_end_time, List<Building> buildings, ByteString unknownFields) {
+  public Colony(Long id, Long empire_id, Float population, ColonyFocus focus, Float delta_population, Float delta_goods, Float delta_minerals, Float delta_energy, Float defence_bonus, Long cooldown_end_time, List<Building> buildings, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
     this.id = id;
     this.empire_id = empire_id;
@@ -165,7 +154,6 @@ public final class Colony extends Message<Colony, Colony.Builder> {
     this.delta_minerals = delta_minerals;
     this.delta_energy = delta_energy;
     this.defence_bonus = defence_bonus;
-    this.max_population = max_population;
     this.cooldown_end_time = cooldown_end_time;
     this.buildings = Internal.immutableCopyOf("buildings", buildings);
   }
@@ -182,7 +170,6 @@ public final class Colony extends Message<Colony, Colony.Builder> {
     builder.delta_minerals = delta_minerals;
     builder.delta_energy = delta_energy;
     builder.defence_bonus = defence_bonus;
-    builder.max_population = max_population;
     builder.cooldown_end_time = cooldown_end_time;
     builder.buildings = Internal.copyOf("buildings", buildings);
     builder.addUnknownFields(unknownFields());
@@ -204,7 +191,6 @@ public final class Colony extends Message<Colony, Colony.Builder> {
         && Internal.equals(delta_minerals, o.delta_minerals)
         && Internal.equals(delta_energy, o.delta_energy)
         && Internal.equals(defence_bonus, o.defence_bonus)
-        && Internal.equals(max_population, o.max_population)
         && Internal.equals(cooldown_end_time, o.cooldown_end_time)
         && Internal.equals(buildings, o.buildings);
   }
@@ -223,7 +209,6 @@ public final class Colony extends Message<Colony, Colony.Builder> {
       result = result * 37 + (delta_minerals != null ? delta_minerals.hashCode() : 0);
       result = result * 37 + (delta_energy != null ? delta_energy.hashCode() : 0);
       result = result * 37 + (defence_bonus != null ? defence_bonus.hashCode() : 0);
-      result = result * 37 + (max_population != null ? max_population.hashCode() : 0);
       result = result * 37 + (cooldown_end_time != null ? cooldown_end_time.hashCode() : 0);
       result = result * 37 + (buildings != null ? buildings.hashCode() : 1);
       super.hashCode = result;
@@ -243,7 +228,6 @@ public final class Colony extends Message<Colony, Colony.Builder> {
     if (delta_minerals != null) builder.append(", delta_minerals=").append(delta_minerals);
     if (delta_energy != null) builder.append(", delta_energy=").append(delta_energy);
     if (defence_bonus != null) builder.append(", defence_bonus=").append(defence_bonus);
-    if (max_population != null) builder.append(", max_population=").append(max_population);
     if (cooldown_end_time != null) builder.append(", cooldown_end_time=").append(cooldown_end_time);
     if (buildings != null) builder.append(", buildings=").append(buildings);
     return builder.replace(0, 2, "Colony{").append('}').toString();
@@ -267,8 +251,6 @@ public final class Colony extends Message<Colony, Colony.Builder> {
     public Float delta_energy;
 
     public Float defence_bonus;
-
-    public Float max_population;
 
     public Long cooldown_end_time;
 
@@ -344,14 +326,6 @@ public final class Colony extends Message<Colony, Colony.Builder> {
     }
 
     /**
-     * When all bonuses and what-not are applies, what is this colony's maximum population?
-     */
-    public Builder max_population(Float max_population) {
-      this.max_population = max_population;
-      return this;
-    }
-
-    /**
      * If set, this is the time the "cooldown" period ends. While in cooldown, the colony will not
      * lose population
      */
@@ -371,7 +345,7 @@ public final class Colony extends Message<Colony, Colony.Builder> {
 
     @Override
     public Colony build() {
-      return new Colony(id, empire_id, population, focus, delta_population, delta_goods, delta_minerals, delta_energy, defence_bonus, max_population, cooldown_end_time, buildings, buildUnknownFields());
+      return new Colony(id, empire_id, population, focus, delta_population, delta_goods, delta_minerals, delta_energy, defence_bonus, cooldown_end_time, buildings, buildUnknownFields());
     }
   }
 
@@ -391,9 +365,8 @@ public final class Colony extends Message<Colony, Colony.Builder> {
           + (value.delta_minerals != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(7, value.delta_minerals) : 0)
           + (value.delta_energy != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(8, value.delta_energy) : 0)
           + (value.defence_bonus != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(9, value.defence_bonus) : 0)
-          + (value.max_population != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(10, value.max_population) : 0)
-          + (value.cooldown_end_time != null ? ProtoAdapter.INT64.encodedSizeWithTag(11, value.cooldown_end_time) : 0)
-          + Building.ADAPTER.asRepeated().encodedSizeWithTag(12, value.buildings)
+          + (value.cooldown_end_time != null ? ProtoAdapter.INT64.encodedSizeWithTag(10, value.cooldown_end_time) : 0)
+          + Building.ADAPTER.asRepeated().encodedSizeWithTag(11, value.buildings)
           + value.unknownFields().size();
     }
 
@@ -408,9 +381,8 @@ public final class Colony extends Message<Colony, Colony.Builder> {
       if (value.delta_minerals != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 7, value.delta_minerals);
       if (value.delta_energy != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 8, value.delta_energy);
       if (value.defence_bonus != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 9, value.defence_bonus);
-      if (value.max_population != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 10, value.max_population);
-      if (value.cooldown_end_time != null) ProtoAdapter.INT64.encodeWithTag(writer, 11, value.cooldown_end_time);
-      if (value.buildings != null) Building.ADAPTER.asRepeated().encodeWithTag(writer, 12, value.buildings);
+      if (value.cooldown_end_time != null) ProtoAdapter.INT64.encodeWithTag(writer, 10, value.cooldown_end_time);
+      if (value.buildings != null) Building.ADAPTER.asRepeated().encodeWithTag(writer, 11, value.buildings);
       writer.writeBytes(value.unknownFields());
     }
 
@@ -429,9 +401,8 @@ public final class Colony extends Message<Colony, Colony.Builder> {
           case 7: builder.delta_minerals(ProtoAdapter.FLOAT.decode(reader)); break;
           case 8: builder.delta_energy(ProtoAdapter.FLOAT.decode(reader)); break;
           case 9: builder.defence_bonus(ProtoAdapter.FLOAT.decode(reader)); break;
-          case 10: builder.max_population(ProtoAdapter.FLOAT.decode(reader)); break;
-          case 11: builder.cooldown_end_time(ProtoAdapter.INT64.decode(reader)); break;
-          case 12: builder.buildings.add(Building.ADAPTER.decode(reader)); break;
+          case 10: builder.cooldown_end_time(ProtoAdapter.INT64.decode(reader)); break;
+          case 11: builder.buildings.add(Building.ADAPTER.decode(reader)); break;
           default: {
             FieldEncoding fieldEncoding = reader.peekFieldEncoding();
             Object value = fieldEncoding.rawProtoAdapter().decode(reader);
