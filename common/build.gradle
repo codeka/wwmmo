@@ -12,4 +12,5 @@ tasks.withType(JavaCompile) {
 dependencies {
   compile fileTree(dir: 'libs', include: ['*.jar'])
   compile 'com.squareup.wire:wire-runtime:2.1.2'
+  compile 'com.google.code.findbugs:jsr305:3.0.0'
 }

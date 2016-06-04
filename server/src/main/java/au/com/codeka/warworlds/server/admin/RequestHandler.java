@@ -156,6 +156,21 @@ public class RequestHandler {
     }
   }
 
+  protected void setResponseGson(Object obj) {
+    response.setContentType("application/json");
+    response.setCharacterEncoding("utf-8");
+    try {
+      PrintWriter writer = response.getWriter();
+      Gson gson = new GsonBuilder()
+          .disableHtmlEscaping()
+          .create();
+      writer.write(gson.toJson(obj));
+      writer.flush();
+    } catch (IOException e) {
+      // Ignore.
+    }
+  }
+
   protected void redirect(String url) {
     response.setStatus(302);
     response.addHeader("Location", url);

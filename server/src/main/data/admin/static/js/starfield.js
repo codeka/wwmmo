@@ -72,6 +72,20 @@ $(function() {
     $("#star-details").html(html);
   }
 
+  window.simulate = function(id) {
+    $.ajax({
+      url: "/admin/ajax/simulate",
+      data: {
+        "id": id
+      },
+      method: "POST",
+      success: function(data) {
+        $("#simulate-result")
+        alert(JSON.stringify(data));
+      }
+    })
+  }
+
   $("#xy button").on("click", function() {
     $.ajax({
       url: "/admin/ajax/starfield",
