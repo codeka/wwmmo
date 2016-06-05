@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+  <FrameLayout
+      android:id="@+id/planet_background"
+      android:layout_width="match_parent"
+      android:layout_height="190dp">
+  </FrameLayout>
+
+  <ImageView android:id="@+id/planet_icon"
+             android:layout_width="150dp"
+             android:layout_height="150dp"
+             android:layout_alignParentLeft="true"
+             android:layout_alignParentStart="true"
+             android:layout_alignParentTop="true"
+             android:layout_margin="10dp" />
+
+    <RelativeLayout android:id="@+id/congeniality_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="16dp"
+                    android:layout_toRightOf="@+id/planet_icon"
+                    android:layout_toEndOf="@+id/planet_icon">
+
+        <ImageView
+            android:id="@+id/population_congeniality_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/population" />
+
+        <TextView
+            android:id="@+id/population_congeniality_value"
+            android:layout_width="45dp"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/population_congeniality_icon"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <ProgressBar
+            android:id="@+id/population_congeniality"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/population_congeniality_icon"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="50dp" />
+
+        <ImageView
+            android:id="@+id/farming_congeniality_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_below="@+id/population_congeniality_icon"
+            android:src="@drawable/farming" />
+
+        <TextView
+            android:id="@+id/farming_congeniality_value"
+            android:layout_width="45dp"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/farming_congeniality_icon"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <ProgressBar
+            android:id="@+id/farming_congeniality"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/farming_congeniality_icon"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="50dp" />
+
+        <ImageView
+            android:id="@+id/mining_congeniality_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_below="@+id/farming_congeniality_icon"
+            android:src="@drawable/mining" />
+
+        <TextView
+            android:id="@+id/mining_congeniality_value"
+            android:layout_width="45dp"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/mining_congeniality_icon"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <ProgressBar
+            android:id="@+id/mining_congeniality"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/mining_congeniality_icon"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="50dp" />
+
+      <ImageView
+          android:id="@+id/energy_congeniality_icon"
+          android:layout_width="16dp"
+          android:layout_height="16dp"
+          android:layout_marginTop="2dp"
+          android:layout_marginBottom="2dp"
+          android:layout_below="@+id/mining_congeniality_icon"
+          android:src="@drawable/energy" />
+
+      <TextView
+          android:id="@+id/energy_congeniality_value"
+          android:layout_width="45dp"
+          android:layout_height="20dp"
+          android:layout_alignTop="@id/energy_congeniality_icon"
+          android:layout_alignParentRight="true"
+          android:layout_alignParentEnd="true" />
+
+      <ProgressBar
+          android:id="@+id/energy_congeniality"
+          style="?android:attr/progressBarStyleHorizontal"
+          android:layout_width="match_parent"
+          android:layout_height="20dp"
+          android:layout_alignTop="@id/energy_congeniality_icon"
+          android:layout_marginLeft="20dp"
+          android:layout_marginRight="50dp"
+          android:layout_marginStart="20dp"
+          android:layout_marginEnd="50dp" />
+    </RelativeLayout>
+
+    <RelativeLayout android:id="@+id/bottom_pane"
+                    style="@style/BottomPane"
+                    android:transitionName="bottom_pane"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/planet_icon"
+                    android:layout_alignParentBottom="true">
+        <ImageView android:id="@+id/enemy_empire_icon"
+                   android:layout_width="40dp"
+                   android:layout_height="40dp"
+                   android:layout_marginTop="6dp"
+                   android:layout_marginLeft="6dp"
+                   android:layout_marginStart="6dp" />
+        <TextView android:id="@+id/enemy_empire_name"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toRightOf="@id/enemy_empire_icon"
+                  android:layout_toEndOf="@id/enemy_empire_icon"
+                  android:layout_marginTop="6dp"
+                  android:layout_marginLeft="6dp"
+                  android:layout_marginStart="6dp"
+                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:singleLine="true"
+                  android:ellipsize="end"
+                  android:text="Empire Name" />
+        <TextView android:id="@+id/enemy_empire_defence"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toRightOf="@id/enemy_empire_icon"
+                  android:layout_toEndOf="@id/enemy_empire_icon"
+                  android:layout_below="@id/enemy_empire_name"
+                  android:layout_marginLeft="6dp"
+                  android:layout_marginStart="6dp"
+                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:text="Defence: 1234" />
+        <Button android:id="@+id/attack_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/enemy_empire_icon"
+                android:layout_alignLeft="@id/enemy_empire_icon"
+                android:layout_alignStart="@id/enemy_empire_icon"
+                android:layout_alignRight="@id/enemy_empire_defence"
+                android:layout_alignEnd="@id/enemy_empire_defence"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="Attack" />
+    </RelativeLayout>
+
+</RelativeLayout>

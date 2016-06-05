@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.client.ctrl;
 
 import android.content.Context;
-import android.text.Html;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
@@ -9,7 +8,6 @@ import android.widget.TextView;
 
 import com.squareup.wire.Wire;
 
-import java.util.Date;
 import java.util.Locale;
 
 import au.com.codeka.warworlds.client.R;

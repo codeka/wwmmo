@@ -20,6 +20,7 @@ import java.util.Locale;
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
+import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.client.util.NumberFormatter;
@@ -42,7 +43,6 @@ import au.com.codeka.warworlds.common.sim.ColonyHelper;
 public class SolarSystemFragment extends BaseFragment {
   private static final Log log = new Log("SolarSystemFragment");
 
-  private static final int BUILD_REQUEST = 3000;
   private static final String STAR_ID_KEY = "StarID";
   private static final String PLANET_INDEX_KEY = "PlanetIndex";
 
@@ -171,9 +171,12 @@ public class SolarSystemFragment extends BaseFragment {
           return;
         }
 
-//        FocusDialog dialog = new FocusDialog();
-//        dialog.setColony(star, mColony);
-//        dialog.show(getActivity().getSupportFragmentManager(), "");
+        getFragmentTransitionManager().replaceFragment(
+            PlanetDetailsFragment.class,
+            PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
+            SharedViewHolder.builder()
+                .addSharedView(R.id.bottom_pane, "bottom_pane")
+                .build());
       }
     });
 
@@ -359,16 +362,12 @@ public class SolarSystemFragment extends BaseFragment {
       return;
     }
 
-    // TODO: determine if enemy colony or not...
-    //Intent intent;
-    //if (mColony != null) {
-    //  intent = new Intent(getActivity(), EnemyPlanetActivity.class);
-    //} else {
-    //  intent = new Intent(getActivity(), EmptyPlanetActivity.class);
-    //}
-    //intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-    //intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.getIndex());
-    //startActivity(intent);
+    getFragmentTransitionManager().replaceFragment(
+        PlanetDetailsFragment.class,
+        PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
+        SharedViewHolder.builder()
+            .addSharedView(R.id.bottom_pane, "bottom_pane")
+            .build());
   }
 
   private void refreshSelectedPlanet() {
