@@ -254,7 +254,7 @@
                      android:layout_alignBottom="@+id/focus_population"
                      android:layout_alignParentRight="true"
                      android:layout_marginRight="10dp"
-                     android:scaleType="fitXY"
+                     android:scaleType="center"
                      android:src="@drawable/lock_opened" />
 
         <SeekBar android:id="@+id/focus_farming"
@@ -319,7 +319,7 @@
                      android:layout_alignBottom="@+id/focus_farming"
                      android:layout_alignParentRight="true"
                      android:layout_marginRight="10dp"
-                     android:scaleType="fitXY"
+                     android:scaleType="center"
                      android:src="@drawable/lock_opened" />
 
         <SeekBar android:id="@+id/focus_mining"
@@ -384,7 +384,7 @@
                      android:layout_alignBottom="@+id/focus_mining"
                      android:layout_alignParentRight="true"
                      android:layout_marginRight="10dp"
-                     android:scaleType="fitXY"
+                     android:scaleType="center"
                      android:src="@drawable/lock_opened" />
 
         <SeekBar android:id="@+id/focus_construction"
@@ -441,7 +441,7 @@
                      android:layout_alignBottom="@id/focus_construction"
                      android:layout_alignParentRight="true"
                      android:layout_marginRight="10dp"
-                     android:scaleType="fitXY"
+                     android:scaleType="center"
                      android:src="@drawable/lock_opened" />
 
         <View android:layout_width="match_parent"
