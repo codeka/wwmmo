@@ -1,16 +1,23 @@
 package au.com.codeka.warworlds.client.world;
 
 import android.content.Context;
+import android.databinding.BindingAdapter;
 import android.util.DisplayMetrics;
+import android.widget.ImageView;
 
 import com.google.common.collect.ImmutableMap;
+import com.squareup.picasso.Picasso;
 
 import java.util.Locale;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.BuildConfig;
 import au.com.codeka.warworlds.client.net.ServerUrl;
+import au.com.codeka.warworlds.client.opengl.DimensionResolver;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -65,4 +72,53 @@ public class ImageHelper {
         ServerUrl.getUrl(), empire.id, width, height);
   }
 
+  /**
+   * This is a binding adapter so we can load images using data binding.
+   *
+   * Usage is pretty simple:
+   *
+   * <code>&lt;ImageView app:imageUrl="@{model.url}" /&gt;</code>
+   */
+  @BindingAdapter({"bind:imageUrl"})
+  public static void bindImage(ImageView view, String imageUrl) {
+    Picasso.with(view.getContext())
+        .load(imageUrl)
+        .into(view);
+  }
+
+  /**
+   * This is a binding adapter so we can load images using data binding.
+   *
+   * Usage is pretty simple:
+   *
+   * <code>&lt;ImageView app:imageUrl="@{model.url}" /&gt;</code>
+   */
+  @BindingAdapter({"bind:empireShield"})
+  public static void bindEmpireShield(ImageView view, @Nullable Empire empire) {
+    if (empire == null) {
+      return;
+    }
+
+    DimensionResolver resolver = new DimensionResolver(view.getContext());
+    int width = (int) resolver.px2dp(view.getLayoutParams().width);
+    int height = (int) resolver.px2dp(view.getLayoutParams().height);
+    bindImage(view, getEmpireImageUrl(view.getContext(), empire, width, height));
+  }
+
+
+  /**
+   * <code>&lt;ImageView app:star="@{star}" app:planet="@{planet}" /&gt;</code>
+   */
+  @BindingAdapter({"bind:star", "bind:planet"})
+  public static void bindPlanetIcon(ImageView view, @Nullable Star star, @Nullable Planet planet) {
+    if (star == null || planet == null) {
+      return;
+    }
+
+    DimensionResolver resolver = new DimensionResolver(view.getContext());
+    int width = (int) resolver.px2dp(view.getLayoutParams().width);
+    int height = (int) resolver.px2dp(view.getLayoutParams().height);
+    bindImage(view, getPlanetImageUrl(
+        view.getContext(), star, star.planets.indexOf(planet), width, height));
+  }
 }

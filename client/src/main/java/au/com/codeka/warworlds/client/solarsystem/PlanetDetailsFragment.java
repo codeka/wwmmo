@@ -1,26 +1,21 @@
 package au.com.codeka.warworlds.client.solarsystem;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
-
-import javax.annotation.Nullable;
-
-import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
-import au.com.codeka.warworlds.client.util.NumberFormatter;
+import au.com.codeka.warworlds.client.databinding.FragPlanetDetailsBinding;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.world.EmpireManager;
-import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.client.world.StarManager;
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -30,25 +25,12 @@ import au.com.codeka.warworlds.common.proto.Star;
  * could also be an ally or faction member).
  */
 public class PlanetDetailsFragment extends BaseFragment {
+  private static final Log log = new Log("PlanetDetailsFragment");
   private static final String STAR_ID_KEY = "StarID";
   private static final String PLANET_INDEX_KEY = "PlanetIndex";
 
-  private Star star;
-  private int planetIndex;
-  private Planet planet;
-  @Nullable private Empire empire;
-
-  private Button attackBtn;
-  private ImageView planetIcon;
-  private View congenialityContainer;
-  private ProgressBar populationCongenialityProgressBar;
-  private TextView populationCongenialityTextView;
-  private ProgressBar farmingCongenialityProgressBar;
-  private TextView farmingCongenialityTextView;
-  private ProgressBar miningCongenialityProgressBar;
-  private TextView miningCongenialityTextView;
-  private ProgressBar energyCongenialityProgressBar;
-  private TextView energyCongenialityTextView;
+  private FragPlanetDetailsBinding binding;
+  private Handlers handlers = new Handlers();
 
   public static Bundle createArguments(long starID, int planetIndex) {
     Bundle args = new Bundle();
@@ -60,39 +42,13 @@ public class PlanetDetailsFragment extends BaseFragment {
   @Override
   public View onCreateView(
       LayoutInflater layoutInflater, ViewGroup parent, Bundle savedInstanceState) {
-    return layoutInflater.inflate(R.layout.frag_planet_details, parent, false);
+    binding = DataBindingUtil.inflate(layoutInflater, R.layout.frag_planet_details, parent, false);
+    return binding.getRoot();
   }
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     ViewBackgroundGenerator.setBackground(view.findViewById(R.id.planet_background));
-
-    attackBtn = (Button) view.findViewById(R.id.attack_btn);
-    planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
-    congenialityContainer = view.findViewById(R.id.congeniality_container);
-    populationCongenialityProgressBar = (ProgressBar) view.findViewById(
-        R.id.population_congeniality);
-    populationCongenialityTextView = (TextView) view.findViewById(
-        R.id.population_congeniality_value);
-    farmingCongenialityProgressBar = (ProgressBar) view.findViewById(
-        R.id.farming_congeniality);
-    farmingCongenialityTextView = (TextView) view.findViewById(
-        R.id.farming_congeniality_value);
-    miningCongenialityProgressBar = (ProgressBar) view.findViewById(
-        R.id.mining_congeniality);
-    miningCongenialityTextView = (TextView) view.findViewById(
-        R.id.mining_congeniality_value);
-    energyCongenialityProgressBar = (ProgressBar) view.findViewById(
-        R.id.energy_congeniality);
-    energyCongenialityTextView = (TextView) view.findViewById(
-        R.id.energy_congeniality_value);
-
-    attackBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onAttackClick();
-      }
-    });
   }
 
   @Override
@@ -100,17 +56,25 @@ public class PlanetDetailsFragment extends BaseFragment {
     super.onResume();
    // App.i.getEventBus().register(eventHandler);
 
-    star = StarManager.i.getStar(getArguments().getLong(STAR_ID_KEY));
+    Star star = StarManager.i.getStar(getArguments().getLong(STAR_ID_KEY));
     if (star == null) {
       return;
     }
-    planetIndex = getArguments().getInt(PLANET_INDEX_KEY);
-    planet = star.planets.get(planetIndex);
-    refreshStarDetails();
+    int planetIndex = getArguments().getInt(PLANET_INDEX_KEY);
+    Planet planet = star.planets.get(planetIndex);
+
+    Empire empire = null;
+    FocusModel focusModel = null;
     if (planet.colony != null && planet.colony.empire_id != null) {
       empire = EmpireManager.i.getEmpire(planet.colony.empire_id);
-      refreshEmpireDetails();
+      focusModel = new FocusModel(planet.colony.focus);
     }
+
+    binding.setHandlers(handlers);
+    binding.setStar(star);
+    binding.setPlanet(planet);
+    binding.setEmpire(empire);
+    binding.setFocus(focusModel);
   }
 
   @Override
@@ -148,101 +112,81 @@ public class PlanetDetailsFragment extends BaseFragment {
     }*/
   };
 
-  private void refreshStarDetails() {
-    if (empire != null) {
-      attackBtn.setEnabled(false);
-      refreshEmpireDetails();
-    } else {
-      attackBtn.setVisibility(View.GONE);
-    }
+  public class Handlers {
+    public void onAttackClick(View view) {
+      log.info("Attack!");
+      /*
+      int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
 
-    if (star == null || planet == null) {
-      planetIcon.setVisibility(View.GONE);
-      congenialityContainer.setVisibility(View.GONE);
-    } else {
-      planetIcon.setVisibility(View.VISIBLE);
-
-      Picasso.with(getContext())
-          .load(ImageHelper.getPlanetImageUrl(getContext(), star, planetIndex, 150, 150))
-          .into(planetIcon);
-
-      congenialityContainer.setVisibility(View.VISIBLE);
-
-      populationCongenialityTextView.setText(
-          NumberFormatter.format(planet.population_congeniality));
-      populationCongenialityProgressBar.setProgress(
-          (int) (populationCongenialityProgressBar.getMax()
-              * (planet.population_congeniality / 1000.0)));
-
-      farmingCongenialityTextView.setText(NumberFormatter.format(planet.farming_congeniality));
-      farmingCongenialityProgressBar.setProgress(
-          (int)(farmingCongenialityProgressBar.getMax() * (planet.farming_congeniality / 100.0)));
-
-      miningCongenialityTextView.setText(NumberFormatter.format(planet.mining_congeniality));
-      miningCongenialityProgressBar.setProgress(
-          (int)(miningCongenialityProgressBar.getMax() * (planet.mining_congeniality / 100.0)));
-
-      energyCongenialityTextView.setText(NumberFormatter.format(planet.energy_congeniality));
-      energyCongenialityProgressBar.setProgress(
-          (int)(miningCongenialityProgressBar.getMax() * (planet.energy_congeniality / 100.0)));
-    }
-
-  }
-
-  private void refreshEmpireDetails() {
-    attackBtn.setVisibility(View.GONE);
-
-    /*
-    ImageView enemyIcon = (ImageView) findViewById(R.id.enemy_empire_icon);
-    TextView enemyName = (TextView) findViewById(R.id.enemy_empire_name);
-    TextView enemyDefence = (TextView) findViewById(R.id.enemy_empire_defence);
-
-    int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
-    if (defence < 1) {
-      defence = 1;
-    }
-    enemyIcon.setImageBitmap(EmpireShieldManager.i.getShield(this, colonyEmpire));
-    enemyName.setText(colonyEmpire.getDisplayName());
-    enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d", defence));
-  */}
-
-  private void onAttackClick() {/*
-    int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
-
-    final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-    int attack = 0;
-    for (BaseFleet fleet : star.getFleets()) {
-      if (fleet.getEmpireKey() == null) {
-        continue;
-      }
-      if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
-        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP,
-            fleet.getDesignID());
-        if (design.hasEffect("troopcarrier")) {
-          attack += Math.ceil(fleet.getNumShips());
+      final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+      int attack = 0;
+      for (BaseFleet fleet : star.getFleets()) {
+        if (fleet.getEmpireKey() == null) {
+          continue;
+        }
+        if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
+          ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP,
+              fleet.getDesignID());
+          if (design.hasEffect("troopcarrier")) {
+            attack += Math.ceil(fleet.getNumShips());
+          }
         }
       }
+
+      StyledDialog.Builder b = new StyledDialog.Builder(this);
+      b.setMessage(Html.fromHtml(String.format(Locale.ENGLISH,
+          "<p>Do you want to attack this %s colony?</p>"
+              + "<p><b>Colony defence:</b> %d<br />"
+              + "   <b>Your attack capability:</b> %d</p>", colonyEmpire.getDisplayName(), defence,
+          attack)));
+      b.setPositiveButton("Attack!", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(final DialogInterface dialog, int which) {
+          myEmpire.attackColony(star, colony, new MyEmpire.AttackColonyCompleteHandler() {
+            @Override
+            public void onComplete() {
+              dialog.dismiss();
+              finish();
+            }
+          });
+        }
+      });
+      b.setNegativeButton("Cancel", null);
+      b.create().show();
+    */}
+  }
+
+  public static class FocusModel extends BaseObservable {
+    private float farmingFocus;
+    private float miningFocus;
+    private float energyFocus;
+    private float constructionFocus;
+
+    public FocusModel(ColonyFocus focus) {
+      farmingFocus = focus.farming;
+      miningFocus = focus.mining;
+      energyFocus = focus.energy;
+      constructionFocus = focus.construction;
     }
 
-    StyledDialog.Builder b = new StyledDialog.Builder(this);
-    b.setMessage(Html.fromHtml(String.format(Locale.ENGLISH,
-        "<p>Do you want to attack this %s colony?</p>"
-            + "<p><b>Colony defence:</b> %d<br />"
-            + "   <b>Your attack capability:</b> %d</p>", colonyEmpire.getDisplayName(), defence,
-        attack)));
-    b.setPositiveButton("Attack!", new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(final DialogInterface dialog, int which) {
-        myEmpire.attackColony(star, colony, new MyEmpire.AttackColonyCompleteHandler() {
-          @Override
-          public void onComplete() {
-            dialog.dismiss();
-            finish();
-          }
-        });
-      }
-    });
-    b.setNegativeButton("Cancel", null);
-    b.create().show();
-  */}
+    @Bindable
+    public float getFarmingFocus() {
+      return farmingFocus;
+    }
+
+    @Bindable
+    public float getMiningFocus() {
+      return miningFocus;
+    }
+
+    @Bindable
+    public float getEnergyFocus() {
+      return energyFocus;
+    }
+
+    @Bindable
+    public float getConstructionFocus() {
+      return constructionFocus;
+    }
+  }
 }

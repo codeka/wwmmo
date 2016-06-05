@@ -20,6 +20,7 @@
   <string name="build">Build</string>
   <string name="focus">Focus</string>
   <string name="boost">Boost</string>
+  <string name="attack">Attack</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to
@@ -30,6 +31,8 @@
   </string>
   <string name="create_empire_hint">Player name</string>
   <string name="create_empire_switch_account_btn">I already have an empire</string>
+
+  <string name="focus_hint">Drag the sliders to adjust focus.</string>
 
   <string name="pref_category_chat">Chat</string>
   <string name="pref_chat_profanity_filter">Filter profanity</string>

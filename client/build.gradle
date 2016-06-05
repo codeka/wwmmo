@@ -50,6 +50,9 @@ android {
       buildConfigField "String", "DEFAULT_SERVER", "\"http://192.168.1.3:8080/\""
     }
   }
+  dataBinding {
+    enabled = true
+  }
   dexOptions {
     incremental true
   }
