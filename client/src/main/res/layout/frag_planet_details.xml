@@ -248,7 +248,8 @@
                  android:layout_toLeftOf="@+id/focus_farming_value"
                  android:layout_toStartOf="@+id/focus_farming_value"
                  android:max="1000"
-                 android:progress="@{(int)(focus.farmingFocus * 1000.0f)}" />
+                 android:progress="@{(int)(focus.farmingFocus * 1000.0f)}"
+                 android:onProgressChanged="@{focus.onFarmingProgressChanged}" />
 
         <ImageView android:id="@+id/focus_farming_icon"
                    android:layout_width="20dp"
@@ -302,9 +303,12 @@
                      android:layout_height="30dp"
                      android:layout_alignBottom="@+id/focus_farming"
                      android:layout_alignParentRight="true"
+                     android:layout_alignParentEnd="true"
                      android:layout_marginRight="10dp"
+                     android:layout_marginEnd="10dp"
                      android:scaleType="center"
-                     android:src="@drawable/lock_opened" />
+                     android:src="@{focus.farmingLocked ? @drawable/lock_closed : @drawable/lock_opened}"
+                     android:onClick="@{focus.onFarmingLockClick}" />
 
         <SeekBar android:id="@+id/focus_mining"
                  android:layout_width="match_parent"
@@ -322,7 +326,8 @@
                  android:layout_toLeftOf="@+id/focus_mining_value"
                  android:layout_toStartOf="@+id/focus_mining_value"
                  android:max="1000"
-                 android:progress="@{(int)(focus.miningFocus * 1000.0f)}" />
+                 android:progress="@{(int)(focus.miningFocus * 1000.0f)}"
+                 android:onProgressChanged="@{focus.onMiningProgressChanged}" />
 
         <ImageView android:id="@+id/focus_mining_icon"
                    android:layout_width="20dp"
@@ -376,9 +381,12 @@
                      android:layout_height="30dp"
                      android:layout_alignBottom="@+id/focus_mining"
                      android:layout_alignParentRight="true"
+                     android:layout_alignParentEnd="true"
                      android:layout_marginRight="10dp"
+                     android:layout_marginEnd="10dp"
                      android:scaleType="center"
-                     android:src="@drawable/lock_opened" />
+                     android:src="@{focus.miningLocked ? @drawable/lock_closed : @drawable/lock_opened}"
+                     android:onClick="@{focus.onMiningLockClick}" />
 
         <SeekBar android:id="@+id/focus_energy"
                  android:layout_width="match_parent"
@@ -394,7 +402,8 @@
                  android:layout_alignParentRight="true"
                  android:layout_alignParentEnd="true"
                  android:max="1000"
-                 android:progress="@{(int)(focus.energyFocus * 1000.0f)}" />
+                 android:progress="@{(int)(focus.energyFocus * 1000.0f)}"
+                 android:onProgressChanged="@{focus.onEnergyProgressChanged}" />
 
         <ImageView android:id="@+id/focus_energy_icon"
                    android:layout_width="20dp"
@@ -439,9 +448,12 @@
                      android:layout_height="30dp"
                      android:layout_alignBottom="@+id/focus_energy"
                      android:layout_alignParentRight="true"
+                     android:layout_alignParentEnd="true"
                      android:layout_marginRight="10dp"
+                     android:layout_marginEnd="10dp"
                      android:scaleType="center"
-                     android:src="@drawable/lock_opened" />
+                     android:src="@{focus.energyLocked ? @drawable/lock_closed : @drawable/lock_opened}"
+                     android:onClick="@{focus.onEnergyLockClick}" />
 
         <SeekBar android:id="@+id/focus_construction"
                  android:layout_width="match_parent"
@@ -460,7 +472,8 @@
                  android:layout_toLeftOf="@+id/focus_construction_value"
                  android:layout_toStartOf="@+id/focus_construction_value"
                  android:max="1000"
-                 android:progress="@{(int)(focus.constructionFocus * 1000.0f)}" />
+                 android:progress="@{(int)(focus.constructionFocus * 1000.0f)}"
+                 android:onProgressChanged="@{focus.onConstructionProgressChanged}" />
 
         <ImageView android:id="@+id/focus_construction_icon"
                    android:layout_width="20dp"
@@ -505,9 +518,12 @@
                      android:layout_height="30dp"
                      android:layout_alignBottom="@id/focus_construction"
                      android:layout_alignParentRight="true"
+                     android:layout_alignParentEnd="true"
                      android:layout_marginRight="10dp"
+                     android:layout_marginEnd="10dp"
                      android:scaleType="center"
-                     android:src="@drawable/lock_opened" />
+                     android:src="@{focus.constructionLocked ? @drawable/lock_closed : @drawable/lock_opened}"
+                     android:onClick="@{focus.onConstructionLockClick}" />
 
         <View android:layout_width="match_parent"
               android:layout_height="10dp"

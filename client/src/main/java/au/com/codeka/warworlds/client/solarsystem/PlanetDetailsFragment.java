@@ -3,11 +3,15 @@ package au.com.codeka.warworlds.client.solarsystem;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.DataBindingUtil;
+import android.databinding.ObservableBoolean;
+import android.databinding.ObservableFloat;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 
+import au.com.codeka.warworlds.client.BR;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.databinding.FragPlanetDetailsBinding;
@@ -112,6 +116,7 @@ public class PlanetDetailsFragment extends BaseFragment {
     }*/
   };
 
+  @SuppressWarnings("unused") // used through data binding
   public class Handlers {
     public void onAttackClick(View view) {
       log.info("Attack!");
@@ -156,37 +161,55 @@ public class PlanetDetailsFragment extends BaseFragment {
     */}
   }
 
-  public static class FocusModel extends BaseObservable {
-    private float farmingFocus;
-    private float miningFocus;
-    private float energyFocus;
-    private float constructionFocus;
+  @SuppressWarnings("unused") // used by bindings
+  public static class FocusModel {
+    public ObservableFloat farmingFocus;
+    public ObservableFloat miningFocus;
+    public ObservableFloat energyFocus;
+    public ObservableFloat constructionFocus;
+    public ObservableBoolean farmingLocked;
+    public ObservableBoolean miningLocked;
+    public ObservableBoolean energyLocked;
+    public ObservableBoolean constructionLocked;
 
     public FocusModel(ColonyFocus focus) {
-      farmingFocus = focus.farming;
-      miningFocus = focus.mining;
-      energyFocus = focus.energy;
-      constructionFocus = focus.construction;
+      farmingFocus = new ObservableFloat(focus.farming);
+      miningFocus = new ObservableFloat(focus.mining);
+      energyFocus = new ObservableFloat(focus.energy);
+      constructionFocus = new ObservableFloat(focus.construction);
+      farmingLocked = new ObservableBoolean(false);
+      miningLocked = new ObservableBoolean(true);
+      energyLocked = new ObservableBoolean(false);
+      constructionLocked = new ObservableBoolean(false);
     }
 
-    @Bindable
-    public float getFarmingFocus() {
-      return farmingFocus;
+    public void onFarmingProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
     }
 
-    @Bindable
-    public float getMiningFocus() {
-      return miningFocus;
+    public void onFarmingLockClick(View view) {
+      farmingLocked.set(!farmingLocked.get());
     }
 
-    @Bindable
-    public float getEnergyFocus() {
-      return energyFocus;
+    public void onMiningProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
     }
 
-    @Bindable
-    public float getConstructionFocus() {
-      return constructionFocus;
+    public void onMiningLockClick(View view) {
+      miningLocked.set(!miningLocked.get());
+    }
+
+    public void onEnergyProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
+    }
+
+    public void onEnergyLockClick(View view) {
+      energyLocked.set(!energyLocked.get());
+    }
+
+    public void onConstructionProgressChanged(
+        SeekBar seekBar, int progressValue, boolean fromUser) {
+    }
+
+    public void onConstructionLockClick(View view) {
+      constructionLocked.set(!constructionLocked.get());
     }
   }
 }
