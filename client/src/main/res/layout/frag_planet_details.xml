@@ -147,17 +147,17 @@
                     android:layout_height="match_parent"
                     android:layout_below="@id/planet_icon"
                     android:layout_alignParentBottom="true">
-        <ImageView android:id="@+id/enemy_empire_icon"
+        <ImageView android:id="@+id/empire_icon"
                    android:layout_width="40dp"
                    android:layout_height="40dp"
                    android:layout_marginTop="6dp"
                    android:layout_marginLeft="6dp"
                    android:layout_marginStart="6dp" />
-        <TextView android:id="@+id/enemy_empire_name"
+        <TextView android:id="@+id/empire_name"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:layout_toRightOf="@id/enemy_empire_icon"
-                  android:layout_toEndOf="@id/enemy_empire_icon"
+                  android:layout_toRightOf="@id/empire_icon"
+                  android:layout_toEndOf="@id/empire_icon"
                   android:layout_marginTop="6dp"
                   android:layout_marginLeft="6dp"
                   android:layout_marginStart="6dp"
@@ -165,12 +165,12 @@
                   android:singleLine="true"
                   android:ellipsize="end"
                   android:text="Empire Name" />
-        <TextView android:id="@+id/enemy_empire_defence"
+        <TextView android:id="@+id/empire_defence"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:layout_toRightOf="@id/enemy_empire_icon"
-                  android:layout_toEndOf="@id/enemy_empire_icon"
-                  android:layout_below="@id/enemy_empire_name"
+                  android:layout_toRightOf="@id/empire_icon"
+                  android:layout_toEndOf="@id/empire_icon"
+                  android:layout_below="@id/empire_name"
                   android:layout_marginLeft="6dp"
                   android:layout_marginStart="6dp"
                   android:textAppearance="?android:attr/textAppearanceSmall"
@@ -178,15 +178,277 @@
         <Button android:id="@+id/attack_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/enemy_empire_icon"
-                android:layout_alignLeft="@id/enemy_empire_icon"
-                android:layout_alignStart="@id/enemy_empire_icon"
-                android:layout_alignRight="@id/enemy_empire_defence"
-                android:layout_alignEnd="@id/enemy_empire_defence"
+                android:layout_below="@id/empire_icon"
+                android:layout_alignLeft="@id/empire_icon"
+                android:layout_alignStart="@id/empire_icon"
+                android:layout_alignRight="@id/empire_defence"
+                android:layout_alignEnd="@id/empire_defence"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:text="Attack" />
+
+      <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:layout_width="match_parent"
+                      android:layout_below="@id/empire_defence"
+                      android:layout_height="wrap_content"
+                      android:layout_margin="10dp">
+
+        <TextView android:id="@+id/note"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_alignParentTop="true"
+                  android:layout_alignParentLeft="true"
+                  android:layout_margin="10dp"
+                  android:text="Drag the sliders to adjust focus." />
+
+        <SeekBar android:id="@+id/focus_population"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="10dp"
+                 android:layout_marginLeft="10dp"
+                 android:layout_marginRight="60dp"
+                 android:layout_below="@+id/note"
+                 android:layout_toRightOf="@+id/focus_population_plus_btn"
+                 android:layout_alignParentRight="true" />
+
+        <ImageView android:id="@+id/focus_population_icon"
+                   android:layout_width="20dp"
+                   android:layout_height="20dp"
+                   android:layout_alignTop="@+id/focus_population"
+                   android:layout_alignBottom="@+id/focus_population"
+                   android:layout_alignParentLeft="true"
+                   android:layout_marginLeft="10dp"
+                   android:src="@drawable/population" />
+
+        <Button android:id="@+id/focus_population_minus_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignBottom="@+id/focus_population"
+                android:layout_toRightOf="@+id/focus_population_icon"
+                android:layout_marginLeft="4dp"
+                android:text="-" />
+
+        <Button android:id="@+id/focus_population_plus_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignBottom="@+id/focus_population"
+                android:layout_toRightOf="@+id/focus_population_minus_btn"
+                android:layout_marginLeft="4dp"
+                android:text="+" />
+
+        <TextView android:id="@+id/focus_population_value"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toLeftOf="@+id/focus_population_lock"
+                  android:layout_marginRight="2dp"
+                  android:layout_alignTop="@+id/focus_population"
+                  android:layout_alignBottom="@+id/focus_population"
+                  android:gravity="center_vertical"
+                  android:text="99" />
+
+        <ImageButton android:id="@+id/focus_population_lock"
+                     style="@style/Button"
+                     android:layout_width="30dp"
+                     android:layout_height="30dp"
+                     android:layout_alignBottom="@+id/focus_population"
+                     android:layout_alignParentRight="true"
+                     android:layout_marginRight="10dp"
+                     android:scaleType="fitXY"
+                     android:src="@drawable/lock_opened" />
+
+        <SeekBar android:id="@+id/focus_farming"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="10dp"
+                 android:layout_marginLeft="10dp"
+                 android:layout_marginRight="60dp"
+                 android:layout_alignParentRight="true"
+                 android:layout_below="@+id/focus_population"
+                 android:layout_toRightOf="@+id/focus_farming_plus_btn"
+                 android:layout_toLeftOf="@+id/focus_farming_value" />
+
+        <ImageView android:id="@+id/focus_farming_icon"
+                   android:layout_width="20dp"
+                   android:layout_height="20dp"
+                   android:layout_alignTop="@+id/focus_farming"
+                   android:layout_alignBottom="@+id/focus_farming"
+                   android:layout_alignParentLeft="true"
+                   android:layout_marginLeft="10dp"
+                   android:src="@drawable/farming" />
+
+        <Button android:id="@+id/focus_farming_minus_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignBottom="@+id/focus_farming"
+                android:layout_toRightOf="@+id/focus_farming_icon"
+                android:layout_marginLeft="4dp"
+                android:text="-" />
+
+        <Button android:id="@+id/focus_farming_plus_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignBottom="@+id/focus_farming"
+                android:layout_toRightOf="@+id/focus_farming_minus_btn"
+                android:layout_marginLeft="4dp"
+                android:text="+" />
+
+        <TextView android:id="@+id/focus_farming_value"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toLeftOf="@+id/focus_farming_lock"
+                  android:layout_marginRight="2dp"
+                  android:layout_alignTop="@+id/focus_farming"
+                  android:gravity="center_vertical"
+                  android:text="99" />
+
+        <TextView android:id="@+id/focus_farming_delta"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toLeftOf="@+id/focus_farming_lock"
+                  android:layout_alignRight="@+id/focus_farming_value"
+                  android:layout_below="@+id/focus_farming_value"
+                  android:layout_marginRight="2dp"
+                  android:text="+66 / hr"
+                  android:textSize="10sp" />
+
+        <ImageButton android:id="@+id/focus_farming_lock"
+                     style="@style/Button"
+                     android:layout_width="30dp"
+                     android:layout_height="30dp"
+                     android:layout_alignBottom="@+id/focus_farming"
+                     android:layout_alignParentRight="true"
+                     android:layout_marginRight="10dp"
+                     android:scaleType="fitXY"
+                     android:src="@drawable/lock_opened" />
+
+        <SeekBar android:id="@+id/focus_mining"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="10dp"
+                 android:layout_marginLeft="10dp"
+                 android:layout_marginRight="60dp"
+                 android:layout_alignParentRight="true"
+                 android:layout_below="@+id/focus_farming"
+                 android:layout_toRightOf="@+id/focus_mining_plus_btn"
+                 android:layout_toLeftOf="@+id/focus_mining_value" />
+
+        <ImageView android:id="@+id/focus_mining_icon"
+                   android:layout_width="20dp"
+                   android:layout_height="20dp"
+                   android:layout_alignTop="@+id/focus_mining"
+                   android:layout_alignBottom="@+id/focus_mining"
+                   android:layout_alignParentLeft="true"
+                   android:layout_marginLeft="10dp"
+                   android:src="@drawable/mining" />
+
+        <Button android:id="@+id/focus_mining_minus_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignBottom="@+id/focus_mining"
+                android:layout_toRightOf="@+id/focus_mining_icon"
+                android:layout_marginLeft="4dp"
+                android:text="-" />
+
+        <Button android:id="@+id/focus_mining_plus_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignBottom="@+id/focus_mining"
+                android:layout_toRightOf="@+id/focus_mining_minus_btn"
+                android:layout_marginLeft="4dp"
+                android:text="+" />
+
+        <TextView android:id="@+id/focus_mining_value"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toLeftOf="@+id/focus_mining_lock"
+                  android:layout_marginRight="2dp"
+                  android:layout_alignTop="@+id/focus_mining"
+                  android:gravity="center_vertical"
+                  android:text="99" />
+
+        <TextView android:id="@+id/focus_mining_delta"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toLeftOf="@+id/focus_mining_lock"
+                  android:layout_alignRight="@+id/focus_mining_value"
+                  android:layout_below="@+id/focus_mining_value"
+                  android:layout_marginRight="2dp"
+                  android:text="+66 / hr"
+                  android:textSize="10sp" />
+
+        <ImageButton android:id="@+id/focus_mining_lock"
+                     style="@style/Button"
+                     android:layout_width="30dp"
+                     android:layout_height="30dp"
+                     android:layout_alignBottom="@+id/focus_mining"
+                     android:layout_alignParentRight="true"
+                     android:layout_marginRight="10dp"
+                     android:scaleType="fitXY"
+                     android:src="@drawable/lock_opened" />
+
+        <SeekBar android:id="@+id/focus_construction"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="10dp"
+                 android:layout_marginBottom="10dp"
+                 android:layout_marginLeft="10dp"
+                 android:layout_marginRight="60dp"
+                 android:layout_alignParentRight="true"
+                 android:layout_below="@+id/focus_mining"
+                 android:layout_toRightOf="@+id/focus_construction_plus_btn"
+                 android:layout_toLeftOf="@+id/focus_construction_value" />
+
+        <ImageView android:id="@+id/focus_construction_icon"
+                   android:layout_width="20dp"
+                   android:layout_height="20dp"
+                   android:layout_alignTop="@+id/focus_construction"
+                   android:layout_alignBottom="@+id/focus_construction"
+                   android:layout_alignParentLeft="true"
+                   android:layout_marginLeft="10dp"
+                   android:src="@drawable/construction_white" />
+
+        <Button android:id="@+id/focus_construction_minus_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignBottom="@+id/focus_construction"
+                android:layout_toRightOf="@+id/focus_construction_icon"
+                android:layout_marginLeft="4dp"
+                android:text="-" />
+
+        <Button android:id="@+id/focus_construction_plus_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignBottom="@+id/focus_construction"
+                android:layout_toRightOf="@+id/focus_construction_minus_btn"
+                android:layout_marginLeft="4dp"
+                android:text="+" />
+
+        <TextView android:id="@+id/focus_construction_value"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toLeftOf="@+id/focus_construction_lock"
+                  android:layout_marginRight="2dp"
+                  android:layout_alignTop="@+id/focus_construction"
+                  android:layout_alignBottom="@+id/focus_construction"
+                  android:gravity="center_vertical"
+                  android:text="99" />
+
+        <ImageButton android:id="@+id/focus_construction_lock"
+                     style="@style/Button"
+                     android:layout_width="30dp"
+                     android:layout_height="30dp"
+                     android:layout_alignBottom="@id/focus_construction"
+                     android:layout_alignParentRight="true"
+                     android:layout_marginRight="10dp"
+                     android:scaleType="fitXY"
+                     android:src="@drawable/lock_opened" />
+
+        <View android:layout_width="match_parent"
+              android:layout_height="10dp"
+              android:layout_below="@id/focus_construction" />
+
+      </RelativeLayout>
     </RelativeLayout>
 
 </RelativeLayout>

@@ -189,7 +189,10 @@ public class PlanetDetailsFragment extends BaseFragment {
 
   }
 
-  private void refreshEmpireDetails() {/*
+  private void refreshEmpireDetails() {
+    attackBtn.setVisibility(View.GONE);
+
+    /*
     ImageView enemyIcon = (ImageView) findViewById(R.id.enemy_empire_icon);
     TextView enemyName = (TextView) findViewById(R.id.enemy_empire_name);
     TextView enemyDefence = (TextView) findViewById(R.id.enemy_empire_defence);
