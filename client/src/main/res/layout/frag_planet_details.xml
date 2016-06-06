@@ -249,7 +249,7 @@
                  android:layout_toStartOf="@+id/focus_farming_value"
                  android:max="1000"
                  android:progress="@{(int)(focus.farmingFocus * 1000.0f)}"
-                 android:onProgressChanged="@{focus.onFarmingProgressChanged}" />
+                 android:onProgressChanged="@{focus.onFocusProgressChanged}" />
 
         <ImageView android:id="@+id/focus_farming_icon"
                    android:layout_width="20dp"
@@ -327,7 +327,7 @@
                  android:layout_toStartOf="@+id/focus_mining_value"
                  android:max="1000"
                  android:progress="@{(int)(focus.miningFocus * 1000.0f)}"
-                 android:onProgressChanged="@{focus.onMiningProgressChanged}" />
+                 android:onProgressChanged="@{focus.onFocusProgressChanged}" />
 
         <ImageView android:id="@+id/focus_mining_icon"
                    android:layout_width="20dp"
@@ -403,7 +403,7 @@
                  android:layout_alignParentEnd="true"
                  android:max="1000"
                  android:progress="@{(int)(focus.energyFocus * 1000.0f)}"
-                 android:onProgressChanged="@{focus.onEnergyProgressChanged}" />
+                 android:onProgressChanged="@{focus.onFocusProgressChanged}" />
 
         <ImageView android:id="@+id/focus_energy_icon"
                    android:layout_width="20dp"
@@ -473,7 +473,7 @@
                  android:layout_toStartOf="@+id/focus_construction_value"
                  android:max="1000"
                  android:progress="@{(int)(focus.constructionFocus * 1000.0f)}"
-                 android:onProgressChanged="@{focus.onConstructionProgressChanged}" />
+                 android:onProgressChanged="@{focus.onFocusProgressChanged}" />
 
         <ImageView android:id="@+id/focus_construction_icon"
                    android:layout_width="20dp"

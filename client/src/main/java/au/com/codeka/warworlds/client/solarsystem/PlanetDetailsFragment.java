@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import au.com.codeka.warworlds.client.BR;
 import au.com.codeka.warworlds.client.R;
@@ -162,7 +163,7 @@ public class PlanetDetailsFragment extends BaseFragment {
   }
 
   @SuppressWarnings("unused") // used by bindings
-  public static class FocusModel {
+  public class FocusModel {
     public ObservableFloat farmingFocus;
     public ObservableFloat miningFocus;
     public ObservableFloat energyFocus;
@@ -183,36 +184,65 @@ public class PlanetDetailsFragment extends BaseFragment {
       constructionLocked = new ObservableBoolean(false);
     }
 
-    public void onFarmingProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
-      farmingFocus.set((float) progressValue / seekBar.getMax());
-    }
-
     public void onFarmingLockClick(View view) {
       farmingLocked.set(!farmingLocked.get());
-    }
-
-    public void onMiningProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
-      miningFocus.set((float) progressValue / seekBar.getMax());
     }
 
     public void onMiningLockClick(View view) {
       miningLocked.set(!miningLocked.get());
     }
 
-    public void onEnergyProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
-      energyFocus.set((float) progressValue / seekBar.getMax());
-    }
-
     public void onEnergyLockClick(View view) {
       energyLocked.set(!energyLocked.get());
     }
 
-    public void onConstructionProgressChanged(
-        SeekBar seekBar, int progressValue, boolean fromUser) {
-    }
-
     public void onConstructionLockClick(View view) {
       constructionLocked.set(!constructionLocked.get());
+    }
+
+    public void onFocusProgressChanged(
+        SeekBar changedSeekBar, int progressValue, boolean fromUser) {
+      SeekBar[] seekBars = {
+          binding.focusFarming, binding.focusMining, binding.focusEnergy, binding.focusConstruction
+      };
+      ObservableBoolean[] locks = {
+          farmingLocked, miningLocked, energyLocked, constructionLocked
+      };
+      ObservableFloat[] focuses = {
+          farmingFocus, miningFocus, energyFocus, constructionFocus
+      };
+
+      float otherValuesTotal = 0.0f;
+      for (int i = 0; i < 4; i++) {
+        if (seekBars[i] == changedSeekBar)
+          continue;
+        otherValuesTotal += focuses[i].get();
+      }
+
+      float newValue = (float) progressValue / changedSeekBar.getMax();
+
+      float desiredOtherValuesTotal = 1.0f - newValue;
+      if (desiredOtherValuesTotal <= 0.0f) {
+        for (int i = 0; i < 4; i++) {
+          if (seekBars[i] == changedSeekBar || locks[i].get()) {
+            continue;
+          };
+          focuses[i].set(0.0f);
+        }
+        return;
+      }
+
+      float ratio = otherValuesTotal / desiredOtherValuesTotal;
+      for (int i = 0; i < 4; i++) {
+        if (seekBars[i] == changedSeekBar || locks[i].get()) {
+          continue;
+        }
+        float focus = focuses[i].get();
+        if (focus <= 0.001f) {
+          focus = 0.001f;
+        }
+        focuses[i].set(focus / ratio);
+      }
     }
   }
 }
