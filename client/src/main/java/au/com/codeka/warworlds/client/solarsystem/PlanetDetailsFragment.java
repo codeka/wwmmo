@@ -178,12 +178,13 @@ public class PlanetDetailsFragment extends BaseFragment {
       energyFocus = new ObservableFloat(focus.energy);
       constructionFocus = new ObservableFloat(focus.construction);
       farmingLocked = new ObservableBoolean(false);
-      miningLocked = new ObservableBoolean(true);
+      miningLocked = new ObservableBoolean(false);
       energyLocked = new ObservableBoolean(false);
       constructionLocked = new ObservableBoolean(false);
     }
 
     public void onFarmingProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
+      farmingFocus.set((float) progressValue / seekBar.getMax());
     }
 
     public void onFarmingLockClick(View view) {
@@ -191,6 +192,7 @@ public class PlanetDetailsFragment extends BaseFragment {
     }
 
     public void onMiningProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
+      miningFocus.set((float) progressValue / seekBar.getMax());
     }
 
     public void onMiningLockClick(View view) {
@@ -198,6 +200,7 @@ public class PlanetDetailsFragment extends BaseFragment {
     }
 
     public void onEnergyProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
+      energyFocus.set((float) progressValue / seekBar.getMax());
     }
 
     public void onEnergyLockClick(View view) {
