@@ -200,6 +200,14 @@ public class PlanetDetailsFragment extends BaseFragment {
       constructionLocked.set(!constructionLocked.get());
     }
 
+    public void onPlusClick(View view) {
+
+    }
+
+    public void onMinusClick(View view) {
+
+    }
+
     public void onFocusProgressChanged(
         SeekBar changedSeekBar, int progressValue, boolean fromUser) {
       SeekBar[] seekBars = {
@@ -220,7 +228,6 @@ public class PlanetDetailsFragment extends BaseFragment {
       }
 
       float newValue = (float) progressValue / changedSeekBar.getMax();
-
       float desiredOtherValuesTotal = 1.0f - newValue;
       if (desiredOtherValuesTotal <= 0.0f) {
         for (int i = 0; i < 4; i++) {

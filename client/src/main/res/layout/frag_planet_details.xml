@@ -257,7 +257,9 @@
                    android:layout_alignTop="@+id/focus_farming"
                    android:layout_alignBottom="@+id/focus_farming"
                    android:layout_alignParentLeft="true"
+                   android:layout_alignParentStart="true"
                    android:layout_marginLeft="10dp"
+                   android:layout_marginStart="10dp"
                    android:src="@drawable/farming" />
 
         <Button android:id="@+id/focus_farming_minus_btn"
@@ -265,16 +267,22 @@
                 android:layout_height="30dp"
                 android:layout_alignBottom="@+id/focus_farming"
                 android:layout_toRightOf="@+id/focus_farming_icon"
+                android:layout_toEndOf="@+id/focus_farming_icon"
                 android:layout_marginLeft="4dp"
-                android:text="-" />
+                android:layout_marginStart="4dp"
+                android:text="-"
+                android:onClick="@{focus.onMinusClick}" />
 
         <Button android:id="@+id/focus_farming_plus_btn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignBottom="@+id/focus_farming"
                 android:layout_toRightOf="@+id/focus_farming_minus_btn"
+                android:layout_toEndOf="@+id/focus_farming_minus_btn"
                 android:layout_marginLeft="4dp"
-                android:text="+" />
+                android:layout_marginStart="4dp"
+                android:text="+"
+                android:onClick="@{focus.onPlusClick}" />
 
         <TextView android:id="@+id/focus_farming_value"
                   android:layout_width="wrap_content"
@@ -291,11 +299,14 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_toLeftOf="@+id/focus_farming_lock"
+                  android:layout_toStartOf="@+id/focus_farming_lock"
                   android:layout_alignRight="@+id/focus_farming_value"
+                  android:layout_alignEnd="@+id/focus_farming_value"
                   android:layout_below="@+id/focus_farming_value"
                   android:layout_marginRight="2dp"
+                  android:layout_marginEnd="2dp"
                   android:text="+66 / hr"
-                  android:textSize="10sp" />
+                  android:textSize="12sp" />
 
         <ImageButton android:id="@+id/focus_farming_lock"
                      style="@style/Button"
@@ -335,7 +346,9 @@
                    android:layout_alignTop="@+id/focus_mining"
                    android:layout_alignBottom="@+id/focus_mining"
                    android:layout_alignParentLeft="true"
+                   android:layout_alignParentStart="true"
                    android:layout_marginLeft="10dp"
+                   android:layout_marginStart="10dp"
                    android:src="@drawable/mining" />
 
         <Button android:id="@+id/focus_mining_minus_btn"
@@ -343,16 +356,22 @@
                 android:layout_height="30dp"
                 android:layout_alignBottom="@+id/focus_mining"
                 android:layout_toRightOf="@+id/focus_mining_icon"
+                android:layout_toEndOf="@+id/focus_mining_icon"
                 android:layout_marginLeft="4dp"
-                android:text="-" />
+                android:layout_marginStart="4dp"
+                android:text="-"
+                android:onClick="@{focus.onMinusClick}" />
 
         <Button android:id="@+id/focus_mining_plus_btn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignBottom="@+id/focus_mining"
                 android:layout_toRightOf="@+id/focus_mining_minus_btn"
+                android:layout_toEndOf="@+id/focus_mining_minus_btn"
                 android:layout_marginLeft="4dp"
-                android:text="+" />
+                android:layout_marginStart="4dp"
+                android:text="+"
+                android:onClick="@{focus.onPlusClick}" />
 
         <TextView android:id="@+id/focus_mining_value"
                   android:layout_width="wrap_content"
@@ -369,11 +388,14 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_toLeftOf="@+id/focus_mining_lock"
+                  android:layout_toStartOf="@+id/focus_mining_lock"
                   android:layout_alignRight="@+id/focus_mining_value"
+                  android:layout_alignEnd="@+id/focus_mining_value"
                   android:layout_below="@+id/focus_mining_value"
                   android:layout_marginRight="2dp"
+                  android:layout_marginEnd="2dp"
                   android:text="+66 / hr"
-                  android:textSize="10sp" />
+                  android:textSize="12sp" />
 
         <ImageButton android:id="@+id/focus_mining_lock"
                      style="@style/Button"
@@ -411,7 +433,9 @@
                    android:layout_alignTop="@+id/focus_energy"
                    android:layout_alignBottom="@+id/focus_energy"
                    android:layout_alignParentLeft="true"
+                   android:layout_alignParentStart="true"
                    android:layout_marginLeft="10dp"
+                   android:layout_marginStart="10dp"
                    android:src="@drawable/energy" />
 
         <Button android:id="@+id/focus_energy_minus_btn"
@@ -419,16 +443,22 @@
                 android:layout_height="30dp"
                 android:layout_alignBottom="@+id/focus_energy"
                 android:layout_toRightOf="@+id/focus_energy_icon"
+                android:layout_toEndOf="@+id/focus_energy_icon"
                 android:layout_marginLeft="4dp"
-                android:text="-" />
+                android:layout_marginStart="4dp"
+                android:text="-"
+                android:onClick="@{focus.onMinusClick}" />
 
         <Button android:id="@+id/focus_energy_plus_btn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignBottom="@+id/focus_energy"
                 android:layout_toRightOf="@+id/focus_energy_minus_btn"
+                android:layout_toEndOf="@+id/focus_energy_minus_btn"
                 android:layout_marginLeft="4dp"
-                android:text="+" />
+                android:layout_marginStart="4dp"
+                android:text="+"
+                android:onClick="@{focus.onPlusClick}" />
 
         <TextView android:id="@+id/focus_energy_value"
                   android:layout_width="wrap_content"
@@ -481,7 +511,9 @@
                    android:layout_alignTop="@+id/focus_construction"
                    android:layout_alignBottom="@+id/focus_construction"
                    android:layout_alignParentLeft="true"
+                   android:layout_alignParentStart="true"
                    android:layout_marginLeft="10dp"
+                   android:layout_marginStart="10dp"
                    android:src="@drawable/construction_white" />
 
         <Button android:id="@+id/focus_construction_minus_btn"
@@ -489,16 +521,22 @@
                 android:layout_height="30dp"
                 android:layout_alignBottom="@+id/focus_construction"
                 android:layout_toRightOf="@+id/focus_construction_icon"
+                android:layout_toEndOf="@+id/focus_construction_icon"
                 android:layout_marginLeft="4dp"
-                android:text="-" />
+                android:layout_marginStart="4dp"
+                android:text="-"
+                android:onClick="@{focus.onMinusClick}" />
 
         <Button android:id="@+id/focus_construction_plus_btn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignBottom="@+id/focus_construction"
                 android:layout_toRightOf="@+id/focus_construction_minus_btn"
+                android:layout_toEndOf="@+id/focus_construction_minus_btn"
                 android:layout_marginLeft="4dp"
-                android:text="+" />
+                android:layout_marginStart="4dp"
+                android:text="+"
+                android:onClick="@{focus.onPlusClick}" />
 
         <TextView android:id="@+id/focus_construction_value"
                   android:layout_width="wrap_content"
