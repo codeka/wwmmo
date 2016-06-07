@@ -201,18 +201,66 @@ public class PlanetDetailsFragment extends BaseFragment {
     }
 
     public void onPlusClick(View view) {
+      SeekBar[] seekBars = {
+          binding.focusFarming, binding.focusMining, binding.focusEnergy, binding.focusConstruction
+      };
+      View buttons[] = {
+          binding.focusFarmingPlusBtn, binding.focusMiningPlusBtn, binding.focusEnergyPlusBtn,
+          binding.focusConstructionPlusBtn
+      };
+      ObservableFloat[] focuses = {
+          farmingFocus, miningFocus, energyFocus, constructionFocus
+      };
 
+      for (int i = 0; i < 4; i++) {
+        if (view == buttons[i]) {
+          float newValue = Math.max(0.0f, focuses[i].get() + 0.01f);
+          seekBars[i].setProgress(Math.round(newValue * seekBars[i].getMax()));
+          redistribute(i, newValue);
+          break;
+        }
+      }
     }
 
     public void onMinusClick(View view) {
+      SeekBar[] seekBars = {
+          binding.focusFarming, binding.focusMining, binding.focusEnergy, binding.focusConstruction
+      };
+      View buttons[] = {
+          binding.focusFarmingMinusBtn, binding.focusMiningMinusBtn, binding.focusEnergyMinusBtn,
+          binding.focusConstructionMinusBtn
+      };
+      ObservableFloat[] focuses = {
+          farmingFocus, miningFocus, energyFocus, constructionFocus
+      };
 
+      for (int i = 0; i < 4; i++) {
+        if (view == buttons[i]) {
+          float newValue = Math.max(0.0f, focuses[i].get() - 0.01f);
+          seekBars[i].setProgress(Math.round(newValue * seekBars[i].getMax()));
+          redistribute(i, newValue);
+          break;
+        }
+      }
     }
 
     public void onFocusProgressChanged(
         SeekBar changedSeekBar, int progressValue, boolean fromUser) {
+      if (!fromUser) {
+        return;
+      }
+
       SeekBar[] seekBars = {
           binding.focusFarming, binding.focusMining, binding.focusEnergy, binding.focusConstruction
       };
+      for (int i = 0; i < 4; i++) {
+        if (seekBars[i] == changedSeekBar) {
+          redistribute(i, (float) changedSeekBar.getProgress() / changedSeekBar.getMax());
+        }
+      }
+    }
+
+    private void redistribute(int changedIndex, float newValue) {
       ObservableBoolean[] locks = {
           farmingLocked, miningLocked, energyLocked, constructionLocked
       };
@@ -222,16 +270,17 @@ public class PlanetDetailsFragment extends BaseFragment {
 
       float otherValuesTotal = 0.0f;
       for (int i = 0; i < 4; i++) {
-        if (seekBars[i] == changedSeekBar)
+        if (i == changedIndex) {
+          focuses[i].set(newValue);
           continue;
+        }
         otherValuesTotal += focuses[i].get();
       }
 
-      float newValue = (float) progressValue / changedSeekBar.getMax();
       float desiredOtherValuesTotal = 1.0f - newValue;
       if (desiredOtherValuesTotal <= 0.0f) {
         for (int i = 0; i < 4; i++) {
-          if (seekBars[i] == changedSeekBar || locks[i].get()) {
+          if (i == changedIndex || locks[i].get()) {
             continue;
           };
           focuses[i].set(0.0f);
@@ -241,7 +290,7 @@ public class PlanetDetailsFragment extends BaseFragment {
 
       float ratio = otherValuesTotal / desiredOtherValuesTotal;
       for (int i = 0; i < 4; i++) {
-        if (seekBars[i] == changedSeekBar || locks[i].get()) {
+        if (i == changedIndex || locks[i].get()) {
           continue;
         }
         float focus = focuses[i].get();
