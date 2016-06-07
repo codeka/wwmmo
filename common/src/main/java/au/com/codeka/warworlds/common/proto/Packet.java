@@ -42,15 +42,22 @@ public final class Packet extends Message<Packet, Packet.Builder> {
   )
   public final StarUpdatedPacket star_updated;
 
-  public Packet(HelloPacket hello, WatchSectorsPacket watch_sectors, StarUpdatedPacket star_updated) {
-    this(hello, watch_sectors, star_updated, ByteString.EMPTY);
+  @WireField(
+      tag = 4,
+      adapter = "au.com.codeka.warworlds.common.proto.ModifyStarPacket#ADAPTER"
+  )
+  public final ModifyStarPacket modify_star;
+
+  public Packet(HelloPacket hello, WatchSectorsPacket watch_sectors, StarUpdatedPacket star_updated, ModifyStarPacket modify_star) {
+    this(hello, watch_sectors, star_updated, modify_star, ByteString.EMPTY);
   }
 
-  public Packet(HelloPacket hello, WatchSectorsPacket watch_sectors, StarUpdatedPacket star_updated, ByteString unknownFields) {
+  public Packet(HelloPacket hello, WatchSectorsPacket watch_sectors, StarUpdatedPacket star_updated, ModifyStarPacket modify_star, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
     this.hello = hello;
     this.watch_sectors = watch_sectors;
     this.star_updated = star_updated;
+    this.modify_star = modify_star;
   }
 
   @Override
@@ -59,6 +66,7 @@ public final class Packet extends Message<Packet, Packet.Builder> {
     builder.hello = hello;
     builder.watch_sectors = watch_sectors;
     builder.star_updated = star_updated;
+    builder.modify_star = modify_star;
     builder.addUnknownFields(unknownFields());
     return builder;
   }
@@ -71,7 +79,8 @@ public final class Packet extends Message<Packet, Packet.Builder> {
     return Internal.equals(unknownFields(), o.unknownFields())
         && Internal.equals(hello, o.hello)
         && Internal.equals(watch_sectors, o.watch_sectors)
-        && Internal.equals(star_updated, o.star_updated);
+        && Internal.equals(star_updated, o.star_updated)
+        && Internal.equals(modify_star, o.modify_star);
   }
 
   @Override
@@ -82,6 +91,7 @@ public final class Packet extends Message<Packet, Packet.Builder> {
       result = result * 37 + (hello != null ? hello.hashCode() : 0);
       result = result * 37 + (watch_sectors != null ? watch_sectors.hashCode() : 0);
       result = result * 37 + (star_updated != null ? star_updated.hashCode() : 0);
+      result = result * 37 + (modify_star != null ? modify_star.hashCode() : 0);
       super.hashCode = result;
     }
     return result;
@@ -93,6 +103,7 @@ public final class Packet extends Message<Packet, Packet.Builder> {
     if (hello != null) builder.append(", hello=").append(hello);
     if (watch_sectors != null) builder.append(", watch_sectors=").append(watch_sectors);
     if (star_updated != null) builder.append(", star_updated=").append(star_updated);
+    if (modify_star != null) builder.append(", modify_star=").append(modify_star);
     return builder.replace(0, 2, "Packet{").append('}').toString();
   }
 
@@ -102,6 +113,8 @@ public final class Packet extends Message<Packet, Packet.Builder> {
     public WatchSectorsPacket watch_sectors;
 
     public StarUpdatedPacket star_updated;
+
+    public ModifyStarPacket modify_star;
 
     public Builder() {
     }
@@ -121,9 +134,14 @@ public final class Packet extends Message<Packet, Packet.Builder> {
       return this;
     }
 
+    public Builder modify_star(ModifyStarPacket modify_star) {
+      this.modify_star = modify_star;
+      return this;
+    }
+
     @Override
     public Packet build() {
-      return new Packet(hello, watch_sectors, star_updated, buildUnknownFields());
+      return new Packet(hello, watch_sectors, star_updated, modify_star, buildUnknownFields());
     }
   }
 
@@ -137,6 +155,7 @@ public final class Packet extends Message<Packet, Packet.Builder> {
       return (value.hello != null ? HelloPacket.ADAPTER.encodedSizeWithTag(1, value.hello) : 0)
           + (value.watch_sectors != null ? WatchSectorsPacket.ADAPTER.encodedSizeWithTag(2, value.watch_sectors) : 0)
           + (value.star_updated != null ? StarUpdatedPacket.ADAPTER.encodedSizeWithTag(3, value.star_updated) : 0)
+          + (value.modify_star != null ? ModifyStarPacket.ADAPTER.encodedSizeWithTag(4, value.modify_star) : 0)
           + value.unknownFields().size();
     }
 
@@ -145,6 +164,7 @@ public final class Packet extends Message<Packet, Packet.Builder> {
       if (value.hello != null) HelloPacket.ADAPTER.encodeWithTag(writer, 1, value.hello);
       if (value.watch_sectors != null) WatchSectorsPacket.ADAPTER.encodeWithTag(writer, 2, value.watch_sectors);
       if (value.star_updated != null) StarUpdatedPacket.ADAPTER.encodeWithTag(writer, 3, value.star_updated);
+      if (value.modify_star != null) ModifyStarPacket.ADAPTER.encodeWithTag(writer, 4, value.modify_star);
       writer.writeBytes(value.unknownFields());
     }
 
@@ -157,6 +177,7 @@ public final class Packet extends Message<Packet, Packet.Builder> {
           case 1: builder.hello(HelloPacket.ADAPTER.decode(reader)); break;
           case 2: builder.watch_sectors(WatchSectorsPacket.ADAPTER.decode(reader)); break;
           case 3: builder.star_updated(StarUpdatedPacket.ADAPTER.decode(reader)); break;
+          case 4: builder.modify_star(ModifyStarPacket.ADAPTER.decode(reader)); break;
           default: {
             FieldEncoding fieldEncoding = reader.peekFieldEncoding();
             Object value = fieldEncoding.rawProtoAdapter().decode(reader);
@@ -174,6 +195,7 @@ public final class Packet extends Message<Packet, Packet.Builder> {
       if (builder.hello != null) builder.hello = HelloPacket.ADAPTER.redact(builder.hello);
       if (builder.watch_sectors != null) builder.watch_sectors = WatchSectorsPacket.ADAPTER.redact(builder.watch_sectors);
       if (builder.star_updated != null) builder.star_updated = StarUpdatedPacket.ADAPTER.redact(builder.star_updated);
+      if (builder.modify_star != null) builder.modify_star = ModifyStarPacket.ADAPTER.redact(builder.modify_star);
       builder.clearUnknownFields();
       return builder.build();
     }

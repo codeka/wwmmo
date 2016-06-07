@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.client.world;
 
 import android.support.annotation.Nullable;
 
+import com.google.common.collect.Lists;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +12,8 @@ import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.store.ProtobufStore;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.ModifyStarPacket;
+import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
@@ -54,9 +58,18 @@ public class StarManager {
         Star.Builder starBuilder = star.newBuilder();
         starModifier.modifyStar(starBuilder, modification);
 
+        // Save the now-modified star.
         Star newStar = starBuilder.build();
         stars.put(star.id, newStar);
         App.i.getEventBus().publish(newStar);
+
+        // Send the modification to the server as well.
+        App.i.getServer().send(new Packet.Builder()
+            .modify_star(new ModifyStarPacket.Builder()
+                .star_id(star.id)
+                .modification(Lists.newArrayList(modification))
+                .build())
+            .build());
       }
     }, Threads.BACKGROUND);
   }

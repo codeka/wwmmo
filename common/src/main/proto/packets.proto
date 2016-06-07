@@ -9,6 +9,7 @@ message Packet {
   optional HelloPacket hello = 1;
   optional WatchSectorsPacket watch_sectors = 2;
   optional StarUpdatedPacket star_updated = 3;
+  optional ModifyStarPacket modify_star = 4;
 }
 
 // The "hello" message is returned when you first connect to the game.
@@ -39,4 +40,11 @@ message WatchSectorsPacket {
 // Sent from the server when a Star is updated. You can get more than one star update in a packet.
 message StarUpdatedPacket {
   repeated Star stars = 1;
+}
+
+// Send from the client to the server when it wants to modify a star. The server will modify the
+// star then send StarUpdatedPackets to everybody who is interested in this star.
+message ModifyStarPacket {
+  optional int64 star_id = 1;
+  repeated StarModification modification = 2;
 }
