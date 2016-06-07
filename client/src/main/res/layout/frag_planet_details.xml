@@ -563,9 +563,17 @@
                      android:src="@{focus.constructionLocked ? @drawable/lock_closed : @drawable/lock_opened}"
                      android:onClick="@{focus.onConstructionLockClick}" />
 
-        <View android:layout_width="match_parent"
-              android:layout_height="10dp"
-              android:layout_below="@id/focus_construction" />
+        <Button
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/focus_construction"
+            android:layout_alignRight="@id/focus_construction_lock"
+            android:layout_alignEnd="@id/focus_construction_lock"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:text="@string/save"
+            android:onClick="@{focus.onSaveClick}" />
 
       </RelativeLayout>
     </RelativeLayout>

@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.solarsystem;
 
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableFloat;
@@ -10,9 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
-import au.com.codeka.warworlds.client.BR;
+import com.google.common.base.Preconditions;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.databinding.FragPlanetDetailsBinding;
@@ -24,6 +22,7 @@ import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.proto.StarModification;
 
 /**
  * Activity for interacting with enemy planets (note it's not necessarily an enemy, per se, it
@@ -34,6 +33,8 @@ public class PlanetDetailsFragment extends BaseFragment {
   private static final String STAR_ID_KEY = "StarID";
   private static final String PLANET_INDEX_KEY = "PlanetIndex";
 
+  private Star star;
+  private Long colonyId;
   private FragPlanetDetailsBinding binding;
   private Handlers handlers = new Handlers();
 
@@ -61,7 +62,7 @@ public class PlanetDetailsFragment extends BaseFragment {
     super.onResume();
    // App.i.getEventBus().register(eventHandler);
 
-    Star star = StarManager.i.getStar(getArguments().getLong(STAR_ID_KEY));
+    star = StarManager.i.getStar(getArguments().getLong(STAR_ID_KEY));
     if (star == null) {
       return;
     }
@@ -71,6 +72,7 @@ public class PlanetDetailsFragment extends BaseFragment {
     Empire empire = null;
     FocusModel focusModel = null;
     if (planet.colony != null && planet.colony.empire_id != null) {
+      colonyId = planet.colony.id;
       empire = EmpireManager.i.getEmpire(planet.colony.empire_id);
       focusModel = new FocusModel(planet.colony.focus);
     }
@@ -116,6 +118,25 @@ public class PlanetDetailsFragment extends BaseFragment {
       }
     }*/
   };
+
+  /** Called when the user clicks 'save', we want to update the focus to the new values. */
+  private void saveFocus(float farming, float mining, float energy, float construction) {
+    Preconditions.checkState(colonyId != null);
+
+    StarManager.i.updateStar(star, new StarModification.Builder()
+        .type(StarModification.MODIFICATION_TYPE.ADJUST_FOCUS)
+        .colony_id(colonyId)
+        .focus(new ColonyFocus.Builder()
+            .farming(farming)
+            .mining(mining)
+            .energy(energy)
+            .construction(construction)
+            .build())
+        .build());
+
+    // TODO: have a nicer API for this.
+    getFragmentActivity().getSupportFragmentManager().popBackStack();
+  }
 
   @SuppressWarnings("unused") // used through data binding
   public class Handlers {
@@ -258,6 +279,10 @@ public class PlanetDetailsFragment extends BaseFragment {
           redistribute(i, (float) changedSeekBar.getProgress() / changedSeekBar.getMax());
         }
       }
+    }
+
+    public void onSaveClick(View view) {
+      saveFocus(farmingFocus.get(), miningFocus.get(), energyFocus.get(), constructionFocus.get());
     }
 
     private void redistribute(int changedIndex, float newValue) {

@@ -11,7 +11,9 @@ import au.com.codeka.warworlds.client.store.ProtobufStore;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
+import au.com.codeka.warworlds.common.sim.StarModifier;
 
 /**
  * Manages the {@link Star}s we keep cached and stuff.
@@ -21,9 +23,17 @@ public class StarManager {
   public static final StarManager i = new StarManager();
 
   private final ProtobufStore<Star> stars;
+  private final StarModifier starModifier;
 
   private StarManager() {
     stars = App.i.getDataStore().stars();
+    starModifier = new StarModifier(new StarModifier.IdentifierGenerator() {
+      @Override
+      public long nextIdentifier() {
+        // TODO?
+        return 0;
+      }
+    });
   }
 
   public void create() {
@@ -37,6 +47,20 @@ public class StarManager {
     return stars.get(id);
   }
 
+  public void updateStar(final Star star, final StarModification modification) {
+    App.i.getTaskRunner().runTask(new Runnable() {
+      @Override
+      public void run() {
+        Star.Builder starBuilder = star.newBuilder();
+        starModifier.modifyStar(starBuilder, modification);
+
+        Star newStar = starBuilder.build();
+        stars.put(star.id, newStar);
+        App.i.getEventBus().publish(newStar);
+      }
+    }, Threads.BACKGROUND);
+  }
+
   private final Object eventListener = new Object() {
     /**
      * When the server that a star has been updated, we'll want to update our cached copy of it.
@@ -47,6 +71,7 @@ public class StarManager {
       long startTime = System.nanoTime();
       Map<Long, Star> values = new HashMap<>();
       for (Star star : pkt.stars) {
+        App.i.getEventBus().publish(star);
         values.put(star.id, star);
       }
       stars.putAll(values);

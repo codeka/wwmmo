@@ -34,7 +34,6 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
-import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
 
 /**
@@ -279,7 +278,6 @@ public class StarfieldManager {
 
     int i = 0;
     for (Map.Entry<Long, EmpireIconInfo> entry : empires.entrySet()) {
-      long empireID = entry.getKey();
       EmpireIconInfo iconInfo = entry.getValue();
 
       Vector2 pt = new Vector2(0, 30.0f);
@@ -423,16 +421,14 @@ public class StarfieldManager {
     }
 
     @EventHandler(thread = Threads.BACKGROUND)
-    public void onStarUpdatedPacket(StarUpdatedPacket pkt) {
-      for (Star star : pkt.stars) {
-        // Make sure this star is one that we're tracking.
-        if (star.sector_x < sectorLeft || star.sector_x > sectorRight
-            || star.sector_y < sectorTop || star.sector_y > sectorBottom) {
-          continue;
-        }
-
-        updateStar(star);
+    public void onStar(Star star) {
+      // Make sure this star is one that we're tracking.
+      if (star.sector_x < sectorLeft || star.sector_x > sectorRight
+          || star.sector_y < sectorTop || star.sector_y > sectorBottom) {
+        return;
       }
+
+      updateStar(star);
     }
   };
 

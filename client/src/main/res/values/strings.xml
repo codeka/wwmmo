@@ -21,6 +21,7 @@
   <string name="focus">Focus</string>
   <string name="boost">Boost</string>
   <string name="attack">Attack</string>
+  <string name="save">Save</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to
