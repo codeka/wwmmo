@@ -32,6 +32,19 @@ public class EmpireManager {
     return myEmpire;
   }
 
+  public boolean isEnemy(@Nullable Empire empire) {
+    if (empire == null) {
+      return false;
+    }
+    if (empire.id == null) {
+      return true;
+    }
+    if (myEmpire != null && !empire.id.equals(myEmpire.id)) {
+      return true;
+    }
+    return false;
+  }
+
   public Empire getEmpire(long id) {
     if (myEmpire != null && myEmpire.id.equals(id)) {
       return myEmpire;

@@ -5,6 +5,7 @@
     <import type="android.view.View"/>
     <import type="au.com.codeka.warworlds.client.util.NumberFormatter" />
     <import type="au.com.codeka.warworlds.client.world.ImageHelper" />
+    <import type="au.com.codeka.warworlds.client.world.EmpireManager" />
     <variable name="handlers" type="au.com.codeka.warworlds.client.solarsystem.PlanetDetailsFragment.Handlers" />
     <variable name="star" type="au.com.codeka.warworlds.common.proto.Star" />
     <variable name="planet" type="au.com.codeka.warworlds.common.proto.Planet" />
@@ -200,8 +201,7 @@
                 android:layout_marginStart="6dp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Defence: 1234" />
-      <Button android:id="@+id/attack_btn"
-              android:layout_width="wrap_content"
+      <Button android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_below="@id/empire_icon"
               android:layout_alignLeft="@id/empire_icon"
@@ -213,6 +213,19 @@
               android:layout_marginRight="10dp"
               android:onClick="@{handlers.onAttackClick}"
               android:text="@string/attack"
+              android:visibility="@{EmpireManager.i.isEnemy(empire) ? View.VISIBLE : View.GONE}" />
+      <Button android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@id/empire_icon"
+              android:layout_alignLeft="@id/empire_icon"
+              android:layout_alignStart="@id/empire_icon"
+              android:layout_alignRight="@id/empire_defence"
+              android:layout_alignEnd="@id/empire_defence"
+              android:layout_marginTop="10dp"
+              android:layout_marginLeft="10dp"
+              android:layout_marginRight="10dp"
+              android:onClick="@{handlers.onColonizeClick}"
+              android:text="@string/colonize"
               android:visibility="@{empire == null ? View.VISIBLE : View.GONE}" />
 
       <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -564,7 +577,6 @@
                      android:onClick="@{focus.onConstructionLockClick}" />
 
         <Button
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/focus_construction"

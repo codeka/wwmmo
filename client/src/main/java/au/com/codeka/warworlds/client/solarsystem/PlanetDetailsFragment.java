@@ -34,6 +34,7 @@ public class PlanetDetailsFragment extends BaseFragment {
   private static final String PLANET_INDEX_KEY = "PlanetIndex";
 
   private Star star;
+  private int planetIndex;
   private Long colonyId;
   private FragPlanetDetailsBinding binding;
   private Handlers handlers = new Handlers();
@@ -66,7 +67,7 @@ public class PlanetDetailsFragment extends BaseFragment {
     if (star == null) {
       return;
     }
-    int planetIndex = getArguments().getInt(PLANET_INDEX_KEY);
+    planetIndex = getArguments().getInt(PLANET_INDEX_KEY);
     Planet planet = star.planets.get(planetIndex);
 
     Empire empire = null;
@@ -181,6 +182,18 @@ public class PlanetDetailsFragment extends BaseFragment {
       b.setNegativeButton("Cancel", null);
       b.create().show();
     */}
+
+    public void onColonizeClick(View view) {
+      Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
+      StarManager.i.updateStar(star, new StarModification.Builder()
+          .type(StarModification.MODIFICATION_TYPE.COLONIZE)
+          .empire_id(myEmpire.id)
+          .planet_index(planetIndex)
+          .build());
+
+      // TODO: have a nicer API for this.
+      getFragmentActivity().getSupportFragmentManager().popBackStack();
+    }
   }
 
   @SuppressWarnings("unused") // used by bindings

@@ -57,15 +57,10 @@ public class EmpireManager {
     WatchableObject<Star> star = StarManager.i.getStar(newStarFinder.getStar().id);
     StarManager.i.modifyStar(star, Lists.newArrayList(
         new StarModification.Builder()
-            .empire_id(id)
-            .type(StarModification.MODIFICATION_TYPE.COLONIZE)
-            .planet_index(newStarFinder.getPlanetIndex())
-            .build(),
-        new StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
             .empire_id(id)
             .design_id("colony")
-            .count(2)
+            .count(3) // note: one is destroyed by COLONIZE below
             .build(),
         new StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
@@ -84,6 +79,11 @@ public class EmpireManager {
             .empire_id(id)
             .design_id("scout")
             .count(10)
+            .build(),
+        new StarModification.Builder()
+            .empire_id(id)
+            .type(StarModification.MODIFICATION_TYPE.COLONIZE)
+            .planet_index(newStarFinder.getPlanetIndex())
             .build()
     ));
 
