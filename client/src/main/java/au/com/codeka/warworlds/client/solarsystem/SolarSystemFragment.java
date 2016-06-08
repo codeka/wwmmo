@@ -223,8 +223,7 @@ public class SolarSystemFragment extends BaseFragment {
     App.i.getEventBus().register(eventHandler);
 
     log.info("Getting star: %d", starID);
-    star = StarManager.i.getStar(starID);
-    onStarFetched(star);
+    onStarFetched(StarManager.i.getStar(starID));
   }
 
   @Override
@@ -236,7 +235,7 @@ public class SolarSystemFragment extends BaseFragment {
   private Object eventHandler = new Object() {
     @EventHandler
     public void onStarUpdated(Star star) {
-      if (starID == star.id) {
+      if (star != null && starID == star.id) {
         onStarFetched(star);
       }
     }
