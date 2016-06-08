@@ -189,13 +189,12 @@ public class SolarSystemView extends RelativeLayout {
         return;
       }
 
-      int selectedPlanetIndex = getSelectedPlanetIndex();
       RelativeLayout.LayoutParams params =
           (RelativeLayout.LayoutParams) selectionIndicator.getLayoutParams();
       params.leftMargin =
-          (int) (planetInfos[selectedPlanetIndex].centre.x - (selectionIndicator.getWidth() / 2));
+          (int) (planetInfos[selectedPlanet.index].centre.x - (selectionIndicator.getWidth() / 2));
       params.topMargin =
-          (int) (planetInfos[selectedPlanetIndex].centre.y - (selectionIndicator.getHeight() / 2));
+          (int) (planetInfos[selectedPlanet.index].centre.y - (selectionIndicator.getHeight() / 2));
       selectionIndicator.setLayoutParams(params);
       selectionIndicator.setVisibility(View.VISIBLE);
     } else {

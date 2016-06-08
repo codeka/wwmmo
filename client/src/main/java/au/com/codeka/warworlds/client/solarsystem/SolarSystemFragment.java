@@ -341,6 +341,7 @@ public class SolarSystemFragment extends BaseFragment {
             Math.round(Wire.get(storage.minerals_delta_per_hour, 0.0f))));
       }
     }
+    refreshSelectedPlanet();
   }
 
   private void onViewColony() {
