@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 
 import com.squareup.picasso.Picasso;
 
+import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.common.Log;
@@ -31,6 +32,7 @@ public class SolarSystemView extends RelativeLayout {
   private final Paint orbitPaint;
   private Star star;
   private PlanetInfo[] planetInfos;
+  private ImageView selectionIndicator;
   @Nullable private Planet selectedPlanet;
   @Nullable private PlanetSelectedHandler planetSelectedHandler;
 
@@ -41,6 +43,11 @@ public class SolarSystemView extends RelativeLayout {
     orbitPaint = new Paint();
     orbitPaint.setARGB(255, 255, 255, 255);
     orbitPaint.setStyle(Paint.Style.STROKE);
+
+    selectionIndicator = new ImageView(context);
+    selectionIndicator.setImageResource(R.drawable.planet_selection);
+    selectionIndicator.setVisibility(View.GONE);
+    addView(selectionIndicator);
   }
 
   public void setPlanetSelectedHandler(@Nullable PlanetSelectedHandler handler) {
@@ -161,16 +168,34 @@ public class SolarSystemView extends RelativeLayout {
   }
 
   private void updateSelection() {
-    //if (mSelectedPlanet != null && mSelectionView != null) {
-    //  mSelectionView.setVisibility(View.VISIBLE);
+    if (selectedPlanet != null) {
+      if (selectionIndicator.getWidth() == 0) {
+        // If it doesn't have a width, make it visible then re-update the selection once it's width
+        // has been calculated.
+        selectionIndicator.setVisibility(View.VISIBLE);
+        selectionIndicator.post(new Runnable() {
+          @Override
+          public void run() {
+            updateSelection();
+          }
+        });
+        return;
+      }
 
-    //  RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mSelectionView.getLayoutParams();
-    //  params.width = (int) ((((mSelectedPlanet.planet.getSize() - 10.0) / 8.0) + 4.0) * 10.0) + (int) (40 * getPixelScale());
-    //  params.height = params.width;
-    //  params.leftMargin = (int) (getLeft() + mSelectedPlanet.centre.x - (params.width / 2));
-    //  params.topMargin = (int) (getTop() + mSelectedPlanet.centre.y - (params.height / 2));
-    //  mSelectionView.setLayoutParams(params);
-    //}
+      for (int i = 0; i < planetInfos.length; i++) {
+        if (planetInfos[i].planet == selectedPlanet) {
+          RelativeLayout.LayoutParams params =
+              (RelativeLayout.LayoutParams) selectionIndicator.getLayoutParams();
+          params.leftMargin = (int) (planetInfos[i].centre.x - (selectionIndicator.getWidth() / 2));
+          params.topMargin = (int) (planetInfos[i].centre.y - (selectionIndicator.getHeight() / 2));
+          selectionIndicator.setLayoutParams(params);
+          selectionIndicator.setVisibility(View.VISIBLE);
+          break;
+        }
+      }
+    } else {
+      selectionIndicator.setVisibility(View.GONE);
+    }
 
     if (planetSelectedHandler != null) {
       planetSelectedHandler.onPlanetSelected(selectedPlanet);
