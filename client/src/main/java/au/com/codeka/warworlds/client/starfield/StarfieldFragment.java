@@ -55,7 +55,13 @@ public class StarfieldFragment extends BaseFragment {
         new PlanetListSimple.PlanetSelectedHandler() { // planetSelectHandler
           @Override
           public void onPlanetSelected(Planet planet) {
-
+            Star star = selectionDetailsView.getStar();
+            getFragmentTransitionManager().replaceFragment(
+                SolarSystemFragment.class,
+                SolarSystemFragment.createArguments(star.id, star.planets.indexOf(planet)),
+                SharedViewHolder.builder()
+                    .addSharedView(R.id.bottom_pane, "bottom_pane")
+                    .build());
           }
         }, new FleetListSimple.FleetSelectedHandler() { // fleetSelectHandler
           @Override

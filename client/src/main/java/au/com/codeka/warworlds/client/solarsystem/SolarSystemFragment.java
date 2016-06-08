@@ -77,8 +77,15 @@ public class SolarSystemFragment extends BaseFragment {
   private ColonyFocusView colonyFocusView;
 
   public static Bundle createArguments(long starID) {
+    return createArguments(starID, -1);
+  }
+
+  public static Bundle createArguments(long starID, int planetIndex) {
     Bundle args = new Bundle();
     args.putLong(STAR_ID_KEY, starID);
+    if (planetIndex >= 0) {
+      args.putInt(PLANET_INDEX_KEY, planetIndex);
+    }
     return args;
   }
 
@@ -128,9 +135,6 @@ public class SolarSystemFragment extends BaseFragment {
     enemyColonyDetailsContainer = view.findViewById(R.id.enemy_colony_details);
     populationCountTextView = (TextView) view.findViewById(R.id.population_count);
     colonyFocusView = (ColonyFocusView) view.findViewById(R.id.colony_focus_view);
-
-    //final SelectionView selectionView = (SelectionView) mView.findViewById(R.id.selection);
-    //mSolarSystemSurfaceView.setSelectionView(selectionView);
 
     isFirstRefresh = true;
     if (savedInstanceState != null) {
@@ -246,17 +250,12 @@ public class SolarSystemFragment extends BaseFragment {
   };
 
   private void onStarFetched(Star star) {
-    //if (StarSimulationQueue.needsSimulation(star)) {
-     // StarSimulationQueue.i.simulate(star, true);
-    //}
-
-    // if we don't have a star yet, we'll need to figure out which planet to select
-    // initially from the intent that started us. Otherwise, we'll want to select
-    // whatever planet we have currently
+    // If we don't have a star yet, we'll need to figure out which planet to select initially from
+    // the arguments that started us. Otherwise, we'll want to select whatever planet we have
+    // currently.
     int selectedPlanetIndex;
     if (isFirstRefresh) {
-      Bundle extras = getArguments();
-      selectedPlanetIndex = extras.getInt(PLANET_INDEX_KEY, -1);
+      selectedPlanetIndex = getArguments().getInt(PLANET_INDEX_KEY, -1);
     } else {
       selectedPlanetIndex = -1;
     }
@@ -264,7 +263,7 @@ public class SolarSystemFragment extends BaseFragment {
     solarSystemView.setStar(star);
     if (selectedPlanetIndex >= 0) {
       log.debug("Selecting planet #%d", selectedPlanetIndex);
-      //mSolarSystemSurfaceView.selectPlanet(selectedPlanetIndex);
+      solarSystemView.selectPlanet(selectedPlanetIndex);
     } else {
       log.debug("No planet selected");
     }

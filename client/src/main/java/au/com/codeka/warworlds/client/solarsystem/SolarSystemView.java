@@ -90,6 +90,12 @@ public class SolarSystemView extends RelativeLayout {
     placePlanets();
   }
 
+  /** Selects the planet at the given index. */
+  public void selectPlanet(int planetIndex) {
+    selectedPlanet = planetInfos[planetIndex].planet;
+    updateSelection();
+  }
+
   private float getDistanceFromSun(int planetIndex) {
     int width = getWidth();
     if (width == 0) {
@@ -163,7 +169,6 @@ public class SolarSystemView extends RelativeLayout {
       //}
     }
 
-    selectedPlanet = null; // TODO: select a default one?
     updateSelection();
   }
 
