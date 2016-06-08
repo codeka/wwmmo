@@ -48,7 +48,6 @@ public class SolarSystemFragment extends BaseFragment {
 
   private Star star;
   private Planet planet;
-  private boolean isFirstRefresh;
   private long starID;
 
   private SolarSystemView solarSystemView;
@@ -90,9 +89,8 @@ public class SolarSystemFragment extends BaseFragment {
   }
 
   @Override
-  public View onCreateView(
-      LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.frag_solarsystem, container, false);
+  protected int getViewResourceId() {
+    return R.layout.frag_solarsystem;
   }
 
   @Override
@@ -135,11 +133,6 @@ public class SolarSystemFragment extends BaseFragment {
     enemyColonyDetailsContainer = view.findViewById(R.id.enemy_colony_details);
     populationCountTextView = (TextView) view.findViewById(R.id.population_count);
     colonyFocusView = (ColonyFocusView) view.findViewById(R.id.colony_focus_view);
-
-    isFirstRefresh = true;
-    if (savedInstanceState != null) {
-      isFirstRefresh = savedInstanceState.getBoolean("au.com.codeka.warworlds.IsFirstRefresh");
-    }
 
     solarSystemView.setPlanetSelectedHandler(new SolarSystemView.PlanetSelectedHandler() {
         @Override
@@ -252,12 +245,13 @@ public class SolarSystemFragment extends BaseFragment {
   private void onStarFetched(Star star) {
     // If we don't have a star yet, we'll need to figure out which planet to select initially from
     // the arguments that started us. Otherwise, we'll want to select whatever planet we have
-    // currently.
+    // currently selected.
     int selectedPlanetIndex;
+    boolean isFirstRefresh = (this.star == null);
     if (isFirstRefresh) {
       selectedPlanetIndex = getArguments().getInt(PLANET_INDEX_KEY, -1);
     } else {
-      selectedPlanetIndex = -1;
+      selectedPlanetIndex = solarSystemView.getSelectedPlanetIndex();
     }
 
     solarSystemView.setStar(star);
@@ -280,7 +274,6 @@ public class SolarSystemFragment extends BaseFragment {
     }
 
     if (isFirstRefresh) {
-      isFirstRefresh = false;
       Bundle extras = getArguments();
       boolean showScoutReport = extras.getBoolean("au.com.codeka.warworlds.ShowScoutReport");
       if (showScoutReport) {
@@ -348,12 +341,6 @@ public class SolarSystemFragment extends BaseFragment {
             Math.round(Wire.get(storage.minerals_delta_per_hour, 0.0f))));
       }
     }
-  }
-
-  @Override
-  public void onSaveInstanceState(Bundle state) {
-    super.onSaveInstanceState(state);
-    state.putBoolean("au.com.codeka.warworlds.IsFirstRefresh", false);
   }
 
   private void onViewColony() {

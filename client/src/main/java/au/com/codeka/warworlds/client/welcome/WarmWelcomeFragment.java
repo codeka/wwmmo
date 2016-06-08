@@ -21,9 +21,8 @@ import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
  */
 public class WarmWelcomeFragment extends BaseFragment {
   @Override
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.frag_warm_welcome, container, false);
+  protected int getViewResourceId() {
+    return R.layout.frag_warm_welcome;
   }
 
   @Override

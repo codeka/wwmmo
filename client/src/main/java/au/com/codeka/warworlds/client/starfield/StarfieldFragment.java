@@ -38,9 +38,8 @@ public class StarfieldFragment extends BaseFragment {
   private Button allianceBtn;
 
   @Override
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.frag_starfield, container, false);
+  protected int getViewResourceId() {
+    return R.layout.frag_starfield;
   }
 
   @Override
@@ -96,8 +95,14 @@ public class StarfieldFragment extends BaseFragment {
           }
         });
 
-    hideBottomPane(false);
-    ((MainActivity) getActivity()).getStarfieldManager().setTapListener(
+    StarfieldManager starfieldManager = ((MainActivity) getActivity()).getStarfieldManager();
+    if (starfieldManager.getSelectedStar() != null) {
+      showBottomPane();
+      selectionDetailsView.showStar(starfieldManager.getSelectedStar());
+    } else {
+      hideBottomPane(false);
+    }
+    starfieldManager.setTapListener(
         new StarfieldManager.TapListener() {
       @Override
       public void onStarTapped(@Nullable Star star) {

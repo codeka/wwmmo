@@ -55,12 +55,7 @@ public class SolarSystemView extends RelativeLayout {
   }
 
   public Vector2 getPlanetCentre(Planet planet) {
-    for (PlanetInfo planetInfo : planetInfos) {
-      if (planetInfo.planet == planet) {
-        return planetInfo.centre;
-      }
-    }
-    throw new IllegalStateException("No planetInfo found for the given planet!");
+    return planetInfos[planet.index].centre;
   }
 
   public void setStar(Star star) {
@@ -94,6 +89,13 @@ public class SolarSystemView extends RelativeLayout {
   public void selectPlanet(int planetIndex) {
     selectedPlanet = planetInfos[planetIndex].planet;
     updateSelection();
+  }
+
+  public int getSelectedPlanetIndex() {
+    if (selectedPlanet == null) {
+      return -1;
+    }
+    return star.planets.indexOf(selectedPlanet);
   }
 
   private float getDistanceFromSun(int planetIndex) {
@@ -187,17 +189,15 @@ public class SolarSystemView extends RelativeLayout {
         return;
       }
 
-      for (int i = 0; i < planetInfos.length; i++) {
-        if (planetInfos[i].planet == selectedPlanet) {
-          RelativeLayout.LayoutParams params =
-              (RelativeLayout.LayoutParams) selectionIndicator.getLayoutParams();
-          params.leftMargin = (int) (planetInfos[i].centre.x - (selectionIndicator.getWidth() / 2));
-          params.topMargin = (int) (planetInfos[i].centre.y - (selectionIndicator.getHeight() / 2));
-          selectionIndicator.setLayoutParams(params);
-          selectionIndicator.setVisibility(View.VISIBLE);
-          break;
-        }
-      }
+      int selectedPlanetIndex = getSelectedPlanetIndex();
+      RelativeLayout.LayoutParams params =
+          (RelativeLayout.LayoutParams) selectionIndicator.getLayoutParams();
+      params.leftMargin =
+          (int) (planetInfos[selectedPlanetIndex].centre.x - (selectionIndicator.getWidth() / 2));
+      params.topMargin =
+          (int) (planetInfos[selectedPlanetIndex].centre.y - (selectionIndicator.getHeight() / 2));
+      selectionIndicator.setLayoutParams(params);
+      selectionIndicator.setVisibility(View.VISIBLE);
     } else {
       selectionIndicator.setVisibility(View.GONE);
     }
