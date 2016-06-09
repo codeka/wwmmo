@@ -157,7 +157,8 @@ public class SolarSystemFragment extends BaseFragment {
             .replaceFragment(BuildFragment.class,
                 BuildFragment.createArguments(star.id, planet.index),
                 SharedViewHolder.builder()
-                  .build());
+                    .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
+                    .build());
       }
     });
 
@@ -173,6 +174,7 @@ public class SolarSystemFragment extends BaseFragment {
             PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
             SharedViewHolder.builder()
                 .addSharedView(R.id.bottom_pane, "bottom_pane")
+                .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
                 .build());
       }
     });
@@ -353,6 +355,7 @@ public class SolarSystemFragment extends BaseFragment {
         PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
         SharedViewHolder.builder()
             .addSharedView(R.id.bottom_pane, "bottom_pane")
+            .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
             .build());
   }
 

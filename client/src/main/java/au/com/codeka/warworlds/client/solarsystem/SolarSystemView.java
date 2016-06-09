@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -56,6 +57,11 @@ public class SolarSystemView extends RelativeLayout {
 
   public Vector2 getPlanetCentre(Planet planet) {
     return planetInfos[planet.index].centre;
+  }
+
+  /** Gets the {@link ImageView} that displays the given planet's icon. */
+  public ImageView getPlanetView(Planet planet) {
+    return planetInfos[planet.index].imageView;
   }
 
   public void setStar(Star star) {
@@ -151,6 +157,7 @@ public class SolarSystemView extends RelativeLayout {
       planetInfo.imageView.setLayoutParams(lp);
       planetInfo.imageView.setTag(planetInfo);
       planetInfo.imageView.setOnClickListener(planetOnClickListener);
+      ViewCompat.setTransitionName(planetInfo.imageView, "planet_icon_" + i);
       addView(planetInfo.imageView);
 
       Picasso.with(getContext())
