@@ -15,13 +15,20 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.common.base.Preconditions;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.ctrl.FleetListHelper;
+import au.com.codeka.warworlds.client.world.EmpireManager;
+import au.com.codeka.warworlds.common.DesignHelper;
 import au.com.codeka.warworlds.common.proto.Colony;
+import au.com.codeka.warworlds.common.proto.Design;
+import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 
 public class ShipsFragment extends BuildFragment.BaseTabFragment {
@@ -31,60 +38,60 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
     View v = inflater.inflate(R.layout.frag_build_ships, container, false);
-/*
+
     shipListAdapter = new ShipListAdapter();
     updateStar(getStar(), getColony());
 
-    final ListView availableDesignsList = (ListView) v.findViewById(R.id.ship_list);
-    availableDesignsList.setAdapter(shipListAdapter);
-    availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    final ListView shipList = (ListView) v.findViewById(R.id.ship_list);
+    shipList.setAdapter(shipListAdapter);
+    shipList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ShipListAdapter.ItemEntry entry =
             (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
-        if (entry.fleet == null && entry.buildRequest == null) {
-          BuildConfirmDialog dialog = new BuildConfirmDialog();
-          dialog.setup(entry.design, getStar(), getColony());
-          dialog.show(getActivity().getSupportFragmentManager(), "");
-        } else if (entry.fleet != null && entry.buildRequest == null) {
-          ShipUpgradeDialog dialog = new ShipUpgradeDialog();
-          dialog.setup(getStar(), getColony(), entry.fleet);
-          dialog.show(getActivity().getSupportFragmentManager(), "");
+        if (entry.fleet == null /*&& entry.buildRequest == null*/) {
+          //BuildConfirmDialog dialog = new BuildConfirmDialog();
+          //dialog.setup(entry.design, getStar(), getColony());
+          //dialog.show(getActivity().getSupportFragmentManager(), "");
+        } else if (entry.fleet != null /*&& entry.buildRequest == null*/) {
+          //ShipUpgradeDialog dialog = new ShipUpgradeDialog();
+          //dialog.setup(getStar(), getColony(), entry.fleet);
+          //dialog.show(getActivity().getSupportFragmentManager(), "");
         }
       }
     });
 
-    availableDesignsList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+    shipList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
         final ShipListAdapter.ItemEntry entry =
             (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
 
-        NotesDialog dialog = new NotesDialog();
-        dialog.setup(entry.fleet == null ? entry.buildRequest.getNotes() : entry.fleet.getNotes(),
-            new NotesDialog.NotesChangedHandler() {
-              @Override
-              public void onNotesChanged(String notes) {
-                if (entry.fleet != null) {
-                  entry.fleet.setNotes(notes);
-                } else if (entry.buildRequest != null) {
-                  entry.buildRequest.setNotes(notes);
-                }
-                shipListAdapter.notifyDataSetChanged();
+        //NotesDialog dialog = new NotesDialog();
+        //dialog.setup(entry.fleet == null ? entry.buildRequest.getNotes() : entry.fleet.getNotes(),
+        //    new NotesDialog.NotesChangedHandler() {
+        //      @Override
+        //      public void onNotesChanged(String notes) {
+        //        if (entry.fleet != null) {
+        //          entry.fleet.setNotes(notes);
+        //        } else if (entry.buildRequest != null) {
+        //          entry.buildRequest.setNotes(notes);
+        //        }
+        //        shipListAdapter.notifyDataSetChanged();
 
-                if (entry.fleet != null) {
-                  FleetManager.i.updateNotes(entry.fleet);
-                } else {
-                  BuildManager.i.updateNotes(entry.buildRequest.getKey(), notes);
-                }
-              }
-            });
+        //        if (entry.fleet != null) {
+        //          FleetManager.i.updateNotes(entry.fleet);
+        //        } else {
+        //          BuildManager.i.updateNotes(entry.buildRequest.getKey(), notes);
+        //        }
+        //      }
+        //    });
 
-        dialog.show(getActivity().getSupportFragmentManager(), "");
+        //dialog.show(getActivity().getSupportFragmentManager(), "");
         return true;
       }
     });
-*/
+
     return v;
   }
 
@@ -125,25 +132,25 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
     }
   };
 */
-  private void updateStar(Star star, Colony colony) {/*
-    ArrayList<Fleet> fleets = new ArrayList<Fleet>();
-    for (BaseFleet baseFleet : star.getFleets()) {
-      if (baseFleet.getEmpireKey() != null
-          && baseFleet.getEmpireKey().equals(EmpireManager.i.getEmpire().getKey())) {
-        fleets.add((Fleet) baseFleet);
+  private void updateStar(Star star, Colony colony) {
+    Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
+    ArrayList<Fleet> fleets = new ArrayList<>();
+    for (Fleet fleet : star.fleets) {
+      if (fleet.empire_id != null && myEmpire.id.equals(fleet.empire_id)) {
+        fleets.add(fleet);
       }
     }
 
-    ArrayList<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
-    for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
-      if (baseBuildRequest.getEmpireKey().equals(EmpireManager.i.getEmpire().getKey())
-          && baseBuildRequest.getDesignKind() == DesignKind.SHIP) {
-        buildRequests.add((BuildRequest) baseBuildRequest);
-      }
-    }
+//    ArrayList<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
+//    for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
+//      if (baseBuildRequest.getEmpireKey().equals(EmpireManager.i.getEmpire().getKey())
+//          && baseBuildRequest.getDesignKind() == DesignKind.SHIP) {
+//        buildRequests.add((BuildRequest) baseBuildRequest);
+//      }
+//    }
 
-    shipListAdapter.setShips(DesignManager.i.getDesigns(DesignKind.SHIP), fleets, buildRequests);
-  */}
+    shipListAdapter.setShips(fleets, null);
+  }
 
   /** This adapter is used to populate the list of ship designs in our view. */
   private class ShipListAdapter extends BaseAdapter {
@@ -152,43 +159,44 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
     private static final int HEADING_TYPE = 0;
     private static final int EXISTING_SHIP_TYPE = 1;
     private static final int NEW_SHIP_TYPE = 2;
-/*
-    public void setShips(Map<String, Design> designs, ArrayList<Fleet> fleets,
-        ArrayList<BuildRequest> buildRequests) {
-      entries = new ArrayList<ItemEntry>();
+
+    public void setShips(ArrayList<Fleet> fleets, ArrayList<Integer/*BuildRequest*/> buildRequests) {
+      entries = new ArrayList<>();
 
       entries.add(new ItemEntry("New Ships"));
-      for (Design design : designs.values()) {
-        entries.add(new ItemEntry((ShipDesign) design));
+      for (Design design : DesignHelper.designs.designs) {
+        if (design.design_kind == Design.DesignKind.SHIP) {
+          entries.add(new ItemEntry(design));
+        }
       }
 
       entries.add(new ItemEntry("Existing Ships"));
       for (Fleet fleet : fleets) {
-        if (fleet.getState() != Fleet.State.IDLE) {
+        if (fleet.state != Fleet.FLEET_STATE.IDLE) {
           continue;
         }
         ItemEntry entry = new ItemEntry(fleet);
-        for (BuildRequest buildRequest : buildRequests) {
-          if (buildRequest.getExistingFleetID() != null
-              && ((int) buildRequest.getExistingFleetID()) == Integer.parseInt(fleet.getKey())) {
-            entry.buildRequest = buildRequest;
-          }
-        }
+        //for (BuildRequest buildRequest : buildRequests) {
+        //  if (buildRequest.getExistingFleetID() != null
+        //      && ((int) buildRequest.getExistingFleetID()) == Integer.parseInt(fleet.getKey())) {
+        //    entry.buildRequest = buildRequest;
+        //  }
+        //}
         entries.add(entry);
       }
-      for (BuildRequest buildRequest : buildRequests) {
-        if (buildRequest.getExistingFleetID() != null) {
-          continue;
-        }
-        entries.add(new ItemEntry(buildRequest));
-      }
+      //for (BuildRequest buildRequest : buildRequests) {
+      //  if (buildRequest.getExistingFleetID() != null) {
+      //    continue;
+      //  }
+      //  entries.add(new ItemEntry(buildRequest));
+      //}
 
       notifyDataSetChanged();
     }
-*/
+
     /**
-     * We have three types of items, the "headings", the list of existing
-     * buildings and the list of building designs.
+     * We have three types of items, the "headings", the list of existing buildings and the list
+     * of building designs.
      */
     @Override
     public int getViewTypeCount() {
@@ -215,18 +223,19 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
     public int getItemViewType(int position) {
       if (entries == null)
         return 0;
-/*
+
       if (entries.get(position).heading != null)
         return HEADING_TYPE;
       if (entries.get(position).design != null)
-        return NEW_SHIP_TYPE;*/
+        return NEW_SHIP_TYPE;
       return EXISTING_SHIP_TYPE;
     }
 
     @Override
     public Object getItem(int position) {
-      if (entries == null)
+      if (entries == null) {
         return null;
+      }
       return entries.get(position);
     }
 
@@ -239,14 +248,14 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
     public View getView(int position, View convertView, ViewGroup parent) {
       ItemEntry entry = entries.get(position);
 
-      View view = convertView;/*
+      View view = convertView;
       if (view == null) {
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(
             Context.LAYOUT_INFLATER_SERVICE);
         if (entry.heading != null) {
-          view = new TextView(getActivity());
+          view = new TextView(getContext());
         } else {
-          view = inflater.inflate(R.layout.buildings_design, parent, false);
+          view = inflater.inflate(R.layout.ctrl_build_design, parent, false);
         }
       }
 
@@ -254,26 +263,24 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
         TextView tv = (TextView) view;
         tv.setTypeface(Typeface.DEFAULT_BOLD);
         tv.setText(entry.heading);
-      } else if (entry.fleet != null || entry.buildRequest != null) {
+      } else if (entry.fleet != null /*|| entry.buildRequest != null*/) {
         // existing fleet/upgrading fleet
         ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.building_row1);
-        TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-        TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-        TextView level = (TextView) view.findViewById(R.id.building_level);
-        TextView levelLabel = (TextView) view.findViewById(R.id.building_level_label);
-        ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
+        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.design_row1);
+        TextView row2 = (TextView) view.findViewById(R.id.design_row2);
+        TextView row3 = (TextView) view.findViewById(R.id.design_row3);
+        TextView level = (TextView) view.findViewById(R.id.build_level);
+        TextView levelLabel = (TextView) view.findViewById(R.id.build_level_label);
+        ProgressBar progress = (ProgressBar) view.findViewById(R.id.build_progress);
         TextView notes = (TextView) view.findViewById(R.id.notes);
 
         Fleet fleet = entry.fleet;
-        BuildRequest buildRequest = entry.buildRequest;
-        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP,
-            (fleet != null ? fleet.getDesignID() : buildRequest.getDesignID()));
+        //BuildRequest buildRequest = entry.buildRequest;
+        Design design = DesignHelper.getDesign(
+            fleet != null ? fleet.design_id : /*buildRequest.getDesignID()*/null);
+        FleetListHelper.setDesignIcon(design, icon);
 
-        icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
-
-        int numUpgrades = 0;// design.getUpgrades().size();
-
+        int numUpgrades = design.upgrades.size();
         if (numUpgrades == 0 || fleet == null) {
           level.setVisibility(View.GONE);
           levelLabel.setVisibility(View.GONE);
@@ -285,46 +292,46 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
         }
 
         row1.removeAllViews();
-        FleetListRow.populateFleetNameRow(getActivity(), row1, fleet, design);
-        if (buildRequest != null) {
-          String verb = (fleet == null ? "Building" : "Upgrading");
-          row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
-              "<font color=\"#0c6476\">%s:</font> %d %%, %s left", verb,
-              (int) buildRequest.getPercentComplete(),
-              TimeFormatter.create().format(buildRequest.getRemainingTime()))));
+        FleetListHelper.populateFleetNameRow(getContext(), row1, fleet, design);
+       // if (buildRequest != null) {
+       //   String verb = (fleet == null ? "Building" : "Upgrading");
+       //   row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
+       //       "<font color=\"#0c6476\">%s:</font> %d %%, %s left", verb,
+       //       (int) buildRequest.getPercentComplete(),
+       //       TimeFormatter.create().format(buildRequest.getRemainingTime()))));
 
-          row3.setVisibility(View.GONE);
-          progress.setVisibility(View.VISIBLE);
-          progress.setProgress((int) buildRequest.getPercentComplete());
-        } else {
+       //   row3.setVisibility(View.GONE);
+       //   progress.setVisibility(View.VISIBLE);
+       //   progress.setProgress((int) buildRequest.getPercentComplete());
+       // } else {
           String upgrades = "";
-          for (ShipDesign.Upgrade upgrade : design.getUpgrades()) {
-            if (fleet != null && !fleet.hasUpgrade(upgrade.getID())) {
-              if (upgrades.length() > 0) {
-                upgrades += ", ";
-              }
-              upgrades += upgrade.getDisplayName();
-            }
+          for (Design.Upgrade upgrade : design.upgrades) {
+            //if (fleet != null && !fleet.hasUpgrade(upgrade.getID())) {
+            //  if (upgrades.length() > 0) {
+            //    upgrades += ", ";
+            //  }
+            //  upgrades += upgrade.getDisplayName();
+            //}
           }
 
           progress.setVisibility(View.GONE);
           if (upgrades.length() == 0) {
-            row2.setText(Html.fromHtml(String.format(Locale.ENGLISH, "Upgrades: <i>none</i>")));
+            row2.setText(Html.fromHtml(String.format(Locale.US, "Upgrades: <i>none</i>")));
           } else {
-            row2.setText(String.format(Locale.ENGLISH, "Upgrades: " + upgrades));
+            row2.setText(String.format(Locale.US, "Upgrades: " + upgrades));
           }
 
-          String requiredHtml = design.getDependenciesHtml(getColony());
+          String requiredHtml = "";//design.getDependenciesHtml(getColony());
           row3.setVisibility(View.VISIBLE);
           row3.setText(Html.fromHtml(requiredHtml));
-        }
+       // }
 
-        if (fleet != null && fleet.getNotes() != null) {
-          notes.setText(fleet.getNotes());
+        if (fleet != null && fleet.notes != null) {
+          notes.setText(fleet.notes);
           notes.setVisibility(View.VISIBLE);
-        } else if (buildRequest != null && buildRequest.getNotes() != null) {
-          notes.setText(buildRequest.getNotes());
-          notes.setVisibility(View.VISIBLE);
+        //} else if (buildRequest != null && buildRequest.getNotes() != null) {
+        //  notes.setText(buildRequest.getNotes());
+        //  notes.setVisibility(View.VISIBLE);
         } else {
           notes.setText("");
           notes.setVisibility(View.GONE);
@@ -332,43 +339,42 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
       } else {
         // new fleet
         ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.building_row1);
-        TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-        TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.design_row1);
+        TextView row2 = (TextView) view.findViewById(R.id.design_row2);
+        TextView row3 = (TextView) view.findViewById(R.id.design_row3);
 
-        view.findViewById(R.id.building_progress).setVisibility(View.GONE);
-        view.findViewById(R.id.building_level).setVisibility(View.GONE);
-        view.findViewById(R.id.building_level_label).setVisibility(View.GONE);
+        view.findViewById(R.id.build_progress).setVisibility(View.GONE);
+        view.findViewById(R.id.build_level).setVisibility(View.GONE);
+        view.findViewById(R.id.build_level_label).setVisibility(View.GONE);
         view.findViewById(R.id.notes).setVisibility(View.GONE);
 
-        ShipDesign design = entry.design;
-
-        icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+        Design design = entry.design;
+        FleetListHelper.setDesignIcon(design, icon);
 
         row1.removeAllViews();
-        FleetListRow.populateFleetNameRow(getActivity(), row1, null, design);
-        String requiredHtml = design.getDependenciesHtml(getColony());
+        FleetListHelper.populateFleetNameRow(getContext(), row1, null, design);
+        String requiredHtml = "";//design.getDependenciesHtml(getColony());
         row2.setText(Html.fromHtml(requiredHtml));
 
         row3.setVisibility(View.GONE);
       }
-*/
+
       return view;
     }
 
-    public class ItemEntry {/*
-      public ShipDesign design;
+    public class ItemEntry {
+      public Design design;
       public Fleet fleet;
-      public BuildRequest buildRequest;
+     // public BuildRequest buildRequest;
       public String heading;
 
-      public ItemEntry(ShipDesign design) {
+      public ItemEntry(Design design) {
         this.design = design;
       }
 
-      public ItemEntry(BuildRequest buildRequest) {
-        this.buildRequest = buildRequest;
-      }
+     // public ItemEntry(BuildRequest buildRequest) {
+    //    this.buildRequest = buildRequest;
+     // }
 
       public ItemEntry(Fleet fleet) {
         this.fleet = fleet;
@@ -376,7 +382,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
 
       public ItemEntry(String heading) {
         this.heading = heading;
-      }*/
+      }
     }
   }
 }

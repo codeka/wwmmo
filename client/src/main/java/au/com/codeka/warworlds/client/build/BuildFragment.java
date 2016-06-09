@@ -206,10 +206,14 @@ public class BuildFragment extends BaseFragment {
   }
 
   public static class BaseTabFragment extends BaseFragment {
+    private Star star;
     private Integer planetIndex;
 
     protected Star getStar() {
-      return ((BuildFragment) getParentFragment()).star;
+      if (star == null) {
+        star = StarManager.i.getStar(getArguments().getLong(STAR_ID_KEY));
+      }
+      return star;
     }
 
     protected Colony getColony() {
