@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.SharedViewHolder;
+import au.com.codeka.warworlds.client.build.BuildFragment;
 import au.com.codeka.warworlds.client.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.client.util.NumberFormatter;
@@ -152,12 +153,11 @@ public class SolarSystemFragment extends BaseFragment {
           return; // shouldn't happen, the button should be hidden.
         }
 
-        //Intent intent = new Intent(getActivity(), BuildActivity.class);
-        //intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-        //Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
-        //mColony.toProtocolBuffer(colony_pb);
-        //intent.putExtra("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
-        //startActivityForResult(intent, BUILD_REQUEST);
+        getFragmentTransitionManager()
+            .replaceFragment(BuildFragment.class,
+                BuildFragment.createArguments(star.id, planet.index),
+                SharedViewHolder.builder()
+                  .build());
       }
     });
 
