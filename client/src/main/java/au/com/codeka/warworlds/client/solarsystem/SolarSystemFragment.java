@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.SharedViewHolder;
+import au.com.codeka.warworlds.client.build.BuildFragment;
 import au.com.codeka.warworlds.client.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.client.util.NumberFormatter;
@@ -48,7 +49,6 @@ public class SolarSystemFragment extends BaseFragment {
 
   private Star star;
   private Planet planet;
-  private boolean isFirstRefresh;
   private long starID;
 
   private SolarSystemView solarSystemView;
@@ -77,15 +77,21 @@ public class SolarSystemFragment extends BaseFragment {
   private ColonyFocusView colonyFocusView;
 
   public static Bundle createArguments(long starID) {
+    return createArguments(starID, -1);
+  }
+
+  public static Bundle createArguments(long starID, int planetIndex) {
     Bundle args = new Bundle();
     args.putLong(STAR_ID_KEY, starID);
+    if (planetIndex >= 0) {
+      args.putInt(PLANET_INDEX_KEY, planetIndex);
+    }
     return args;
   }
 
   @Override
-  public View onCreateView(
-      LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.frag_solarsystem, container, false);
+  protected int getViewResourceId() {
+    return R.layout.frag_solarsystem;
   }
 
   @Override
@@ -129,14 +135,6 @@ public class SolarSystemFragment extends BaseFragment {
     populationCountTextView = (TextView) view.findViewById(R.id.population_count);
     colonyFocusView = (ColonyFocusView) view.findViewById(R.id.colony_focus_view);
 
-    //final SelectionView selectionView = (SelectionView) mView.findViewById(R.id.selection);
-    //mSolarSystemSurfaceView.setSelectionView(selectionView);
-
-    isFirstRefresh = true;
-    if (savedInstanceState != null) {
-      isFirstRefresh = savedInstanceState.getBoolean("au.com.codeka.warworlds.IsFirstRefresh");
-    }
-
     solarSystemView.setPlanetSelectedHandler(new SolarSystemView.PlanetSelectedHandler() {
         @Override
         public void onPlanetSelected(Planet planet) {
@@ -155,12 +153,12 @@ public class SolarSystemFragment extends BaseFragment {
           return; // shouldn't happen, the button should be hidden.
         }
 
-        //Intent intent = new Intent(getActivity(), BuildActivity.class);
-        //intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-        //Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
-        //mColony.toProtocolBuffer(colony_pb);
-        //intent.putExtra("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
-        //startActivityForResult(intent, BUILD_REQUEST);
+        getFragmentTransitionManager()
+            .replaceFragment(BuildFragment.class,
+                BuildFragment.createArguments(star.id, planet.index),
+                SharedViewHolder.builder()
+                    .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
+                    .build());
       }
     });
 
@@ -176,6 +174,7 @@ public class SolarSystemFragment extends BaseFragment {
             PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
             SharedViewHolder.builder()
                 .addSharedView(R.id.bottom_pane, "bottom_pane")
+                .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
                 .build());
       }
     });
@@ -226,8 +225,7 @@ public class SolarSystemFragment extends BaseFragment {
     App.i.getEventBus().register(eventHandler);
 
     log.info("Getting star: %d", starID);
-    star = StarManager.i.getStar(starID);
-    onStarFetched(star);
+    onStarFetched(StarManager.i.getStar(starID));
   }
 
   @Override
@@ -239,32 +237,28 @@ public class SolarSystemFragment extends BaseFragment {
   private Object eventHandler = new Object() {
     @EventHandler
     public void onStarUpdated(Star star) {
-      if (starID == star.id) {
+      if (star != null && starID == star.id) {
         onStarFetched(star);
       }
     }
   };
 
   private void onStarFetched(Star star) {
-    //if (StarSimulationQueue.needsSimulation(star)) {
-     // StarSimulationQueue.i.simulate(star, true);
-    //}
-
-    // if we don't have a star yet, we'll need to figure out which planet to select
-    // initially from the intent that started us. Otherwise, we'll want to select
-    // whatever planet we have currently
+    // If we don't have a star yet, we'll need to figure out which planet to select initially from
+    // the arguments that started us. Otherwise, we'll want to select whatever planet we have
+    // currently selected.
     int selectedPlanetIndex;
+    boolean isFirstRefresh = (this.star == null);
     if (isFirstRefresh) {
-      Bundle extras = getArguments();
-      selectedPlanetIndex = extras.getInt(PLANET_INDEX_KEY, -1);
+      selectedPlanetIndex = getArguments().getInt(PLANET_INDEX_KEY, -1);
     } else {
-      selectedPlanetIndex = -1;
+      selectedPlanetIndex = solarSystemView.getSelectedPlanetIndex();
     }
 
     solarSystemView.setStar(star);
     if (selectedPlanetIndex >= 0) {
       log.debug("Selecting planet #%d", selectedPlanetIndex);
-      //mSolarSystemSurfaceView.selectPlanet(selectedPlanetIndex);
+      solarSystemView.selectPlanet(selectedPlanetIndex);
     } else {
       log.debug("No planet selected");
     }
@@ -281,7 +275,6 @@ public class SolarSystemFragment extends BaseFragment {
     }
 
     if (isFirstRefresh) {
-      isFirstRefresh = false;
       Bundle extras = getArguments();
       boolean showScoutReport = extras.getBoolean("au.com.codeka.warworlds.ShowScoutReport");
       if (showScoutReport) {
@@ -349,12 +342,7 @@ public class SolarSystemFragment extends BaseFragment {
             Math.round(Wire.get(storage.minerals_delta_per_hour, 0.0f))));
       }
     }
-  }
-
-  @Override
-  public void onSaveInstanceState(Bundle state) {
-    super.onSaveInstanceState(state);
-    state.putBoolean("au.com.codeka.warworlds.IsFirstRefresh", false);
+    refreshSelectedPlanet();
   }
 
   private void onViewColony() {
@@ -367,6 +355,7 @@ public class SolarSystemFragment extends BaseFragment {
         PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
         SharedViewHolder.builder()
             .addSharedView(R.id.bottom_pane, "bottom_pane")
+            .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
             .build());
   }
 

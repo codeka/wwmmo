@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.websock;
 
+import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
@@ -80,12 +81,16 @@ public class GameSocket extends WebSocketAdapter {
     byte[] bytes = pkt.encode();
     log.debug(">> %s", PacketDebug.getPacketDebug(pkt, bytes));
 
+    RemoteEndpoint remoteEndpoint = getRemote();
+    if (remoteEndpoint == null) {
+      log.error("Error sending message, remote endpoint is null.");
+      return;
+    }
+
     try {
-      getRemote().sendBytes(ByteBuffer.wrap(bytes));
+      remoteEndpoint.sendBytes(ByteBuffer.wrap(bytes));
     } catch (IOException e) {
       log.error("Error sending message to client.", e);
     }
   }
-
-
 }

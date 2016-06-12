@@ -53,6 +53,7 @@ public class StarfieldManager {
   private final Context context;
   private boolean initialized;
   @Nullable private TapListener tapListener;
+  @Nullable private Star selectedStar;
 
   private long centerSectorX;
   private long centerSectorY;
@@ -99,6 +100,10 @@ public class StarfieldManager {
 
   public void setTapListener(@Nullable TapListener tapListener) {
     this.tapListener = tapListener;
+  }
+
+  public Star getSelectedStar() {
+    return selectedStar;
   }
 
   public void warpTo(Star star) {
@@ -486,6 +491,7 @@ public class StarfieldManager {
         }
       }
 
+      selectedStar = star;
       tapListener.onStarTapped(star);
     }
   };

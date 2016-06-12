@@ -36,9 +36,8 @@ public class CreateEmpireFragment extends BaseFragment {
   private static final Log log = new Log("CreateEmpireFragment");
 
   @Override
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.frag_create_empire, container, false);
+  protected int getViewResourceId() {
+    return R.layout.frag_create_empire;
   }
 
   @Override

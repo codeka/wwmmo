@@ -65,10 +65,8 @@ public class WelcomeFragment extends BaseFragment {
   private TransparentWebView motdView;
 
   @Override
-  @Nullable
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.frag_welcome, container, false);
+  protected int getViewResourceId() {
+    return R.layout.frag_welcome;
   }
 
   @Override

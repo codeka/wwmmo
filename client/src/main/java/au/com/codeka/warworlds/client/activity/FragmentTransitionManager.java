@@ -60,7 +60,9 @@ public class FragmentTransitionManager {
 
     if (sharedViews != null) {
       for (SharedViewHolder.SharedView sharedView : sharedViews.getSharedViews()) {
-        View v = activity.findViewById(sharedView.getViewId());
+        View v = sharedView.getView() != null
+            ? sharedView.getView()
+            : activity.findViewById(sharedView.getViewId());
         if (v == null) {
           log.warning("No shared view with id #%d for transition to '%s' in %s.",
               sharedView.getViewId(), sharedView.getTransitionName(),
