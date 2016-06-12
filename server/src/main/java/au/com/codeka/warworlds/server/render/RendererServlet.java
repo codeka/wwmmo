@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import au.com.codeka.warworlds.common.Colour;
 import au.com.codeka.warworlds.common.Image;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.Vector3;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -123,7 +124,7 @@ public class RendererServlet extends HttpServlet {
     }
 
     long startTime = System.nanoTime();
-    if (!generateImage(cacheFile, templateFile, width, height, factor, rand)) {
+    if (!generateImage(cacheFile, templateFile, null, width, height, factor, rand)) {
       response.setStatus(500);
       return;
     }
@@ -175,7 +176,8 @@ public class RendererServlet extends HttpServlet {
     Random rand = new Random(starId + planetIndex);
     File templateFile = getTemplateFile(rand, "planet", planet.planet_type.toString());
     long startTime = System.nanoTime();
-    if (!generateImage(cacheFile, templateFile, width, height, factor, rand)) {
+    Vector3 sunDirection = getSunDirection(star.get(), planetIndex);
+    if (!generateImage(cacheFile, templateFile, sunDirection, width, height, factor, rand)) {
       response.setStatus(500);
       return;
     }
@@ -184,6 +186,17 @@ public class RendererServlet extends HttpServlet {
         (endTime - startTime) / 1000000L, request.getPathInfo());
 
     serveCachedFile(cacheFile, response);
+  }
+
+  private Vector3 getSunDirection(Star star, int planetIndex) {
+    int numPlanets = star.planets.size();
+    float angle = (0.5f/(numPlanets + 1));
+    angle = (float) ((angle * planetIndex * Math.PI) + (angle * Math.PI));
+
+    Vector3 sunDirection = new Vector3(0.0, 1.0, -1.0);
+    sunDirection.rotateZ(angle);
+    sunDirection.scale(200.0);
+    return sunDirection;
   }
 
   private void handleEmpire(HttpServletRequest request, HttpServletResponse response)
@@ -271,7 +284,13 @@ public class RendererServlet extends HttpServlet {
   }
 
   private boolean generateImage(
-      File cacheFile, File templateFile, int width, int height, float factor, Random rand) {
+      File cacheFile,
+      File templateFile,
+      @Nullable Vector3 sunDirection,
+      int width,
+      int height,
+      float factor,
+      Random rand) {
     width = (int) Math.ceil(width * factor);
     height = (int) Math.ceil(height * factor);
 
@@ -284,9 +303,19 @@ public class RendererServlet extends HttpServlet {
     }
     PlanetRenderer renderer;
     if (tmpl.getTemplate() instanceof Template.PlanetsTemplate) {
-      renderer = new PlanetRenderer((Template.PlanetsTemplate) tmpl.getTemplate(), rand);
+      Template.PlanetsTemplate planetsTemplate = (Template.PlanetsTemplate) tmpl.getTemplate();
+      if (sunDirection != null) {
+        for (Template.BaseTemplate child : planetsTemplate.getParameters()) {
+          ((Template.PlanetTemplate) child).setSunLocation(sunDirection);
+        }
+      }
+      renderer = new PlanetRenderer(planetsTemplate, rand);
     } else if (tmpl.getTemplate() instanceof Template.PlanetTemplate) {
-      renderer = new PlanetRenderer((Template.PlanetTemplate) tmpl.getTemplate(), rand);
+      Template.PlanetTemplate planetTemplate = (Template.PlanetTemplate) tmpl.getTemplate();
+      if (sunDirection != null) {
+        planetTemplate.setSunLocation(sunDirection);
+      }
+      renderer = new PlanetRenderer(planetTemplate, rand);
     } else {
       log.warning("Unknown template: %s", tmpl.getTemplate().getClass().getSimpleName());
       return false;
