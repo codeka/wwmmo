@@ -57,8 +57,7 @@ public class ColourGradient {
         double factor = (n - lhs.n) / (rhs.n - lhs.n);
 
         Colour c = new Colour(lhs.colour);
-        Colour.interpolate(c, rhs.colour, factor);
-        return c;
+        return Colour.interpolate(c, rhs.colour, factor);
       }
     }
 

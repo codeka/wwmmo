@@ -486,7 +486,8 @@ public class Template {
   public static class AtmosphereTemplate extends BaseTemplate {
     public enum BlendMode {
       Alpha,
-      Additive
+      Additive,
+      Multiply
     }
 
     private InnerOuterTemplate innerTemplate;
@@ -595,6 +596,8 @@ public class Template {
             tmpl.blendMode = BlendMode.Alpha;
           } else if (elem.getAttribute("blend").equalsIgnoreCase("additive")) {
             tmpl.blendMode = BlendMode.Additive;
+          } else if (elem.getAttribute("blend").equalsIgnoreCase("multiply")) {
+            tmpl.blendMode = BlendMode.Multiply;
           } else {
             throw new TemplateException("Unknown 'blend' value: " + elem.getAttribute("blend"));
           }

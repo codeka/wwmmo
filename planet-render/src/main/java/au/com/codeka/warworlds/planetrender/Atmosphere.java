@@ -40,8 +40,7 @@ public class Atmosphere {
   }
 
   public Colour getOuterPixelColour(double u, double v, Vector3 normal,
-      double distanceToSurface, Vector3 sunDirection,
-      Vector3 north) {
+      double distanceToSurface, Vector3 sunDirection, Vector3 north) {
     return new Colour(Colour.TRANSPARENT);
   }
 
@@ -193,10 +192,8 @@ public class Atmosphere {
 
       if (perlin != null) {
         double noiseFactor = getNoiseFactor(u, v, perlin, noisiness);
-        baseColour.reset(baseColour.a * noiseFactor,
-            baseColour.r * noiseFactor,
-            baseColour.g * noiseFactor,
-            baseColour.b * noiseFactor);
+        baseColour.reset(
+            baseColour.a * noiseFactor, baseColour.r, baseColour.g, baseColour.b);
       }
 
       return baseColour;

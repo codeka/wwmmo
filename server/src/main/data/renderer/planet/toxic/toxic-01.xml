@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <planet version="1">
   <texture generator="perlin-noise">
-      <perlin persistence="0.5" startOctave="3" endOctave="9" interpolation="linear" />
-      <colour>
-        <node n="0.0" colour="ff00ff06" />
-        <node n="0.3" colour="ff006000" />
-        <node n="1.0" colour="ff00ff00" />
-      </colour>
+    <perlin persistence="0.5" startOctave="3" endOctave="9" interpolation="linear" />
+    <colour>
+      <node n="0.0" colour="ff00ff06" />
+      <node n="0.3" colour="ff006000" />
+      <node n="1.0" colour="ff00ff00" />
+    </colour>
   </texture>
   <atmosphere>
-    <outer size="5" noisiness="0.7" sunStartShadow="1" sunShadowFactor="0.6">
+    <outer size="5" noisiness="0.7" sunStartShadow="1" sunShadowFactor="0.8">
       <colour>
         <node n="0.0" colour="ff24ff60" />
         <node n="0.8" colour="0024ff60" />

@@ -114,11 +114,7 @@ public class SinglePlanetGenerator {
               surfaceNormal,
               sunDirection,
               north);
-          if (atmosphere.getBlendMode() == Template.AtmosphereTemplate.BlendMode.Alpha) {
-            Colour.blend(c, atmosphereColour);
-          } else {
-            Colour.add(c, atmosphereColour);
-          }
+          c = blendAtmosphere(atmosphere, c, atmosphereColour);
         }
       }
     } else if (atmospheres != null) {
@@ -146,15 +142,23 @@ public class SinglePlanetGenerator {
             distance,
             sunDirection,
             north);
-        if (atmosphere.getBlendMode() == Template.AtmosphereTemplate.BlendMode.Alpha) {
-          Colour.blend(c, atmosphereColour);
-        } else {
-          Colour.add(c, atmosphereColour);
-        }
+        c = blendAtmosphere(atmosphere, c, atmosphereColour);
       }
     }
 
     return c;
+  }
+
+  private Colour blendAtmosphere(Atmosphere atmosphere, Colour imgColour, Colour atmosphereColour) {
+    switch (atmosphere.getBlendMode()) {
+      case Additive:
+        return Colour.add(imgColour, Colour.multiplyAlpha(atmosphereColour));
+      case Alpha:
+        return Colour.blend(imgColour, atmosphereColour);
+      case Multiply:
+        return Colour.multiply(imgColour, atmosphereColour);
+    }
+    return Colour.TRANSPARENT;
   }
 
   /**

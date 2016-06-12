@@ -13,7 +13,7 @@
     <outer size="8" noisiness="0.7">
       <colour>
         <node n="0.0" colour="ffa019de" />
-        <node n="0.8" colour="00a019de" />
+        <node n="0.4" colour="00a019de" />
       </colour>
       <perlin persistence="0.6" startOctave="3" endOctave="8" interpolation="linear" />
     </outer>

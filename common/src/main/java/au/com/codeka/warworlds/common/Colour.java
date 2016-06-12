@@ -68,51 +68,68 @@ public class Colour {
     };
   }
 
+  public static Colour multiplyAlpha(Colour c) {
+    return new Colour(
+        c.a,
+        c.r * c.a,
+        c.g * c.a,
+        c.b * c.a);
+  }
+
   /**
    * Interpolates between two colours. If n <= 0 then lhs is returned. If n >= 1 then rhs
    * is returned. Otherwise, a colour "between" lhs and rhs is returned.
    */
-  public static void interpolate(Colour result, Colour rhs, double n) {
-    final double a = result.a + (rhs.a - result.a) * n;
-    final double r = result.r + (rhs.r - result.r) * n;
-    final double g = result.g + (rhs.g - result.g) * n;
-    final double b = result.b + (rhs.b - result.b) * n;
+  public static Colour interpolate(Colour lhs, Colour rhs, double n) {
+    final double a = lhs.a + (rhs.a - lhs.a) * n;
+    final double r = lhs.r + (rhs.r - lhs.r) * n;
+    final double g = lhs.g + (rhs.g - lhs.g) * n;
+    final double b = lhs.b + (rhs.b - lhs.b) * n;
 
-    result.reset(a, r, g, b);
+    return new Colour(a, r, g, b);
   }
 
   /**
    * Blends the given rhs onto the given lhs, using alpha blending.
    */
-  public static void blend(Colour result, Colour rhs) {
-    double a = result.a + rhs.a;
+  public static Colour blend(Colour lhs, Colour rhs) {
+    double a = lhs.a + rhs.a * (1.0 - lhs.a);
     if (a > 1.0)
       a = 1.0;
-    double r = (result.r * (1.0 - rhs.a)) + (rhs.r * rhs.a);
-    double g = (result.g * (1.0 - rhs.a)) + (rhs.g * rhs.a);
-    double b = (result.b * (1.0 - rhs.a)) + (rhs.b * rhs.a);
+    if (a <= 0.0) {
+      a = 0.0;
+      return Colour.TRANSPARENT;
+    }
 
-    result.reset(a, r, g, b);
+    double r = ((lhs.r * lhs.a) + (rhs.r * rhs.a * (1.0 - lhs.a))) / a;
+    double g = ((lhs.g * lhs.a) + (rhs.g * rhs.a * (1.0 - lhs.a))) / a;
+    double b = ((lhs.b * lhs.a) + (rhs.b * rhs.a * (1.0 - lhs.a))) / a;
+    return new Colour(a, r, g, b);
+  }
+
+  /** Multiplies two colours together. */
+  public static Colour multiply(Colour lhs, Colour rhs) {
+    return new Colour(lhs.a * rhs.a, lhs.r * rhs.r, lhs.g * rhs.g, lhs.b * rhs.b);
   }
 
   /**
    * Adds the given rhs onto the given lhs, using additive blending.
    */
-  public static void add(Colour result, Colour rhs) {
-    double a = result.a + rhs.a;
+  public static Colour add(Colour lhs, Colour rhs) {
+    double a = lhs.a + rhs.a;
     if (a > 1.0)
       a = 1.0;
-    double r = result.r + rhs.r;
+    double r = lhs.r + rhs.r;
     if (r > 1.0)
       r = 1.0;
-    double g = result.g + rhs.g;
+    double g = lhs.g + rhs.g;
     if (g > 1.0)
       g = 1.0;
-    double b = result.b + rhs.b;
+    double b = lhs.b + rhs.b;
     if (b > 1.0)
       b = 1.0;
 
-    result.reset(a, r, g, b);
+    return new Colour(a, r, g, b);
   }
 
   public static Colour RED = new Colour(1.0, 1.0, 0.0, 0.0);

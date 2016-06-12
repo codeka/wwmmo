@@ -12,17 +12,15 @@ import au.com.codeka.warworlds.common.Image;
  * we assume there's only one object in the scene (the planet) and one light source (the sun).
  */
 public class PlanetRenderer {
-  private ArrayList<SinglePlanetGenerator> mSinglePlanetGenerators;
+  private final ArrayList<SinglePlanetGenerator> singlePlanetGenerators = new ArrayList<>();
 
   public PlanetRenderer(Template.PlanetTemplate tmpl, Random rand) {
-    mSinglePlanetGenerators = new ArrayList<>();
-    mSinglePlanetGenerators.add(new SinglePlanetGenerator(tmpl, rand));
+    singlePlanetGenerators.add(new SinglePlanetGenerator(tmpl, rand));
   }
 
   public PlanetRenderer(Template.PlanetsTemplate tmpl, Random rand) {
-    mSinglePlanetGenerators = new ArrayList<>();
     for (Template.PlanetTemplate planetTmpl : tmpl.getParameters(Template.PlanetTemplate.class)) {
-      mSinglePlanetGenerators.add(new SinglePlanetGenerator(planetTmpl, rand));
+      singlePlanetGenerators.add(new SinglePlanetGenerator(planetTmpl, rand));
     }
   }
 
@@ -31,7 +29,7 @@ public class PlanetRenderer {
    */
   public void render(Image img) {
     int i = 0;
-    for (SinglePlanetGenerator planetGenerator : mSinglePlanetGenerators) {
+    for (SinglePlanetGenerator planetGenerator : singlePlanetGenerators) {
       for (int y = 0; y < img.getHeight(); y++) {
         for (int x = 0; x < img.getWidth(); x++) {
           double nx = ((double) x / (double) img.getWidth()) - 0.5;
@@ -53,7 +51,7 @@ public class PlanetRenderer {
    */
   public void render(BufferedImage img) {
     int i = 0;
-    for (SinglePlanetGenerator planetGenerator : mSinglePlanetGenerators) {
+    for (SinglePlanetGenerator planetGenerator : singlePlanetGenerators) {
       for (int y = 0; y < img.getHeight(); y++) {
         for (int x = 0; x < img.getWidth(); x++) {
           double nx = ((double) x / (double) img.getWidth()) - 0.5;
@@ -63,7 +61,7 @@ public class PlanetRenderer {
             img.setRGB(x, y, c.toArgb());
           } else {
             Colour imgColour = new Colour(img.getRGB(x, y));
-            Colour.blend(imgColour, c);
+            imgColour = Colour.blend(imgColour, c);
             img.setRGB(x, y, imgColour.toArgb());
           }
         }

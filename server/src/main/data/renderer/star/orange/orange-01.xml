@@ -9,14 +9,15 @@
     <perlin persistence="0.5" startOctave="6" endOctave="8" interpolation="linear" />
   </texture>
   <atmosphere>
-    <outer size="6" noisiness="0.4">
+    <outer size="6" noisiness="0.6" blend="alpha">
       <colour>
         <node n="0.0" colour="ffff6600" />
+        <node n="0.1" colour="ffff6600" />
         <node n="0.8" colour="00ff6600" />
       </colour>
       <perlin persistence="0.5" startOctave="3" endOctave="6" interpolation="linear" />
     </outer>
-    <inner>
+    <inner blend="additive">
       <colour>
         <node n="0.0" colour="00ff6600" />
         <node n="0.5" colour="a0ff6600" />

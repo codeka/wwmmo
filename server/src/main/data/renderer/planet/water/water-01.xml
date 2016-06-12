@@ -16,7 +16,7 @@
         <node n="1.0" colour="ff002980" />
       </colour>
     </inner>
-    <outer size="2" sunStartShadow="1" sunShadowFactor="0.5">
+    <outer size="2" sunStartShadow="1" sunShadowFactor="0.7">
       <colour>
         <node n="0.0" colour="ff002980" />
         <node n="0.5" colour="a0002980" />

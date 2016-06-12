@@ -2,7 +2,7 @@
 <planet version="1" ambient="0.6" size="8">
   <texture generator="perlin-noise" noisiness="0.8" scaleX="1.2" scaleY="0.6">
     <colour>
-      <node n="0.0" colour="ff333333" />
+      <node n="0.0" colour="ff666666" />
       <node n="0.3" colour="ff999999" />
       <node n="1.0" colour="ffcccccc" />
     </colour>

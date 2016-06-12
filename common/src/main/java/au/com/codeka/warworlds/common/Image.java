@@ -57,7 +57,7 @@ public class Image {
       return;
 
     Colour imgColour = new Colour(argb[y * width + x]);
-    Colour.blend(imgColour, c);
+    imgColour = Colour.blend(imgColour, c);
     argb[y * width + x] = imgColour.toArgb();
   }
 
