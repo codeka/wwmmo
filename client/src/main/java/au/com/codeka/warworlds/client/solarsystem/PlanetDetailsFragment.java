@@ -55,7 +55,8 @@ public class PlanetDetailsFragment extends BaseFragment {
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
-    ViewBackgroundGenerator.setBackground(view.findViewById(R.id.planet_background));
+    long seed = getArguments().getLong(STAR_ID_KEY);
+    ViewBackgroundGenerator.setBackground(view.findViewById(R.id.planet_background), null, seed);
   }
 
   @Override

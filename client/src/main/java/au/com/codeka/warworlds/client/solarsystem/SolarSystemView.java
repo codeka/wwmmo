@@ -39,8 +39,6 @@ public class SolarSystemView extends RelativeLayout {
 
   public SolarSystemView(Context context, AttributeSet attrs) {
     super(context, attrs);
-    ViewBackgroundGenerator.setBackground(this, onBackgroundDrawHandler);
-
     orbitPaint = new Paint();
     orbitPaint.setARGB(255, 255, 255, 255);
     orbitPaint.setStyle(Paint.Style.STROKE);
@@ -65,6 +63,8 @@ public class SolarSystemView extends RelativeLayout {
   }
 
   public void setStar(Star star) {
+    ViewBackgroundGenerator.setBackground(this, onBackgroundDrawHandler, star.id);
+
     this.star = star;
     planetInfos = new PlanetInfo[star.planets.size()];
     for (int i = 0; i < star.planets.size(); i++) {
