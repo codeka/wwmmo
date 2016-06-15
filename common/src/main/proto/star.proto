@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.common.proto;
 
 import "common.proto";
+import "design.proto";
 import "colony.proto";
 import "fleet.proto";
 
@@ -186,6 +187,6 @@ message StarModification {
   optional int64 colony_id = 4;
 
   optional ColonyFocus focus = 5;
-  optional string design_id = 6;
+  optional Design.DesignType design_type = 6;
   optional int32 count = 7;
 }

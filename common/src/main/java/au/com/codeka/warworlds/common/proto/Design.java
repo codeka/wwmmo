@@ -26,7 +26,7 @@ public final class Design extends Message<Design, Design.Builder> {
 
   private static final long serialVersionUID = 0L;
 
-  public static final String DEFAULT_ID = "";
+  public static final DesignType DEFAULT_TYPE = DesignType.UNKNOWN_DESIGN;
 
   public static final String DEFAULT_DISPLAY_NAME = "";
 
@@ -34,7 +34,7 @@ public final class Design extends Message<Design, Design.Builder> {
 
   public static final String DEFAULT_IMAGE_URL = "";
 
-  public static final DesignKind DEFAULT_DESIGN_KIND = DesignKind.UNKNOWN;
+  public static final DesignKind DEFAULT_DESIGN_KIND = DesignKind.UNKNOWN_KIND;
 
   public static final Integer DEFAULT_MAX_PER_COLONY = 0;
 
@@ -54,9 +54,9 @@ public final class Design extends Message<Design, Design.Builder> {
 
   @WireField(
       tag = 1,
-      adapter = "com.squareup.wire.ProtoAdapter#STRING"
+      adapter = "au.com.codeka.warworlds.common.proto.Design$DesignType#ADAPTER"
   )
-  public final String id;
+  public final DesignType type;
 
   @WireField(
       tag = 2,
@@ -157,13 +157,13 @@ public final class Design extends Message<Design, Design.Builder> {
   )
   public final Integer combat_priority;
 
-  public Design(String id, String display_name, String description, BuildCost build_cost, String image_url, DesignKind design_kind, List<Dependency> dependencies, List<Effect> effect, Integer max_per_colony, Integer max_per_empire, Boolean show_in_solar_system, List<Upgrade> upgrades, Float speed_px_per_hour, Float fuel_cost_per_px, Float base_attack, Float base_defence, Integer combat_priority) {
-    this(id, display_name, description, build_cost, image_url, design_kind, dependencies, effect, max_per_colony, max_per_empire, show_in_solar_system, upgrades, speed_px_per_hour, fuel_cost_per_px, base_attack, base_defence, combat_priority, ByteString.EMPTY);
+  public Design(DesignType type, String display_name, String description, BuildCost build_cost, String image_url, DesignKind design_kind, List<Dependency> dependencies, List<Effect> effect, Integer max_per_colony, Integer max_per_empire, Boolean show_in_solar_system, List<Upgrade> upgrades, Float speed_px_per_hour, Float fuel_cost_per_px, Float base_attack, Float base_defence, Integer combat_priority) {
+    this(type, display_name, description, build_cost, image_url, design_kind, dependencies, effect, max_per_colony, max_per_empire, show_in_solar_system, upgrades, speed_px_per_hour, fuel_cost_per_px, base_attack, base_defence, combat_priority, ByteString.EMPTY);
   }
 
-  public Design(String id, String display_name, String description, BuildCost build_cost, String image_url, DesignKind design_kind, List<Dependency> dependencies, List<Effect> effect, Integer max_per_colony, Integer max_per_empire, Boolean show_in_solar_system, List<Upgrade> upgrades, Float speed_px_per_hour, Float fuel_cost_per_px, Float base_attack, Float base_defence, Integer combat_priority, ByteString unknownFields) {
+  public Design(DesignType type, String display_name, String description, BuildCost build_cost, String image_url, DesignKind design_kind, List<Dependency> dependencies, List<Effect> effect, Integer max_per_colony, Integer max_per_empire, Boolean show_in_solar_system, List<Upgrade> upgrades, Float speed_px_per_hour, Float fuel_cost_per_px, Float base_attack, Float base_defence, Integer combat_priority, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
-    this.id = id;
+    this.type = type;
     this.display_name = display_name;
     this.description = description;
     this.build_cost = build_cost;
@@ -185,7 +185,7 @@ public final class Design extends Message<Design, Design.Builder> {
   @Override
   public Builder newBuilder() {
     Builder builder = new Builder();
-    builder.id = id;
+    builder.type = type;
     builder.display_name = display_name;
     builder.description = description;
     builder.build_cost = build_cost;
@@ -212,7 +212,7 @@ public final class Design extends Message<Design, Design.Builder> {
     if (!(other instanceof Design)) return false;
     Design o = (Design) other;
     return Internal.equals(unknownFields(), o.unknownFields())
-        && Internal.equals(id, o.id)
+        && Internal.equals(type, o.type)
         && Internal.equals(display_name, o.display_name)
         && Internal.equals(description, o.description)
         && Internal.equals(build_cost, o.build_cost)
@@ -236,7 +236,7 @@ public final class Design extends Message<Design, Design.Builder> {
     int result = super.hashCode;
     if (result == 0) {
       result = unknownFields().hashCode();
-      result = result * 37 + (id != null ? id.hashCode() : 0);
+      result = result * 37 + (type != null ? type.hashCode() : 0);
       result = result * 37 + (display_name != null ? display_name.hashCode() : 0);
       result = result * 37 + (description != null ? description.hashCode() : 0);
       result = result * 37 + (build_cost != null ? build_cost.hashCode() : 0);
@@ -261,7 +261,7 @@ public final class Design extends Message<Design, Design.Builder> {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    if (id != null) builder.append(", id=").append(id);
+    if (type != null) builder.append(", type=").append(type);
     if (display_name != null) builder.append(", display_name=").append(display_name);
     if (description != null) builder.append(", description=").append(description);
     if (build_cost != null) builder.append(", build_cost=").append(build_cost);
@@ -282,7 +282,7 @@ public final class Design extends Message<Design, Design.Builder> {
   }
 
   public static final class Builder extends Message.Builder<Design, Builder> {
-    public String id;
+    public DesignType type;
 
     public String display_name;
 
@@ -322,8 +322,8 @@ public final class Design extends Message<Design, Design.Builder> {
       upgrades = Internal.newMutableList();
     }
 
-    public Builder id(String id) {
-      this.id = id;
+    public Builder type(DesignType type) {
+      this.type = type;
       return this;
     }
 
@@ -412,7 +412,73 @@ public final class Design extends Message<Design, Design.Builder> {
 
     @Override
     public Design build() {
-      return new Design(id, display_name, description, build_cost, image_url, design_kind, dependencies, effect, max_per_colony, max_per_empire, show_in_solar_system, upgrades, speed_px_per_hour, fuel_cost_per_px, base_attack, base_defence, combat_priority, buildUnknownFields());
+      return new Design(type, display_name, description, build_cost, image_url, design_kind, dependencies, effect, max_per_colony, max_per_empire, show_in_solar_system, upgrades, speed_px_per_hour, fuel_cost_per_px, base_attack, base_defence, combat_priority, buildUnknownFields());
+    }
+  }
+
+  public enum DesignType implements WireEnum {
+    UNKNOWN_DESIGN(0),
+
+    COLONY_SHIP(1),
+
+    SCOUT(2),
+
+    FIGHTER(3),
+
+    TROOP_CARRIER(4),
+
+    WORMHOLE_GENERATOR(5),
+
+    SHIPYARD(101),
+
+    SILO(102),
+
+    RESEARCH(103),
+
+    GROUND_SHIELD(104),
+
+    BIOSPHERE(105),
+
+    HQ(106),
+
+    RADAR(107),
+
+    WORMHOLE_DISRUPTOR(108);
+
+    public static final ProtoAdapter<DesignType> ADAPTER = ProtoAdapter.newEnumAdapter(DesignType.class);
+
+    private final int value;
+
+    DesignType(int value) {
+      this.value = value;
+    }
+
+    /**
+     * Return the constant for {@code value} or null.
+     */
+    public static DesignType fromValue(int value) {
+      switch (value) {
+        case 0: return UNKNOWN_DESIGN;
+        case 1: return COLONY_SHIP;
+        case 2: return SCOUT;
+        case 3: return FIGHTER;
+        case 4: return TROOP_CARRIER;
+        case 5: return WORMHOLE_GENERATOR;
+        case 101: return SHIPYARD;
+        case 102: return SILO;
+        case 103: return RESEARCH;
+        case 104: return GROUND_SHIELD;
+        case 105: return BIOSPHERE;
+        case 106: return HQ;
+        case 107: return RADAR;
+        case 108: return WORMHOLE_DISRUPTOR;
+        default: return null;
+      }
+    }
+
+    @Override
+    public int getValue() {
+      return value;
     }
   }
 
@@ -581,7 +647,7 @@ public final class Design extends Message<Design, Design.Builder> {
   }
 
   public enum DesignKind implements WireEnum {
-    UNKNOWN(0),
+    UNKNOWN_KIND(0),
 
     BUILDING(1),
 
@@ -600,7 +666,7 @@ public final class Design extends Message<Design, Design.Builder> {
      */
     public static DesignKind fromValue(int value) {
       switch (value) {
-        case 0: return UNKNOWN;
+        case 0: return UNKNOWN_KIND;
         case 1: return BUILDING;
         case 2: return SHIP;
         default: return null;
@@ -618,15 +684,15 @@ public final class Design extends Message<Design, Design.Builder> {
 
     private static final long serialVersionUID = 0L;
 
-    public static final String DEFAULT_ID = "";
+    public static final DesignType DEFAULT_TYPE = DesignType.UNKNOWN_DESIGN;
 
     public static final Integer DEFAULT_LEVEL = 0;
 
     @WireField(
         tag = 1,
-        adapter = "com.squareup.wire.ProtoAdapter#STRING"
+        adapter = "au.com.codeka.warworlds.common.proto.Design$DesignType#ADAPTER"
     )
-    public final String id;
+    public final DesignType type;
 
     @WireField(
         tag = 2,
@@ -634,20 +700,20 @@ public final class Design extends Message<Design, Design.Builder> {
     )
     public final Integer level;
 
-    public Dependency(String id, Integer level) {
-      this(id, level, ByteString.EMPTY);
+    public Dependency(DesignType type, Integer level) {
+      this(type, level, ByteString.EMPTY);
     }
 
-    public Dependency(String id, Integer level, ByteString unknownFields) {
+    public Dependency(DesignType type, Integer level, ByteString unknownFields) {
       super(ADAPTER, unknownFields);
-      this.id = id;
+      this.type = type;
       this.level = level;
     }
 
     @Override
     public Builder newBuilder() {
       Builder builder = new Builder();
-      builder.id = id;
+      builder.type = type;
       builder.level = level;
       builder.addUnknownFields(unknownFields());
       return builder;
@@ -659,7 +725,7 @@ public final class Design extends Message<Design, Design.Builder> {
       if (!(other instanceof Dependency)) return false;
       Dependency o = (Dependency) other;
       return Internal.equals(unknownFields(), o.unknownFields())
-          && Internal.equals(id, o.id)
+          && Internal.equals(type, o.type)
           && Internal.equals(level, o.level);
     }
 
@@ -668,7 +734,7 @@ public final class Design extends Message<Design, Design.Builder> {
       int result = super.hashCode;
       if (result == 0) {
         result = unknownFields().hashCode();
-        result = result * 37 + (id != null ? id.hashCode() : 0);
+        result = result * 37 + (type != null ? type.hashCode() : 0);
         result = result * 37 + (level != null ? level.hashCode() : 0);
         super.hashCode = result;
       }
@@ -678,21 +744,21 @@ public final class Design extends Message<Design, Design.Builder> {
     @Override
     public String toString() {
       StringBuilder builder = new StringBuilder();
-      if (id != null) builder.append(", id=").append(id);
+      if (type != null) builder.append(", type=").append(type);
       if (level != null) builder.append(", level=").append(level);
       return builder.replace(0, 2, "Dependency{").append('}').toString();
     }
 
     public static final class Builder extends Message.Builder<Dependency, Builder> {
-      public String id;
+      public DesignType type;
 
       public Integer level;
 
       public Builder() {
       }
 
-      public Builder id(String id) {
-        this.id = id;
+      public Builder type(DesignType type) {
+        this.type = type;
         return this;
       }
 
@@ -703,7 +769,7 @@ public final class Design extends Message<Design, Design.Builder> {
 
       @Override
       public Dependency build() {
-        return new Dependency(id, level, buildUnknownFields());
+        return new Dependency(type, level, buildUnknownFields());
       }
     }
 
@@ -714,14 +780,14 @@ public final class Design extends Message<Design, Design.Builder> {
 
       @Override
       public int encodedSize(Dependency value) {
-        return (value.id != null ? ProtoAdapter.STRING.encodedSizeWithTag(1, value.id) : 0)
+        return (value.type != null ? DesignType.ADAPTER.encodedSizeWithTag(1, value.type) : 0)
             + (value.level != null ? ProtoAdapter.INT32.encodedSizeWithTag(2, value.level) : 0)
             + value.unknownFields().size();
       }
 
       @Override
       public void encode(ProtoWriter writer, Dependency value) throws IOException {
-        if (value.id != null) ProtoAdapter.STRING.encodeWithTag(writer, 1, value.id);
+        if (value.type != null) DesignType.ADAPTER.encodeWithTag(writer, 1, value.type);
         if (value.level != null) ProtoAdapter.INT32.encodeWithTag(writer, 2, value.level);
         writer.writeBytes(value.unknownFields());
       }
@@ -732,7 +798,14 @@ public final class Design extends Message<Design, Design.Builder> {
         long token = reader.beginMessage();
         for (int tag; (tag = reader.nextTag()) != -1;) {
           switch (tag) {
-            case 1: builder.id(ProtoAdapter.STRING.decode(reader)); break;
+            case 1: {
+              try {
+                builder.type(DesignType.ADAPTER.decode(reader));
+              } catch (ProtoAdapter.EnumConstantNotFoundException e) {
+                builder.addUnknownField(tag, FieldEncoding.VARINT, (long) e.value);
+              }
+              break;
+            }
             case 2: builder.level(ProtoAdapter.INT32.decode(reader)); break;
             default: {
               FieldEncoding fieldEncoding = reader.peekFieldEncoding();
@@ -754,42 +827,146 @@ public final class Design extends Message<Design, Design.Builder> {
     }
   }
 
+  public enum EffectType implements WireEnum {
+    UNKNOWN_EFFECT(0),
+
+    FIGHTER_SHIP(1),
+
+    SCOUT_SHIP(2),
+
+    EMPTY_SPACE_MOVER(4),
+
+    STORAGE(101),
+
+    DEFENCE(102),
+
+    POPULATION_BOOST(103),
+
+    RADAR_SCAN(104),
+
+    WORMHOLE_DISRUPT(105),
+
+    RADAR_ALERT(106);
+
+    public static final ProtoAdapter<EffectType> ADAPTER = ProtoAdapter.newEnumAdapter(EffectType.class);
+
+    private final int value;
+
+    EffectType(int value) {
+      this.value = value;
+    }
+
+    /**
+     * Return the constant for {@code value} or null.
+     */
+    public static EffectType fromValue(int value) {
+      switch (value) {
+        case 0: return UNKNOWN_EFFECT;
+        case 1: return FIGHTER_SHIP;
+        case 2: return SCOUT_SHIP;
+        case 4: return EMPTY_SPACE_MOVER;
+        case 101: return STORAGE;
+        case 102: return DEFENCE;
+        case 103: return POPULATION_BOOST;
+        case 104: return RADAR_SCAN;
+        case 105: return WORMHOLE_DISRUPT;
+        case 106: return RADAR_ALERT;
+        default: return null;
+      }
+    }
+
+    @Override
+    public int getValue() {
+      return value;
+    }
+  }
+
   public static final class Effect extends Message<Effect, Effect.Builder> {
     public static final ProtoAdapter<Effect> ADAPTER = new ProtoAdapter_Effect();
 
     private static final long serialVersionUID = 0L;
 
-    public static final String DEFAULT_NAME = "";
+    public static final EffectType DEFAULT_TYPE = EffectType.UNKNOWN_EFFECT;
 
-    public static final Integer DEFAULT_LEVEL = 0;
+    public static final Float DEFAULT_RANGE = 0.0f;
+
+    public static final Integer DEFAULT_GOODS = 0;
+
+    public static final Integer DEFAULT_MINERALS = 0;
+
+    public static final Integer DEFAULT_ENERGY = 0;
+
+    public static final Float DEFAULT_BONUS = 0.0f;
+
+    public static final Integer DEFAULT_MINIMUM = 0;
 
     @WireField(
         tag = 1,
-        adapter = "com.squareup.wire.ProtoAdapter#STRING"
+        adapter = "au.com.codeka.warworlds.common.proto.Design$EffectType#ADAPTER"
     )
-    public final String name;
+    public final EffectType type;
 
     @WireField(
         tag = 2,
+        adapter = "com.squareup.wire.ProtoAdapter#FLOAT"
+    )
+    public final Float range;
+
+    @WireField(
+        tag = 3,
         adapter = "com.squareup.wire.ProtoAdapter#INT32"
     )
-    public final Integer level;
+    public final Integer goods;
 
-    public Effect(String name, Integer level) {
-      this(name, level, ByteString.EMPTY);
+    @WireField(
+        tag = 4,
+        adapter = "com.squareup.wire.ProtoAdapter#INT32"
+    )
+    public final Integer minerals;
+
+    @WireField(
+        tag = 5,
+        adapter = "com.squareup.wire.ProtoAdapter#INT32"
+    )
+    public final Integer energy;
+
+    @WireField(
+        tag = 6,
+        adapter = "com.squareup.wire.ProtoAdapter#FLOAT"
+    )
+    public final Float bonus;
+
+    @WireField(
+        tag = 7,
+        adapter = "com.squareup.wire.ProtoAdapter#INT32"
+    )
+    public final Integer minimum;
+
+    public Effect(EffectType type, Float range, Integer goods, Integer minerals, Integer energy, Float bonus, Integer minimum) {
+      this(type, range, goods, minerals, energy, bonus, minimum, ByteString.EMPTY);
     }
 
-    public Effect(String name, Integer level, ByteString unknownFields) {
+    public Effect(EffectType type, Float range, Integer goods, Integer minerals, Integer energy, Float bonus, Integer minimum, ByteString unknownFields) {
       super(ADAPTER, unknownFields);
-      this.name = name;
-      this.level = level;
+      this.type = type;
+      this.range = range;
+      this.goods = goods;
+      this.minerals = minerals;
+      this.energy = energy;
+      this.bonus = bonus;
+      this.minimum = minimum;
     }
 
     @Override
     public Builder newBuilder() {
       Builder builder = new Builder();
-      builder.name = name;
-      builder.level = level;
+      builder.type = type;
+      builder.range = range;
+      builder.goods = goods;
+      builder.minerals = minerals;
+      builder.energy = energy;
+      builder.bonus = bonus;
+      builder.minimum = minimum;
       builder.addUnknownFields(unknownFields());
       return builder;
     }
@@ -800,8 +977,13 @@ public final class Design extends Message<Design, Design.Builder> {
       if (!(other instanceof Effect)) return false;
       Effect o = (Effect) other;
       return Internal.equals(unknownFields(), o.unknownFields())
-          && Internal.equals(name, o.name)
-          && Internal.equals(level, o.level);
+          && Internal.equals(type, o.type)
+          && Internal.equals(range, o.range)
+          && Internal.equals(goods, o.goods)
+          && Internal.equals(minerals, o.minerals)
+          && Internal.equals(energy, o.energy)
+          && Internal.equals(bonus, o.bonus)
+          && Internal.equals(minimum, o.minimum);
     }
 
     @Override
@@ -809,8 +991,13 @@ public final class Design extends Message<Design, Design.Builder> {
       int result = super.hashCode;
       if (result == 0) {
         result = unknownFields().hashCode();
-        result = result * 37 + (name != null ? name.hashCode() : 0);
-        result = result * 37 + (level != null ? level.hashCode() : 0);
+        result = result * 37 + (type != null ? type.hashCode() : 0);
+        result = result * 37 + (range != null ? range.hashCode() : 0);
+        result = result * 37 + (goods != null ? goods.hashCode() : 0);
+        result = result * 37 + (minerals != null ? minerals.hashCode() : 0);
+        result = result * 37 + (energy != null ? energy.hashCode() : 0);
+        result = result * 37 + (bonus != null ? bonus.hashCode() : 0);
+        result = result * 37 + (minimum != null ? minimum.hashCode() : 0);
         super.hashCode = result;
       }
       return result;
@@ -819,32 +1006,72 @@ public final class Design extends Message<Design, Design.Builder> {
     @Override
     public String toString() {
       StringBuilder builder = new StringBuilder();
-      if (name != null) builder.append(", name=").append(name);
-      if (level != null) builder.append(", level=").append(level);
+      if (type != null) builder.append(", type=").append(type);
+      if (range != null) builder.append(", range=").append(range);
+      if (goods != null) builder.append(", goods=").append(goods);
+      if (minerals != null) builder.append(", minerals=").append(minerals);
+      if (energy != null) builder.append(", energy=").append(energy);
+      if (bonus != null) builder.append(", bonus=").append(bonus);
+      if (minimum != null) builder.append(", minimum=").append(minimum);
       return builder.replace(0, 2, "Effect{").append('}').toString();
     }
 
     public static final class Builder extends Message.Builder<Effect, Builder> {
-      public String name;
+      public EffectType type;
 
-      public Integer level;
+      public Float range;
+
+      public Integer goods;
+
+      public Integer minerals;
+
+      public Integer energy;
+
+      public Float bonus;
+
+      public Integer minimum;
 
       public Builder() {
       }
 
-      public Builder name(String name) {
-        this.name = name;
+      public Builder type(EffectType type) {
+        this.type = type;
         return this;
       }
 
-      public Builder level(Integer level) {
-        this.level = level;
+      public Builder range(Float range) {
+        this.range = range;
+        return this;
+      }
+
+      public Builder goods(Integer goods) {
+        this.goods = goods;
+        return this;
+      }
+
+      public Builder minerals(Integer minerals) {
+        this.minerals = minerals;
+        return this;
+      }
+
+      public Builder energy(Integer energy) {
+        this.energy = energy;
+        return this;
+      }
+
+      public Builder bonus(Float bonus) {
+        this.bonus = bonus;
+        return this;
+      }
+
+      public Builder minimum(Integer minimum) {
+        this.minimum = minimum;
         return this;
       }
 
       @Override
       public Effect build() {
-        return new Effect(name, level, buildUnknownFields());
+        return new Effect(type, range, goods, minerals, energy, bonus, minimum, buildUnknownFields());
       }
     }
 
@@ -855,15 +1082,25 @@ public final class Design extends Message<Design, Design.Builder> {
 
       @Override
       public int encodedSize(Effect value) {
-        return (value.name != null ? ProtoAdapter.STRING.encodedSizeWithTag(1, value.name) : 0)
-            + (value.level != null ? ProtoAdapter.INT32.encodedSizeWithTag(2, value.level) : 0)
+        return (value.type != null ? EffectType.ADAPTER.encodedSizeWithTag(1, value.type) : 0)
+            + (value.range != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(2, value.range) : 0)
+            + (value.goods != null ? ProtoAdapter.INT32.encodedSizeWithTag(3, value.goods) : 0)
+            + (value.minerals != null ? ProtoAdapter.INT32.encodedSizeWithTag(4, value.minerals) : 0)
+            + (value.energy != null ? ProtoAdapter.INT32.encodedSizeWithTag(5, value.energy) : 0)
+            + (value.bonus != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(6, value.bonus) : 0)
+            + (value.minimum != null ? ProtoAdapter.INT32.encodedSizeWithTag(7, value.minimum) : 0)
             + value.unknownFields().size();
       }
 
       @Override
       public void encode(ProtoWriter writer, Effect value) throws IOException {
-        if (value.name != null) ProtoAdapter.STRING.encodeWithTag(writer, 1, value.name);
-        if (value.level != null) ProtoAdapter.INT32.encodeWithTag(writer, 2, value.level);
+        if (value.type != null) EffectType.ADAPTER.encodeWithTag(writer, 1, value.type);
+        if (value.range != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 2, value.range);
+        if (value.goods != null) ProtoAdapter.INT32.encodeWithTag(writer, 3, value.goods);
+        if (value.minerals != null) ProtoAdapter.INT32.encodeWithTag(writer, 4, value.minerals);
+        if (value.energy != null) ProtoAdapter.INT32.encodeWithTag(writer, 5, value.energy);
+        if (value.bonus != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 6, value.bonus);
+        if (value.minimum != null) ProtoAdapter.INT32.encodeWithTag(writer, 7, value.minimum);
         writer.writeBytes(value.unknownFields());
       }
 
@@ -873,8 +1110,20 @@ public final class Design extends Message<Design, Design.Builder> {
         long token = reader.beginMessage();
         for (int tag; (tag = reader.nextTag()) != -1;) {
           switch (tag) {
-            case 1: builder.name(ProtoAdapter.STRING.decode(reader)); break;
-            case 2: builder.level(ProtoAdapter.INT32.decode(reader)); break;
+            case 1: {
+              try {
+                builder.type(EffectType.ADAPTER.decode(reader));
+              } catch (ProtoAdapter.EnumConstantNotFoundException e) {
+                builder.addUnknownField(tag, FieldEncoding.VARINT, (long) e.value);
+              }
+              break;
+            }
+            case 2: builder.range(ProtoAdapter.FLOAT.decode(reader)); break;
+            case 3: builder.goods(ProtoAdapter.INT32.decode(reader)); break;
+            case 4: builder.minerals(ProtoAdapter.INT32.decode(reader)); break;
+            case 5: builder.energy(ProtoAdapter.INT32.decode(reader)); break;
+            case 6: builder.bonus(ProtoAdapter.FLOAT.decode(reader)); break;
+            case 7: builder.minimum(ProtoAdapter.INT32.decode(reader)); break;
             default: {
               FieldEncoding fieldEncoding = reader.peekFieldEncoding();
               Object value = fieldEncoding.rawProtoAdapter().decode(reader);
@@ -895,12 +1144,48 @@ public final class Design extends Message<Design, Design.Builder> {
     }
   }
 
+  public enum UpgradeType implements WireEnum {
+    UNKNOWN_UPGRADE(0),
+
+    CLOAK(1),
+
+    BOOST(2),
+
+    CRYOGENICS(3);
+
+    public static final ProtoAdapter<UpgradeType> ADAPTER = ProtoAdapter.newEnumAdapter(UpgradeType.class);
+
+    private final int value;
+
+    UpgradeType(int value) {
+      this.value = value;
+    }
+
+    /**
+     * Return the constant for {@code value} or null.
+     */
+    public static UpgradeType fromValue(int value) {
+      switch (value) {
+        case 0: return UNKNOWN_UPGRADE;
+        case 1: return CLOAK;
+        case 2: return BOOST;
+        case 3: return CRYOGENICS;
+        default: return null;
+      }
+    }
+
+    @Override
+    public int getValue() {
+      return value;
+    }
+  }
+
   public static final class Upgrade extends Message<Upgrade, Upgrade.Builder> {
     public static final ProtoAdapter<Upgrade> ADAPTER = new ProtoAdapter_Upgrade();
 
     private static final long serialVersionUID = 0L;
 
-    public static final String DEFAULT_ID = "";
+    public static final UpgradeType DEFAULT_TYPE = UpgradeType.UNKNOWN_UPGRADE;
 
     public static final String DEFAULT_DISPLAY_NAME = "";
 
@@ -910,9 +1195,9 @@ public final class Design extends Message<Design, Design.Builder> {
 
     @WireField(
         tag = 1,
-        adapter = "com.squareup.wire.ProtoAdapter#STRING"
+        adapter = "au.com.codeka.warworlds.common.proto.Design$UpgradeType#ADAPTER"
     )
-    public final String id;
+    public final UpgradeType type;
 
     @WireField(
         tag = 2,
@@ -952,13 +1237,13 @@ public final class Design extends Message<Design, Design.Builder> {
     )
     public final List<Effect> effects;
 
-    public Upgrade(String id, String display_name, String description, BuildCost build_cost, String image_url, List<Dependency> dependencies, List<Effect> effects) {
-      this(id, display_name, description, build_cost, image_url, dependencies, effects, ByteString.EMPTY);
+    public Upgrade(UpgradeType type, String display_name, String description, BuildCost build_cost, String image_url, List<Dependency> dependencies, List<Effect> effects) {
+      this(type, display_name, description, build_cost, image_url, dependencies, effects, ByteString.EMPTY);
     }
 
-    public Upgrade(String id, String display_name, String description, BuildCost build_cost, String image_url, List<Dependency> dependencies, List<Effect> effects, ByteString unknownFields) {
+    public Upgrade(UpgradeType type, String display_name, String description, BuildCost build_cost, String image_url, List<Dependency> dependencies, List<Effect> effects, ByteString unknownFields) {
       super(ADAPTER, unknownFields);
-      this.id = id;
+      this.type = type;
       this.display_name = display_name;
       this.description = description;
       this.build_cost = build_cost;
@@ -970,7 +1255,7 @@ public final class Design extends Message<Design, Design.Builder> {
     @Override
     public Builder newBuilder() {
       Builder builder = new Builder();
-      builder.id = id;
+      builder.type = type;
       builder.display_name = display_name;
       builder.description = description;
       builder.build_cost = build_cost;
@@ -987,7 +1272,7 @@ public final class Design extends Message<Design, Design.Builder> {
       if (!(other instanceof Upgrade)) return false;
       Upgrade o = (Upgrade) other;
       return Internal.equals(unknownFields(), o.unknownFields())
-          && Internal.equals(id, o.id)
+          && Internal.equals(type, o.type)
           && Internal.equals(display_name, o.display_name)
           && Internal.equals(description, o.description)
           && Internal.equals(build_cost, o.build_cost)
@@ -1001,7 +1286,7 @@ public final class Design extends Message<Design, Design.Builder> {
       int result = super.hashCode;
       if (result == 0) {
         result = unknownFields().hashCode();
-        result = result * 37 + (id != null ? id.hashCode() : 0);
+        result = result * 37 + (type != null ? type.hashCode() : 0);
         result = result * 37 + (display_name != null ? display_name.hashCode() : 0);
         result = result * 37 + (description != null ? description.hashCode() : 0);
         result = result * 37 + (build_cost != null ? build_cost.hashCode() : 0);
@@ -1016,7 +1301,7 @@ public final class Design extends Message<Design, Design.Builder> {
     @Override
     public String toString() {
       StringBuilder builder = new StringBuilder();
-      if (id != null) builder.append(", id=").append(id);
+      if (type != null) builder.append(", type=").append(type);
       if (display_name != null) builder.append(", display_name=").append(display_name);
       if (description != null) builder.append(", description=").append(description);
       if (build_cost != null) builder.append(", build_cost=").append(build_cost);
@@ -1027,7 +1312,7 @@ public final class Design extends Message<Design, Design.Builder> {
     }
 
     public static final class Builder extends Message.Builder<Upgrade, Builder> {
-      public String id;
+      public UpgradeType type;
 
       public String display_name;
 
@@ -1046,8 +1331,8 @@ public final class Design extends Message<Design, Design.Builder> {
         effects = Internal.newMutableList();
       }
 
-      public Builder id(String id) {
-        this.id = id;
+      public Builder type(UpgradeType type) {
+        this.type = type;
         return this;
       }
 
@@ -1085,7 +1370,7 @@ public final class Design extends Message<Design, Design.Builder> {
 
       @Override
       public Upgrade build() {
-        return new Upgrade(id, display_name, description, build_cost, image_url, dependencies, effects, buildUnknownFields());
+        return new Upgrade(type, display_name, description, build_cost, image_url, dependencies, effects, buildUnknownFields());
       }
     }
 
@@ -1096,7 +1381,7 @@ public final class Design extends Message<Design, Design.Builder> {
 
       @Override
       public int encodedSize(Upgrade value) {
-        return (value.id != null ? ProtoAdapter.STRING.encodedSizeWithTag(1, value.id) : 0)
+        return (value.type != null ? UpgradeType.ADAPTER.encodedSizeWithTag(1, value.type) : 0)
             + (value.display_name != null ? ProtoAdapter.STRING.encodedSizeWithTag(2, value.display_name) : 0)
             + (value.description != null ? ProtoAdapter.STRING.encodedSizeWithTag(3, value.description) : 0)
             + (value.build_cost != null ? BuildCost.ADAPTER.encodedSizeWithTag(4, value.build_cost) : 0)
@@ -1108,7 +1393,7 @@ public final class Design extends Message<Design, Design.Builder> {
 
       @Override
       public void encode(ProtoWriter writer, Upgrade value) throws IOException {
-        if (value.id != null) ProtoAdapter.STRING.encodeWithTag(writer, 1, value.id);
+        if (value.type != null) UpgradeType.ADAPTER.encodeWithTag(writer, 1, value.type);
         if (value.display_name != null) ProtoAdapter.STRING.encodeWithTag(writer, 2, value.display_name);
         if (value.description != null) ProtoAdapter.STRING.encodeWithTag(writer, 3, value.description);
         if (value.build_cost != null) BuildCost.ADAPTER.encodeWithTag(writer, 4, value.build_cost);
@@ -1124,7 +1409,14 @@ public final class Design extends Message<Design, Design.Builder> {
         long token = reader.beginMessage();
         for (int tag; (tag = reader.nextTag()) != -1;) {
           switch (tag) {
-            case 1: builder.id(ProtoAdapter.STRING.decode(reader)); break;
+            case 1: {
+              try {
+                builder.type(UpgradeType.ADAPTER.decode(reader));
+              } catch (ProtoAdapter.EnumConstantNotFoundException e) {
+                builder.addUnknownField(tag, FieldEncoding.VARINT, (long) e.value);
+              }
+              break;
+            }
             case 2: builder.display_name(ProtoAdapter.STRING.decode(reader)); break;
             case 3: builder.description(ProtoAdapter.STRING.decode(reader)); break;
             case 4: builder.build_cost(BuildCost.ADAPTER.decode(reader)); break;
@@ -1161,7 +1453,7 @@ public final class Design extends Message<Design, Design.Builder> {
 
     @Override
     public int encodedSize(Design value) {
-      return (value.id != null ? ProtoAdapter.STRING.encodedSizeWithTag(1, value.id) : 0)
+      return (value.type != null ? DesignType.ADAPTER.encodedSizeWithTag(1, value.type) : 0)
           + (value.display_name != null ? ProtoAdapter.STRING.encodedSizeWithTag(2, value.display_name) : 0)
           + (value.description != null ? ProtoAdapter.STRING.encodedSizeWithTag(3, value.description) : 0)
           + (value.build_cost != null ? BuildCost.ADAPTER.encodedSizeWithTag(4, value.build_cost) : 0)
@@ -1183,7 +1475,7 @@ public final class Design extends Message<Design, Design.Builder> {
 
     @Override
     public void encode(ProtoWriter writer, Design value) throws IOException {
-      if (value.id != null) ProtoAdapter.STRING.encodeWithTag(writer, 1, value.id);
+      if (value.type != null) DesignType.ADAPTER.encodeWithTag(writer, 1, value.type);
       if (value.display_name != null) ProtoAdapter.STRING.encodeWithTag(writer, 2, value.display_name);
       if (value.description != null) ProtoAdapter.STRING.encodeWithTag(writer, 3, value.description);
       if (value.build_cost != null) BuildCost.ADAPTER.encodeWithTag(writer, 4, value.build_cost);
@@ -1209,7 +1501,14 @@ public final class Design extends Message<Design, Design.Builder> {
       long token = reader.beginMessage();
       for (int tag; (tag = reader.nextTag()) != -1;) {
         switch (tag) {
-          case 1: builder.id(ProtoAdapter.STRING.decode(reader)); break;
+          case 1: {
+            try {
+              builder.type(DesignType.ADAPTER.decode(reader));
+            } catch (ProtoAdapter.EnumConstantNotFoundException e) {
+              builder.addUnknownField(tag, FieldEncoding.VARINT, (long) e.value);
+            }
+            break;
+          }
           case 2: builder.display_name(ProtoAdapter.STRING.decode(reader)); break;
           case 3: builder.description(ProtoAdapter.STRING.decode(reader)); break;
           case 4: builder.build_cost(BuildCost.ADAPTER.decode(reader)); break;

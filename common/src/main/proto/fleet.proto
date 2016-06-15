@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.common.proto;
 
 import "common.proto";
+import "design.proto";
 
 // A fleet represents one or more ships of the same(?) design.
 message Fleet {
@@ -15,7 +16,7 @@ message Fleet {
   optional int64 alliance_id = 3;
 
   // The ID of the ship design of the ship(s) in this fleet
-  optional string design_id = 4;
+  optional Design.DesignType design_type = 4;
 
   // The number of ships in this fleet. This is a floating point number because of the way damage is
   // calculated in combat. We only ever display the Math.ceil() of this number to the user, however.

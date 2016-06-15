@@ -4,8 +4,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import java.util.Collection;
-
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.proto.Design;
@@ -21,14 +19,14 @@ public class DesignHelper {
   }
 
   /** Gets the {@link Design} with the given identifier. */
-  public static Design getDesign(String id) {
+  public static Design getDesign(Design.DesignType type) {
     for (Design design : designs.designs) {
-      if (design.id.equals(id)) {
+      if (design.type.equals(type)) {
         return design;
       }
     }
 
-    throw new IllegalStateException("No design with id=" + id + " found.");
+    throw new IllegalStateException("No design with id=" + type + " found.");
   }
 
   public static Iterable<Design> getDesigns(final Design.DesignKind kind) {
@@ -43,7 +41,7 @@ public class DesignHelper {
   /** The list of all designs in the game. */
   public static final Designs designs = new Designs.Builder().designs(Lists.newArrayList(
       new Design.Builder()
-          .id("colony")
+          .type(Design.DesignType.COLONY_SHIP)
           .design_kind(Design.DesignKind.SHIP)
           .display_name("Colony Ship")
           .description(
@@ -52,7 +50,7 @@ public class DesignHelper {
               + " <p>Colony ships are single-use. The ship is destroyed once a planet is"
               + " colonized.</p>")
           .dependencies(Lists.newArrayList(
-              new Design.Dependency.Builder().id("shipyard").level(1).build()))
+              new Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
           .build_cost(new Design.BuildCost.Builder()
               .minerals(1000)
               .population(10000)
@@ -62,13 +60,13 @@ public class DesignHelper {
           .base_defence(1.0f)
           .combat_priority(100)
           .effect(Lists.newArrayList(
-              new Design.Effect.Builder().name("fighter").build()))
+              new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
           .fuel_cost_per_px(35.0f)
           .image_url("colony.png")
           .speed_px_per_hour(32.0f)
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
-                  .id("cryogenics")
+                  .type(Design.UpgradeType.CRYOGENICS)
                   .display_name("Cryogenic Chamber")
                   .description(
                       "<p>The cryogenic chamber means colonists are put to sleep during the voyage"
@@ -80,14 +78,17 @@ public class DesignHelper {
                       .population(20000)
                       .build())
                   .dependencies(Lists.newArrayList(
-                      new Design.Dependency.Builder().id("shipyard").level(1).build()))
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.SHIPYARD)
+                          .level(1)
+                          .build()))
                   .image_url("cryogenics.png")
                   .build()
           ))
           .build(),
 
       new Design.Builder()
-          .id("scout")
+          .type(Design.DesignType.SCOUT)
           .design_kind(Design.DesignKind.SHIP)
           .display_name("Scout")
           .description(
@@ -95,7 +96,7 @@ public class DesignHelper {
               + " of defensive capabilities, either). What they <em>are</em> good at, though, is"
               + " getting in and out of enemy star-systems and reporting back what they found.</p>")
           .dependencies(Lists.newArrayList(
-              new Design.Dependency.Builder().id("shipyard").level(1).build()))
+              new Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
           .build_cost(new Design.BuildCost.Builder()
               .minerals(20)
               .population(50)
@@ -105,14 +106,14 @@ public class DesignHelper {
           .base_defence(1.0f)
           .combat_priority(100)
           .effect(Lists.newArrayList(
-              new Design.Effect.Builder().name("scout").build(),
-              new Design.Effect.Builder().name("fighter").build()))
+              new Design.Effect.Builder().type(Design.EffectType.SCOUT_SHIP).build(),
+              new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
           .fuel_cost_per_px(4.0f)
           .image_url("scout.png")
           .speed_px_per_hour(1024.0f)
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
-                  .id("cloak")
+                  .type(Design.UpgradeType.CLOAK)
                   .display_name("Cloak")
                   .description(
                       "<p>Adding a cloaking device to a scout makes it invisible to enemy radar."
@@ -123,14 +124,17 @@ public class DesignHelper {
                       .population(50)
                       .build())
                   .dependencies(Lists.newArrayList(
-                      new Design.Dependency.Builder().id("shipyard").level(1).build()))
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.SHIPYARD)
+                          .level(1)
+                          .build()))
                   .image_url("cloak.png")
                   .build()
           ))
           .build(),
 
       new Design.Builder()
-          .id("fighter")
+          .type(Design.DesignType.FIGHTER)
           .design_kind(Design.DesignKind.SHIP)
           .display_name("Fighter")
           .description(
@@ -138,7 +142,7 @@ public class DesignHelper {
               + " They make up for a general lack of firepower by being incredibly cheap to produce"
               + " and fuel-efficient, allowing you to overwhelm your enemy with numbers.</p>")
           .dependencies(Lists.newArrayList(
-              new Design.Dependency.Builder().id("shipyard").level(1).build()))
+              new Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
           .build_cost(new Design.BuildCost.Builder()
               .minerals(50)
               .population(100)
@@ -148,13 +152,13 @@ public class DesignHelper {
           .base_defence(15.0f)
           .combat_priority(10)
           .effect(Lists.newArrayList(
-              new Design.Effect.Builder().name("fighter").build()))
+              new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
           .fuel_cost_per_px(16.0f)
           .image_url("fighter.png")
           .speed_px_per_hour(128.0f)
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
-                  .id("boost")
+                  .type(Design.UpgradeType.BOOST)
                   .display_name("Boost")
                   .description(
                       "<p>Boost will halve the remaining travel-time for an in-flight fleet of"
@@ -164,21 +168,24 @@ public class DesignHelper {
                       .population(100)
                       .build())
                   .dependencies(Lists.newArrayList(
-                      new Design.Dependency.Builder().id("shipyard").level(1).build()))
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.SHIPYARD)
+                          .level(1)
+                          .build()))
                   .image_url("boost.png")
                   .build()
           ))
           .build(),
 
       new Design.Builder()
-          .id("troopcarrier")
+          .type(Design.DesignType.TROOP_CARRIER)
           .design_kind(Design.DesignKind.SHIP)
           .display_name("Troop Carrier")
           .description(
               "<p>The Troop Carrier carries ground troops which you can deploy to capture an enemy"
               + " colony.</p>")
           .dependencies(Lists.newArrayList(
-              new Design.Dependency.Builder().id("shipyard").level(1).build()))
+              new Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
           .build_cost(new Design.BuildCost.Builder()
               .minerals(50)
               .population(100)
@@ -188,15 +195,14 @@ public class DesignHelper {
           .base_defence(1.0f)
           .combat_priority(50)
           .effect(Lists.newArrayList(
-              new Design.Effect.Builder().name("troopcarrier").build(),
-              new Design.Effect.Builder().name("fighter").build()))
+              new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
           .fuel_cost_per_px(16.0f)
           .image_url("troopcarrier.png")
           .speed_px_per_hour(128.0f)
           .build(),
 
       new Design.Builder()
-          .id("wormhole-generator")
+          .type(Design.DesignType.WORMHOLE_GENERATOR)
           .design_kind(Design.DesignKind.SHIP)
           .display_name("Wormhole Generator")
           .description(
@@ -205,7 +211,7 @@ public class DesignHelper {
               + " generate a wormhole which you can then use to instantly transport ships"
               + " throughout your empire.</p>")
           .dependencies(Lists.newArrayList(
-              new Design.Dependency.Builder().id("shipyard").level(2).build()))
+              new Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(2).build()))
           .build_cost(new Design.BuildCost.Builder()
               .minerals(98000)
               .population(50000)
@@ -215,9 +221,8 @@ public class DesignHelper {
           .base_defence(1.0f)
           .combat_priority(100)
           .effect(Lists.newArrayList(
-              new Design.Effect.Builder().name("empty-space-mover").build(),
-              new Design.Effect.Builder().name("fighter").build(),
-              new Design.Effect.Builder().name("wormhole-generator").build()))
+              new Design.Effect.Builder().type(Design.EffectType.EMPTY_SPACE_MOVER).build(),
+              new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
           .fuel_cost_per_px(512.0f)
           .image_url("wormhole-generator.png")
           .speed_px_per_hour(8.0f)
@@ -226,7 +231,7 @@ public class DesignHelper {
       //--------------------------------------------------------------------------------------------
 
       new Design.Builder()
-          .id("shipyard")
+          .type(Design.DesignType.SHIPYARD)
           .design_kind(Design.DesignKind.BUILDING)
           .display_name("Shipyard")
           .description(
@@ -252,13 +257,13 @@ public class DesignHelper {
           .build(),
 
       new Design.Builder()
-          .id("silo")
+          .type(Design.DesignType.SILO)
           .design_kind(Design.DesignKind.BUILDING)
           .display_name("Silo")
           .description(
-              "<p>The Silo allows you to store farming produce and minerals indefinitely. The higher"
-              + " the silo level, the more you can store. Silos store produce for all colonies in"
-              + " this starsystem and you can build as many as you like.</p>"
+              "<p>The Silo allows you to store farming produce and minerals indefinitely. The"
+              + " higher the silo level, the more you can store. Silos store produce for all"
+              + " colonies in this starsystem and you can build as many as you like.</p>"
               + "<p>A level 1 Silo adds 100 storage for minerals and goods. A level 2 Silo adds"
               + " 210, level 3 adds 330, a level 4 Silo adds 460, and a level 5 Silo adds 600.</p>")
           .build_cost(new Design.BuildCost.Builder()
@@ -267,7 +272,12 @@ public class DesignHelper {
               .build())
           .image_url("silo.png")
           .effect(Lists.newArrayList(
-              new Design.Effect.Builder().level(1).name("storage").build()
+              new Design.Effect.Builder()
+                  .type(Design.EffectType.STORAGE)
+                  .goods(100)
+                  .minerals(100)
+                  .energy(100)
+                  .build()
           ))
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
@@ -276,7 +286,12 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(2).name("storage").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.STORAGE)
+                          .goods(210)
+                          .minerals(210)
+                          .energy(210)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -285,7 +300,12 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(3).name("storage").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.STORAGE)
+                          .goods(330)
+                          .minerals(330)
+                          .energy(330)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -294,7 +314,12 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(4).name("storage").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.STORAGE)
+                          .goods(460)
+                          .minerals(460)
+                          .energy(460)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -303,7 +328,12 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(5).name("storage").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.STORAGE)
+                          .goods(600)
+                          .minerals(600)
+                          .energy(600)
+                          .build()
                   ))
                   .build()
           ))
@@ -311,7 +341,7 @@ public class DesignHelper {
           .build(),
 
       new Design.Builder()
-          .id("research")
+          .type(Design.DesignType.RESEARCH)
           .design_kind(Design.DesignKind.BUILDING)
           .display_name("Research Laboratory")
           .description(
@@ -326,7 +356,7 @@ public class DesignHelper {
           .build(),
 
       new Design.Builder()
-          .id("groundshield")
+          .type(Design.DesignType.GROUND_SHIELD)
           .design_kind(Design.DesignKind.BUILDING)
           .display_name("Ground Shield")
           .description(
@@ -340,7 +370,7 @@ public class DesignHelper {
           .image_url("groundshield.png")
           .max_per_colony(1)
           .effect(Lists.newArrayList(
-              new Design.Effect.Builder().level(1).name("defence").build()
+              new Design.Effect.Builder().type(Design.EffectType.DEFENCE).bonus(0.25f).build()
           ))
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
@@ -349,7 +379,10 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(2).name("defence").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.DEFENCE)
+                          .bonus(0.5f)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -358,7 +391,10 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(3).name("defence").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.DEFENCE)
+                          .bonus(0.75f)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -367,7 +403,10 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(4).name("defence").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.DEFENCE)
+                          .bonus(1.0f)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -376,7 +415,10 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(5).name("defence").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.DEFENCE)
+                          .bonus(1.25f)
+                          .build()
                   ))
                   .build()
           ))
@@ -384,7 +426,7 @@ public class DesignHelper {
           .build(),
 
       new Design.Builder()
-          .id("biosphere")
+          .type(Design.DesignType.BIOSPHERE)
           .design_kind(Design.DesignKind.BUILDING)
           .display_name("Biosphere")
           .description(
@@ -399,7 +441,11 @@ public class DesignHelper {
           .max_per_colony(1)
           .image_url("biosphere.png")
           .effect(Lists.newArrayList(
-              new Design.Effect.Builder().level(1).name("populationBoost").build()
+              new Design.Effect.Builder()
+                  .type(Design.EffectType.POPULATION_BOOST)
+                  .bonus(0.15f)
+                  .minimum(100)
+                  .build()
           ))
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
@@ -408,7 +454,11 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(2).name("populationBoost").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.POPULATION_BOOST)
+                          .bonus(0.3f)
+                          .minimum(200)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -417,7 +467,11 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(3).name("populationBoost").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.POPULATION_BOOST)
+                          .bonus(0.45f)
+                          .minimum(300)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -426,14 +480,18 @@ public class DesignHelper {
                       .population(200)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(4).name("populationBoost").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.POPULATION_BOOST)
+                          .bonus(0.6f)
+                          .minimum(400)
+                          .build()
                   ))
                   .build()
           ))
           .build(),
 
       new Design.Builder()
-          .id("hq")
+          .type(Design.DesignType.HQ)
           .design_kind(Design.DesignKind.BUILDING)
           .display_name("Galactic HQ")
           .description(
@@ -451,7 +509,7 @@ public class DesignHelper {
           .build(),
 
       new Design.Builder()
-          .id("radar")
+          .type(Design.DesignType.RADAR)
           .design_kind(Design.DesignKind.BUILDING)
           .display_name("Sensor Array")
           .description(
@@ -468,7 +526,7 @@ public class DesignHelper {
           .max_per_colony(1)
           .image_url("radar.png")
           .effect(Lists.newArrayList(
-              new Design.Effect.Builder().level(1).name("radar").build()
+              new Design.Effect.Builder().type(Design.EffectType.RADAR_SCAN).range(20.0f).build()
           ))
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
@@ -477,7 +535,10 @@ public class DesignHelper {
                       .population(500)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(2).name("radar").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.RADAR_SCAN)
+                          .range(30.0f)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -486,7 +547,10 @@ public class DesignHelper {
                       .population(500)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(3).name("radar").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.RADAR_SCAN)
+                          .range(40.0f)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -495,7 +559,10 @@ public class DesignHelper {
                       .population(500)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(4).name("radar").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.RADAR_SCAN)
+                          .range(50.0f)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -504,14 +571,21 @@ public class DesignHelper {
                       .population(500)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(5).name("radar").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.RADAR_SCAN)
+                          .range(60.0f)
+                          .build(),
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.RADAR_ALERT)
+                          .range(60.0f)
+                          .build()
                   ))
                   .build()
           ))
           .build(),
 
       new Design.Builder()
-          .id("wormhole-disruptor")
+          .type(Design.DesignType.WORMHOLE_DISRUPTOR)
           .design_kind(Design.DesignKind.BUILDING)
           .display_name("Wormhole Disruptor")
           .description(
@@ -527,7 +601,10 @@ public class DesignHelper {
           .max_per_colony(1)
           .image_url("wormhole-disruptor.png")
           .effect(Lists.newArrayList(
-              new Design.Effect.Builder().level(1).name("wormhole-disruptor").build()
+              new Design.Effect.Builder()
+                  .type(Design.EffectType.WORMHOLE_DISRUPT)
+                  .range(9.5f)
+                  .build()
           ))
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
@@ -536,7 +613,10 @@ public class DesignHelper {
                       .population(500)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(2).name("wormhole-disruptor").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.WORMHOLE_DISRUPT)
+                          .range(14.5f)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -545,7 +625,10 @@ public class DesignHelper {
                       .population(500)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(3).name("wormhole-disruptor").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.WORMHOLE_DISRUPT)
+                          .range(19.5f)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -554,7 +637,10 @@ public class DesignHelper {
                       .population(500)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(4).name("wormhole-disruptor").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.WORMHOLE_DISRUPT)
+                          .range(24.5f)
+                          .build()
                   ))
                   .build(),
               new Design.Upgrade.Builder()
@@ -563,11 +649,13 @@ public class DesignHelper {
                       .population(500)
                       .build())
                   .effects(Lists.newArrayList(
-                      new Design.Effect.Builder().level(5).name("wormhole-disruptor").build()
+                      new Design.Effect.Builder()
+                          .type(Design.EffectType.WORMHOLE_DISRUPT)
+                          .range(29.5f)
+                          .build()
                   ))
                   .build()
           ))
           .build()
-
       )).build();
 }

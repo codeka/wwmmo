@@ -3,7 +3,24 @@ package au.com.codeka.warworlds.common.proto;
 import "common.proto";
 
 message Design {
-  optional string id = 1;
+  enum DesignType {
+    UNKNOWN_DESIGN = 0;
+    COLONY_SHIP = 1;
+    SCOUT = 2;
+    FIGHTER = 3;
+    TROOP_CARRIER = 4;
+    WORMHOLE_GENERATOR = 5;
+
+    SHIPYARD = 101;
+    SILO = 102;
+    RESEARCH = 103;
+    GROUND_SHIELD = 104;
+    BIOSPHERE = 105;
+    HQ = 106;
+    RADAR = 107;
+    WORMHOLE_DISRUPTOR = 108;
+  }
+  optional DesignType type = 1;
 
   optional string display_name = 2;
 
@@ -19,21 +36,40 @@ message Design {
   optional string image_url = 5;
 
   enum DesignKind {
-    UNKNOWN = 0;
+    UNKNOWN_KIND = 0;
     BUILDING = 1;
     SHIP = 2;
   }
   optional DesignKind design_kind = 6;
 
   message Dependency {
-    optional string id = 1;
+    optional DesignType type = 1;
     optional int32 level = 2;
   }
   repeated Dependency dependencies = 7;
 
+  enum EffectType {
+    UNKNOWN_EFFECT = 0;
+    FIGHTER_SHIP = 1;
+    SCOUT_SHIP = 2;
+    EMPTY_SPACE_MOVER = 4;
+
+    STORAGE = 101;
+    DEFENCE = 102;
+    POPULATION_BOOST = 103;
+    RADAR_SCAN = 104;
+    WORMHOLE_DISRUPT = 105;
+    RADAR_ALERT = 106;
+  }
+
   message Effect {
-    optional string name = 1;
-    optional int32 level = 2;
+    optional EffectType type = 1;
+    optional float range = 2;
+    optional int32 goods = 3;
+    optional int32 minerals = 4;
+    optional int32 energy = 5;
+    optional float bonus = 6;
+    optional int32 minimum = 7;
   }
   repeated Effect effect = 8;
 
@@ -43,8 +79,15 @@ message Design {
 
   optional bool show_in_solar_system = 11;
 
+  enum UpgradeType {
+    UNKNOWN_UPGRADE = 0;
+    CLOAK = 1;
+    BOOST = 2;
+    CRYOGENICS = 3;
+  }
+
   message Upgrade {
-    optional string id = 1;
+    optional UpgradeType type = 1;
     optional string display_name = 2;
     optional string description = 3;
     optional BuildCost build_cost = 4;

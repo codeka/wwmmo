@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -68,7 +69,7 @@ public class StarModifier {
     int population = 100;
     for (int i = 0; i < star.fleets.size(); i++) {
       Fleet fleet = star.fleets.get(i);
-      if (fleet.design_id.equals("colony")) {
+      if (fleet.design_type.equals(Design.DesignType.COLONY_SHIP)) {
         // TODO: check for cyrogenics
         if (Math.ceil(fleet.num_ships) == 1.0f) {
           star.fleets.remove(i);
@@ -127,7 +128,7 @@ public class StarModifier {
     // TODO: simulate star
     star.fleets.add(new Fleet.Builder()
         //TODO: .alliance_id()
-        .design_id(modification.design_id)
+        .design_type(modification.design_type)
         .empire_id(modification.empire_id)
         .id(identifierGenerator.nextIdentifier())
         .num_ships((float) modification.count)

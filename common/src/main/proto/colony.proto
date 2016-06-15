@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.common.proto;
 
 import "common.proto";
+import "design.proto";
 
 // Represents a colony that's on a planet.
 message Colony {
@@ -45,8 +46,8 @@ message ColonyFocus {
 
 // Represents a completed building in a colony.
 message Building {
-  // The name of the design of this building (defined in data/buildings.xml)
-  optional string design_id = 1;
+  // The type of the design of this building
+  optional Design.DesignType design_type = 1;
 
   // The level of this building
   optional int32 level = 2;
