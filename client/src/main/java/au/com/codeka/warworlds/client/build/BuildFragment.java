@@ -165,7 +165,14 @@ public class BuildFragment extends BaseFragment {
     @Override
     public Fragment getItem(int i) {
       Fragment fragment = new TabFragment();
-      fragment.setArguments(createArguments(star.id, i));
+      int planetIndex = -1;
+      for (Planet planet : star.planets) {
+        if (planet.colony != null && planet.colony.id.equals(colonies.get(i).id)) {
+          planetIndex = planet.index;
+          break;
+        }
+      }
+      fragment.setArguments(createArguments(star.id, planetIndex));
       return fragment;
     }
 

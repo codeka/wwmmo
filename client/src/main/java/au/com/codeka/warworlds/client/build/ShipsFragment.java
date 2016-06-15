@@ -164,10 +164,8 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
       entries = new ArrayList<>();
 
       entries.add(new ItemEntry("New Ships"));
-      for (Design design : DesignHelper.designs.designs) {
-        if (design.design_kind == Design.DesignKind.SHIP) {
-          entries.add(new ItemEntry(design));
-        }
+      for (Design design : DesignHelper.getDesigns(Design.DesignKind.SHIP)) {
+        entries.add(new ItemEntry(design));
       }
 
       entries.add(new ItemEntry("Existing Ships"));
@@ -278,7 +276,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
         //BuildRequest buildRequest = entry.buildRequest;
         Design design = DesignHelper.getDesign(
             fleet != null ? fleet.design_id : /*buildRequest.getDesignID()*/null);
-        FleetListHelper.setDesignIcon(design, icon);
+        BuildHelper.setDesignIcon(design, icon);
 
         int numUpgrades = design.upgrades.size();
         if (numUpgrades == 0 || fleet == null) {
@@ -349,7 +347,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
         view.findViewById(R.id.notes).setVisibility(View.GONE);
 
         Design design = entry.design;
-        FleetListHelper.setDesignIcon(design, icon);
+        BuildHelper.setDesignIcon(design, icon);
 
         row1.removeAllViews();
         FleetListHelper.populateFleetNameRow(getContext(), row1, null, design);

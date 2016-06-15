@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.build.BuildHelper;
 import au.com.codeka.warworlds.common.DesignHelper;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -86,7 +87,7 @@ public class FleetListSimple extends LinearLayout {
     LinearLayout row1 = (LinearLayout) view.findViewById(R.id.ship_row1);
     LinearLayout row2 = (LinearLayout) view.findViewById(R.id.ship_row2);
 
-    FleetListHelper.setDesignIcon(design, icon);
+    BuildHelper.setDesignIcon(design, icon);
 
     row1.removeAllViews();
     row2.removeAllViews();

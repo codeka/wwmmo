@@ -26,12 +26,6 @@ public class FleetListHelper {
     populateFleetNameRow(context, row, fleet, design, 0);
   }
 
-  public static void setDesignIcon(Design design, ImageView imageView) {
-    Picasso.with(imageView.getContext())
-        .load("file:///android_asset/sprites/" + design.image_url)
-        .into(imageView);
-  }
-
   public static void populateFleetNameRow(
       Context context, LinearLayout row, Fleet fleet, Design design, float textSize) {
     if (fleet == null) {
