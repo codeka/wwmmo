@@ -319,7 +319,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
             row2.setText(String.format(Locale.US, "Upgrades: " + upgrades));
           }
 
-          String requiredHtml = "";//design.getDependenciesHtml(getColony());
+          String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
           row3.setVisibility(View.VISIBLE);
           row3.setText(Html.fromHtml(requiredHtml));
        // }
@@ -351,7 +351,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
 
         row1.removeAllViews();
         FleetListHelper.populateFleetNameRow(getContext(), row1, null, design);
-        String requiredHtml = "";//design.getDependenciesHtml(getColony());
+        String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
         row2.setText(Html.fromHtml(requiredHtml));
 
         row3.setVisibility(View.GONE);

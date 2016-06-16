@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.client.build;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -271,8 +272,9 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
           } else {
             progress.setVisibility(View.GONE);
 
-            //String requiredHtml = design.getDependenciesHtml(mColony, building.getLevel() + 1);
-            //row2.setText(Html.fromHtml(requiredHtml));
+            String requiredHtml =
+                DesignHelper.getDependenciesHtml(getColony(), design, building.level + 1);
+            row2.setText(Html.fromHtml(requiredHtml));
 
             row3.setVisibility(View.GONE);
           }
@@ -305,8 +307,8 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
 
         row1.removeAllViews();
         addTextToRow(getContext(), row1, design.display_name);
-        //String requiredHtml = design.getDependenciesHtml(mColony);
-        //row2.setText(Html.fromHtml(requiredHtml));
+        String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
+        row2.setText(Html.fromHtml(requiredHtml));
 
         row3.setVisibility(View.GONE);
       }
