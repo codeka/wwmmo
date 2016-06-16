@@ -39,6 +39,7 @@
 
     <RelativeLayout android:id="@+id/bottom_pane"
                     style="@style/BottomPane"
+                    android:transitionName="bottom_pane"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_alignParentBottom="true">

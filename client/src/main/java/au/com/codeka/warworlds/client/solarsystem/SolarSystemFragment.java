@@ -158,6 +158,7 @@ public class SolarSystemFragment extends BaseFragment {
                 BuildFragment.createArguments(star.id, planet.index),
                 SharedViewHolder.builder()
                     .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
+                    .addSharedView(R.id.bottom_pane, "bottom_pane")
                     .build());
       }
     });
