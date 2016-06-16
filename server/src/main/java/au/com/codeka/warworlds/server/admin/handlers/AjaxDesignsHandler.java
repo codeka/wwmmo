@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.admin.handlers;
 
-import au.com.codeka.warworlds.common.DesignHelper;
+import au.com.codeka.warworlds.common.proto.Designs;
+import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.server.admin.RequestException;
 
 /**
@@ -9,6 +10,6 @@ import au.com.codeka.warworlds.server.admin.RequestException;
 public class AjaxDesignsHandler extends AdminHandler {
   @Override
   public void get() throws RequestException {
-    setResponseJson(DesignHelper.designs);
+    setResponseJson(new Designs.Builder().designs(DesignHelper.getDesigns()).build());
   }
 }

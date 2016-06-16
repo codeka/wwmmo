@@ -1,43 +1,12 @@
-package au.com.codeka.warworlds.common;
+package au.com.codeka.warworlds.common.sim;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
-import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Designs;
 
-/**
- * Helper class for working with ship and building designs.
- */
-public class DesignHelper {
-
-  public static String getDesignName(Design design, boolean plural) {
-    return design.display_name + (plural ? "s" : "");
-  }
-
-  /** Gets the {@link Design} with the given identifier. */
-  public static Design getDesign(Design.DesignType type) {
-    for (Design design : designs.designs) {
-      if (design.type.equals(type)) {
-        return design;
-      }
-    }
-
-    throw new IllegalStateException("No design with id=" + type + " found.");
-  }
-
-  public static Iterable<Design> getDesigns(final Design.DesignKind kind) {
-    return Iterables.filter(designs.designs, new Predicate<Design>() {
-      @Override
-      public boolean apply(@Nullable Design design) {
-        return design != null && design.design_kind.equals(kind);
-      }
-    });
-  }
-
+/** Holder class that just holds all the design definitions. */
+public class DesignDefinitions {
   /** The list of all designs in the game. */
   public static final Designs designs = new Designs.Builder().designs(Lists.newArrayList(
       new Design.Builder()
@@ -46,9 +15,9 @@ public class DesignHelper {
           .display_name("Colony Ship")
           .description(
               "<p>The colony ship is what you'll need to colonize remote planets. They'll carry 100"
-              + " of your colony's population to a brave new world.</p>"
-              + " <p>Colony ships are single-use. The ship is destroyed once a planet is"
-              + " colonized.</p>")
+                  + " of your colony's population to a brave new world.</p>"
+                  + " <p>Colony ships are single-use. The ship is destroyed once a planet is"
+                  + " colonized.</p>")
           .dependencies(Lists.newArrayList(
               new Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
           .build_cost(new Design.BuildCost.Builder()
@@ -251,6 +220,11 @@ public class DesignHelper {
                       .minerals(500)
                       .population(500)
                       .build())
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(1)
+                          .build()))
                   .build()
           ))
           .show_in_solar_system(true)
@@ -352,6 +326,14 @@ public class DesignHelper {
               .population(1000)
               .build())
           .image_url("research.png")
+          .upgrades(Lists.newArrayList(
+              new Design.Upgrade.Builder()
+                  .build_cost(new Design.BuildCost.Builder()
+                      .minerals(1500)
+                      .population(2000)
+                      .build())
+                  .build()
+          ))
           .max_per_colony(1)
           .build(),
 
@@ -384,6 +366,11 @@ public class DesignHelper {
                           .bonus(0.5f)
                           .build()
                   ))
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(1)
+                          .build()))
                   .build(),
               new Design.Upgrade.Builder()
                   .build_cost(new Design.BuildCost.Builder()
@@ -396,6 +383,11 @@ public class DesignHelper {
                           .bonus(0.75f)
                           .build()
                   ))
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(1)
+                          .build()))
                   .build(),
               new Design.Upgrade.Builder()
                   .build_cost(new Design.BuildCost.Builder()
@@ -408,6 +400,11 @@ public class DesignHelper {
                           .bonus(1.0f)
                           .build()
                   ))
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(1)
+                          .build()))
                   .build(),
               new Design.Upgrade.Builder()
                   .build_cost(new Design.BuildCost.Builder()
@@ -420,6 +417,11 @@ public class DesignHelper {
                           .bonus(1.25f)
                           .build()
                   ))
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(1)
+                          .build()))
                   .build()
           ))
           .show_in_solar_system(true)
@@ -564,6 +566,11 @@ public class DesignHelper {
                           .range(50.0f)
                           .build()
                   ))
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(1)
+                          .build()))
                   .build(),
               new Design.Upgrade.Builder()
                   .build_cost(new Design.BuildCost.Builder()
@@ -580,6 +587,11 @@ public class DesignHelper {
                           .range(60.0f)
                           .build()
                   ))
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(1)
+                          .build()))
                   .build()
           ))
           .build(),
@@ -606,6 +618,11 @@ public class DesignHelper {
                   .range(9.5f)
                   .build()
           ))
+          .dependencies(Lists.newArrayList(
+              new Design.Dependency.Builder()
+                  .type(Design.DesignType.RESEARCH)
+                  .level(2)
+                  .build()))
           .upgrades(Lists.newArrayList(
               new Design.Upgrade.Builder()
                   .build_cost(new Design.BuildCost.Builder()
@@ -618,6 +635,11 @@ public class DesignHelper {
                           .range(14.5f)
                           .build()
                   ))
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(2)
+                          .build()))
                   .build(),
               new Design.Upgrade.Builder()
                   .build_cost(new Design.BuildCost.Builder()
@@ -630,6 +652,11 @@ public class DesignHelper {
                           .range(19.5f)
                           .build()
                   ))
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(2)
+                          .build()))
                   .build(),
               new Design.Upgrade.Builder()
                   .build_cost(new Design.BuildCost.Builder()
@@ -642,6 +669,11 @@ public class DesignHelper {
                           .range(24.5f)
                           .build()
                   ))
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(2)
+                          .build()))
                   .build(),
               new Design.Upgrade.Builder()
                   .build_cost(new Design.BuildCost.Builder()
@@ -654,8 +686,13 @@ public class DesignHelper {
                           .range(29.5f)
                           .build()
                   ))
+                  .dependencies(Lists.newArrayList(
+                      new Design.Dependency.Builder()
+                          .type(Design.DesignType.RESEARCH)
+                          .level(2)
+                          .build()))
                   .build()
           ))
           .build()
-      )).build();
+  )).build();
 }

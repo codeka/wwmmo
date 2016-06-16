@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.client.ctrl;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Context;
@@ -12,10 +11,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.common.base.CaseFormat;
-import com.squareup.picasso.Picasso;
 
 import au.com.codeka.warworlds.client.world.StarManager;
-import au.com.codeka.warworlds.common.DesignHelper;
+import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
