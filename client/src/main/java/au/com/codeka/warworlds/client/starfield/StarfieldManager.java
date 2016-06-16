@@ -29,6 +29,7 @@ import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.Vector3;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Packet;
@@ -273,7 +274,7 @@ public class StarfieldManager {
           iconInfo = new EmpireIconInfo(empire);
           empires.put(empire.id, iconInfo);
         }
-        if (fleet.design_id.equals("fighter")) {
+        if (fleet.design_type.equals(Design.DesignType.FIGHTER)) {
           iconInfo.numFighterShips += (int) Math.ceil(fleet.num_ships);
         } else {
           iconInfo.numNonFighterShips += (int) Math.ceil(fleet.num_ships);

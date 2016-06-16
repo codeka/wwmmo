@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
@@ -59,25 +60,25 @@ public class EmpireManager {
         new StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
             .empire_id(id)
-            .design_id("colony")
+            .design_type(Design.DesignType.COLONY_SHIP)
             .count(3) // note: one is destroyed by COLONIZE below
             .build(),
         new StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
             .empire_id(id)
-            .design_id("fighter")
+            .design_type(Design.DesignType.FIGHTER)
             .count(50)
             .build(),
         new StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
             .empire_id(id)
-            .design_id("troopcarrier")
+            .design_type(Design.DesignType.TROOP_CARRIER)
             .count(200)
             .build(),
         new StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
             .empire_id(id)
-            .design_id("scout")
+            .design_type(Design.DesignType.SCOUT)
             .count(10)
             .build(),
         new StarModification.Builder()

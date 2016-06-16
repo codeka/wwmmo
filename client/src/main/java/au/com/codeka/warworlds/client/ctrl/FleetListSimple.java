@@ -81,7 +81,7 @@ public class FleetListSimple extends LinearLayout {
 
   private View getRowView(LayoutInflater inflater, Fleet fleet) {
     View view = inflater.inflate(R.layout.ctrl_fleet_list_simple_row, this, false);
-    Design design = DesignHelper.getDesign(fleet.design_id);
+    Design design = DesignHelper.getDesign(fleet.design_type);
 
     ImageView icon = (ImageView) view.findViewById(R.id.fleet_icon);
     LinearLayout row1 = (LinearLayout) view.findViewById(R.id.ship_row1);

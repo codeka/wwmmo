@@ -83,7 +83,7 @@ public class FleetInfoView extends FrameLayout {
     empireName.setText("");
     empireIcon.setImageBitmap(null);
 
-    Design design = DesignHelper.getDesign(fleet.design_id);
+    Design design = DesignHelper.getDesign(fleet.design_type);
     Empire empire = null;//EmpireManager.i.getEmpire(fleet.getEmpireID());
     if (empire != null) {
       empireName.setText(empire.display_name);

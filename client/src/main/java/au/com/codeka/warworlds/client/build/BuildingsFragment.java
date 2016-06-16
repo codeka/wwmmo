@@ -90,8 +90,8 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         public int compare(Entry lhs, Entry rhs) {
 //          String a = (lhs.building != null ? lhs.building.design_id : lhs.buildRequest.design_id);
 //          String b = (rhs.building != null ? rhs.building.design_id : rhs.buildRequest.design_id);
-          String a = lhs.building.design_id;
-          String b = rhs.building.design_id;
+          Design.DesignType a = lhs.building.design_type;
+          Design.DesignType b = rhs.building.design_type;
           return a.compareTo(b);
         }
       });
@@ -105,7 +105,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
           int numExisting = 0;
           for (Entry e : existingBuildingEntries) {
             if (e.building != null) {
-              if (e.building.design_id.equals(design.id)) {
+              if (e.building.design_type.equals(design.type)) {
                 numExisting ++;
               }
             }// else if (e.buildRequest != null) {
@@ -173,7 +173,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
       // upgraded any more, so also disabled.
       Entry entry = entries.get(position);
       if (entry.building != null) {
-        int maxUpgrades = DesignHelper.getDesign(entry.building.design_id).upgrades.size();
+        int maxUpgrades = DesignHelper.getDesign(entry.building.design_type).upgrades.size();
         if (entry.building.level > maxUpgrades) {
           return false;
         }
@@ -237,7 +237,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         Building building = entry.building;
         //BuildRequest buildRequest = entry.buildRequest;
         Design design = DesignHelper.getDesign(
-            (building != null ? building.design_id : /*buildRequest.getDesignID()*/null));
+            (building != null ? building.design_type : /*buildRequest.getDesignID()*/null));
 
         BuildHelper.setDesignIcon(design, icon);
         int numUpgrades = design.upgrades.size();

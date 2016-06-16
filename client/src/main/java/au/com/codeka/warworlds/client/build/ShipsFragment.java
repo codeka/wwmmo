@@ -275,7 +275,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
         Fleet fleet = entry.fleet;
         //BuildRequest buildRequest = entry.buildRequest;
         Design design = DesignHelper.getDesign(
-            fleet != null ? fleet.design_id : /*buildRequest.getDesignID()*/null);
+            fleet != null ? fleet.design_type : /*buildRequest.getDesignID()*/null);
         BuildHelper.setDesignIcon(design, icon);
 
         int numUpgrades = design.upgrades.size();
