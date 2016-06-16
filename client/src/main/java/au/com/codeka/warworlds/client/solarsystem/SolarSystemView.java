@@ -46,7 +46,6 @@ public class SolarSystemView extends RelativeLayout {
     selectionIndicator = new ImageView(context);
     selectionIndicator.setImageResource(R.drawable.planet_selection);
     selectionIndicator.setVisibility(View.GONE);
-    addView(selectionIndicator);
   }
 
   public void setPlanetSelectedHandler(@Nullable PlanetSelectedHandler handler) {
@@ -64,6 +63,8 @@ public class SolarSystemView extends RelativeLayout {
 
   public void setStar(Star star) {
     ViewBackgroundGenerator.setBackground(this, onBackgroundDrawHandler, star.id);
+    removeAllViews();
+    addView(selectionIndicator);
 
     this.star = star;
     planetInfos = new PlanetInfo[star.planets.size()];
