@@ -47,16 +47,12 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
     shipList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ShipListAdapter.ItemEntry entry =
-            (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
+        ItemEntry entry = (ItemEntry) shipListAdapter.getItem(position);
         if (entry.fleet == null /*&& entry.buildRequest == null*/) {
-          //BuildConfirmDialog dialog = new BuildConfirmDialog();
-          //dialog.setup(entry.design, getStar(), getColony());
-          //dialog.show(getActivity().getSupportFragmentManager(), "");
+          getBuildFragment().showBuildSheet(entry.design);
         } else if (entry.fleet != null /*&& entry.buildRequest == null*/) {
-          //ShipUpgradeDialog dialog = new ShipUpgradeDialog();
-          //dialog.setup(getStar(), getColony(), entry.fleet);
-          //dialog.show(getActivity().getSupportFragmentManager(), "");
+          // TODO: upgrade
+          getBuildFragment().showBuildSheet(entry.design);
         }
       }
     });
@@ -64,8 +60,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
     shipList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-        final ShipListAdapter.ItemEntry entry =
-            (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
+        final ItemEntry entry = (ItemEntry) shipListAdapter.getItem(position);
 
         //NotesDialog dialog = new NotesDialog();
         //dialog.setup(entry.fleet == null ? entry.buildRequest.getNotes() : entry.fleet.getNotes(),
@@ -359,28 +354,28 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
 
       return view;
     }
+  }
 
-    public class ItemEntry {
-      public Design design;
-      public Fleet fleet;
-     // public BuildRequest buildRequest;
-      public String heading;
+  public static class ItemEntry {
+    public Design design;
+    public Fleet fleet;
+    // public BuildRequest buildRequest;
+    public String heading;
 
-      public ItemEntry(Design design) {
-        this.design = design;
-      }
+    public ItemEntry(Design design) {
+      this.design = design;
+    }
 
-     // public ItemEntry(BuildRequest buildRequest) {
+    // public ItemEntry(BuildRequest buildRequest) {
     //    this.buildRequest = buildRequest;
-     // }
+    // }
 
-      public ItemEntry(Fleet fleet) {
-        this.fleet = fleet;
-      }
+    public ItemEntry(Fleet fleet) {
+      this.fleet = fleet;
+    }
 
-      public ItemEntry(String heading) {
-        this.heading = heading;
-      }
+    public ItemEntry(String heading) {
+      this.heading = heading;
     }
   }
 }

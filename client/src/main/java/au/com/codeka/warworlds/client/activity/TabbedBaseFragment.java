@@ -39,7 +39,7 @@ public abstract class TabbedBaseFragment extends BaseFragment {
     return R.layout.frag_tabbed;
   }
 
-  protected TabHost getTabHost() {
+  public TabHost getTabHost() {
     return tabHost;
   }
 

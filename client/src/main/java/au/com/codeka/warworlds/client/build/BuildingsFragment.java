@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,14 +40,27 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    BuildingListAdapter adapter = new BuildingListAdapter();
+    final BuildingListAdapter adapter = new BuildingListAdapter();
     adapter.setColony(getStar(), getColony());
-    ((ListView) view.findViewById(R.id.building_list)).setAdapter(adapter);
+    ListView buildingsList = (ListView) view.findViewById(R.id.building_list);
+    buildingsList.setAdapter(adapter);
+    buildingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        ItemEntry entry = (ItemEntry) adapter.getItem(position);
+        if (entry.building == null /*&& entry.buildRequest == null*/) {
+          getBuildFragment().showBuildSheet(entry.design);
+        } else if (entry.building != null /*&& entry.buildRequest == null*/) {
+          // TODO: upgrade
+          getBuildFragment().showBuildSheet(entry.design);
+        }
+      }
+    });
   }
 
   /** This adapter is used to populate a list of buildings in a list view. */
   private class BuildingListAdapter extends BaseAdapter {
-    private ArrayList<Entry> entries;
+    private ArrayList<ItemEntry> entries;
 
     private static final int HEADING_TYPE = 0;
     private static final int EXISTING_BUILDING_TYPE = 1;
@@ -60,9 +74,9 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         buildings = new ArrayList<>();
       }
 
-      ArrayList<Entry> existingBuildingEntries = new ArrayList<>();
+      ArrayList<ItemEntry> existingBuildingEntries = new ArrayList<>();
       for (Building b : buildings) {
-        Entry entry = new Entry();
+        ItemEntry entry = new ItemEntry();
         entry.building = b;
 //        if (star.build_requests != null) {
 //          // if the building is being upgraded (i.e. if there's a build request that
@@ -86,9 +100,9 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
 //        }
 //      }
 
-      Collections.sort(existingBuildingEntries, new Comparator<Entry>() {
+      Collections.sort(existingBuildingEntries, new Comparator<ItemEntry>() {
         @Override
-        public int compare(Entry lhs, Entry rhs) {
+        public int compare(ItemEntry lhs, ItemEntry rhs) {
 //          String a = (lhs.building != null ? lhs.building.design_id : lhs.buildRequest.design_id);
 //          String b = (rhs.building != null ? rhs.building.design_id : rhs.buildRequest.design_id);
           Design.DesignType a = lhs.building.design_type;
@@ -97,14 +111,14 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         }
       });
 
-      Entry title = new Entry();
+      ItemEntry title = new ItemEntry();
       title.title = "New Buildings";
       entries.add(title);
 
       for (Design design : DesignHelper.getDesigns(Design.DesignKind.BUILDING)) {
         if (design.max_per_colony != null && design.max_per_colony > 0) {
           int numExisting = 0;
-          for (Entry e : existingBuildingEntries) {
+          for (ItemEntry e : existingBuildingEntries) {
             if (e.building != null) {
               if (e.building.design_type.equals(design.type)) {
                 numExisting ++;
@@ -127,16 +141,16 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
        //     continue;
        //   }
        // }
-        Entry entry = new Entry();
+        ItemEntry entry = new ItemEntry();
         entry.design = design;
         entries.add(entry);
       }
 
-      title = new Entry();
+      title = new ItemEntry();
       title.title = "Existing Buildings";
       entries.add(title);
 
-      for (Entry entry : existingBuildingEntries) {
+      for (ItemEntry entry : existingBuildingEntries) {
         entries.add(entry);
       }
 
@@ -172,7 +186,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
 
       // also, if it's an existing building that's at the max level it can't be
       // upgraded any more, so also disabled.
-      Entry entry = entries.get(position);
+      ItemEntry entry = entries.get(position);
       if (entry.building != null) {
         int maxUpgrades = DesignHelper.getDesign(entry.building.design_type).upgrades.size();
         if (entry.building.level > maxUpgrades) {
@@ -219,7 +233,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         }
       }
 
-      Entry entry = entries.get(position);
+      ItemEntry entry = entries.get(position);
       if (entry.title != null) {
         TextView tv = (TextView) view;
         tv.setTypeface(Typeface.DEFAULT_BOLD);
@@ -325,7 +339,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
     }
   }
 
-  public static class Entry {
+  public static class ItemEntry {
     public String title;
   //  public BuildRequest buildRequest;
     public Building building;

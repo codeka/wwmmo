@@ -38,6 +38,10 @@
 
   <string name="no_more_upgrades">No more upgrades</string>
 
+  <string name="num_to_build">Number to build:</string>
+  <string name="current_level">Current level:</string>
+  <string name="time_to_build">Time to build:</string>
+
   <string name="pref_category_chat">Chat</string>
   <string name="pref_chat_profanity_filter">Filter profanity</string>
 

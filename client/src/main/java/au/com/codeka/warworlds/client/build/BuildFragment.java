@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
 import com.squareup.picasso.Picasso;
+import com.transitionseverywhere.TransitionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ import au.com.codeka.warworlds.client.world.EmpireManager;
 import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.client.world.StarManager;
 import au.com.codeka.warworlds.common.proto.Colony;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -49,6 +52,11 @@ public class BuildFragment extends BaseFragment {
   private TextView planetName;
   private TextView buildQueueDescription;
 
+  private ViewGroup bottomPane;
+  private ImageView buildIcon;
+  private TextView buildName;
+  private TextView buildDescription;
+
   public static Bundle createArguments(long starId, int planetIndex) {
     Bundle args = new Bundle();
     args.putLong(STAR_ID_KEY, starId);
@@ -65,12 +73,17 @@ public class BuildFragment extends BaseFragment {
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    colonyPagerAdapter = new ColonyPagerAdapter(getFragmentManager());
+    colonyPagerAdapter = new ColonyPagerAdapter(this);
     viewPager = (ViewPager) view.findViewById(R.id.pager);
     viewPager.setAdapter(colonyPagerAdapter);
     planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
     planetName = (TextView) view.findViewById(R.id.planet_name);
     buildQueueDescription = (TextView) view.findViewById(R.id.build_queue_description);
+
+    bottomPane = (ViewGroup) view.findViewById(R.id.bottom_pane);
+    buildIcon = (ImageView) view.findViewById(R.id.build_icon);
+    buildName = (TextView) view.findViewById(R.id.build_name);
+    buildDescription = (TextView) view.findViewById(R.id.build_description);
   }
 
   @Override
@@ -86,6 +99,16 @@ public class BuildFragment extends BaseFragment {
   public void onPause() {
     super.onPause();
     App.i.getEventBus().unregister(eventHandler);
+  }
+
+  /** Show the "build" popup sheet for the given {@link Design}. */
+  public void showBuildSheet(Design design) {
+    TransitionManager.beginDelayedTransition(bottomPane);
+    bottomPane.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+    BuildHelper.setDesignIcon(design, buildIcon);
+    buildName.setText(design.display_name);
+    buildDescription.setText(Html.fromHtml(design.description));
   }
 
   private final Object eventHandler = new Object() {
@@ -158,8 +181,15 @@ public class BuildFragment extends BaseFragment {
   }
 
   public class ColonyPagerAdapter extends FragmentStatePagerAdapter {
-    public ColonyPagerAdapter(FragmentManager fm) {
-      super(fm);
+    private BuildFragment buildFragment;
+
+    public ColonyPagerAdapter(BuildFragment buildFragment) {
+      super(buildFragment.getFragmentManager());
+      this.buildFragment = buildFragment;
+    }
+
+    public BuildFragment getBuildFragment() {
+      return buildFragment;
     }
 
     @Override
@@ -233,6 +263,14 @@ public class BuildFragment extends BaseFragment {
         return null;
       }
       return star.planets.get(planetIndex).colony;
+    }
+
+    /** Gets a reference to the {@link BuildFragment} we're inside of. */
+    protected BuildFragment getBuildFragment() {
+      TabFragment tabFragment = (TabFragment) getParentFragment();
+      ViewPager viewPager = (ViewPager) tabFragment.getTabHost().getParent();
+      ColonyPagerAdapter adapter = (ColonyPagerAdapter) viewPager.getAdapter();
+      return adapter.getBuildFragment();
     }
   }
 }
