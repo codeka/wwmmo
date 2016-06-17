@@ -20,6 +20,7 @@ public class TabManager {
   private TabHost tabHost;
   private TreeMap<String, TabInfo> tabInfos = new TreeMap<>();
   private TabInfo lastTab;
+  private TabHost.OnTabChangeListener onTabChangeListener;
 
   public TabManager(TabHost tabHost) {
     this.tabHost = tabHost;
@@ -49,6 +50,10 @@ public class TabManager {
     }
   }
 
+  public void setOnTabChangeListener(TabHost.OnTabChangeListener onTabChangeListener) {
+    this.onTabChangeListener = onTabChangeListener;
+  }
+
   public void reloadTab() {
     if (lastTab != null && lastTab.reload()) {
       return;
@@ -64,6 +69,9 @@ public class TabManager {
       if (newTab != null) {
         newTab.switchTo(lastTab);
         lastTab = newTab;
+        if (onTabChangeListener != null) {
+          onTabChangeListener.onTabChanged(newTab.title);
+        }
       }
     }
   }

@@ -6,9 +6,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
@@ -23,6 +25,7 @@ import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.TabbedBaseFragment;
+import au.com.codeka.warworlds.client.opengl.DimensionResolver;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.world.EmpireManager;
@@ -109,6 +112,13 @@ public class BuildFragment extends BaseFragment {
     BuildHelper.setDesignIcon(design, buildIcon);
     buildName.setText(design.display_name);
     buildDescription.setText(Html.fromHtml(design.description));
+  }
+
+  public void hideBuildSheet() {
+    TransitionManager.beginDelayedTransition(bottomPane);
+    bottomPane.getLayoutParams().height = (int) new DimensionResolver(getContext()).dp2px(30);
+    buildName.setText("");
+    buildIcon.setImageDrawable(null);
   }
 
   private final Object eventHandler = new Object() {
@@ -231,6 +241,24 @@ public class BuildFragment extends BaseFragment {
 
   public static class TabFragment extends TabbedBaseFragment {
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+      super.onViewCreated(view, savedInstanceState);
+
+      getTabManager().setOnTabChangeListener(new TabHost.OnTabChangeListener() {
+        @Override
+        public void onTabChanged(String s) {
+          getBuildFragment().hideBuildSheet();
+        }
+      });
+    }
+
+    public BuildFragment getBuildFragment() {
+      ViewPager viewPager = (ViewPager) getTabHost().getParent();
+      ColonyPagerAdapter adapter = (ColonyPagerAdapter) viewPager.getAdapter();
+      return adapter.getBuildFragment();
+    }
+
+    @Override
     protected void createTabs() {
       Bundle args = getArguments();
       getTabManager().addTab(getContext(),
@@ -268,9 +296,7 @@ public class BuildFragment extends BaseFragment {
     /** Gets a reference to the {@link BuildFragment} we're inside of. */
     protected BuildFragment getBuildFragment() {
       TabFragment tabFragment = (TabFragment) getParentFragment();
-      ViewPager viewPager = (ViewPager) tabFragment.getTabHost().getParent();
-      ColonyPagerAdapter adapter = (ColonyPagerAdapter) viewPager.getAdapter();
-      return adapter.getBuildFragment();
+      return tabFragment.getBuildFragment();
     }
   }
 }

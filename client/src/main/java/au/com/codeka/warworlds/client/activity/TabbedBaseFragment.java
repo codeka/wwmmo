@@ -19,7 +19,8 @@ public abstract class TabbedBaseFragment extends BaseFragment {
   private View rootView;
 
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+  public View onCreateView(
+      LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     rootView = inflater.inflate(getLayoutID(), container, false);
 
     tabHost = (TabHost) rootView.findViewById(android.R.id.tabhost);
@@ -48,7 +49,7 @@ public abstract class TabbedBaseFragment extends BaseFragment {
   }
 
   public static class TabInfo extends TabManager.TabInfo {
-    private Fragment mContainerFragment;
+    private Fragment containerFragment;
 
     Class<?> fragmentClass;
     Bundle args;
@@ -56,14 +57,14 @@ public abstract class TabbedBaseFragment extends BaseFragment {
 
     public TabInfo(Fragment containerFragment, String title, Class<?> fragmentClass, Bundle args) {
       super(title);
-      mContainerFragment = containerFragment;
+      this.containerFragment = containerFragment;
       this.fragmentClass = fragmentClass;
       this.args = args;
     }
 
     @Override
     public View createTabContent(String tag) {
-      View v = new View(mContainerFragment.getActivity());
+      View v = new View(containerFragment.getActivity());
       v.setMinimumHeight(0);
       v.setMinimumWidth(0);
       return v;
@@ -71,15 +72,16 @@ public abstract class TabbedBaseFragment extends BaseFragment {
 
     @Override
     public void switchTo(TabManager.TabInfo lastTabBase) {
-      FragmentTransaction ft = mContainerFragment.getChildFragmentManager().beginTransaction();
+      FragmentTransaction ft = containerFragment.getChildFragmentManager().beginTransaction();
       if (fragment == null) {
-        fragment = Fragment.instantiate(mContainerFragment.getActivity(), fragmentClass.getName(), args);
+        fragment =
+            Fragment.instantiate(containerFragment.getActivity(), fragmentClass.getName(), args);
       }
       ft.replace(R.id.real_tabcontent, fragment, title);
 
       try {
         ft.commit();
-        mContainerFragment.getChildFragmentManager().executePendingTransactions();
+        containerFragment.getChildFragmentManager().executePendingTransactions();
       } catch (IllegalStateException e) {
         // we can ignore this since it probably just means the activity is gone.
       }
@@ -87,18 +89,19 @@ public abstract class TabbedBaseFragment extends BaseFragment {
 
     @Override
     public void recreate() {
-      FragmentTransaction ft = mContainerFragment.getChildFragmentManager().beginTransaction();
+      FragmentTransaction ft = containerFragment.getChildFragmentManager().beginTransaction();
       if (fragment != null) {
         ft.detach(fragment);
         ft.attach(fragment);
       } else {
-        fragment = Fragment.instantiate(mContainerFragment.getActivity(), fragmentClass.getName(), args);
+        fragment =
+            Fragment.instantiate(containerFragment.getActivity(), fragmentClass.getName(), args);
         ft.add(R.id.real_tabcontent, fragment, title);
       }
 
       try {
         ft.commit();
-        mContainerFragment.getChildFragmentManager().executePendingTransactions();
+        containerFragment.getChildFragmentManager().executePendingTransactions();
       } catch (IllegalStateException e) {
         // we can ignore this since it probably just means the activity is gone.
       }
