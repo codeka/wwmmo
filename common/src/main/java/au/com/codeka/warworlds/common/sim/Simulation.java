@@ -87,12 +87,15 @@ public class Simulation {
     while (true) {
       if (now < endTime) {
         simulateStepForAllEmpires(now, star, empireIds);
+      } else if (predictionStar == null) {
+        // We always predict at least one more step, so that we can put the deltas from the next
+        // step in (since they'll take into account things like focus changes, new builds, etc that
+        // the user has applied in THIS step).
+        predictionStar = star.build().newBuilder();
+        log("Begin prediction");
+        simulateStepForAllEmpires(now, predictionStar, empireIds);
+        copyDeltas(star, predictionStar);
       } else if (predict && now < predictionTime) {
-        if (predictionStar == null) {
-          // Create the prediction star so that we can start predicting.
-          predictionStar = star.build().newBuilder();
-          log("Begin prediction");
-        }
         simulateStepForAllEmpires(now, predictionStar, empireIds);
       } else {
         break;
@@ -100,54 +103,69 @@ public class Simulation {
       now += STEP_TIME;
     }
 
-    if (predictionStar != null) {
-      // copy the end times for builds from the prediction star
-      for (int i = 0; i < star.planets.size(); i++) {
-        Planet predictionPlanet = predictionStar.planets.get(i);
-        Planet.Builder planet = star.planets.get(i).newBuilder();
-        if (planet.colony == null || predictionPlanet.colony == null
-            || planet.colony.build_requests == null
-            || predictionPlanet.colony.build_requests == null) {
-          continue;
-        }
-
-        for (BuildRequest predictionBuildRequest : predictionPlanet.colony.build_requests) {
-          ArrayList<BuildRequest> buildRequests = new ArrayList<>();
-          for (int j = 0; j < planet.colony.build_requests.size(); j++) {
-            BuildRequest.Builder br = planet.colony.build_requests.get(j).newBuilder();
-            if (predictionBuildRequest.id.equals(br.id)) {
-              buildRequests.add(br.end_time(predictionBuildRequest.end_time).build());
-            }
-          }
-          planet.colony(planet.colony.newBuilder().build_requests(buildRequests).build());
-        }
-        star.planets.set(i, planet.build());
+    // copy the end times for builds from the prediction star
+    for (int i = 0; i < star.planets.size(); i++) {
+      Planet predictionPlanet = predictionStar.planets.get(i);
+      Planet.Builder planet = star.planets.get(i).newBuilder();
+      if (planet.colony == null || predictionPlanet.colony == null
+          || planet.colony.build_requests == null
+          || predictionPlanet.colony.build_requests == null) {
+        continue;
       }
+
+      for (BuildRequest predictionBuildRequest : predictionPlanet.colony.build_requests) {
+        ArrayList<BuildRequest> buildRequests = new ArrayList<>();
+        for (int j = 0; j < planet.colony.build_requests.size(); j++) {
+          BuildRequest.Builder br = planet.colony.build_requests.get(j).newBuilder();
+          if (predictionBuildRequest.id.equals(br.id)) {
+            buildRequests.add(br.end_time(predictionBuildRequest.end_time).build());
+          }
+        }
+        planet.colony(planet.colony.newBuilder().build_requests(buildRequests).build());
+      }
+      star.planets.set(i, planet.build());
+    }
 /*
-      // any fleets that *will be* destroyed, remember the time of their death
-      for (BaseFleet fleet : star.getFleets()) {
-        for (BaseFleet predictedFleet : predictionStar.getFleets()) {
-          if (fleet.getKey().equals(predictedFleet.getKey())) {
-            log(String.format("Fleet #%s updating timeDestroyed to: %s", fleet.getKey(), predictedFleet.getTimeDestroyed()));
-            fleet.setTimeDestroyed(predictedFleet.getTimeDestroyed());
-          }
+    // any fleets that *will be* destroyed, remember the time of their death
+    for (BaseFleet fleet : star.getFleets()) {
+      for (BaseFleet predictedFleet : predictionStar.getFleets()) {
+        if (fleet.getKey().equals(predictedFleet.getKey())) {
+          log(String.format("Fleet #%s updating timeDestroyed to: %s", fleet.getKey(), predictedFleet.getTimeDestroyed()));
+          fleet.setTimeDestroyed(predictedFleet.getTimeDestroyed());
         }
       }
+    }
 
-      // if the empire is going to run out of resources, save that time as well.
-      for (BaseEmpirePresence empirePresence : star.getEmpirePresences()) {
-        for (BaseEmpirePresence predictedEmpirePresence : predictionStar.getEmpirePresences()) {
-          if (empirePresence.getKey().equals(predictedEmpirePresence.getKey())) {
-            empirePresence.setGoodsZeroTime(predictedEmpirePresence.getGoodsZeroTime());
-          }
+    // if the empire is going to run out of resources, save that time as well.
+    for (BaseEmpirePresence empirePresence : star.getEmpirePresences()) {
+      for (BaseEmpirePresence predictedEmpirePresence : predictionStar.getEmpirePresences()) {
+        if (empirePresence.getKey().equals(predictedEmpirePresence.getKey())) {
+          empirePresence.setGoodsZeroTime(predictedEmpirePresence.getGoodsZeroTime());
         }
       }
+    }
 
-      // also, the prediction combat report (if any) is the one to use
-      star.setCombatReport(predictionStar.getCombatReport());
-    */}
+    // also, the prediction combat report (if any) is the one to use
+    star.setCombatReport(predictionStar.getCombatReport());
+    */
 
     star.last_simulation = endTime;
+  }
+
+  /**
+   * After simulating one more step in the prediction star, copy the mineral, goods and energy
+   * deltas across to the main star.
+   */
+  private void copyDeltas(Star.Builder star, Star.Builder predictionStar) {
+    ArrayList<EmpireStorage> stores = new ArrayList<>();
+    for (int i = 0; i < star.empire_stores.size(); i++) {
+      stores.add(star.empire_stores.get(i).newBuilder()
+          .minerals_delta_per_hour(predictionStar.empire_stores.get(i).minerals_delta_per_hour)
+          .goods_delta_per_hour(predictionStar.empire_stores.get(i).goods_delta_per_hour)
+          .energy_delta_per_hour(predictionStar.empire_stores.get(i).energy_delta_per_hour)
+          .build());
+    }
+    star.empire_stores(stores);
   }
 
   /**
