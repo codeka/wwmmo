@@ -11,7 +11,7 @@ function fix_times() {
     if ($(this).attr("datetime")) {
       dt = new Date($(this).attr("datetime")+" UTC");
     } else {
-      dt = new Date($(this).attr("timestamp") * 1000);
+      dt = new Date(parseInt($(this).attr("timestamp")));
     }
 
     var hours = dt.getHours();

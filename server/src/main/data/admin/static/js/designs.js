@@ -8,10 +8,9 @@ var Designs = (function() {
   });
 
   return {
-    get: function(id) {
-      console.log(JSON.stringify(designs));
+    get: function(type) {
       for (var i in designs) {
-        if (designs[i].id == id) {
+        if (designs[i].type == type) {
           return designs[i];
         }
       }

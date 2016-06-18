@@ -6,6 +6,7 @@
   <script type="text/javascript" src="/admin/js/empirestore.js"></script>
   <script type="text/javascript" src="/admin/js/starfield.js"></script>
   <script type="text/javascript" src="/admin/js/designs.js"></script>
+  <script type="text/javascript" src="/admin/js/time.js"></script>
 {% endblock %}
 {% block content %}
   <h1>Starfield</h1>
@@ -44,6 +45,36 @@
             <div class="colony">
               <img src="/render/empire/<%= planets[i].colony.empire_id %>/24x24/mdpi.png" width="24" height="24">
               <h2><span data-empireid="<%= planets[i].colony.empire_id %>">...</span></h2>
+              <table>
+                <tr>
+                  <th>Focus</th>
+                  <th>Buildings</th>
+                  <th>Build queue</th>
+                </tr>
+                <tr>
+                  <td>
+                    <div><img src="/admin/img/focus/farming.png" width="16" height="16"> <%= Math.round(planets[i].colony.focus.farming * 100) %>%</div>
+                    <div><img src="/admin/img/focus/mining.png" width="16" height="16"> <%= Math.round(planets[i].colony.focus.mining * 100) %>%</div>
+                    <div><img src="/admin/img/focus/energy.png" width="16" height="16"> <%= Math.round(planets[i].colony.focus.energy * 100) %>%</div>
+                    <div><img src="/admin/img/focus/construction.png" width="16" height="16"> <%= Math.round(planets[i].colony.focus.construction * 100) %>%</div>
+                  </td>
+                  <td><i>None</i></td>
+                  <td>
+                    <% for (var j in planets[i].colony.build_requests) { %>
+                      <div class="build-queue-entry">
+                        <% var design = Designs.get(planets[i].colony.build_requests[j].design_type); %>
+                        <img src="/admin/img/sprites/<%= design.image_url %>" />
+                        <div><%= design.display_name %> x <%= planets[i].colony.build_requests[j].count %></div>
+                        <div><%= Math.round(planets[i].colony.build_requests[j].progress * 100) %> % complete</div>
+                        <div><time timestamp="<%= planets[i].colony.build_requests[j].end_time %>"></time></div>
+                      </div>
+                    <% } %>
+                    <% if (planets[i].colony.build_requests == null || planets[i].colony.build_requests.length == 0) { %>
+                      <i>None</i>
+                    <% } %>
+                  </td>
+                </tr>
+              </table>
             </div>
             <% empireStore.getEmpire(planets[i].colony.empire_id); %>
           <% } %>
@@ -51,10 +82,10 @@
       </div>
       <div class="fleets">
         <% for (var i in fleets ) { %>
-          <% var design = Designs.get(fleets[i].design_id); %>
+          <% var design = Designs.get(fleets[i].design_type); %>
           <div class="fleet">
             <div class="fleet-icon"><img src="/admin/img/sprites/<%= design.image_url %>" /></div>
-            <%= design.display_name %>
+            <%= design.display_name %> x <%= fleets[i].num_ships %>
           </div>
         <% } %>
       </div>

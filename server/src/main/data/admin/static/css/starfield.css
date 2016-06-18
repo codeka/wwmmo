@@ -8,6 +8,10 @@
   float: left;
 }
 
+table td {
+  vertical-align: top;
+}
+
 #starfield {
   width: 512px;
   height: 512px;
@@ -136,7 +140,6 @@
 }
 
 .colony {
-  height: 24px;
   margin-left: 64px;
   margin-bottom: 10px;
 }
@@ -171,4 +174,8 @@
 
 .simulate {
   clear: both;
+}
+
+.build-queue-entry {
+  width: 400px;
 }
