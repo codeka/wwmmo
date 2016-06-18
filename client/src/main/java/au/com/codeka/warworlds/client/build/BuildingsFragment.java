@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.proto.Building;
 import au.com.codeka.warworlds.common.proto.Colony;
@@ -48,9 +49,9 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ItemEntry entry = (ItemEntry) adapter.getItem(position);
-        if (entry.building == null /*&& entry.buildRequest == null*/) {
+        if (entry.building == null && entry.buildRequest == null) {
           getBuildFragment().showBuildSheet(entry.design);
-        } else if (entry.building != null /*&& entry.buildRequest == null*/) {
+        } else if (entry.building != null && entry.buildRequest == null) {
           // TODO: upgrade
           getBuildFragment().showBuildSheet(entry.design);
         }
@@ -78,35 +79,33 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
       for (Building b : buildings) {
         ItemEntry entry = new ItemEntry();
         entry.building = b;
-//        if (star.build_requests != null) {
-//          // if the building is being upgraded (i.e. if there's a build request that
-//          // references this building) then add the build request as well
-//          for (BaseBuildRequest br : star.getBuildRequests()) {
-//            if (br.getExistingBuildingKey() != null && br.getExistingBuildingKey().equals(b.getKey())) {
-//              entry.buildRequest = (BuildRequest) br;
-//            }
+        // if the building is being upgraded (i.e. if there's a build request that
+        // references this building) then add the build request as well
+        for (BuildRequest br : BuildHelper.getBuildRequests(star)) {
+//          if (br.existing_building_id != null && br.existing_building_id.equals(b.id)) {
+//            entry.buildRequest = (BuildRequest) br;
 //          }
-//        }
+        }
         existingBuildingEntries.add(entry);
       }
 
-//      for (BaseBuildRequest br : star.getBuildRequests()) {
-//        if (br.getColonyKey().equals(colony.getKey()) &&
-//            br.getDesignKind().equals(DesignKind.BUILDING) &&
-//            br.getExistingBuildingKey() == null) {
-//          Entry entry = new Entry();
-//          entry.buildRequest = (BuildRequest) br;
-//          existingBuildingEntries.add(entry);
-//        }
-//      }
+      for (BuildRequest br : colony.build_requests) {
+        Design design = DesignHelper.getDesign(br.design_type);
+        if (design.design_kind == Design.DesignKind.BUILDING
+          /*&& br.existing_building_id == null*/) {
+          ItemEntry entry = new ItemEntry();
+          entry.buildRequest = br;
+          existingBuildingEntries.add(entry);
+        }
+      }
 
       Collections.sort(existingBuildingEntries, new Comparator<ItemEntry>() {
         @Override
         public int compare(ItemEntry lhs, ItemEntry rhs) {
-//          String a = (lhs.building != null ? lhs.building.design_id : lhs.buildRequest.design_id);
-//          String b = (rhs.building != null ? rhs.building.design_id : rhs.buildRequest.design_id);
-          Design.DesignType a = lhs.building.design_type;
-          Design.DesignType b = rhs.building.design_type;
+          Design.DesignType a = (lhs.building != null
+              ? lhs.building.design_type : lhs.buildRequest.design_type);
+          Design.DesignType b = (rhs.building != null
+              ? rhs.building.design_type : rhs.buildRequest.design_type);
           return a.compareTo(b);
         }
       });
@@ -123,11 +122,11 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
               if (e.building.design_type.equals(design.type)) {
                 numExisting ++;
               }
-            }// else if (e.buildRequest != null) {
-             // if (e.buildRequest.getDesignID().equals(bd.getID())) {
-             //   numExisting ++;
-             // }
-            //}
+            } else if (e.buildRequest != null) {
+              if (e.buildRequest.design_type.equals(design.type)) {
+                numExisting ++;
+              }
+            }
           }
           if (numExisting >= design.max_per_colony) {
             continue;
@@ -158,8 +157,8 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
     }
 
     /**
-     * We have three types of items, the "headings", the list of existing buildings
-     * and the list of building designs.
+     * We have three types of items, the "headings", the list of existing buildings and the list of
+     * building designs.
      */
     @Override
     public int getViewTypeCount() {
@@ -238,7 +237,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         TextView tv = (TextView) view;
         tv.setTypeface(Typeface.DEFAULT_BOLD);
         tv.setText(entry.title);
-      } else if (entry.building != null /*|| entry.buildRequest != null*/) {
+      } else if (entry.building != null || entry.buildRequest != null) {
         // existing building/upgrading building
         ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
         LinearLayout row1 = (LinearLayout) view.findViewById(R.id.design_row1);
@@ -250,9 +249,9 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         TextView notes = (TextView) view.findViewById(R.id.notes);
 
         Building building = entry.building;
-        //BuildRequest buildRequest = entry.buildRequest;
+        BuildRequest buildRequest = entry.buildRequest;
         Design design = DesignHelper.getDesign(
-            (building != null ? building.design_type : /*buildRequest.getDesignID()*/null));
+            (building != null ? building.design_type : buildRequest.design_type));
 
         BuildHelper.setDesignIcon(design, icon);
         int numUpgrades = design.upgrades.size();
@@ -268,17 +267,17 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
 
         row1.removeAllViews();
         addTextToRow(getContext(), row1, design.display_name);
-        /*if (buildRequest != null) {
+        if (buildRequest != null) {
           String verb = (building == null ? "Building" : "Upgrading");
           row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
               "<font color=\"#0c6476\">%s:</font> %d %%, %s left",
-              verb, (int) buildRequest.getPercentComplete(),
-              TimeFormatter.create().format(buildRequest.getRemainingTime()))));
+              verb, Math.round(buildRequest.progress * 100.0f),
+              /*TimeFormatter.create().format(buildRequest.getRemainingTime())*/ "1 hrs")));
 
           row3.setVisibility(View.GONE);
           progress.setVisibility(View.VISIBLE);
-          progress.setProgress((int) buildRequest.getPercentComplete());
-        } else*/ if (building != null) {
+          progress.setProgress(Math.round(buildRequest.progress * 100.0f));
+        } else if (building != null) {
           if (numUpgrades < building.level) {
             row2.setText(getContext().getString(R.string.no_more_upgrades));
             row3.setVisibility(View.GONE);
@@ -297,10 +296,10 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         if (building != null && building.notes != null) {
           notes.setText(building.notes);
           notes.setVisibility(View.VISIBLE);
-        } /*else if (buildRequest != null && buildRequest.getNotes() != null) {
+        } /*else if (buildRequest != null && buildRequest.notes != null) {
           notes.setText(buildRequest.getNotes());
           notes.setVisibility(View.VISIBLE);
-        }*/ else {
+        } */else {
           notes.setText("");
           notes.setVisibility(View.GONE);
         }
@@ -341,7 +340,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
 
   public static class ItemEntry {
     public String title;
-  //  public BuildRequest buildRequest;
+    public BuildRequest buildRequest;
     public Building building;
     public Design design;
   }

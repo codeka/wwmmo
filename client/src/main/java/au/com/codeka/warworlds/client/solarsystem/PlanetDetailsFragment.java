@@ -136,8 +136,7 @@ public class PlanetDetailsFragment extends BaseFragment {
             .build())
         .build());
 
-    // TODO: have a nicer API for this.
-    getFragmentActivity().getSupportFragmentManager().popBackStack();
+    getFragmentManager().popBackStack();
   }
 
   @SuppressWarnings("unused") // used through data binding

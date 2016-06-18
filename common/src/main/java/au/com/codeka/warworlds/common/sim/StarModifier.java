@@ -5,8 +5,11 @@ import com.google.common.collect.Lists;
 
 import java.util.Collection;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
+import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Design;
@@ -54,6 +57,9 @@ public class StarModifier {
         return;
       case ADJUST_FOCUS:
         applyAdjustFocus(star, modification);
+        return;
+      case ADD_BUILD_REQUEST:
+        applyAddBuildRequest(star, modification);
         return;
       default:
         log.error("Unknown or unexpected modification type: %s", modification.type);
@@ -142,15 +148,44 @@ public class StarModifier {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.ADJUST_FOCUS));
 
+    Planet planet = getPlanetWithColony(star, modification.colony_id);
+    if (planet != null) {
+      star.planets.set(planet.index, planet.newBuilder()
+          .colony(planet.colony.newBuilder()
+              .focus(modification.focus)
+              .build())
+          .build());
+    }
+  }
+
+  private void applyAddBuildRequest(Star.Builder star, StarModification modification) {
+    Preconditions.checkArgument(
+        modification.type.equals(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST));
+
+    Planet planet = getPlanetWithColony(star, modification.colony_id);
+    if (planet != null) {
+      Colony.Builder colonyBuilder = planet.colony.newBuilder();
+      colonyBuilder.build_requests.add(new BuildRequest.Builder()
+          .design_type(modification.design_type)
+          .start_time(star.last_simulation)
+          .count(modification.count)
+          .progress(0.0f)
+          .build());
+      star.planets.set(planet.index, planet.newBuilder()
+          .colony(colonyBuilder.build())
+          .build());
+    }
+  }
+
+  @Nullable
+  private Planet getPlanetWithColony(Star.Builder star, long colonyId) {
     for (int i = 0; i < star.planets.size(); i++) {
       Planet planet = star.planets.get(i);
-      if (planet.colony != null && planet.colony.id.equals(modification.colony_id)) {
-        star.planets.set(i, planet.newBuilder()
-            .colony(planet.colony.newBuilder()
-                .focus(modification.focus)
-                .build())
-            .build());
+      if (planet.colony != null && planet.colony.id.equals(colonyId)) {
+        return planet;
       }
     }
+
+    return null;
   }
 }

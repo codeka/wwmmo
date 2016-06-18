@@ -138,8 +138,6 @@ public final class Star extends Message<Star, Star.Builder> {
   public final List<EmpireStorage> empire_stores;
 
   /**
-   * collection of BuildRequests for colonies in this star
-   *  repeated BuildRequest build_requests = 15;
    * List of fleets located in this star
    */
   @WireField(
@@ -396,8 +394,6 @@ public final class Star extends Message<Star, Star.Builder> {
     }
 
     /**
-     * collection of BuildRequests for colonies in this star
-     *  repeated BuildRequest build_requests = 15;
      * List of fleets located in this star
      */
     public Builder fleets(List<Fleet> fleets) {

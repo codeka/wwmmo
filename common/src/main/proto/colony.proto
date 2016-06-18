@@ -34,6 +34,9 @@ message Colony {
 
   // collection of buildings in this colony.
   repeated Building buildings = 11;
+
+  // List of current build requests.
+  repeated BuildRequest build_requests = 12;
 }
 
 // The "focus" of the colony. The values here should all add up to 1.0.
@@ -54,4 +57,21 @@ message Building {
 
   // Not as useful for buildings (compared to fleets, say), but notes the player can attach.
   optional string notes = 3;
+}
+
+// A build request is an in-progress build for the current colony.
+message BuildRequest {
+  // The type of the design being created.
+  optional Design.DesignType design_type = 1;
+
+  // The number of things being created. Required when building ships, otherwise ignored.
+  optional int32 count = 2;
+
+  // The start and end time of this build, in millis since epoch.
+  optional int64 start_time = 3;
+  optional int64 end_time = 4;
+
+  // The "progress" of the build, from 0 (just started) to 1.0 (complete). It's not always going to
+  // relate to start_time/end_time (due to lack of resources, changing focus etc).
+  optional float progress = 5;
 }

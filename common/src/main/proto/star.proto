@@ -78,9 +78,6 @@ message Star {
   // collection of EmpireStorages details the presences of the empire(s) in this solar system.
   repeated EmpireStorage empire_stores = 14;
 
-  // collection of BuildRequests for colonies in this star
-//  repeated BuildRequest build_requests = 15;
-
   // List of fleets located in this star
   repeated Fleet fleets = 16;
 
@@ -177,8 +174,13 @@ message StarModification {
     ADJUST_FOCUS = 2;
 
     // Create a new fleet, ignored if sent from client.
-    // empire_id, design_id and count are required.
+    // empire_id, design_type and count are required.
     CREATE_FLEET = 3;
+
+    // Add a build request, start building it.
+    // empire_id, colony_id, design_type are required.
+    // count is required for ship builds.
+    ADD_BUILD_REQUEST = 4;
   }
   optional MODIFICATION_TYPE type = 1;
 

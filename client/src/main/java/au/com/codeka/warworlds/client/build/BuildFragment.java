@@ -9,6 +9,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
@@ -32,10 +35,12 @@ import au.com.codeka.warworlds.client.world.EmpireManager;
 import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.client.world.StarManager;
 import au.com.codeka.warworlds.common.proto.Colony;
+import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.proto.StarModification;
 
 /**
  * Shows buildings and ships on a planet. You can swipe left/right to switch between your colonies
@@ -49,6 +54,9 @@ public class BuildFragment extends BaseFragment {
   private List<Colony> colonies;
   private Colony initialColony;
   private ColonyPagerAdapter colonyPagerAdapter;
+
+  /** The {@link Design} we're currently planning to build. */
+  @Nullable private Design currentDesign;
 
   private ViewPager viewPager;
   private ImageView planetIcon;
@@ -87,6 +95,13 @@ public class BuildFragment extends BaseFragment {
     buildIcon = (ImageView) view.findViewById(R.id.build_icon);
     buildName = (TextView) view.findViewById(R.id.build_name);
     buildDescription = (TextView) view.findViewById(R.id.build_description);
+
+    view.findViewById(R.id.build_button).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        build();
+      }
+    });
   }
 
   @Override
@@ -106,6 +121,8 @@ public class BuildFragment extends BaseFragment {
 
   /** Show the "build" popup sheet for the given {@link Design}. */
   public void showBuildSheet(Design design) {
+    currentDesign = design;
+
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -119,6 +136,21 @@ public class BuildFragment extends BaseFragment {
     bottomPane.getLayoutParams().height = (int) new DimensionResolver(getContext()).dp2px(30);
     buildName.setText("");
     buildIcon.setImageDrawable(null);
+  }
+
+  /** Start building the thing we currently have showing. */
+  public void build() {
+    if (currentDesign != null) {
+      Colony colony = colonies.get(viewPager.getCurrentItem());
+      StarManager.i.updateStar(star, new StarModification.Builder()
+          .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
+          .colony_id(colony.id)
+          .design_type(currentDesign.type)
+          .count(1)
+          .build());
+    }
+
+    getFragmentManager().popBackStack();
   }
 
   private final Object eventHandler = new Object() {

@@ -139,11 +139,21 @@ public final class Colony extends Message<Colony, Colony.Builder> {
   )
   public final List<Building> buildings;
 
-  public Colony(Long id, Long empire_id, Float population, ColonyFocus focus, Float delta_population, Float delta_goods, Float delta_minerals, Float delta_energy, Float defence_bonus, Long cooldown_end_time, List<Building> buildings) {
-    this(id, empire_id, population, focus, delta_population, delta_goods, delta_minerals, delta_energy, defence_bonus, cooldown_end_time, buildings, ByteString.EMPTY);
+  /**
+   * List of current build requests.
+   */
+  @WireField(
+      tag = 12,
+      adapter = "au.com.codeka.warworlds.common.proto.BuildRequest#ADAPTER",
+      label = WireField.Label.REPEATED
+  )
+  public final List<BuildRequest> build_requests;
+
+  public Colony(Long id, Long empire_id, Float population, ColonyFocus focus, Float delta_population, Float delta_goods, Float delta_minerals, Float delta_energy, Float defence_bonus, Long cooldown_end_time, List<Building> buildings, List<BuildRequest> build_requests) {
+    this(id, empire_id, population, focus, delta_population, delta_goods, delta_minerals, delta_energy, defence_bonus, cooldown_end_time, buildings, build_requests, ByteString.EMPTY);
   }
 
-  public Colony(Long id, Long empire_id, Float population, ColonyFocus focus, Float delta_population, Float delta_goods, Float delta_minerals, Float delta_energy, Float defence_bonus, Long cooldown_end_time, List<Building> buildings, ByteString unknownFields) {
+  public Colony(Long id, Long empire_id, Float population, ColonyFocus focus, Float delta_population, Float delta_goods, Float delta_minerals, Float delta_energy, Float defence_bonus, Long cooldown_end_time, List<Building> buildings, List<BuildRequest> build_requests, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
     this.id = id;
     this.empire_id = empire_id;
@@ -156,6 +166,7 @@ public final class Colony extends Message<Colony, Colony.Builder> {
     this.defence_bonus = defence_bonus;
     this.cooldown_end_time = cooldown_end_time;
     this.buildings = Internal.immutableCopyOf("buildings", buildings);
+    this.build_requests = Internal.immutableCopyOf("build_requests", build_requests);
   }
 
   @Override
@@ -172,6 +183,7 @@ public final class Colony extends Message<Colony, Colony.Builder> {
     builder.defence_bonus = defence_bonus;
     builder.cooldown_end_time = cooldown_end_time;
     builder.buildings = Internal.copyOf("buildings", buildings);
+    builder.build_requests = Internal.copyOf("build_requests", build_requests);
     builder.addUnknownFields(unknownFields());
     return builder;
   }
@@ -192,7 +204,8 @@ public final class Colony extends Message<Colony, Colony.Builder> {
         && Internal.equals(delta_energy, o.delta_energy)
         && Internal.equals(defence_bonus, o.defence_bonus)
         && Internal.equals(cooldown_end_time, o.cooldown_end_time)
-        && Internal.equals(buildings, o.buildings);
+        && Internal.equals(buildings, o.buildings)
+        && Internal.equals(build_requests, o.build_requests);
   }
 
   @Override
@@ -211,6 +224,7 @@ public final class Colony extends Message<Colony, Colony.Builder> {
       result = result * 37 + (defence_bonus != null ? defence_bonus.hashCode() : 0);
       result = result * 37 + (cooldown_end_time != null ? cooldown_end_time.hashCode() : 0);
       result = result * 37 + (buildings != null ? buildings.hashCode() : 1);
+      result = result * 37 + (build_requests != null ? build_requests.hashCode() : 1);
       super.hashCode = result;
     }
     return result;
@@ -230,6 +244,7 @@ public final class Colony extends Message<Colony, Colony.Builder> {
     if (defence_bonus != null) builder.append(", defence_bonus=").append(defence_bonus);
     if (cooldown_end_time != null) builder.append(", cooldown_end_time=").append(cooldown_end_time);
     if (buildings != null) builder.append(", buildings=").append(buildings);
+    if (build_requests != null) builder.append(", build_requests=").append(build_requests);
     return builder.replace(0, 2, "Colony{").append('}').toString();
   }
 
@@ -256,8 +271,11 @@ public final class Colony extends Message<Colony, Colony.Builder> {
 
     public List<Building> buildings;
 
+    public List<BuildRequest> build_requests;
+
     public Builder() {
       buildings = Internal.newMutableList();
+      build_requests = Internal.newMutableList();
     }
 
     /**
@@ -343,9 +361,18 @@ public final class Colony extends Message<Colony, Colony.Builder> {
       return this;
     }
 
+    /**
+     * List of current build requests.
+     */
+    public Builder build_requests(List<BuildRequest> build_requests) {
+      Internal.checkElementsNotNull(build_requests);
+      this.build_requests = build_requests;
+      return this;
+    }
+
     @Override
     public Colony build() {
-      return new Colony(id, empire_id, population, focus, delta_population, delta_goods, delta_minerals, delta_energy, defence_bonus, cooldown_end_time, buildings, buildUnknownFields());
+      return new Colony(id, empire_id, population, focus, delta_population, delta_goods, delta_minerals, delta_energy, defence_bonus, cooldown_end_time, buildings, build_requests, buildUnknownFields());
     }
   }
 
@@ -367,6 +394,7 @@ public final class Colony extends Message<Colony, Colony.Builder> {
           + (value.defence_bonus != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(9, value.defence_bonus) : 0)
           + (value.cooldown_end_time != null ? ProtoAdapter.INT64.encodedSizeWithTag(10, value.cooldown_end_time) : 0)
           + Building.ADAPTER.asRepeated().encodedSizeWithTag(11, value.buildings)
+          + BuildRequest.ADAPTER.asRepeated().encodedSizeWithTag(12, value.build_requests)
           + value.unknownFields().size();
     }
 
@@ -383,6 +411,7 @@ public final class Colony extends Message<Colony, Colony.Builder> {
       if (value.defence_bonus != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 9, value.defence_bonus);
       if (value.cooldown_end_time != null) ProtoAdapter.INT64.encodeWithTag(writer, 10, value.cooldown_end_time);
       if (value.buildings != null) Building.ADAPTER.asRepeated().encodeWithTag(writer, 11, value.buildings);
+      if (value.build_requests != null) BuildRequest.ADAPTER.asRepeated().encodeWithTag(writer, 12, value.build_requests);
       writer.writeBytes(value.unknownFields());
     }
 
@@ -403,6 +432,7 @@ public final class Colony extends Message<Colony, Colony.Builder> {
           case 9: builder.defence_bonus(ProtoAdapter.FLOAT.decode(reader)); break;
           case 10: builder.cooldown_end_time(ProtoAdapter.INT64.decode(reader)); break;
           case 11: builder.buildings.add(Building.ADAPTER.decode(reader)); break;
+          case 12: builder.build_requests.add(BuildRequest.ADAPTER.decode(reader)); break;
           default: {
             FieldEncoding fieldEncoding = reader.peekFieldEncoding();
             Object value = fieldEncoding.rawProtoAdapter().decode(reader);
@@ -419,6 +449,7 @@ public final class Colony extends Message<Colony, Colony.Builder> {
       Builder builder = value.newBuilder();
       if (builder.focus != null) builder.focus = ColonyFocus.ADAPTER.redact(builder.focus);
       Internal.redactElements(builder.buildings, Building.ADAPTER);
+      Internal.redactElements(builder.build_requests, BuildRequest.ADAPTER);
       builder.clearUnknownFields();
       return builder.build();
     }
