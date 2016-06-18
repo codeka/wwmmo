@@ -292,7 +292,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
           row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
               "<font color=\"#0c6476\">%s:</font> %d %%, %s left", verb,
               Math.round(buildRequest.progress * 100.0f),
-              /*TimeFormatter.create().format(buildRequest.getRemainingTime())*/ "1 hr")));
+              BuildHelper.formatTimeRemaining(buildRequest))));
 
           row3.setVisibility(View.GONE);
           progress.setVisibility(View.VISIBLE);

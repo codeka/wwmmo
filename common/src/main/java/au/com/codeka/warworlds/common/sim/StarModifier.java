@@ -166,6 +166,7 @@ public class StarModifier {
     if (planet != null) {
       Colony.Builder colonyBuilder = planet.colony.newBuilder();
       colonyBuilder.build_requests.add(new BuildRequest.Builder()
+          .id(identifierGenerator.nextIdentifier())
           .design_type(modification.design_type)
           .start_time(star.last_simulation)
           .count(modification.count)

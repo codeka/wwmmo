@@ -27,6 +27,8 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
 
   private static final long serialVersionUID = 0L;
 
+  public static final Long DEFAULT_ID = 0L;
+
   public static final Design.DesignType DEFAULT_DESIGN_TYPE = Design.DesignType.UNKNOWN_DESIGN;
 
   public static final Integer DEFAULT_COUNT = 0;
@@ -37,11 +39,17 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
 
   public static final Float DEFAULT_PROGRESS = 0.0f;
 
+  @WireField(
+      tag = 1,
+      adapter = "com.squareup.wire.ProtoAdapter#INT64"
+  )
+  public final Long id;
+
   /**
    * The type of the design being created.
    */
   @WireField(
-      tag = 1,
+      tag = 2,
       adapter = "au.com.codeka.warworlds.common.proto.Design$DesignType#ADAPTER"
   )
   public final Design.DesignType design_type;
@@ -50,7 +58,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
    * The number of things being created. Required when building ships, otherwise ignored.
    */
   @WireField(
-      tag = 2,
+      tag = 3,
       adapter = "com.squareup.wire.ProtoAdapter#INT32"
   )
   public final Integer count;
@@ -59,13 +67,13 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
    * The start and end time of this build, in millis since epoch.
    */
   @WireField(
-      tag = 3,
+      tag = 4,
       adapter = "com.squareup.wire.ProtoAdapter#INT64"
   )
   public final Long start_time;
 
   @WireField(
-      tag = 4,
+      tag = 5,
       adapter = "com.squareup.wire.ProtoAdapter#INT64"
   )
   public final Long end_time;
@@ -75,17 +83,18 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
    * relate to start_time/end_time (due to lack of resources, changing focus etc).
    */
   @WireField(
-      tag = 5,
+      tag = 6,
       adapter = "com.squareup.wire.ProtoAdapter#FLOAT"
   )
   public final Float progress;
 
-  public BuildRequest(Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress) {
-    this(design_type, count, start_time, end_time, progress, ByteString.EMPTY);
+  public BuildRequest(Long id, Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress) {
+    this(id, design_type, count, start_time, end_time, progress, ByteString.EMPTY);
   }
 
-  public BuildRequest(Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress, ByteString unknownFields) {
+  public BuildRequest(Long id, Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
+    this.id = id;
     this.design_type = design_type;
     this.count = count;
     this.start_time = start_time;
@@ -96,6 +105,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
   @Override
   public Builder newBuilder() {
     Builder builder = new Builder();
+    builder.id = id;
     builder.design_type = design_type;
     builder.count = count;
     builder.start_time = start_time;
@@ -111,6 +121,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     if (!(other instanceof BuildRequest)) return false;
     BuildRequest o = (BuildRequest) other;
     return Internal.equals(unknownFields(), o.unknownFields())
+        && Internal.equals(id, o.id)
         && Internal.equals(design_type, o.design_type)
         && Internal.equals(count, o.count)
         && Internal.equals(start_time, o.start_time)
@@ -123,6 +134,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     int result = super.hashCode;
     if (result == 0) {
       result = unknownFields().hashCode();
+      result = result * 37 + (id != null ? id.hashCode() : 0);
       result = result * 37 + (design_type != null ? design_type.hashCode() : 0);
       result = result * 37 + (count != null ? count.hashCode() : 0);
       result = result * 37 + (start_time != null ? start_time.hashCode() : 0);
@@ -136,6 +148,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
+    if (id != null) builder.append(", id=").append(id);
     if (design_type != null) builder.append(", design_type=").append(design_type);
     if (count != null) builder.append(", count=").append(count);
     if (start_time != null) builder.append(", start_time=").append(start_time);
@@ -145,6 +158,8 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
   }
 
   public static final class Builder extends Message.Builder<BuildRequest, Builder> {
+    public Long id;
+
     public Design.DesignType design_type;
 
     public Integer count;
@@ -156,6 +171,11 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     public Float progress;
 
     public Builder() {
+    }
+
+    public Builder id(Long id) {
+      this.id = id;
+      return this;
     }
 
     /**
@@ -198,7 +218,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
 
     @Override
     public BuildRequest build() {
-      return new BuildRequest(design_type, count, start_time, end_time, progress, buildUnknownFields());
+      return new BuildRequest(id, design_type, count, start_time, end_time, progress, buildUnknownFields());
     }
   }
 
@@ -209,21 +229,23 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
 
     @Override
     public int encodedSize(BuildRequest value) {
-      return (value.design_type != null ? Design.DesignType.ADAPTER.encodedSizeWithTag(1, value.design_type) : 0)
-          + (value.count != null ? ProtoAdapter.INT32.encodedSizeWithTag(2, value.count) : 0)
-          + (value.start_time != null ? ProtoAdapter.INT64.encodedSizeWithTag(3, value.start_time) : 0)
-          + (value.end_time != null ? ProtoAdapter.INT64.encodedSizeWithTag(4, value.end_time) : 0)
-          + (value.progress != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(5, value.progress) : 0)
+      return (value.id != null ? ProtoAdapter.INT64.encodedSizeWithTag(1, value.id) : 0)
+          + (value.design_type != null ? Design.DesignType.ADAPTER.encodedSizeWithTag(2, value.design_type) : 0)
+          + (value.count != null ? ProtoAdapter.INT32.encodedSizeWithTag(3, value.count) : 0)
+          + (value.start_time != null ? ProtoAdapter.INT64.encodedSizeWithTag(4, value.start_time) : 0)
+          + (value.end_time != null ? ProtoAdapter.INT64.encodedSizeWithTag(5, value.end_time) : 0)
+          + (value.progress != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(6, value.progress) : 0)
           + value.unknownFields().size();
     }
 
     @Override
     public void encode(ProtoWriter writer, BuildRequest value) throws IOException {
-      if (value.design_type != null) Design.DesignType.ADAPTER.encodeWithTag(writer, 1, value.design_type);
-      if (value.count != null) ProtoAdapter.INT32.encodeWithTag(writer, 2, value.count);
-      if (value.start_time != null) ProtoAdapter.INT64.encodeWithTag(writer, 3, value.start_time);
-      if (value.end_time != null) ProtoAdapter.INT64.encodeWithTag(writer, 4, value.end_time);
-      if (value.progress != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 5, value.progress);
+      if (value.id != null) ProtoAdapter.INT64.encodeWithTag(writer, 1, value.id);
+      if (value.design_type != null) Design.DesignType.ADAPTER.encodeWithTag(writer, 2, value.design_type);
+      if (value.count != null) ProtoAdapter.INT32.encodeWithTag(writer, 3, value.count);
+      if (value.start_time != null) ProtoAdapter.INT64.encodeWithTag(writer, 4, value.start_time);
+      if (value.end_time != null) ProtoAdapter.INT64.encodeWithTag(writer, 5, value.end_time);
+      if (value.progress != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 6, value.progress);
       writer.writeBytes(value.unknownFields());
     }
 
@@ -233,7 +255,8 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
       long token = reader.beginMessage();
       for (int tag; (tag = reader.nextTag()) != -1;) {
         switch (tag) {
-          case 1: {
+          case 1: builder.id(ProtoAdapter.INT64.decode(reader)); break;
+          case 2: {
             try {
               builder.design_type(Design.DesignType.ADAPTER.decode(reader));
             } catch (ProtoAdapter.EnumConstantNotFoundException e) {
@@ -241,10 +264,10 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
             }
             break;
           }
-          case 2: builder.count(ProtoAdapter.INT32.decode(reader)); break;
-          case 3: builder.start_time(ProtoAdapter.INT64.decode(reader)); break;
-          case 4: builder.end_time(ProtoAdapter.INT64.decode(reader)); break;
-          case 5: builder.progress(ProtoAdapter.FLOAT.decode(reader)); break;
+          case 3: builder.count(ProtoAdapter.INT32.decode(reader)); break;
+          case 4: builder.start_time(ProtoAdapter.INT64.decode(reader)); break;
+          case 5: builder.end_time(ProtoAdapter.INT64.decode(reader)); break;
+          case 6: builder.progress(ProtoAdapter.FLOAT.decode(reader)); break;
           default: {
             FieldEncoding fieldEncoding = reader.peekFieldEncoding();
             Object value = fieldEncoding.rawProtoAdapter().decode(reader);

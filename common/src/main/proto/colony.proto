@@ -61,17 +61,19 @@ message Building {
 
 // A build request is an in-progress build for the current colony.
 message BuildRequest {
+  optional int64 id = 1;
+
   // The type of the design being created.
-  optional Design.DesignType design_type = 1;
+  optional Design.DesignType design_type = 2;
 
   // The number of things being created. Required when building ships, otherwise ignored.
-  optional int32 count = 2;
+  optional int32 count = 3;
 
   // The start and end time of this build, in millis since epoch.
-  optional int64 start_time = 3;
-  optional int64 end_time = 4;
+  optional int64 start_time = 4;
+  optional int64 end_time = 5;
 
   // The "progress" of the build, from 0 (just started) to 1.0 (complete). It's not always going to
   // relate to start_time/end_time (due to lack of resources, changing focus etc).
-  optional float progress = 5;
+  optional float progress = 6;
 }

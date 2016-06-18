@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.common.sim;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -8,7 +9,9 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
+import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -61,7 +64,7 @@ public class Simulation {
 
     // figure out the start time, which is the oldest last_simulation time
     long startTime = getSimulateStartTime(star);
-    if (startTime >= trimTimeToStep(timeOverride)) {
+    if (startTime >= trimTimeToStep(timeOverride) && !predict) {
       log("Simulation already up-to-date, not simulating.");
       return;
     }
@@ -97,16 +100,30 @@ public class Simulation {
       now += STEP_TIME;
     }
 
-    if (predictionStar != null) {/*
+    if (predictionStar != null) {
       // copy the end times for builds from the prediction star
-      for (BaseBuildRequest starBuildRequest : star.getBuildRequests()) {
-        for (BaseBuildRequest predictedBuildRequest : predictionStar.getBuildRequests()) {
-          if (starBuildRequest.getKey().equals(predictedBuildRequest.getKey())) {
-            starBuildRequest.setEndTime(predictedBuildRequest.getEndTime());
-          }
+      for (int i = 0; i < star.planets.size(); i++) {
+        Planet predictionPlanet = predictionStar.planets.get(i);
+        Planet.Builder planet = star.planets.get(i).newBuilder();
+        if (planet.colony == null || predictionPlanet.colony == null
+            || planet.colony.build_requests == null
+            || predictionPlanet.colony.build_requests == null) {
+          continue;
         }
-      }
 
+        for (BuildRequest predictionBuildRequest : predictionPlanet.colony.build_requests) {
+          ArrayList<BuildRequest> buildRequests = new ArrayList<>();
+          for (int j = 0; j < planet.colony.build_requests.size(); j++) {
+            BuildRequest.Builder br = planet.colony.build_requests.get(j).newBuilder();
+            if (predictionBuildRequest.id.equals(br.id)) {
+              buildRequests.add(br.end_time(predictionBuildRequest.end_time).build());
+            }
+          }
+          planet.colony(planet.colony.newBuilder().build_requests(buildRequests).build());
+        }
+        star.planets.set(i, planet.build());
+      }
+/*
       // any fleets that *will be* destroyed, remember the time of their death
       for (BaseFleet fleet : star.getFleets()) {
         for (BaseFleet predictedFleet : predictionStar.getFleets()) {
@@ -228,7 +245,8 @@ public class Simulation {
       colony.delta_goods(goods);
       storage.total_goods(storage.total_goods + goods * dt);
       goodsDeltaPerHour += goods;
-      log("    Goods: [delta=%.2f / hr] [this turn=%.2f]", goods, goods * dt);
+      log("    Goods: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
+          storage.total_goods, goods, goods * dt);
 
       // calculate the output from mining this turn and add it to the star global
       float minerals =
@@ -236,7 +254,8 @@ public class Simulation {
       colony.delta_minerals(minerals);
       storage.total_minerals(storage.total_minerals + minerals * dt);
       mineralsDeltaPerHour += minerals;
-      log("    Minerals: [delta=%.2f / hr] [this turn=%.2f]", goods, goods * dt);
+      log("    Minerals: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
+          storage.total_minerals, minerals, minerals * dt);
 
       // calculate the output from energy this turn and add it to the star global
       float enegry =
@@ -244,37 +263,38 @@ public class Simulation {
       colony.delta_energy(enegry);
       storage.total_energy(storage.total_energy + enegry * dt);
       energyDeltaPerHour += enegry;
-      log("    Minerals: [delta=%.2f / hr] [this turn=%.2f]", goods, goods * dt);
+      log("    Energy: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
+          storage.total_energy, enegry, enegry * dt);
 
       totalPopulation += colony.population;
 
       star.planets.set(i, planet.newBuilder().colony(colony.build()).build());
     }
 
-    // A second loop though the colonies, once the goods/minerals have been calculated. This way,
-    // goods minerals are shared between colonies
-    /*for (BaseColony colony : star.getColonies()) {
-      if (!equalEmpireKey(colony.getEmpireKey(), empireKey)) {
+    // A second loop though the colonies, once the goods/minerals have been calculated.
+    for (int i = 0; i < star.planets.size(); i++) {
+      Planet.Builder planet = star.planets.get(i).newBuilder();
+      if (planet.colony == null) {
         continue;
       }
-
-      ArrayList<BaseBuildRequest> buildRequests = new ArrayList<BaseBuildRequest>();
-      for (BaseBuildRequest br : star.getBuildRequests()) {
-        if (br.getColonyKey().equals(colony.getKey())) {
-          buildRequests.add(br);
-        }
+      Colony.Builder colony = planet.colony.newBuilder();
+      if (!equalEmpire(colony.empire_id, empireId)) {
+        continue;
+      }
+      if (colony.build_requests == null || colony.build_requests.isEmpty()) {
+        continue;
       }
 
       // not all build requests will be processed this turn. We divide up the population
       // based on the number of ACTUAL build requests they'll be working on this turn
       int numValidBuildRequests = 0;
-      for (BaseBuildRequest br : buildRequests) {
-        if (br.getStartTime().compareTo(now.plus(dt)) > 0) {
+      for (BuildRequest br : colony.build_requests) {
+        if (br.start_time > now) {
           continue;
         }
 
-        // the end_time will be accurate, since it'll have been updated last step
-        if (br.getEndTime().compareTo(now) < 0 && br.getEndTime().compareTo(year2k) > 0) {
+        // the end_time should be accurate, since it'll have been updated last step
+        if (br.end_time != null && br.end_time < now) {
           continue;
         }
 
@@ -284,126 +304,97 @@ public class Simulation {
 
       // If we have pending build requests, we'll have to update them as well
       if (numValidBuildRequests > 0) {
-        float totalWorkers = colony.getPopulation() * colony.getConstructionFocus();
+        float totalWorkers = colony.population * colony.focus.construction;
         float workersPerBuildRequest = totalWorkers / numValidBuildRequests;
-        log(String.format("--- Building [buildRequests=%d] [planetIndex=%d] [totalWorker=%.2f]",
-            numValidBuildRequests, colony.getPlanetIndex(), totalWorkers));
+        float mineralsPerBuildRequest = storage.total_minerals / numValidBuildRequests;
+
+        log("--- Building [buildRequests=%d] [planetIndex=%d] [totalWorker=%.2f] [totalMinerals=%.2f]",
+            numValidBuildRequests, planet.index, totalWorkers, storage.total_minerals);
 
         // OK, we can spare at least ONE population
         if (workersPerBuildRequest < 1.0f) {
           workersPerBuildRequest = 1.0f;
         }
 
-        // divide the minerals up per build request, so they each get a share. I'm not sure
-        // if we should portion minerals out by how 'big' the build request is, but we'll
-        // see how this goes initially
-        float mineralsPerBuildRequest = totalMinerals / numValidBuildRequests;
+        ArrayList<BuildRequest> completeBuildRequests = new ArrayList<>();
+        for (int j = 0; j < colony.build_requests.size(); j++) {
+          BuildRequest.Builder br = colony.build_requests.get(j).newBuilder();
+          Design design = DesignHelper.getDesign(br.design_type);
 
-        for (BaseBuildRequest br : buildRequests) {
-          Design design = BaseDesignManager.i.getDesign(br.getDesignKind(), br.getDesignID());
-          log(String.format("---- Building [design=%s %s] [count=%d]",
-              br.getDesignKind(), br.getDesignID(), br.getCount()));
-
-          DateTime startTime = br.getStartTime();
-          if (startTime.compareTo(now.plus(dt)) > 0) {
+          long startTime = br.start_time;
+          if (startTime > now) {
+            completeBuildRequests.add(br.build());
             continue;
           }
 
           // the build cost is defined by the original design, or possibly by the upgrade if that
           // is what it is.
-          Design.BuildCost buildCost = design.getBuildCost();
-          if (br.mExistingFleetID != null) {
-            ShipDesign shipDesign = (ShipDesign) design;
-            ShipDesign.Upgrade upgrade = shipDesign.getUpgrade(br.getUpgradeID());
-            buildCost = upgrade.getBuildCost();
-          }
+          Design.BuildCost buildCost = design.build_cost;
+          //if (br.mExistingFleetID != null) {
+          //  ShipDesign shipDesign = (ShipDesign) design;
+          //  ShipDesign.Upgrade upgrade = shipDesign.getUpgrade(br.getUpgradeID());
+          //  buildCost = upgrade.getBuildCost();
+          //}
 
-          // So the build time the design specifies is the time to build the structure with
-          // 100 workers available. Double the workers and you halve the build time. Halve
-          // the workers and you double the build time.
-          float totalBuildTimeInHours = (float)(br.getCount() * (double) buildCost.getTimeInSeconds() / 3600.0);
-          totalBuildTimeInHours *= (100.0 / workersPerBuildRequest);
+          log("---- Building [design=%s %s] [count=%d] cost [workers=%d] [minerals=%d]",
+              design.design_kind, design.type, br.count, buildCost.population, buildCost.minerals);
 
-          // the number of hours of work required, assuming we have all the minerals we need
-          float timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
-          if (timeRemainingInHours < (10.0f / 3600.0f)) {
-            // if there's less than 10 seconds to go, just say it's done now.
-            timeRemainingInHours = 0.0f;
-          }
-          log(String.format("     Time [total=%.2f hrs] [remaining=%.2f hrs]",
-              totalBuildTimeInHours, timeRemainingInHours));
+          // The total amount of time to build something is based on the number of workers it
+          // requires, if you have the right number of workers and the right amount of minerals,
+          // you can finish the build in one turn. We require whatever fraction of progress is left
+          // of both minerals and workers.
+          float totalWorkersRequired = buildCost.population * (1.0f - br.progress);
+          float totalMineralsRequired = buildCost.minerals * (1.0f - br.progress);
+          log("     Required: [population=%.2f] [minerals=%.2f]",
+              totalWorkersRequired, totalMineralsRequired);
 
-          float dtUsed = dtInHours;
-          if (startTime.isAfter(now)) {
-            Duration startOffset = new Interval(now, startTime).toDuration();
-            dtUsed -= startOffset.getMillis() / (1000.0f * 3600.0f);
-          }
-          if (dtUsed > timeRemainingInHours) {
-            dtUsed = timeRemainingInHours;
-          }
+          // The amount of work we can do this turn is the minimum of whatever resources we have
+          // available allows.
+          float progressThisTurn = Math.min(
+              workersPerBuildRequest / totalWorkersRequired,
+              mineralsPerBuildRequest / totalMineralsRequired);
+          log("     Progress: [this turn=%.4f] [total=%.4f]",
+              progressThisTurn, br.progress + progressThisTurn);
 
           // what is the current amount of time we have now as a percentage of the total build
           // time?
-          float progressThisTurn = dtUsed / totalBuildTimeInHours;
-          log(String.format("Progress this turn: %f", progressThisTurn));
-          if (progressThisTurn <= 0) {
-            DateTime endTime;
-            timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
-            if (timeRemainingInHours < (10.0f / 3600.0f)) {
-              endTime = now;
-            } else {
-              endTime = now.plus((long)(timeRemainingInHours * 3600.0f * 1000.0f));
-            }
-            if (br.getEndTime().compareTo(endTime) > 0) {
-              br.setEndTime(endTime);
-            }
-            log("    Finished this turn.");
+          if (progressThisTurn + br.progress >= 1.0f) {
+            // OK, we've finished!
+            log("     FINISHED!");
+            br.progress(1.0f);
+            br.end_time(now);
+            completeBuildRequests.add(br.build());
             continue;
           }
 
-          // work out how many minerals we require for this turn
-          float mineralsRequired = br.getCount() * buildCost.getCostInMinerals() * progressThisTurn;
-          log(String.format("Cost in minerals: %f", mineralsRequired));
-          if (mineralsRequired > mineralsPerBuildRequest) {
-            // if we don't have enough minerals, we'll just do a percentage of the work
-            // this turn
-            totalMinerals -= mineralsPerBuildRequest;
-            float percentMineralsAvailable = mineralsPerBuildRequest / mineralsRequired;
-            br.setProgress(br.getProgress(false) + (progressThisTurn * percentMineralsAvailable));
-            log(String.format("     Progress %.4f%% + %.4f%% (this turn, adjusted - %.4f%% originally) ",
-                br.getProgress(false) * 100.0f,
-                progressThisTurn * percentMineralsAvailable * 100.0f,
-                progressThisTurn * 100.0f));
-          } else {
-            // awesome, we have enough minerals so we can make some progress. We'll start by
-            // removing the minerals we need from the global pool...
-            totalMinerals -= mineralsRequired;
-            br.setProgress(br.getProgress(false) + progressThisTurn);
-            log(String.format("     Progress %.4f%% + %.4f%% (this turn)",
-                br.getProgress(false) * 100.0f, progressThisTurn * 100.0f));
-          }
-          mineralsDeltaPerHour -= mineralsRequired / dtInHours;
-          log(String.format("     Minerals [required=%.2f] [available=%.2f] [available per build=%.2f]",
-              mineralsRequired, totalMinerals, mineralsPerBuildRequest));
+          // work hasn't finished yet, so lets estimate how long it will take now
+          float remainingWorkersRequired =
+              buildCost.population * (1.0f - br.progress - progressThisTurn);
+          float remainingMineralsRequired =
+              buildCost.minerals * (1.0f - br.progress - progressThisTurn);
 
-          // adjust the end_time for this turn
-          timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
-          if (timeRemainingInHours > 100000) {
-            // this is waaaaaay too long! it's basically never going to finish, but cap it to
-            // avoid overflow errors.
-            timeRemainingInHours = 100000;
-          }
-          DateTime endTime = now.plus((long)(dtUsed * 1000 * 3600) + (long)(timeRemainingInHours * 1000 * 3600));
-          br.setEndTime(endTime);
-          log(String.format("     End Time: %s (%.2f hrs)", endTime, Seconds.secondsBetween(now, endTime).getSeconds() / 3600.0f));
+          float mineralsUsedThisTurn = totalMineralsRequired - remainingMineralsRequired;
+          storage.total_minerals(storage.total_minerals - mineralsUsedThisTurn);
+          mineralsDeltaPerHour -= mineralsUsedThisTurn;
+          log("     Used: [minerals=%.2f]", mineralsUsedThisTurn);
 
-          if (br.getProgress(false) >= 1.0f) {
-            // if we've finished this turn, just set progress
-            br.setProgress(1.0f);
-          }
+          float timeForMineralsHours =
+              remainingMineralsRequired / mineralsUsedThisTurn / (Time.HOUR / STEP_TIME);
+          float timeForPopulationHours =
+              remainingWorkersRequired / workersPerBuildRequest / (Time.HOUR / STEP_TIME);
+          log("     Remaining: [minerals=%.2f hrs] [population=%.2f hrs]",
+              timeForMineralsHours, timeForPopulationHours);
+          br.end_time(now +
+              Math.round(Math.max(timeForMineralsHours, timeForPopulationHours)) * Time.HOUR);
+          br.progress(br.progress + progressThisTurn);
+
+          completeBuildRequests.add(br.build());
         }
+
+        star.planets.set(i, planet.colony(
+            colony.build_requests(completeBuildRequests).build()).build());
       }
-    }*/
+    }
 
     // Finally, update the population. The first thing we need to do is evenly distribute goods
     // between all of the colonies.

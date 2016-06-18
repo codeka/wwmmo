@@ -31,9 +31,10 @@ public class AjaxSimulateHandler extends AjaxHandler {
         logMessages.append("\n");
       }
     }).simulate(starBuilder);
-    resp.simulateTime = (System.nanoTime() - startTime) / 1000000L;
+    long simulateTime = System.nanoTime();
+    resp.simulateTime = (simulateTime - startTime) / 1000000L;
     star.set(starBuilder.build());
-    resp.saveTime = (System.nanoTime() - startTime) / 1000000L;
+    resp.saveTime = (System.nanoTime() - simulateTime) / 1000000L;
     resp.logMessages = logMessages.toString();
 
     setResponseGson(resp);
