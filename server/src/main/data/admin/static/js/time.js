@@ -1,6 +1,6 @@
 // update all <time> elements on the page to be in local time, rather than UTC
 function fix_times() {
-  function zero_pad(n) {
+  function zeroPad(n) {
     n = "00"+n;
     return n.substr(n.length - 2);
   }
@@ -22,30 +22,36 @@ function fix_times() {
       hours -= 12;
     }
 
-    var dtstr = dt.getDate()+" "+month_names[dt.getMonth()]+" "+dt.getFullYear()+" "+zero_pad(hours)+":"+zero_pad(dt.getMinutes())+" "+ampm;
+    var dtstr = dt.getDate() + " " + month_names[dt.getMonth()] + " " + dt.getFullYear() +
+        " " + zeroPad(hours) + ":" + zeroPad(dt.getMinutes()) + " " + ampm;
+    var timestr = zeroPad(hours) + ":" + zeroPad(dt.getMinutes()) + " " + ampm;
 
     var now = new Date();
-    var seconds = (now.getTime() - dt.getTime()) / 1000.0;
-    if (seconds < (5 * 60)) {
-      // less than five minutes ago
+    if (Math.abs(now.getTime() - dt.getTime()) < 5000.0) {
+      // less than 5 seconds
       $(this).html("Just now")
              .attr("title", dtstr);
-    } else {
-      var dtDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
-      var nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      var timestr = zero_pad(hours)+":"+zero_pad(dt.getMinutes())+" "+ampm;
-      var days = (nowDate.getTime() - dtDate.getTime()) / (1000 * 60 * 60 * 24);
-      if (days < 1) {
-        $(this).html("Today, "+timestr)
-               .attr("title", dtstr);
-      } else if (days < 2) {
+      return;
+    }
+
+    var dtDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+    var nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var days = (nowDate.getTime() - dtDate.getTime()) / (1000 * 60 * 60 * 24);
+    if (Math.abs(days) < 1) {
+      $(this).html("Today, " + timestr)
+             .attr("title", dtstr);
+    } else if (Math.abs(days) < 2) {
+      if (days < 0) {
         $(this).html("Yesterday, "+timestr)
                .attr("title", dtstr);
       } else {
-        $(this).html(dtstr);
+        $(this).html("Tomorrow, "+timestr)
+               .attr("title", dtstr);
       }
+    } else {
+      $(this).html(dtstr);
     }
-  });
+   });
 }
 
 $(function() {

@@ -58,7 +58,18 @@
                     <div><img src="/admin/img/focus/energy.png" width="16" height="16"> <%= Math.round(planets[i].colony.focus.energy * 100) %>%</div>
                     <div><img src="/admin/img/focus/construction.png" width="16" height="16"> <%= Math.round(planets[i].colony.focus.construction * 100) %>%</div>
                   </td>
-                  <td><i>None</i></td>
+                  <td>
+                    <% for (var j in planets[i].colony.buildings) { %>
+                    <div class="building-entry">
+                      <% var design = Designs.get(planets[i].colony.buildings[j].design_type); %>
+                      <img src="/admin/img/sprites/<%= design.image_url %>" />
+                      <div><%= design.display_name %> lvl <%= planets[i].colony.buildings[j].level %></div>
+                    </div>
+                    <% } %>
+                    <% if (planets[i].colony.buildings == null || planets[i].colony.buildings.length == 0) { %>
+                    <i>None</i>
+                    <% } %>
+                  </td>
                   <td>
                     <% for (var j in planets[i].colony.build_requests) { %>
                       <div class="build-queue-entry">

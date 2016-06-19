@@ -181,6 +181,10 @@ message StarModification {
     // empire_id, colony_id, design_type are required.
     // count is required for ship builds.
     ADD_BUILD_REQUEST = 4;
+
+    // Create a new building, ignored if sent from client.
+    // empire_id, colony_id, design_type are required.
+    CREATE_BUILDING = 5;
   }
   optional MODIFICATION_TYPE type = 1;
 

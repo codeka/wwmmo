@@ -33,7 +33,7 @@ public class AjaxSimulateHandler extends AjaxHandler {
     }).simulate(starBuilder);
     long simulateTime = System.nanoTime();
     resp.simulateTime = (simulateTime - startTime) / 1000000L;
-    star.set(starBuilder.build());
+    StarManager.i.completeActions(star, starBuilder);
     resp.saveTime = (System.nanoTime() - simulateTime) / 1000000L;
     resp.logMessages = logMessages.toString();
 

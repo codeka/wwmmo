@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
+import au.com.codeka.warworlds.common.proto.Building;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Design;
@@ -55,6 +56,9 @@ public class StarModifier {
       case CREATE_FLEET:
         applyCreateFleet(star, modification);
         return;
+      case CREATE_BUILDING:
+        applyCreateBuilding(star, modification);
+        break;
       case ADJUST_FOCUS:
         applyAdjustFocus(star, modification);
         return;
@@ -131,7 +135,6 @@ public class StarModifier {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.CREATE_FLEET));
 
-    // TODO: simulate star
     star.fleets.add(new Fleet.Builder()
         //TODO: .alliance_id()
         .design_type(modification.design_type)
@@ -142,6 +145,23 @@ public class StarModifier {
         .state(Fleet.FLEET_STATE.IDLE)
         .state_start_time(System.currentTimeMillis())
         .build());
+  }
+
+  private void applyCreateBuilding(Star.Builder star, StarModification modification) {
+    Preconditions.checkArgument(
+        modification.type.equals(StarModification.MODIFICATION_TYPE.CREATE_BUILDING));
+
+    Planet planet = getPlanetWithColony(star, modification.colony_id);
+    if (planet != null) {
+      Colony.Builder colony = planet.colony.newBuilder();
+      colony.buildings.add(new Building.Builder()
+          .design_type(modification.design_type)
+          .level(1)
+          .build());
+      star.planets.set(planet.index, planet.newBuilder()
+          .colony(colony.build())
+          .build());
+    }
   }
 
   private void applyAdjustFocus(Star.Builder star, StarModification modification) {

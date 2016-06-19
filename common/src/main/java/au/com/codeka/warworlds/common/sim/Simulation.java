@@ -54,8 +54,9 @@ public class Simulation {
    * Simulate the given star, and make sure it's "current".
    *
    * @param star The {@link Star.Builder} of the star to simulate. We modify the builder in-place
-   *             with the new values.
+   *     with the new values.
    */
+  @Nullable
   public void simulate(Star.Builder star) {
     if (logHandler != null) {
       logHandler.setStarName(star.name);
@@ -310,9 +311,7 @@ public class Simulation {
         if (br.start_time > now) {
           continue;
         }
-
-        // the end_time should be accurate, since it'll have been updated last step
-        if (br.end_time != null && br.end_time < now) {
+        if (br.progress >= 1.0f) {
           continue;
         }
 
@@ -380,7 +379,7 @@ public class Simulation {
             // OK, we've finished!
             log("     FINISHED!");
             br.progress(1.0f);
-            br.end_time(now);
+            br.end_time(now + STEP_TIME);
             completeBuildRequests.add(br.build());
             continue;
           }

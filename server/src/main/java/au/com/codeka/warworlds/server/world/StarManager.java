@@ -2,10 +2,18 @@ package au.com.codeka.warworlds.server.world;
 
 import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.BuildRequest;
+import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.StarModifier;
@@ -59,6 +67,43 @@ public class StarManager {
       }
       star.set(starBuilder.build());
     }
+  }
+
+  /**
+   * Call this after simulating a star to complete the actions required (e.g. if a building has
+   * finished or a fleet has arrived) and also save the star to the data store.
+   *
+   * @param star The {@link WatchableObject<Star>} of the star that we'll update.
+   * @param starBuilder A simulated star that we need to finish up.
+   */
+  public void completeActions(WatchableObject<Star> star, Star.Builder starBuilder) {
+    // Any builds which have finished, we'll want to remove them and add modifications for them
+    // instead.
+    for (int i = 0; i < starBuilder.planets.size(); i++) {
+      Planet.Builder planet = starBuilder.planets.get(i).newBuilder();
+      if (planet.colony == null || planet.colony.build_requests == null) {
+        continue;
+      }
+
+      ArrayList<BuildRequest> remainingBuildRequests = new ArrayList<>();
+      for (BuildRequest br : planet.colony.build_requests) {
+        if (br.progress >= 1.0f) {
+          starModifier.modifyStar(starBuilder, new StarModification.Builder()
+              .type(StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
+              .colony_id(planet.colony.id)
+              .design_type(br.design_type)
+              .build_request_id(br.id)
+              .build());
+          // TODO: add a sitrep as well
+        } else {
+          remainingBuildRequests.add(br);
+        }
+      }
+      planet.colony(planet.colony.newBuilder().build_requests(remainingBuildRequests).build());
+      starBuilder.planets.set(i, planet.build());
+    }
+
+    star.set(starBuilder.build());
   }
 
   private final WatchableObject.Watcher<Star> starWatcher = new WatchableObject.Watcher<Star>() {
