@@ -13,9 +13,11 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
+import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.sim.StarModifier;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.ProtobufStore;
@@ -88,12 +90,21 @@ public class StarManager {
       ArrayList<BuildRequest> remainingBuildRequests = new ArrayList<>();
       for (BuildRequest br : planet.colony.build_requests) {
         if (br.progress >= 1.0f) {
-          starModifier.modifyStar(starBuilder, new StarModification.Builder()
-              .type(StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
-              .colony_id(planet.colony.id)
-              .design_type(br.design_type)
-              .build_request_id(br.id)
-              .build());
+          Design design = DesignHelper.getDesign(br.design_type);
+          if (design.design_kind == Design.DesignKind.BUILDING) {
+            starModifier.modifyStar(starBuilder, new StarModification.Builder()
+                .type(StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
+                .colony_id(planet.colony.id)
+                .design_type(br.design_type)
+                .build_request_id(br.id)
+                .build());
+          } else {
+            starModifier.modifyStar(starBuilder, new StarModification.Builder()
+                .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+                .design_type(br.design_type)
+                .count(br.count)
+                .build());
+          }
           // TODO: add a sitrep as well
         } else {
           remainingBuildRequests.add(br);
