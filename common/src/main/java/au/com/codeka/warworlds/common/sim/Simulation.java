@@ -339,7 +339,7 @@ public class Simulation {
           Design design = DesignHelper.getDesign(br.design_type);
 
           long startTime = br.start_time;
-          if (startTime > now) {
+          if (startTime > now || br.progress >= 1.0f) {
             completeBuildRequests.add(br.build());
             continue;
           }
