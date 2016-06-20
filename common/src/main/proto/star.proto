@@ -88,6 +88,10 @@ message Star {
   // Time, that this star was last simulated
   optional int64 last_simulation = 18;
 
+  // Time that this star should be simulated again (e.g. to make sure a build is completed or a
+  // fleet arrives, etc).
+  optional int64 next_simulation = 19;
+
   // These are extra details stored with the star that define the properties needed by wormholes.
   message Wormhole {
     optional int64 dest_star_id = 1;

@@ -5,12 +5,12 @@ import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
+import com.sleepycat.je.Transaction;
 
 import java.io.File;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /** Wraps our reference to MapDB's data store objects. */
@@ -23,6 +23,7 @@ public class DataStore {
   private ProtobufStore<Empire> empires;
   private SectorsStore sectors;
   private ProtobufStore<Star> stars;
+  private StarQueueSecondaryStore starsQueue;
   private UniqueNameStore uniqueEmpireNames;
 
   private DataStore() {
@@ -44,6 +45,7 @@ public class DataStore {
 
       db = env.openDatabase(null, "stars", dbConfig);
       stars = new ProtobufStore<>(db, Star.class);
+      starsQueue = new StarQueueSecondaryStore(env, db, stars);
 
       db = env.openDatabase(null, "sectors", dbConfig);
       sectors = new SectorsStore(db, stars);
@@ -63,6 +65,10 @@ public class DataStore {
     env.close();
   }
 
+  public Transaction beginTransaction() {
+    return env.beginTransaction(null, null);
+  }
+
   public AccountsStore accounts() {
     return accounts;
   }
@@ -78,6 +84,8 @@ public class DataStore {
   public ProtobufStore<Star> stars() {
     return stars;
   }
+
+  public StarQueueSecondaryStore starsQueue() { return starsQueue; }
 
   public UniqueNameStore uniqueEmpireNames() {
     return uniqueEmpireNames;

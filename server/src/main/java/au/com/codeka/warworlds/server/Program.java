@@ -19,6 +19,7 @@ import au.com.codeka.warworlds.server.admin.AdminServlet;
 import au.com.codeka.warworlds.server.render.RendererServlet;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.websock.GameWebSocketServlet;
+import au.com.codeka.warworlds.server.world.StarSimulatorQueue;
 
 public class Program {
   private static final Log log = new Log("Runner");
@@ -57,31 +58,29 @@ public class Program {
   }
 
   private static void gameMain() throws Exception {
-    //EventProcessor.i.ping();
+    StarSimulatorQueue.i.start();
+    try {
+      int port = 8080;//Configuration.i.getListenPort();
 
-    //StarSimulatorThreadManager starSimulatorThreadManager = new StarSimulatorThreadManager();
-    //starSimulatorThreadManager.start();
+      Server server = new Server();
+      ServerConnector connector = new ServerConnector(server);
+      connector.setPort(port);
+      server.addConnector(connector);
 
-    int port = 8080;//Configuration.i.getListenPort();
+      ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+      context.setContextPath("/");
+      server.setHandler(context);
 
-    Server server = new Server();
-    ServerConnector connector = new ServerConnector(server);
-    connector.setPort(port);
-    server.addConnector(connector);
+      context.addServlet(new ServletHolder(GameWebSocketServlet.class), "/conn");
+      context.addServlet(new ServletHolder(AccountsServlet.class), "/accounts");
+      context.addServlet(new ServletHolder(RendererServlet.class), "/render/*");
+      context.addServlet(new ServletHolder(AdminServlet.class), "/admin/*");
 
-    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-    context.setContextPath("/");
-    server.setHandler(context);
-
-    context.addServlet(new ServletHolder(GameWebSocketServlet.class), "/conn");
-    context.addServlet(new ServletHolder(AccountsServlet.class), "/accounts");
-    context.addServlet(new ServletHolder(RendererServlet.class), "/render/*");
-    context.addServlet(new ServletHolder(AdminServlet.class), "/admin/*");
-
-    server.start();
-    log.info("Server started on http://localhost:%d/", port);
-    server.join();
-
-    //starSimulatorThreadManager.stop();
+      server.start();
+      log.info("Server started on http://localhost:%d/", port);
+      server.join();
+    } finally {
+      StarSimulatorQueue.i.stop();
+    }
   }
 }

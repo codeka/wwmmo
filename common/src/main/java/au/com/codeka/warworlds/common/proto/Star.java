@@ -50,6 +50,8 @@ public final class Star extends Message<Star, Star.Builder> {
 
   public static final Long DEFAULT_LAST_SIMULATION = 0L;
 
+  public static final Long DEFAULT_NEXT_SIMULATION = 0L;
+
   /**
    * the identifier of the star, unique throughout the universe.
    */
@@ -166,17 +168,27 @@ public final class Star extends Message<Star, Star.Builder> {
   )
   public final Long last_simulation;
 
+  /**
+   * Time that this star should be simulated again (e.g. to make sure a build is completed or a
+   * fleet arrives, etc).
+   */
+  @WireField(
+      tag = 19,
+      adapter = "com.squareup.wire.ProtoAdapter#INT64"
+  )
+  public final Long next_simulation;
+
   @WireField(
       tag = 20,
       adapter = "au.com.codeka.warworlds.common.proto.Star$Wormhole#ADAPTER"
   )
   public final Wormhole wormhole;
 
-  public Star(Long id, Long sector_x, Long sector_y, String name, CLASSIFICATION classification, Integer size, Integer offset_x, Integer offset_y, List<Planet> planets, List<EmpireStorage> empire_stores, List<Fleet> fleets, Long time_emptied, Long last_simulation, Wormhole wormhole) {
-    this(id, sector_x, sector_y, name, classification, size, offset_x, offset_y, planets, empire_stores, fleets, time_emptied, last_simulation, wormhole, ByteString.EMPTY);
+  public Star(Long id, Long sector_x, Long sector_y, String name, CLASSIFICATION classification, Integer size, Integer offset_x, Integer offset_y, List<Planet> planets, List<EmpireStorage> empire_stores, List<Fleet> fleets, Long time_emptied, Long last_simulation, Long next_simulation, Wormhole wormhole) {
+    this(id, sector_x, sector_y, name, classification, size, offset_x, offset_y, planets, empire_stores, fleets, time_emptied, last_simulation, next_simulation, wormhole, ByteString.EMPTY);
   }
 
-  public Star(Long id, Long sector_x, Long sector_y, String name, CLASSIFICATION classification, Integer size, Integer offset_x, Integer offset_y, List<Planet> planets, List<EmpireStorage> empire_stores, List<Fleet> fleets, Long time_emptied, Long last_simulation, Wormhole wormhole, ByteString unknownFields) {
+  public Star(Long id, Long sector_x, Long sector_y, String name, CLASSIFICATION classification, Integer size, Integer offset_x, Integer offset_y, List<Planet> planets, List<EmpireStorage> empire_stores, List<Fleet> fleets, Long time_emptied, Long last_simulation, Long next_simulation, Wormhole wormhole, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
     this.id = id;
     this.sector_x = sector_x;
@@ -191,6 +203,7 @@ public final class Star extends Message<Star, Star.Builder> {
     this.fleets = Internal.immutableCopyOf("fleets", fleets);
     this.time_emptied = time_emptied;
     this.last_simulation = last_simulation;
+    this.next_simulation = next_simulation;
     this.wormhole = wormhole;
   }
 
@@ -210,6 +223,7 @@ public final class Star extends Message<Star, Star.Builder> {
     builder.fleets = Internal.copyOf("fleets", fleets);
     builder.time_emptied = time_emptied;
     builder.last_simulation = last_simulation;
+    builder.next_simulation = next_simulation;
     builder.wormhole = wormhole;
     builder.addUnknownFields(unknownFields());
     return builder;
@@ -234,6 +248,7 @@ public final class Star extends Message<Star, Star.Builder> {
         && Internal.equals(fleets, o.fleets)
         && Internal.equals(time_emptied, o.time_emptied)
         && Internal.equals(last_simulation, o.last_simulation)
+        && Internal.equals(next_simulation, o.next_simulation)
         && Internal.equals(wormhole, o.wormhole);
   }
 
@@ -255,6 +270,7 @@ public final class Star extends Message<Star, Star.Builder> {
       result = result * 37 + (fleets != null ? fleets.hashCode() : 1);
       result = result * 37 + (time_emptied != null ? time_emptied.hashCode() : 0);
       result = result * 37 + (last_simulation != null ? last_simulation.hashCode() : 0);
+      result = result * 37 + (next_simulation != null ? next_simulation.hashCode() : 0);
       result = result * 37 + (wormhole != null ? wormhole.hashCode() : 0);
       super.hashCode = result;
     }
@@ -277,6 +293,7 @@ public final class Star extends Message<Star, Star.Builder> {
     if (fleets != null) builder.append(", fleets=").append(fleets);
     if (time_emptied != null) builder.append(", time_emptied=").append(time_emptied);
     if (last_simulation != null) builder.append(", last_simulation=").append(last_simulation);
+    if (next_simulation != null) builder.append(", next_simulation=").append(next_simulation);
     if (wormhole != null) builder.append(", wormhole=").append(wormhole);
     return builder.replace(0, 2, "Star{").append('}').toString();
   }
@@ -307,6 +324,8 @@ public final class Star extends Message<Star, Star.Builder> {
     public Long time_emptied;
 
     public Long last_simulation;
+
+    public Long next_simulation;
 
     public Wormhole wormhole;
 
@@ -419,6 +438,15 @@ public final class Star extends Message<Star, Star.Builder> {
       return this;
     }
 
+    /**
+     * Time that this star should be simulated again (e.g. to make sure a build is completed or a
+     * fleet arrives, etc).
+     */
+    public Builder next_simulation(Long next_simulation) {
+      this.next_simulation = next_simulation;
+      return this;
+    }
+
     public Builder wormhole(Wormhole wormhole) {
       this.wormhole = wormhole;
       return this;
@@ -426,7 +454,7 @@ public final class Star extends Message<Star, Star.Builder> {
 
     @Override
     public Star build() {
-      return new Star(id, sector_x, sector_y, name, classification, size, offset_x, offset_y, planets, empire_stores, fleets, time_emptied, last_simulation, wormhole, buildUnknownFields());
+      return new Star(id, sector_x, sector_y, name, classification, size, offset_x, offset_y, planets, empire_stores, fleets, time_emptied, last_simulation, next_simulation, wormhole, buildUnknownFields());
     }
   }
 
@@ -696,6 +724,7 @@ public final class Star extends Message<Star, Star.Builder> {
           + Fleet.ADAPTER.asRepeated().encodedSizeWithTag(16, value.fleets)
           + (value.time_emptied != null ? ProtoAdapter.INT64.encodedSizeWithTag(17, value.time_emptied) : 0)
           + (value.last_simulation != null ? ProtoAdapter.INT64.encodedSizeWithTag(18, value.last_simulation) : 0)
+          + (value.next_simulation != null ? ProtoAdapter.INT64.encodedSizeWithTag(19, value.next_simulation) : 0)
           + (value.wormhole != null ? Wormhole.ADAPTER.encodedSizeWithTag(20, value.wormhole) : 0)
           + value.unknownFields().size();
     }
@@ -715,6 +744,7 @@ public final class Star extends Message<Star, Star.Builder> {
       if (value.fleets != null) Fleet.ADAPTER.asRepeated().encodeWithTag(writer, 16, value.fleets);
       if (value.time_emptied != null) ProtoAdapter.INT64.encodeWithTag(writer, 17, value.time_emptied);
       if (value.last_simulation != null) ProtoAdapter.INT64.encodeWithTag(writer, 18, value.last_simulation);
+      if (value.next_simulation != null) ProtoAdapter.INT64.encodeWithTag(writer, 19, value.next_simulation);
       if (value.wormhole != null) Wormhole.ADAPTER.encodeWithTag(writer, 20, value.wormhole);
       writer.writeBytes(value.unknownFields());
     }
@@ -745,6 +775,7 @@ public final class Star extends Message<Star, Star.Builder> {
           case 16: builder.fleets.add(Fleet.ADAPTER.decode(reader)); break;
           case 17: builder.time_emptied(ProtoAdapter.INT64.decode(reader)); break;
           case 18: builder.last_simulation(ProtoAdapter.INT64.decode(reader)); break;
+          case 19: builder.next_simulation(ProtoAdapter.INT64.decode(reader)); break;
           case 20: builder.wormhole(Wormhole.ADAPTER.decode(reader)); break;
           default: {
             FieldEncoding fieldEncoding = reader.peekFieldEncoding();

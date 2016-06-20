@@ -5,11 +5,6 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
@@ -21,6 +16,7 @@ import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.sim.StarModifier;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.ProtobufStore;
+import au.com.codeka.warworlds.server.store.StarQueueSecondaryStore;
 
 /**
  * Manages stars and keeps the up-to-date in the data store.
@@ -30,11 +26,13 @@ public class StarManager {
   public static final StarManager i = new StarManager();
 
   private final ProtobufStore<Star> store;
+  private final StarQueueSecondaryStore queue;
   private final HashMap<Long, WatchableObject<Star>> stars = new HashMap<>();
   private final StarModifier starModifier;
 
   private StarManager() {
     store = DataStore.i.stars();
+    queue = DataStore.i.starsQueue();
     starModifier = new StarModifier(store::nextIdentifier);
   }
 
@@ -67,7 +65,7 @@ public class StarManager {
       for (StarModification modification : modifications) {
         starModifier.modifyStar(starBuilder, modification);
       }
-      star.set(starBuilder.build());
+      completeActions(star, starBuilder);
     }
   }
 
@@ -79,6 +77,10 @@ public class StarManager {
    * @param starBuilder A simulated star that we need to finish up.
    */
   public void completeActions(WatchableObject<Star> star, Star.Builder starBuilder) {
+    // For any builds that finish in the future, make sure we schedule a job to re-simulate the
+    // star then. Similarly if any fleets arrive in the future.
+    Long nextSimulateTime = null;
+
     // Any builds which have finished, we'll want to remove them and add modifications for them
     // instead.
     for (int i = 0; i < starBuilder.planets.size(); i++) {
@@ -96,7 +98,6 @@ public class StarManager {
                 .type(StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
                 .colony_id(planet.colony.id)
                 .design_type(br.design_type)
-                .build_request_id(br.id)
                 .build());
           } else {
             starModifier.modifyStar(starBuilder, new StarModification.Builder()
@@ -107,6 +108,9 @@ public class StarManager {
           }
           // TODO: add a sitrep as well
         } else {
+          if (nextSimulateTime == null || nextSimulateTime > br.end_time) {
+            nextSimulateTime = br.end_time;
+          }
           remainingBuildRequests.add(br);
         }
       }
@@ -114,7 +118,11 @@ public class StarManager {
       starBuilder.planets.set(i, planet.build());
     }
 
+    starBuilder.next_simulation(nextSimulateTime);
     star.set(starBuilder.build());
+
+    // TODO: only ping if the next simulate time is in the next 10 minutes.
+    StarSimulatorQueue.i.ping();
   }
 
   private final WatchableObject.Watcher<Star> starWatcher = new WatchableObject.Watcher<Star>() {
