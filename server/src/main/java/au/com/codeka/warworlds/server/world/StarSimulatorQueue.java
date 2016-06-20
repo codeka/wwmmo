@@ -80,7 +80,7 @@ public class StarSimulatorQueue {
           pinger.wait(waitTime);
         }
       } catch (InterruptedException e) {
-        log.debug("StarSimulatorQueue got woken up, checking for new stars.");
+        // Ignore.
       }
 
       if (star != null) {

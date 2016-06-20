@@ -84,7 +84,7 @@ public class StarManager {
     // Any builds which have finished, we'll want to remove them and add modifications for them
     // instead.
     for (int i = 0; i < starBuilder.planets.size(); i++) {
-      Planet.Builder planet = starBuilder.planets.get(i).newBuilder();
+      Planet planet = starBuilder.planets.get(i);
       if (planet.colony == null || planet.colony.build_requests == null) {
         continue;
       }
@@ -114,8 +114,12 @@ public class StarManager {
           remainingBuildRequests.add(br);
         }
       }
-      planet.colony(planet.colony.newBuilder().build_requests(remainingBuildRequests).build());
-      starBuilder.planets.set(i, planet.build());
+
+      Planet.Builder planetBuilder = starBuilder.planets.get(i).newBuilder();
+      planetBuilder.colony(planetBuilder.colony.newBuilder()
+          .build_requests(remainingBuildRequests)
+          .build());
+      starBuilder.planets.set(i, planetBuilder.build());
     }
 
     starBuilder.next_simulation(nextSimulateTime);

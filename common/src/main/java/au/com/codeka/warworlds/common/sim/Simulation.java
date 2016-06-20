@@ -114,16 +114,16 @@ public class Simulation {
         continue;
       }
 
+      ArrayList<BuildRequest> buildRequests = new ArrayList<>();
       for (BuildRequest predictionBuildRequest : predictionPlanet.colony.build_requests) {
-        ArrayList<BuildRequest> buildRequests = new ArrayList<>();
         for (int j = 0; j < planet.colony.build_requests.size(); j++) {
           BuildRequest.Builder br = planet.colony.build_requests.get(j).newBuilder();
           if (predictionBuildRequest.id.equals(br.id)) {
             buildRequests.add(br.end_time(predictionBuildRequest.end_time).build());
           }
         }
-        planet.colony(planet.colony.newBuilder().build_requests(buildRequests).build());
       }
+      planet.colony(planet.colony.newBuilder().build_requests(buildRequests).build());
       star.planets.set(i, planet.build());
     }
 /*
