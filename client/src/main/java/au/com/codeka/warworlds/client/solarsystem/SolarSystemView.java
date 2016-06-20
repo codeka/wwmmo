@@ -81,7 +81,8 @@ public class SolarSystemView extends RelativeLayout {
     RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
         (int)(256 * getContext().getResources().getDisplayMetrics().density),
         (int)(256 * getContext().getResources().getDisplayMetrics().density));
-    lp.topMargin = -lp.height / 2;
+    int yOffset = (int)(20 * getContext().getResources().getDisplayMetrics().density);
+    lp.topMargin = -lp.height / 2 + + yOffset;
     lp.leftMargin = -lp.width / 2;
     sunImageView.setLayoutParams(lp);
     addView(sunImageView);
@@ -145,6 +146,7 @@ public class SolarSystemView extends RelativeLayout {
 
       Vector2 centre = new Vector2(x, y);
       centre.rotate(angle);
+      centre.y += (int)(20 * getContext().getResources().getDisplayMetrics().density);
 
       planetInfo.centre = centre;
       planetInfo.distanceFromSun = distanceFromSun;
@@ -229,7 +231,8 @@ public class SolarSystemView extends RelativeLayout {
     public void onDraw(Canvas canvas) {
       for (int i = 0; i < planetInfos.length; i++) {
         float radius = getDistanceFromSun(i);
-        canvas.drawCircle(0.0f, 0.0f, radius, orbitPaint);
+        float y = 20.0f * getContext().getResources().getDisplayMetrics().density;
+        canvas.drawCircle(0.0f, y, radius, orbitPaint);
       }
     }
   };

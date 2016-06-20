@@ -54,11 +54,17 @@ public class SolarSystemFragment extends BaseFragment {
   private SolarSystemView solarSystemView;
   private TextView planetName;
   private TextView storedGoods;
+  private TextView totalGoods;
   private TextView deltaGoods;
   private View storedGoodsIcon;
   private TextView storedMinerals;
+  private TextView totalMinerals;
   private TextView deltaMinerals;
   private View storedMineralsIcon;
+  private TextView storedEnergy;
+  private TextView totalEnergy;
+  private TextView deltaEnergy;
+  private View storedEnergyIcon;
   private FleetListSimple fleetList;
   private View congenialityContainer;
   private ProgressBar populationCongenialityProgressBar;
@@ -105,11 +111,17 @@ public class SolarSystemFragment extends BaseFragment {
     final Button planetViewButton = (Button) view.findViewById(R.id.enemy_empire_view);
     planetName = (TextView) view.findViewById(R.id.planet_name);
     storedGoods = (TextView) view.findViewById(R.id.stored_goods);
+    totalGoods = (TextView) view.findViewById(R.id.total_goods);
     deltaGoods = (TextView) view.findViewById(R.id.delta_goods);
     storedGoodsIcon = view.findViewById(R.id.stored_goods_icon);
     storedMinerals = (TextView) view.findViewById(R.id.stored_minerals);
+    totalMinerals = (TextView) view.findViewById(R.id.total_minerals);
     deltaMinerals = (TextView) view.findViewById(R.id.delta_minerals);
     storedMineralsIcon = view.findViewById(R.id.stored_minerals_icon);
+    storedEnergy = (TextView) view.findViewById(R.id.stored_energy);
+    totalEnergy = (TextView) view.findViewById(R.id.total_energy);
+    deltaEnergy = (TextView) view.findViewById(R.id.delta_energy);
+    storedEnergyIcon = view.findViewById(R.id.stored_energy_icon);
     fleetList = (FleetListSimple) view.findViewById(R.id.fleet_list);
     congenialityContainer = view.findViewById(R.id.congeniality_container);
     populationCongenialityProgressBar = (ProgressBar) view.findViewById(
@@ -307,22 +319,39 @@ public class SolarSystemFragment extends BaseFragment {
     if (storage == null) {
       storedGoods.setVisibility(View.GONE);
       deltaGoods.setVisibility(View.GONE);
+      totalGoods.setVisibility(View.GONE);
       storedGoodsIcon.setVisibility(View.GONE);
       storedMinerals.setVisibility(View.GONE);
       deltaMinerals.setVisibility(View.GONE);
+      totalMinerals.setVisibility(View.GONE);
       storedMineralsIcon.setVisibility(View.GONE);
+      storedEnergy.setVisibility(View.GONE);
+      deltaEnergy.setVisibility(View.GONE);
+      totalEnergy.setVisibility(View.GONE);
+      storedEnergyIcon.setVisibility(View.GONE);
     } else {
       storedGoods.setVisibility(View.VISIBLE);
       deltaGoods.setVisibility(View.VISIBLE);
+      totalGoods.setVisibility(View.VISIBLE);
       storedGoodsIcon.setVisibility(View.VISIBLE);
       storedMinerals.setVisibility(View.VISIBLE);
       deltaMinerals.setVisibility(View.VISIBLE);
+      totalMinerals.setVisibility(View.VISIBLE);
       storedMineralsIcon.setVisibility(View.VISIBLE);
+      storedEnergy.setVisibility(View.VISIBLE);
+      deltaEnergy.setVisibility(View.VISIBLE);
+      totalEnergy.setVisibility(View.VISIBLE);
+      storedEnergyIcon.setVisibility(View.VISIBLE);
 
-      storedGoods.setText(String.format(Locale.ENGLISH, "%d / %d",
-          Math.round(storage.total_goods), Math.round(storage.max_goods)));
-      storedMinerals.setText(String.format(Locale.ENGLISH, "%d / %d",
-          Math.round(storage.total_minerals), Math.round(storage.max_minerals)));
+      storedGoods.setText(NumberFormatter.format(Math.round(storage.total_goods)));
+      totalGoods.setText(String.format(Locale.ENGLISH, "/ %s",
+          NumberFormatter.format(Math.round(storage.max_goods))));
+      storedMinerals.setText(NumberFormatter.format(Math.round(storage.total_minerals)));
+      totalMinerals.setText(String.format(Locale.ENGLISH, "/ %s",
+          NumberFormatter.format(Math.round(storage.max_minerals))));
+      storedEnergy.setText(NumberFormatter.format(Math.round(storage.total_energy)));
+      totalEnergy.setText(String.format(Locale.ENGLISH, "/ %s",
+          NumberFormatter.format(Math.round(storage.max_energy))));
 
       if (Wire.get(storage.goods_delta_per_hour, 0.0f) >= 0) {
         deltaGoods.setTextColor(Color.GREEN);
@@ -341,6 +370,15 @@ public class SolarSystemFragment extends BaseFragment {
         deltaMinerals.setTextColor(Color.RED);
         deltaMinerals.setText(String.format(Locale.ENGLISH, "%d/hr",
             Math.round(Wire.get(storage.minerals_delta_per_hour, 0.0f))));
+      }
+      if (Wire.get(storage.energy_delta_per_hour, 0.0f) >= 0) {
+        deltaEnergy.setTextColor(Color.GREEN);
+        deltaEnergy.setText(String.format(Locale.ENGLISH, "+%d/hr",
+            Math.round(Wire.get(storage.energy_delta_per_hour, 0.0f))));
+      } else {
+        deltaEnergy.setTextColor(Color.RED);
+        deltaEnergy.setText(String.format(Locale.ENGLISH, "%d/hr",
+            Math.round(Wire.get(storage.energy_delta_per_hour, 0.0f))));
       }
     }
     refreshSelectedPlanet();
