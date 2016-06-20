@@ -177,6 +177,7 @@ table td {
 }
 
 .build-queue-entry {
+  clear: both;
   width: 350px;
 }
 
