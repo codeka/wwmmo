@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Locale;
 
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.ctrl.FleetListHelper;
+import au.com.codeka.warworlds.client.fleets.FleetListHelper;
 import au.com.codeka.warworlds.client.world.EmpireManager;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.sim.DesignHelper;

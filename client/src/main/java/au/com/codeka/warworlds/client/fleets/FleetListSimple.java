@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.ctrl;
+package au.com.codeka.warworlds.client.fleets;
 
 import android.content.Context;
 import android.util.AttributeSet;

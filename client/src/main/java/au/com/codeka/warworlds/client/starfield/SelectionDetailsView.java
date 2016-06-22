@@ -16,7 +16,7 @@ import java.util.Locale;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
+import au.com.codeka.warworlds.client.fleets.FleetListSimple;
 import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.world.EmpireManager;

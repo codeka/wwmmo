@@ -198,7 +198,7 @@
         <ScrollView android:layout_width="match_parent"
                     android:layout_height="match_parent"
                       android:layout_below="@+id/solarsystem_colony_details">
-            <au.com.codeka.warworlds.client.ctrl.FleetListSimple
+            <au.com.codeka.warworlds.client.fleets.FleetListSimple
                       android:id="@+id/fleet_list"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
