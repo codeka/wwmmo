@@ -24,6 +24,7 @@ import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.build.BuildFragment;
 import au.com.codeka.warworlds.client.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
+import au.com.codeka.warworlds.client.fleets.FleetsFragment;
 import au.com.codeka.warworlds.client.util.NumberFormatter;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
@@ -222,10 +223,12 @@ public class SolarSystemFragment extends BaseFragment {
     fleetList.setFleetSelectedHandler(new FleetListSimple.FleetSelectedHandler() {
       @Override
       public void onFleetSelected(Fleet fleet) {
-//        Intent intent = new Intent(getActivity(), FleetActivity.class);
-//        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-//        intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
- //       startActivity(intent);
+        getFragmentTransitionManager().replaceFragment(
+            FleetsFragment.class,
+            FleetsFragment.createArguments(star.id),
+            SharedViewHolder.builder()
+                .addSharedView(R.id.bottom_pane, "bottom_pane")
+                .build());
       }
     });
   }

@@ -11,10 +11,15 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.Locale;
 
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.build.BuildHelper;
 import au.com.codeka.warworlds.client.ctrl.FleetListHelper;
+import au.com.codeka.warworlds.client.world.EmpireManager;
+import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.client.world.StarManager;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.proto.Design;
@@ -84,15 +89,17 @@ public class FleetInfoView extends FrameLayout {
     empireIcon.setImageBitmap(null);
 
     Design design = DesignHelper.getDesign(fleet.design_type);
-    Empire empire = null;//EmpireManager.i.getEmpire(fleet.getEmpireID());
+    Empire empire = EmpireManager.i.getEmpire(fleet.empire_id);
     if (empire != null) {
       empireName.setText(empire.display_name);
-      //empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
+      Picasso.with(getContext())
+          .load(ImageHelper.getEmpireImageUrl(getContext(), empire, 20, 20))
+          .into(empireIcon);
     }
 
     fleetDesign.removeAllViews();
     FleetListHelper.populateFleetNameRow(context, fleetDesign, fleet, design, 18.0f);
-   // fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+    BuildHelper.setDesignIcon(design, fleetIcon);
 
     fleetDestination.removeAllViews();
     FleetListHelper.populateFleetDestinationRow(context, fleetDestination, star, fleet, false);

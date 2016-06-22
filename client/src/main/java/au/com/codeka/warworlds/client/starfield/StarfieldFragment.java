@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
+import au.com.codeka.warworlds.client.fleets.FleetsFragment;
 import au.com.codeka.warworlds.client.solarsystem.SolarSystemFragment;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -65,8 +66,14 @@ public class StarfieldFragment extends BaseFragment {
         }, new FleetListSimple.FleetSelectedHandler() { // fleetSelectHandler
           @Override
           public void onFleetSelected(Fleet fleet) {
-
-          }
+            Star star = selectionDetailsView.getStar();
+            getFragmentTransitionManager().replaceFragment(
+                FleetsFragment.class,
+                FleetsFragment.createArguments(star.id),
+                SharedViewHolder.builder()
+                    .addSharedView(R.id.bottom_pane, "bottom_pane")
+                    .build());
+           }
         }, new View.OnClickListener() { // renameClickListener
           @Override
           public void onClick(View v) {
