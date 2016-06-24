@@ -130,7 +130,7 @@
              android:layout_toRightOf="@id/colony_center_marker"
              android:layout_toEndOf="@id/colony_center_marker"
              android:layout_marginTop="8dp"
-             android:src="@drawable/construction_white" />
+             android:src="@drawable/construction" />
 
   <ProgressBar android:id="@+id/solarsystem_colony_construction_focus"
                android:layout_width="wrap_content"
