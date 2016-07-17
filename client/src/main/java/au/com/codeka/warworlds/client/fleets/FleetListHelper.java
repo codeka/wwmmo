@@ -7,11 +7,16 @@ import android.graphics.Bitmap;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.common.base.CaseFormat;
+import com.squareup.picasso.Picasso;
 
+import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.build.BuildHelper;
+import au.com.codeka.warworlds.client.world.ImageHelper;
 import au.com.codeka.warworlds.client.world.StarManager;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.proto.Design;
@@ -19,6 +24,19 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 
 public class FleetListHelper {
+
+  public static void populateAllFleetRows(
+      Context context, ViewGroup parent, Star star, Fleet fleet, Design design) {
+
+    BuildHelper.setDesignIcon(design, (ImageView) parent.findViewById(R.id.ship_icon));
+    populateFleetNameRow(
+        context, (LinearLayout) parent.findViewById(R.id.ship_row1), fleet, design);
+    populateFleetStanceRow(
+        context, (LinearLayout) parent.findViewById(R.id.ship_row2), fleet);
+    populateFleetDestinationRow(
+        context, (LinearLayout) parent.findViewById(R.id.ship_row3), star, fleet, true);
+  }
+
   public static void populateFleetNameRow(
       Context context, LinearLayout row, Fleet fleet, Design design) {
     populateFleetNameRow(context, row, fleet, design, 0);
@@ -50,6 +68,10 @@ public class FleetListHelper {
   public static void populateFleetDestinationRow(
       final Context context, final LinearLayout row, final Star srcStar, final Fleet fleet,
       final boolean includeEta) {
+    if (fleet.destination_star_id == null) {
+      return;
+    }
+
     Star destStar = StarManager.i.getStar(fleet.destination_star_id);
     if (srcStar != null && destStar != null) {
       populateFleetDestinationRow(context, row, fleet, srcStar, destStar, includeEta);

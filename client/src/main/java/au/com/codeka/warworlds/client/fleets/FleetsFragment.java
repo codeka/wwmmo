@@ -8,7 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -17,8 +19,12 @@ import com.google.common.base.CaseFormat;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
+import au.com.codeka.warworlds.client.world.ArrayListStarCollection;
+import au.com.codeka.warworlds.client.world.StarCollection;
+import au.com.codeka.warworlds.client.world.StarManager;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
+import au.com.codeka.warworlds.common.proto.Star;
 
 /**
  * This fragment contains a list of fleets, and lets you do all the interesting stuff on them (like
@@ -27,6 +33,12 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 public class FleetsFragment extends BaseFragment {
   private static final Log log = new Log("FleetFragment");
   private static final String STAR_ID_KEY = "StarID";
+
+  /** The star whose fleets we're displaying, null if we're displaying all stars fleets. */
+  @Nullable private Star star;
+
+  private ArrayListStarCollection starCollection;
+  private FleetExpandableStarListAdapter adapter;
 
   public static Bundle createArguments(long starId) {
     Bundle args = new Bundle();
@@ -45,6 +57,23 @@ public class FleetsFragment extends BaseFragment {
 
     Spinner stanceSpinner = (Spinner) view.findViewById(R.id.stance);
     stanceSpinner.setAdapter(new StanceAdapter());
+
+    ExpandableListView listView = (ExpandableListView) view.findViewById(R.id.fleets_list);
+    starCollection = new ArrayListStarCollection();
+    adapter = new FleetExpandableStarListAdapter(
+        getLayoutInflater(savedInstanceState), starCollection);
+    listView.setAdapter(adapter);
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+
+    long starID = getArguments().getLong(STAR_ID_KEY);
+    star = StarManager.i.getStar(starID);
+    starCollection.getStars().clear();
+    starCollection.getStars().add(star);
+    adapter.notifyDataSetChanged();
   }
 
   public class StanceAdapter extends BaseAdapter implements SpinnerAdapter {
