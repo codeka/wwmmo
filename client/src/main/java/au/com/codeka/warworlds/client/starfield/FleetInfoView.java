@@ -27,9 +27,7 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 
-/**
- * This view displays information about a fleet you've selected on the starfield view.
- */
+/** This view displays information about a fleet you've selected on the starfield view. */
 public class FleetInfoView extends FrameLayout {
   private Context context;
   private View view;
@@ -78,9 +76,9 @@ public class FleetInfoView extends FrameLayout {
 
     final ImageView fleetIcon = (ImageView) findViewById(R.id.fleet_icon);
     final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
-    final LinearLayout fleetDesign = (LinearLayout) findViewById(R.id.fleet_design);
+    final TextView fleetDesign = (TextView) findViewById(R.id.fleet_design);
     final TextView empireName = (TextView) findViewById(R.id.empire_name);
-    final LinearLayout fleetDestination = (LinearLayout) findViewById(R.id.fleet_destination);
+    final TextView fleetDestination = (TextView) findViewById(R.id.fleet_destination);
     final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
     final TextView progressText = (TextView) findViewById(R.id.progress_text);
     final Button boostBtn = (Button) findViewById(R.id.boost_btn);
@@ -97,12 +95,9 @@ public class FleetInfoView extends FrameLayout {
           .into(empireIcon);
     }
 
-    fleetDesign.removeAllViews();
-    FleetListHelper.populateFleetNameRow(context, fleetDesign, fleet, design, 18.0f);
+    fleetDesign.setText(FleetListHelper.getFleetName(fleet, design/*, 18.0f*/));
+    fleetDestination.setText(FleetListHelper.getFleetDestination(star, fleet, false));
     BuildHelper.setDesignIcon(design, fleetIcon);
-
-    fleetDestination.removeAllViews();
-    FleetListHelper.populateFleetDestinationRow(context, fleetDestination, star, fleet, false);
 
     Star destStar = StarManager.i.getStar(fleet.destination_star_id);
     if (destStar != null) {

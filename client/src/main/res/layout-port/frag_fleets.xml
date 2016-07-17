@@ -3,7 +3,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
   <ExpandableListView
-      android:id="@+id/fleets_list"
+      android:id="@+id/fleet_list"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_alignParentTop="true"

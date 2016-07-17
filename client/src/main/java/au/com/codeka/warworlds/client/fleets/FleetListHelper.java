@@ -5,7 +5,13 @@ import java.util.Locale;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils.TruncateAt;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.TextAppearanceSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.common.base.CaseFormat;
 import com.squareup.picasso.Picasso;
+
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.build.BuildHelper;
@@ -24,35 +32,31 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 
 public class FleetListHelper {
-
-  public static void populateAllFleetRows(
-      Context context, ViewGroup parent, Star star, Fleet fleet, Design design) {
-
-    BuildHelper.setDesignIcon(design, (ImageView) parent.findViewById(R.id.ship_icon));
-    populateFleetNameRow(
-        context, (LinearLayout) parent.findViewById(R.id.ship_row1), fleet, design);
-    populateFleetStanceRow(
-        context, (LinearLayout) parent.findViewById(R.id.ship_row2), fleet);
-    populateFleetDestinationRow(
-        context, (LinearLayout) parent.findViewById(R.id.ship_row3), star, fleet, true);
+  public static void populateFleetRow(ViewGroup row, Star star, Fleet fleet, Design design) {
+    BuildHelper.setDesignIcon(design, (ImageView) row.findViewById(R.id.fleet_icon));
+    ((TextView) row.findViewById(R.id.fleet_row1)).setText(getFleetName(fleet, design));
+    ((TextView) row.findViewById(R.id.fleet_row2)).setText(getFleetStance(fleet));
+    ((TextView) row.findViewById(R.id.fleet_row3)).setText(getFleetDestination(star, fleet, true));
   }
 
-  public static void populateFleetNameRow(
-      Context context, LinearLayout row, Fleet fleet, Design design) {
-    populateFleetNameRow(context, row, fleet, design, 0);
-  }
-
-  public static void populateFleetNameRow(
-      Context context, LinearLayout row, Fleet fleet, Design design, float textSize) {
+  /**
+   * Gets the name of a fleet.
+   *
+   * @param fleet The fleet whose name we want to get. Can be null if there is no fleet (actually
+   *              this is just used to get the count of ships).
+   * @param design The ship's {@link Design}.
+   */
+  public static CharSequence getFleetName(@Nullable Fleet fleet, Design design) {
+    SpannableStringBuilder ssb = new SpannableStringBuilder();
     if (fleet == null) {
       String text = String.format(Locale.ENGLISH, "%s",
           DesignHelper.getDesignName(design, false /* plural */));
-      addTextToRow(context, row, text, textSize);
+      ssb.append(text);
     } else /*if (fleet.upgrades.size() == 0) */ {
       String text = String.format(Locale.ENGLISH, "%d × %s",
           (int) Math.ceil(fleet.num_ships),
           DesignHelper.getDesignName(design, fleet.num_ships > 1 /* plural */));
-      addTextToRow(context, row, text, textSize);
+      ssb.append(text);
     } /*else {
       String text = String.format(Locale.ENGLISH, "%d ×", (int) Math.ceil(fleet.getNumShips()));
       addTextToRow(context, row, text, textSize);
@@ -63,23 +67,27 @@ public class FleetListHelper {
       text = String.format(Locale.ENGLISH, "%s", design.getDisplayName(fleet.getNumShips() > 1));
       addTextToRow(context, row, text, textSize);
     }*/
+    return ssb;
   }
 
-  public static void populateFleetDestinationRow(
-      final Context context, final LinearLayout row, final Star srcStar, final Fleet fleet,
-      final boolean includeEta) {
+  /** Gets the destination text for the given fleet, or null if the fleet is not moving. */
+  @Nullable
+  public static CharSequence getFleetDestination(Star srcStar, Fleet fleet, boolean includeEta) {
     if (fleet.destination_star_id == null) {
-      return;
+      return null;
     }
 
     Star destStar = StarManager.i.getStar(fleet.destination_star_id);
     if (srcStar != null && destStar != null) {
-      populateFleetDestinationRow(context, row, fleet, srcStar, destStar, includeEta);
+      return getFleetDestination(fleet, srcStar, destStar, includeEta);
     }
+
+    return null;
   }
 
-  private static void populateFleetDestinationRow(Context context, LinearLayout row,
+  private static CharSequence getFleetDestination(
       Fleet fleet, Star src, Star dest, boolean includeEta) {
+    SpannableStringBuilder ssb = new SpannableStringBuilder();
     /*float timeRemainingInHours = fleet.getTimeToDestination();
     Sprite sprite = StarImageManager.getInstance().getSprite(dest, -1, true);
     String eta = TimeFormatter.create().format(timeRemainingInHours);*/
@@ -95,7 +103,7 @@ public class FleetListHelper {
     //if (boostUpgrade != null && boostUpgrade.isBoosting()) {
     //  addTextToRow(context, row, "→", 0);
     //}
-    addTextToRow(context, row, "→", 0);
+    ssb.append("→");
     //addImageToRow(context, row, sprite, marginHorz, marginVert, 0);
     String name = dest.name;
     if (dest.classification == Star.CLASSIFICATION.MARKER) {
@@ -103,63 +111,17 @@ public class FleetListHelper {
     }
     if (includeEta) {
       String text = String.format("%s <b>ETA:</b> %s", name, "eta"/*eta*/);
-      addTextToRow(context, row, Html.fromHtml(text), 0);
+      ssb.append(Html.fromHtml(text));
     } else {
-      addTextToRow(context, row, Html.fromHtml(name), 0);
+      ssb.append(Html.fromHtml(name));
     }
 
-    row.setVisibility(View.VISIBLE);
+    return ssb;
   }
 
-  public static void populateFleetStanceRow(Context context, LinearLayout row, Fleet fleet) {
-    String text = String.format("%s (stance: %s)",
+  public static CharSequence getFleetStance(Fleet fleet) {
+    return String.format("%s (stance: %s)",
         CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, fleet.state.toString()),
         CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, fleet.stance.toString()));
-    addTextToRow(context, row, text, 0);
   }
-
-  private static void addTextToRow(
-      Context context, LinearLayout row, CharSequence text, float size) {
-    TextView tv = new TextView(context);
-    tv.setText(text);
-    tv.setSingleLine(true);
-    tv.setEllipsize(TruncateAt.END);
-    if (size != 0) {
-      tv.setTextSize(size);
-    }
-    row.addView(tv);
-  }
-/*
-  private static void addImageToRow(Context context, LinearLayout row, Sprite sprite, float size) {
-    addImageToRow(context, row, sprite, 0, 0, size);
-  }
-*/
-  private static void addImageToRow(Context context, LinearLayout row, Bitmap bmp, float size) {
-    ImageView iv = new ImageView(context);
-    iv.setImageBitmap(bmp);
-
-    if (size == 0) {
-      size = 16.0f;
-    }
-    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams((int) size * 2, (int) size * 2);
-    lp.setMargins(5, -5, 5, -5);
-    iv.setLayoutParams(lp);
-
-    row.addView(iv);
-  }
-/*
-  private static void addImageToRow(Context context, LinearLayout row, Sprite sprite, float marginHorz, float marginVert, float size) {
-    ImageView iv = new ImageView(context);
-    iv.setImageDrawable(new SpriteDrawable(sprite));
-
-    if (size == 0) {
-      size = 16.0f;
-    }
-    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams((int) size * 2, (int) size * 2);
-    lp.setMargins((int) (marginHorz + 5), (int) (marginVert - 5), (int) (marginHorz + 5), (int) (marginVert - 5));
-    iv.setLayoutParams(lp);
-
-    row.addView(iv);
-  }
-*/
 }

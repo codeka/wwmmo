@@ -260,7 +260,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
       } else if (entry.fleet != null || entry.buildRequest != null) {
         // existing fleet/upgrading fleet
         ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.design_row1);
+        TextView row1 = (TextView) view.findViewById(R.id.design_row1);
         TextView row2 = (TextView) view.findViewById(R.id.design_row2);
         TextView row3 = (TextView) view.findViewById(R.id.design_row3);
         TextView level = (TextView) view.findViewById(R.id.build_level);
@@ -285,8 +285,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
           levelLabel.setVisibility(View.VISIBLE);
         }
 
-        row1.removeAllViews();
-        FleetListHelper.populateFleetNameRow(getContext(), row1, fleet, design);
+        row1.setText(FleetListHelper.getFleetName(fleet, design));
         if (buildRequest != null) {
           String verb = (fleet == null ? "Building" : "Upgrading");
           row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
@@ -333,7 +332,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
       } else {
         // new fleet
         ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.design_row1);
+        TextView row1 = (TextView) view.findViewById(R.id.design_row1);
         TextView row2 = (TextView) view.findViewById(R.id.design_row2);
         TextView row3 = (TextView) view.findViewById(R.id.design_row3);
 
@@ -345,8 +344,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
         Design design = entry.design;
         BuildHelper.setDesignIcon(design, icon);
 
-        row1.removeAllViews();
-        FleetListHelper.populateFleetNameRow(getContext(), row1, null, design);
+        row1.setText(FleetListHelper.getFleetName(null, design));
         String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
         row2.setText(Html.fromHtml(requiredHtml));
 

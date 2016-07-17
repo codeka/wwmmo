@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,16 +83,13 @@ public class FleetListSimple extends LinearLayout {
     Design design = DesignHelper.getDesign(fleet.design_type);
 
     ImageView icon = (ImageView) view.findViewById(R.id.fleet_icon);
-    LinearLayout row1 = (LinearLayout) view.findViewById(R.id.ship_row1);
-    LinearLayout row2 = (LinearLayout) view.findViewById(R.id.ship_row2);
+    TextView row1 = (TextView) view.findViewById(R.id.fleet_row1);
+    TextView row2 = (TextView) view.findViewById(R.id.fleet_row2);
 
     BuildHelper.setDesignIcon(design, icon);
 
-    row1.removeAllViews();
-    row2.removeAllViews();
-
-    FleetListHelper.populateFleetNameRow(context, row1, fleet, design);
-    FleetListHelper.populateFleetStanceRow(context, row2, fleet);
+    row1.setText(FleetListHelper.getFleetName(fleet, design));
+    row2.setText(FleetListHelper.getFleetStance(fleet));
 
     view.setOnClickListener(onClickListener);
     view.setTag(fleet);

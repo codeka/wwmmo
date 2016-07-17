@@ -127,12 +127,8 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter {
     if (star != null) {
       Fleet fleet = (Fleet) getChild(star, index);
       if (fleet != null) {
-        FleetListHelper.populateAllFleetRows(
-            view.getContext(),
-            (ViewGroup) view,
-            star,
-            fleet,
-            DesignHelper.getDesign(fleet.design_type));
+        FleetListHelper.populateFleetRow(
+            (ViewGroup) view,star, fleet, DesignHelper.getDesign(fleet.design_type));
 /*
         Fleet selectedFleet = fleetSelectionPanel.getFleet();
         if (selectedFleet != null && selectedFleet.getKey().equals(fleet.getKey())) {

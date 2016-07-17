@@ -21,16 +21,16 @@
                android:layout_toEndOf="@+id/fleet_icon"
                android:src="@drawable/app_icon" />
 
-    <LinearLayout android:id="@+id/fleet_design"
-                  android:layout_width="wrap_content"
-                  android:layout_height="20dp"
-                  android:layout_alignParentRight="true"
-                  android:layout_alignParentEnd="true"
-                  android:layout_alignParentTop="true"
-                  android:layout_toRightOf="@+id/fleet_icon"
-                  android:layout_toEndOf="@+id/fleet_icon"
-                  android:gravity="center_vertical"
-                  android:orientation="horizontal" />
+    <TextView android:id="@+id/fleet_design"
+              android:layout_width="wrap_content"
+              android:layout_height="20dp"
+              android:layout_alignParentRight="true"
+              android:layout_alignParentEnd="true"
+              android:layout_alignParentTop="true"
+              android:layout_toRightOf="@+id/fleet_icon"
+              android:layout_toEndOf="@+id/fleet_icon"
+              android:gravity="center_vertical"
+              android:orientation="horizontal" />
 
     <TextView android:id="@+id/empire_name"
               android:layout_width="wrap_content"
@@ -40,17 +40,17 @@
               android:layout_toEndOf="@+id/empire_icon"
               android:gravity="center_vertical" />
 
-    <LinearLayout android:id="@+id/fleet_destination"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:layout_alignParentLeft="true"
-                  android:layout_alignParentStart="true"
-                  android:layout_below="@id/fleet_icon"
-                  android:layout_marginTop="8dp"
-                  android:layout_marginLeft="4dp"
-                  android:layout_marginStart="4dp"
-                  android:gravity="center_vertical"
-                  android:orientation="horizontal" />
+    <TextView android:id="@+id/fleet_destination"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentLeft="true"
+              android:layout_alignParentStart="true"
+              android:layout_below="@id/fleet_icon"
+              android:layout_marginTop="8dp"
+              android:layout_marginLeft="4dp"
+              android:layout_marginStart="4dp"
+              android:gravity="center_vertical"
+              android:orientation="horizontal" />
 
     <ProgressBar android:id="@+id/progress_bar"
                  style="?android:attr/progressBarStyleHorizontal"

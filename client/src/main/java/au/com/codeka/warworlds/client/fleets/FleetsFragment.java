@@ -10,7 +10,6 @@ import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -20,7 +19,6 @@ import com.google.common.base.CaseFormat;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.world.ArrayListStarCollection;
-import au.com.codeka.warworlds.client.world.StarCollection;
 import au.com.codeka.warworlds.client.world.StarManager;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -58,7 +56,7 @@ public class FleetsFragment extends BaseFragment {
     Spinner stanceSpinner = (Spinner) view.findViewById(R.id.stance);
     stanceSpinner.setAdapter(new StanceAdapter());
 
-    ExpandableListView listView = (ExpandableListView) view.findViewById(R.id.fleets_list);
+    ExpandableListView listView = (ExpandableListView) view.findViewById(R.id.fleet_list);
     starCollection = new ArrayListStarCollection();
     adapter = new FleetExpandableStarListAdapter(
         getLayoutInflater(savedInstanceState), starCollection);
