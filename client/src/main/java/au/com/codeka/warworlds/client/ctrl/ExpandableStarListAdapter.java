@@ -45,8 +45,8 @@ public abstract class ExpandableStarListAdapter extends BaseExpandableListAdapte
   protected abstract int getNumChildren(Star star);
   protected abstract Object getChild(Star star, int index);
   protected abstract View getStarView(Star star, View convertView, ViewGroup parent);
-  protected abstract View getChildView(Star star, int index, View convertView,
-      ViewGroup parent);
+  protected abstract View getChildView(
+      Star star, int index, View convertView, ViewGroup parent);
 
   @Override
   public int getChildrenCount(int groupPosition) {

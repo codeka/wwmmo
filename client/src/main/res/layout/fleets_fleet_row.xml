@@ -19,9 +19,7 @@
       android:layout_height="wrap_content"
       android:layout_alignParentTop="true"
       android:layout_toRightOf="@+id/fleet_icon"
-      android:layout_toEndOf="@+id/fleet_icon"
-      android:gravity="center_vertical"
-      android:orientation="horizontal" />
+      android:layout_toEndOf="@+id/fleet_icon" />
 
   <TextView
       android:id="@+id/fleet_row2"
@@ -29,9 +27,7 @@
       android:layout_height="wrap_content"
       android:layout_below="@id/fleet_row1"
       android:layout_toRightOf="@+id/fleet_icon"
-      android:layout_toEndOf="@+id/fleet_icon"
-      android:gravity="center_vertical"
-      android:orientation="horizontal" />
+      android:layout_toEndOf="@+id/fleet_icon" />
 
   <TextView
       android:id="@+id/fleet_row3"
@@ -39,9 +35,7 @@
       android:layout_height="wrap_content"
       android:layout_toRightOf="@+id/fleet_icon"
       android:layout_toEndOf="@+id/fleet_icon"
-      android:layout_below="@id/fleet_row2"
-      android:gravity="center_vertical"
-      android:orientation="horizontal" />
+      android:layout_below="@id/fleet_row2" />
 
   <TextView
       android:id="@+id/notes"
@@ -54,6 +48,7 @@
       android:ellipsize="end"
       android:singleLine="true"
       android:textAppearance="?android:attr/textAppearanceSmall"
-      android:textColor="#666666" />
+      android:textColor="#666666"
+      android:visibility="gone" />
 
 </RelativeLayout>
