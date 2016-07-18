@@ -11,6 +11,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ctrl.ExpandableStarListAdapter;
 import au.com.codeka.warworlds.client.util.NumberFormatter;
@@ -26,14 +28,32 @@ import au.com.codeka.warworlds.common.sim.DesignHelper;
 /**
  * Represents an {@link ExpandableStarListAdapter} which shows a list of fleets under each star.
  */
-public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter {
+public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fleet> {
   private final LayoutInflater inflater;
   private final long myEmpireId;
+
+  @Nullable
+  private Long selectedFleetId;
 
   public FleetExpandableStarListAdapter(LayoutInflater inflater, StarCollection stars) {
     super(stars);
     this.inflater = inflater;
     myEmpireId = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire()).id;
+  }
+
+  @Nullable
+  public Long getSelectedFleetId() {
+    return selectedFleetId;
+  }
+
+  public void setSelectedFleetId(@Nullable Long fleetId) {
+    selectedFleetId = fleetId;
+  }
+
+  public void onItemClick(int groupPosition, int childPosition) {
+    Fleet fleet = getChild(groupPosition, childPosition);
+    selectedFleetId = fleet.id;
+    notifyDataSetChanged();
   }
 
   @Override
@@ -50,7 +70,7 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter {
   }
 
   @Override
-  public Object getChild(Star star, int index) {
+  public Fleet getChild(Star star, int index) {
     int fleetIndex = 0;
     for (int i = 0; i < star.fleets.size(); i++) {
       Long empireID = star.fleets.get(i).empire_id;
@@ -129,14 +149,12 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter {
       if (fleet != null) {
         FleetListHelper.populateFleetRow(
             (ViewGroup) view,star, fleet, DesignHelper.getDesign(fleet.design_type));
-/*
-        Fleet selectedFleet = fleetSelectionPanel.getFleet();
-        if (selectedFleet != null && selectedFleet.getKey().equals(fleet.getKey())) {
+
+        if (selectedFleetId != null && selectedFleetId.equals(fleet.id)) {
           view.setBackgroundResource(R.color.list_item_selected);
         } else {
           view.setBackgroundResource(android.R.color.transparent);
         }
-*/
       }
     }
 

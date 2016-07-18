@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
@@ -61,6 +62,14 @@ public class FleetsFragment extends BaseFragment {
     adapter = new FleetExpandableStarListAdapter(
         getLayoutInflater(savedInstanceState), starCollection);
     listView.setAdapter(adapter);
+    listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+      @Override
+      public boolean onChildClick(
+          ExpandableListView listView, View view, int groupPosition, int childPosition, long id) {
+        adapter.onItemClick(groupPosition, childPosition);
+        return false;
+      }
+    });
   }
 
   @Override

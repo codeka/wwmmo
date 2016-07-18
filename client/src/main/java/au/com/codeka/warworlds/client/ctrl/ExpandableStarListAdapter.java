@@ -14,8 +14,10 @@ import au.com.codeka.warworlds.common.proto.Star;
 /**
  * Base adapter class for adapter which show an expandable list of stars which you can expand and
  * collapse and show other things inside of.
+ *
+ * We assume the children we care about are all of type {@code T}.
  */
-public abstract class ExpandableStarListAdapter extends BaseExpandableListAdapter {
+public abstract class ExpandableStarListAdapter<T> extends BaseExpandableListAdapter {
   private final StarCollection stars;
 
   public ExpandableStarListAdapter(@Nonnull StarCollection stars) {
@@ -38,12 +40,12 @@ public abstract class ExpandableStarListAdapter extends BaseExpandableListAdapte
   }
 
   @Override
-  public Object getGroup(int groupPosition) {
+  public Star getGroup(int groupPosition) {
     return getStar(groupPosition);
   }
 
   protected abstract int getNumChildren(Star star);
-  protected abstract Object getChild(Star star, int index);
+  protected abstract T getChild(Star star, int index);
   protected abstract View getStarView(Star star, View convertView, ViewGroup parent);
   protected abstract View getChildView(
       Star star, int index, View convertView, ViewGroup parent);
@@ -59,7 +61,7 @@ public abstract class ExpandableStarListAdapter extends BaseExpandableListAdapte
   }
 
   @Override
-  public Object getChild(int groupPosition, int childPosition) {
+  public T getChild(int groupPosition, int childPosition) {
     Star star = getStar(groupPosition);
     if (star == null) {
       return null;
