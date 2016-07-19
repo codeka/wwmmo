@@ -26,7 +26,7 @@ public abstract class ExpandableStarListAdapter<T> extends BaseExpandableListAda
 
   @Override
   public boolean hasStableIds() {
-    return false;
+    return true;
   }
 
   @Override
@@ -49,6 +49,7 @@ public abstract class ExpandableStarListAdapter<T> extends BaseExpandableListAda
   protected abstract View getStarView(Star star, View convertView, ViewGroup parent);
   protected abstract View getChildView(
       Star star, int index, View convertView, ViewGroup parent);
+  protected abstract long getChildId(Star star, int childPosition);
 
   @Override
   public int getChildrenCount(int groupPosition) {
@@ -72,12 +73,12 @@ public abstract class ExpandableStarListAdapter<T> extends BaseExpandableListAda
 
   @Override
   public long getGroupId(int groupPosition) {
-    return groupPosition;
+    return stars.get(groupPosition).id;
   }
 
   @Override
   public long getChildId(int groupPosition, int childPosition) {
-    return childPosition;
+    return getChildId(stars.get(groupPosition), childPosition);
   }
 
   @Override
@@ -94,7 +95,7 @@ public abstract class ExpandableStarListAdapter<T> extends BaseExpandableListAda
     return getChildView(star, childPosition, convertView, parent);
   }
 
-  private Star getStar(int index) {
+  protected Star getStar(int index) {
     return stars.get(index);
   }
 }

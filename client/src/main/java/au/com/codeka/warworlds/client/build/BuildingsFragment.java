@@ -240,7 +240,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
       } else if (entry.building != null || entry.buildRequest != null) {
         // existing building/upgrading building
         ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.design_row1);
+        TextView row1 = (TextView) view.findViewById(R.id.design_row1);
         TextView row2 = (TextView) view.findViewById(R.id.design_row2);
         TextView row3 = (TextView) view.findViewById(R.id.design_row3);
         TextView level = (TextView) view.findViewById(R.id.build_level);
@@ -265,8 +265,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
           levelLabel.setVisibility(View.VISIBLE);
         }
 
-        row1.removeAllViews();
-        addTextToRow(getContext(), row1, design.display_name);
+        row1.setText(design.display_name);
         if (buildRequest != null) {
           String verb = (building == null ? "Building" : "Upgrading");
           row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
@@ -306,7 +305,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
       } else {
         // new building
         ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.design_row1);
+        TextView row1 = (TextView) view.findViewById(R.id.design_row1);
         TextView row2 = (TextView) view.findViewById(R.id.design_row2);
         TextView row3 = (TextView) view.findViewById(R.id.design_row3);
 
@@ -318,8 +317,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         Design design = entries.get(position).design;
         BuildHelper.setDesignIcon(design, icon);
 
-        row1.removeAllViews();
-        addTextToRow(getContext(), row1, design.display_name);
+        row1.setText(design.display_name);
         String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
         row2.setText(Html.fromHtml(requiredHtml));
 
@@ -327,14 +325,6 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
       }
 
       return view;
-    }
-
-    private void addTextToRow(Context context, LinearLayout row, CharSequence text) {
-      TextView tv = new TextView(context);
-      tv.setText(text);
-      tv.setSingleLine(true);
-      tv.setEllipsize(TextUtils.TruncateAt.END);
-      row.addView(tv);
     }
   }
 

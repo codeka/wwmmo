@@ -46,8 +46,9 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
     return selectedFleetId;
   }
 
-  public void setSelectedFleetId(@Nullable Long fleetId) {
+  public void setSelectedFleetId(@Nullable Long starId, @Nullable Long fleetId) {
     selectedFleetId = fleetId;
+    // TODO: scroll to the star, and expand it
   }
 
   public void onItemClick(int groupPosition, int childPosition) {
@@ -84,6 +85,11 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
 
     // Shouldn't get here...
     return null;
+  }
+
+  @Override
+  protected long getChildId(Star star, int childPosition) {
+    return star.fleets.get(childPosition).id;
   }
 
   @Override
@@ -145,7 +151,7 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
     }
 
     if (star != null) {
-      Fleet fleet = (Fleet) getChild(star, index);
+      Fleet fleet = getChild(star, index);
       if (fleet != null) {
         FleetListHelper.populateFleetRow(
             (ViewGroup) view,star, fleet, DesignHelper.getDesign(fleet.design_type));

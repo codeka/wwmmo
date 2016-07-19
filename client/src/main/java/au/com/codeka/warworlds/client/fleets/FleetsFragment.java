@@ -32,6 +32,7 @@ import au.com.codeka.warworlds.common.proto.Star;
 public class FleetsFragment extends BaseFragment {
   private static final Log log = new Log("FleetFragment");
   private static final String STAR_ID_KEY = "StarID";
+  private static final String FLEET_ID_KEY = "FleetID";
 
   /** The star whose fleets we're displaying, null if we're displaying all stars fleets. */
   @Nullable private Star star;
@@ -39,9 +40,12 @@ public class FleetsFragment extends BaseFragment {
   private ArrayListStarCollection starCollection;
   private FleetExpandableStarListAdapter adapter;
 
-  public static Bundle createArguments(long starId) {
+  public static Bundle createArguments(long starId, @Nullable Long selectedFleetId) {
     Bundle args = new Bundle();
     args.putLong(STAR_ID_KEY, starId);
+    if (selectedFleetId != null) {
+      args.putLong(FLEET_ID_KEY, selectedFleetId);
+    }
     return args;
   }
 
@@ -80,6 +84,11 @@ public class FleetsFragment extends BaseFragment {
     star = StarManager.i.getStar(starID);
     starCollection.getStars().clear();
     starCollection.getStars().add(star);
+
+    if (getArguments().getLong(FLEET_ID_KEY, 0) != 0) {
+      adapter.setSelectedFleetId(star.id, getArguments().getLong(FLEET_ID_KEY));
+    }
+
     adapter.notifyDataSetChanged();
   }
 

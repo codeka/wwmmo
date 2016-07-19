@@ -224,7 +224,7 @@ public class SolarSystemFragment extends BaseFragment {
       public void onFleetSelected(Fleet fleet) {
         getFragmentTransitionManager().replaceFragment(
             FleetsFragment.class,
-            FleetsFragment.createArguments(star.id),
+            FleetsFragment.createArguments(star.id, fleet.id),
             SharedViewHolder.builder()
                 .addSharedView(R.id.bottom_pane, "bottom_pane")
                 .build());
