@@ -29,4 +29,8 @@ public class PendingConnection {
     conn.start();
     return conn;
   }
+
+  public WatchableObject<Empire> getEmpire() {
+    return empire;
+  }
 }

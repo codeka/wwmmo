@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.debug.PacketDebug;
 import au.com.codeka.warworlds.common.net.PacketDecoder;
 import au.com.codeka.warworlds.common.net.PacketEncoder;
 import au.com.codeka.warworlds.common.proto.Account;
@@ -46,6 +47,7 @@ public class Connection implements PacketDecoder.PacketHandler {
   }
 
   public void start() {
+    encoder.setPacketHandler(packetEncodeHandler);
   }
 
   public void send(Packet pkt) {
@@ -57,7 +59,21 @@ public class Connection implements PacketDecoder.PacketHandler {
   }
 
   @Override
-  public void onPacket(PacketDecoder decoder, Packet pkt) {
-    player.onPacket(pkt);
+  public void onPacket(PacketDecoder decoder, Packet packet, int encodedSize) {
+    if (log.isDebugEnabled()) {
+      log.debug("<< [%d %s] %s", empire.get().id, empire.get().display_name,
+          PacketDebug.getPacketDebug(packet, encodedSize));
+    }
+    player.onPacket(packet);
   }
+
+  private PacketEncoder.PacketHandler packetEncodeHandler = new PacketEncoder.PacketHandler() {
+    @Override
+    public void onPacket(Packet packet, int encodedSize) {
+      if (log.isDebugEnabled()) {
+        log.debug(">> [%d %s] %s", empire.get().id, empire.get().display_name,
+            PacketDebug.getPacketDebug(packet, encodedSize));
+      }
+    }
+  };
 }

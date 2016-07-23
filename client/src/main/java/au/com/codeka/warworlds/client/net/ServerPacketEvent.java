@@ -14,13 +14,13 @@ public class ServerPacketEvent {
   }
 
   private final Packet packet;
-  private final byte[] bytes;
+  private final int encodedLength;
   private final Direction direction;
   private final String packetDebug;
 
-  public ServerPacketEvent(Packet packet, byte[] bytes, Direction direction, String packetDebug) {
+  public ServerPacketEvent(Packet packet, int encodedLength, Direction direction, String packetDebug) {
     this.packet = Preconditions.checkNotNull(packet);
-    this.bytes = Preconditions.checkNotNull(bytes);
+    this.encodedLength = encodedLength;
     this.direction = Preconditions.checkNotNull(direction);
     this.packetDebug = Preconditions.checkNotNull(packetDebug);
   }
@@ -30,9 +30,9 @@ public class ServerPacketEvent {
     return packet;
   }
 
-  /** @return The serialized packet. */
-  public byte[] getBytes() {
-    return bytes;
+  /** @return The length of the encoded packet. */
+  public int getEncodedLength() {
+    return encodedLength;
   }
 
   /** @return Whether the packet was sent or received. */

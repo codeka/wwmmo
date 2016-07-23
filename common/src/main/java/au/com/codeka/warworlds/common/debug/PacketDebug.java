@@ -10,7 +10,7 @@ import au.com.codeka.warworlds.common.proto.Packet;
  * Helper class that contains some nice debugging details about our packets.
  */
 public class PacketDebug {
-  public static String getPacketDebug(Packet pkt, byte[] serialized) {
+  public static String getPacketDebug(Packet pkt, int serializedLength) {
     StringBuilder sb = new StringBuilder();
 
     for (Field field : pkt.getClass().getFields()) {
@@ -27,7 +27,7 @@ public class PacketDebug {
     }
 
     sb.append("(");
-    sb.append(serialized.length);
+    sb.append(serializedLength);
     sb.append(" bytes)");
 
     if (pkt.watch_sectors != null) {

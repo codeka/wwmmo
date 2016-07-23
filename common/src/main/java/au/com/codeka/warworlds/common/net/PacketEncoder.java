@@ -8,17 +8,22 @@ import java.io.OutputStream;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Packet;
+import okio.BufferedSink;
+import okio.Okio;
 
 /**
  * Encodes {@link Packet}s onto a stream so that {@link PacketDecoder} can decode them.
  */
 public class PacketEncoder {
+  private final static Log log = new Log("PacketEncoder");
+
   public interface PacketHandler {
     void onPacket(Packet packet, int encodedSize);
   }
 
-  private final OutputStream outs;
+  private final BufferedSink sink;
   private final Object lock = new Object();
   @Nullable private PacketHandler handler;
 
@@ -27,24 +32,24 @@ public class PacketEncoder {
   }
 
   public PacketEncoder(OutputStream outs, @Nullable PacketHandler handler) {
-    this.outs = Preconditions.checkNotNull(outs);
+    this.sink = Okio.buffer(Okio.sink(outs));
     this.handler = handler;
   }
-
 
   public void setPacketHandler(@Nullable PacketHandler handler) {
     this.handler = handler;
   }
 
   public void send(Packet packet) throws IOException {
-    int encodedSize = packet.adapter().encodedSize(packet);
-    if (handler != null) {
-      handler.onPacket(packet, encodedSize);
+    int size = packet.adapter().encodedSize(packet);
+    synchronized (lock) {
+      sink.writeIntLe(size);
+      packet.encode(sink);
+      sink.emit();
     }
 
-    synchronized (lock) {
-      ProtoAdapter.INT32.encode(outs, encodedSize);
-      packet.encode(outs);
+    if (handler != null) {
+      handler.onPacket(packet, size);
     }
   }
 }

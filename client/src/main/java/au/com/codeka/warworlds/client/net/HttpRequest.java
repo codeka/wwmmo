@@ -3,8 +3,10 @@ package au.com.codeka.warworlds.client.net;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.squareup.wire.Message;
+import com.squareup.wire.ProtoAdapter;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -100,7 +102,9 @@ public class HttpRequest {
     }
 
     try {
-      return (T) protoType.newInstance().adapter().decode(bytes);
+      Field adapterField = protoType.getField("ADAPTER");
+      ProtoAdapter<T> adapter = (ProtoAdapter<T>) adapterField.get(null);
+      return (T) adapter.decode(bytes);
     } catch (IOException e) {
       exception = e;
       log.warning("Error fetching '%s'", url, e);

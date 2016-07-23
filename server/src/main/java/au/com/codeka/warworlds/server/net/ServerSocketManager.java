@@ -105,7 +105,7 @@ public class ServerSocketManager {
     }
 
     @Override
-    public void onPacket(PacketDecoder decoder, Packet pkt) {
+    public void onPacket(PacketDecoder decoder, Packet pkt, int encodedSize) {
       if (pkt.hello == null) {
         log.error("Expected 'hello' packet, but didn't get it.");
         return;
@@ -118,6 +118,8 @@ public class ServerSocketManager {
         return;
       }
 
+      log.info("GameSocket connection received for empire #%d %s",
+          pkt.hello.empire_id, pendingConnection.getEmpire().get().display_name);
       connections.put(pkt.hello.empire_id, pendingConnection.connect(socket, decoder, outs));
     }
   }
@@ -126,6 +128,7 @@ public class ServerSocketManager {
     while (true) {
       try {
         Socket socket = serverSocket.accept();
+        log.debug("Socket accepted from %s", socket.getRemoteSocketAddress());
         handleConnection(socket);
       } catch (IOException e) {
         log.error("Error accepting connection.", e);

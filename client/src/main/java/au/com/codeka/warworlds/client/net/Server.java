@@ -14,7 +14,9 @@ import javax.annotation.Nullable;
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.util.GameSettings;
+import au.com.codeka.warworlds.client.world.EmpireManager;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.debug.PacketDebug;
 import au.com.codeka.warworlds.common.net.PacketDecoder;
 import au.com.codeka.warworlds.common.net.PacketEncoder;
 import au.com.codeka.warworlds.common.proto.HelloPacket;
@@ -52,7 +54,7 @@ public class Server {
 
   /** Connect to the server. */
   public void connect() {
-    String cookie = GameSettings.i.getString(GameSettings.Key.COOKIE);
+    final String cookie = GameSettings.i.getString(GameSettings.Key.COOKIE);
     if (cookie.isEmpty()) {
       log.warning("No cookie yet, not connecting.");
       return;
@@ -69,21 +71,28 @@ public class Server {
       }
     });
 
-    log.info("Logging in: %s", ServerUrl.getLoginUrl());
     updateState(ServerStateEvent.ConnectionState.CONNECTING);
 
-    HttpRequest request = new HttpRequest.Builder()
-        .body(new LoginRequest.Builder()
-            .cookie(cookie)
-            .build().encode())
-        .build();
-    LoginResponse loginResponse = request.getBody(LoginResponse.class);
-    if (request.getResponseCode() != 200) {
-      log.error("Error logging in, will try again.", request.getException());
-      onDisconnect();
-    } else {
-      connectGameSocket(loginResponse);
-    }
+    App.i.getTaskRunner().runTask(new Runnable() {
+      @Override
+      public void run() {
+        log.info("Logging in: %s", ServerUrl.getLoginUrl());
+        HttpRequest request = new HttpRequest.Builder()
+            .url(ServerUrl.getLoginUrl())
+            .method(HttpRequest.Method.POST)
+            .body(new LoginRequest.Builder()
+                .cookie(cookie)
+                .build().encode())
+            .build();
+        LoginResponse loginResponse = request.getBody(LoginResponse.class);
+        if (request.getResponseCode() != 200) {
+          log.error("Error logging in, will try again.", request.getException());
+          onDisconnect();
+        } else {
+          connectGameSocket(loginResponse);
+        }
+      }
+    }, Threads.BACKGROUND);
   }
 
   private void connectGameSocket(LoginResponse loginResponse) {
@@ -93,20 +102,23 @@ public class Server {
       packetEncoder = new PacketEncoder(gameSocket.getOutputStream(), packetEncodeHandler);
       packetDecoder = new PacketDecoder(gameSocket.getInputStream(), packetDecodeHandler);
 
+      Queue<Packet> oldQueuedPackets = Preconditions.checkNotNull(queuedPackets);
+      queuedPackets = null;
+
       send(new Packet.Builder()
           .hello(new HelloPacket.Builder()
               .empire_id(loginResponse.empire.id)
               .build())
           .build());
 
+      EmpireManager.i.onHello(loginResponse.empire);
+
       reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS;
       updateState(ServerStateEvent.ConnectionState.CONNECTED);
 
-      Preconditions.checkNotNull(queuedPackets);
-      while (!queuedPackets.isEmpty()) {
-        send(queuedPackets.remove());
+      while (!oldQueuedPackets.isEmpty()) {
+        send(oldQueuedPackets.remove());
       }
-      queuedPackets = null;
     } catch (IOException e) {
       gameSocket = null;
       log.error("Error connecting game socket, will try again.", e);
@@ -168,15 +180,23 @@ public class Server {
       new PacketEncoder.PacketHandler() {
     @Override
     public void onPacket(Packet packet, int encodedSize) {
-
+      String packetDebug = PacketDebug.getPacketDebug(packet, encodedSize);
+      App.i.getEventBus().publish(new ServerPacketEvent(
+          packet, encodedSize, ServerPacketEvent.Direction.Sent, packetDebug));
+      log.debug(">> %s", packetDebug);
     }
   };
 
   private final PacketDecoder.PacketHandler packetDecodeHandler =
       new PacketDecoder.PacketHandler() {
     @Override
-    public void onPacket(PacketDecoder decoder, Packet pkt) {
-      packetDispatcher.dispatch(pkt);
+    public void onPacket(PacketDecoder decoder, Packet packet, int encodedSize) {
+      String packetDebug = PacketDebug.getPacketDebug(packet, encodedSize);
+      App.i.getEventBus().publish(new ServerPacketEvent(
+          packet, encodedSize, ServerPacketEvent.Direction.Received, packetDebug));
+      log.debug("<< %s", packetDebug);
+
+      packetDispatcher.dispatch(packet);
     }
   };
 
