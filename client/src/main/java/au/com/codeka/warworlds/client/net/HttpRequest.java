@@ -9,11 +9,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.Log;
 
 /**
- * Simple wrapper around {@link HttpURLConnection} that lets us make HTTP requests more
- * easily.
+ * Simple wrapper around {@link HttpURLConnection} that lets us make HTTP requests more easily.
  */
 public class HttpRequest {
   private final static Log log = new Log("HttpRequest");
@@ -70,6 +71,7 @@ public class HttpRequest {
     return exception;
   }
 
+  @Nullable
   public byte[] getBody() {
     if (exception != null) {
       return null;
@@ -86,6 +88,27 @@ public class HttpRequest {
     }
 
     return body;
+  }
+
+  /** Simple wrapper around {@link #getBody()} that casts to a proto message. */
+  @SuppressWarnings("unchecked")
+  @Nullable
+  public <T extends Message> T getBody(Class<T> protoType) {
+    byte[] bytes = getBody();
+    if (bytes == null) {
+      return null;
+    }
+
+    try {
+      return (T) protoType.newInstance().adapter().decode(bytes);
+    } catch (IOException e) {
+      exception = e;
+      log.warning("Error fetching '%s'", url, e);
+      return null;
+    } catch (Exception e) {
+      log.warning("Error fetching '%s'", url, e);
+      return null;
+    }
   }
 
   public static class Builder {

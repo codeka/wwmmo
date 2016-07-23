@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.common.proto;
 
 import "common.proto";
+import "empire.proto";
 
 message NewAccountRequest {
   optional string empire_name = 1;
@@ -15,4 +16,30 @@ message NewAccountResponse {
 // details about your account.
 message Account {
   optional int64 empire_id = 1;
+}
+
+// This is sent to the /login endpoint in order to log in to the server.
+message LoginRequest {
+  // Your login cookie. Required.
+  optional string cookie = 1;
+}
+
+// This is sent from the /login endpoing in response to a LoginRequest.
+message LoginResponse {
+  // The host to connect to.
+  optional string host = 1;
+
+  // The port to connect to.
+  optional int32 port = 2;
+
+  // If specified, the Empire you're currently logged in as (if not specified, it means
+  // you haven't set up an empire yet, and you should do that before anything else...)
+  optional Empire empire = 3;
+
+  // If true, it means we need to re-register with GCM (maybe because last time it failed)
+  optional bool require_gcm_register = 4;
+
+  // If true, we'll force the ads to be removed. If false, or not specified, we'll check
+  // whatever the In-App Purchase API has to say.
+  optional bool force_remove_ads = 5;
 }

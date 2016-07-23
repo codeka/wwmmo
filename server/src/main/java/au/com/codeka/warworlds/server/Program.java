@@ -1,24 +1,17 @@
 package au.com.codeka.warworlds.server;
 
-import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.account.AccountsServlet;
+import au.com.codeka.warworlds.server.account.LoginServlet;
 import au.com.codeka.warworlds.server.admin.AdminServlet;
+import au.com.codeka.warworlds.server.net.ServerSocketManager;
 import au.com.codeka.warworlds.server.render.RendererServlet;
 import au.com.codeka.warworlds.server.store.DataStore;
-import au.com.codeka.warworlds.server.websock.GameWebSocketServlet;
 import au.com.codeka.warworlds.server.world.StarSimulatorQueue;
 
 public class Program {
@@ -59,6 +52,8 @@ public class Program {
 
   private static void gameMain() throws Exception {
     StarSimulatorQueue.i.start();
+    ServerSocketManager.i.start();
+
     try {
       int port = 8080;//Configuration.i.getListenPort();
 
@@ -71,8 +66,8 @@ public class Program {
       context.setContextPath("/");
       server.setHandler(context);
 
-      context.addServlet(new ServletHolder(GameWebSocketServlet.class), "/conn");
       context.addServlet(new ServletHolder(AccountsServlet.class), "/accounts");
+      context.addServlet(new ServletHolder(LoginServlet.class), "/login");
       context.addServlet(new ServletHolder(RendererServlet.class), "/render/*");
       context.addServlet(new ServletHolder(AdminServlet.class), "/admin/*");
 
@@ -80,6 +75,7 @@ public class Program {
       log.info("Server started on http://localhost:%d/", port);
       server.join();
     } finally {
+      ServerSocketManager.i.stop();
       StarSimulatorQueue.i.stop();
     }
   }

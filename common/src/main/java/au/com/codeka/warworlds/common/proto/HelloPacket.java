@@ -10,7 +10,7 @@ import com.squareup.wire.ProtoWriter;
 import com.squareup.wire.WireField;
 import com.squareup.wire.internal.Internal;
 import java.io.IOException;
-import java.lang.Boolean;
+import java.lang.Long;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
@@ -18,63 +18,38 @@ import java.lang.StringBuilder;
 import okio.ByteString;
 
 /**
- * The "hello" message is returned when you first connect to the game.
+ * The "hello" packet that's sent by the client when it first connects to the game socket.
  */
 public final class HelloPacket extends Message<HelloPacket, HelloPacket.Builder> {
   public static final ProtoAdapter<HelloPacket> ADAPTER = new ProtoAdapter_HelloPacket();
 
   private static final long serialVersionUID = 0L;
 
-  public static final Boolean DEFAULT_REQUIRE_GCM_REGISTER = false;
-
-  public static final Boolean DEFAULT_FORCE_REMOVE_ADS = false;
+  public static final Long DEFAULT_EMPIRE_ID = 0L;
 
   /**
-   * If specified, the Empire you're currently logged in as (if not specified, it means
-   * you haven't set up an empire yet, and you should do that before anything else...)
+   * The ID of the empire you're connecting as. You should already know this from the response to
+   * the login request.
    */
   @WireField(
       tag = 1,
-      adapter = "au.com.codeka.warworlds.common.proto.Empire#ADAPTER"
+      adapter = "com.squareup.wire.ProtoAdapter#INT64"
   )
-  public final Empire empire;
+  public final Long empire_id;
 
-  /**
-   * If true, it means we need to re-register with GCM (maybe because last time it failed)
-   */
-  @WireField(
-      tag = 2,
-      adapter = "com.squareup.wire.ProtoAdapter#BOOL"
-  )
-  public final Boolean require_gcm_register;
-
-  /**
-   * If true, we'll force the ads to be removed. If false, or not specified, we'll check
-   * whatever the In-App Purchase API has to say.
-   */
-  @WireField(
-      tag = 3,
-      adapter = "com.squareup.wire.ProtoAdapter#BOOL"
-  )
-  public final Boolean force_remove_ads;
-
-  public HelloPacket(Empire empire, Boolean require_gcm_register, Boolean force_remove_ads) {
-    this(empire, require_gcm_register, force_remove_ads, ByteString.EMPTY);
+  public HelloPacket(Long empire_id) {
+    this(empire_id, ByteString.EMPTY);
   }
 
-  public HelloPacket(Empire empire, Boolean require_gcm_register, Boolean force_remove_ads, ByteString unknownFields) {
+  public HelloPacket(Long empire_id, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
-    this.empire = empire;
-    this.require_gcm_register = require_gcm_register;
-    this.force_remove_ads = force_remove_ads;
+    this.empire_id = empire_id;
   }
 
   @Override
   public Builder newBuilder() {
     Builder builder = new Builder();
-    builder.empire = empire;
-    builder.require_gcm_register = require_gcm_register;
-    builder.force_remove_ads = force_remove_ads;
+    builder.empire_id = empire_id;
     builder.addUnknownFields(unknownFields());
     return builder;
   }
@@ -85,9 +60,7 @@ public final class HelloPacket extends Message<HelloPacket, HelloPacket.Builder>
     if (!(other instanceof HelloPacket)) return false;
     HelloPacket o = (HelloPacket) other;
     return Internal.equals(unknownFields(), o.unknownFields())
-        && Internal.equals(empire, o.empire)
-        && Internal.equals(require_gcm_register, o.require_gcm_register)
-        && Internal.equals(force_remove_ads, o.force_remove_ads);
+        && Internal.equals(empire_id, o.empire_id);
   }
 
   @Override
@@ -95,9 +68,7 @@ public final class HelloPacket extends Message<HelloPacket, HelloPacket.Builder>
     int result = super.hashCode;
     if (result == 0) {
       result = unknownFields().hashCode();
-      result = result * 37 + (empire != null ? empire.hashCode() : 0);
-      result = result * 37 + (require_gcm_register != null ? require_gcm_register.hashCode() : 0);
-      result = result * 37 + (force_remove_ads != null ? force_remove_ads.hashCode() : 0);
+      result = result * 37 + (empire_id != null ? empire_id.hashCode() : 0);
       super.hashCode = result;
     }
     return result;
@@ -106,51 +77,28 @@ public final class HelloPacket extends Message<HelloPacket, HelloPacket.Builder>
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    if (empire != null) builder.append(", empire=").append(empire);
-    if (require_gcm_register != null) builder.append(", require_gcm_register=").append(require_gcm_register);
-    if (force_remove_ads != null) builder.append(", force_remove_ads=").append(force_remove_ads);
+    if (empire_id != null) builder.append(", empire_id=").append(empire_id);
     return builder.replace(0, 2, "HelloPacket{").append('}').toString();
   }
 
   public static final class Builder extends Message.Builder<HelloPacket, Builder> {
-    public Empire empire;
-
-    public Boolean require_gcm_register;
-
-    public Boolean force_remove_ads;
+    public Long empire_id;
 
     public Builder() {
     }
 
     /**
-     * If specified, the Empire you're currently logged in as (if not specified, it means
-     * you haven't set up an empire yet, and you should do that before anything else...)
+     * The ID of the empire you're connecting as. You should already know this from the response to
+     * the login request.
      */
-    public Builder empire(Empire empire) {
-      this.empire = empire;
-      return this;
-    }
-
-    /**
-     * If true, it means we need to re-register with GCM (maybe because last time it failed)
-     */
-    public Builder require_gcm_register(Boolean require_gcm_register) {
-      this.require_gcm_register = require_gcm_register;
-      return this;
-    }
-
-    /**
-     * If true, we'll force the ads to be removed. If false, or not specified, we'll check
-     * whatever the In-App Purchase API has to say.
-     */
-    public Builder force_remove_ads(Boolean force_remove_ads) {
-      this.force_remove_ads = force_remove_ads;
+    public Builder empire_id(Long empire_id) {
+      this.empire_id = empire_id;
       return this;
     }
 
     @Override
     public HelloPacket build() {
-      return new HelloPacket(empire, require_gcm_register, force_remove_ads, buildUnknownFields());
+      return new HelloPacket(empire_id, buildUnknownFields());
     }
   }
 
@@ -161,17 +109,13 @@ public final class HelloPacket extends Message<HelloPacket, HelloPacket.Builder>
 
     @Override
     public int encodedSize(HelloPacket value) {
-      return (value.empire != null ? Empire.ADAPTER.encodedSizeWithTag(1, value.empire) : 0)
-          + (value.require_gcm_register != null ? ProtoAdapter.BOOL.encodedSizeWithTag(2, value.require_gcm_register) : 0)
-          + (value.force_remove_ads != null ? ProtoAdapter.BOOL.encodedSizeWithTag(3, value.force_remove_ads) : 0)
+      return (value.empire_id != null ? ProtoAdapter.INT64.encodedSizeWithTag(1, value.empire_id) : 0)
           + value.unknownFields().size();
     }
 
     @Override
     public void encode(ProtoWriter writer, HelloPacket value) throws IOException {
-      if (value.empire != null) Empire.ADAPTER.encodeWithTag(writer, 1, value.empire);
-      if (value.require_gcm_register != null) ProtoAdapter.BOOL.encodeWithTag(writer, 2, value.require_gcm_register);
-      if (value.force_remove_ads != null) ProtoAdapter.BOOL.encodeWithTag(writer, 3, value.force_remove_ads);
+      if (value.empire_id != null) ProtoAdapter.INT64.encodeWithTag(writer, 1, value.empire_id);
       writer.writeBytes(value.unknownFields());
     }
 
@@ -181,9 +125,7 @@ public final class HelloPacket extends Message<HelloPacket, HelloPacket.Builder>
       long token = reader.beginMessage();
       for (int tag; (tag = reader.nextTag()) != -1;) {
         switch (tag) {
-          case 1: builder.empire(Empire.ADAPTER.decode(reader)); break;
-          case 2: builder.require_gcm_register(ProtoAdapter.BOOL.decode(reader)); break;
-          case 3: builder.force_remove_ads(ProtoAdapter.BOOL.decode(reader)); break;
+          case 1: builder.empire_id(ProtoAdapter.INT64.decode(reader)); break;
           default: {
             FieldEncoding fieldEncoding = reader.peekFieldEncoding();
             Object value = fieldEncoding.rawProtoAdapter().decode(reader);
@@ -198,7 +140,6 @@ public final class HelloPacket extends Message<HelloPacket, HelloPacket.Builder>
     @Override
     public HelloPacket redact(HelloPacket value) {
       Builder builder = value.newBuilder();
-      if (builder.empire != null) builder.empire = Empire.ADAPTER.redact(builder.empire);
       builder.clearUnknownFields();
       return builder.build();
     }

@@ -16,13 +16,14 @@ import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
-import au.com.codeka.warworlds.server.websock.GameSocket;
+import au.com.codeka.warworlds.server.net.Connection;
 
 /**
  * Represents a currently-connected player.
  */
 public class Player {
-  private final GameSocket socket;
+  private final Connection connection;
+
   /** The {@link Empire} this player belongs to. */
   private final WatchableObject<Empire> empire;
 
@@ -35,12 +36,12 @@ public class Player {
   /** The {@link WatchableObject.Watcher} which we'll be watching stars with. */
   private final WatchableObject.Watcher<Star> starWatcher;
 
-  public Player(GameSocket socket, WatchableObject<Empire> empire) {
-    this.socket = Preconditions.checkNotNull(socket);
+  public Player(Connection connection, WatchableObject<Empire> empire) {
+    this.connection = Preconditions.checkNotNull(connection);
     this.empire = Preconditions.checkNotNull(empire);
 
     starWatcher = star -> {
-      socket.send(new Packet.Builder()
+      connection.send(new Packet.Builder()
           .star_updated(new StarUpdatedPacket.Builder()
               .stars(Lists.newArrayList(star.get()))
               .build())
@@ -79,7 +80,7 @@ public class Player {
       }
     }
 
-    socket.send(new Packet.Builder()
+    connection.send(new Packet.Builder()
         .star_updated(new StarUpdatedPacket.Builder()
             .stars(stars)
             .build())

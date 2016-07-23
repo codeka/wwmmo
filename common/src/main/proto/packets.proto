@@ -12,18 +12,11 @@ message Packet {
   optional ModifyStarPacket modify_star = 4;
 }
 
-// The "hello" message is returned when you first connect to the game.
+// The "hello" packet that's sent by the client when it first connects to the game socket.
 message HelloPacket {
-  // If specified, the Empire you're currently logged in as (if not specified, it means
-  // you haven't set up an empire yet, and you should do that before anything else...)
-  optional Empire empire = 1;
-
-  // If true, it means we need to re-register with GCM (maybe because last time it failed)
-  optional bool require_gcm_register = 2;
-
-  // If true, we'll force the ads to be removed. If false, or not specified, we'll check
-  // whatever the In-App Purchase API has to say.
-  optional bool force_remove_ads = 3;
+  // The ID of the empire you're connecting as. You should already know this from the response to
+  // the login request.
+  optional int64 empire_id = 1;
 }
 
 // Requests that we want updates about all stars in sectors between (left,top) and (right,bottom)

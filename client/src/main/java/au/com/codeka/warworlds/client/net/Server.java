@@ -1,31 +1,25 @@
 package au.com.codeka.warworlds.client.net;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import com.google.common.base.Preconditions;
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketAdapter;
-import com.neovisionaries.ws.client.WebSocketException;
-import com.neovisionaries.ws.client.WebSocketFactory;
-import com.neovisionaries.ws.client.WebSocketFrame;
-import com.neovisionaries.ws.client.WebSocketListener;
-import com.squareup.wire.WireField;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.ArrayDeque;
-import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.App;
-import au.com.codeka.warworlds.client.BuildConfig;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.util.GameSettings;
-import au.com.codeka.warworlds.client.world.EmpireManager;
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.debug.PacketDebug;
+import au.com.codeka.warworlds.common.net.PacketDecoder;
+import au.com.codeka.warworlds.common.net.PacketEncoder;
+import au.com.codeka.warworlds.common.proto.HelloPacket;
+import au.com.codeka.warworlds.common.proto.LoginRequest;
+import au.com.codeka.warworlds.common.proto.LoginResponse;
 import au.com.codeka.warworlds.common.proto.Packet;
 
 /** Represents our connection to the server. */
@@ -36,11 +30,17 @@ public class Server {
   private static final int MAX_RECONNECT_TIME_MS = 30000;
 
   private final PacketDispatcher packetDispatcher = new PacketDispatcher();
-  @NonNull private ServerStateEvent currState =
+  @Nonnull private ServerStateEvent currState =
       new ServerStateEvent("", ServerStateEvent.ConnectionState.DISCONNECTED);
 
-  /** The WebSocket we're connected to. Will be null if we're not connected. */
-  @Nullable private WebSocket ws;
+  /** The socket that's connected to the server. Null if we're not connected. */
+  @Nullable private Socket gameSocket;
+
+  /** The PacketEncoder we'll use to send packets. Null if we're not connected. */
+  @Nullable private PacketEncoder packetEncoder;
+
+  /** The PacketDecoder we'll use to receive packets. Null if we're not connected. */
+  @Nullable private PacketDecoder packetDecoder;
 
   /** A queue for storing packets while we attempt to reconnect. Will be null if we're connected. */
   @Nullable private Queue<Packet> queuedPackets = new ArrayDeque<>();
@@ -69,69 +69,84 @@ public class Server {
       }
     });
 
-    log.info("Attempting to connect to: %s", ServerUrl.getWebSocketUrl());
+    log.info("Logging in: %s", ServerUrl.getLoginUrl());
     updateState(ServerStateEvent.ConnectionState.CONNECTING);
 
-    WebSocketFactory factory = new WebSocketFactory();
-    try {
-      WebSocket newWebSocket = factory.createSocket(ServerUrl.getWebSocketUrl());
-      newWebSocket.addHeader("X-Cookie", cookie);
-      newWebSocket.addListener(webSocketListener);
-      newWebSocket.setPingInterval(15000); // ping every 15 seconds.
-      // TODO: re-enable this, but it seems broken when packets get fragmented.
-      //newWebSocket.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE);
-      newWebSocket.connectAsynchronously();
-    } catch (IOException e) {
-      log.error("Error connecting to server, will try again.", e);
+    HttpRequest request = new HttpRequest.Builder()
+        .body(new LoginRequest.Builder()
+            .cookie(cookie)
+            .build().encode())
+        .build();
+    LoginResponse loginResponse = request.getBody(LoginResponse.class);
+    if (request.getResponseCode() != 200) {
+      log.error("Error logging in, will try again.", request.getException());
       onDisconnect();
+    } else {
+      connectGameSocket(loginResponse);
     }
   }
 
-  @NonNull
-  public ServerStateEvent getCurrState() {
-    return currState;
-  }
+  private void connectGameSocket(LoginResponse loginResponse) {
+    try {
+      gameSocket = new Socket();
+      gameSocket.connect(new InetSocketAddress(loginResponse.host, loginResponse.port));
+      packetEncoder = new PacketEncoder(gameSocket.getOutputStream(), packetEncodeHandler);
+      packetDecoder = new PacketDecoder(gameSocket.getInputStream(), packetDecodeHandler);
 
-  public void send(Packet pkt) {
-    byte[] bytes = null;
-    synchronized (lock) {
-      if (queuedPackets != null) {
-        queuedPackets.add(pkt);
-      } else if (ws != null) {
-        bytes = pkt.encode();
+      send(new Packet.Builder()
+          .hello(new HelloPacket.Builder()
+              .empire_id(loginResponse.empire.id)
+              .build())
+          .build());
 
-        String packetDebug = PacketDebug.getPacketDebug(pkt, bytes);
-        App.i.getEventBus().publish(new ServerPacketEvent(
-            pkt, bytes, ServerPacketEvent.Direction.Sent, packetDebug));
-        log.debug(">> %s", packetDebug);
-      } else {
-        throw new IllegalStateException("One of queuedPackets or ws should be non-null.");
-      }
-    }
-
-    if (bytes != null) {
-      ws.sendBinary(bytes);
-    }
-  }
-
-  private void onConnect(WebSocket ws) {
-    synchronized (lock) {
-      this.ws = ws;
       reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS;
-      // We are now in the "waiting for hello" state as we wait for the HelloResponse packet.
-      updateState(ServerStateEvent.ConnectionState.WAITING_FOR_HELLO);
+      updateState(ServerStateEvent.ConnectionState.CONNECTED);
 
       Preconditions.checkNotNull(queuedPackets);
       while (!queuedPackets.isEmpty()) {
         send(queuedPackets.remove());
       }
       queuedPackets = null;
+    } catch (IOException e) {
+      gameSocket = null;
+      log.error("Error connecting game socket, will try again.", e);
+      onDisconnect();
+    }
+  }
+
+  @Nonnull
+  public ServerStateEvent getCurrState() {
+    return currState;
+  }
+
+  public void send(Packet pkt) {
+    synchronized (lock) {
+      if (queuedPackets != null) {
+        queuedPackets.add(pkt);
+      } else {
+        Preconditions.checkNotNull(packetEncoder);
+        try {
+          packetEncoder.send(pkt);
+        } catch (IOException e) {
+          // TODO: handle error
+          onDisconnect();
+        }
+      }
     }
   }
 
   private void onDisconnect() {
+
     synchronized (lock) {
-      ws = null;
+      Preconditions.checkNotNull(gameSocket);
+      try {
+        gameSocket.close();
+      } catch (IOException e) {
+        // ignore.
+      }
+      gameSocket = null;
+      packetEncoder = null;
+      packetDecoder = null;
       queuedPackets = new ArrayDeque<>();
     }
 
@@ -149,94 +164,24 @@ public class Server {
     }, Threads.BACKGROUND, reconnectTimeMs);
   }
 
-  private void onPacket(Packet pkt) {
-    if (currState.getState().equals(ServerStateEvent.ConnectionState.WAITING_FOR_HELLO)) {
-      if (pkt.hello != null) {
-        // Now we're connected!
-        EmpireManager.i.onHello(pkt.hello.empire);
-        updateState(ServerStateEvent.ConnectionState.CONNECTED);
-      } else {
-        // Any other packet is unexpected in this state!
-        log.warning("Unknown packet received while waiting for hello_response.");
-      }
-      return;
-    }
+  private final PacketEncoder.PacketHandler packetEncodeHandler =
+      new PacketEncoder.PacketHandler() {
+    @Override
+    public void onPacket(Packet packet, int encodedSize) {
 
-    // Dispatch the packet to the event bus.
-    packetDispatcher.dispatch(pkt);
-  }
+    }
+  };
+
+  private final PacketDecoder.PacketHandler packetDecodeHandler =
+      new PacketDecoder.PacketHandler() {
+    @Override
+    public void onPacket(PacketDecoder decoder, Packet pkt) {
+      packetDispatcher.dispatch(pkt);
+    }
+  };
 
   private void updateState(ServerStateEvent.ConnectionState state) {
-    currState = new ServerStateEvent(ServerUrl.getWebSocketUrl(), state);
+    currState = new ServerStateEvent(ServerUrl.getUrl(), state);
     App.i.getEventBus().publish(currState);
   }
-
-  private WebSocketListener webSocketListener = new WebSocketAdapter() {
-    @Override
-    public void onConnected(WebSocket ws, Map<String, List<String>> headers) throws Exception {
-      log.debug("onConnected()");
-      onConnect(ws);
-    }
-
-    @Override
-    public void onConnectError(WebSocket websocket, WebSocketException cause) throws Exception {
-      log.debug("onConnectError(%s)", cause.getMessage());
-      onDisconnect();
-    }
-
-    @Override
-    public void onDisconnected(
-        WebSocket ws, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
-        boolean closedByServer) throws Exception {
-      log.debug("onDisconnected(%s /* closedByServer */)", closedByServer ? "true" : "false");
-      onDisconnect();
-    }
-
-    @Override
-    public void onBinaryMessage(WebSocket ws, byte[] binary) throws Exception {
-      Packet pkt = Packet.ADAPTER.decode(binary);
-
-      String packetDebug = PacketDebug.getPacketDebug(pkt, binary);
-      App.i.getEventBus().publish(new ServerPacketEvent(pkt, binary,
-          ServerPacketEvent.Direction.Received, packetDebug));
-      log.debug("<< %s (%d bytes)", packetDebug, binary.length);
-
-      onPacket(pkt);
-    }
-
-    @Override
-    public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
-      log.warning("onError()", cause);
-    }
-
-    @Override
-    public void onFrameError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame)
-        throws Exception {
-      log.warning("onFrameError()", cause);
-    }
-
-    @Override
-    public void onMessageError(WebSocket websocket, WebSocketException cause,
-        List<WebSocketFrame> frames) throws Exception {
-      log.warning("onMessageError()", cause);
-    }
-
-    @Override
-    public void onMessageDecompressionError(WebSocket websocket, WebSocketException cause,
-        byte[] compressed) throws Exception {
-      log.warning("onMessageDecompressionError(%d bytes)", compressed.length, cause);
-    }
-
-    @Override
-    public void onSendError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame)
-        throws Exception {
-      log.warning("onSendError()", cause);
-    }
-
-    @Override
-    public void onUnexpectedError(WebSocket websocket, WebSocketException cause) throws Exception {
-      log.warning("onUnexpectedError()", cause);
-    }
-
-  };
 }

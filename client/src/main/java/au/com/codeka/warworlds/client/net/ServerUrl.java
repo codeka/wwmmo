@@ -10,8 +10,8 @@ public class ServerUrl {
     return GameSettings.i.getString(GameSettings.Key.SERVER);
   }
 
-  public static String getWebSocketUrl() {
+  public static String getLoginUrl() {
     String url = GameSettings.i.getString(GameSettings.Key.SERVER);
-    return url.replace("http:", "ws:").replace("https:", "wss:") + "conn";
+    return url + "login";
   }
 }
