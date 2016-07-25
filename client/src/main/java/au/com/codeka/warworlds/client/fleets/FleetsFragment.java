@@ -7,7 +7,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
@@ -20,6 +19,8 @@ import com.google.common.base.CaseFormat;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.world.ArrayListStarCollection;
+import au.com.codeka.warworlds.client.world.CompleteStarCollection;
+import au.com.codeka.warworlds.client.world.StarCollection;
 import au.com.codeka.warworlds.client.world.StarManager;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -37,7 +38,8 @@ public class FleetsFragment extends BaseFragment {
   /** The star whose fleets we're displaying, null if we're displaying all stars fleets. */
   @Nullable private Star star;
 
-  private ArrayListStarCollection starCollection;
+  private StarCollection starCollection;
+  private ExpandableListView listView;
   private FleetExpandableStarListAdapter adapter;
 
   public static Bundle createArguments(long starId, @Nullable Long selectedFleetId) {
@@ -61,11 +63,7 @@ public class FleetsFragment extends BaseFragment {
     Spinner stanceSpinner = (Spinner) view.findViewById(R.id.stance);
     stanceSpinner.setAdapter(new StanceAdapter());
 
-    ExpandableListView listView = (ExpandableListView) view.findViewById(R.id.fleet_list);
-    starCollection = new ArrayListStarCollection();
-    adapter = new FleetExpandableStarListAdapter(
-        getLayoutInflater(savedInstanceState), starCollection);
-    listView.setAdapter(adapter);
+    listView = (ExpandableListView) view.findViewById(R.id.fleet_list);
     listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
       @Override
       public boolean onChildClick(
@@ -80,12 +78,19 @@ public class FleetsFragment extends BaseFragment {
   public void onStart() {
     super.onStart();
 
-    long starID = getArguments().getLong(STAR_ID_KEY);
-    star = StarManager.i.getStar(starID);
-    starCollection.getStars().clear();
-    starCollection.getStars().add(star);
+    long starID = getArguments().getLong(STAR_ID_KEY, 0);
+    if (starID != 0) {
+      star = StarManager.i.getStar(starID);
+      starCollection = new ArrayListStarCollection();
+      ((ArrayListStarCollection) starCollection).getStars().add(star);
+    } else {
+      starCollection = new CompleteStarCollection();
+    }
 
-    if (getArguments().getLong(FLEET_ID_KEY, 0) != 0) {
+    adapter = new FleetExpandableStarListAdapter(getLayoutInflater(null), starCollection);
+    listView.setAdapter(adapter);
+
+    if (star != null && getArguments().getLong(FLEET_ID_KEY, 0) != 0) {
       adapter.setSelectedFleetId(star.id, getArguments().getLong(FLEET_ID_KEY));
     }
 
