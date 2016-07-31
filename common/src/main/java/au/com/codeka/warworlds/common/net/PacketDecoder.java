@@ -40,7 +40,11 @@ public class PacketDecoder {
       try {
         while (!source.exhausted()) {
           int size = source.readIntLe();
+          int flags = source.readIntLe();
           byte[] bytes = source.readByteArray(size);
+          if ((flags & PacketFlags.COMPRESSED) != 0) {
+            bytes = GzipHelper.decompress(bytes);
+          }
           Packet pkt = Packet.ADAPTER.decode(bytes);
 
           handler.onPacket(PacketDecoder.this, pkt, size);
