@@ -40,11 +40,11 @@ public class PacketEncoder {
   public void send(Packet packet) throws IOException {
     byte[] bytes;
     synchronized (lock) {
-      int flags = 0;
+      int flags = PacketFlags.NONE;
 
       bytes = packet.encode();
       byte[] compressed = GzipHelper.compress(bytes);
-      if (compressed.length < bytes.length) {
+      if (compressed != null && compressed.length < bytes.length) {
         flags |= PacketFlags.COMPRESSED;
         bytes = compressed;
       }
