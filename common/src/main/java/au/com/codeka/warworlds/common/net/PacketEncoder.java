@@ -1,8 +1,5 @@
 package au.com.codeka.warworlds.common.net;
 
-import com.google.common.base.Preconditions;
-import com.squareup.wire.ProtoAdapter;
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -41,15 +38,25 @@ public class PacketEncoder {
   }
 
   public void send(Packet packet) throws IOException {
-    int size = packet.adapter().encodedSize(packet);
+    byte[] bytes;
     synchronized (lock) {
-      sink.writeIntLe(size);
-      packet.encode(sink);
+      int flags = PacketFlags.NONE;
+
+      bytes = packet.encode();
+      byte[] compressed = GzipHelper.compress(bytes);
+      if (compressed != null && compressed.length < bytes.length) {
+        flags |= PacketFlags.COMPRESSED;
+        bytes = compressed;
+      }
+
+      sink.writeIntLe(bytes.length);
+      sink.writeIntLe(flags);
+      sink.write(bytes);
       sink.emit();
     }
 
     if (handler != null) {
-      handler.onPacket(packet, size);
+      handler.onPacket(packet, bytes.length);
     }
   }
 }
