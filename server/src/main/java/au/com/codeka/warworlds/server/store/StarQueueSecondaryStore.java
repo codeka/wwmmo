@@ -39,7 +39,7 @@ public class StarQueueSecondaryStore {
     this.stars = Preconditions.checkNotNull(stars);
   }
 
-  /** Gets the next {@link Star} that needs to be simulated. */
+  /** Gets a {@link Cursor} that returns all stars belonging to a . */
   @Nullable
   public Star next(@Nullable Transaction trans) {
     CursorConfig cursorConfig = new CursorConfig();

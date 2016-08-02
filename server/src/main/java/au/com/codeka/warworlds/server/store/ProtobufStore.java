@@ -9,6 +9,8 @@ import com.squareup.wire.Message;
 
 import java.nio.ByteBuffer;
 
+import javax.annotation.Nonnull;
+
 /**
  * {@link ProtobufStore} is basically a map of key/value pairs where the key is an 64-bit int and
  * the value is a protocol buffer of type M.
@@ -21,6 +23,7 @@ public class ProtobufStore<M extends Message<?, ?>> extends BaseStore<Long, M> {
     this.serializer = new ProtobufSerializer<>(cls);
   }
 
+  @Nonnull
   @Override
   protected DatabaseEntry encodeKey(Long id) {
     return new DatabaseEntry(ByteBuffer.allocate(Long.BYTES).putLong(id).array());

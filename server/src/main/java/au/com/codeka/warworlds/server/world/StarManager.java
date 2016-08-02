@@ -16,6 +16,7 @@ import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.sim.StarModifier;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.ProtobufStore;
+import au.com.codeka.warworlds.server.store.StarEmpireSecondaryStore;
 import au.com.codeka.warworlds.server.store.StarQueueSecondaryStore;
 
 /**
@@ -27,12 +28,14 @@ public class StarManager {
 
   private final ProtobufStore<Star> store;
   private final StarQueueSecondaryStore queue;
+  private final StarEmpireSecondaryStore empireSecondaryStore;
   private final HashMap<Long, WatchableObject<Star>> stars = new HashMap<>();
   private final StarModifier starModifier;
 
   private StarManager() {
     store = DataStore.i.stars();
     queue = DataStore.i.starsQueue();
+    empireSecondaryStore = DataStore.i.starEmpireSecondaryStore();
     starModifier = new StarModifier(store::nextIdentifier);
   }
 
@@ -53,6 +56,21 @@ public class StarManager {
     }
 
     return watchableStar;
+  }
+
+  public ArrayList<WatchableObject<Star>> getStarsForEmpire(long empireId) {
+    ArrayList<WatchableObject<Star>> stars = new ArrayList<>();
+    try (StarEmpireSecondaryStore.StarIterable iter =
+             empireSecondaryStore.getStarsForEmpire(null, empireId)) {
+      if (iter == null) {
+        return stars;
+      }
+
+      for (Star star : iter) {
+        stars.add(getStar(star.id));
+      }
+    }
+    return stars;
   }
 
   public void modifyStar(WatchableObject<Star> star, StarModification modification) {

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.ModifyStarPacket;
 import au.com.codeka.warworlds.common.proto.Packet;
@@ -16,12 +17,14 @@ import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
+import au.com.codeka.warworlds.server.concurrency.TaskRunner;
+import au.com.codeka.warworlds.server.concurrency.Threads;
 import au.com.codeka.warworlds.server.net.Connection;
 
-/**
- * Represents a currently-connected player.
- */
+/** Represents a currently-connected player. */
 public class Player {
+  private static final Log log = new Log("Player");
+
   private final Connection connection;
 
   /** The {@link Empire} this player belongs to. */
@@ -37,6 +40,8 @@ public class Player {
   private final WatchableObject.Watcher<Star> starWatcher;
 
   public Player(Connection connection, WatchableObject<Empire> empire) {
+    log.setPrefix(String.format("[%d %s]", empire.get().id, empire.get().display_name));
+
     this.connection = Preconditions.checkNotNull(connection);
     this.empire = Preconditions.checkNotNull(empire);
 
@@ -47,7 +52,10 @@ public class Player {
               .build())
           .build());
     };
+
+    TaskRunner.i.runTask(this::onPostConnect, Threads.BACKGROUND);
   }
+
 
   public void onPacket(Packet pkt) {
     if (pkt.watch_sectors != null) {
@@ -57,7 +65,20 @@ public class Player {
     }
   }
 
-  protected void onWatchSectorsPacket(WatchSectorsPacket pkt) {
+  /**
+   * This is called on a background thread when this {@link Player} is created. We'll send the
+   * client some updates they might be interested in.
+   */
+  private void onPostConnect() {
+    long startTime = System.nanoTime();
+    ArrayList<WatchableObject<Star>> stars = StarManager.i.getStarsForEmpire(empire.get().id);
+    log.debug("Fetched %d stars for empire %d in %dms", stars.size(), empire.get().id,
+        (System.nanoTime() - startTime) / 1000000L);
+
+    // TODO: send to player
+  }
+
+  private void onWatchSectorsPacket(WatchSectorsPacket pkt) {
     // TODO: if we're already watching some of these sectors, we can just keep watching those,
 
     // Remove all our current watched stars
@@ -95,7 +116,7 @@ public class Player {
     }
   }
 
-  protected void onModifyStar(ModifyStarPacket pkt) {
+  private void onModifyStar(ModifyStarPacket pkt) {
     WatchableObject<Star> star = StarManager.i.getStar(pkt.star_id);
     StarManager.i.modifyStar(star, pkt.modification);
   }

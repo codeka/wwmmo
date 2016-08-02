@@ -5,6 +5,8 @@ import java.io.StringWriter;
 import java.util.Formatter;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 /**
  * This is a helper class for working with logging. We support both Android Log.x() and Java's
  * built-in logger (for server-side).
@@ -21,9 +23,14 @@ public class Log {
   }
 
   private String tag;
+  @Nullable private String prefix;
 
   public Log(String tag) {
     this.tag = tag;
+  }
+
+  public void setPrefix(@Nullable String prefix) {
+    this.prefix = prefix;
   }
 
   public void error(String fmt, Object... args) {
@@ -62,8 +69,12 @@ public class Log {
    * Formats the given message. If the last argument is an exception, we'll append the exception to
    * the end of the message.
    */
-  private static String formatMsg(String fmt, Object[] args) {
+  private String formatMsg(String fmt, Object[] args) {
     StringBuilder sb = new StringBuilder();
+    if (prefix != null) {
+      sb.append(prefix);
+      sb.append(" ");
+    }
     Formatter formatter = new Formatter(sb, Locale.ENGLISH);
     try {
       formatter.format(fmt, args);

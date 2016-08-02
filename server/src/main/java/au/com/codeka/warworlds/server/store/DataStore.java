@@ -24,6 +24,7 @@ public class DataStore {
   private SectorsStore sectors;
   private ProtobufStore<Star> stars;
   private StarQueueSecondaryStore starsQueue;
+  private StarEmpireSecondaryStore starEmpireSecondaryStore;
   private UniqueNameStore uniqueEmpireNames;
 
   private DataStore() {
@@ -46,6 +47,7 @@ public class DataStore {
       db = env.openDatabase(null, "stars", dbConfig);
       stars = new ProtobufStore<>(db, Star.class);
       starsQueue = new StarQueueSecondaryStore(env, db, stars);
+      starEmpireSecondaryStore = new StarEmpireSecondaryStore(env, db, stars);
 
       db = env.openDatabase(null, "sectors", dbConfig);
       sectors = new SectorsStore(db, stars);
@@ -85,7 +87,13 @@ public class DataStore {
     return stars;
   }
 
-  public StarQueueSecondaryStore starsQueue() { return starsQueue; }
+  public StarQueueSecondaryStore starsQueue() {
+    return starsQueue;
+  }
+
+  public StarEmpireSecondaryStore starEmpireSecondaryStore() {
+    return starEmpireSecondaryStore;
+  }
 
   public UniqueNameStore uniqueEmpireNames() {
     return uniqueEmpireNames;
