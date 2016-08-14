@@ -1,0 +1,25 @@
+{% extends "skeleton.html" %}
+{% block title %}Users{% endblock %}
+{% block head %}
+<script type="text/javascript" src="/admin/js/tmpl.js"></script>
+<script type="text/javascript" src="/admin/js/time.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Users</h1>
+<table>
+  <tr>
+    <th>Email</th>
+    <th>Role</th>
+    <th></th>
+  </tr>
+  {% for user in users %}
+    <tr>
+      <td>{{ user.email_addr }}</td>
+      <td>{{ user.role }}</td>
+      <td></td>
+    </tr>
+  {% endfor %}
+</table>
+
+<p><a href="/admin/users/create">New user</a></p>
+{% endblock %}

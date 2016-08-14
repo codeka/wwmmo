@@ -34,6 +34,11 @@ public class StringProtobufStore<M extends Message<?, ?>> extends BaseStore<Stri
   }
 
   @Override
+  protected String decodeKey(DatabaseEntry databaseEntry) {
+    return new String(databaseEntry.getData(), charset);
+  }
+
+  @Override
   protected M decodeValue(DatabaseEntry databaseEntry) {
     return serializer.deserialize(databaseEntry);
   }

@@ -23,8 +23,10 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.admin.RequestException;
 import au.com.codeka.warworlds.server.admin.RequestHandler;
 import au.com.codeka.warworlds.server.admin.Session;
+import au.com.codeka.warworlds.server.store.DataStore;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 
 import javax.annotation.Nullable;
 
@@ -76,12 +78,16 @@ public class AdminHandler extends RequestHandler {
     if (data == null) {
       data = new TreeMap<>();
     }
+    if (data instanceof ImmutableMap) {
+      data = new TreeMap<>(data); // make it mutable again...
+    }
 
     data.put("realm", getRealm());
     Session session = getSessionNoError();
     if (session != null) {
       data.put("logged_in_user", session.getEmail());
     }
+    data.put("num_backend_users", DataStore.i.adminUsers().count());
 
     getResponse().setContentType("text/html");
     getResponse().setHeader("Content-Type", "text/html; charset=utf-8");

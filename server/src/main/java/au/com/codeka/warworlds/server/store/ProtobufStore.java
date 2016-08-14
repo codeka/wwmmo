@@ -32,6 +32,11 @@ public class ProtobufStore<M extends Message<?, ?>> extends BaseStore<Long, M> {
   }
 
   @Override
+  protected Long decodeKey(DatabaseEntry databaseEntry) {
+    return ByteBuffer.wrap(databaseEntry.getData()).getLong();
+  }
+
+  @Override
   protected M decodeValue(DatabaseEntry databaseEntry) {
     return serializer.deserialize(databaseEntry);
   }
