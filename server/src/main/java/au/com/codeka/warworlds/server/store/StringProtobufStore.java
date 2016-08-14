@@ -5,25 +5,27 @@ import com.sleepycat.je.DatabaseEntry;
 import com.squareup.wire.Message;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 import javax.annotation.Nonnull;
 
 /**
- * {@link ProtobufStore} is basically a map of key/value pairs where the key is an 64-bit int and
+ * {@link StringProtobufStore} is basically a map of key/value pairs where the key is a string and
  * the value is a protocol buffer of type M.
  */
-public class ProtobufStore<M extends Message<?, ?>> extends BaseStore<Long, M> {
+public class StringProtobufStore<M extends Message<?, ?>> extends BaseStore<String, M> {
   private final ProtobufSerializer<M> serializer;
+  private static final Charset charset = Charset.forName("utf-8");
 
-  /* package */ ProtobufStore(Database db, Class<M> cls) {
+  /* package */ StringProtobufStore(Database db, Class<M> cls) {
     super(db);
     this.serializer = new ProtobufSerializer<>(cls);
   }
 
   @Nonnull
   @Override
-  protected DatabaseEntry encodeKey(Long id) {
-    return new DatabaseEntry(ByteBuffer.allocate(Long.BYTES).putLong(id).array());
+  protected DatabaseEntry encodeKey(String id) {
+    return new DatabaseEntry(id.getBytes(charset));
   }
 
   @Override

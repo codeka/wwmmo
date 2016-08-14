@@ -10,6 +10,8 @@ import com.sleepycat.je.Transaction;
 import java.io.File;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Account;
+import au.com.codeka.warworlds.common.proto.AdminUser;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Star;
 
@@ -19,13 +21,14 @@ public class DataStore {
   public static final DataStore i = new DataStore();
 
   private Environment env;
-  private AccountsStore accounts;
+  private StringProtobufStore<Account> accounts;
   private ProtobufStore<Empire> empires;
   private SectorsStore sectors;
   private ProtobufStore<Star> stars;
   private StarQueueSecondaryStore starsQueue;
   private StarEmpireSecondaryStore starEmpireSecondaryStore;
   private UniqueNameStore uniqueEmpireNames;
+  private StringProtobufStore<AdminUser> adminUsers;
 
   private DataStore() {
     try {
@@ -39,7 +42,7 @@ public class DataStore {
       dbConfig.setTransactional(true);
 
       Database db = env.openDatabase(null, "accounts", dbConfig);
-      accounts = new AccountsStore(db);
+      accounts = new StringProtobufStore<>(db, Account.class);
 
       db = env.openDatabase(null, "empires", dbConfig);
       empires = new ProtobufStore<>(db, Empire.class);
@@ -54,6 +57,9 @@ public class DataStore {
 
       db = env.openDatabase(null, "uniqueEmpireNames", dbConfig);
       uniqueEmpireNames = new UniqueNameStore(db);
+
+      db = env.openDatabase(null, "adminUsers", dbConfig);
+      adminUsers = new StringProtobufStore<>(db, AdminUser.class);
     } catch (DatabaseException e) {
       log.error("Error creating databases.", e);
       throw new RuntimeException(e);
@@ -71,7 +77,7 @@ public class DataStore {
     return env.beginTransaction(null, null);
   }
 
-  public AccountsStore accounts() {
+  public StringProtobufStore<Account> accounts() {
     return accounts;
   }
 
@@ -97,5 +103,9 @@ public class DataStore {
 
   public UniqueNameStore uniqueEmpireNames() {
     return uniqueEmpireNames;
+  }
+
+  public StringProtobufStore<AdminUser> adminUsers() {
+    return adminUsers;
   }
 }
