@@ -222,7 +222,7 @@ public class RequestHandler {
       return false;
     }
 
-    return session.getRole().equals(role);
+    return session.isInRole(role);
   }
 
   @Nullable

@@ -30,7 +30,7 @@
       <ul>
         <li><a href="/admin">Dashboard</a>
         <li><a href="/admin/users">Users</a>
-        {% if session|isinrole:ADMINISTRATOR %}
+        {% if session|isinrole:CHAT %}
         <li><span><span>Chat</span></span>
           <ul>
             <li><a href="/admin/chat">Messages</a>

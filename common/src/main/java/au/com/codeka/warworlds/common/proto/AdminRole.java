@@ -11,9 +11,24 @@ import java.lang.Override;
  */
 public enum AdminRole implements WireEnum {
   /**
-   * The administrator role gets access to everything.
+   * The administrator role allows you to modify the security settings of the backend.
    */
-  ADMINISTRATOR(1);
+  ADMINISTRATOR(1),
+
+  /**
+   * A role which allows you to modify/view the starfield.
+   */
+  STARFIELD(2),
+
+  /**
+   * A role which allows you to modify empires.
+   */
+  EMPIRE(3),
+
+  /**
+   * A role which allows you to monitor chat and sinbin users, etc.
+   */
+  CHAT(4);
 
   public static final ProtoAdapter<AdminRole> ADAPTER = ProtoAdapter.newEnumAdapter(AdminRole.class);
 
@@ -29,6 +44,9 @@ public enum AdminRole implements WireEnum {
   public static AdminRole fromValue(int value) {
     switch (value) {
       case 1: return ADMINISTRATOR;
+      case 2: return STARFIELD;
+      case 3: return EMPIRE;
+      case 4: return CHAT;
       default: return null;
     }
   }

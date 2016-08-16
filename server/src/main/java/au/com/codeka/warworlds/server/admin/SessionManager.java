@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.admin;
 
+import com.google.common.collect.Lists;
+
 import org.joda.time.DateTime;
 
 import java.security.SecureRandom;
@@ -29,10 +31,10 @@ public class SessionManager {
     // TODO: expire old sessions
     AdminUser user;
     if (DataStore.i.adminUsers().count() == 0) {
-      // If you don't have any users, then everybody who authenticates is an administrator.
+      // If you don't have any users, then everybody who authenticates is in all roles.
       user = new AdminUser.Builder()
           .email_addr(emailAddr)
-          .role(AdminRole.ADMINISTRATOR)
+          .roles(Lists.newArrayList(AdminRole.values()))
           .build();
     } else {
       user = DataStore.i.adminUsers().get(emailAddr);

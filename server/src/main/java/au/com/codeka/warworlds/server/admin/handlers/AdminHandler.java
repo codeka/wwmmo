@@ -209,7 +209,7 @@ public class AdminHandler extends RequestHandler {
         throws InterpretException {
       if (object instanceof Session) {
         AdminRole role = AdminRole.valueOf(args[0]);
-        return ((Session) object).getRole().equals(role);
+        return ((Session) object).isInRole(role);
       }
 
       throw new InterpretException("Expected a Session, not " + object);

@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server.admin;
 
 import org.joda.time.DateTime;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import au.com.codeka.warworlds.common.proto.AdminRole;
@@ -29,9 +31,13 @@ public class Session {
     return adminUser.email_addr;
   }
 
-  @Nonnull
-  public AdminRole getRole() {
-    return adminUser.role;
+  public boolean isInRole(AdminRole role) {
+    for (AdminRole ar : adminUser.roles) {
+      if (ar.equals(role)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public DateTime getLoginTime() {

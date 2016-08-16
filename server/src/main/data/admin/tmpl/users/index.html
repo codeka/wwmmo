@@ -9,13 +9,13 @@
 <table>
   <tr>
     <th>Email</th>
-    <th>Role</th>
+    <th>Roles</th>
     <th></th>
   </tr>
   {% for user in users %}
     <tr>
       <td>{{ user.email_addr }}</td>
-      <td>{{ user.role }}</td>
+      <td>{{ user.roles }}</td>
       <td></td>
     </tr>
   {% endfor %}
