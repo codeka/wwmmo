@@ -1,7 +1,9 @@
 package au.com.codeka.warworlds.server.admin.handlers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
@@ -10,10 +12,17 @@ import org.joda.time.Days;
 import com.google.gson.JsonObject;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.AdminRole;
 import au.com.codeka.warworlds.server.admin.RequestException;
 
 public class DashboardHandler extends AdminHandler {
   private static final Log log = new Log("DashboardHandler");
+
+  /** Any role can visit this page. */
+  @Override
+  protected Collection<AdminRole> getRequiredRoles() {
+    return Arrays.asList(AdminRole.values());
+  }
 
   @Override
   protected void get() throws RequestException {

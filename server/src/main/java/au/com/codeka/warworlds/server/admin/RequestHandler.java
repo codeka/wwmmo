@@ -65,7 +65,10 @@ public class RequestHandler {
     this.response.setStatus(200);
 
     try {
-      onBeforeHandle();
+      if (!onBeforeHandle()) {
+        return;
+      }
+
       if (request.getMethod().equals("GET")) {
         get();
       } else if (request.getMethod().equals("POST")) {
@@ -87,10 +90,14 @@ public class RequestHandler {
   }
 
   /**
-   * This is called before the get(), put(), etc methods but after the request
-   * is set up, ready to go.
+   * This is called before the get(), put(), etc methods but after the request is set up, ready to
+   * go.
+   *
+   * @return true if we should continue processing the request, false if not. If you return false
+   *     then you should have set response headers, status code and so on already.
    */
-  protected void onBeforeHandle() {
+  protected boolean onBeforeHandle() {
+    return true;
   }
 
   protected void get() throws RequestException {

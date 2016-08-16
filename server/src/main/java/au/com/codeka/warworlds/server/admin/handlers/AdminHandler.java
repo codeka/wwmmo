@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,6 +29,7 @@ import au.com.codeka.warworlds.server.store.DataStore;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
 
@@ -51,11 +53,27 @@ public class AdminHandler extends RequestHandler {
   }
 
   @Override
-  public void onBeforeHandle() {
-    if (requiresSession() && getSessionNoError() == null) {
-      // If we require a session, make sure we're authenticated.
-      authenticate();
+  public boolean onBeforeHandle() {
+    Collection<AdminRole> requiredRoles = getRequiredRoles();
+    if (requiredRoles != null) {
+      Session session = getSessionNoError();
+      if (session == null) {
+        authenticate();
+        return false;
+      } else {
+        boolean inRoles = false;
+        for (AdminRole role : requiredRoles) {
+          inRoles = inRoles || session.isInRole(role);
+        }
+        if (!inRoles) {
+          // you're not in a required role.
+          redirect("/admin");
+          return false;
+        }
+      }
     }
+
+    return true;
   }
 
   @Override
@@ -72,8 +90,11 @@ public class AdminHandler extends RequestHandler {
     }
   }
 
-  protected boolean requiresSession() {
-    return true;
+  /**
+   * Gets a collection of roles, one of which the current user must be in to access this handler.
+   */
+  protected Collection<AdminRole> getRequiredRoles() {
+    return Lists.newArrayList(AdminRole.ADMINISTRATOR);
   }
 
   protected void render(String path, @Nullable Map<String, Object> data) throws RequestException {

@@ -29,7 +29,9 @@
       </div>
       <ul>
         <li><a href="/admin">Dashboard</a>
+        {% if session|isinrole:ADMINISTRATOR %}
         <li><a href="/admin/users">Users</a>
+        {% endif %}
         {% if session|isinrole:CHAT %}
         <li><span><span>Chat</span></span>
           <ul>
@@ -38,31 +40,12 @@
             <li><a href="/admin/chat/sinbin">Sinbin</a>
           </ul>
         {% endif %}
-        <li><span><span>Actions</span></span>
+        {% if session|isinrole:STARFIELD %}
+        <li><span><span>Starfield</span></span>
           <ul>
-            <li><a href="/admin/actions/move-star">Move Star</a>
-            <li><a href="/admin/actions/create-fleet">Create Fleet</a>
-            <li><a href="/admin/actions/reset-empire">Reset Empire</a>
+            <li><a href="/admin/debug/starfield">View</a>
           </ul>
-        <li><span><span>Empires</span></span>
-          <ul>
-            <li><a href="/admin/empire/search">Search</a>
-            <li><a href="/admin/empire/shields">Shields</a>
-            <li><a href="/admin/empire/alts">Alt Accounts</a>
-            <li><a href="/admin/empire/ban">Ban Empire</a>
-          </ul>
-        <li><span><span>Alliances</span></span>
-          <ul>
-            <li><a href="/admin/alliance/search">Search</a>
-          </ul>
-        <li><span><span>Debug</span></span>
-          <ul>
-            <li><a href="/admin/debug/starfield">Starfield</a>
-            <li><a href="/admin/debug/colonies">Colonies</a>
-            <li><a href="/admin/debug/reports">Reports</a>
-            <li><a href="/admin/debug/purchases">Purchases</a>
-            <li><a href="/admin/debug/error-reports">Error Reports</a>
-          </ul>
+        {% endif %}
       </ul>
     </div></section>
 

@@ -11,6 +11,7 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.AdminRole;
 import au.com.codeka.warworlds.server.admin.RequestException;
 import au.com.codeka.warworlds.server.admin.Session;
 import au.com.codeka.warworlds.server.admin.SessionManager;
@@ -28,10 +30,10 @@ public class AdminLoginHandler extends AdminHandler {
   private static final String CLIENT_ID =
       "1021675369049-sumlr2cihs72j4okvfl8hl72keognhsa.apps.googleusercontent.com";
 
-  /** We don't require a session, because we're *creating* a session. */
+  /** We don't require any roles, because we're creating a session. */
   @Override
-  protected boolean requiresSession() {
-    return false;
+  protected Collection<AdminRole> getRequiredRoles() {
+    return null;
   }
 
   @Override
