@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -76,13 +77,23 @@ public class AdminServlet extends GenericServlet {
       return; // should never happen.
     }
 
-    Session session = null;
+    Session session = getSession(request);
+
+    try {
+      handler.handle(matcher, route.extraOption, session, request, response);
+    } catch (RequestException e) {
+      e.populate(response);
+    }
+  }
+
+  @Nullable
+  private static Session getSession(HttpServletRequest request) {
     if (request.getCookies() != null) {
       String sessionCookieValue = "";
       for (Cookie cookie : request.getCookies()) {
         if (cookie.getName().equals("SESSION")) {
           sessionCookieValue = cookie.getValue();
-          session = SessionManager.i.getSession(sessionCookieValue);
+          return SessionManager.i.getSession(sessionCookieValue);
         }
       }
       if (sessionCookieValue.equals("")) {
@@ -90,11 +101,7 @@ public class AdminServlet extends GenericServlet {
       }
     }
 
-    try {
-      handler.handle(matcher, route.extraOption, session, request, response);
-    } catch (RequestException e) {
-      e.populate(response);
-    }
+    return null;
   }
 
   private static class Route {

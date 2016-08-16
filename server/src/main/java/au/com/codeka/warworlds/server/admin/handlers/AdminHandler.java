@@ -20,6 +20,7 @@ import au.com.codeka.carrot.interpret.InterpretException;
 import au.com.codeka.carrot.lib.Filter;
 import au.com.codeka.carrot.template.TemplateEngine;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.AdminRole;
 import au.com.codeka.warworlds.server.admin.RequestException;
 import au.com.codeka.warworlds.server.admin.RequestHandler;
 import au.com.codeka.warworlds.server.admin.Session;
@@ -85,7 +86,7 @@ public class AdminHandler extends RequestHandler {
     data.put("realm", getRealm());
     Session session = getSessionNoError();
     if (session != null) {
-      data.put("logged_in_user", session.getEmail());
+      data.put("session", session);
     }
     data.put("num_backend_users", DataStore.i.adminUsers().count());
 
@@ -206,13 +207,12 @@ public class AdminHandler extends RequestHandler {
     @Override
     public Object filter(Object object, CarrotInterpreter interpreter, String... args)
         throws InterpretException {
-      //if (object instanceof BackendUser) {
-      //  BackendUser.Role role = BackendUser.Role.valueOf(args[0]);
-      //  return ((BackendUser) object).isInRole(role);
-      //}
-      return true;
+      if (object instanceof Session) {
+        AdminRole role = AdminRole.valueOf(args[0]);
+        return ((Session) object).getRole().equals(role);
+      }
 
-      //throw new InterpretException("Expected a BackendUser, not " + object);
+      throw new InterpretException("Expected a Session, not " + object);
     }
   }
 }

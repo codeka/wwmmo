@@ -2,26 +2,22 @@ package au.com.codeka.warworlds.server.admin;
 
 import org.joda.time.DateTime;
 
+import javax.annotation.Nonnull;
+
+import au.com.codeka.warworlds.common.proto.AdminRole;
+import au.com.codeka.warworlds.common.proto.AdminUser;
+
 /**
  * Represents details about the current session, such as your username, access level and so on.
  */
 public class Session {
-  private String cookie;
-  private String email;
-  private DateTime loginTime;
+  private final String cookie;
+  private final DateTime loginTime;
+  @Nonnull private final AdminUser adminUser;
 
-  public Session() {
-  }
-
-  public Session(Session copy) {
-    cookie = copy.cookie;
-    email = copy.email;
-    loginTime = copy.loginTime;
-  }
-
-  public Session(String cookie, String email, DateTime loginTime) {
+  public Session(String cookie, @Nonnull AdminUser adminUser, DateTime loginTime) {
     this.cookie = cookie;
-    this.email = email;
+    this.adminUser = adminUser;
     this.loginTime = loginTime;
   }
 
@@ -30,7 +26,12 @@ public class Session {
   }
 
   public String getEmail() {
-    return email;
+    return adminUser.email_addr;
+  }
+
+  @Nonnull
+  public AdminRole getRole() {
+    return adminUser.role;
   }
 
   public DateTime getLoginTime() {

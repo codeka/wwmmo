@@ -25,12 +25,12 @@
 
     <section id="navmenu"><div class="navmenu-bg">
       <div class="user-details">
-        <div>{{ logged_in_user }}</div>
+        <div>{{ session.email }}</div>
       </div>
       <ul>
         <li><a href="/admin">Dashboard</a>
         <li><a href="/admin/users">Users</a>
-        {% if backend_user|isinrole:ChatRead %}
+        {% if session|isinrole:ADMINISTRATOR %}
         <li><span><span>Chat</span></span>
           <ul>
             <li><a href="/admin/chat">Messages</a>

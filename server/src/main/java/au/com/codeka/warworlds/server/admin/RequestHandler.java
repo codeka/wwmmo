@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.AdminRole;
 
 /**
  * This is the base class for the game's request handlers. It handles some common tasks such as
@@ -214,22 +215,15 @@ public class RequestHandler {
   }
 
   /**
-   * Checks whether the current user is in the given role. If the user is not an admin, then they
-   * are -- by definition -- not in any roles.
-   *//*
-  protected boolean isInRole(BackendUser.Role role) throws RequestException {
-    if (session == null || !session.isAdmin()) {
+   * Checks whether the current user is in the given role.
+   */
+  protected boolean isInRole(AdminRole role) throws RequestException {
+    if (session == null) {
       return false;
     }
 
-    BackendUser backendUser = new AdminController().getBackendUser(session.getActualEmail());
-    if (backendUser == null) {
-      // should  be impossible if it's really an admin user...
-      throw new RequestException(500, "This is impossible.");
-    }
-
-    return backendUser.isInRole(role);
-  }*/
+    return session.getRole().equals(role);
+  }
 
   @Nullable
   private <T> T getRequestJson(Class<T> protoType) {

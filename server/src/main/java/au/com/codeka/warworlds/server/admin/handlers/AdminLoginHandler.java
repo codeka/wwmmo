@@ -72,7 +72,12 @@ public class AdminLoginHandler extends AdminHandler {
       throw new RequestException(e);
     }
 
-    Session session =  SessionManager.i.authenticate(emailAddr);
+    Session session = SessionManager.i.authenticate(emailAddr);
+    if (session == null) {
+      // not a valid user
+      redirect("/");
+      return;
+    }
     log.info("Got cookie: %s for %s", session.getCookie(), emailAddr);
 
     Cookie cookie = new Cookie("SESSION", session.getCookie());
