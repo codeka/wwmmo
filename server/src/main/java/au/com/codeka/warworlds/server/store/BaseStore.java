@@ -39,6 +39,10 @@ public abstract class BaseStore<K, V> {
     }
   }
 
+  public boolean delete(K key) {
+    return (db.delete(null, encodeKey(key)) == OperationStatus.SUCCESS);
+  }
+
   /** Gets the number of entries in this store. */
   public long count() {
     return db.count();

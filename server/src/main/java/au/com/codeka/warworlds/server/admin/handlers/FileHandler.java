@@ -50,4 +50,9 @@ public class FileHandler extends AdminHandler {
       log.error("Error sending static file!", e);
     }
   }
+
+  @Override
+  public void post() throws RequestException {
+    throw new RequestException(404);
+  }
 }

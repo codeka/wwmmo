@@ -61,10 +61,11 @@ public class AdminHandler extends RequestHandler {
   @Override
   protected void handleException(RequestException e) {
     try {
-      TreeMap<String, Object> data = new TreeMap<String, Object>();
-      data.put("exception", e);
-      data.put("stack_trace", Throwables.getStackTraceAsString(e));
-      render("exception.html", data);
+      render("exception.html", ImmutableMap.<String, Object>builder()
+          .put("exception", e)
+          .put("stack_trace", Throwables.getStackTraceAsString(e))
+          .build());
+      e.populate(getResponse());
     } catch (Exception e2) {
       log.error("Error loading exception.html template.", e2);
       setResponseText(e2.toString());
