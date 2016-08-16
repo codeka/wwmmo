@@ -67,6 +67,8 @@ public class AdminHandler extends RequestHandler {
         }
         if (!inRoles) {
           // you're not in a required role.
+          log.warning("User '%s' is not in any required role: %s",
+              session.getEmail(), requiredRoles);
           redirect("/admin");
           return false;
         }
