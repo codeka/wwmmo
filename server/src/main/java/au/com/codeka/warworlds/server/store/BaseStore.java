@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.store;
 
-import com.google.api.client.util.Data;
 import com.google.common.base.Preconditions;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
@@ -10,8 +9,6 @@ import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.Sequence;
 import com.sleepycat.je.SequenceConfig;
 import com.sleepycat.je.utilint.Pair;
-
-import au.com.codeka.warworlds.common.proto.Account;
 
 /**
  * Base storage object for {@link ProtobufStore} and some of the other stores.
@@ -93,11 +90,16 @@ public abstract class BaseStore<K, V> {
     }
 
     public Pair<K, V> next() {
-      if (cursor.getNext(key, value, LockMode.DEFAULT) != OperationStatus.SUCCESS) {
-        return null;
+      K k = null;
+      while (k == null) {
+        if (cursor.getNext(key, value, LockMode.DEFAULT) != OperationStatus.SUCCESS) {
+          return null;
+        }
+
+        k = decodeKey(key);
       }
 
-      return new Pair<>(decodeKey(key), decodeValue(value));
+      return new Pair<>(k, decodeValue(value));
     }
 
     @Override
