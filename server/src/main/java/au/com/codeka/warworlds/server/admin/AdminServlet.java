@@ -27,6 +27,7 @@ import au.com.codeka.warworlds.server.admin.handlers.AjaxStarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxUsersHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DashboardHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DebugStarfieldHandler;
+import au.com.codeka.warworlds.server.admin.handlers.EmpiresHandler;
 import au.com.codeka.warworlds.server.admin.handlers.FileHandler;
 import au.com.codeka.warworlds.server.admin.handlers.UsersCreateHandler;
 import au.com.codeka.warworlds.server.admin.handlers.UsersHandler;
@@ -40,6 +41,7 @@ public class AdminServlet extends GenericServlet {
       new Route("/", DashboardHandler.class),
       new Route("/login", AdminLoginHandler.class),
       new Route("/debug/starfield", DebugStarfieldHandler.class),
+      new Route("/empires", EmpiresHandler.class),
       new Route("/users", UsersHandler.class),
       new Route("/users/create", UsersCreateHandler.class),
       new Route("/ajax/empire", AjaxEmpireHandler.class),

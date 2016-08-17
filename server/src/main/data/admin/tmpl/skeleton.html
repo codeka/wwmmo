@@ -40,6 +40,12 @@
             <li><a href="/admin/chat/sinbin">Sinbin</a>
           </ul>
         {% endif %}
+        {% if session|isinrole:EMPIRE %}
+        <li><span><span>Empires</span></span>
+          <ul>
+            <li><a href="/admin/empires">View</a>
+          </ul>
+          {% endif %}
         {% if session|isinrole:STARFIELD %}
         <li><span><span>Starfield</span></span>
           <ul>
