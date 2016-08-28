@@ -23,7 +23,8 @@ public class ProtobufStore<M extends Message<?, ?>> extends BaseStore<Long, M> {
   @Nonnull
   @Override
   protected DatabaseEntry encodeKey(Long id) {
-    return new DatabaseEntry(ByteBuffer.allocate(Long.BYTES).putLong(id).array());
+    return new DatabaseEntry(ByteBuffer.allocate(Long.BYTES + 1)
+        .put(KEY_MARKER).putLong(id).array());
   }
 
   @Override
@@ -33,12 +34,12 @@ public class ProtobufStore<M extends Message<?, ?>> extends BaseStore<Long, M> {
 
   @Override
   protected Long decodeKey(DatabaseEntry databaseEntry) {
-    byte[] data = databaseEntry.getData();
-    if (data.length != 8) {
+    ByteBuffer bb = ByteBuffer.wrap(databaseEntry.getData());
+    if (bb.get() != KEY_MARKER) {
       return null;
     }
 
-    return ByteBuffer.wrap(data).getLong();
+    return bb.getLong();
   }
 
   @Override

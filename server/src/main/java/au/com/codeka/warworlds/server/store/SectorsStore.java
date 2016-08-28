@@ -280,7 +280,6 @@ public class SectorsStore {
     }
   }
 
-
   private DatabaseEntry makeKey(long x, long y) {
     String key = String.format(Locale.US, "sector:%d,%d", x, y);
     return new DatabaseEntry(key.getBytes(Charset.defaultCharset()));

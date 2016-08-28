@@ -10,6 +10,8 @@ import com.sleepycat.je.Sequence;
 import com.sleepycat.je.SequenceConfig;
 import com.sleepycat.je.utilint.Pair;
 
+import java.nio.ByteBuffer;
+
 /**
  * Base storage object for {@link ProtobufStore} and some of the other stores.
  *
@@ -18,6 +20,12 @@ import com.sleepycat.je.utilint.Pair;
 public abstract class BaseStore<K, V> {
   protected final Database db;
   protected Sequence seq;
+
+  /** The first byte of a key will be KEY_MARKER if the key is for a 'normal' value. */
+  protected static final byte KEY_MARKER = 0;
+
+  /** The first byte of the key will be SEQUENCE_MARKER if the key is for a sequence. */
+  protected static final byte SEQUENCE_MARKER = 1;
 
   public BaseStore(Database db) {
     this.db = Preconditions.checkNotNull(db);
@@ -56,7 +64,8 @@ public abstract class BaseStore<K, V> {
         SequenceConfig seqConfig = new SequenceConfig();
         seqConfig.setAllowCreate(true);
         seqConfig.setInitialValue(100);
-        seq = db.openSequence(null, new DatabaseEntry("ids".getBytes()), seqConfig);
+        ByteBuffer bb = ByteBuffer.allocate(4).put(SEQUENCE_MARKER).put("ids".getBytes());
+        seq = db.openSequence(null, new DatabaseEntry(bb.array()), seqConfig);
       }
     }
     return seq.get(null, 1);
