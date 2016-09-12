@@ -20,6 +20,8 @@ public class Program {
   public static void main(String[] args) throws Exception {
     //Configuration.loadConfig();
     LogImpl.setup();
+    DataStore.i.open();
+
     try {
       //new SchemaUpdater().verifySchema();
       //ErrorReportingLoggingHandler.setup();

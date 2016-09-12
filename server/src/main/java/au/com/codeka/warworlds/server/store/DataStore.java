@@ -31,11 +31,21 @@ public class DataStore {
   private StringProtobufStore<AdminUser> adminUsers;
 
   private DataStore() {
+  }
+
+  public void open() {
+    File home = new File("data/store");
+    if (!home.exists()) {
+      if (!home.mkdirs()) {
+        throw new RuntimeException("Error creating directories for data store.");
+      }
+    }
+
     try {
       EnvironmentConfig envConfig = new EnvironmentConfig();
       envConfig.setAllowCreate(true);
       envConfig.setTransactional(true);
-      env = new Environment(new File("data/store"), envConfig);
+      env = new Environment(home, envConfig);
 
       DatabaseConfig dbConfig = new DatabaseConfig();
       dbConfig.setAllowCreate(true);
