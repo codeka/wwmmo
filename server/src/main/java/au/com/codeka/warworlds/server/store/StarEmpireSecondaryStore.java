@@ -35,15 +35,14 @@ public class StarEmpireSecondaryStore {
   private final ProtobufStore<Star> stars;
 
   public StarEmpireSecondaryStore(Environment env, Database db, ProtobufStore<Star> stars) {
+    this.stars = Preconditions.checkNotNull(stars);
     SecondaryConfig secondaryConfig = new SecondaryConfig();
+    secondaryConfig.setAllowPopulate(true);
     secondaryConfig.setAllowCreate(true);
     secondaryConfig.setTransactional(true);
     secondaryConfig.setSortedDuplicates(true);
     secondaryConfig.setMultiKeyCreator(new KeyCreator());
-    SecondaryDatabase sdb = env.openSecondaryDatabase(null, "empire_stars", db, secondaryConfig);
-
-    this.sdb = Preconditions.checkNotNull(sdb);
-    this.stars = Preconditions.checkNotNull(stars);
+    this.sdb = env.openSecondaryDatabase(null, "empire_stars", db, secondaryConfig);
   }
 
   /** Gets an iterable of all the stars beloning to the given empire. */
@@ -80,9 +79,8 @@ public class StarEmpireSecondaryStore {
 
       // TODO: fleets
 
-      log.debug("updating empire index for star %d", star.id);
+      log.debug("updating empire index for star %d (%d empires)", star.id, empireIds.size());
       for (long empireId : empireIds) {
-        log.debug(".. adding empire %d", empireId);
         results.add(stars.encodeKey(empireId));
       }
     }
@@ -129,17 +127,20 @@ public class StarEmpireSecondaryStore {
         return false;
       }
 
-      if (currKey == null || currValue == null) {
+      if (currValue != null) {
+        // We've already got a value, so it's obviously valid.
+        return true;
+      }
+
+      if (currKey == null) {
         currKey = stars.encodeKey(empireId);
         currValue = new DatabaseEntry();
-
         OperationStatus status = cursor.getSearchKey(currKey, currValue, LockMode.DEFAULT);
         validValue = (status == OperationStatus.SUCCESS);
-        log.debug("first status = %s for %d", status, empireId);
       } else {
+        currValue = new DatabaseEntry();
         OperationStatus status = cursor.getNextDup(currKey, currValue, LockMode.DEFAULT);
         validValue = (status == OperationStatus.SUCCESS);
-        log.debug("later status = %s for %d", status, empireId);
       }
       return validValue;
     }
@@ -147,7 +148,9 @@ public class StarEmpireSecondaryStore {
     @Override
     public Star next() {
       if (validValue) {
-        return stars.decodeValue(currValue);
+        Star star = stars.decodeValue(currValue);
+        currValue = null;
+        return star;
       }
 
       return null;

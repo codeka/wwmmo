@@ -12,6 +12,8 @@ import com.sleepycat.je.utilint.Pair;
 
 import java.nio.ByteBuffer;
 
+import au.com.codeka.warworlds.common.Log;
+
 /**
  * Base storage object for {@link ProtobufStore} and some of the other stores.
  *
