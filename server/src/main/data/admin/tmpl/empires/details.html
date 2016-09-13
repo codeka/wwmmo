@@ -7,8 +7,11 @@
 </script>
 {% endblock %}
 {% block content %}
-<h1>Empires</h1>
-{% for empire in empires %}
-  <p>{{ empire.id }} <a href="/admin/empires/{{ empire.id }}">{{ empire.display_name }}</a></p>
+<h1>{{ empire.display_name }}</h1>
+
+<h2>Stars</h2>
+{% for star in stars %}
+  <p>star</p>
 {% endfor %}
+
 {% endblock %}

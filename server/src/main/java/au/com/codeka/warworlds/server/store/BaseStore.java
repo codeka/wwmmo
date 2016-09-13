@@ -21,12 +21,6 @@ public abstract class BaseStore<K, V> {
   protected final Database db;
   protected Sequence seq;
 
-  /** The first byte of a key will be KEY_MARKER if the key is for a 'normal' value. */
-  protected static final byte KEY_MARKER = 0;
-
-  /** The first byte of the key will be SEQUENCE_MARKER if the key is for a sequence. */
-  protected static final byte SEQUENCE_MARKER = 1;
-
   public BaseStore(Database db) {
     this.db = Preconditions.checkNotNull(db);
   }
@@ -64,7 +58,8 @@ public abstract class BaseStore<K, V> {
         SequenceConfig seqConfig = new SequenceConfig();
         seqConfig.setAllowCreate(true);
         seqConfig.setInitialValue(100);
-        ByteBuffer bb = ByteBuffer.allocate(4).put(SEQUENCE_MARKER).put("ids".getBytes());
+        ByteBuffer bb =
+            ByteBuffer.allocate(4).put(StoreHelper.SEQUENCE_MARKER).put("ids".getBytes());
         seq = db.openSequence(null, new DatabaseEntry(bb.array()), seqConfig);
       }
     }

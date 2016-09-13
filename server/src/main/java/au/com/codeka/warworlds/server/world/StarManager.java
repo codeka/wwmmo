@@ -150,6 +150,7 @@ public class StarManager {
   private final WatchableObject.Watcher<Star> starWatcher = new WatchableObject.Watcher<Star>() {
     @Override
     public void onUpdate(WatchableObject<Star> star) {
+      log.debug("Saving star %d %s", star.get().id, star.get().name);
       store.put(star.get().id, star.get());
     }
   };

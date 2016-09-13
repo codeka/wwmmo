@@ -24,7 +24,7 @@ public class ProtobufStore<M extends Message<?, ?>> extends BaseStore<Long, M> {
   @Override
   protected DatabaseEntry encodeKey(Long id) {
     return new DatabaseEntry(ByteBuffer.allocate(Long.BYTES + 1)
-        .put(KEY_MARKER).putLong(id).array());
+        .put(StoreHelper.KEY_MARKER).putLong(id).array());
   }
 
   @Override
@@ -35,7 +35,7 @@ public class ProtobufStore<M extends Message<?, ?>> extends BaseStore<Long, M> {
   @Override
   protected Long decodeKey(DatabaseEntry databaseEntry) {
     ByteBuffer bb = ByteBuffer.wrap(databaseEntry.getData());
-    if (bb.get() != KEY_MARKER) {
+    if (bb.get() != StoreHelper.KEY_MARKER) {
       return null;
     }
 

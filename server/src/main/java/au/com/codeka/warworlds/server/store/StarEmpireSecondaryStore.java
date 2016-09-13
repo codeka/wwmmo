@@ -46,8 +46,7 @@ public class StarEmpireSecondaryStore {
     this.stars = Preconditions.checkNotNull(stars);
   }
 
-  /** Gets the next {@link Star} that needs to be simulated. */
-  @Nullable
+  /** Gets an iterable of all the stars beloning to the given empire. */
   public StarIterable getStarsForEmpire(@Nullable Transaction trans, final long empireId) {
     CursorConfig cursorConfig = new CursorConfig();
     Cursor cursor = sdb.openCursor(trans, cursorConfig);
@@ -62,7 +61,8 @@ public class StarEmpireSecondaryStore {
         DatabaseEntry key,
         DatabaseEntry value,
         Set<DatabaseEntry> results) {
-      if (key.getSize() != 8) {
+      if (!StoreHelper.isKey(key)) {
+        log.debug("Not a key, not checking for empire_id.");
         // it's probably not a star (probably the sequence)
         return;
       }
@@ -116,7 +116,7 @@ public class StarEmpireSecondaryStore {
 
     @Nullable private DatabaseEntry currKey;
     @Nullable private DatabaseEntry currValue;
-    private boolean validValue;
+    private Boolean validValue = null;
 
     StarIterator(Cursor cursor, long empireId) {
       this.cursor = Preconditions.checkNotNull(cursor);
@@ -125,18 +125,21 @@ public class StarEmpireSecondaryStore {
 
     @Override
     public boolean hasNext() {
+      if (validValue != null && !validValue) {
+        return false;
+      }
+
       if (currKey == null || currValue == null) {
         currKey = stars.encodeKey(empireId);
         currValue = new DatabaseEntry();
 
         OperationStatus status = cursor.getSearchKey(currKey, currValue, LockMode.DEFAULT);
-        validValue = status == OperationStatus.SUCCESS;
-        log.debug("valid value = %s for %d", status, empireId);
-
+        validValue = (status == OperationStatus.SUCCESS);
+        log.debug("first status = %s for %d", status, empireId);
       } else {
         OperationStatus status = cursor.getNextDup(currKey, currValue, LockMode.DEFAULT);
-        validValue = status == OperationStatus.SUCCESS;
-        log.debug("valid value = %s for %d", status, empireId);
+        validValue = (status == OperationStatus.SUCCESS);
+        log.debug("later status = %s for %d", status, empireId);
       }
       return validValue;
     }
