@@ -12,7 +12,11 @@ var empireStore = (function() {
     $("span[data-empireid]").each(function(i, elem) {
       var $this = $(this);
       if ($this.data("empireid") == empire.id) {
-        $this.html(empire.display_name);
+        if ($this.data("nolink") == "1") {
+          $this.html(empire.display_name);
+        } else {
+          $this.html("<a href=\"/admin/empires/" + empire.id + "\">" + empire.display_name + "</a>");
+        }
       }
     });
   }

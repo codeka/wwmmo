@@ -49,7 +49,7 @@ $(function() {
       }
       for (var i in empires) {
         label = $("<div class=\"starfield-empire\"><img /><span>...</span></div>");
-        $("span", label).attr("data-empireid", empires[i]);
+        $("span", label).attr("data-empireid", empires[i]).attr("data-nolink", "1");
         var angle = (Math.PI / 4.0) * (i + 1);
         var x = 0.0;
         var y = -20.0;
