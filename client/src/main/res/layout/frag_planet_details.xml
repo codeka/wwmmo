@@ -4,13 +4,13 @@
   <data>
     <import type="android.view.View"/>
     <import type="au.com.codeka.warworlds.client.util.NumberFormatter" />
-    <import type="au.com.codeka.warworlds.client.world.ImageHelper" />
-    <import type="au.com.codeka.warworlds.client.world.EmpireManager" />
-    <variable name="handlers" type="au.com.codeka.warworlds.client.solarsystem.PlanetDetailsFragment.Handlers" />
+    <import type="au.com.codeka.warworlds.client.game.world.ImageHelper" />
+    <import type="au.com.codeka.warworlds.client.game.world.EmpireManager" />
+    <variable name="handlers" type="au.com.codeka.warworlds.client.game.solarsystem.PlanetDetailsFragment.Handlers" />
     <variable name="star" type="au.com.codeka.warworlds.common.proto.Star" />
     <variable name="planet" type="au.com.codeka.warworlds.common.proto.Planet" />
     <variable name="empire" type="au.com.codeka.warworlds.common.proto.Empire" />
-    <variable name="focus" type="au.com.codeka.warworlds.client.solarsystem.PlanetDetailsFragment.FocusModel" />
+    <variable name="focus" type="au.com.codeka.warworlds.client.game.solarsystem.PlanetDetailsFragment.FocusModel" />
   </data>
   <RelativeLayout android:layout_width="match_parent"
                   android:layout_height="match_parent">
