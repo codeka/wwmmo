@@ -10,7 +10,7 @@ import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.net.Server;
 import au.com.codeka.warworlds.client.store.DataStore;
 import au.com.codeka.warworlds.client.util.eventbus.EventBus;
-import au.com.codeka.warworlds.client.world.StarManager;
+import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.common.Log;
 
 /**

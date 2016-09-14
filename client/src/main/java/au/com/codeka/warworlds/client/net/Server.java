@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.util.GameSettings;
-import au.com.codeka.warworlds.client.world.EmpireManager;
+import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.debug.PacketDebug;
 import au.com.codeka.warworlds.common.net.PacketDecoder;

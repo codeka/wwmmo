@@ -1,14 +1,13 @@
 package au.com.codeka.warworlds.client.ctrl;
 
 
-import android.databinding.tool.util.Preconditions;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 
 import javax.annotation.Nonnull;
 
-import au.com.codeka.warworlds.client.world.StarCollection;
+import au.com.codeka.warworlds.client.game.world.StarCollection;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**

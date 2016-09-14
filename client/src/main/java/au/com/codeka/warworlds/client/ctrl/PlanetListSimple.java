@@ -5,11 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,8 +15,8 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.world.EmpireManager;
-import au.com.codeka.warworlds.client.world.ImageHelper;
+import au.com.codeka.warworlds.client.game.world.EmpireManager;
+import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;

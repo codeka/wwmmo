@@ -80,7 +80,7 @@
             android:layout_alignParentBottom="true">
             <RelativeLayout android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <au.com.codeka.warworlds.client.fleets.FleetListSimple
+                <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
                     android:id="@+id/fleet_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -146,7 +146,7 @@
         </ScrollView>
     </RelativeLayout>
 
-    <au.com.codeka.warworlds.client.starfield.FleetInfoView
+    <au.com.codeka.warworlds.client.game.starfield.FleetInfoView
         android:id="@+id/selected_fleet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

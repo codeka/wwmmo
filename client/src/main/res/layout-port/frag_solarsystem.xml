@@ -14,7 +14,7 @@
         android:layout_height="50dp"
         android:layout_alignParentTop="true" />
 
-    <au.com.codeka.warworlds.client.solarsystem.SolarSystemView
+    <au.com.codeka.warworlds.client.game.solarsystem.SolarSystemView
         android:id="@+id/solarsystem_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -224,7 +224,7 @@
                 <ScrollView android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_below="@+id/sitrep_btn">
-                    <au.com.codeka.warworlds.client.fleets.FleetListSimple
+                    <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
                               android:id="@+id/fleet_list"
                               android:layout_width="match_parent"
                               android:layout_height="wrap_content"

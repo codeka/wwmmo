@@ -46,7 +46,7 @@
         android:layout_alignParentEnd="true"
         android:baselineAligned="false">
 
-        <au.com.codeka.warworlds.client.starfield.SelectionDetailsView
+        <au.com.codeka.warworlds.client.game.starfield.SelectionDetailsView
             android:id="@+id/selection_details"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
