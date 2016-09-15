@@ -18,6 +18,7 @@ import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.SharedViewHolder;
+import au.com.codeka.warworlds.client.game.empire.EmpireFragment;
 import au.com.codeka.warworlds.client.game.fleets.FleetListSimple;
 import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
 import au.com.codeka.warworlds.client.game.fleets.FleetsFragment;
@@ -36,6 +37,7 @@ public class StarfieldFragment extends BaseFragment {
 
   private ViewGroup bottomPane;
   private Button allianceBtn;
+  private Button empireBtn;
 
   @Override
   protected int getViewResourceId() {
@@ -49,6 +51,7 @@ public class StarfieldFragment extends BaseFragment {
         (SelectionDetailsView) view.findViewById(R.id.selection_details);
     bottomPane = (ViewGroup) view.findViewById(R.id.bottom_pane);
     allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
+    empireBtn = (Button) view.findViewById(R.id.empire_btn);
 
     selectionDetailsView.setHandlers(
         new PlanetListSimple.PlanetSelectedHandler() { // planetSelectHandler
@@ -100,6 +103,18 @@ public class StarfieldFragment extends BaseFragment {
 
           }
         });
+
+    empireBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        getFragmentTransitionManager().replaceFragment(
+            EmpireFragment.class,
+            EmpireFragment.createArguments(),
+            SharedViewHolder.builder()
+                .addSharedView(R.id.bottom_pane, "bottom_pane")
+                .build());
+      }
+    });
 
     StarfieldManager starfieldManager = ((MainActivity) getActivity()).getStarfieldManager();
     if (starfieldManager.getSelectedStar() != null) {
