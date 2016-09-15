@@ -98,7 +98,11 @@ public class Server {
   private void connectGameSocket(LoginResponse loginResponse) {
     try {
       gameSocket = new Socket();
-      gameSocket.connect(new InetSocketAddress(loginResponse.host, loginResponse.port));
+      String host = loginResponse.host;
+      if (host == null) {
+        host = ServerUrl.getHost();
+      }
+      gameSocket.connect(new InetSocketAddress(host, loginResponse.port));
       packetEncoder = new PacketEncoder(gameSocket.getOutputStream(), packetEncodeHandler);
       packetDecoder = new PacketDecoder(gameSocket.getInputStream(), packetDecodeHandler);
 

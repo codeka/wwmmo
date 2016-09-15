@@ -43,7 +43,6 @@ public class LoginServlet extends ProtobufHttpServlet {
 
     writeProtobuf(response,
         new LoginResponse.Builder()
-            .host("192.168.1.3")
             .port(8081)
             .empire(empire.get())
             .build());
