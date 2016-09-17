@@ -1,19 +1,16 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
-import android.databinding.DataBindingUtil;
-import android.databinding.ObservableBoolean;
-import android.databinding.ObservableFloat;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 
 import com.google.common.base.Preconditions;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
-import au.com.codeka.warworlds.client.databinding.FragPlanetDetailsBinding;
+import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
@@ -36,8 +33,11 @@ public class PlanetDetailsFragment extends BaseFragment {
   private Star star;
   private int planetIndex;
   private Long colonyId;
-  private FragPlanetDetailsBinding binding;
-  private Handlers handlers = new Handlers();
+
+  private ImageView planetIcon;
+  private SeekBar[] focusSeekBars;
+  private Button[] focusMinusButtons;
+  private Button[] focusPlusButtons;
 
   public static Bundle createArguments(long starID, int planetIndex) {
     Bundle args = new Bundle();
@@ -47,16 +47,31 @@ public class PlanetDetailsFragment extends BaseFragment {
   }
 
   @Override
-  public View onCreateView(
-      LayoutInflater layoutInflater, ViewGroup parent, Bundle savedInstanceState) {
-    binding = DataBindingUtil.inflate(layoutInflater, R.layout.frag_planet_details, parent, false);
-    return binding.getRoot();
+  protected int getViewResourceId() {
+    return R.layout.frag_planet_details;
   }
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     long seed = getArguments().getLong(STAR_ID_KEY);
     ViewBackgroundGenerator.setBackground(view.findViewById(R.id.planet_background), null, seed);
+
+    planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
+    focusSeekBars = new SeekBar[] {
+        (SeekBar) view.findViewById(R.id.focus_farming),
+        (SeekBar) view.findViewById(R.id.focus_mining),
+        (SeekBar) view.findViewById(R.id.focus_energy),
+        (SeekBar) view.findViewById(R.id.focus_construction)};
+    focusMinusButtons = new Button[] {
+        (Button) view.findViewById(R.id.focus_farming_minus_btn),
+        (Button) view.findViewById(R.id.focus_mining_minus_btn),
+        (Button) view.findViewById(R.id.focus_energy_minus_btn),
+        (Button) view.findViewById(R.id.focus_construction_minus_btn)};
+    focusPlusButtons = new Button[] {
+        (Button) view.findViewById(R.id.focus_farming_plus_btn),
+        (Button) view.findViewById(R.id.focus_mining_plus_btn),
+        (Button) view.findViewById(R.id.focus_energy_plus_btn),
+        (Button) view.findViewById(R.id.focus_construction_plus_btn)};
   }
 
   @Override
@@ -79,11 +94,7 @@ public class PlanetDetailsFragment extends BaseFragment {
       focusModel = new FocusModel(planet.colony.focus);
     }
 
-    binding.setHandlers(handlers);
-    binding.setStar(star);
-    binding.setPlanet(planet);
-    binding.setEmpire(empire);
-    binding.setFocus(focusModel);
+    ImageHelper.bindPlanetIcon(planetIcon, star, planet);
   }
 
   @Override
@@ -235,21 +246,14 @@ public class PlanetDetailsFragment extends BaseFragment {
     }
 
     public void onPlusClick(View view) {
-      SeekBar[] seekBars = {
-          binding.focusFarming, binding.focusMining, binding.focusEnergy, binding.focusConstruction
-      };
-      View buttons[] = {
-          binding.focusFarmingPlusBtn, binding.focusMiningPlusBtn, binding.focusEnergyPlusBtn,
-          binding.focusConstructionPlusBtn
-      };
       ObservableFloat[] focuses = {
           farmingFocus, miningFocus, energyFocus, constructionFocus
       };
 
       for (int i = 0; i < 4; i++) {
-        if (view == buttons[i]) {
+        if (view == focusPlusButtons[i]) {
           float newValue = Math.max(0.0f, focuses[i].get() + 0.01f);
-          seekBars[i].setProgress(Math.round(newValue * seekBars[i].getMax()));
+          focusSeekBars[i].setProgress(Math.round(newValue * focusSeekBars[i].getMax()));
           redistribute(i, newValue);
           break;
         }
@@ -257,21 +261,14 @@ public class PlanetDetailsFragment extends BaseFragment {
     }
 
     public void onMinusClick(View view) {
-      SeekBar[] seekBars = {
-          binding.focusFarming, binding.focusMining, binding.focusEnergy, binding.focusConstruction
-      };
-      View buttons[] = {
-          binding.focusFarmingMinusBtn, binding.focusMiningMinusBtn, binding.focusEnergyMinusBtn,
-          binding.focusConstructionMinusBtn
-      };
       ObservableFloat[] focuses = {
           farmingFocus, miningFocus, energyFocus, constructionFocus
       };
 
       for (int i = 0; i < 4; i++) {
-        if (view == buttons[i]) {
+        if (view == focusMinusButtons[i]) {
           float newValue = Math.max(0.0f, focuses[i].get() - 0.01f);
-          seekBars[i].setProgress(Math.round(newValue * seekBars[i].getMax()));
+          focusSeekBars[i].setProgress(Math.round(newValue * focusSeekBars[i].getMax()));
           redistribute(i, newValue);
           break;
         }
@@ -284,11 +281,8 @@ public class PlanetDetailsFragment extends BaseFragment {
         return;
       }
 
-      SeekBar[] seekBars = {
-          binding.focusFarming, binding.focusMining, binding.focusEnergy, binding.focusConstruction
-      };
       for (int i = 0; i < 4; i++) {
-        if (seekBars[i] == changedSeekBar) {
+        if (focusSeekBars[i] == changedSeekBar) {
           redistribute(i, (float) changedSeekBar.getProgress() / changedSeekBar.getMax());
         }
       }

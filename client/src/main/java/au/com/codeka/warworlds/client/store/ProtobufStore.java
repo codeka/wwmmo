@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
 
 import com.google.common.base.Preconditions;
 import com.squareup.wire.Message;
@@ -32,15 +31,12 @@ public class ProtobufStore<M extends Message<?, ?>> {
 
   public M get(long id) {
     SQLiteDatabase db = helper.getReadableDatabase();
-    Cursor cursor = db.query(false, name, new String[] {"value"},
-        "key = ?", new String[] {Long.toString(id)},
-        null, null, null, null);
-    try {
+    try (Cursor cursor = db.query(false, name, new String[]{"value"},
+        "key = ?", new String[]{Long.toString(id)},
+        null, null, null, null)) {
       if (cursor.moveToFirst()) {
         return serializer.deserialize(cursor.getBlob(0));
       }
-    } finally {
-      cursor.close();
     }
 
     return null;

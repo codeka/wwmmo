@@ -28,10 +28,17 @@ android {
 
   defaultConfig {
     applicationId "au.com.codeka.warworlds2"
-    minSdkVersion 10
+    minSdkVersion 15
     targetSdkVersion 23
     versionCode getVersionCodeFromGit()
     versionName "2.0"
+    //jackOptions {
+    //  enabled true
+    //}
+  }
+  compileOptions {
+    //sourceCompatibility JavaVersion.VERSION_1_8
+    //targetCompatibility JavaVersion.VERSION_1_8
   }
   signingConfigs {
     release {

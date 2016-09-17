@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
-  <data>
-    <import type="android.view.View"/>
-    <import type="au.com.codeka.warworlds.client.util.NumberFormatter" />
-    <import type="au.com.codeka.warworlds.client.game.world.ImageHelper" />
-    <import type="au.com.codeka.warworlds.client.game.world.EmpireManager" />
-    <variable name="handlers" type="au.com.codeka.warworlds.client.game.solarsystem.PlanetDetailsFragment.Handlers" />
-    <variable name="star" type="au.com.codeka.warworlds.common.proto.Star" />
-    <variable name="planet" type="au.com.codeka.warworlds.common.proto.Planet" />
-    <variable name="empire" type="au.com.codeka.warworlds.common.proto.Empire" />
-    <variable name="focus" type="au.com.codeka.warworlds.client.game.solarsystem.PlanetDetailsFragment.FocusModel" />
-  </data>
   <RelativeLayout android:layout_width="match_parent"
                   android:layout_height="match_parent">
     <FrameLayout
@@ -27,9 +16,7 @@
                android:layout_alignParentLeft="true"
                android:layout_alignParentStart="true"
                android:layout_alignParentTop="true"
-               android:layout_margin="10dp"
-               app:star="@{star}"
-               app:planet="@{planet}"/>
+               android:layout_margin="10dp" />
 
     <RelativeLayout android:id="@+id/congeniality_container"
                     android:layout_width="match_parent"
