@@ -43,8 +43,7 @@
           android:layout_height="20dp"
           android:layout_alignTop="@id/population_congeniality_icon"
           android:layout_alignParentRight="true"
-          android:layout_alignParentEnd="true"
-          android:text="@{NumberFormatter.format(planet.population_congeniality)}" />
+          android:layout_alignParentEnd="true" />
 
       <ProgressBar
           android:id="@+id/population_congeniality"
@@ -56,8 +55,7 @@
           android:layout_marginRight="50dp"
           android:layout_marginStart="20dp"
           android:layout_marginEnd="50dp"
-          android:max="1000"
-          android:progress="@{planet.population_congeniality}" />
+          android:max="1000" />
 
       <ImageView
           android:id="@+id/farming_congeniality_icon"
@@ -74,8 +72,7 @@
           android:layout_height="20dp"
           android:layout_alignTop="@id/farming_congeniality_icon"
           android:layout_alignParentRight="true"
-          android:layout_alignParentEnd="true"
-          android:text="@{NumberFormatter.format(planet.farming_congeniality)}" />
+          android:layout_alignParentEnd="true" />
 
       <ProgressBar
           android:id="@+id/farming_congeniality"
@@ -87,8 +84,7 @@
           android:layout_marginRight="50dp"
           android:layout_marginStart="20dp"
           android:layout_marginEnd="50dp"
-          android:max="100"
-          android:progress="@{planet.farming_congeniality}" />
+          android:max="100" />
 
       <ImageView
           android:id="@+id/mining_congeniality_icon"
@@ -105,8 +101,7 @@
           android:layout_height="20dp"
           android:layout_alignTop="@id/mining_congeniality_icon"
           android:layout_alignParentRight="true"
-          android:layout_alignParentEnd="true"
-          android:text="@{NumberFormatter.format(planet.mining_congeniality)}" />
+          android:layout_alignParentEnd="true" />
 
       <ProgressBar
           android:id="@+id/mining_congeniality"
@@ -118,8 +113,7 @@
           android:layout_marginRight="50dp"
           android:layout_marginStart="20dp"
           android:layout_marginEnd="50dp"
-          android:max="100"
-          android:progress="@{planet.mining_congeniality}" />
+          android:max="100" />
 
       <ImageView
           android:id="@+id/energy_congeniality_icon"
@@ -136,8 +130,7 @@
           android:layout_height="20dp"
           android:layout_alignTop="@id/energy_congeniality_icon"
           android:layout_alignParentRight="true"
-          android:layout_alignParentEnd="true"
-          android:text="@{NumberFormatter.format(planet.energy_congeniality)}" />
+          android:layout_alignParentEnd="true" />
 
       <ProgressBar
           android:id="@+id/energy_congeniality"
@@ -149,8 +142,7 @@
           android:layout_marginRight="50dp"
           android:layout_marginStart="20dp"
           android:layout_marginEnd="50dp"
-          android:max="100"
-          android:progress="@{planet.energy_congeniality}" />
+          android:max="100" />
     </RelativeLayout>
 
     <RelativeLayout android:id="@+id/bottom_pane"
@@ -165,8 +157,7 @@
                  android:layout_height="40dp"
                  android:layout_marginTop="6dp"
                  android:layout_marginLeft="6dp"
-                 android:layout_marginStart="6dp"
-                 app:empireShield="@{empire}"/>
+                 android:layout_marginStart="6dp" />
       <TextView android:id="@+id/empire_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -177,8 +168,7 @@
                 android:layout_marginStart="6dp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:singleLine="true"
-                android:ellipsize="end"
-                android:text="@{empire.display_name}" />
+                android:ellipsize="end" />
       <TextView android:id="@+id/empire_defence"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -189,7 +179,8 @@
                 android:layout_marginStart="6dp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Defence: 1234" />
-      <Button android:layout_width="wrap_content"
+      <Button android:id="@+id/attack_btn"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_below="@id/empire_icon"
               android:layout_alignLeft="@id/empire_icon"
@@ -199,10 +190,9 @@
               android:layout_marginTop="10dp"
               android:layout_marginLeft="10dp"
               android:layout_marginRight="10dp"
-              android:onClick="@{handlers.onAttackClick}"
-              android:text="@string/attack"
-              android:visibility="@{EmpireManager.i.isEnemy(empire) ? View.VISIBLE : View.GONE}" />
-      <Button android:layout_width="wrap_content"
+              android:text="@string/attack" />
+      <Button android:id="@+id/colonize_btn"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_below="@id/empire_icon"
               android:layout_alignLeft="@id/empire_icon"
@@ -212,17 +202,13 @@
               android:layout_marginTop="10dp"
               android:layout_marginLeft="10dp"
               android:layout_marginRight="10dp"
-              android:onClick="@{handlers.onColonizeClick}"
-              android:text="@string/colonize"
-              android:visibility="@{empire == null ? View.VISIBLE : View.GONE}" />
+              android:text="@string/colonize"/>
 
-      <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                      android:id="@+id/focus_container"
+      <RelativeLayout android:id="@+id/focus_container"
                       android:layout_width="match_parent"
                       android:layout_below="@id/empire_defence"
                       android:layout_height="wrap_content"
-                      android:layout_margin="10dp"
-                      android:visibility="@{empire == null ? View.GONE : View.VISIBLE}">
+                      android:layout_margin="10dp">
 
         <TextView android:id="@+id/note"
                   android:layout_width="wrap_content"
@@ -248,9 +234,7 @@
                  android:layout_toEndOf="@+id/focus_farming_plus_btn"
                  android:layout_toLeftOf="@+id/focus_farming_value"
                  android:layout_toStartOf="@+id/focus_farming_value"
-                 android:max="1000"
-                 android:progress="@{(int)(focus.farmingFocus * 1000.0f)}"
-                 android:onProgressChanged="@{focus.onFocusProgressChanged}" />
+                 android:max="1000" />
 
         <ImageView android:id="@+id/focus_farming_icon"
                    android:layout_width="20dp"
@@ -271,8 +255,7 @@
                 android:layout_toEndOf="@+id/focus_farming_icon"
                 android:layout_marginLeft="4dp"
                 android:layout_marginStart="4dp"
-                android:text="-"
-                android:onClick="@{focus.onMinusClick}" />
+                android:text="-" />
 
         <Button android:id="@+id/focus_farming_plus_btn"
                 android:layout_width="30dp"
@@ -282,8 +265,7 @@
                 android:layout_toEndOf="@+id/focus_farming_minus_btn"
                 android:layout_marginLeft="4dp"
                 android:layout_marginStart="4dp"
-                android:text="+"
-                android:onClick="@{focus.onPlusClick}" />
+                android:text="+" />
 
         <TextView android:id="@+id/focus_farming_value"
                   android:layout_width="wrap_content"
@@ -293,8 +275,7 @@
                   android:layout_marginRight="2dp"
                   android:layout_marginEnd="2dp"
                   android:layout_alignTop="@+id/focus_farming"
-                  android:gravity="center_vertical"
-                  android:text="@{NumberFormatter.format(Math.round(focus.farmingFocus * 100.0f))}" />
+                  android:gravity="center_vertical" />
 
         <TextView android:id="@+id/focus_farming_delta"
                   android:layout_width="wrap_content"
@@ -318,9 +299,7 @@
                      android:layout_alignParentEnd="true"
                      android:layout_marginRight="10dp"
                      android:layout_marginEnd="10dp"
-                     android:scaleType="center"
-                     android:src="@{focus.farmingLocked ? @drawable/lock_closed : @drawable/lock_opened}"
-                     android:onClick="@{focus.onFarmingLockClick}" />
+                     android:scaleType="center" />
 
         <SeekBar android:id="@+id/focus_mining"
                  android:layout_width="match_parent"
@@ -337,9 +316,7 @@
                  android:layout_toEndOf="@+id/focus_mining_plus_btn"
                  android:layout_toLeftOf="@+id/focus_mining_value"
                  android:layout_toStartOf="@+id/focus_mining_value"
-                 android:max="1000"
-                 android:progress="@{(int)(focus.miningFocus * 1000.0f)}"
-                 android:onProgressChanged="@{focus.onFocusProgressChanged}" />
+                 android:max="1000"/>
 
         <ImageView android:id="@+id/focus_mining_icon"
                    android:layout_width="20dp"
@@ -360,8 +337,7 @@
                 android:layout_toEndOf="@+id/focus_mining_icon"
                 android:layout_marginLeft="4dp"
                 android:layout_marginStart="4dp"
-                android:text="-"
-                android:onClick="@{focus.onMinusClick}" />
+                android:text="-" />
 
         <Button android:id="@+id/focus_mining_plus_btn"
                 android:layout_width="30dp"
@@ -371,8 +347,7 @@
                 android:layout_toEndOf="@+id/focus_mining_minus_btn"
                 android:layout_marginLeft="4dp"
                 android:layout_marginStart="4dp"
-                android:text="+"
-                android:onClick="@{focus.onPlusClick}" />
+                android:text="+" />
 
         <TextView android:id="@+id/focus_mining_value"
                   android:layout_width="wrap_content"
@@ -382,8 +357,7 @@
                   android:layout_marginRight="2dp"
                   android:layout_marginEnd="2dp"
                   android:layout_alignTop="@+id/focus_mining"
-                  android:gravity="center_vertical"
-                  android:text="@{NumberFormatter.format(Math.round(focus.miningFocus * 100.0f))}" />
+                  android:gravity="center_vertical" />
 
         <TextView android:id="@+id/focus_mining_delta"
                   android:layout_width="wrap_content"
@@ -407,9 +381,7 @@
                      android:layout_alignParentEnd="true"
                      android:layout_marginRight="10dp"
                      android:layout_marginEnd="10dp"
-                     android:scaleType="center"
-                     android:src="@{focus.miningLocked ? @drawable/lock_closed : @drawable/lock_opened}"
-                     android:onClick="@{focus.onMiningLockClick}" />
+                     android:scaleType="center" />
 
         <SeekBar android:id="@+id/focus_energy"
                  android:layout_width="match_parent"
@@ -424,9 +396,7 @@
                  android:layout_toEndOf="@+id/focus_energy_plus_btn"
                  android:layout_alignParentRight="true"
                  android:layout_alignParentEnd="true"
-                 android:max="1000"
-                 android:progress="@{(int)(focus.energyFocus * 1000.0f)}"
-                 android:onProgressChanged="@{focus.onFocusProgressChanged}" />
+                 android:max="1000" />
 
         <ImageView android:id="@+id/focus_energy_icon"
                    android:layout_width="20dp"
@@ -447,8 +417,7 @@
                 android:layout_toEndOf="@+id/focus_energy_icon"
                 android:layout_marginLeft="4dp"
                 android:layout_marginStart="4dp"
-                android:text="-"
-                android:onClick="@{focus.onMinusClick}" />
+                android:text="-" />
 
         <Button android:id="@+id/focus_energy_plus_btn"
                 android:layout_width="30dp"
@@ -458,8 +427,7 @@
                 android:layout_toEndOf="@+id/focus_energy_minus_btn"
                 android:layout_marginLeft="4dp"
                 android:layout_marginStart="4dp"
-                android:text="+"
-                android:onClick="@{focus.onPlusClick}" />
+                android:text="+" />
 
         <TextView android:id="@+id/focus_energy_value"
                   android:layout_width="wrap_content"
@@ -470,8 +438,7 @@
                   android:layout_marginEnd="2dp"
                   android:layout_alignTop="@+id/focus_energy"
                   android:layout_alignBottom="@+id/focus_energy"
-                  android:gravity="center_vertical"
-                  android:text="@{NumberFormatter.format(Math.round(focus.energyFocus * 100.0f))}" />
+                  android:gravity="center_vertical" />
 
         <ImageButton android:id="@+id/focus_energy_lock"
                      style="@style/Button"
@@ -482,9 +449,7 @@
                      android:layout_alignParentEnd="true"
                      android:layout_marginRight="10dp"
                      android:layout_marginEnd="10dp"
-                     android:scaleType="center"
-                     android:src="@{focus.energyLocked ? @drawable/lock_closed : @drawable/lock_opened}"
-                     android:onClick="@{focus.onEnergyLockClick}" />
+                     android:scaleType="center" />
 
         <SeekBar android:id="@+id/focus_construction"
                  android:layout_width="match_parent"
@@ -502,9 +467,7 @@
                  android:layout_toEndOf="@+id/focus_construction_plus_btn"
                  android:layout_toLeftOf="@+id/focus_construction_value"
                  android:layout_toStartOf="@+id/focus_construction_value"
-                 android:max="1000"
-                 android:progress="@{(int)(focus.constructionFocus * 1000.0f)}"
-                 android:onProgressChanged="@{focus.onFocusProgressChanged}" />
+                 android:max="1000" />
 
         <ImageView android:id="@+id/focus_construction_icon"
                    android:layout_width="20dp"
@@ -525,8 +488,7 @@
                 android:layout_toEndOf="@+id/focus_construction_icon"
                 android:layout_marginLeft="4dp"
                 android:layout_marginStart="4dp"
-                android:text="-"
-                android:onClick="@{focus.onMinusClick}" />
+                android:text="-" />
 
         <Button android:id="@+id/focus_construction_plus_btn"
                 android:layout_width="30dp"
@@ -536,8 +498,7 @@
                 android:layout_toEndOf="@+id/focus_construction_minus_btn"
                 android:layout_marginLeft="4dp"
                 android:layout_marginStart="4dp"
-                android:text="+"
-                android:onClick="@{focus.onPlusClick}" />
+                android:text="+" />
 
         <TextView android:id="@+id/focus_construction_value"
                   android:layout_width="wrap_content"
@@ -548,8 +509,7 @@
                   android:layout_marginEnd="2dp"
                   android:layout_alignTop="@+id/focus_construction"
                   android:layout_alignBottom="@+id/focus_construction"
-                  android:gravity="center_vertical"
-                  android:text="@{NumberFormatter.format(Math.round(focus.constructionFocus * 100.0f))}" />
+                  android:gravity="center_vertical" />
 
         <ImageButton android:id="@+id/focus_construction_lock"
                      style="@style/Button"
@@ -560,20 +520,17 @@
                      android:layout_alignParentEnd="true"
                      android:layout_marginRight="10dp"
                      android:layout_marginEnd="10dp"
-                     android:scaleType="center"
-                     android:src="@{focus.constructionLocked ? @drawable/lock_closed : @drawable/lock_opened}"
-                     android:onClick="@{focus.onConstructionLockClick}" />
+                     android:scaleType="center" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/focus_construction"
-            android:layout_alignRight="@id/focus_construction_lock"
-            android:layout_alignEnd="@id/focus_construction_lock"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-            android:text="@string/save"
-            android:onClick="@{focus.onSaveClick}" />
+        <Button android:id="@+id/focus_save_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/focus_construction"
+                android:layout_alignRight="@id/focus_construction_lock"
+                android:layout_alignEnd="@id/focus_construction_lock"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:text="@string/save" />
 
       </RelativeLayout>
     </RelativeLayout>

@@ -3,18 +3,23 @@ package au.com.codeka.warworlds.client.game.solarsystem;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
+import au.com.codeka.warworlds.client.util.NumberFormatter;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -34,10 +39,34 @@ public class PlanetDetailsFragment extends BaseFragment {
   private int planetIndex;
   private Long colonyId;
 
+  // The index into the focus arrays for each type of focus (farming, mining, etc).
+  private static final int FARMING_INDEX = 0;
+  private static final int MINING_INDEX = 1;
+  private static final int ENERGY_INDEX = 2;
+  private static final int CONSTRUCTION_INDEX = 3;
+
+  private boolean[] focusLocks = new boolean[] { false, false, false, false };
+  private float[] focusValues = new float[] { 0.25f, 0.25f, 0.25f, 0.25f };
+
   private ImageView planetIcon;
+  private ImageView empireIcon;
+  private View focusContainer;
   private SeekBar[] focusSeekBars;
+  private TextView[] focusTextViews;
   private Button[] focusMinusButtons;
   private Button[] focusPlusButtons;
+  private ImageButton[] focusLockButtons;
+  private TextView populationCongenialityValue;
+  private ProgressBar populationCongeniality;
+  private TextView farmingCongenialityValue;
+  private ProgressBar farmingCongeniality;
+  private TextView miningCongenialityValue;
+  private ProgressBar miningCongeniality;
+  private TextView energyCongenialityValue;
+  private ProgressBar energyCongeniality;
+  private TextView empireName;
+  private Button attackBtn;
+  private Button colonizeBtn;
 
   public static Bundle createArguments(long starID, int planetIndex) {
     Bundle args = new Bundle();
@@ -57,11 +86,18 @@ public class PlanetDetailsFragment extends BaseFragment {
     ViewBackgroundGenerator.setBackground(view.findViewById(R.id.planet_background), null, seed);
 
     planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
+    empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
+    focusContainer = view.findViewById(R.id.focus_container);
     focusSeekBars = new SeekBar[] {
         (SeekBar) view.findViewById(R.id.focus_farming),
         (SeekBar) view.findViewById(R.id.focus_mining),
         (SeekBar) view.findViewById(R.id.focus_energy),
         (SeekBar) view.findViewById(R.id.focus_construction)};
+    focusTextViews = new TextView[] {
+        (TextView) view.findViewById(R.id.focus_farming_value),
+        (TextView) view.findViewById(R.id.focus_mining_value),
+        (TextView) view.findViewById(R.id.focus_energy_value),
+        (TextView) view.findViewById(R.id.focus_construction_value)};
     focusMinusButtons = new Button[] {
         (Button) view.findViewById(R.id.focus_farming_minus_btn),
         (Button) view.findViewById(R.id.focus_mining_minus_btn),
@@ -72,6 +108,80 @@ public class PlanetDetailsFragment extends BaseFragment {
         (Button) view.findViewById(R.id.focus_mining_plus_btn),
         (Button) view.findViewById(R.id.focus_energy_plus_btn),
         (Button) view.findViewById(R.id.focus_construction_plus_btn)};
+    focusLockButtons = new ImageButton[] {
+        (ImageButton) view.findViewById(R.id.focus_farming_lock),
+        (ImageButton) view.findViewById(R.id.focus_mining_lock),
+        (ImageButton) view.findViewById(R.id.focus_energy_lock),
+        (ImageButton) view.findViewById(R.id.focus_construction_lock)};
+    populationCongenialityValue = (TextView) view.findViewById(R.id.population_congeniality_value);
+    populationCongeniality = (ProgressBar) view.findViewById(R.id.population_congeniality);
+    farmingCongenialityValue = (TextView) view.findViewById(R.id.farming_congeniality_value);
+    farmingCongeniality = (ProgressBar) view.findViewById(R.id.farming_congeniality);
+    miningCongenialityValue = (TextView) view.findViewById(R.id.mining_congeniality_value);
+    miningCongeniality = (ProgressBar) view.findViewById(R.id.mining_congeniality);
+    energyCongenialityValue = (TextView) view.findViewById(R.id.energy_congeniality_value);
+    energyCongeniality = (ProgressBar) view.findViewById(R.id.energy_congeniality);
+    empireName = (TextView) view.findViewById(R.id.empire_name);
+
+    attackBtn = (Button) view.findViewById(R.id.attack_btn);
+    attackBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        onAttackClick(view);
+      }
+    });
+
+    colonizeBtn = (Button) view.findViewById(R.id.colonize_btn);
+    colonizeBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        onColonizeClick(view);
+      }
+    });
+
+    for (int i = 0; i < 4; i++) {
+      focusLockButtons[i].setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          onFocusLockClick(view);
+        }
+      });
+
+      focusPlusButtons[i].setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          onFocusPlusClick(view);
+        }
+      });
+
+      focusMinusButtons[i].setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          onFocusMinusClick(view);
+        }
+      });
+
+      focusSeekBars[i].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
+          onFocusProgressChanged(seekBar, progressValue, fromUser);
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
+      });
+    }
+    view.findViewById(R.id.focus_save_btn).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        onFocusSaveClick(view);
+      }
+    });
   }
 
   @Override
@@ -84,17 +194,62 @@ public class PlanetDetailsFragment extends BaseFragment {
       return;
     }
     planetIndex = getArguments().getInt(PLANET_INDEX_KEY);
-    Planet planet = star.planets.get(planetIndex);
 
+    rebind();
+  }
+
+  private void rebind() {
+    Planet planet = star.planets.get(planetIndex);
     Empire empire = null;
-    FocusModel focusModel = null;
     if (planet.colony != null && planet.colony.empire_id != null) {
       colonyId = planet.colony.id;
       empire = EmpireManager.i.getEmpire(planet.colony.empire_id);
-      focusModel = new FocusModel(planet.colony.focus);
     }
 
     ImageHelper.bindPlanetIcon(planetIcon, star, planet);
+    ImageHelper.bindEmpireShield(empireIcon, empire);
+    if (empire != null) {
+      empireName.setText(empire.display_name);
+    } else {
+      empireName.setText("");
+    }
+    populationCongeniality.setProgress(planet.population_congeniality);
+    populationCongenialityValue.setText(NumberFormatter.format(planet.population_congeniality));
+    farmingCongeniality.setProgress(planet.farming_congeniality);
+    farmingCongenialityValue.setText(NumberFormatter.format(planet.farming_congeniality));
+    miningCongeniality.setProgress(planet.mining_congeniality);
+    miningCongenialityValue.setText(NumberFormatter.format(planet.mining_congeniality));
+    energyCongeniality.setProgress(planet.energy_congeniality);
+    energyCongenialityValue.setText(NumberFormatter.format(planet.energy_congeniality));
+
+    focusContainer.setVisibility(empire == null ? View.GONE : View.VISIBLE);
+
+    attackBtn.setVisibility(
+        empire != null && EmpireManager.i.isEnemy(empire) ? View.VISIBLE : View.GONE);
+    colonizeBtn.setVisibility(empire == null ? View.VISIBLE : View.GONE);
+
+    if (planet.colony != null) {
+      focusValues[FARMING_INDEX] = planet.colony.focus.farming;
+      focusValues[MINING_INDEX] = planet.colony.focus.mining;
+      focusValues[ENERGY_INDEX] = planet.colony.focus.energy;
+      focusValues[CONSTRUCTION_INDEX] = planet.colony.focus.construction;
+    }
+    bindFocus();
+  }
+
+  private void bindFocus() {
+    Planet planet = star.planets.get(planetIndex);
+    if (planet.colony == null) {
+      return;
+    }
+    ColonyFocus focus = planet.colony.focus;
+
+    for (int i = 0; i < 4; i++) {
+      focusLockButtons[i].setImageResource(
+          focusLocks[i] ? R.drawable.lock_closed : R.drawable.lock_opened);
+      focusSeekBars[i].setProgress((int)(focusValues[i] * 1000.0f));
+      focusTextViews[i].setText(NumberFormatter.format(Math.round(focusValues[i] * 100.0f)));
+    }
   }
 
   @Override
@@ -150,187 +305,146 @@ public class PlanetDetailsFragment extends BaseFragment {
     getFragmentManager().popBackStack();
   }
 
-  @SuppressWarnings("unused") // used through data binding
-  public class Handlers {
-    public void onAttackClick(View view) {
-      log.info("Attack!");
-      /*
-      int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
+  private void onAttackClick(View view) {
+    log.info("Attack!");
+    /*
+    int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
 
-      final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-      int attack = 0;
-      for (BaseFleet fleet : star.getFleets()) {
-        if (fleet.getEmpireKey() == null) {
-          continue;
-        }
-        if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
-          ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP,
-              fleet.getDesignID());
-          if (design.hasEffect("troopcarrier")) {
-            attack += Math.ceil(fleet.getNumShips());
-          }
+    final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+    int attack = 0;
+    for (BaseFleet fleet : star.getFleets()) {
+      if (fleet.getEmpireKey() == null) {
+        continue;
+      }
+      if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
+        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP,
+            fleet.getDesignID());
+        if (design.hasEffect("troopcarrier")) {
+          attack += Math.ceil(fleet.getNumShips());
         }
       }
-
-      StyledDialog.Builder b = new StyledDialog.Builder(this);
-      b.setMessage(Html.fromHtml(String.format(Locale.ENGLISH,
-          "<p>Do you want to attack this %s colony?</p>"
-              + "<p><b>Colony defence:</b> %d<br />"
-              + "   <b>Your attack capability:</b> %d</p>", colonyEmpire.getDisplayName(), defence,
-          attack)));
-      b.setPositiveButton("Attack!", new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(final DialogInterface dialog, int which) {
-          myEmpire.attackColony(star, colony, new MyEmpire.AttackColonyCompleteHandler() {
-            @Override
-            public void onComplete() {
-              dialog.dismiss();
-              finish();
-            }
-          });
-        }
-      });
-      b.setNegativeButton("Cancel", null);
-      b.create().show();
-    */}
-
-    public void onColonizeClick(View view) {
-      Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
-      StarManager.i.updateStar(star, new StarModification.Builder()
-          .type(StarModification.MODIFICATION_TYPE.COLONIZE)
-          .empire_id(myEmpire.id)
-          .planet_index(planetIndex)
-          .build());
-
-      // TODO: have a nicer API for this.
-      getFragmentActivity().getSupportFragmentManager().popBackStack();
     }
+
+    StyledDialog.Builder b = new StyledDialog.Builder(this);
+    b.setMessage(Html.fromHtml(String.format(Locale.ENGLISH,
+        "<p>Do you want to attack this %s colony?</p>"
+            + "<p><b>Colony defence:</b> %d<br />"
+            + "   <b>Your attack capability:</b> %d</p>", colonyEmpire.getDisplayName(), defence,
+        attack)));
+    b.setPositiveButton("Attack!", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(final DialogInterface dialog, int which) {
+        myEmpire.attackColony(star, colony, new MyEmpire.AttackColonyCompleteHandler() {
+          @Override
+          public void onComplete() {
+            dialog.dismiss();
+            finish();
+          }
+        });
+      }
+    });
+    b.setNegativeButton("Cancel", null);
+    b.create().show();
+  */}
+
+  private void onColonizeClick(View view) {
+    Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
+    StarManager.i.updateStar(star, new StarModification.Builder()
+        .type(StarModification.MODIFICATION_TYPE.COLONIZE)
+        .empire_id(myEmpire.id)
+        .planet_index(planetIndex)
+        .build());
+
+    // TODO: have a nicer API for this.
+    getFragmentActivity().getSupportFragmentManager().popBackStack();
   }
 
-  @SuppressWarnings("unused") // used by bindings
-  public class FocusModel {
-    public ObservableFloat farmingFocus;
-    public ObservableFloat miningFocus;
-    public ObservableFloat energyFocus;
-    public ObservableFloat constructionFocus;
-    public ObservableBoolean farmingLocked;
-    public ObservableBoolean miningLocked;
-    public ObservableBoolean energyLocked;
-    public ObservableBoolean constructionLocked;
-
-    public FocusModel(ColonyFocus focus) {
-      farmingFocus = new ObservableFloat(focus.farming);
-      miningFocus = new ObservableFloat(focus.mining);
-      energyFocus = new ObservableFloat(focus.energy);
-      constructionFocus = new ObservableFloat(focus.construction);
-      farmingLocked = new ObservableBoolean(false);
-      miningLocked = new ObservableBoolean(false);
-      energyLocked = new ObservableBoolean(false);
-      constructionLocked = new ObservableBoolean(false);
-    }
-
-    public void onFarmingLockClick(View view) {
-      farmingLocked.set(!farmingLocked.get());
-    }
-
-    public void onMiningLockClick(View view) {
-      miningLocked.set(!miningLocked.get());
-    }
-
-    public void onEnergyLockClick(View view) {
-      energyLocked.set(!energyLocked.get());
-    }
-
-    public void onConstructionLockClick(View view) {
-      constructionLocked.set(!constructionLocked.get());
-    }
-
-    public void onPlusClick(View view) {
-      ObservableFloat[] focuses = {
-          farmingFocus, miningFocus, energyFocus, constructionFocus
-      };
-
-      for (int i = 0; i < 4; i++) {
-        if (view == focusPlusButtons[i]) {
-          float newValue = Math.max(0.0f, focuses[i].get() + 0.01f);
-          focusSeekBars[i].setProgress(Math.round(newValue * focusSeekBars[i].getMax()));
-          redistribute(i, newValue);
-          break;
-        }
+  public void onFocusLockClick(View view) {
+    for (int i = 0; i < 4; i++) {
+      if (focusLockButtons[i] == view) {
+        focusLocks[i] = !focusLocks[i];
       }
     }
+    bindFocus();
+  }
 
-    public void onMinusClick(View view) {
-      ObservableFloat[] focuses = {
-          farmingFocus, miningFocus, energyFocus, constructionFocus
-      };
-
-      for (int i = 0; i < 4; i++) {
-        if (view == focusMinusButtons[i]) {
-          float newValue = Math.max(0.0f, focuses[i].get() - 0.01f);
-          focusSeekBars[i].setProgress(Math.round(newValue * focusSeekBars[i].getMax()));
-          redistribute(i, newValue);
-          break;
-        }
+  public void onFocusPlusClick(View view) {
+    for (int i = 0; i < 4; i++) {
+      if (view == focusPlusButtons[i]) {
+        float newValue = Math.max(0.0f, focusValues[i] + 0.01f);
+        focusSeekBars[i].setProgress(Math.round(newValue * focusSeekBars[i].getMax()));
+        redistribute(i, newValue);
+        break;
       }
     }
+    bindFocus();
+  }
 
-    public void onFocusProgressChanged(
-        SeekBar changedSeekBar, int progressValue, boolean fromUser) {
-      if (!fromUser) {
-        return;
-      }
-
-      for (int i = 0; i < 4; i++) {
-        if (focusSeekBars[i] == changedSeekBar) {
-          redistribute(i, (float) changedSeekBar.getProgress() / changedSeekBar.getMax());
-        }
+  public void onFocusMinusClick(View view) {
+    for (int i = 0; i < 4; i++) {
+      if (view == focusMinusButtons[i]) {
+        float newValue = Math.max(0.0f, focusValues[i] - 0.01f);
+        focusSeekBars[i].setProgress(Math.round(newValue * focusSeekBars[i].getMax()));
+        redistribute(i, newValue);
+        break;
       }
     }
+    bindFocus();
+  }
 
-    public void onSaveClick(View view) {
-      saveFocus(farmingFocus.get(), miningFocus.get(), energyFocus.get(), constructionFocus.get());
+  public void onFocusProgressChanged(
+      SeekBar changedSeekBar, int progressValue, boolean fromUser) {
+    if (!fromUser) {
+      return;
     }
 
-    private void redistribute(int changedIndex, float newValue) {
-      ObservableBoolean[] locks = {
-          farmingLocked, miningLocked, energyLocked, constructionLocked
-      };
-      ObservableFloat[] focuses = {
-          farmingFocus, miningFocus, energyFocus, constructionFocus
-      };
+    for (int i = 0; i < 4; i++) {
+      if (focusSeekBars[i] == changedSeekBar) {
+        redistribute(i, (float) progressValue / changedSeekBar.getMax());
+      }
+    }
+    bindFocus();
+  }
 
-      float otherValuesTotal = 0.0f;
+  public void onFocusSaveClick(View view) {
+    saveFocus(
+        focusValues[FARMING_INDEX],
+        focusValues[MINING_INDEX],
+        focusValues[ENERGY_INDEX],
+        focusValues[CONSTRUCTION_INDEX]);
+  }
+
+  private void redistribute(int changedIndex, float newValue) {
+    float otherValuesTotal = 0.0f;
+    for (int i = 0; i < 4; i++) {
+      if (i == changedIndex) {
+        focusValues[i] = newValue;
+        continue;
+      }
+      otherValuesTotal += focusValues[i];
+    }
+
+    float desiredOtherValuesTotal = 1.0f - newValue;
+    if (desiredOtherValuesTotal <= 0.0f) {
       for (int i = 0; i < 4; i++) {
-        if (i == changedIndex) {
-          focuses[i].set(newValue);
+        if (i == changedIndex || focusLocks[i]) {
           continue;
-        }
-        otherValuesTotal += focuses[i].get();
+        };
+        focusValues[i] = 0.0f;
       }
+      return;
+    }
 
-      float desiredOtherValuesTotal = 1.0f - newValue;
-      if (desiredOtherValuesTotal <= 0.0f) {
-        for (int i = 0; i < 4; i++) {
-          if (i == changedIndex || locks[i].get()) {
-            continue;
-          };
-          focuses[i].set(0.0f);
-        }
-        return;
+    float ratio = otherValuesTotal / desiredOtherValuesTotal;
+    for (int i = 0; i < 4; i++) {
+      if (i == changedIndex || focusLocks[i]) {
+        continue;
       }
-
-      float ratio = otherValuesTotal / desiredOtherValuesTotal;
-      for (int i = 0; i < 4; i++) {
-        if (i == changedIndex || locks[i].get()) {
-          continue;
-        }
-        float focus = focuses[i].get();
-        if (focus <= 0.001f) {
-          focus = 0.001f;
-        }
-        focuses[i].set(focus / ratio);
+      float focus = focusValues[i];
+      if (focus <= 0.001f) {
+        focus = 0.001f;
       }
+      focusValues[i] = focus / ratio;
     }
   }
 }

@@ -95,6 +95,7 @@ public class ImageHelper {
   @BindingAdapter({"bind:empireShield"})
   public static void bindEmpireShield(ImageView view, @Nullable Empire empire) {
     if (empire == null) {
+      view.setImageDrawable(null);
       return;
     }
 
