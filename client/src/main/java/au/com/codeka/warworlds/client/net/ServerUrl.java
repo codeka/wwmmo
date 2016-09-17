@@ -37,7 +37,7 @@ public class ServerUrl {
   }
 
   public static String getLoginUrl() {
-    String url = GameSettings.i.getString(GameSettings.Key.SERVER);
+    String url = getUrl();
     return url + "login";
   }
 }
