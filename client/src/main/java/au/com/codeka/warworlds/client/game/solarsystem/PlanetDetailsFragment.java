@@ -19,7 +19,6 @@ import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -124,42 +123,15 @@ public class PlanetDetailsFragment extends BaseFragment {
     empireName = (TextView) view.findViewById(R.id.empire_name);
 
     attackBtn = (Button) view.findViewById(R.id.attack_btn);
-    attackBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        onAttackClick(view);
-      }
-    });
+    attackBtn.setOnClickListener(this::onAttackClick);
 
     colonizeBtn = (Button) view.findViewById(R.id.colonize_btn);
-    colonizeBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        onColonizeClick(view);
-      }
-    });
+    colonizeBtn.setOnClickListener(this::onColonizeClick);
 
     for (int i = 0; i < 4; i++) {
-      focusLockButtons[i].setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          onFocusLockClick(view);
-        }
-      });
-
-      focusPlusButtons[i].setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          onFocusPlusClick(view);
-        }
-      });
-
-      focusMinusButtons[i].setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          onFocusMinusClick(view);
-        }
-      });
+      focusLockButtons[i].setOnClickListener(this::onFocusLockClick);
+      focusPlusButtons[i].setOnClickListener(this::onFocusPlusClick);
+      focusMinusButtons[i].setOnClickListener(this::onFocusMinusClick);
 
       focusSeekBars[i].setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
         @Override
@@ -176,12 +148,7 @@ public class PlanetDetailsFragment extends BaseFragment {
         }
       });
     }
-    view.findViewById(R.id.focus_save_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        onFocusSaveClick(view);
-      }
-    });
+    view.findViewById(R.id.focus_save_btn).setOnClickListener(this::onFocusSaveClick);
   }
 
   @Override

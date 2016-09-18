@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.client.game.world;
 
 import android.content.Context;
-import android.databinding.BindingAdapter;
 import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
@@ -72,13 +71,8 @@ public class ImageHelper {
   }
 
   /**
-   * This is a binding adapter so we can load images using data binding.
-   *
-   * Usage is pretty simple:
-   *
-   * <code>&lt;ImageView app:imageUrl="@{model.url}" /&gt;</code>
+   * Bind an image with the given URL to the given {@link ImageView}.
    */
-  @BindingAdapter({"bind:imageUrl"})
   public static void bindImage(ImageView view, String imageUrl) {
     Picasso.with(view.getContext())
         .load(imageUrl)
@@ -86,13 +80,8 @@ public class ImageHelper {
   }
 
   /**
-   * This is a binding adapter so we can load images using data binding.
-   *
-   * Usage is pretty simple:
-   *
-   * <code>&lt;ImageView app:imageUrl="@{model.url}" /&gt;</code>
+   * Bind an empire's shield image to the given {@link ImageView}.
    */
-  @BindingAdapter({"bind:empireShield"})
   public static void bindEmpireShield(ImageView view, @Nullable Empire empire) {
     if (empire == null) {
       view.setImageDrawable(null);
@@ -107,9 +96,8 @@ public class ImageHelper {
 
 
   /**
-   * <code>&lt;ImageView app:star="@{star}" app:planet="@{planet}" /&gt;</code>
+   * Bind a planet's image to the given {@link ImageView}.
    */
-  @BindingAdapter({"bind:star", "bind:planet"})
   public static void bindPlanetIcon(ImageView view, @Nullable Star star, @Nullable Planet planet) {
     if (star == null || planet == null) {
       return;
