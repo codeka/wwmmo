@@ -2,6 +2,10 @@ package au.com.codeka.warworlds.client.game.world;
 
 import android.support.annotation.Nullable;
 
+import com.google.common.base.Preconditions;
+
+import javax.annotation.Nonnull;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.store.ProtobufStore;
 import au.com.codeka.warworlds.common.proto.Empire;
@@ -26,8 +30,10 @@ public class EmpireManager {
     App.i.getEventBus().publish(empire);
   }
 
-  @Nullable
+  /** Gets my empire, if my empire hasn't been set yet, IllegalStateException is thrown. */
+  @Nonnull
   public Empire getMyEmpire() {
+    Preconditions.checkState(myEmpire != null);
     return myEmpire;
   }
 

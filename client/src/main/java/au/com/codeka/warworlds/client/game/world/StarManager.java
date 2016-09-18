@@ -9,7 +9,7 @@ import java.util.Map;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.client.store.ProtobufStore;
+import au.com.codeka.warworlds.client.store.StarStore;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.ModifyStarPacket;
@@ -26,17 +26,14 @@ public class StarManager {
   private static final Log log = new Log("StarManager");
   public static final StarManager i = new StarManager();
 
-  private final ProtobufStore<Star> stars;
+  private final StarStore stars;
   private final StarModifier starModifier;
 
   private StarManager() {
     stars = App.i.getDataStore().stars();
-    starModifier = new StarModifier(new StarModifier.IdentifierGenerator() {
-      @Override
-      public long nextIdentifier() {
-        // TODO?
-        return 0;
-      }
+    starModifier = new StarModifier(() -> {
+      // TODO?
+      return 0;
     });
   }
 
@@ -52,25 +49,22 @@ public class StarManager {
   }
 
   public void updateStar(final Star star, final StarModification modification) {
-    App.i.getTaskRunner().runTask(new Runnable() {
-      @Override
-      public void run() {
-        Star.Builder starBuilder = star.newBuilder();
-        starModifier.modifyStar(starBuilder, modification);
+    App.i.getTaskRunner().runTask(() -> {
+      Star.Builder starBuilder = star.newBuilder();
+      starModifier.modifyStar(starBuilder, modification);
 
-        // Save the now-modified star.
-        Star newStar = starBuilder.build();
-        stars.put(star.id, newStar);
-        App.i.getEventBus().publish(newStar);
+      // Save the now-modified star.
+      Star newStar = starBuilder.build();
+      stars.put(star.id, newStar, EmpireManager.i.getMyEmpire());
+      App.i.getEventBus().publish(newStar);
 
-        // Send the modification to the server as well.
-        App.i.getServer().send(new Packet.Builder()
-            .modify_star(new ModifyStarPacket.Builder()
-                .star_id(star.id)
-                .modification(Lists.newArrayList(modification))
-                .build())
-            .build());
-      }
+      // Send the modification to the server as well.
+      App.i.getServer().send(new Packet.Builder()
+          .modify_star(new ModifyStarPacket.Builder()
+              .star_id(star.id)
+              .modification(Lists.newArrayList(modification))
+              .build())
+          .build());
     }, Threads.BACKGROUND);
   }
 
@@ -87,7 +81,7 @@ public class StarManager {
         App.i.getEventBus().publish(star);
         values.put(star.id, star);
       }
-      stars.putAll(values);
+      stars.putAll(values, EmpireManager.i.getMyEmpire());
       long endTime = System.nanoTime();
       log.info("Updated %d stars in DB in %d ms", pkt.stars.size(), (endTime - startTime) / 1000000L);
     }
