@@ -40,6 +40,17 @@ public class StarStore extends BaseStore<Long, Star> {
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
   }
 
+  public StarCursor getMyStars() {
+    return new StarCursor(helper.getReadableDatabase().query(
+        name,
+        new String[] { "value" } /* columns */,
+        "my_empire = 1" /* selection */,
+        null /* selectionArgs */,
+        null /* groupBy */,
+        null /* having */,
+        null /* orderBy */));
+  }
+
   /**
    * Gets the {@link Star} with the given ID, or {@code null} if it's not found.
    */

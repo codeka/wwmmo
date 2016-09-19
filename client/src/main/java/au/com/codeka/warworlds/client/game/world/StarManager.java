@@ -9,6 +9,7 @@ import java.util.Map;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.client.store.StarCursor;
 import au.com.codeka.warworlds.client.store.StarStore;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
@@ -46,6 +47,10 @@ public class StarManager {
   public Star getStar(long id) {
     // TODO: this probably shouldn't happen on a UI thread...
     return stars.get(id);
+  }
+
+  public StarCursor getMyStars() {
+    return stars.getMyStars();
   }
 
   public void updateStar(final Star star, final StarModification modification) {

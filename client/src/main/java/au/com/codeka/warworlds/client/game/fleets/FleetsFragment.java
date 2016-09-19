@@ -19,6 +19,8 @@ import com.google.common.base.CaseFormat;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.game.world.ArrayListStarCollection;
+import au.com.codeka.warworlds.client.game.world.MyEmpireStarCollection;
+import au.com.codeka.warworlds.client.game.world.StarCollection;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -36,7 +38,8 @@ public class FleetsFragment extends BaseFragment {
   /** The star whose fleets we're displaying, null if we're displaying all stars fleets. */
   @Nullable private Star star;
 
-  private ArrayListStarCollection starCollection;
+  private StarCollection starCollection;
+  private ExpandableListView listView;
   private FleetExpandableStarListAdapter adapter;
 
   public static Bundle createArguments(long starId, @Nullable Long selectedFleetId) {
@@ -60,18 +63,12 @@ public class FleetsFragment extends BaseFragment {
     Spinner stanceSpinner = (Spinner) view.findViewById(R.id.stance);
     stanceSpinner.setAdapter(new StanceAdapter());
 
-    ExpandableListView listView = (ExpandableListView) view.findViewById(R.id.fleet_list);
-    starCollection = new ArrayListStarCollection();
-    adapter = new FleetExpandableStarListAdapter(
-        getLayoutInflater(savedInstanceState), starCollection);
-    listView.setAdapter(adapter);
-    listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-      @Override
-      public boolean onChildClick(
-          ExpandableListView listView, View view, int groupPosition, int childPosition, long id) {
+    listView = (ExpandableListView) view.findViewById(R.id.fleet_list);
+    listView.setOnChildClickListener((lv, v, groupPosition, childPosition, id) -> {
+      if (adapter != null) {
         adapter.onItemClick(groupPosition, childPosition);
-        return false;
       }
+      return false;
     });
   }
 
@@ -79,14 +76,30 @@ public class FleetsFragment extends BaseFragment {
   public void onStart() {
     super.onStart();
 
-    long starID = getArguments().getLong(STAR_ID_KEY);
-    star = StarManager.i.getStar(starID);
-    starCollection.getStars().clear();
-    starCollection.getStars().add(star);
+    starCollection = new ArrayListStarCollection();
 
-    if (getArguments().getLong(FLEET_ID_KEY, 0) != 0) {
-      adapter.setSelectedFleetId(star.id, getArguments().getLong(FLEET_ID_KEY));
+    long starID = getArguments().getLong(STAR_ID_KEY, 0);
+    if (starID != 0) {
+      star = StarManager.i.getStar(starID);
+      if (star != null) {
+        ArrayListStarCollection arrayListStarCollection = new ArrayListStarCollection();
+        arrayListStarCollection.getStars().clear();
+        arrayListStarCollection.getStars().add(star);
+        starCollection = arrayListStarCollection;
+      } else {
+        // TODO: wait for the star to be returned from cache?
+      }
+    } else {
+      starCollection = new MyEmpireStarCollection();
     }
+
+    adapter = new FleetExpandableStarListAdapter(getLayoutInflater(null), starCollection);
+    long fleetID = getArguments().getLong(FLEET_ID_KEY, 0);
+    if (fleetID != 0 && starID != 0) {
+      adapter.setSelectedFleetId(starID, fleetID);
+    }
+    listView.setAdapter(adapter);
+
 
     adapter.notifyDataSetChanged();
   }
