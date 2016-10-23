@@ -83,6 +83,8 @@ public class StarSimulatorThread {
           Thread.sleep(waitTimeMs);
         } catch (InterruptedException e) {
         }
+      } else {
+        Thread.yield();
       }
     }
   }
