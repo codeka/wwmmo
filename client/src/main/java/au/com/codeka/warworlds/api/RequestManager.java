@@ -51,8 +51,11 @@ public class RequestManager {
     httpClient = new OkHttpClient();
 
     CertificatePinner certificatePinner = new CertificatePinner.Builder()
+        // LetsEncrypt's root certificate:
+        .add("game.war-worlds.com", "sha1/2ptSqHcRadMTGKVn4dybH0S1s1w=")
+        // RapidSSL's certificate:
         .add("game.war-worlds.com", "sha1/7pk8GWNOfZdQYlUboW2S4aXDNls=")
-        // The below are obsolete as of May, 2016.
+        // The below are obsolete as of May, 2016:
         .add("game.war-worlds.com", "sha1/DQYffq7Bm+6ChL1D0VUBHAd3k6g=")
         .add("game.war-worlds.com", "sha1/o5OZxATDsgmwgcIfIWIneMJ0jkw=")
         .build();
