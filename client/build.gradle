@@ -23,8 +23,8 @@ if (signingPropsFile.isFile()) {
 }
 
 android {
-  compileSdkVersion 24
-  buildToolsVersion "24.0.2"
+  compileSdkVersion 25
+  buildToolsVersion "25.0.2"
 
   defaultConfig {
     applicationId "au.com.codeka.warworlds2"
@@ -59,9 +59,6 @@ android {
     debug {
       buildConfigField "String", "DEFAULT_SERVER", "\"http://192.168.1.3:8080/\""
     }
-  }
-  dexOptions {
-    incremental true
   }
   packagingOptions {
     // These get added twice from different dependencies, so just ignore them.
@@ -104,8 +101,8 @@ def getVersionCodeFromGit() {
 dependencies {
   compile fileTree(include: ['*.jar'], dir: 'libs')
   compile 'com.andkulikov:transitionseverywhere:1.6.3'
-  compile 'com.android.support:appcompat-v7:24.2.0'
-  compile 'com.android.support:preference-v7:24.2.0'
+  compile 'com.android.support:appcompat-v7:25.1.0'
+  compile 'com.android.support:preference-v7:25.1.0'
   compile 'com.google.guava:guava:19.0'
   compile 'com.squareup.picasso:picasso:2.5.2'
   compile project(':common')
