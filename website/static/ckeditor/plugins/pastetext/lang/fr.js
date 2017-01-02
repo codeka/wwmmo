@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("pastetext","fr",{button:"Coller comme texte brut",title:"Coller comme texte brut"});

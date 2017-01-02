@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("about","id",{copy:"Hak cipta \x26copy; $1. All rights reserved.",dlgTitle:"Tentang CKEditor",help:"Cel $1 untuk bantuan.",moreInfo:"Untuk informasi lisensi silahkan kunjungi web site kami:",title:"Tentang CKEditor",userGuide:"Petunjuk Pengguna CKEditor"});

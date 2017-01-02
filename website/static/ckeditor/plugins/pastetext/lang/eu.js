@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("pastetext","eu",{button:"Itsatsi testu arrunta bezala",title:"Itsatsi testu arrunta bezala"});
