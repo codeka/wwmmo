@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("about","pt-br",{copy:"Copyright \x26copy; $1. Todos os direitos reservados.",dlgTitle:"Sobre o CKEditor",help:"Verifique o $1 para obter ajuda.",moreInfo:"Para informações sobre a licença por favor visite o nosso site:",title:"Sobre o CKEditor",userGuide:"Guia do Usuário do CKEditor"});

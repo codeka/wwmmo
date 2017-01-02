@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("about","lt",{copy:"Copyright \x26copy; $1. Visos teiss saugomos.",dlgTitle:"Apie CKEditor",help:"Patikrinkite $1 dėl pagalbos.",moreInfo:"Dėl licencijavimo apsilankykite mūsų svetainėje:",title:"Apie CKEditor",userGuide:"CKEditor Vartotojo Gidas"});

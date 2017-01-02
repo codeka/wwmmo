@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("about","hr",{copy:"Copyright \x26copy; $1. All rights reserved.",dlgTitle:"O CKEditoru",help:"Provjeri $1 za pomoć.",moreInfo:"Za informacije o licencama posjetite našu web stranicu:",title:"O CKEditoru",userGuide:"Vodič za CKEditor korisnike"});

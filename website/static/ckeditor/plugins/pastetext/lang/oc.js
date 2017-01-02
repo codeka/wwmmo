@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("pastetext","oc",{button:"Pegar coma tèxte brut",title:"Pegar coma tèxte brut"});

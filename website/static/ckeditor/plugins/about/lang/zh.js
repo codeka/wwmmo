@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("about","zh",{copy:"Copyright \x26copy; $1. All rights reserved.",dlgTitle:"關於 CKEditor",help:"檢閱 $1 尋求幫助。",moreInfo:"關於授權資訊，請參閱我們的網站：",title:"關於 CKEditor",userGuide:"CKEditor 使用者手冊"});

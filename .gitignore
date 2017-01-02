@@ -2,6 +2,7 @@
 # Temp files
 *~
 *.class
+*.pyc
 
 # Make sure keystore.jks never gets added to source control, it's SEKRET!
 keystore.jks
@@ -25,6 +26,6 @@ captures/
 /*/build/
 
 
-#Ignore generated android code
+# Ignore generated android code
 ** gen/
 gen/
