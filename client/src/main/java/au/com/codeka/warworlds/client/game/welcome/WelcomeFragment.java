@@ -132,9 +132,8 @@ public class WelcomeFragment extends BaseFragment {
     updateServerState(App.i.getServer().getCurrState());
     App.i.getEventBus().register(eventHandler);
 
-    Empire myEmpire = EmpireManager.i.getMyEmpire();
-    if (myEmpire != null) {
-      refreshEmpireDetails(myEmpire);
+    if (EmpireManager.i.hasMyEmpire()) {
+      refreshEmpireDetails(EmpireManager.i.getMyEmpire());
     }
 
 /*

@@ -30,6 +30,11 @@ public class EmpireManager {
     App.i.getEventBus().publish(empire);
   }
 
+  /** Returns {@link true} if my empire has been set, or false if it's not ready yet. */
+  public boolean hasMyEmpire() {
+    return myEmpire != null;
+  }
+
   /** Gets my empire, if my empire hasn't been set yet, IllegalStateException is thrown. */
   @Nonnull
   public Empire getMyEmpire() {

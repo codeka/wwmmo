@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.net;
 
-import com.google.common.base.Preconditions;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -23,6 +21,8 @@ import au.com.codeka.warworlds.common.proto.HelloPacket;
 import au.com.codeka.warworlds.common.proto.LoginRequest;
 import au.com.codeka.warworlds.common.proto.LoginResponse;
 import au.com.codeka.warworlds.common.proto.Packet;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /** Represents our connection to the server. */
 public class Server {
@@ -73,24 +73,30 @@ public class Server {
 
     updateState(ServerStateEvent.ConnectionState.CONNECTING);
 
-    App.i.getTaskRunner().runTask(new Runnable() {
-      @Override
-      public void run() {
-        log.info("Logging in: %s", ServerUrl.getLoginUrl());
-        HttpRequest request = new HttpRequest.Builder()
-            .url(ServerUrl.getLoginUrl())
-            .method(HttpRequest.Method.POST)
-            .body(new LoginRequest.Builder()
-                .cookie(cookie)
-                .build().encode())
-            .build();
-        LoginResponse loginResponse = request.getBody(LoginResponse.class);
-        if (request.getResponseCode() != 200) {
-          log.error("Error logging in, will try again.", request.getException());
-          onDisconnect();
-        } else {
-          connectGameSocket(loginResponse);
+    App.i.getTaskRunner().runTask(() -> {
+      log.info("Logging in: %s", ServerUrl.getLoginUrl());
+      HttpRequest request = new HttpRequest.Builder()
+          .url(ServerUrl.getLoginUrl())
+          .method(HttpRequest.Method.POST)
+          .body(new LoginRequest.Builder()
+              .cookie(cookie)
+              .build().encode())
+          .build();
+      if (request.getResponseCode() != 200) {
+        if (request.getResponseCode() == 403) {
+          // Our cookie must not be valid, we'll clear it before trying again.
+          GameSettings.i.edit()
+              .setString(GameSettings.Key.COOKIE, "")
+              .commit();
         }
+        log.error(
+            "Error logging in, will try again: %d",
+            request.getResponseCode(),
+            request.getException());
+        onDisconnect();
+      } else {
+        LoginResponse loginResponse = checkNotNull(request.getBody(LoginResponse.class));
+        connectGameSocket(loginResponse);
       }
     }, Threads.BACKGROUND);
   }
@@ -106,7 +112,7 @@ public class Server {
       packetEncoder = new PacketEncoder(gameSocket.getOutputStream(), packetEncodeHandler);
       packetDecoder = new PacketDecoder(gameSocket.getInputStream(), packetDecodeHandler);
 
-      Queue<Packet> oldQueuedPackets = Preconditions.checkNotNull(queuedPackets);
+      Queue<Packet> oldQueuedPackets = checkNotNull(queuedPackets);
       queuedPackets = null;
 
       send(new Packet.Builder()
@@ -140,7 +146,7 @@ public class Server {
       if (queuedPackets != null) {
         queuedPackets.add(pkt);
       } else {
-        Preconditions.checkNotNull(packetEncoder);
+        checkNotNull(packetEncoder);
         try {
           packetEncoder.send(pkt);
         } catch (IOException e) {
@@ -152,15 +158,15 @@ public class Server {
   }
 
   private void onDisconnect() {
-
     synchronized (lock) {
-      Preconditions.checkNotNull(gameSocket);
-      try {
-        gameSocket.close();
-      } catch (IOException e) {
-        // ignore.
+      if (gameSocket != null) {
+        try {
+          gameSocket.close();
+        } catch (IOException e) {
+          // ignore.
+        }
+        gameSocket = null;
       }
-      gameSocket = null;
       packetEncoder = null;
       packetDecoder = null;
       queuedPackets = new ArrayDeque<>();

@@ -75,7 +75,7 @@ public class HttpRequest {
 
   @Nullable
   public byte[] getBody() {
-    if (exception != null) {
+    if (exception != null || getResponseCode() != 200) {
       return null;
     }
 

@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.account;
 
+import com.google.common.base.Strings;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -28,12 +30,17 @@ public class LoginServlet extends ProtobufHttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     LoginRequest req = LoginRequest.ADAPTER.decode(request.getInputStream());
-    log.info("Login request received, cookie=%s", req.cookie);
+    if (Strings.isNullOrEmpty(req.cookie)) {
+      log.warning("No cookie in request, not connected.");
+      response.setStatus(403);
+      return;
+    }
 
+    log.info("Login request received, cookie=%s", req.cookie);
     Account account = DataStore.i.accounts().get(req.cookie);
     if (account == null) {
       log.warning("No account for cookie, not connecting: %s", req.cookie);
-      //TODO sendError(resp, 403, "Invalid cookie specified.");
+      response.setStatus(401);
       return;
     }
     WatchableObject<Empire> empire = EmpireManager.i.getEmpire(account.empire_id);
