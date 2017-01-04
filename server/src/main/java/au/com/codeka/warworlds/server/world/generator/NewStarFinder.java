@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.world.generator;
 
-import java.util.ArrayList;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -11,10 +9,10 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.SectorManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
-import au.com.codeka.warworlds.server.world.generator.SectorGenerator;
 
 /**
  * Find a star which is suitable for a new empire.
+ *
  * <p>When a new player joins the game, we want to find a star for their initial colony. We need to
  * choose a star that's close to other players, but not <i>too</i> close as to make them an easy
  * target.
@@ -95,18 +93,21 @@ public class NewStarFinder {
   private boolean findStar() {
     SectorCoord coord = DataStore.i.sectors().getEmptySector();
     if (coord == null) {
+      log.debug("No empty sector.");
       return false;
     }
 
     WatchableObject<Sector> sector = SectorManager.i.getSector(coord);
     Star star = findHighestScoreStar(sector.get());
     if (star == null) {
+      log.debug("No stars found.");
       return false;
     }
 
     // if we get here, then we've found the star. Also find which planet to put the colony on.
     this.star = star;
     findPlanetOnStar(star);
+    log.debug("Found a star: %d %s (sector: %d,%d)", star.id, star.name, coord.x, coord.y);
     return true;
   }
 

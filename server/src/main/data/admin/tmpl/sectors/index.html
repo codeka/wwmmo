@@ -1,0 +1,14 @@
+{% extends "skeleton.html" %}
+{% block title %}Starfield{% endblock %}
+{% block head %}
+  <script type="text/javascript" src="/admin/js/tmpl.js"></script>
+  <script type="text/javascript" src="/admin/js/time.js"></script>
+  <script type="text/javascript" src="/admin/js/sectors.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Sectors</h1>
+<div>
+  <span><a href="javascript:findEmptySector();">Find empty sector</a></span> &bull;
+</div>
+<div id="result"></div>
+{% endblock %}

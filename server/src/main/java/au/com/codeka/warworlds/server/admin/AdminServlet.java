@@ -22,10 +22,12 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.admin.handlers.AdminLoginHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxDesignsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxEmpireHandler;
+import au.com.codeka.warworlds.server.admin.handlers.AjaxSectorsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxSimulateHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxStarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxUsersHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DashboardHandler;
+import au.com.codeka.warworlds.server.admin.handlers.SectorsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.StarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.EmpireDetailsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.EmpiresHandler;
@@ -41,6 +43,7 @@ public class AdminServlet extends GenericServlet {
   private static final ArrayList<Route> ROUTES = Lists.newArrayList(
       new Route("/", DashboardHandler.class),
       new Route("/login", AdminLoginHandler.class),
+      new Route("/sectors", SectorsHandler.class),
       new Route("/starfield", StarfieldHandler.class),
       new Route("/empires", EmpiresHandler.class),
       new Route("/empires/(?<id>[0-9]+)", EmpireDetailsHandler.class),
@@ -48,6 +51,7 @@ public class AdminServlet extends GenericServlet {
       new Route("/users/create", UsersCreateHandler.class),
       new Route("/ajax/empire", AjaxEmpireHandler.class),
       new Route("/ajax/designs", AjaxDesignsHandler.class),
+      new Route("/ajax/sectors", AjaxSectorsHandler.class),
       new Route("/ajax/simulate", AjaxSimulateHandler.class),
       new Route("/ajax/starfield", AjaxStarfieldHandler.class),
       new Route("/ajax/users", AjaxUsersHandler.class),
