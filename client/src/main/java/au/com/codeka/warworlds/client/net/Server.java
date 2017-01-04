@@ -54,22 +54,23 @@ public class Server {
 
   /** Connect to the server. */
   public void connect() {
+    GameSettings.i.addSettingChangedHandler(key -> {
+      if (key == GameSettings.Key.SERVER) {
+        // If you change SERVER, we'll want to clear the cookie.
+        GameSettings.i.edit()
+            .setString(GameSettings.Key.COOKIE, "")
+            .commit();
+      } else if (key == GameSettings.Key.COOKIE) {
+        // We got a new cookie, try connecting again.
+        disconnect();
+      }
+    });
+
     final String cookie = GameSettings.i.getString(GameSettings.Key.COOKIE);
     if (cookie.isEmpty()) {
       log.warning("No cookie yet, not connecting.");
       return;
     }
-    GameSettings.i.addSettingChangedHandler(new GameSettings.SettingChangeHandler() {
-      @Override
-      public void onSettingChanged(GameSettings.Key key) {
-        if (key == GameSettings.Key.SERVER) {
-          // If you change SERVER, we'll want to clear the cookie.
-          GameSettings.i.edit()
-             .setString(GameSettings.Key.COOKIE, "")
-             .commit();
-        }
-      }
-    });
 
     updateState(ServerStateEvent.ConnectionState.CONNECTING);
 
@@ -93,7 +94,7 @@ public class Server {
             "Error logging in, will try again: %d",
             request.getResponseCode(),
             request.getException());
-        onDisconnect();
+        disconnect();
       } else {
         LoginResponse loginResponse = checkNotNull(request.getBody(LoginResponse.class));
         connectGameSocket(loginResponse);
@@ -132,7 +133,7 @@ public class Server {
     } catch (IOException e) {
       gameSocket = null;
       log.error("Error connecting game socket, will try again.", e);
-      onDisconnect();
+      disconnect();
     }
   }
 
@@ -151,13 +152,13 @@ public class Server {
           packetEncoder.send(pkt);
         } catch (IOException e) {
           // TODO: handle error
-          onDisconnect();
+          disconnect();
         }
       }
     }
   }
 
-  private void onDisconnect() {
+  private void disconnect() {
     synchronized (lock) {
       if (gameSocket != null) {
         try {
@@ -173,42 +174,33 @@ public class Server {
     }
 
     updateState(ServerStateEvent.ConnectionState.DISCONNECTED);
-    App.i.getTaskRunner().runTask(new Runnable() {
-      @Override
-      public void run() {
-        reconnectTimeMs *= 2;
-        if (reconnectTimeMs > MAX_RECONNECT_TIME_MS) {
-          reconnectTimeMs = MAX_RECONNECT_TIME_MS;
-        }
-
-        connect();
+    App.i.getTaskRunner().runTask(() -> {
+      reconnectTimeMs *= 2;
+      if (reconnectTimeMs > MAX_RECONNECT_TIME_MS) {
+        reconnectTimeMs = MAX_RECONNECT_TIME_MS;
       }
+
+      connect();
     }, Threads.BACKGROUND, reconnectTimeMs);
   }
 
   private final PacketEncoder.PacketHandler packetEncodeHandler =
-      new PacketEncoder.PacketHandler() {
-    @Override
-    public void onPacket(Packet packet, int encodedSize) {
-      String packetDebug = PacketDebug.getPacketDebug(packet, encodedSize);
-      App.i.getEventBus().publish(new ServerPacketEvent(
-          packet, encodedSize, ServerPacketEvent.Direction.Sent, packetDebug));
-      log.debug(">> %s", packetDebug);
-    }
-  };
+      (packet, encodedSize) -> {
+        String packetDebug = PacketDebug.getPacketDebug(packet, encodedSize);
+        App.i.getEventBus().publish(new ServerPacketEvent(
+            packet, encodedSize, ServerPacketEvent.Direction.Sent, packetDebug));
+        log.debug(">> %s", packetDebug);
+      };
 
   private final PacketDecoder.PacketHandler packetDecodeHandler =
-      new PacketDecoder.PacketHandler() {
-    @Override
-    public void onPacket(PacketDecoder decoder, Packet packet, int encodedSize) {
-      String packetDebug = PacketDebug.getPacketDebug(packet, encodedSize);
-      App.i.getEventBus().publish(new ServerPacketEvent(
-          packet, encodedSize, ServerPacketEvent.Direction.Received, packetDebug));
-      log.debug("<< %s", packetDebug);
+      (decoder, packet, encodedSize) -> {
+        String packetDebug = PacketDebug.getPacketDebug(packet, encodedSize);
+        App.i.getEventBus().publish(new ServerPacketEvent(
+            packet, encodedSize, ServerPacketEvent.Direction.Received, packetDebug));
+        log.debug("<< %s", packetDebug);
 
-      packetDispatcher.dispatch(packet);
-    }
-  };
+        packetDispatcher.dispatch(packet);
+      };
 
   private void updateState(ServerStateEvent.ConnectionState state) {
     currState = new ServerStateEvent(ServerUrl.getUrl(), state);

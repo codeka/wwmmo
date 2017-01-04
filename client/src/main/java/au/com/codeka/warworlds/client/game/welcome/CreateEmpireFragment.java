@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.io.IOException;
 
@@ -35,13 +36,7 @@ public class CreateEmpireFragment extends BaseFragment {
   @Override
   public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
     ViewBackgroundGenerator.setBackground(view);
-
-    view.findViewById(R.id.done_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        registerEmpire(view);
-      }
-    });
+    view.findViewById(R.id.done_btn).setOnClickListener(v -> registerEmpire(view));
   }
 
   private void registerEmpire(final View rootView) {
@@ -51,43 +46,29 @@ public class CreateEmpireFragment extends BaseFragment {
     rootView.findViewById(R.id.progress).setVisibility(View.VISIBLE);
 
     final String empireName = ((EditText) rootView.findViewById(R.id.empire_name)).getText().toString();
-    App.i.getTaskRunner().runTask(new Runnable() {
-      @Override
-      public void run() {
-        HttpRequest request = new HttpRequest.Builder()
-            .url(ServerUrl.getUrl() + "accounts")
-            .method(HttpRequest.Method.POST)
-            .header("Content-Type", "application/x-protobuf")
-            .body(new NewAccountRequest.Builder()
-                .empire_name(empireName)
-                .build().encode())
-            .build();
-        NewAccountResponse resp = null;
-        try {
-          final byte[] respBytes = request.getBody();
-          if (respBytes != null) {
-            resp = NewAccountResponse.ADAPTER.decode(respBytes);
-          }
-        } catch (IOException e) {
-          log.warning("Error decoding new account response.", e);
-        }
-        if (resp == null) {
-          // TODO: report the error
-          App.i.getTaskRunner().runTask(new Runnable() {
-            @Override
-            public void run() {
-              onRegisterError(rootView, "An unknown error occurred.");
-            }
-          }, Threads.UI);
-        } else {
-          final NewAccountResponse finalResponse = resp;
-          App.i.getTaskRunner().runTask(new Runnable() {
-            @Override
-            public void run() {
-              onRegisterSuccess(finalResponse);
-            }
-          }, Threads.UI);
-        }
+    App.i.getTaskRunner().runTask(() -> {
+      HttpRequest request = new HttpRequest.Builder()
+          .url(ServerUrl.getUrl() + "accounts")
+          .method(HttpRequest.Method.POST)
+          .header("Content-Type", "application/x-protobuf")
+          .body(new NewAccountRequest.Builder()
+              .empire_name(empireName)
+              .build().encode())
+          .build();
+      NewAccountResponse resp = request.getBody(NewAccountResponse.class);
+      if (resp == null) {
+        // TODO: report the error
+        log.error("Didn't get NewAccountResponse, as expected.", request.getException());
+        App.i.getTaskRunner().runTask(() ->
+            onRegisterError(rootView, "An unknown error occurred."), Threads.UI);
+      } else if (resp.cookie == null) {
+        App.i.getTaskRunner().runTask(() -> onRegisterError(rootView, resp.message), Threads.UI);
+      } else {
+        log.info(
+            "New account response, cookie: %s, message: %s",
+            resp.cookie,
+            resp.message);
+        App.i.getTaskRunner().runTask(() -> onRegisterSuccess(resp), Threads.UI);
       }
     }, Threads.BACKGROUND);
   }
@@ -96,6 +77,7 @@ public class CreateEmpireFragment extends BaseFragment {
     rootView.findViewById(R.id.empire_name).setVisibility(View.VISIBLE);
     rootView.findViewById(R.id.switch_account_btn).setVisibility(View.VISIBLE);
     rootView.findViewById(R.id.progress).setVisibility(View.GONE);
+    ((TextView) rootView.findViewById(R.id.setup_name)).setText(errorMsg);
   }
 
   private void onRegisterSuccess(NewAccountResponse resp) {
