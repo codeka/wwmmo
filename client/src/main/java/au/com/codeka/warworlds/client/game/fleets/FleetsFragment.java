@@ -41,6 +41,7 @@ public class FleetsFragment extends BaseFragment {
   private StarCollection starCollection;
   private ExpandableListView listView;
   private FleetExpandableStarListAdapter adapter;
+  private FrameLayout bottomPane;
 
   public static Bundle createArguments(long starId, @Nullable Long selectedFleetId) {
     Bundle args = new Bundle();
@@ -60,8 +61,8 @@ public class FleetsFragment extends BaseFragment {
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    Spinner stanceSpinner = (Spinner) view.findViewById(R.id.stance);
-    stanceSpinner.setAdapter(new StanceAdapter());
+    bottomPane = (FrameLayout) view.findViewById(R.id.bottom_pane);
+    bottomPane.addView(new ActionBottomPane(getContext(), null));
 
     listView = (ExpandableListView) view.findViewById(R.id.fleet_list);
     listView.setOnChildClickListener((lv, v, groupPosition, childPosition, id) -> {
@@ -100,65 +101,6 @@ public class FleetsFragment extends BaseFragment {
     }
     listView.setAdapter(adapter);
 
-
     adapter.notifyDataSetChanged();
-  }
-
-  public class StanceAdapter extends BaseAdapter implements SpinnerAdapter {
-    Fleet.FLEET_STANCE[] values;
-
-    public StanceAdapter() {
-      values = Fleet.FLEET_STANCE.values();
-    }
-
-    @Override
-    public int getCount() {
-      return values.length;
-    }
-
-    @Override
-    public Object getItem(int position) {
-      return values[position];
-    }
-
-    @Override
-    public long getItemId(int position) {
-      return values[position].getValue();
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-      TextView view = getCommonView(position, convertView, parent);
-
-      view.setTextColor(Color.WHITE);
-      return view;
-    }
-
-    @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
-      TextView view = getCommonView(position, convertView, parent);
-
-      ViewGroup.LayoutParams lp = new AbsListView.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-          FrameLayout.LayoutParams.MATCH_PARENT);
-      lp.height = 80;
-      view.setLayoutParams(lp);
-      view.setTextColor(Color.WHITE);
-      view.setText("  "+view.getText().toString());
-      return view;
-    }
-
-    private TextView getCommonView(int position, View convertView, ViewGroup parent) {
-      TextView view;
-      if (convertView != null) {
-        view = (TextView) convertView;
-      } else {
-        view = new TextView(getContext());
-        view.setGravity(Gravity.CENTER_VERTICAL);
-      }
-
-      Fleet.FLEET_STANCE value = values[position];
-      view.setText(CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, value.toString()));
-      return view;
-    }
   }
 }
