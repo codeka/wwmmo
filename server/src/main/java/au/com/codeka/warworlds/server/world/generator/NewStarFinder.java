@@ -56,8 +56,13 @@ public class NewStarFinder {
     }
 
     if (!findStar()) {
-      // Expand the universe then try again.
+      // Make sure the coord there isn't counted as being empty any more.
+      DataStore.i.sectors().removeEmptySector(coord);
+
+      // Expand the universe, for good measure.
       new SectorGenerator().expandUniverse();
+
+      // And try again.
       return findStar();
     }
 

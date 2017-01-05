@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.server.store.DataStore;
@@ -108,6 +109,9 @@ public class EmpireManager {
         .home_star(newStarFinder.getStar())
         .build();
     empires.put(id, empire);
+
+    DataStore.i.sectors().removeEmptySector(
+        new SectorCoord.Builder().x(star.get().sector_x).y(star.get().sector_y).build());
 
     return watchEmpire(empire);
   }

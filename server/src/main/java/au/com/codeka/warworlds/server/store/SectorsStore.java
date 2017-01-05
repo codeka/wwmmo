@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.server.store;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
@@ -16,6 +18,7 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.IdentifierArray;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
@@ -37,6 +40,7 @@ public class SectorsStore {
   private static final DatabaseEntry UNIVERSE_BOUNDS_KEY =
       new DatabaseEntry("universe-bounds".getBytes(Charset.defaultCharset()));
 
+  private final Log log = new Log("SectorsStore");
   private final Database db;
   private final ProtobufStore<Star> starsStore;
   private final ProtobufSerializer<IdentifierArray> idsArraySerializer;
@@ -108,6 +112,17 @@ public class SectorsStore {
     DatabaseEntry value = new DatabaseEntry();
     if (db.get(null, EMPTY_SECTORS_KEY, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
       List<SectorCoord> coords = sectorCoordArraySerializer.deserialize(value).coords;
+      if (log.isDebugEnabled()) {
+        StringBuilder msg = new StringBuilder();
+        msg.append("Empty sectors: ");
+        for (int i = 0; i < coords.size(); i++) {
+          if (i != 0) {
+            msg.append(", ");
+          }
+          msg.append(String.format(Locale.US, "[%d,%d]", coords.get(i).x, coords.get(i).y));
+        }
+        log.debug(msg.toString());
+      }
 
       // Find the one closest to (0,0)
       SectorCoord closest = null;
@@ -124,6 +139,44 @@ public class SectorsStore {
       return closest;
     } else {
       return null;
+    }
+  }
+
+  /**
+   * Remove the given {@link SectorCoord} from the "empty" set: we'll no longer return that sector
+   * from {@link #getEmptySector()}.
+   */
+  public void removeEmptySector(SectorCoord coord) {
+    Transaction trans = db.getEnvironment().beginTransaction(null, null);
+    try {
+      DatabaseEntry value = new DatabaseEntry();
+      if (db.get(null, EMPTY_SECTORS_KEY, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+        List<SectorCoord> coords = sectorCoordArraySerializer.deserialize(value).coords;
+        coords = new ArrayList<>(
+            Collections2.filter(coords, e -> !(coord.x.equals(e.x) && coord.y.equals(e.y))));
+        if (log.isDebugEnabled()) {
+          StringBuilder msg = new StringBuilder();
+          msg.append("Empty sectors: ");
+          for (int i = 0; i < coords.size(); i++) {
+            if (i != 0) {
+              msg.append(", ");
+            }
+            msg.append(String.format(Locale.US, "[%d,%d]", coords.get(i).x, coords.get(i).y));
+          }
+          log.debug(msg.toString());
+        }
+        db.put(
+            trans,
+            EMPTY_SECTORS_KEY,
+            sectorCoordArraySerializer.serialize(
+                new SectorCoordArray.Builder().coords(coords).build()));
+        trans.commit();
+        trans = null;
+      }
+    } finally {
+      if (trans != null) {
+        trans.abort();
+      }
     }
   }
 
