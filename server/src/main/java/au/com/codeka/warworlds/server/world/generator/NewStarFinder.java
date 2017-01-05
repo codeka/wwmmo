@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.world.generator;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -21,7 +23,9 @@ import au.com.codeka.warworlds.server.world.WatchableObject;
  * appropriate one.
  */
 public class NewStarFinder {
-  private final Log log = new Log("NewStarFinder");
+  private final Log log;
+
+  private SectorCoord coord;
   private Star star;
   private int planetIndex;
 
@@ -30,6 +34,20 @@ public class NewStarFinder {
   }
   public int getPlanetIndex() {
     return planetIndex;
+  }
+
+  public NewStarFinder() {
+    this(null);
+  }
+
+  public NewStarFinder(SectorCoord coord) {
+    this.log = new Log("NewStarFinder");
+    this.coord = coord;
+  }
+
+  public NewStarFinder(Log log, @Nullable SectorCoord coord) {
+    this.log = log;
+    this.coord = coord;
   }
 
   public boolean findStarForNewEmpire() {
@@ -91,7 +109,9 @@ public class NewStarFinder {
   }
 
   private boolean findStar() {
-    SectorCoord coord = DataStore.i.sectors().getEmptySector();
+    if (coord == null) {
+      coord = DataStore.i.sectors().getEmptySector();
+    }
     if (coord == null) {
       log.debug("No empty sector.");
       return false;
@@ -147,7 +167,7 @@ public class NewStarFinder {
       double score = scoreStar(sector, star);
       if (score > highestScore) {
         highestScore = score;
-        highestScoreStar = (Star) star;
+        highestScoreStar = star;
       }
     }
 

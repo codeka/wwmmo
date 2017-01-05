@@ -53,6 +53,20 @@ public class EmpireManager {
       return null;
     }
 
+    return createEmpire(name, newStarFinder);
+  }
+
+  /**
+   * Create a new {@link Empire}, and return it as a {@link WatchableObject}.
+   * @param name The name to give this new empire. We assume you've already confirmed that the name
+   *             is unique.
+   * @param newStarFinder A {@link NewStarFinder} that's already found the star we will put the
+   *                      empire on.
+   *
+   * @return The new empire, or null if there was an error creating the empire.
+   */
+  @Nullable
+  public WatchableObject<Empire> createEmpire(String name, NewStarFinder newStarFinder) {
     long id = empires.nextIdentifier();
 
     WatchableObject<Star> star = StarManager.i.getStar(newStarFinder.getStar().id);
