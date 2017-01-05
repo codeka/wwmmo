@@ -3,22 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--au.com.codeka.warworlds.ctrl.BannerAdView
-        android:id="@+id/ad"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true" /-->
-    <View
-        android:id="@+id/ad"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true" />
-
     <au.com.codeka.warworlds.client.game.solarsystem.SolarSystemView
         android:id="@+id/solarsystem_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:layout_above="@+id/bottom_pane"
         android:layout_marginBottom="-8px" />
 
@@ -249,7 +238,7 @@
         android:id="@+id/congeniality_container"
         android:layout_width="85dp"
         android:layout_height="64dp"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:visibility="visible">
 
         <ImageView
@@ -393,7 +382,7 @@
         android:layout_height="16dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:gravity="center|end"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
@@ -430,7 +419,7 @@
         android:background="#000"
         android:layout_toLeftOf="@+id/stored_energy"
         android:layout_toStartOf="@+id/stored_energy"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:src="@drawable/energy" />
 
 
@@ -440,7 +429,7 @@
         android:layout_height="16dp"
         android:layout_toLeftOf="@+id/stored_energy_icon"
         android:layout_toStartOf="@+id/stored_energy_icon"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:gravity="center|end"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
@@ -477,7 +466,7 @@
         android:background="#000"
         android:layout_toLeftOf="@+id/stored_goods"
         android:layout_toStartOf="@+id/stored_goods"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:src="@drawable/farming" />
 
     <TextView
@@ -486,7 +475,7 @@
         android:layout_height="16dp"
         android:layout_toLeftOf="@+id/stored_goods_icon"
         android:layout_toStartOf="@+id/stored_goods_icon"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:gravity="center|end"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
@@ -523,7 +512,7 @@
         android:background="#000"
         android:layout_toLeftOf="@+id/stored_minerals"
         android:layout_toStartOf="@+id/stored_minerals"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:src="@drawable/mining" />
 
 </RelativeLayout>

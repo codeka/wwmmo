@@ -125,12 +125,7 @@ public class SolarSystemView extends RelativeLayout {
     }
     int width = getWidth();
     if (width == 0) {
-      this.post(new Runnable() {
-        @Override
-        public void run() {
-          placePlanets();
-        }
-      });
+      this.post(this::placePlanets);
       return;
     }
 
@@ -190,12 +185,7 @@ public class SolarSystemView extends RelativeLayout {
         // If it doesn't have a width, make it visible then re-update the selection once it's width
         // has been calculated.
         selectionIndicator.setVisibility(View.VISIBLE);
-        selectionIndicator.post(new Runnable() {
-          @Override
-          public void run() {
-            updateSelection();
-          }
-        });
+        selectionIndicator.post(this::updateSelection);
         return;
       }
 
