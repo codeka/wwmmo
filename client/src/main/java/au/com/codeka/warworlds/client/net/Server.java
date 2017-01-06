@@ -45,7 +45,7 @@ public class Server {
   @Nullable private PacketDecoder packetDecoder;
 
   /** A queue for storing packets while we attempt to reconnect. Will be null if we're connected. */
-  @Nullable private Queue<Packet> queuedPackets = new ArrayDeque<>();
+  @Nullable private Queue<Packet> queuedPackets;
 
   /** A lock used to guard access to the web socket/queue. */
   private final Object lock = new Object();
@@ -113,7 +113,7 @@ public class Server {
       packetEncoder = new PacketEncoder(gameSocket.getOutputStream(), packetEncodeHandler);
       packetDecoder = new PacketDecoder(gameSocket.getInputStream(), packetDecodeHandler);
 
-      Queue<Packet> oldQueuedPackets = checkNotNull(queuedPackets);
+      Queue<Packet> oldQueuedPackets = queuedPackets;
       queuedPackets = null;
 
       send(new Packet.Builder()
@@ -127,7 +127,7 @@ public class Server {
       reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS;
       updateState(ServerStateEvent.ConnectionState.CONNECTED);
 
-      while (!oldQueuedPackets.isEmpty()) {
+      while (oldQueuedPackets != null && !oldQueuedPackets.isEmpty()) {
         send(oldQueuedPackets.remove());
       }
     } catch (IOException e) {
