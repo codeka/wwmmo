@@ -84,7 +84,7 @@ public class Server {
               .build().encode())
           .build();
       if (request.getResponseCode() != 200) {
-        if (request.getResponseCode() == 403) {
+        if (request.getResponseCode() >= 401 && request.getResponseCode() < 500) {
           // Our cookie must not be valid, we'll clear it before trying again.
           GameSettings.i.edit()
               .setString(GameSettings.Key.COOKIE, "")
