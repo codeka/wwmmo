@@ -16,27 +16,44 @@ import android.widget.TextView;
 
 import com.google.common.base.CaseFormat;
 
+import javax.annotation.Nonnull;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.common.proto.Fleet;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Bottom pane of the fleets view that contains the main action buttons (split, move, etc).
  */
 public class ActionBottomPane extends RelativeLayout {
-  public ActionBottomPane(Context context, AttributeSet attrs) {
-    super(context, attrs);
+  /** Implement this to get notified of events. */
+  public interface Callback {
+    void onSplitClick();
+  }
+
+  private final Callback callback;
+
+  public ActionBottomPane(Context context, @Nonnull Callback callback) {
+    super(context, null);
+    this.callback = checkNotNull(callback);
 
     inflate(context, R.layout.ctrl_fleet_action_bottom_pane, this);
 
     Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
     stanceSpinner.setAdapter(new StanceAdapter());
 
-    findViewById(R.id.split_btn).setOnClickListener(this::onSplitClick);
+    findViewById(R.id.split_btn).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        onSplitClick(v);
+      }
+    });
   }
 
   /** Called when you click 'split'. */
   private void onSplitClick(View view) {
-
+    callback.onSplitClick();
   }
 
   public class StanceAdapter extends BaseAdapter implements SpinnerAdapter {

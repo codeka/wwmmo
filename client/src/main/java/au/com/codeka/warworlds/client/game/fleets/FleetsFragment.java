@@ -15,6 +15,7 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.google.common.base.CaseFormat;
+import com.transitionseverywhere.TransitionManager;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
@@ -62,7 +63,7 @@ public class FleetsFragment extends BaseFragment {
     super.onViewCreated(view, savedInstanceState);
 
     bottomPane = (FrameLayout) view.findViewById(R.id.bottom_pane);
-    bottomPane.addView(new ActionBottomPane(getContext(), null));
+    showActionsPane();
 
     listView = (ExpandableListView) view.findViewById(R.id.fleet_list);
     listView.setOnChildClickListener((lv, v, groupPosition, childPosition, id) -> {
@@ -102,5 +103,27 @@ public class FleetsFragment extends BaseFragment {
     listView.setAdapter(adapter);
 
     adapter.notifyDataSetChanged();
+  }
+
+  private void showActionsPane() {
+    TransitionManager.beginDelayedTransition(bottomPane);
+    bottomPane.removeAllViews();
+    bottomPane.addView(new ActionBottomPane(getContext(), new ActionBottomPane.Callback() {
+      @Override
+      public void onSplitClick() {
+        showSplitPane();
+      }
+    }));
+  }
+
+  private void showSplitPane() {
+    TransitionManager.beginDelayedTransition(bottomPane);
+    bottomPane.removeAllViews();
+    bottomPane.addView(new SplitBottomPane(getContext(), new SplitBottomPane.Callback() {
+      @Override
+      public void onCancel() {
+        showActionsPane();
+      }
+    }));
   }
 }
