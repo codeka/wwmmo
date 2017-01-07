@@ -25,12 +25,21 @@ public class ArrayListStarCollection implements StarCollection {
   }
 
   @Override
-  public boolean notifyStarModified(Star star) {
+  public int indexOf(long starId) {
     for (int i = 0; i < stars.size(); i++) {
-      if (stars.get(i).id.equals(star.id)) {
-        stars.set(i, star);
-        return true;
+      if (stars.get(i).id.equals(starId)) {
+        return i;
       }
+    }
+    return -1;
+  }
+
+  @Override
+  public boolean notifyStarModified(Star star) {
+    int index = indexOf(star.id);
+    if (index >= 0) {
+      stars.set(index, star);
+      return true;
     }
     return false;
   }

@@ -47,7 +47,6 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
 
   public void setSelectedFleetId(@Nullable Long starId, @Nullable Long fleetId) {
     selectedFleetId = fleetId;
-    // TODO: scroll to the star, and expand it
   }
 
   public void onItemClick(int groupPosition, int childPosition) {

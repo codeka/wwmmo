@@ -97,11 +97,12 @@ public class FleetsFragment extends BaseFragment {
     }
 
     adapter = new FleetExpandableStarListAdapter(getLayoutInflater(null), starCollection);
+    listView.setAdapter(adapter);
     long fleetID = getArguments().getLong(FLEET_ID_KEY, 0);
     if (fleetID != 0 && starID != 0) {
       adapter.setSelectedFleetId(starID, fleetID);
+      listView.expandGroup(starCollection.indexOf(starID), false /* animate */);
     }
-    listView.setAdapter(adapter);
 
     adapter.notifyDataSetChanged();
   }

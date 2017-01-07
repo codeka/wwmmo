@@ -24,6 +24,12 @@ public class MyEmpireStarCollection implements StarCollection {
   }
 
   @Override
+  public int indexOf(long starId) {
+    // TODO
+    return -1;
+  }
+
+  @Override
   public boolean notifyStarModified(Star star) {
     // TODO
     return false;

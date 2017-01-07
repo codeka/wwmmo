@@ -14,6 +14,9 @@ public interface StarCollection {
   /** Gets the star at the given index. */
   Star get(int index);
 
+  /** Finds the index of the star with the given ID, or -1 if the star isn't in this collection. */
+  int indexOf(long starId);
+
   /**
    * Notify the collection that the given star has been modified.
    *
