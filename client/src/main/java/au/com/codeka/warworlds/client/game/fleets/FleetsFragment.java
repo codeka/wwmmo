@@ -109,6 +109,8 @@ public class FleetsFragment extends BaseFragment {
 
   @Override
   public void onStop() {
+    super.onStop();
+
     starCollection = null;
     listView.setAdapter((ExpandableListAdapter) null);
     adapter.destroy();
