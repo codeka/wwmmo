@@ -117,13 +117,24 @@ public class FleetsFragment extends BaseFragment {
   }
 
   private void showSplitPane() {
+    if (adapter.getSelectedFleetId() == null) {
+      // No fleet selected, can't split.
+      return;
+    }
+    long fleetId = adapter.getSelectedFleetId();
+
+    SplitBottomPane splitBottomPane = new SplitBottomPane(
+        getContext(),
+        new SplitBottomPane.Callback() {
+          @Override
+          public void onCancel() {
+            showActionsPane();
+          }
+        });
+    splitBottomPane.setFleet(star, fleetId);
+
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.removeAllViews();
-    bottomPane.addView(new SplitBottomPane(getContext(), new SplitBottomPane.Callback() {
-      @Override
-      public void onCancel() {
-        showActionsPane();
-      }
-    }));
+    bottomPane.addView(splitBottomPane);
   }
 }
