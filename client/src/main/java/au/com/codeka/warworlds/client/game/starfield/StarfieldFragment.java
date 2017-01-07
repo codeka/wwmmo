@@ -35,7 +35,10 @@ import au.com.codeka.warworlds.common.proto.Star;
 public class StarfieldFragment extends BaseFragment {
   private final Log log = new Log("StarfieldFragment");
 
+  private StarfieldManager starfieldManager;
+
   private ViewGroup bottomPane;
+  private SelectionDetailsView selectionDetailsView;
   private Button allianceBtn;
   private Button empireBtn;
 
@@ -47,8 +50,7 @@ public class StarfieldFragment extends BaseFragment {
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    final SelectionDetailsView selectionDetailsView =
-        (SelectionDetailsView) view.findViewById(R.id.selection_details);
+    selectionDetailsView = (SelectionDetailsView) view.findViewById(R.id.selection_details);
     bottomPane = (ViewGroup) view.findViewById(R.id.bottom_pane);
     allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
     empireBtn = (Button) view.findViewById(R.id.empire_btn);
@@ -116,25 +118,25 @@ public class StarfieldFragment extends BaseFragment {
       }
     });
 
-    StarfieldManager starfieldManager = ((MainActivity) getActivity()).getStarfieldManager();
+    starfieldManager = ((MainActivity) getActivity()).getStarfieldManager();
     if (starfieldManager.getSelectedStar() != null) {
       showBottomPane();
       selectionDetailsView.showStar(starfieldManager.getSelectedStar());
     } else {
       hideBottomPane(false);
     }
-    starfieldManager.setTapListener(
-        new StarfieldManager.TapListener() {
-      @Override
-      public void onStarTapped(@Nullable Star star) {
-        if (star == null) {
-          hideBottomPane(false);
-        } else {
-          showBottomPane();
-          selectionDetailsView.showStar(star);
-        }
-      }
-    });
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    starfieldManager.addTapListener(tapListener);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    starfieldManager.removeTapListener(tapListener);
   }
 
   private void hideBottomPane(boolean instant) {
@@ -194,4 +196,16 @@ public class StarfieldFragment extends BaseFragment {
     }
     bottomPane.requestLayout();
   }
+
+  private final StarfieldManager.TapListener tapListener = new StarfieldManager.TapListener() {
+    @Override
+    public void onStarTapped(@Nullable Star star) {
+      if (star == null) {
+        hideBottomPane(false);
+      } else {
+        showBottomPane();
+        selectionDetailsView.showStar(star);
+      }
+    }
+  };
 }

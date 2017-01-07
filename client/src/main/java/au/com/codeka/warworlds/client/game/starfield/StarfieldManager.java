@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.client.game.starfield;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 
 import com.google.common.base.Preconditions;
@@ -12,6 +11,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
@@ -52,8 +54,8 @@ public class StarfieldManager {
   private final Camera camera;
   private final StarfieldGestureDetector gestureDetector;
   private final Context context;
+  private final ArrayList<TapListener> tapListeners = new ArrayList<>();
   private boolean initialized;
-  @Nullable private TapListener tapListener;
   @Nullable private Star selectedStar;
 
   private long centerSectorX;
@@ -68,8 +70,16 @@ public class StarfieldManager {
   private long sectorRight;
   private long sectorBottom;
 
+  /** A mapping of star ID to {@link SceneObject} representing those stars. */
   private final Map<Long, SceneObject> starSceneObjects = new HashMap<>();
+
+  /** A mapping of sector x,y coordinates to the list of {@link SceneObject}s for that sector. */
   private final Map<Pair<Long,Long>, ArrayList<SceneObject>> sectorSceneObjects = new HashMap<>();
+
+  /**
+   * The "selection indicator" which is added to a star or fleet scene object to indicate the
+   * current selection. It's never null, but it might not be attached to anything.
+   */
   private final SelectionIndicatorSceneObject selectionIndicatorSceneObject;
 
   public StarfieldManager(RenderSurfaceView renderSurfaceView) {
@@ -99,14 +109,27 @@ public class StarfieldManager {
     App.i.getEventBus().unregister(eventListener);
   }
 
-  public void setTapListener(@Nullable TapListener tapListener) {
-    this.tapListener = tapListener;
+  public void addTapListener(@Nonnull TapListener tapListener) {
+    tapListeners.add(tapListener);
+  }
+
+  public void removeTapListener(@Nonnull TapListener tapListener) {
+    tapListeners.remove(tapListener);
   }
 
   /** Gets the selected star (or null if no star is selected) */
   @Nullable
   public Star getSelectedStar() {
     return selectedStar;
+  }
+
+  /**
+   * Gets the {@link SceneObject} that's being used to render the star with the given ID, or if
+   * the given star isn't being rendered by us, returns null.
+   */
+  @Nullable
+  public SceneObject getStarSceneObject(long starId) {
+    return starSceneObjects.get(starId);
   }
 
   /** Sets the star we have selected to the given value (or unselects if star is null). */
@@ -120,7 +143,7 @@ public class StarfieldManager {
     }
 
     selectedStar = star;
-    if (tapListener != null) {
+    for (TapListener tapListener : tapListeners) {
       tapListener.onStarTapped(star);
     }
   }
@@ -215,6 +238,33 @@ public class StarfieldManager {
     }
   }
 
+  public Sprite createStarSprite(Star star) {
+    Vector2 uvTopLeft = getStarUvTopLeft(star);
+    Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
+        .shader(scene.getSpriteShader())
+        .texture(scene.getTextureManager().loadTexture("stars/stars.png"))
+        .uvTopLeft(uvTopLeft)
+        .uvBottomRight(new Vector2(
+            uvTopLeft.x + (star.classification == Star.CLASSIFICATION.NEUTRON ? 0.5f : 0.25f),
+            uvTopLeft.y + (star.classification == Star.CLASSIFICATION.NEUTRON ? 0.5f : 0.25f)))
+        .build());
+    if (star.classification == Star.CLASSIFICATION.NEUTRON) {
+      sprite.setSize(90.0f, 90.0f);
+    } else {
+      sprite.setSize(40.0f, 40.0f);
+    }
+    return sprite;
+  }
+
+  public Sprite createFleetSprite(Fleet fleet) {
+    Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
+        .shader(scene.getSpriteShader())
+        .texture(scene.getTextureManager().loadTexture(getFleetTexture(fleet)))
+        .build());
+    sprite.setSize(120.0f, 120.0f);
+    return sprite;
+  }
+
   /** Called when a star is updated, we may need to update the sprite for it. */
   private void updateStar(Star star) {
     SceneObject container = starSceneObjects.get(star.id);
@@ -229,20 +279,7 @@ public class StarfieldManager {
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
       container.translate(x, -y);
 
-      Vector2 uvTopLeft = getStarUvTopLeft(star);
-      Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
-          .shader(scene.getSpriteShader())
-          .texture(scene.getTextureManager().loadTexture("stars/stars.png"))
-          .uvTopLeft(uvTopLeft)
-          .uvBottomRight(new Vector2(
-              uvTopLeft.x + (star.classification == Star.CLASSIFICATION.NEUTRON ? 0.5f : 0.25f),
-              uvTopLeft.y + (star.classification == Star.CLASSIFICATION.NEUTRON ? 0.5f : 0.25f)))
-          .build());
-      if (star.classification == Star.CLASSIFICATION.NEUTRON) {
-        sprite.setSize(90.0f, 90.0f);
-      } else {
-        sprite.setSize(40.0f, 40.0f);
-      }
+      Sprite sprite = createStarSprite(star);
       container.addChild(sprite);
 
       TextSceneObject text = scene.createText(star.name);
@@ -433,6 +470,25 @@ public class StarfieldManager {
       default:
         // Shouldn't happen!
         return new Vector2(0.5f, 0.0f);
+    }
+  }
+
+  private String getFleetTexture(Fleet fleet) {
+    switch (fleet.design_type) {
+      case COLONY_SHIP:
+        return "sprites/colony.png";
+      case SCOUT:
+        return "sprites/scout.png";
+      case FIGHTER:
+        return "sprites/fighter.png";
+      case TROOP_CARRIER:
+        return "sprites/troopcarrier.png";
+      case WORMHOLE_GENERATOR:
+        return "sprites/wormhole-generator.png";
+      case UNKNOWN_DESIGN:
+      default:
+        // Shouldn't happen, the rest are reserved for buildings.
+        return "sprites/hq.png";
     }
   }
 

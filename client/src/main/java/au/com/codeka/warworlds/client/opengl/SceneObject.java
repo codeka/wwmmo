@@ -1,11 +1,12 @@
 package au.com.codeka.warworlds.client.opengl;
 
 import android.opengl.Matrix;
-import android.support.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
+
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 
@@ -15,7 +16,8 @@ public class SceneObject {
   private final DimensionResolver dimensionResolver;
 
   /** The scene we belong to, or null if we're not part of a scene. */
-  @Nullable private Scene scene;
+  @Nullable
+  private Scene scene;
 
   /** Our parent {@link SceneObject}, if any. */
   @Nullable private SceneObject parent;
@@ -70,6 +72,11 @@ public class SceneObject {
       child.scene = null;
       child.parent = null;
     }
+  }
+
+  @Nullable
+  public Scene getScene() {
+    return scene;
   }
 
   @Nullable

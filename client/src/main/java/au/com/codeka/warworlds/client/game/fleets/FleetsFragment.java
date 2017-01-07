@@ -157,7 +157,6 @@ public class FleetsFragment extends BaseFragment {
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.removeAllViews();
     bottomPane.addView(moveBottomPane);
-
   }
 
   private void showSplitPane() {
