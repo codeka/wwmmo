@@ -15,8 +15,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -40,6 +42,9 @@ public class SplitBottomPane extends RelativeLayout {
 
   /** The fleet we're splitting, may be null if {@link #setFleet(Star, long)} hasn't been called. */
   @Nullable Fleet fleet;
+
+  /** The star of the fleet we're splitting. */
+  @Nullable Star star;
 
   public SplitBottomPane(Context context, @Nonnull Callback callback) {
     super(context, null);
@@ -84,6 +89,7 @@ public class SplitBottomPane extends RelativeLayout {
   }
 
   private void setFleet(Star star, Fleet fleet) {
+    this.star = star;
     this.fleet = fleet;
 
     FleetListHelper.populateFleetRow(
@@ -107,7 +113,15 @@ public class SplitBottomPane extends RelativeLayout {
   }
 
   private void onSplitClick(View view) {
-    // TODO: split
+    if (star == null || fleet == null) {
+      return;
+    }
+    StarManager.i.updateStar(star, new StarModification.Builder()
+        .type(StarModification.MODIFICATION_TYPE.SPLIT_FLEET)
+        .fleet_id(fleet.id)
+        .count(splitRatio.getMax() - splitRatio.getProgress())
+        .build());
+
     callback.onCancel();
   }
 

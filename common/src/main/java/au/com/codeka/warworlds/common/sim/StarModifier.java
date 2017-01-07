@@ -65,6 +65,8 @@ public class StarModifier {
       case ADD_BUILD_REQUEST:
         applyAddBuildRequest(star, modification);
         return;
+      case SPLIT_FLEET:
+        applySplitFleet(star, modification);
       default:
         log.error("Unknown or unexpected modification type: %s", modification.type);
     }
@@ -198,6 +200,27 @@ public class StarModifier {
     }
   }
 
+  private void applySplitFleet(Star.Builder star, StarModification modification) {
+    Preconditions.checkArgument(
+        modification.type.equals(StarModification.MODIFICATION_TYPE.SPLIT_FLEET));
+
+    int fleetIndex = findFleetIndex(star, modification.fleet_id);
+    if (fleetIndex >= 0) {
+      // Modify the existing fleet to change it's number of ships
+      Fleet.Builder fleet = star.fleets.get(fleetIndex).newBuilder();
+      star.fleets.set(fleetIndex, fleet
+          .num_ships(fleet.num_ships - modification.count)
+          .build());
+
+      // Add a new fleet, that's a copy of the existing fleet, but with the new number of ships.
+      fleet = star.fleets.get(fleetIndex).newBuilder();
+      star.fleets.add(fleet
+          .id(identifierGenerator.nextIdentifier())
+          .num_ships((float) modification.count)
+          .build());
+    }
+  }
+
   @Nullable
   private Planet getPlanetWithColony(Star.Builder star, long colonyId) {
     for (int i = 0; i < star.planets.size(); i++) {
@@ -208,5 +231,14 @@ public class StarModifier {
     }
 
     return null;
+  }
+
+  private int findFleetIndex(Star.Builder star, long fleetId) {
+    for (int i = 0; i < star.fleets.size(); i++) {
+      if (star.fleets.get(i).id.equals(fleetId)) {
+        return i;
+      }
+    }
+    return -1;
   }
 }

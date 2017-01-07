@@ -37,6 +37,8 @@ public final class StarModification extends Message<StarModification, StarModifi
 
   public static final Long DEFAULT_COLONY_ID = 0L;
 
+  public static final Long DEFAULT_FLEET_ID = 0L;
+
   public static final Design.DesignType DEFAULT_DESIGN_TYPE = Design.DesignType.UNKNOWN_DESIGN;
 
   public static final Integer DEFAULT_COUNT = 0;
@@ -67,32 +69,39 @@ public final class StarModification extends Message<StarModification, StarModifi
 
   @WireField(
       tag = 5,
+      adapter = "com.squareup.wire.ProtoAdapter#INT64"
+  )
+  public final Long fleet_id;
+
+  @WireField(
+      tag = 6,
       adapter = "au.com.codeka.warworlds.common.proto.ColonyFocus#ADAPTER"
   )
   public final ColonyFocus focus;
 
   @WireField(
-      tag = 6,
+      tag = 7,
       adapter = "au.com.codeka.warworlds.common.proto.Design$DesignType#ADAPTER"
   )
   public final Design.DesignType design_type;
 
   @WireField(
-      tag = 7,
+      tag = 8,
       adapter = "com.squareup.wire.ProtoAdapter#INT32"
   )
   public final Integer count;
 
-  public StarModification(MODIFICATION_TYPE type, Long empire_id, Integer planet_index, Long colony_id, ColonyFocus focus, Design.DesignType design_type, Integer count) {
-    this(type, empire_id, planet_index, colony_id, focus, design_type, count, ByteString.EMPTY);
+  public StarModification(MODIFICATION_TYPE type, Long empire_id, Integer planet_index, Long colony_id, Long fleet_id, ColonyFocus focus, Design.DesignType design_type, Integer count) {
+    this(type, empire_id, planet_index, colony_id, fleet_id, focus, design_type, count, ByteString.EMPTY);
   }
 
-  public StarModification(MODIFICATION_TYPE type, Long empire_id, Integer planet_index, Long colony_id, ColonyFocus focus, Design.DesignType design_type, Integer count, ByteString unknownFields) {
+  public StarModification(MODIFICATION_TYPE type, Long empire_id, Integer planet_index, Long colony_id, Long fleet_id, ColonyFocus focus, Design.DesignType design_type, Integer count, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
     this.type = type;
     this.empire_id = empire_id;
     this.planet_index = planet_index;
     this.colony_id = colony_id;
+    this.fleet_id = fleet_id;
     this.focus = focus;
     this.design_type = design_type;
     this.count = count;
@@ -105,6 +114,7 @@ public final class StarModification extends Message<StarModification, StarModifi
     builder.empire_id = empire_id;
     builder.planet_index = planet_index;
     builder.colony_id = colony_id;
+    builder.fleet_id = fleet_id;
     builder.focus = focus;
     builder.design_type = design_type;
     builder.count = count;
@@ -122,6 +132,7 @@ public final class StarModification extends Message<StarModification, StarModifi
         && Internal.equals(empire_id, o.empire_id)
         && Internal.equals(planet_index, o.planet_index)
         && Internal.equals(colony_id, o.colony_id)
+        && Internal.equals(fleet_id, o.fleet_id)
         && Internal.equals(focus, o.focus)
         && Internal.equals(design_type, o.design_type)
         && Internal.equals(count, o.count);
@@ -136,6 +147,7 @@ public final class StarModification extends Message<StarModification, StarModifi
       result = result * 37 + (empire_id != null ? empire_id.hashCode() : 0);
       result = result * 37 + (planet_index != null ? planet_index.hashCode() : 0);
       result = result * 37 + (colony_id != null ? colony_id.hashCode() : 0);
+      result = result * 37 + (fleet_id != null ? fleet_id.hashCode() : 0);
       result = result * 37 + (focus != null ? focus.hashCode() : 0);
       result = result * 37 + (design_type != null ? design_type.hashCode() : 0);
       result = result * 37 + (count != null ? count.hashCode() : 0);
@@ -151,6 +163,7 @@ public final class StarModification extends Message<StarModification, StarModifi
     if (empire_id != null) builder.append(", empire_id=").append(empire_id);
     if (planet_index != null) builder.append(", planet_index=").append(planet_index);
     if (colony_id != null) builder.append(", colony_id=").append(colony_id);
+    if (fleet_id != null) builder.append(", fleet_id=").append(fleet_id);
     if (focus != null) builder.append(", focus=").append(focus);
     if (design_type != null) builder.append(", design_type=").append(design_type);
     if (count != null) builder.append(", count=").append(count);
@@ -165,6 +178,8 @@ public final class StarModification extends Message<StarModification, StarModifi
     public Integer planet_index;
 
     public Long colony_id;
+
+    public Long fleet_id;
 
     public ColonyFocus focus;
 
@@ -195,6 +210,11 @@ public final class StarModification extends Message<StarModification, StarModifi
       return this;
     }
 
+    public Builder fleet_id(Long fleet_id) {
+      this.fleet_id = fleet_id;
+      return this;
+    }
+
     public Builder focus(ColonyFocus focus) {
       this.focus = focus;
       return this;
@@ -212,7 +232,7 @@ public final class StarModification extends Message<StarModification, StarModifi
 
     @Override
     public StarModification build() {
-      return new StarModification(type, empire_id, planet_index, colony_id, focus, design_type, count, buildUnknownFields());
+      return new StarModification(type, empire_id, planet_index, colony_id, fleet_id, focus, design_type, count, buildUnknownFields());
     }
   }
 
@@ -251,7 +271,14 @@ public final class StarModification extends Message<StarModification, StarModifi
      * Create a new building, ignored if sent from client.
      * empire_id, colony_id, design_type are required.
      */
-    CREATE_BUILDING(5);
+    CREATE_BUILDING(5),
+
+    /**
+     * Split a fleet in two. In this case, count refers to the number of ships to take out and
+     * create a new fleet with. The remaining ships will stay in this fleet.
+     * empire_id, fleet_id and count are required.
+     */
+    SPLIT_FLEET(6);
 
     public static final ProtoAdapter<MODIFICATION_TYPE> ADAPTER = ProtoAdapter.newEnumAdapter(MODIFICATION_TYPE.class);
 
@@ -272,6 +299,7 @@ public final class StarModification extends Message<StarModification, StarModifi
         case 3: return CREATE_FLEET;
         case 4: return ADD_BUILD_REQUEST;
         case 5: return CREATE_BUILDING;
+        case 6: return SPLIT_FLEET;
         default: return null;
       }
     }
@@ -293,9 +321,10 @@ public final class StarModification extends Message<StarModification, StarModifi
           + (value.empire_id != null ? ProtoAdapter.INT64.encodedSizeWithTag(2, value.empire_id) : 0)
           + (value.planet_index != null ? ProtoAdapter.INT32.encodedSizeWithTag(3, value.planet_index) : 0)
           + (value.colony_id != null ? ProtoAdapter.INT64.encodedSizeWithTag(4, value.colony_id) : 0)
-          + (value.focus != null ? ColonyFocus.ADAPTER.encodedSizeWithTag(5, value.focus) : 0)
-          + (value.design_type != null ? Design.DesignType.ADAPTER.encodedSizeWithTag(6, value.design_type) : 0)
-          + (value.count != null ? ProtoAdapter.INT32.encodedSizeWithTag(7, value.count) : 0)
+          + (value.fleet_id != null ? ProtoAdapter.INT64.encodedSizeWithTag(5, value.fleet_id) : 0)
+          + (value.focus != null ? ColonyFocus.ADAPTER.encodedSizeWithTag(6, value.focus) : 0)
+          + (value.design_type != null ? Design.DesignType.ADAPTER.encodedSizeWithTag(7, value.design_type) : 0)
+          + (value.count != null ? ProtoAdapter.INT32.encodedSizeWithTag(8, value.count) : 0)
           + value.unknownFields().size();
     }
 
@@ -305,9 +334,10 @@ public final class StarModification extends Message<StarModification, StarModifi
       if (value.empire_id != null) ProtoAdapter.INT64.encodeWithTag(writer, 2, value.empire_id);
       if (value.planet_index != null) ProtoAdapter.INT32.encodeWithTag(writer, 3, value.planet_index);
       if (value.colony_id != null) ProtoAdapter.INT64.encodeWithTag(writer, 4, value.colony_id);
-      if (value.focus != null) ColonyFocus.ADAPTER.encodeWithTag(writer, 5, value.focus);
-      if (value.design_type != null) Design.DesignType.ADAPTER.encodeWithTag(writer, 6, value.design_type);
-      if (value.count != null) ProtoAdapter.INT32.encodeWithTag(writer, 7, value.count);
+      if (value.fleet_id != null) ProtoAdapter.INT64.encodeWithTag(writer, 5, value.fleet_id);
+      if (value.focus != null) ColonyFocus.ADAPTER.encodeWithTag(writer, 6, value.focus);
+      if (value.design_type != null) Design.DesignType.ADAPTER.encodeWithTag(writer, 7, value.design_type);
+      if (value.count != null) ProtoAdapter.INT32.encodeWithTag(writer, 8, value.count);
       writer.writeBytes(value.unknownFields());
     }
 
@@ -328,8 +358,9 @@ public final class StarModification extends Message<StarModification, StarModifi
           case 2: builder.empire_id(ProtoAdapter.INT64.decode(reader)); break;
           case 3: builder.planet_index(ProtoAdapter.INT32.decode(reader)); break;
           case 4: builder.colony_id(ProtoAdapter.INT64.decode(reader)); break;
-          case 5: builder.focus(ColonyFocus.ADAPTER.decode(reader)); break;
-          case 6: {
+          case 5: builder.fleet_id(ProtoAdapter.INT64.decode(reader)); break;
+          case 6: builder.focus(ColonyFocus.ADAPTER.decode(reader)); break;
+          case 7: {
             try {
               builder.design_type(Design.DesignType.ADAPTER.decode(reader));
             } catch (ProtoAdapter.EnumConstantNotFoundException e) {
@@ -337,7 +368,7 @@ public final class StarModification extends Message<StarModification, StarModifi
             }
             break;
           }
-          case 7: builder.count(ProtoAdapter.INT32.decode(reader)); break;
+          case 8: builder.count(ProtoAdapter.INT32.decode(reader)); break;
           default: {
             FieldEncoding fieldEncoding = reader.peekFieldEncoding();
             Object value = fieldEncoding.rawProtoAdapter().decode(reader);

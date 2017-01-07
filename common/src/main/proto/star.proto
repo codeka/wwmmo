@@ -189,14 +189,20 @@ message StarModification {
     // Create a new building, ignored if sent from client.
     // empire_id, colony_id, design_type are required.
     CREATE_BUILDING = 5;
+
+    // Split a fleet in two. In this case, count refers to the number of ships to take out and
+    // create a new fleet with. The remaining ships will stay in this fleet.
+    // empire_id, fleet_id and count are required.
+    SPLIT_FLEET = 6;
   }
   optional MODIFICATION_TYPE type = 1;
 
   optional int64 empire_id = 2;
   optional int32 planet_index = 3;
   optional int64 colony_id = 4;
+  optional int64 fleet_id = 5;
 
-  optional ColonyFocus focus = 5;
-  optional Design.DesignType design_type = 6;
-  optional int32 count = 7;
+  optional ColonyFocus focus = 6;
+  optional Design.DesignType design_type = 7;
+  optional int32 count = 8;
 }
