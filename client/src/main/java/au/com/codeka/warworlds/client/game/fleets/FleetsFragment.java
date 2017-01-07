@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
@@ -103,6 +104,14 @@ public class FleetsFragment extends BaseFragment {
     listView.setAdapter(adapter);
 
     adapter.notifyDataSetChanged();
+  }
+
+  @Override
+  public void onStop() {
+    starCollection = null;
+    listView.setAdapter((ExpandableListAdapter) null);
+    adapter.destroy();
+    adapter = null;
   }
 
   private void showActionsPane() {
