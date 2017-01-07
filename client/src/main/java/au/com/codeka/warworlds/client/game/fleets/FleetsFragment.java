@@ -18,8 +18,10 @@ import android.widget.TextView;
 import com.google.common.base.CaseFormat;
 import com.transitionseverywhere.TransitionManager;
 
+import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
+import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.game.world.ArrayListStarCollection;
 import au.com.codeka.warworlds.client.game.world.MyEmpireStarCollection;
 import au.com.codeka.warworlds.client.game.world.StarCollection;
@@ -119,8 +121,7 @@ public class FleetsFragment extends BaseFragment {
   }
 
   private void showActionsPane() {
-    listView.setVisibility(View.VISIBLE);
-    getView().setBackgroundResource(R.color.default_background);
+    showStarfield(false /* visible */);
 
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.removeAllViews();
@@ -138,12 +139,25 @@ public class FleetsFragment extends BaseFragment {
   }
 
   private void showMovePane() {
-    listView.setVisibility(View.GONE);
-    getView().setBackground(null);
+    if (adapter.getSelectedFleetId() == null) {
+      return;
+    }
+    showStarfield(true /* visible */);
+
+    long fleetId = adapter.getSelectedFleetId();
+
+    // TODO: the cast seems... not great.
+    StarfieldManager starfieldManager =
+        ((MainActivity) getFragmentActivity()).getStarfieldManager();
+
+    MoveBottomPane moveBottomPane =
+        new MoveBottomPane(getContext(), starfieldManager, this::showActionsPane);
+    moveBottomPane.setFleet(star, fleetId);
 
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.removeAllViews();
-    bottomPane.addView(new MoveBottomPane(getContext(), this::showActionsPane));
+    bottomPane.addView(moveBottomPane);
+
   }
 
   private void showSplitPane() {
@@ -151,8 +165,7 @@ public class FleetsFragment extends BaseFragment {
       // No fleet selected, can't split.
       return;
     }
-    listView.setVisibility(View.VISIBLE);
-    getView().setBackgroundResource(R.color.default_background);
+    showStarfield(false /* visible */);
 
     long fleetId = adapter.getSelectedFleetId();
 
@@ -162,5 +175,18 @@ public class FleetsFragment extends BaseFragment {
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.removeAllViews();
     bottomPane.addView(splitBottomPane);
+  }
+
+  private void showStarfield(boolean visible) {
+    View view = getView();
+    if (view != null) {
+      if (visible) {
+        listView.setVisibility(View.GONE);
+        view.setBackground(null);
+      } else {
+        listView.setVisibility(View.VISIBLE);
+        view.setBackgroundResource(R.color.default_background);
+      }
+    }
   }
 }

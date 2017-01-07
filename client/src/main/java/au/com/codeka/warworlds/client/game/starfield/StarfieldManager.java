@@ -103,8 +103,26 @@ public class StarfieldManager {
     this.tapListener = tapListener;
   }
 
+  /** Gets the selected star (or null if no star is selected) */
+  @Nullable
   public Star getSelectedStar() {
     return selectedStar;
+  }
+
+  /** Sets the star we have selected to the given value (or unselects if star is null). */
+  public void setSelectedStar(@Nullable Star star) {
+    if (star != null) {
+      selectionIndicatorSceneObject.setSize(60, 60);
+      SceneObject sceneObject = starSceneObjects.get(star.id);
+      sceneObject.addChild(selectionIndicatorSceneObject);
+    } else if (selectionIndicatorSceneObject.getParent() != null) {
+      selectionIndicatorSceneObject.getParent().removeChild(selectionIndicatorSceneObject);
+    }
+
+    selectedStar = star;
+    if (tapListener != null) {
+      tapListener.onStarTapped(star);
+    }
   }
 
   public void warpTo(Star star) {
@@ -457,9 +475,6 @@ public class StarfieldManager {
 
     @Override
     public void onTap(float x, float y) {
-      if (tapListener == null) {
-        return;
-      }
       Star star = null;
 
       // Work out which star (if any) you tapped on.
@@ -484,16 +499,11 @@ public class StarfieldManager {
         }
 
         if (selected != null) {
-          selectionIndicatorSceneObject.setSize(60, 60);
-          selected.addChild(selectionIndicatorSceneObject);
           star = (Star) selected.getTag();
-        } else if (selectionIndicatorSceneObject.getParent() != null) {
-          selectionIndicatorSceneObject.getParent().removeChild(selectionIndicatorSceneObject);
         }
       }
 
-      selectedStar = star;
-      tapListener.onStarTapped(star);
+      setSelectedStar(star);
     }
   };
 

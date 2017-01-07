@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.client.game.fleets;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +60,7 @@ public class ActionBottomPane extends RelativeLayout {
   public class StanceAdapter extends BaseAdapter implements SpinnerAdapter {
     Fleet.FLEET_STANCE[] values;
 
-    public StanceAdapter() {
+    StanceAdapter() {
       values = Fleet.FLEET_STANCE.values();
     }
 
