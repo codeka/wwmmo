@@ -32,8 +32,7 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
   private final LayoutInflater inflater;
   private final long myEmpireId;
 
-  @Nullable
-  private Long selectedFleetId;
+  @Nullable private Long selectedFleetId;
 
   public FleetExpandableStarListAdapter(LayoutInflater inflater, StarCollection stars) {
     super(stars);

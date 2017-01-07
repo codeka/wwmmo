@@ -22,4 +22,10 @@ public class MyEmpireStarCollection implements StarCollection {
   public Star get(int index) {
     return starCursor.getValue(index);
   }
+
+  @Override
+  public boolean notifyStarModified(Star star) {
+    // TODO
+    return false;
+  }
 }

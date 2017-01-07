@@ -7,7 +7,10 @@ import android.widget.BaseExpandableListAdapter;
 
 import javax.annotation.Nonnull;
 
+import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.world.StarCollection;
+import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -21,6 +24,15 @@ public abstract class ExpandableStarListAdapter<T> extends BaseExpandableListAda
 
   public ExpandableStarListAdapter(@Nonnull StarCollection stars) {
     this.stars = stars;
+    App.i.getEventBus().register(eventListener);
+  }
+
+  /**
+   * Destroy this {@link ExpandableStarListAdapter}. Must be called to unregister us from the event
+   * bus when you're finished.
+   */
+  public void destroy() {
+    App.i.getEventBus().unregister(eventListener);
   }
 
   @Override
@@ -97,4 +109,13 @@ public abstract class ExpandableStarListAdapter<T> extends BaseExpandableListAda
   protected Star getStar(int index) {
     return stars.get(index);
   }
+
+  private final Object eventListener = new Object() {
+    @EventHandler(thread= Threads.UI)
+    public void onStarUpdated(Star star) {
+      if (stars.notifyStarModified(star)) {
+        notifyDataSetChanged();
+      }
+    }
+  };
 }

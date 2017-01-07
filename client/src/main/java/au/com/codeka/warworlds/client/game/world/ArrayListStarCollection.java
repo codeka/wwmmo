@@ -24,6 +24,17 @@ public class ArrayListStarCollection implements StarCollection {
     return stars.get(index);
   }
 
+  @Override
+  public boolean notifyStarModified(Star star) {
+    for (int i = 0; i < stars.size(); i++) {
+      if (stars.get(i).id.equals(star.id)) {
+        stars.set(i, star);
+        return true;
+      }
+    }
+    return false;
+  }
+
   public ArrayList<Star> getStars() {
     return stars;
   }
