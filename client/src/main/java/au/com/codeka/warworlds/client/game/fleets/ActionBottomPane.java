@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ActionBottomPane extends RelativeLayout {
   /** Implement this to get notified of events. */
   public interface Callback {
+    void onMoveClick();
     void onSplitClick();
   }
 
@@ -43,17 +44,18 @@ public class ActionBottomPane extends RelativeLayout {
     Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
     stanceSpinner.setAdapter(new StanceAdapter());
 
-    findViewById(R.id.split_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onSplitClick(v);
-      }
-    });
+    findViewById(R.id.split_btn).setOnClickListener(this::onSplitClick);
+    findViewById(R.id.move_btn).setOnClickListener(this::onMoveClick);
   }
 
   /** Called when you click 'split'. */
   private void onSplitClick(View view) {
     callback.onSplitClick();
+  }
+
+  /** Called when you click 'move'. */
+  private void onMoveClick(View view) {
+    callback.onMoveClick();
   }
 
   public class StanceAdapter extends BaseAdapter implements SpinnerAdapter {

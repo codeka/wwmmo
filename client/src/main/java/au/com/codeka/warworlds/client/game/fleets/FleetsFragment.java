@@ -64,7 +64,6 @@ public class FleetsFragment extends BaseFragment {
     super.onViewCreated(view, savedInstanceState);
 
     bottomPane = (FrameLayout) view.findViewById(R.id.bottom_pane);
-    showActionsPane();
 
     listView = (ExpandableListView) view.findViewById(R.id.fleet_list);
     listView.setOnChildClickListener((lv, v, groupPosition, childPosition, id) -> {
@@ -105,6 +104,8 @@ public class FleetsFragment extends BaseFragment {
     }
 
     adapter.notifyDataSetChanged();
+
+    showActionsPane();
   }
 
   @Override
@@ -118,9 +119,17 @@ public class FleetsFragment extends BaseFragment {
   }
 
   private void showActionsPane() {
+    listView.setVisibility(View.VISIBLE);
+    getView().setBackgroundResource(R.color.default_background);
+
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.removeAllViews();
     bottomPane.addView(new ActionBottomPane(getContext(), new ActionBottomPane.Callback() {
+      @Override
+      public void onMoveClick() {
+        showMovePane();
+      }
+
       @Override
       public void onSplitClick() {
         showSplitPane();
@@ -128,21 +137,26 @@ public class FleetsFragment extends BaseFragment {
     }));
   }
 
+  private void showMovePane() {
+    listView.setVisibility(View.GONE);
+    getView().setBackground(null);
+
+    TransitionManager.beginDelayedTransition(bottomPane);
+    bottomPane.removeAllViews();
+    bottomPane.addView(new MoveBottomPane(getContext(), this::showActionsPane));
+  }
+
   private void showSplitPane() {
     if (adapter.getSelectedFleetId() == null) {
       // No fleet selected, can't split.
       return;
     }
+    listView.setVisibility(View.VISIBLE);
+    getView().setBackgroundResource(R.color.default_background);
+
     long fleetId = adapter.getSelectedFleetId();
 
-    SplitBottomPane splitBottomPane = new SplitBottomPane(
-        getContext(),
-        new SplitBottomPane.Callback() {
-          @Override
-          public void onCancel() {
-            showActionsPane();
-          }
-        });
+    SplitBottomPane splitBottomPane = new SplitBottomPane(getContext(), this::showActionsPane);
     splitBottomPane.setFleet(star, fleetId);
 
     TransitionManager.beginDelayedTransition(bottomPane);
