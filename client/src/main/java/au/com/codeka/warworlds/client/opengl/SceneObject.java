@@ -40,6 +40,9 @@ public class SceneObject {
   @Nullable private Float tapTargetRadius;
   private Object tag;
 
+  /** An optional {@link Runnable} that'll be called before this {@link SceneObject} is drawn. */
+  @Nullable private Runnable drawRunnable;
+
   public SceneObject(DimensionResolver dimensionResolver) {
     this(dimensionResolver, null);
   }
@@ -72,6 +75,17 @@ public class SceneObject {
       child.scene = null;
       child.parent = null;
     }
+  }
+
+  /**
+   * Sets an optional draw {@link Runnable} that is called on the draw thread before this
+   * {@link SceneObject} is drawn. You can use this to update the position, scale, etc of the
+   * object just before it's drawn (useful for animation, etc).
+   *
+   * <p>You cannot modify the object heirarchy in this method (add children, remove children, etc)
+   */
+  public void setDrawRunnable(@Nullable Runnable drawRunnable) {
+    this.drawRunnable = drawRunnable;
   }
 
   @Nullable
@@ -147,13 +161,37 @@ public class SceneObject {
     this.heightPx = heightPx;
   }
 
+  public void setTranslation(float xDp, float yDp) {
+    float xPx = dimensionResolver.dp2px(xDp);
+    float yPx = dimensionResolver.dp2px(yDp);
+    matrix[12] = 0; matrix[13] = 0; matrix[14] = 0; matrix[15] = 1.0f;
+    Matrix.translateM(matrix, 0, xPx / widthPx, yPx / heightPx, 0.0f);
+  }
+
   public void translate(float xDp, float yDp) {
     float xPx = dimensionResolver.dp2px(xDp);
     float yPx = dimensionResolver.dp2px(yDp);
     Matrix.translateM(matrix, 0, xPx, yPx, 0.0f);
   }
 
+  public void rotate(float radians, float x, float y, float z) {
+    Matrix.rotateM(matrix, 0, (float)(radians * Math.PI * 2.0), x, y, z);
+  }
+
+  public void setRotation(float radians, float x, float y, float z) {
+    float tx = matrix[12];
+    float ty = matrix[13];
+    Matrix.setRotateM(matrix, 0, (float)(radians * Math.PI * 2.0), x, y, z);
+    Matrix.scaleM(matrix, 0, widthPx, heightPx, 1.0f);
+    setTranslation(tx, ty);
+  }
+
   public void draw(float[] viewProjMatrix) {
+    Runnable localDrawRunnable = drawRunnable;
+    if (localDrawRunnable != null) {
+      localDrawRunnable.run();
+    }
+
     Matrix.multiplyMM(modelViewProjMatrix, 0, viewProjMatrix, 0, matrix, 0);
 
     if (clipRadius != null) {

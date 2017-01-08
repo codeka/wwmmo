@@ -109,6 +109,11 @@ public class Vector2 {
     y *= s;
   }
 
+  public void scale(double sx, double sy) {
+    x *= sx;
+    y *= sy;
+  }
+
   @Override
   public int hashCode() {
     // this avoids the boxing that "new Double(x).hashCode()" would require

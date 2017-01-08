@@ -4,12 +4,17 @@ import android.content.Context;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.google.common.base.Preconditions;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.game.starfield.StarfieldHelper;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.opengl.SceneObject;
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 
@@ -19,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Bottom pane of the fleets view that contains the "move" function.
  */
 public class MoveBottomPane extends RelativeLayout {
+  private static final Log log = new Log("MoveBottomPane");
+
   /** Implement this when you want to get notified about when we want to close this pane. */
   public interface Callback {
     void onClose();
@@ -33,6 +40,7 @@ public class MoveBottomPane extends RelativeLayout {
   @Nullable private Star destStar;
 
   @Nullable private SceneObject fleetMoveIndicator;
+  private float fleetMoveIndicatorFraction;
 
   public MoveBottomPane(
       Context context,
@@ -107,6 +115,29 @@ public class MoveBottomPane extends RelativeLayout {
     }
 
     fleetMoveIndicator = starfieldManager.createFleetSprite(fleet);
+    fleetMoveIndicator.setDrawRunnable(() -> {
+      Preconditions.checkNotNull(fleetMoveIndicator);
+
+      if (destStar != null) {
+        fleetMoveIndicatorFraction += 0.016f; // TODO: pass in dt here?
+        while (fleetMoveIndicatorFraction > 1.0f) {
+          fleetMoveIndicatorFraction -= 1.0f;
+        }
+
+        Vector2 dir = StarfieldHelper.directionBetween(star, destStar);
+
+        Vector2 dirUnit = new Vector2(dir.x, dir.y);
+        dirUnit.normalize();
+        float angle = Vector2.angleBetween(dirUnit, new Vector2(0, -1));
+        log.info("angle: %.2f", angle);
+        fleetMoveIndicator.setRotation(angle, 0, 0, 1);
+
+        dir.scale(1.0, -1.0);
+        dir.scale(fleetMoveIndicatorFraction);
+     //   fleetMoveIndicator.setTranslation((float) dir.x, (float) dir.y);
+
+      }
+    });
     starSceneObject.addChild(fleetMoveIndicator);
   }
 
