@@ -175,13 +175,13 @@ public class SceneObject {
   }
 
   public void rotate(float radians, float x, float y, float z) {
-    Matrix.rotateM(matrix, 0, (float)(radians * Math.PI * 2.0), x, y, z);
+    Matrix.rotateM(matrix, 0, (float)(radians * 180.0f / Math.PI), x, y, z);
   }
 
   public void setRotation(float radians, float x, float y, float z) {
     float tx = matrix[12];
     float ty = matrix[13];
-    Matrix.setRotateM(matrix, 0, (float)(radians * Math.PI * 2.0), x, y, z);
+    Matrix.setRotateM(matrix, 0, (float)(radians * 180.0f / Math.PI), x, y, z);
     Matrix.scaleM(matrix, 0, widthPx, heightPx, 1.0f);
     setTranslation(tx, ty);
   }

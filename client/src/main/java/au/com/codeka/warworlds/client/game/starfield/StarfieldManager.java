@@ -261,7 +261,7 @@ public class StarfieldManager {
         .shader(scene.getSpriteShader())
         .texture(scene.getTextureManager().loadTexture(getFleetTexture(fleet)))
         .build());
-    sprite.setSize(120.0f, 120.0f);
+    sprite.setSize(64.0f, 64.0f);
     return sprite;
   }
 

@@ -119,7 +119,7 @@ public class MoveBottomPane extends RelativeLayout {
       Preconditions.checkNotNull(fleetMoveIndicator);
 
       if (destStar != null) {
-        fleetMoveIndicatorFraction += 0.016f; // TODO: pass in dt here?
+        fleetMoveIndicatorFraction += 0.032f; // TODO: pass in dt here?
         while (fleetMoveIndicatorFraction > 1.0f) {
           fleetMoveIndicatorFraction -= 1.0f;
         }
@@ -129,13 +129,10 @@ public class MoveBottomPane extends RelativeLayout {
         Vector2 dirUnit = new Vector2(dir.x, dir.y);
         dirUnit.normalize();
         float angle = Vector2.angleBetween(dirUnit, new Vector2(0, -1));
-        log.info("angle: %.2f", angle);
         fleetMoveIndicator.setRotation(angle, 0, 0, 1);
 
-        dir.scale(1.0, -1.0);
         dir.scale(fleetMoveIndicatorFraction);
-     //   fleetMoveIndicator.setTranslation((float) dir.x, (float) dir.y);
-
+        fleetMoveIndicator.setTranslation(0.0f, (float) dir.length());
       }
     });
     starSceneObject.addChild(fleetMoveIndicator);
