@@ -21,9 +21,11 @@ import au.com.codeka.warworlds.client.opengl.SceneObject;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.proto.Design;
+import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
+import au.com.codeka.warworlds.common.sim.StarHelper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -128,21 +130,21 @@ public class MoveBottomPane extends RelativeLayout {
       int hrs = (int) Math.floor(timeInHours);
       int mins = (int) Math.floor((timeInHours - hrs) * 60.0f);
 
-      double estimatedCost = design.fuel_cost_per_px * distanceInParsecs * fleet.num_ships;
-      //String cash = Cash.format(estimatedCost);
-      String energy = String.format(Locale.US, "%.1f", estimatedCost);
+      double estimatedFuel = design.fuel_cost_per_px * distanceInParsecs * fleet.num_ships;
+      String fuel = String.format(Locale.US, "%.1f", estimatedFuel);
 
       String fontOpen = "";
       String fontClose = "";
-      //    if (estimatedCost > EmpireManager.i.getMyEmpire().) {
-      fontOpen = "<font color=\"#ff0000\">";
-      fontClose = "</font>";
-      //    }
+      EmpireStorage storage = StarHelper.getStorage(star, EmpireManager.i.getMyEmpire().id);
+      if (storage == null || estimatedFuel > storage.total_energy) {
+        fontOpen = "<font color=\"#ff0000\">";
+        fontClose = "</font>";
+      }
 
       String rightDetails = String.format(
           Locale.ENGLISH,
           "<b>ETA:</b> %d hrs, %d mins<br />%s<b>Energy:</b> %s%s",
-          hrs, mins, fontOpen, energy, fontClose);
+          hrs, mins, fontOpen, fuel, fontClose);
       ((TextView) findViewById(R.id.star_details_right)).setText(Html.fromHtml(rightDetails));
     }
 
