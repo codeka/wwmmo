@@ -51,4 +51,8 @@
 
   <string name="pref_category_debug">Debug</string>
   <string name="pref_server_url">Server URL</string>
+
+  <string name="fleet_move_instructions">
+    Select the star you want to move your fleet to and click &quot;Move&quot;
+  </string>
 </resources>

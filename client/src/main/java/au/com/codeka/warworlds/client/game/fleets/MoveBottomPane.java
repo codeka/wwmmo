@@ -1,10 +1,14 @@
 package au.com.codeka.warworlds.client.game.fleets;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
+
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,11 +16,14 @@ import javax.annotation.Nullable;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldHelper;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
+import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.opengl.SceneObject;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector2;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.DesignHelper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -107,6 +114,36 @@ public class MoveBottomPane extends RelativeLayout {
 
     if (star == null || fleet == null) {
       return;
+    }
+
+    if (destStar != null) {
+      double distanceInParsecs = StarfieldHelper.distanceBetween(star, destStar);
+      String leftDetails = String
+          .format(Locale.ENGLISH, "<b>Star:</b> %s<br /><b>Distance:</b> %.2f pc",
+              destStar.name, distanceInParsecs);
+      ((TextView) findViewById(R.id.star_details_left)).setText(Html.fromHtml(leftDetails));
+
+      Design design = DesignHelper.getDesign(fleet.design_type);
+      double timeInHours = distanceInParsecs / design.speed_px_per_hour;
+      int hrs = (int) Math.floor(timeInHours);
+      int mins = (int) Math.floor((timeInHours - hrs) * 60.0f);
+
+      double estimatedCost = design.fuel_cost_per_px * distanceInParsecs * fleet.num_ships;
+      //String cash = Cash.format(estimatedCost);
+      String energy = String.format(Locale.US, "%.1f", estimatedCost);
+
+      String fontOpen = "";
+      String fontClose = "";
+      //    if (estimatedCost > EmpireManager.i.getMyEmpire().) {
+      fontOpen = "<font color=\"#ff0000\">";
+      fontClose = "</font>";
+      //    }
+
+      String rightDetails = String.format(
+          Locale.ENGLISH,
+          "<b>ETA:</b> %d hrs, %d mins<br />%s<b>Energy:</b> %s%s",
+          hrs, mins, fontOpen, energy, fontClose);
+      ((TextView) findViewById(R.id.star_details_right)).setText(Html.fromHtml(rightDetails));
     }
 
     SceneObject starSceneObject = starfieldManager.getStarSceneObject(star.id);

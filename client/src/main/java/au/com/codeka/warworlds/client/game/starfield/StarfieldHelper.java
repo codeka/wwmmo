@@ -21,4 +21,8 @@ public class StarfieldHelper {
         to.offset_x - from.offset_x + (sdx * 1024.0f),
         to.offset_y - from.offset_y + (sdy * 1024.0f));
   }
+
+  public static double distanceBetween(Star from, Star to) {
+    return directionBetween(from, to).length();
+  }
 }
