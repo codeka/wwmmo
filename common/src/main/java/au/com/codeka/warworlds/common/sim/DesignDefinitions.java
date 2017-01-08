@@ -30,7 +30,7 @@ public class DesignDefinitions {
           .combat_priority(100)
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
-          .fuel_cost_per_px(35.0f)
+          .fuel_cost_per_px(3.5f)
           .image_url("colony.png")
           .speed_px_per_hour(32.0f)
           .upgrades(Lists.newArrayList(
@@ -77,7 +77,7 @@ public class DesignDefinitions {
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.SCOUT_SHIP).build(),
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
-          .fuel_cost_per_px(4.0f)
+          .fuel_cost_per_px(0.4f)
           .image_url("scout.png")
           .speed_px_per_hour(1024.0f)
           .upgrades(Lists.newArrayList(
@@ -122,7 +122,7 @@ public class DesignDefinitions {
           .combat_priority(10)
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
-          .fuel_cost_per_px(16.0f)
+          .fuel_cost_per_px(1.6f)
           .image_url("fighter.png")
           .speed_px_per_hour(128.0f)
           .upgrades(Lists.newArrayList(
@@ -165,7 +165,7 @@ public class DesignDefinitions {
           .combat_priority(50)
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
-          .fuel_cost_per_px(16.0f)
+          .fuel_cost_per_px(1.6f)
           .image_url("troopcarrier.png")
           .speed_px_per_hour(128.0f)
           .build(),
@@ -192,7 +192,7 @@ public class DesignDefinitions {
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.EMPTY_SPACE_MOVER).build(),
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
-          .fuel_cost_per_px(512.0f)
+          .fuel_cost_per_px(51.2f)
           .image_url("wormhole-generator.png")
           .speed_px_per_hour(8.0f)
           .build(),
