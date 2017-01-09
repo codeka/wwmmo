@@ -7,6 +7,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import java.util.Locale;
 
@@ -14,9 +15,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.game.starfield.StarfieldHelper;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
+import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.opengl.SceneObject;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector2;
@@ -24,6 +25,7 @@ import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.sim.StarHelper;
 
@@ -119,7 +121,7 @@ public class MoveBottomPane extends RelativeLayout {
     }
 
     if (destStar != null) {
-      double distanceInParsecs = StarfieldHelper.distanceBetween(star, destStar);
+      double distanceInParsecs = StarHelper.distanceBetween(star, destStar);
       String leftDetails = String
           .format(Locale.ENGLISH, "<b>Star:</b> %s<br /><b>Distance:</b> %.2f pc",
               destStar.name, distanceInParsecs);
@@ -163,7 +165,7 @@ public class MoveBottomPane extends RelativeLayout {
           fleetMoveIndicatorFraction -= 1.0f;
         }
 
-        Vector2 dir = StarfieldHelper.directionBetween(star, destStar);
+        Vector2 dir = StarHelper.directionBetween(star, destStar);
 
         Vector2 dirUnit = new Vector2(dir.x, dir.y);
         dirUnit.normalize();
@@ -187,7 +189,17 @@ public class MoveBottomPane extends RelativeLayout {
   }
 
   private void onMoveClick(View view) {
-    // TODO: move
+    Preconditions.checkNotNull(star);
+    Preconditions.checkNotNull(fleet);
+    if (destStar == null) {
+      return;
+    }
+
+    StarManager.i.updateStar(star, new StarModification.Builder()
+        .type(StarModification.MODIFICATION_TYPE.MOVE_FLEET)
+        .fleet_id(fleet.id)
+        .star_ids(Lists.newArrayList(destStar.id))
+        .build());
 
     callback.onClose();
   }

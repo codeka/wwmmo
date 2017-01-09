@@ -197,7 +197,7 @@ message StarModification {
 
     // Begin a "fleet move" to a new star. The move will take time, at which point the server will
     // issue a MOVE_FLEET_COMPLETE modification to complete the operation.
-    // empire_id, fleet_id, target_star_id are required.
+    // empire_id, fleet_id, star_ids (with the single target star) are required.
     MOVE_FLEET = 7;
   }
   optional MODIFICATION_TYPE type = 1;
@@ -210,5 +210,5 @@ message StarModification {
   optional ColonyFocus focus = 6;
   optional Design.DesignType design_type = 7;
   optional int32 count = 8;
-  optional int64 target_star_id = 9;
+  repeated int64 star_ids = 9;
 }

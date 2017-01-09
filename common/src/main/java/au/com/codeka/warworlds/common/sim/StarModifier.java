@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -26,6 +27,8 @@ import au.com.codeka.warworlds.common.proto.StarModification;
 public class StarModifier {
   private static final Log log = new Log("StarModifier");
 
+  private static final long HOURS_MS = 3600000L;
+
   public interface IdentifierGenerator {
     long nextIdentifier();
   }
@@ -37,18 +40,37 @@ public class StarModifier {
   }
 
   public void modifyStar(Star.Builder star, StarModification modification) {
-    modifyStar(star, Lists.newArrayList(modification));
+    modifyStar(star, null, Lists.newArrayList(modification));
   }
 
-  public void modifyStar(Star.Builder star, Collection<StarModification> modifications) {
-    new Simulation(false).simulate(star);
-    for (StarModification modification : modifications) {
-      applyModification(star, modification);
+  /** Modify a star, and possibly other auxiliary stars. */
+  public void modifyStar(
+      Star.Builder star,
+      @Nullable List<Star.Builder> stars,
+      Collection<StarModification> modifications) {
+    Simulation simulation = new Simulation(false);
+    simulation.simulate(star);
+    if (stars != null) {
+      for (Star.Builder s : stars) {
+        simulation.simulate(s);
+      }
     }
-    new Simulation().simulate(star);
+    for (StarModification modification : modifications) {
+      applyModification(star, stars, modification);
+    }
+    simulation = new Simulation();
+    simulation.simulate(star);
+    if (stars != null) {
+      for (Star.Builder s : stars) {
+        simulation.simulate(s);
+      }
+    }
   }
 
-  private void applyModification(Star.Builder star, StarModification modification) {
+  private void applyModification(
+      Star.Builder star,
+      @Nullable List<Star.Builder> stars,
+      StarModification modification) {
     switch (modification.type) {
       case COLONIZE:
         applyColonize(star, modification);
@@ -67,6 +89,10 @@ public class StarModifier {
         return;
       case SPLIT_FLEET:
         applySplitFleet(star, modification);
+        return;
+      case MOVE_FLEET:
+        applyMoveFleet(star, stars, modification);
+        return;
       default:
         log.error("Unknown or unexpected modification type: %s", modification.type);
     }
@@ -219,6 +245,69 @@ public class StarModifier {
           .num_ships((float) modification.count)
           .build());
     }
+  }
+
+  private void applyMoveFleet(
+      Star.Builder star,
+      List<Star.Builder> stars,
+      StarModification modification) {
+    Preconditions.checkArgument(
+        modification.type.equals(StarModification.MODIFICATION_TYPE.MOVE_FLEET));
+
+    if (stars.size() != 1) {
+      // TODO: suspicious!
+      log.warning("No destination star.");
+      return;
+    }
+    Star.Builder targetStar = stars.get(0);
+
+    int fleetIndex = findFleetIndex(star, modification.fleet_id);
+    if (fleetIndex < 0) {
+      // TODO: suspicious!
+      log.warning("No fleet with given ID on star.");
+      return;
+    }
+    Fleet fleet = star.fleets.get(fleetIndex);
+
+    if (fleet.state != Fleet.FLEET_STATE.IDLE) {
+      // TODO: suspicious?
+      log.warning("Fleet is not idle, can't move.");
+      return;
+    }
+
+    if (targetStar.id != modification.star_ids.get(0)) {
+      // TODO: suspicious!
+      log.warning("star_ids was not the target star.");
+      return;
+    }
+
+    Design design = DesignHelper.getDesign(fleet.design_type);
+    double distance = StarHelper.distanceBetween(star, targetStar);
+    double timeInHours = distance / design.speed_px_per_hour;
+    double fuel = design.fuel_cost_per_px * distance * fleet.num_ships;
+
+    int storageIndex = StarHelper.getStorageIndex(star, fleet.empire_id);
+    if (storageIndex < 0) {
+      // No storage. TODO: some kind of portable fuel?
+      log.debug("No storages on this star.");
+      return;
+    }
+
+    EmpireStorage.Builder empireStorageBuilder = star.empire_stores.get(storageIndex).newBuilder();
+    if (empireStorageBuilder.total_energy < fuel) {
+      log.debug(
+          "Not enough energy for move (%.2f < %.2f)", empireStorageBuilder.total_energy, fuel);
+      return;
+    }
+
+    star.empire_stores.set(storageIndex, empireStorageBuilder
+        .total_energy(empireStorageBuilder.total_energy - (float) fuel)
+        .build());
+    star.fleets.set(fleetIndex, star.fleets.get(fleetIndex).newBuilder()
+        .destination_star_id(targetStar.id)
+        .state(Fleet.FLEET_STATE.MOVING)
+        .eta(System.currentTimeMillis() + (long)(timeInHours * HOURS_MS))
+        .build());
   }
 
   @Nullable
