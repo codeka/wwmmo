@@ -7,6 +7,10 @@
 # Make sure keystore.jks never gets added to source control, it's SEKRET!
 keystore.jks
 
+# These are generated from the .proto files.
+common/src/main/java/au/com/codeka/warworlds/common/proto/
+
+# A bunch of data files.
 server/src/main/data/cache/*
 server/src/main/data/store/*
 server/src/main/data/config-debug.json
