@@ -110,7 +110,7 @@
               <%= fleets[i].state %> <% if (fleets[i].state == "MOVING") { %>
                 <%= fleets[i].destination_star_id %>
                 <b>ETA:</b>
-                <%= new Date(fleets[i].eta) %>
+                <time timestamp="<%= fleets[i].eta %>" class="timer">
               <% } %>
             </div>
           </div>

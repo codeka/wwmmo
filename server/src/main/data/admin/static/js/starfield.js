@@ -70,7 +70,7 @@ $(function() {
   function showStar(star) {
     var html = $("#star-details-tmpl").applyTemplate(star);
     $("#star-details").html(html);
-    fix_times();
+    fixTimes();
   }
 
   window.simulate = function(id) {
