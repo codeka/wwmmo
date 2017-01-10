@@ -178,7 +178,8 @@ message StarModification {
     ADJUST_FOCUS = 2;
 
     // Create a new fleet, ignored if sent from client.
-    // empire_id, design_type and count are required.
+    // empire_id and either (design_type and count) or (fleet) are required. If fleet is specified,
+    // the new fleet will be a copy of the given fleet.
     CREATE_FLEET = 3;
 
     // Add a build request, start building it.
@@ -211,4 +212,5 @@ message StarModification {
   optional Design.DesignType design_type = 7;
   optional int32 count = 8;
   optional int64 star_id = 9;
+  optional Fleet fleet = 10;
 }

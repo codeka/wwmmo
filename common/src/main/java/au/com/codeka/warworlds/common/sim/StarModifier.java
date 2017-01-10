@@ -159,16 +159,25 @@ public class StarModifier {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.CREATE_FLEET));
 
-    star.fleets.add(new Fleet.Builder()
-        //TODO: .alliance_id()
-        .design_type(modification.design_type)
-        .empire_id(modification.empire_id)
-        .id(identifierGenerator.nextIdentifier())
-        .num_ships((float) modification.count)
-        .stance(Fleet.FLEET_STANCE.AGGRESSIVE)
-        .state(Fleet.FLEET_STATE.IDLE)
-        .state_start_time(System.currentTimeMillis())
-        .build());
+    if (modification.fleet != null) {
+      star.fleets.add(modification.fleet.newBuilder()
+          .id(identifierGenerator.nextIdentifier())
+          .state(Fleet.FLEET_STATE.IDLE)
+          .state_start_time(System.currentTimeMillis())
+          .destination_star_id(null)
+          .build());
+    } else {
+      star.fleets.add(new Fleet.Builder()
+          //TODO: .alliance_id()
+          .design_type(modification.design_type)
+          .empire_id(modification.empire_id)
+          .id(identifierGenerator.nextIdentifier())
+          .num_ships((float) modification.count)
+          .stance(Fleet.FLEET_STANCE.AGGRESSIVE)
+          .state(Fleet.FLEET_STATE.IDLE)
+          .state_start_time(System.currentTimeMillis())
+          .build());
+    }
   }
 
   private void applyCreateBuilding(Star.Builder star, StarModification modification) {

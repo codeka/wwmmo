@@ -121,6 +121,9 @@ public class StarManager {
     // re-simulate the star then.
     Long nextSimulateTime = null;
 
+    // TODO: pass this into modifyStar as well so the simulation uses the same time everywhere.
+    long now = System.currentTimeMillis();
+
     // Any builds which have finished, we'll want to remove them and add modifications for them
     // instead.
     for (int i = 0; i < starBuilder.planets.size(); i++) {
@@ -160,6 +163,29 @@ public class StarManager {
           .build_requests(remainingBuildRequests)
           .build());
       starBuilder.planets.set(i, planetBuilder.build());
+    }
+
+    // Any fleets that have arrives, make sure we remove them here and add them to the destination.
+    for (int i = 0; i < starBuilder.fleets.size(); i++) {
+      Fleet fleet = starBuilder.fleets.get(i);
+      if (fleet.state != Fleet.FLEET_STATE.MOVING || fleet.eta > now) {
+        continue;
+      }
+
+      // First, grab the destination star and add it there.
+      WatchableObject<Star> destStar = getStar(fleet.destination_star_id);
+      synchronized (destStar.lock) { // TODO: this could deadlock, need to lock in the same order
+        Star.Builder destStarBuilder = destStar.get().newBuilder();
+        starModifier.modifyStar(destStarBuilder, new StarModification.Builder()
+            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+            .empire_id(fleet.empire_id)
+            .fleet(fleet)
+            .build());
+        destStar.set(destStarBuilder.build());
+      }
+
+      // Then remove it from our star.
+      starBuilder.fleets.remove(i);
     }
 
     // Make sure we simulate at least when the next fleet arrives
