@@ -43,33 +43,31 @@ public class StarModifier {
     modifyStar(star, null, Lists.newArrayList(modification));
   }
 
-  /** Modify a star, and possibly other auxiliary stars. */
+  /**
+   * Modify a star, and possibly other auxiliary stars.
+   *
+   * @param star The {@link Star.Builder} that we're modifying. The star is simulated before and
+   *             after being modified.
+   * @param auxStars A list of auxiliary stars that we may need while modifying this star (for
+   *                 example, MOVE_FLEET needs to know about the destination). These are not
+   *                 simulated.
+   * @param modifications The list of {@link StarModification}s to apply.
+   */
   public void modifyStar(
       Star.Builder star,
-      @Nullable List<Star.Builder> stars,
+      @Nullable List<Star> auxStars,
       Collection<StarModification> modifications) {
-    Simulation simulation = new Simulation(false);
-    simulation.simulate(star);
-    if (stars != null) {
-      for (Star.Builder s : stars) {
-        simulation.simulate(s);
-      }
-    }
+    new Simulation(false).simulate(star);
+
     for (StarModification modification : modifications) {
-      applyModification(star, stars, modification);
+      applyModification(star, auxStars, modification);
     }
-    simulation = new Simulation();
-    simulation.simulate(star);
-    if (stars != null) {
-      for (Star.Builder s : stars) {
-        simulation.simulate(s);
-      }
-    }
+    new Simulation().simulate(star);
   }
 
   private void applyModification(
       Star.Builder star,
-      @Nullable List<Star.Builder> stars,
+      @Nullable List<Star> auxStars,
       StarModification modification) {
     switch (modification.type) {
       case COLONIZE:
@@ -91,7 +89,7 @@ public class StarModifier {
         applySplitFleet(star, modification);
         return;
       case MOVE_FLEET:
-        applyMoveFleet(star, stars, modification);
+        applyMoveFleet(star, auxStars, modification);
         return;
       default:
         log.error("Unknown or unexpected modification type: %s", modification.type);
@@ -249,17 +247,24 @@ public class StarModifier {
 
   private void applyMoveFleet(
       Star.Builder star,
-      List<Star.Builder> stars,
+      List<Star> auxStars,
       StarModification modification) {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.MOVE_FLEET));
 
-    if (stars.size() != 1) {
-      // TODO: suspicious!
-      log.warning("No destination star.");
+    Star targetStar = null;
+    for (Star s : auxStars) {
+      if (s.id.equals(modification.star_id)) {
+        targetStar = s;
+        break;
+      }
+    }
+    if (targetStar == null) {
+      // Not suspicious, the caller made a mistake not the user.
+      log.error(
+          "Target star #%d was not included in the auxiliary star list.", modification.star_id);
       return;
     }
-    Star.Builder targetStar = stars.get(0);
 
     int fleetIndex = findFleetIndex(star, modification.fleet_id);
     if (fleetIndex < 0) {
@@ -272,12 +277,6 @@ public class StarModifier {
     if (fleet.state != Fleet.FLEET_STATE.IDLE) {
       // TODO: suspicious?
       log.warning("Fleet is not idle, can't move.");
-      return;
-    }
-
-    if (targetStar.id != modification.star_ids.get(0)) {
-      // TODO: suspicious!
-      log.warning("star_ids was not the target star.");
       return;
     }
 

@@ -58,12 +58,10 @@ public class StarManager {
   public void updateStar(final Star star, final StarModification modification) {
     App.i.getTaskRunner().runTask(() -> {
       // If there's any auxiliary stars, grab them now, too.
-      List<Star.Builder> auxiliaryStars = null;
-      if (modification.star_ids != null) {
+      List<Star> auxiliaryStars = null;
+      if (modification.star_id != null) {
         auxiliaryStars = new ArrayList<>();
-        for (Long id : modification.star_ids) {
-          auxiliaryStars.add(stars.get(id).newBuilder());
-        }
+        auxiliaryStars.add(stars.get(modification.star_id));
       }
 
       // Modify the star.
@@ -74,15 +72,6 @@ public class StarManager {
       Star newStar = starBuilder.build();
       stars.put(star.id, newStar, EmpireManager.i.getMyEmpire());
       App.i.getEventBus().publish(newStar);
-
-      // If there's auxiliary stars, save them as well.
-      if (auxiliaryStars != null) {
-        for (Star.Builder auxiliaryStar : auxiliaryStars) {
-          newStar = auxiliaryStar.build();
-          stars.put(auxiliaryStar.id, newStar, EmpireManager.i.getMyEmpire());
-          App.i.getEventBus().publish(auxiliaryStar);
-        }
-      }
 
       // Send the modification to the server as well.
       App.i.getServer().send(new Packet.Builder()

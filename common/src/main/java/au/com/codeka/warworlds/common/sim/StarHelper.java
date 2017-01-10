@@ -51,7 +51,7 @@ public class StarHelper {
         to.offset_y - from.offset_y + (sdy * 1024.0f));
   }
 
-  public static Vector2 directionBetween(Star.Builder from, Star.Builder to) {
+  public static Vector2 directionBetween(Star.Builder from, Star to) {
     long sdx = to.sector_x - from.sector_x;
     long sdy = to.sector_y - from.sector_y;
 
@@ -64,7 +64,7 @@ public class StarHelper {
     return directionBetween(from, to).length();
   }
 
-  public static double distanceBetween(Star.Builder from, Star.Builder to) {
+  public static double distanceBetween(Star.Builder from, Star to) {
     return directionBetween(from, to).length();
   }
 }
