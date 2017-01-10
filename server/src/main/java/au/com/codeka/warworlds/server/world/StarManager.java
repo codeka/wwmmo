@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Design;
+import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
@@ -116,8 +117,8 @@ public class StarManager {
    * @param starBuilder A simulated star that we need to finish up.
    */
   public void completeActions(WatchableObject<Star> star, Star.Builder starBuilder) {
-    // For any builds that finish in the future, make sure we schedule a job to re-simulate the
-    // star then. Similarly if any fleets arrive in the future.
+    // For any builds/moves/etc that finish in the future, make sure we schedule a job to
+    // re-simulate the star then.
     Long nextSimulateTime = null;
 
     // Any builds which have finished, we'll want to remove them and add modifications for them
@@ -159,6 +160,13 @@ public class StarManager {
           .build_requests(remainingBuildRequests)
           .build());
       starBuilder.planets.set(i, planetBuilder.build());
+    }
+
+    // Make sure we simulate at least when the next fleet arrives
+    for (Fleet fleet : starBuilder.fleets) {
+      if (fleet.eta != null && (nextSimulateTime == null || nextSimulateTime > fleet.eta)) {
+        nextSimulateTime = fleet.eta;
+      }
     }
 
     starBuilder.next_simulation(nextSimulateTime);
