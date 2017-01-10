@@ -43,15 +43,12 @@ public class StarQueueSecondaryStore {
   @Nullable
   public Star next(@Nullable Transaction trans) {
     CursorConfig cursorConfig = new CursorConfig();
-    Cursor cursor = sdb.openCursor(trans, cursorConfig);
-    try {
+    try (Cursor cursor = sdb.openCursor(trans, cursorConfig)) {
       DatabaseEntry value = new DatabaseEntry();
       if (cursor.getFirst(new DatabaseEntry(), value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
         return stars.decodeValue(value);
       }
       return null;
-    } finally {
-      cursor.close();
     }
   }
 
@@ -63,7 +60,7 @@ public class StarQueueSecondaryStore {
         DatabaseEntry key,
         DatabaseEntry value,
         DatabaseEntry result) {
-      if (key.getSize() != 8) {
+      if (!StoreHelper.isKey(key)) {
         // it's probably not a star (probably the sequence)
         return false;
       }
