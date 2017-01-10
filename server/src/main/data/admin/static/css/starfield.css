@@ -1,6 +1,6 @@
 
 .left-column {
-  width: 524px;
+  width: 574px;
   float: left;
 }
 
@@ -12,12 +12,41 @@ table td {
   vertical-align: top;
 }
 
+#starfield-container {
+  position: relative;
+  width: 552px;
+  height: 552px;
+}
+#starfield-container a {
+  display: block;
+  position: absolute;
+ text-decoration: none;
+ color: #fff;
+}
+#starfield-up-btn {
+  top: 0; left: 20px; width: 512px; height: 20px;
+  text-align: center;
+}
+#starfield-down-btn {
+  bottom: 0; left: 20px; width: 512px; height: 20px;
+  text-align: center;
+}
+#starfield-left-btn {
+  top: 20px; left: 0; width: 20px; bottom: 20px;
+  line-height: 512px;
+}
+#starfield-right-btn {
+  top: 20px; right: 0; width: 20px; bottom: 20px;
+  line-height: 512px;
+}
 #starfield {
   width: 512px;
   height: 512px;
+  top: 20px;
+  right: 20px;
   border: dotted 1px white;
   background: #000;
-  position: relative;
+  position: absolute;
 }
 
 .starfield-star {
@@ -87,6 +116,7 @@ table td {
 #search {
   width: 492px;
   margin-top: 10px;
+  margin-left: 20px;
 }
 
 .planets {

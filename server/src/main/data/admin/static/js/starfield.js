@@ -100,4 +100,21 @@ $(function() {
       }
     });
   });
+
+  $("#starfield-container a").on("click", function() {
+    var dx = 0;
+    var dy = 0;
+    if (this.id == "starfield-up-btn") {
+      dy = -1;
+    } else if (this.id == "starfield-down-btn") {
+      dy = 1;
+    } else if (this.id == "starfield-left-btn") {
+      dx = -1;
+    } else if (this.id == "starfield-right-btn") {
+      dx = 1;
+    }
+    $("#xy input[name=x]").val(parseInt($("#xy input[name=x]").val()) + dx);
+    $("#xy input[name=y]").val(parseInt($("#xy input[name=y]").val()) + dy);
+    $("#xy button").click();
+  });
 });
