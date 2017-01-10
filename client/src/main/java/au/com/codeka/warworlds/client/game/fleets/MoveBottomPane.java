@@ -198,7 +198,7 @@ public class MoveBottomPane extends RelativeLayout {
     StarManager.i.updateStar(star, new StarModification.Builder()
         .type(StarModification.MODIFICATION_TYPE.MOVE_FLEET)
         .fleet_id(fleet.id)
-        .star_ids(Lists.newArrayList(destStar.id))
+        .star_id(destStar.id)
         .build());
 
     callback.onClose();
