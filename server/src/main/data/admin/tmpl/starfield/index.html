@@ -102,7 +102,17 @@
           <% var design = Designs.get(fleets[i].design_type); %>
           <div class="fleet">
             <div class="fleet-icon"><img src="/admin/img/sprites/<%= design.image_url %>" /></div>
-            <%= design.display_name %> x <%= fleets[i].num_ships %>
+            <div>
+              <b><span data-empireid="<%= fleets[i].empire_id %>">...</span></b>
+              <%= design.display_name %> x <%= fleets[i].num_ships %>
+            </div>
+            <div>
+              <%= fleets[i].state %> <% if (fleets[i].state == "MOVING") { %>
+                <%= fleets[i].destination_star_id %>
+                <b>ETA:</b>
+                <%= new Date(fleets[i].eta) %>
+              <% } %>
+            </div>
           </div>
         <% } %>
       </div>

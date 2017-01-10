@@ -11,7 +11,7 @@
 
 <h2>Stars</h2>
 {% for star in stars %}
-  <p>star {{star.id}} {{star.name}}</p>
+  <p>star {{star.id}} {{star.name}} (sector={{star.sector_x}}, {{star.sector_y}})</p>
 {% endfor %}
 
 {% endblock %}
