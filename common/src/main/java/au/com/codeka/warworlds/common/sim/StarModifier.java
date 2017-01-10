@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -48,17 +47,16 @@ public class StarModifier {
    *
    * @param star The {@link Star.Builder} that we're modifying. The star is simulated before and
    *             after being modified.
-   * @param auxStars A list of auxiliary stars that we may need while modifying this star (for
+   * @param auxStars A collection of auxiliary stars that we may need while modifying this star (for
    *                 example, MOVE_FLEET needs to know about the destination). These are not
    *                 simulated.
    * @param modifications The list of {@link StarModification}s to apply.
    */
   public void modifyStar(
       Star.Builder star,
-      @Nullable List<Star> auxStars,
+      @Nullable Collection<Star> auxStars,
       Collection<StarModification> modifications) {
     new Simulation(false).simulate(star);
-
     for (StarModification modification : modifications) {
       applyModification(star, auxStars, modification);
     }
@@ -67,7 +65,7 @@ public class StarModifier {
 
   private void applyModification(
       Star.Builder star,
-      @Nullable List<Star> auxStars,
+      @Nullable Collection<Star> auxStars,
       StarModification modification) {
     switch (modification.type) {
       case COLONIZE:
@@ -247,7 +245,7 @@ public class StarModifier {
 
   private void applyMoveFleet(
       Star.Builder star,
-      List<Star> auxStars,
+      Collection<Star> auxStars,
       StarModification modification) {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.MOVE_FLEET));

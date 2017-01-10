@@ -5,6 +5,11 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
@@ -78,11 +83,27 @@ public class StarManager {
   }
 
   public void modifyStar(WatchableObject<Star> star, Collection<StarModification> modifications) {
+    Map<Long, Star> auxStars = null;
+    for (StarModification modification : modifications) {
+      if (modification.star_id != null) {
+        auxStars = auxStars == null ? new TreeMap<>() : auxStars;
+        if (!auxStars.containsKey(modification.star_id)) {
+          Star auxStar = getStar(modification.star_id).get();
+          auxStars.put(auxStar.id, auxStar);
+        }
+      }
+    }
+
+    modifyStar(star, auxStars == null ? null : auxStars.values(), modifications);
+  }
+
+  public void modifyStar(
+      WatchableObject<Star> star,
+      @Nullable Collection<Star> auxStars,
+      Collection<StarModification> modifications) {
     synchronized (star.lock) {
       Star.Builder starBuilder = star.get().newBuilder();
-      for (StarModification modification : modifications) {
-        starModifier.modifyStar(starBuilder, modification);
-      }
+      starModifier.modifyStar(starBuilder, auxStars, modifications);
       completeActions(star, starBuilder);
     }
   }
