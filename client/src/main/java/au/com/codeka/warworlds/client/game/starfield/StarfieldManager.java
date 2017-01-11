@@ -660,8 +660,12 @@ public class StarfieldManager {
         }
       }
 
-      setSelectedStar(star);
-      setSelectedFleet(fleet);
+      if ((selectedFleet != null && fleet == null) || fleet != null) {
+        setSelectedFleet(null);
+      }
+      if ((selectedStar != null && star == null) || star != null) {
+        setSelectedStar(star);
+      }
     }
   };
 
