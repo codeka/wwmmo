@@ -44,7 +44,7 @@ table td {
   height: 512px;
   top: 20px;
   right: 20px;
-  border: dotted 1px white;
+  border: solid 1px #666;
   background: #000;
   position: absolute;
 }
