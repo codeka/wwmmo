@@ -207,5 +207,15 @@ public class StarfieldFragment extends BaseFragment {
         selectionDetailsView.showStar(star);
       }
     }
+
+    @Override
+    public void onFleetTapped(@Nullable Fleet fleet) {
+      if (fleet == null) {
+        hideBottomPane(false);
+      } else {
+        showBottomPane();
+        //TODO selectionDetailsView.showFleet(null, fleet);
+      }
+    }
   };
 }

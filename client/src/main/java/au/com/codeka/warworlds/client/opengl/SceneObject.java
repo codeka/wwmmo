@@ -56,6 +56,27 @@ public class SceneObject {
     Matrix.setIdentityM(modelViewProjMatrix, 0);
   }
 
+  /**
+   * Sets an optional draw {@link Runnable} that is called on the draw thread before this
+   * {@link SceneObject} is drawn. You can use this to update the position, scale, etc of the
+   * object just before it's drawn (useful for animation, etc).
+   *
+   * <p>You cannot modify the object heirarchy in this method (add children, remove children, etc)
+   */
+  public void setDrawRunnable(@Nullable Runnable drawRunnable) {
+    this.drawRunnable = drawRunnable;
+  }
+
+  @Nullable
+  public Scene getScene() {
+    return scene;
+  }
+
+  @Nullable
+  public SceneObject getParent() {
+    return parent;
+  }
+
   public void addChild(SceneObject child) {
     if (child.parent != null) {
       child.parent.removeChild(child);
@@ -77,25 +98,10 @@ public class SceneObject {
     }
   }
 
-  /**
-   * Sets an optional draw {@link Runnable} that is called on the draw thread before this
-   * {@link SceneObject} is drawn. You can use this to update the position, scale, etc of the
-   * object just before it's drawn (useful for animation, etc).
-   *
-   * <p>You cannot modify the object heirarchy in this method (add children, remove children, etc)
-   */
-  public void setDrawRunnable(@Nullable Runnable drawRunnable) {
-    this.drawRunnable = drawRunnable;
-  }
-
-  @Nullable
-  public Scene getScene() {
-    return scene;
-  }
-
-  @Nullable
-  public SceneObject getParent() {
-    return parent;
+  public void removeAllChildren() {
+    if (children != null) {
+      children.clear();
+    }
   }
 
   public int getNumChildren() {

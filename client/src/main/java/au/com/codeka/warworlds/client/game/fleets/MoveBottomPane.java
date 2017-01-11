@@ -226,5 +226,10 @@ public class MoveBottomPane extends RelativeLayout {
       refreshMoveIndicator();
       destStar = star;
     }
+
+    @Override
+    public void onFleetTapped(@Nullable Fleet fleet) {
+      // TODO: indicate that we don't want to select this fleet.
+    }
   };
 }

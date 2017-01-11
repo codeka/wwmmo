@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.client.game.starfield;
 
 import android.content.Context;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.util.Pair;
 
 import com.google.common.base.Preconditions;
@@ -17,6 +18,7 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.opengl.Camera;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
@@ -38,6 +40,7 @@ import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
+import au.com.codeka.warworlds.common.sim.StarHelper;
 
 /**
  * {@link StarfieldManager} manages the starfield view that we display in the main activity. You can
@@ -47,6 +50,7 @@ import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
 public class StarfieldManager {
   public interface TapListener {
     void onStarTapped(@Nullable Star star);
+    void onFleetTapped(@Nullable Fleet fleet);
   }
 
   private static final Log log = new Log("StarfieldManager");
@@ -56,7 +60,10 @@ public class StarfieldManager {
   private final Context context;
   private final ArrayList<TapListener> tapListeners = new ArrayList<>();
   private boolean initialized;
+
+  // At most one of these will be non-null.
   @Nullable private Star selectedStar;
+  @Nullable private Fleet selectedFleet;
 
   private long centerSectorX;
   private long centerSectorY;
@@ -71,7 +78,7 @@ public class StarfieldManager {
   private long sectorBottom;
 
   /** A mapping of star ID to {@link SceneObject} representing those stars. */
-  private final Map<Long, SceneObject> starSceneObjects = new HashMap<>();
+  private final LongSparseArray<SceneObject> starSceneObjects = new LongSparseArray<>();
 
   /** A mapping of sector x,y coordinates to the list of {@link SceneObject}s for that sector. */
   private final Map<Pair<Long,Long>, ArrayList<SceneObject>> sectorSceneObjects = new HashMap<>();
@@ -117,10 +124,16 @@ public class StarfieldManager {
     tapListeners.remove(tapListener);
   }
 
-  /** Gets the selected star (or null if no star is selected) */
+  /** Gets the selected star (or null if no star is selected). */
   @Nullable
   public Star getSelectedStar() {
     return selectedStar;
+  }
+
+  /** Gets the selected fleet (or null if not fleet is selected). */
+  @Nullable
+  public Fleet getSelectedFleet() {
+    return selectedFleet;
   }
 
   /**
@@ -145,6 +158,22 @@ public class StarfieldManager {
     selectedStar = star;
     for (TapListener tapListener : tapListeners) {
       tapListener.onStarTapped(star);
+    }
+  }
+
+  /** Sets the fleet we have selected to the given value (or unselects it if fleet is null). */
+  public void setSelectedFleet(@Nullable Fleet fleet) {
+    if (fleet != null) {
+      selectionIndicatorSceneObject.setSize(60, 60);
+      SceneObject sceneObject = starSceneObjects.get(fleet.id);
+      sceneObject.addChild(selectionIndicatorSceneObject);
+    } else if (selectionIndicatorSceneObject.getParent() != null) {
+      selectionIndicatorSceneObject.getParent().removeChild(selectionIndicatorSceneObject);
+    }
+
+    selectedFleet = fleet;
+    for (TapListener tapListener : tapListeners) {
+      tapListener.onFleetTapped(fleet);
     }
   }
 
@@ -238,6 +267,7 @@ public class StarfieldManager {
     }
   }
 
+  /** Create a {@link Sprite} to represent the given {@link Star}. */
   public Sprite createStarSprite(Star star) {
     Vector2 uvTopLeft = getStarUvTopLeft(star);
     Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
@@ -256,6 +286,7 @@ public class StarfieldManager {
     return sprite;
   }
 
+  /** Create a {@link Sprite} to represent the given {@link Fleet}. */
   public Sprite createFleetSprite(Fleet fleet) {
     Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
         .shader(scene.getSpriteShader())
@@ -278,23 +309,31 @@ public class StarfieldManager {
       float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
       container.translate(x, -y);
-
-      Sprite sprite = createStarSprite(star);
-      container.addChild(sprite);
-
-      TextSceneObject text = scene.createText(star.name);
-      text.translate(0.0f, -24.0f);
-      text.setTextSize(16);
-      text.translate(-text.getTextWidth() / 2.0f, 0.0f);
-      container.addChild(text);
-
-      attachEmpireFleetIcons(scene, container, star);
-
+    } else {
+      // Temporarily remove the container, and clear out it's children. We'll re-add them all.
       synchronized (scene.lock) {
-        scene.getRootObject().addChild(container);
+        scene.getRootObject().removeChild(container);
       }
-      starSceneObjects.put(star.id, container);
+      container.removeAllChildren();
     }
+
+    Sprite sprite = createStarSprite(star);
+    container.addChild(sprite);
+
+    TextSceneObject text = scene.createText(star.name);
+    text.translate(0.0f, -24.0f);
+    text.setTextSize(16);
+    text.translate(-text.getTextWidth() / 2.0f, 0.0f);
+    container.addChild(text);
+
+    attachEmpireFleetIcons(scene, container, star);
+
+    synchronized (scene.lock) {
+      scene.getRootObject().addChild(container);
+    }
+    starSceneObjects.put(star.id, container);
+
+    attachMovingFleets(scene, star);
   }
 
   /** Attach the empire labels and fleet counts to the given sprite container for the given star. */
@@ -318,7 +357,7 @@ public class StarfieldManager {
 
     for (Fleet fleet : star.fleets) {
       if (fleet.empire_id == null || fleet.state == Fleet.FLEET_STATE.MOVING) {
-        // Ignore native feets, and moving fleets, which we'll draw them separately.
+        // Ignore native fleets, and moving fleets, which we'll draw them separately.
         continue;
       }
 
@@ -374,13 +413,69 @@ public class StarfieldManager {
     }
   }
 
-  private static final class EmpireIconInfo {
-    public final Empire empire;
-    public int numColonies;
-    public int numFighterShips;
-    public int numNonFighterShips;
+  /** Attach moving fleets to the given sprite container for the given star. */
+  private void attachMovingFleets(Scene scene, Star star) {
+    for (Fleet fleet : star.fleets) {
+      if (fleet.state == Fleet.FLEET_STATE.MOVING) {
+        attachMovingFleet(scene, star, fleet);
+      }
+    }
+  }
 
-    public EmpireIconInfo(Empire empire) {
+  private void attachMovingFleet(Scene scene, Star star, Fleet fleet) {
+    Star destStar = StarManager.i.getStar(fleet.destination_star_id);
+    if (destStar == null) {
+      log.warning("Cannot attach moving fleet, destination star is null.");
+      return;
+    }
+
+    SceneObject container = starSceneObjects.get(fleet.id);
+    if (container == null) {
+      container = new SceneObject(scene.getDimensionResolver());
+      container.setClipRadius(80.0f);
+      container.setTapTargetRadius(80.0f);
+      container.setTag(fleet);
+      addSectorSceneObject(Pair.create(star.sector_x, star.sector_y), container);
+
+      Vector2 pos = getMovingFleetPosition(star, fleet);
+      container.translate((float) pos.x, (float) -pos.y);
+    } else {
+      // Temporarily remove the container, and clear out it's children. We'll re-add them all.
+      synchronized (scene.lock) {
+        scene.getRootObject().removeChild(container);
+      }
+      container.removeAllChildren();
+    }
+
+    Sprite sprite = createFleetSprite(fleet);
+    container.addChild(sprite);
+
+    // Rotate the sprite
+    Vector2 dir = StarHelper.directionBetween(star, destStar);
+    dir.normalize();
+    float angle = Vector2.angleBetween(dir, new Vector2(0, -1));
+    sprite.setRotation(angle, 0, 0, 1);
+
+    synchronized (scene.lock) {
+      scene.getRootObject().addChild(container);
+    }
+    starSceneObjects.put(star.id, container);
+  }
+
+  /** Get the current position of the given moving fleet. */
+  private Vector2 getMovingFleetPosition(Star star, Fleet fleet) {
+    float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
+    float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
+    return new Vector2(x, y);
+  }
+
+  private static final class EmpireIconInfo {
+    final Empire empire;
+    int numColonies;
+    int numFighterShips;
+    int numNonFighterShips;
+
+    EmpireIconInfo(Empire empire) {
       this.empire = empire;
     }
   }
@@ -532,8 +627,9 @@ public class StarfieldManager {
     @Override
     public void onTap(float x, float y) {
       Star star = null;
+      Fleet fleet = null;
 
-      // Work out which star (if any) you tapped on.
+      // Work out which object (if any) you tapped on.
       synchronized (scene) {
         SceneObject selected = null;
         float[] outVec = new float[4];
@@ -555,24 +651,22 @@ public class StarfieldManager {
         }
 
         if (selected != null) {
-          star = (Star) selected.getTag();
+          // work out of it's a star or a fleet.
+          if (selected.getTag() instanceof Star) {
+            star = (Star) selected.getTag();
+          } else { // fleet
+            fleet = (Fleet) selected.getTag();
+          }
         }
       }
 
       setSelectedStar(star);
+      setSelectedFleet(fleet);
     }
   };
 
   private final Camera.CameraUpdateListener cameraUpdateListener
-      = new Camera.CameraUpdateListener() {
-    @Override
-    public void onCameraTranslate(final float x, final float y, float dx, float dy) {
-      App.i.getTaskRunner().runTask(new Runnable() {
-        @Override
-        public void run() {
-          StarfieldManager.this.onCameraTranslate(x, y);
-        }
-      }, Threads.BACKGROUND);
-    }
-  };
+      = (x, y, dx, dy) -> App.i.getTaskRunner().runTask(
+          () -> StarfieldManager.this.onCameraTranslate(x, y),
+          Threads.BACKGROUND);
 }
