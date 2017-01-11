@@ -50,7 +50,7 @@ import au.com.codeka.warworlds.common.sim.StarHelper;
 public class StarfieldManager {
   public interface TapListener {
     void onStarTapped(@Nullable Star star);
-    void onFleetTapped(@Nullable Fleet fleet);
+    void onFleetTapped(@Nullable Star star, @Nullable Fleet fleet);
   }
 
   private static final Log log = new Log("StarfieldManager");
@@ -61,7 +61,8 @@ public class StarfieldManager {
   private final ArrayList<TapListener> tapListeners = new ArrayList<>();
   private boolean initialized;
 
-  // At most one of these will be non-null.
+  // The selected star/fleet. If selectedFleet is non-null, selectedStar will be the star that
+  // fleet is on.
   @Nullable private Star selectedStar;
   @Nullable private Fleet selectedFleet;
 
@@ -161,19 +162,28 @@ public class StarfieldManager {
     }
   }
 
-  /** Sets the fleet we have selected to the given value (or unselects it if fleet is null). */
-  public void setSelectedFleet(@Nullable Fleet fleet) {
+  /**
+   * Sets the fleet we have selected to the given value (or unselects it if fleet is null).
+   *
+   * @param star The star the fleet is coming from.
+   * @param fleet The fleet.
+   */
+  public void setSelectedFleet(@Nullable Star star, @Nullable Fleet fleet) {
     if (fleet != null) {
       selectionIndicatorSceneObject.setSize(60, 60);
       SceneObject sceneObject = starSceneObjects.get(fleet.id);
-      sceneObject.addChild(selectionIndicatorSceneObject);
+      if (sceneObject != null) {
+        sceneObject.addChild(selectionIndicatorSceneObject);
+      } else {
+        log.warning("No SceneObject for fleet #%d", fleet.id);
+      }
     } else if (selectionIndicatorSceneObject.getParent() != null) {
       selectionIndicatorSceneObject.getParent().removeChild(selectionIndicatorSceneObject);
     }
 
     selectedFleet = fleet;
     for (TapListener tapListener : tapListeners) {
-      tapListener.onFleetTapped(fleet);
+      tapListener.onFleetTapped(star, fleet);
     }
   }
 
@@ -303,7 +313,7 @@ public class StarfieldManager {
       container = new SceneObject(scene.getDimensionResolver());
       container.setClipRadius(80.0f);
       container.setTapTargetRadius(80.0f);
-      container.setTag(star);
+      container.setTag(new SceneObjectInfo(star));
       addSectorSceneObject(Pair.create(star.sector_x, star.sector_y), container);
 
       float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
@@ -434,10 +444,10 @@ public class StarfieldManager {
       container = new SceneObject(scene.getDimensionResolver());
       container.setClipRadius(80.0f);
       container.setTapTargetRadius(80.0f);
-      container.setTag(fleet);
+      container.setTag(new SceneObjectInfo(star, fleet));
       addSectorSceneObject(Pair.create(star.sector_x, star.sector_y), container);
 
-      Vector2 pos = getMovingFleetPosition(star, fleet);
+      Vector2 pos = getMovingFleetPosition(star, destStar, fleet);
       container.translate((float) pos.x, (float) -pos.y);
     } else {
       // Temporarily remove the container, and clear out it's children. We'll re-add them all.
@@ -459,25 +469,36 @@ public class StarfieldManager {
     synchronized (scene.lock) {
       scene.getRootObject().addChild(container);
     }
-    starSceneObjects.put(star.id, container);
+    starSceneObjects.put(fleet.id, container);
   }
 
   /** Get the current position of the given moving fleet. */
-  private Vector2 getMovingFleetPosition(Star star, Fleet fleet) {
-    float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
-    float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
-    return new Vector2(x, y);
-  }
+  private Vector2 getMovingFleetPosition(Star star, Star destStar, Fleet fleet) {
+    Vector2 src = new Vector2(
+        (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f),
+        (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f));
+    Vector2 dest = new Vector2(
+        (destStar.sector_x - centerSectorX) * 1024.0f + (destStar.offset_x - 512.0f),
+        (destStar.sector_y - centerSectorY) * 1024.0f + (destStar.offset_y - 512.0f));
 
-  private static final class EmpireIconInfo {
-    final Empire empire;
-    int numColonies;
-    int numFighterShips;
-    int numNonFighterShips;
+    long totalTime = fleet.eta - fleet.state_start_time;
+    long elapsedTime = System.currentTimeMillis() - fleet.state_start_time;
+    double timeFraction = (float) elapsedTime / (float) totalTime;
 
-    EmpireIconInfo(Empire empire) {
-      this.empire = empire;
+    // Subtract 100, we'll add 50 after because we want the fleet to start offset from the star and
+    // finish offset as well.
+    double distance = src.distanceTo(dest) - 100.0;
+    distance *= timeFraction;
+    distance += 50;
+    if (distance < 50.0) {
+      distance = 50.0;
     }
+
+    dest.subtract(src);
+    dest.normalize();
+    dest.scale(distance);
+    dest.add(src);
+    return dest;
   }
 
   private void createSectorBackground(long sectorX, long sectorY) {
@@ -535,9 +556,13 @@ public class StarfieldManager {
 
     synchronized (scene.lock) {
       for (SceneObject obj : objects) {
-        Star star = (Star) obj.getTag();
-        if (star != null) {
-          starSceneObjects.remove(star.id);
+        SceneObjectInfo sceneObjectInfo = (SceneObjectInfo) obj.getTag();
+        if (sceneObjectInfo != null) {
+          if (sceneObjectInfo.fleet != null) {
+            starSceneObjects.remove(sceneObjectInfo.fleet.id);
+          } else {
+            starSceneObjects.remove(sceneObjectInfo.star.id);
+          }
         }
         scene.getRootObject().removeChild(obj);
       }
@@ -626,12 +651,11 @@ public class StarfieldManager {
 
     @Override
     public void onTap(float x, float y) {
-      Star star = null;
-      Fleet fleet = null;
+      SceneObjectInfo selected = null;
 
       // Work out which object (if any) you tapped on.
       synchronized (scene) {
-        SceneObject selected = null;
+        SceneObject selectedSceneObject = null;
         float[] outVec = new float[4];
         Vector3 pos = new Vector3();
         Vector3 tap = new Vector3(x, y, 0.0f);
@@ -646,25 +670,23 @@ public class StarfieldManager {
               (-outVec[1] + 1.0f) * 0.5f * camera.getScreenHeight(),
               0.0f);
           if (Vector3.distanceBetween(pos, tap) < so.getTapTargetRadius()) {
-            selected = so;
+            selectedSceneObject = so;
           }
         }
 
-        if (selected != null) {
-          // work out of it's a star or a fleet.
-          if (selected.getTag() instanceof Star) {
-            star = (Star) selected.getTag();
-          } else { // fleet
-            fleet = (Fleet) selected.getTag();
-          }
+        if (selectedSceneObject != null) {
+          selected = (SceneObjectInfo) selectedSceneObject.getTag();
         }
       }
 
-      if ((selectedFleet != null && fleet == null) || fleet != null) {
-        setSelectedFleet(null);
-      }
-      if ((selectedStar != null && star == null) || star != null) {
-        setSelectedStar(star);
+      if (selectedFleet != null && (selected == null || selected.fleet == null)) {
+        setSelectedFleet(null, null);
+      } else if (selected != null && selected.fleet != null) {
+        setSelectedFleet(selected.star, selected.fleet);
+      } else if (selectedStar != null && selected == null) {
+        setSelectedStar(null);
+      } else if (selected != null) {
+        setSelectedStar(selected.star);
       }
     }
   };
@@ -673,4 +695,30 @@ public class StarfieldManager {
       = (x, y, dx, dy) -> App.i.getTaskRunner().runTask(
           () -> StarfieldManager.this.onCameraTranslate(x, y),
           Threads.BACKGROUND);
+
+  private static final class EmpireIconInfo {
+    final Empire empire;
+    int numColonies;
+    int numFighterShips;
+    int numNonFighterShips;
+
+    EmpireIconInfo(Empire empire) {
+      this.empire = empire;
+    }
+  }
+
+  private static final class SceneObjectInfo {
+    final Star star;
+    @Nullable final Fleet fleet;
+
+    SceneObjectInfo(Star star) {
+      this.star = star;
+      this.fleet = null;
+    }
+
+    SceneObjectInfo(Star star, Fleet fleet) {
+      this.star = star;
+      this.fleet = fleet;
+    }
+  }
 }
