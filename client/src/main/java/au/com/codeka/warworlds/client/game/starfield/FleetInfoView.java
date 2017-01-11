@@ -107,7 +107,7 @@ public class FleetInfoView extends FrameLayout {
       long eta = fleet.eta;
 
       final float fractionRemaining =
-          (float) (System.currentTimeMillis() - startTime) / (float) (eta - startTime);
+          1.0f - (float) (System.currentTimeMillis() - startTime) / (float) (eta - startTime);
       progressBar.setMax(1000);
       progressBar.setProgress(1000 - (int) (fractionRemaining * 1000.0f));
 
