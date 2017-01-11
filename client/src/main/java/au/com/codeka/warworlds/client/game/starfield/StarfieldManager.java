@@ -53,6 +53,9 @@ public class StarfieldManager {
     void onFleetTapped(@Nullable Star star, @Nullable Fleet fleet);
   }
 
+  /** Number of milliseconds between updates to moving fleets. */
+  private static final long UPDATE_MOVING_FLEETS_TIME_MS = 10000L;
+
   private static final Log log = new Log("StarfieldManager");
   private final Scene scene;
   private final Camera camera;
@@ -78,8 +81,8 @@ public class StarfieldManager {
   private long sectorRight;
   private long sectorBottom;
 
-  /** A mapping of star ID to {@link SceneObject} representing those stars. */
-  private final LongSparseArray<SceneObject> starSceneObjects = new LongSparseArray<>();
+  /** A mapping of IDs to {@link SceneObject} representing stars and fleets. */
+  private final LongSparseArray<SceneObject> sceneObjects = new LongSparseArray<>();
 
   /** A mapping of sector x,y coordinates to the list of {@link SceneObject}s for that sector. */
   private final Map<Pair<Long,Long>, ArrayList<SceneObject>> sectorSceneObjects = new HashMap<>();
@@ -108,6 +111,11 @@ public class StarfieldManager {
 
     camera.setCameraUpdateListener(cameraUpdateListener);
     gestureDetector.create();
+
+    App.i.getTaskRunner().runTask(
+        updateMovingFleetsRunnable,
+        Threads.UI,
+        UPDATE_MOVING_FLEETS_TIME_MS);
   }
 
   public void destroy() {
@@ -143,14 +151,14 @@ public class StarfieldManager {
    */
   @Nullable
   public SceneObject getStarSceneObject(long starId) {
-    return starSceneObjects.get(starId);
+    return sceneObjects.get(starId);
   }
 
   /** Sets the star we have selected to the given value (or unselects if star is null). */
   public void setSelectedStar(@Nullable Star star) {
     if (star != null) {
       selectionIndicatorSceneObject.setSize(60, 60);
-      SceneObject sceneObject = starSceneObjects.get(star.id);
+      SceneObject sceneObject = sceneObjects.get(star.id);
       sceneObject.addChild(selectionIndicatorSceneObject);
     } else if (selectionIndicatorSceneObject.getParent() != null) {
       selectionIndicatorSceneObject.getParent().removeChild(selectionIndicatorSceneObject);
@@ -171,7 +179,7 @@ public class StarfieldManager {
   public void setSelectedFleet(@Nullable Star star, @Nullable Fleet fleet) {
     if (fleet != null) {
       selectionIndicatorSceneObject.setSize(60, 60);
-      SceneObject sceneObject = starSceneObjects.get(fleet.id);
+      SceneObject sceneObject = sceneObjects.get(fleet.id);
       if (sceneObject != null) {
         sceneObject.addChild(selectionIndicatorSceneObject);
       } else {
@@ -308,7 +316,7 @@ public class StarfieldManager {
 
   /** Called when a star is updated, we may need to update the sprite for it. */
   private void updateStar(Star star) {
-    SceneObject container = starSceneObjects.get(star.id);
+    SceneObject container = sceneObjects.get(star.id);
     if (container == null) {
       container = new SceneObject(scene.getDimensionResolver());
       container.setClipRadius(80.0f);
@@ -341,7 +349,7 @@ public class StarfieldManager {
     synchronized (scene.lock) {
       scene.getRootObject().addChild(container);
     }
-    starSceneObjects.put(star.id, container);
+    sceneObjects.put(star.id, container);
 
     attachMovingFleets(scene, star);
   }
@@ -439,12 +447,12 @@ public class StarfieldManager {
       return;
     }
 
-    SceneObject container = starSceneObjects.get(fleet.id);
+    SceneObject container = sceneObjects.get(fleet.id);
     if (container == null) {
       container = new SceneObject(scene.getDimensionResolver());
       container.setClipRadius(80.0f);
       container.setTapTargetRadius(80.0f);
-      container.setTag(new SceneObjectInfo(star, fleet));
+      container.setTag(new SceneObjectInfo(star, fleet, destStar));
       addSectorSceneObject(Pair.create(star.sector_x, star.sector_y), container);
 
       Vector2 pos = getMovingFleetPosition(star, destStar, fleet);
@@ -469,7 +477,7 @@ public class StarfieldManager {
     synchronized (scene.lock) {
       scene.getRootObject().addChild(container);
     }
-    starSceneObjects.put(fleet.id, container);
+    sceneObjects.put(fleet.id, container);
   }
 
   /** Get the current position of the given moving fleet. */
@@ -533,6 +541,40 @@ public class StarfieldManager {
     }
   }
 
+  /**
+   * Goes through all of the moving fleets and updates their position. This is called every now and
+   * then to make sure fleets are moving.
+   */
+  private final Runnable updateMovingFleetsRunnable = new Runnable() {
+    @Override
+    public void run() {
+      synchronized (scene.lock) {
+        for (int i = 0; i < sceneObjects.size(); i++) {
+          SceneObjectInfo sceneObjectInfo = (SceneObjectInfo) sceneObjects.valueAt(i).getTag();
+          if (sceneObjectInfo != null && sceneObjectInfo.fleet != null) {
+            updateMovingFleet(sceneObjects.valueAt(i));
+          }
+        }
+      }
+
+      App.i.getTaskRunner().runTask(
+          updateMovingFleetsRunnable,
+          Threads.UI,
+          UPDATE_MOVING_FLEETS_TIME_MS);
+    }
+  };
+
+  /**
+   * Update the given {@link SceneObject} that represents a moving fleet. Should already be in the
+   * scene.lock.
+   */
+  private void updateMovingFleet(SceneObject fleetSceneObject) {
+    SceneObjectInfo sceneObjectInfo = (SceneObjectInfo) fleetSceneObject.getTag();
+    Vector2 pos = getMovingFleetPosition(
+        sceneObjectInfo.star, sceneObjectInfo.destStar, sceneObjectInfo.fleet);
+    fleetSceneObject.setTranslation((float) pos.x, (float) -pos.y);
+  }
+
   private void addSectorSceneObject(Pair<Long, Long> sectorCoord, SceneObject obj) {
     synchronized (sectorSceneObjects) {
       ArrayList<SceneObject> objects = sectorSceneObjects.get(sectorCoord);
@@ -559,9 +601,9 @@ public class StarfieldManager {
         SceneObjectInfo sceneObjectInfo = (SceneObjectInfo) obj.getTag();
         if (sceneObjectInfo != null) {
           if (sceneObjectInfo.fleet != null) {
-            starSceneObjects.remove(sceneObjectInfo.fleet.id);
+            sceneObjects.remove(sceneObjectInfo.fleet.id);
           } else {
-            starSceneObjects.remove(sceneObjectInfo.star.id);
+            sceneObjects.remove(sceneObjectInfo.star.id);
           }
         }
         scene.getRootObject().removeChild(obj);
@@ -710,15 +752,18 @@ public class StarfieldManager {
   private static final class SceneObjectInfo {
     final Star star;
     @Nullable final Fleet fleet;
+    @Nullable final Star destStar;
 
     SceneObjectInfo(Star star) {
       this.star = star;
       this.fleet = null;
+      this.destStar = null;
     }
 
-    SceneObjectInfo(Star star, Fleet fleet) {
+    SceneObjectInfo(Star star, Fleet fleet, Star destStar) {
       this.star = star;
       this.fleet = fleet;
+      this.destStar = destStar;
     }
   }
 }
