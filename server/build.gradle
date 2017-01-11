@@ -16,7 +16,6 @@ apply plugin: 'application'
 apply plugin: 'org.hidetake.ssh'
 
 dependencies {
-  compile fileTree(dir: '../jetty/lib', include: ['*.jar'])
   compile fileTree(dir: 'libs', include: ['*.jar'])
   compile 'au.com.codeka:carrot:1.0.0'
   compile 'joda-time:joda-time:2.3'
@@ -26,6 +25,8 @@ dependencies {
   compile 'com.google.code.gson:gson:2.6.2'
   compile 'com.google.guava:guava:19.0'
   compile 'com.squareup.wire:wire-gson-support:2.1.2'
+  compile 'org.eclipse.jetty:jetty-server:9.4.0.v20161208'
+  compile 'org.eclipse.jetty.websocket:websocket-server:9.4.0.v20161208'
   compile project(':common')
   compile project(':planet-render')
 }
