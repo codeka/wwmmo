@@ -20,11 +20,13 @@ import au.com.codeka.warworlds.client.game.fleets.FleetListHelper;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
+import au.com.codeka.warworlds.common.TimeFormatter;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.StarHelper;
 
 /** This view displays information about a fleet you've selected on the starfield view. */
 public class FleetInfoView extends FrameLayout {
@@ -100,19 +102,19 @@ public class FleetInfoView extends FrameLayout {
 
     Star destStar = StarManager.i.getStar(fleet.destination_star_id);
     if (destStar != null) {
-      float distanceInParsecs = 1.0f;//Sector.distanceInParsecs(srcStar, destStar);
-      float timeFromSourceInHours = 1.0f;//fleet.getTimeFromSource();
-      float timeToDestinationInHours = 1.0f;//fleet.getTimeToDestination();
+      double distanceInParsecs = StarHelper.distanceBetween(star, destStar);
+      long startTime = fleet.state_start_time;
+      long eta = fleet.eta;
 
       final float fractionRemaining =
-          timeToDestinationInHours / (timeToDestinationInHours + timeFromSourceInHours);
+          (float) (System.currentTimeMillis() - startTime) / (float) (eta - startTime);
       progressBar.setMax(1000);
       progressBar.setProgress(1000 - (int) (fractionRemaining * 1000.0f));
 
-      String eta = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
+      String msg = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
           distanceInParsecs * fractionRemaining,
-          /*TimeFormatter.create().format(timeToDestinationInHours)*/ "1 hr");
-      progressText.setText(Html.fromHtml(eta));
+          TimeFormatter.create().format(eta - startTime));
+      progressText.setText(Html.fromHtml(msg));
     }
 
     //FleetUpgrade.BoostFleetUpgrade fleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");
