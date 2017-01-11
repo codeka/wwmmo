@@ -61,7 +61,6 @@ public class StarEmpireSecondaryStore {
         DatabaseEntry value,
         Set<DatabaseEntry> results) {
       if (!StoreHelper.isKey(key)) {
-        log.debug("Not a key, not checking for empire_id.");
         // it's probably not a star (probably the sequence)
         return;
       }
@@ -79,7 +78,6 @@ public class StarEmpireSecondaryStore {
 
       // TODO: fleets
 
-      log.debug("updating empire index for star %d (%d empires)", star.id, empireIds.size());
       for (long empireId : empireIds) {
         results.add(stars.encodeKey(empireId));
       }

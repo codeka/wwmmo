@@ -12,7 +12,9 @@ import java.util.TreeMap;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.NormalRandom;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
+import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -62,6 +64,45 @@ public class StarManager {
     }
 
     return watchableStar;
+  }
+
+  /**
+   * Add native colonies to the star with the given ID. We assume it's already eligible for one.
+   */
+  public void addNativeColonies(long id) {
+    WatchableObject<Star> star = getStar(id);
+    synchronized (star.lock) {
+      log.debug("Adding native colonies to star %d \"%s\"...", star.get().id, star.get().name);
+
+      // OK, so basically any planet with a population congeniality > 500 will get a colony.
+      Star.Builder starBuilder = star.get().newBuilder();
+
+      int numColonies = 0;
+      for (int i = 0; i < starBuilder.planets.size(); i++) {
+        if (starBuilder.planets.get(i).population_congeniality > 500) {
+          starModifier.modifyStar(starBuilder, new StarModification.Builder()
+              .type(StarModification.MODIFICATION_TYPE.COLONIZE)
+              .planet_index(i)
+              .build());
+          numColonies ++;
+        }
+      }
+
+      // Create a fleet of fighters for each colony.
+      NormalRandom rand = new NormalRandom();
+      while (numColonies > 0) {
+        int numShips = 100 + (int) (rand.next() * 40);
+        starModifier.modifyStar(starBuilder, new StarModification.Builder()
+            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+            .design_type(Design.DesignType.FIGHTER)
+            .count(numShips)
+            .build());
+
+        numColonies--;
+      }
+
+      star.set(starBuilder.build());
+    }
   }
 
   public ArrayList<WatchableObject<Star>> getStarsForEmpire(long empireId) {

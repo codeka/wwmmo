@@ -98,27 +98,30 @@ public class StarModifier {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.COLONIZE));
 
-    // Destroy a colony ship.
-    boolean found = false;
-    int population = 100;
-    for (int i = 0; i < star.fleets.size(); i++) {
-      Fleet fleet = star.fleets.get(i);
-      if (fleet.design_type.equals(Design.DesignType.COLONY_SHIP)) {
-        // TODO: check for cyrogenics
-        if (Math.ceil(fleet.num_ships) == 1.0f) {
-          star.fleets.remove(i);
-        } else {
-          star.fleets.set(i, fleet.newBuilder()
-              .num_ships(fleet.num_ships - 1)
-              .build());
+    // Destroy a colony ship, unless this is a native colony.
+    if (modification.empire_id != null) {
+      boolean found = false;
+      int population = 100;
+      for (int i = 0; i < star.fleets.size(); i++) {
+        Fleet fleet = star.fleets.get(i);
+        if (fleet.design_type.equals(Design.DesignType.COLONY_SHIP)
+            && fleet.empire_id.equals(modification.empire_id)) {
+          // TODO: check for cyrogenics
+          if (Math.ceil(fleet.num_ships) == 1.0f) {
+            star.fleets.remove(i);
+          } else {
+            star.fleets.set(i, fleet.newBuilder()
+                .num_ships(fleet.num_ships - 1)
+                .build());
+          }
+          found = true;
+          break;
         }
-        found = true;
-        break;
       }
-    }
 
-    if (!found) {
-      return;
+      if (!found) {
+        return;
+      }
     }
 
     star.planets.set(

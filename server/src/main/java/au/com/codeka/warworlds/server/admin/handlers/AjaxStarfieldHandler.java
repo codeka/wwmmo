@@ -24,6 +24,7 @@ public class AjaxStarfieldHandler extends AjaxHandler {
   private void handleXyRequest(long x, long y) {
     WatchableObject<Sector> sector =
         SectorManager.i.getSector(new SectorCoord.Builder().x(x).y(y).build());
+    SectorManager.i.verifyNativeColonies(sector);
     setResponseJson(sector.get());
   }
 }

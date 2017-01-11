@@ -94,10 +94,9 @@ public class Player {
       for (long sectorX = pkt.left; sectorX <= pkt.right; sectorX ++) {
         WatchableObject<Sector> sector =
             SectorManager.i.getSector(new SectorCoord.Builder().x(sectorX).y(sectorY).build());
+        SectorManager.i.verifyNativeColonies(sector);
         sectors.add(sector);
-        for (Star star : sector.get().stars) {
-          stars.add(star);
-        }
+        stars.addAll(sector.get().stars);
       }
     }
 
