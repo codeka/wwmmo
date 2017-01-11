@@ -312,6 +312,7 @@ public class StarModifier {
     star.fleets.set(fleetIndex, star.fleets.get(fleetIndex).newBuilder()
         .destination_star_id(targetStar.id)
         .state(Fleet.FLEET_STATE.MOVING)
+        .state_start_time(System.currentTimeMillis())
         .eta(System.currentTimeMillis() + (long)(timeInHours * HOURS_MS))
         .build());
   }
