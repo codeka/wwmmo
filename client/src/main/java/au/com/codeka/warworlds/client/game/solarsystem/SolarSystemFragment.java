@@ -472,35 +472,41 @@ public class SolarSystemFragment extends BaseFragment {
       colonyDetailsContainer.setVisibility(View.GONE);
       enemyColonyDetailsContainer.setVisibility(View.GONE);
 
-      Empire colonyEmpire = EmpireManager.i.getEmpire(planet.colony.empire_id);
-      if (colonyEmpire != null) {
-        Empire myEmpire = EmpireManager.i.getMyEmpire();
-        if (myEmpire != null && myEmpire.id.equals(colonyEmpire.id)) {
-          colonyDetailsContainer.setVisibility(View.VISIBLE);
-          refreshColonyDetails();
+      if (planet.colony.empire_id == null) {
+        enemyColonyDetailsContainer.setVisibility(View.VISIBLE);
+        refreshNativeColonyDetails();
+      } else {
+        Empire colonyEmpire = EmpireManager.i.getEmpire(planet.colony.empire_id);
+        if (colonyEmpire != null) {
+          Empire myEmpire = EmpireManager.i.getMyEmpire();
+          if (myEmpire.id.equals(colonyEmpire.id)) {
+            colonyDetailsContainer.setVisibility(View.VISIBLE);
+            refreshColonyDetails();
+          } else {
+            enemyColonyDetailsContainer.setVisibility(View.VISIBLE);
+            refreshEnemyColonyDetails(colonyEmpire);
+          }
         } else {
-          enemyColonyDetailsContainer.setVisibility(View.VISIBLE);
-          refreshEnemyColonyDetails(colonyEmpire);
+          // TODO: wait for the empire to come in.
         }
       }
     }
   }
 
   private void refreshUncolonizedDetails() {
-    populationCountTextView.setText("Uncolonized");
+    populationCountTextView.setText(getString(R.string.uncolonized));
   }
 
   private void refreshColonyDetails() {
-    StringBuilder pop = new StringBuilder();
-    pop.append("Pop: ");
-    pop.append(Math.round(planet.colony.population));
-    pop.append(" <small>");
-    pop.append(String.format(Locale.US, "(%s%d / hr)",
-        Wire.get(planet.colony.delta_population, 0.0f) < 0 ? "-" : "+",
-        Math.abs(Math.round(Wire.get(planet.colony.delta_population, 0.0f)))));
-    pop.append("</small> / ");
-    pop.append(ColonyHelper.getMaxPopulation(planet));
-    populationCountTextView.setText(Html.fromHtml(pop.toString()));
+    String pop = "Pop: "
+        + Math.round(planet.colony.population)
+        + " <small>"
+        + String.format(Locale.US, "(%s%d / hr)",
+            Wire.get(planet.colony.delta_population, 0.0f) < 0 ? "-" : "+",
+            Math.abs(Math.round(Wire.get(planet.colony.delta_population, 0.0f))))
+        + "</small> / "
+        + ColonyHelper.getMaxPopulation(planet);
+    populationCountTextView.setText(Html.fromHtml(pop));
 
     colonyFocusView.refresh(star, planet.colony);
   }
@@ -521,4 +527,11 @@ public class SolarSystemFragment extends BaseFragment {
     enemyName.setText(empire.getDisplayName());
     enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d", defence));
   */}
+
+  private void refreshNativeColonyDetails() {
+    String pop = "Pop: "
+        + Math.round(planet.colony.population);
+    populationCountTextView.setText(Html.fromHtml(pop));
+    colonyFocusView.setVisibility(View.GONE);
+  }
 }

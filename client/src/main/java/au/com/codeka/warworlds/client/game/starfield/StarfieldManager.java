@@ -344,18 +344,18 @@ public class StarfieldManager {
     text.translate(-text.getTextWidth() / 2.0f, 0.0f);
     container.addChild(text);
 
-    attachEmpireFleetIcons(scene, container, star);
+    attachEmpireFleetIcons(container, star);
 
     synchronized (scene.lock) {
       scene.getRootObject().addChild(container);
+      sceneObjects.put(star.id, container);
     }
-    sceneObjects.put(star.id, container);
 
-    attachMovingFleets(scene, star);
+    attachMovingFleets(star);
   }
 
   /** Attach the empire labels and fleet counts to the given sprite container for the given star. */
-  private void attachEmpireFleetIcons(Scene scene, SceneObject container, Star star) {
+  private void attachEmpireFleetIcons(SceneObject container, Star star) {
     Map<Long, EmpireIconInfo> empires = new TreeMap<>();
     for (Planet planet : star.planets) {
       if (planet.colony == null || planet.colony.empire_id == null) {
@@ -432,15 +432,15 @@ public class StarfieldManager {
   }
 
   /** Attach moving fleets to the given sprite container for the given star. */
-  private void attachMovingFleets(Scene scene, Star star) {
+  private void attachMovingFleets(Star star) {
     for (Fleet fleet : star.fleets) {
       if (fleet.state == Fleet.FLEET_STATE.MOVING) {
-        attachMovingFleet(scene, star, fleet);
+        attachMovingFleet(star, fleet);
       }
     }
   }
 
-  private void attachMovingFleet(Scene scene, Star star, Fleet fleet) {
+  private void attachMovingFleet(Star star, Fleet fleet) {
     Star destStar = StarManager.i.getStar(fleet.destination_star_id);
     if (destStar == null) {
       log.warning("Cannot attach moving fleet, destination star is null.");
@@ -476,8 +476,8 @@ public class StarfieldManager {
 
     synchronized (scene.lock) {
       scene.getRootObject().addChild(container);
+      sceneObjects.put(fleet.id, container);
     }
-    sceneObjects.put(fleet.id, container);
   }
 
   /** Get the current position of the given moving fleet. */

@@ -55,13 +55,10 @@ public class PlanetListSimple extends LinearLayout {
 
   private void refresh() {
     if (onClickListener == null) {
-      onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          Planet planet = (Planet) v.getTag();
-          if (planetSelectedHandler != null) {
-            planetSelectedHandler.onPlanetSelected(planet);
-          }
+      onClickListener = v -> {
+        Planet planet = (Planet) v.getTag();
+        if (planetSelectedHandler != null) {
+          planetSelectedHandler.onPlanetSelected(planet);
         }
       };
     }
@@ -132,8 +129,6 @@ public class PlanetListSimple extends LinearLayout {
     Picasso.with(getContext())
         .load(ImageHelper.getPlanetImageUrl(getContext(), star, planetIndex, 32, 32))
         .into(icon);
-    //Sprite sprite = pim.getSprite(planet);
-    //icon.setImageDrawable(new SpriteDrawable(sprite));
 
     TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
     planetTypeTextView.setText(planet.planet_type.toString());
@@ -141,11 +136,16 @@ public class PlanetListSimple extends LinearLayout {
     Colony colony = planet.colony;
     final TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
     if (colony != null) {
-      /*Empire empire = EmpireManager.i.getEmpire(colony.getEmpireID());
-      if (empire != null) {
-        colonyTextView.setText(empire.getDisplayName());
-      } else*/ {
-        colonyTextView.setText("Colonized");
+      if (colony.empire_id == null) {
+        colonyTextView.setText(getContext().getString(R.string.native_colony));
+      } else {
+        Empire empire = EmpireManager.i.getEmpire(colony.empire_id);
+        if (empire != null) {
+          colonyTextView.setText(empire.display_name);
+        } else {
+          colonyTextView.setText(getContext().getString(R.string.colonized));
+          // TODO: update when the empire comes around.
+        }
       }
     } else {
       colonyTextView.setText("");
