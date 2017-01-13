@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.common.sim;
 
+import java.util.Locale;
+
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Vector2;
@@ -34,6 +36,16 @@ public class StarHelper {
       }
     }
     return -1;
+  }
+
+  /**
+   * Gets the coordinates string for the given star (something along the lines of "[1.23, 3.45]")
+   */
+  public static String getCoordinateString(Star star) {
+    return String.format(Locale.US,
+        "[%d.%02d, %d.%02d]",
+        star.sector_x, Math.round(100 * star.offset_x / 1024.0f),
+        star.sector_y, Math.round(100 * star.offset_y / 1024.0f));
   }
 
   /**

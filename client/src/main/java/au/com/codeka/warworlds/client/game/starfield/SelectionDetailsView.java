@@ -26,6 +26,7 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.StarHelper;
 
 /** View that displays details about the currently selected object in the game world. */
 public class SelectionDetailsView extends FrameLayout {
@@ -152,7 +153,7 @@ public class SelectionDetailsView extends FrameLayout {
 
     starName.setText(star.name);
     starKind.setText(String.format(Locale.ENGLISH, "%s %s", star.classification,
-        /*star.getCoordinateString()*/"[1,2]"));
+        StarHelper.getCoordinateString(star)));
     Picasso.with(getContext())
         .load(ImageHelper.getStarImageUrl(getContext(), star, 40, 40))
         .into(starIcon);

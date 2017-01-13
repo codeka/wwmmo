@@ -66,14 +66,10 @@ public class PlanetListSimple extends LinearLayout {
     planets = new ArrayList<>(star.planets);
 
     removeAllViews();
-    LayoutInflater inflater = (LayoutInflater) context.getSystemService
-        (Context.LAYOUT_INFLATER_SERVICE);
+    LayoutInflater inflater =
+        (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     Empire myEmpire = EmpireManager.i.getMyEmpire();
-    if (myEmpire == null) {
-      return;
-    }
-
     HashSet<Long> empires = new HashSet<>();
     for (Fleet fleet : star.fleets) {
       if (fleet.empire_id == null) {
@@ -143,7 +139,7 @@ public class PlanetListSimple extends LinearLayout {
         if (empire != null) {
           colonyTextView.setText(empire.display_name);
         } else {
-          colonyTextView.setText(getContext().getString(R.string.colonized));
+          colonyTextView.setText(context.getString(R.string.colonized));
           // TODO: update when the empire comes around.
         }
       }
@@ -162,16 +158,17 @@ public class PlanetListSimple extends LinearLayout {
     final TextView empireName = (TextView) view.findViewById(R.id.starfield_planet_type);
     final TextView allianceName = (TextView) view.findViewById(R.id.starfield_planet_colony);
 
-    /*Empire empire = EmpireManager.i.getEmpire(empireID);
+    Empire empire = EmpireManager.i.getEmpire(empireID);
     if (empire != null) {
-      Bitmap bmp = EmpireShieldManager.i.getShield(context, empire);
-      icon.setImageBitmap(bmp);
+      Picasso.with(getContext())
+          .load(ImageHelper.getEmpireImageUrl(getContext(), empire, 32, 32))
+          .into(icon);
 
-      empireName.setText(empire.getDisplayName());
-      if (empire.getAlliance() != null) {
-        allianceName.setText(empire.getAlliance().getName());
-      }
-    }*/
+      empireName.setText(empire.display_name);
+//      if (empire.alliance != null) {
+//        allianceName.setText(empire.alliance.name);
+//      }
+    }
 
     view.setOnClickListener(onClickListener);
     view.setTag(empireID);
