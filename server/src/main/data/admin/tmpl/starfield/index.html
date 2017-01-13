@@ -49,7 +49,7 @@
           </div>
           <% if (planets[i].colony) { %>
             <div class="colony">
-              <img src="/render/empire/<%= planets[i].colony.empire_id %>/24x24/mdpi.png" width="24" height="24">
+              <img data-empireid="<%= planets[i].colony.empire_id %>" width="24" height="24">
               <h2><span data-empireid="<%= planets[i].colony.empire_id %>">...</span></h2>
               <table>
                 <tr>
@@ -103,6 +103,7 @@
           <div class="fleet">
             <div class="fleet-icon"><img src="/admin/img/sprites/<%= design.image_url %>" /></div>
             <div>
+              <img data-empireid="<%= fleets[i].empire_id %>" width="16" height="16" />
               <b><span data-empireid="<%= fleets[i].empire_id %>">...</span></b>
               <%= design.display_name %> x <%= fleets[i].num_ships %>
             </div>

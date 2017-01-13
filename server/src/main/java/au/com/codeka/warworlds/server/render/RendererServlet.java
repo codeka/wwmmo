@@ -256,7 +256,11 @@ public class RendererServlet extends HttpServlet {
     serveCachedFile(cacheFile, response);
   }
 
-  public Color getShieldColour(long empireID) {
+  private Color getShieldColour(long empireID) {
+    if (empireID == 0) {
+      return new Color(Color.TRANSLUCENT);
+    }
+
     Random rand = new Random(empireID ^ 7438274364563846L);
     return new Color(rand.nextInt(100) + 100,
         rand.nextInt(100) + 100,
