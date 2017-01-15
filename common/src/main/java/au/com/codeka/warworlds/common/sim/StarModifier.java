@@ -162,10 +162,19 @@ public class StarModifier {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.CREATE_FLEET));
 
+    boolean attack = false;
+    if (modification.fleet == null || modification.fleet.stance == Fleet.FLEET_STANCE.AGGRESSIVE) {
+      for (Fleet fleet : star.fleets) {
+        if (!FleetHelper.isFriendly(fleet, modification.empire_id)) {
+          attack = true;
+        }
+      }
+    }
+
     if (modification.fleet != null) {
       star.fleets.add(modification.fleet.newBuilder()
           .id(identifierGenerator.nextIdentifier())
-          .state(Fleet.FLEET_STATE.IDLE)
+          .state(attack ? Fleet.FLEET_STATE.ATTACKING : Fleet.FLEET_STATE.IDLE)
           .state_start_time(System.currentTimeMillis())
           .destination_star_id(null)
           .build());
@@ -177,7 +186,7 @@ public class StarModifier {
           .id(identifierGenerator.nextIdentifier())
           .num_ships((float) modification.count)
           .stance(Fleet.FLEET_STANCE.AGGRESSIVE)
-          .state(Fleet.FLEET_STATE.IDLE)
+          .state(attack ? Fleet.FLEET_STATE.ATTACKING : Fleet.FLEET_STATE.IDLE)
           .state_start_time(System.currentTimeMillis())
           .build());
     }

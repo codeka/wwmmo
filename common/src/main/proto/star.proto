@@ -100,8 +100,24 @@ message Star {
     optional int64 empire_id = 4;
   }
   optional Wormhole wormhole = 20;
+
+  // A list of the recent CombatReports, detailing combat on this star.
+  repeated CombatReport combat_reports = 21;
 }
 
+// A CombatReport is used to detail the results of combat. Combat occurs when an opposing fleet
+// arrives at a star. We keep at most 10 combat reports per star (after a while, they don't really
+// matter any more).
+message CombatReport {
+  // The time the combat happened.
+  optional int64 time = 1;
+
+  // The list of fleets that existed before the combat began.
+  repeated Fleet fleets_before = 2;
+
+  // The list of fleets that remained after the combat completed.
+  repeated Fleet fleets_after = 3;
+}
 
 // Represents a planet in the star system. A planet orbits a Star which in turn belongs
 // to a Sector.
