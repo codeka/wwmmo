@@ -73,6 +73,10 @@ $(function() {
     fixTimes();
   }
 
+  window.modify = function(id) {
+    $("#modify-popup").show();
+  }
+
   window.simulate = function(id) {
     $.ajax({
       url: "/admin/ajax/simulate",

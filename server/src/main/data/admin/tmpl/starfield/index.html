@@ -119,8 +119,62 @@
         <% } %>
       </div>
       <div class="simulate">
-        <a href="javascript:simulate(<%= id %>);">Simulate</a>
+        <a href="javascript:simulate(<%= id %>);">Simulate</a> &bull;
+        <a href="javascript:modify(<%= id %>);">Modify</a>
         <div id="simulate-result"></div>
+      </div>
+      <div id="modify-popup">
+        <h3>Modify star</h3>
+        <dl>
+          <dt>Modification type
+          <dd><select name="type">
+            <option value="COLONIZE">COLONIZE</option>
+            <option value="ADJUST_FOCUS">ADJUST_FOCUS</option>
+            <option value="CREATE_FLEET">CREATE_FLEET</option>
+            <option value="ADD_BUILD_REQUEST">ADD_BUILD_REQUEST</option>
+            <option value="CREATE_BUILDING">CREATE_BUILDING</option>
+            <option value="MOVE_FLEET">MOVE_FLEET</option>
+          </select>
+          <dt>Empire
+          <dd><input type="text" name="empire_id" placeholder="TODO: autocomplete">
+          <dt>Planet index
+          <dd><select name="planet_index">
+            <option>TODO: pre-populate</option>
+          </select>
+          <dt>Colony
+          <dd><select name="colony_id">
+            <option>TODO: pre-populate</option>
+          </select>
+          <dt>Fleet
+          <dd><select name="fleet_id">
+            <option>TODO: pre-populate</option>
+          </select>
+          <dt>Focus
+          <dd>TODO?
+          <dt>Design
+          <dd><select name="design_type">
+            <option value="">N/A</option>
+            <option>COLONY_SHIP</option>
+            <option>SCOUT</option>
+            <option>FIGHTER</option>
+            <option>TROOP_CARRIER</option>
+            <option>WORMHOLE_GENERATOR</option>
+            <option>SHIPYARD</option>
+            <option>SILO</option>
+            <option>RESEARCH</option>
+            <option>GROUND_SHIELD</option>
+            <option>BIOSPHERE</option>
+            <option>HQ</option>
+            <option>RADAR</option>
+            <option>WORMHOLE_DISRUPTOR</option>
+          </select>
+          <dt>Count
+          <dd><input name="count" type="number"/>
+          <dt>Target Star
+          <dd>TODO?
+          <dt>Fleet
+          <dd>TODO?
+        </dl>
       </div>
     </script>
     <script id="simulate-result-tmpl" type="text/html">
