@@ -183,7 +183,19 @@ $(function() {
     $("#modify-ok").on("click", function() {
       $("#modify-popup").hide();
 
-      // TODO: modify
+      var json = {
+        type: parseInt($("#modify-popup select[name=type]").val()),
+        empire_id: parseInt($("#modify-popup select[name=empire_id]").val()),
+        planet_index: parseInt($("#modify-popup select[name=planet_index]").val()),
+        colony_id: parseInt($("#modify-popup select[name=colony_id]").val()),
+        fleet_id: parseInt($("#modify-popup select[name=fleet_id]").val()),
+        // TODO focus:
+        design_type: parseInt($("#modify-popup select[name=design_type]").val()),
+        count: parseInt($("#modify-popup input[name=count]").val()),
+        // TODO star_id:
+        // TODO fleet:
+      };
+      alert(JSON.stringify(json));
     });
   }
 
