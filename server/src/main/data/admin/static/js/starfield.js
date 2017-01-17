@@ -164,6 +164,19 @@ $(function() {
       });
     });
 
+    var empireSelect = $("#modify-popup select[name=empire_id]");
+    empireSelect.empty();
+    empireSelect.append($("<option>None</option>"));
+    empireSelect.append($("<option value=\"0\">Native</option>"));
+    var empires = empireStore.getAllEmpires();
+    for (var i in empires) {
+      var empire = empires[i];
+      var opt = $("<option/>");
+      opt.attr("value", empire.id);
+      opt.html(empire.display_name);
+      empireSelect.append(opt);
+    }
+
     $("#modify-cancel").on("click", function() {
       $("#modify-popup").hide();
     });

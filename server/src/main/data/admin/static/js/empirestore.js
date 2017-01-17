@@ -78,6 +78,11 @@ var empireStore = (function() {
           }
         }
       });
+    },
+
+    // Gets all of the empires that we have stored.
+    getAllEmpires: function() {
+      return empires;
     }
   }
 })();
