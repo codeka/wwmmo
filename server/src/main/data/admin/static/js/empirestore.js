@@ -35,13 +35,14 @@ var empireStore = (function() {
       if (typeof callback === "undefined") {
         callback = defaultCallback;
       }
-      if (empireId == null) {
+      if (!empireId) {
         setTimeout(function() {
           callback({
             id: 0,
             display_name: "Native"
           });
         });
+        return;
       }
 
       // If we have a cached empire already, just return that and we're done.

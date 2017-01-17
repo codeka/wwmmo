@@ -4,6 +4,8 @@ $(function() {
     "<h1>{%= name %}</h1>",
   ].join("\n");
 
+  var currStar = null;
+
   function renderSector(sector) {
     var container = $("#starfield");
     container.empty();
@@ -68,13 +70,108 @@ $(function() {
   }
 
   function showStar(star) {
+    currStar = star;
     var html = $("#star-details-tmpl").applyTemplate(star);
     $("#star-details").html(html);
     fixTimes();
   }
 
   window.modify = function(id) {
+    if (currStar == null) {
+      return;
+    }
+
     $("#modify-popup").show();
+
+    var planetIndexSelect = $("#modify-popup select[name=planet_index]");
+    var colonySelect = $("#modify-popup select[name=colony_id]");
+    var fleetSelect = $("#modify-popup select[name=fleet_id]");
+    planetIndexSelect.empty();
+    colonySelect.empty();
+    fleetSelect.empty();
+
+    planetIndexSelect.append($("<option>None</option>"));
+    colonySelect.append($("<option>None</option>"));
+    fleetSelect.append($("<option>None</option>"));
+    var empires = [];
+
+    for (var i = 0; i < currStar.planets.length; i++) {
+      var planet = currStar.planets[i];
+      var opt = $("<option/>");
+      opt.attr("value", i);
+      opt.html((i + 1) + ": "
+          + toTitleCase(planet.planet_type)
+          + " &nbsp; \uD83D\uDC6A " + planet.population_congeniality
+          + " &nbsp; \u2618 " + planet.farming_congeniality
+          + " &nbsp; \u26cf " + planet.mining_congeniality
+          + " &nbsp; \u26a1 " + planet.energy_congeniality);
+      planetIndexSelect.append(opt);
+
+      if (planet.colony != null) {
+        opt = $("<option/>");
+        opt.attr("value", planet.colony.id);
+        if (empires.indexOf(planet.colony.empire_id) < 0) {
+          empires.push(planet.colony.empire_id);
+        }
+        colonySelect.append(opt);
+      }
+    }
+
+    for (var i = 0; i < currStar.fleets.length; i++) {
+      var fleet = currStar.fleets[i];
+      var opt = $("<option/>");
+      opt.attr("value", fleet.id);
+      if (empires.indexOf(fleet.empire_id) < 0) {
+        empires.push(fleet.empire_id);
+      }
+      fleetSelect.append(opt);
+    }
+
+    empires.forEach(function(empireId) {
+      empireStore.getEmpire(empireId, function(empire) {
+        $("#modify-popup select[name=colony_id]").children().each(function(index, elem) {
+          var colonyId = $(elem).attr("value");
+          if (!colonyId) {
+            return;
+          }
+          for (var planetIndex = 0; planetIndex < currStar.planets.length; planetIndex++) {
+            var planet = currStar.planets[planetIndex];
+            if (planet.colony && planet.colony.id == colonyId) {
+              $(elem).html(
+                  (planetIndex + 1) + ": "
+                  + toTitleCase(planet.planet_type)
+                  + " (" + empire.display_name + ")");
+            }
+          }
+        });
+        $("#modify-popup select[name=fleet_id]").children().each(function(index, elem) {
+          var fleetId = $(elem).attr("value");
+          if (!fleetId) {
+            return;
+          }
+          for (var fleetIndex = 0; fleetIndex < currStar.fleets.length; fleetIndex++) {
+            var fleet = currStar.fleets[fleetIndex];
+            var design = Designs.get(fleet.design_type);
+            if (fleet.id == fleetId) {
+              $(elem).html(
+                  (fleetIndex + 1) + ": "
+                  + toTitleCase(design.display_name)
+                  + " x" + fleet.num_ships
+                  + " (" + empire.display_name + ")");
+            }
+          }
+        });
+      });
+    });
+
+    $("#modify-cancel").on("click", function() {
+      $("#modify-popup").hide();
+    });
+    $("#modify-ok").on("click", function() {
+      $("#modify-popup").hide();
+
+      // TODO: modify
+    });
   }
 
   window.simulate = function(id) {
