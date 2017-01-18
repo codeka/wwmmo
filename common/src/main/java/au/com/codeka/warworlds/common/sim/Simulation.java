@@ -91,6 +91,10 @@ public class Simulation {
       if (now < endTime) {
         simulateStepForAllEmpires(now, star, empireIds);
       } else if (predictionStar == null) {
+        // This is also the time to simulate combat. The star has been simulated up to "now", combat
+        // can run, and then we can do the first prediction once combat has completed.
+        simulateCombat(star, now);
+
         // We always predict at least one more step, so that we can put the deltas from the next
         // step in (since they'll take into account things like focus changes, new builds, etc that
         // the user has applied in THIS step).
@@ -156,7 +160,7 @@ public class Simulation {
   }
 
   /**
-   * After simulating one more step in the prediction star, copy the mineral, goods and energy
+   * After simulating the first step in the prediction star, copy the mineral, goods and energy
    * deltas across to the main star.
    */
   private void copyDeltas(Star.Builder star, Star.Builder predictionStar) {
@@ -221,9 +225,6 @@ public class Simulation {
       log(String.format("-- Empire [%s]", empireId == null ? "Native" : empireId));
       simulateStep(now, star, empireId);
     }
-
-    // Don't forget to simulate combat for this step as well.
-    simulateCombat(star, now);
   }
 
   private void simulateStep(long now, Star.Builder star, @Nullable Long empireId) {

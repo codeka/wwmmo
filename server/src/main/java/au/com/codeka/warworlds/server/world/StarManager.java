@@ -212,7 +212,7 @@ public class StarManager {
       starBuilder.planets.set(i, planetBuilder.build());
     }
 
-    // Any fleets that have arrives, make sure we remove them here and add them to the destination.
+    // Any fleets that have arrived, make sure we remove them here and add them to the destination.
     for (int i = 0; i < starBuilder.fleets.size(); i++) {
       Fleet fleet = starBuilder.fleets.get(i);
       if (fleet.state != Fleet.FLEET_STATE.MOVING || fleet.eta > now) {
@@ -233,6 +233,17 @@ public class StarManager {
 
       // Then remove it from our star.
       starBuilder.fleets.remove(i);
+    }
+
+    // Any fleets that have been destroyed, destroy them.
+    for (int i = 0; i < starBuilder.fleets.size(); i++) {
+      Fleet fleet = starBuilder.fleets.get(i);
+      if (fleet.num_ships <= 0.01f) {
+        starBuilder.fleets.remove(i);
+        i--;
+      }
+
+      // TODO: add a sitrep?
     }
 
     // Make sure we simulate at least when the next fleet arrives
