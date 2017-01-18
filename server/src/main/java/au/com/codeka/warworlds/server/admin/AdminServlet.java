@@ -23,7 +23,6 @@ import au.com.codeka.warworlds.server.admin.handlers.AdminLoginHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxDesignsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxEmpireHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxSectorsHandler;
-import au.com.codeka.warworlds.server.admin.handlers.AjaxSimulateHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxStarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxUsersHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DashboardHandler;
@@ -52,7 +51,6 @@ public class AdminServlet extends GenericServlet {
       new Route("/ajax/empire", AjaxEmpireHandler.class),
       new Route("/ajax/designs", AjaxDesignsHandler.class),
       new Route("/ajax/sectors", AjaxSectorsHandler.class),
-      new Route("/ajax/simulate", AjaxSimulateHandler.class),
       new Route("/ajax/starfield", AjaxStarfieldHandler.class),
       new Route("/ajax/users", AjaxUsersHandler.class),
       new Route("/(?<path>.*)", FileHandler.class)
@@ -115,15 +113,15 @@ public class AdminServlet extends GenericServlet {
   }
 
   private static class Route {
-    public java.util.regex.Pattern pattern;
-    public Class<?> handlerClass;
-    public String extraOption;
+    Pattern pattern;
+    Class<?> handlerClass;
+    String extraOption;
 
-    public Route(@Nonnull String pattern, Class<?> handlerClass) {
+    Route(@Nonnull String pattern, Class<?> handlerClass) {
       this(pattern, handlerClass, null);
     }
 
-    public Route(@Nonnull String pattern, Class<?> handlerClass, String extraOption) {
+    Route(@Nonnull String pattern, Class<?> handlerClass, String extraOption) {
       this.pattern = Pattern.compile(Preconditions.checkNotNull(pattern));
       this.handlerClass = handlerClass;
       this.extraOption = extraOption;

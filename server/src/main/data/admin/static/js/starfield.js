@@ -201,8 +201,9 @@ $(function() {
 
   window.simulate = function(id) {
     $.ajax({
-      url: "/admin/ajax/simulate",
+      url: "/admin/ajax/starfield",
       data: {
+        "action": "simulate",
         "id": id
       },
       method: "POST",
