@@ -132,30 +132,6 @@ public class Simulation {
       planet.colony(planet.colony.newBuilder().build_requests(buildRequests).build());
       star.planets.set(i, planet.build());
     }
-/*
-    // any fleets that *will be* destroyed, remember the time of their death
-    for (BaseFleet fleet : star.getFleets()) {
-      for (BaseFleet predictedFleet : predictionStar.getFleets()) {
-        if (fleet.getKey().equals(predictedFleet.getKey())) {
-          log(String.format("Fleet #%s updating timeDestroyed to: %s", fleet.getKey(), predictedFleet.getTimeDestroyed()));
-          fleet.setTimeDestroyed(predictedFleet.getTimeDestroyed());
-        }
-      }
-    }
-
-    // if the empire is going to run out of resources, save that time as well.
-    for (BaseEmpirePresence empirePresence : star.getEmpirePresences()) {
-      for (BaseEmpirePresence predictedEmpirePresence : predictionStar.getEmpirePresences()) {
-        if (empirePresence.getKey().equals(predictedEmpirePresence.getKey())) {
-          empirePresence.setGoodsZeroTime(predictedEmpirePresence.getGoodsZeroTime());
-        }
-      }
-    }
-
-    // also, the prediction combat report (if any) is the one to use
-    star.setCombatReport(predictionStar.getCombatReport());
-    */
-
     star.last_simulation = endTime;
   }
 
@@ -533,15 +509,14 @@ public class Simulation {
     CombatReport.Builder combatReportBuilder = new CombatReport.Builder()
         .time(now)
         .fleets_before(new ArrayList<>(star.fleets));
-    log("-- Combat has begun.");
+    log("Begin combat for '%s'", star.name);
 
     int roundNumber = 1;
     do {
-      log("   Combat round %d", roundNumber);
+      log(" - Combat round %d", roundNumber);
       simulateCombatRound(star, now);
       roundNumber ++;
     } while (anyFleetsAttacking(star));
-    log("   Combat is complete.");
 
     // Add the combat report to the star, and remove any if there's more than 10 in the history.
     combatReportBuilder.fleets_after(new ArrayList<>(star.fleets));
@@ -573,8 +548,8 @@ public class Simulation {
         // Work out how much attacking power this fleet has.
         Design design = DesignHelper.getDesign(fleet.design_type);
         double attack = fleet.num_ships * design.base_attack;
+        log("   - Fleet=[%d %s] numShips=%.2f", fleet.id, design.display_name, fleet.num_ships);
         while (attack > 0.0) {
-          log("   -- Fleet=[%d %s] attack=%.4f", fleet.id, design.display_name, attack);
           Fleet target = findTarget(star, fleet, damageCounter);
           if (target == null) {
             log("      No target.");
@@ -587,18 +562,20 @@ public class Simulation {
           } else {
             // Got a target, work out how much damage this fleet has already taken.
             Double numShips = (double) target.num_ships;
+            double previousDamage = 0.0;
             if (damageCounter.containsKey(target.id)) {
-              numShips -= damageCounter.get(target.id);
+              previousDamage = damageCounter.get(target.id);
+              numShips -= previousDamage;
             }
-            log("      Target=[%d] numShips=%.4f", target.id, numShips);
-            if (numShips <= attack) {
+            log("      Target=[%d] numShips=%.4f <-- attack=%.4f", target.id, numShips, attack);
+            if (numShips >= attack) {
               // If there's more ships than we have attack capability, just apply the damage.
+              damageCounter.put(target.id, previousDamage + attack);
               attack -= numShips;
-              damageCounter.put(target.id, (double) target.num_ships);
             } else {
               // If we have more attack capability than they have ships, they're dead.
+              damageCounter.put(target.id, (double) target.num_ships);
               attack = 0;
-              damageCounter.put(target.id, numShips - attack);
             }
           }
         }
@@ -616,7 +593,8 @@ public class Simulation {
         }
 
         if (fleet.num_ships <= damage) {
-          log("      Fleet=%d destroyed.", fleet.id);
+          log("      Fleet=%d destroyed (num_ships=%.4f <= damage=%.4f).",
+              fleet.id, fleet.num_ships, damage);
           star.fleets.set(i, fleet.newBuilder()
               .is_destroyed(true)
               .num_ships(0.0f)
@@ -656,6 +634,11 @@ public class Simulation {
     for (Fleet potentialTarget : star.fleets) {
       // If it's moving we can't attack it.
       if (potentialTarget.state == Fleet.FLEET_STATE.MOVING) {
+        continue;
+      }
+
+      // If it's destroyed, it's not a good target.
+      if (potentialTarget.is_destroyed != null && potentialTarget.is_destroyed) {
         continue;
       }
 

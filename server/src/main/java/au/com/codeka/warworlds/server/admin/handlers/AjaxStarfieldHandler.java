@@ -102,6 +102,7 @@ public class AjaxStarfieldHandler extends AjaxHandler {
     public void log(String message) {
       logMessages.append(message);
       logMessages.append("\n");
+      log.debug(message);
     }
   }
 
