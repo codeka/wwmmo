@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.world;
 
+import com.google.api.client.util.Lists;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -86,9 +88,7 @@ public class StarSimulatorQueue {
       if (star != null) {
         long startTime = System.nanoTime();
         WatchableObject<Star> watchableStar = StarManager.i.getStar(star.id);
-        Star.Builder starBuilder = watchableStar.get().newBuilder();
-        new Simulation().simulate(starBuilder);
-        StarManager.i.completeActions(watchableStar, starBuilder);
+        StarManager.i.modifyStar(watchableStar, Lists.newArrayList(), null /* logHandler */);
         long endTime = System.nanoTime();
 
         log.info("Star #%d (%s) simulated in %dms",

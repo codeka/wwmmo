@@ -117,6 +117,6 @@ public class Player {
 
   private void onModifyStar(ModifyStarPacket pkt) {
     WatchableObject<Star> star = StarManager.i.getStar(pkt.star_id);
-    StarManager.i.modifyStar(star, pkt.modification);
+    StarManager.i.modifyStar(star, pkt.modification, null /* logHandler */);
   }
 }

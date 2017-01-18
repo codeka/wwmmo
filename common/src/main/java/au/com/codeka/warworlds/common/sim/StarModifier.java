@@ -39,7 +39,7 @@ public class StarModifier {
   }
 
   public void modifyStar(Star.Builder star, StarModification modification) {
-    modifyStar(star, null, Lists.newArrayList(modification));
+    modifyStar(star, null, Lists.newArrayList(modification), null);
   }
 
   /**
@@ -51,16 +51,21 @@ public class StarModifier {
    *                 example, MOVE_FLEET needs to know about the destination). These are not
    *                 simulated.
    * @param modifications The list of {@link StarModification}s to apply.
+   * @param logHandler An optional {@link Simulation.LogHandler} that we'll pass through all log
+   *                   messages to.
    */
   public void modifyStar(
       Star.Builder star,
       @Nullable Collection<Star> auxStars,
-      Collection<StarModification> modifications) {
-    new Simulation(false).simulate(star);
-    for (StarModification modification : modifications) {
-      applyModification(star, auxStars, modification);
+      Collection<StarModification> modifications,
+      @Nullable Simulation.LogHandler logHandler) {
+    if (modifications.size() > 0) {
+      new Simulation(false).simulate(star);
+      for (StarModification modification : modifications) {
+        applyModification(star, auxStars, modification);
+      }
     }
-    new Simulation().simulate(star);
+    new Simulation(logHandler).simulate(star);
   }
 
   private void applyModification(

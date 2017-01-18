@@ -101,7 +101,7 @@ public class EmpireManager {
             .type(StarModification.MODIFICATION_TYPE.COLONIZE)
             .planet_index(newStarFinder.getPlanetIndex())
             .build()
-    ));
+    ), null /* logHandler */);
 
     Empire empire = new Empire.Builder()
         .display_name(name)

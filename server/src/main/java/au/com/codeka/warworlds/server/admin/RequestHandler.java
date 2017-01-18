@@ -243,6 +243,11 @@ public class RequestHandler {
       return null;
     }
 
+    return fromJson(json, protoType);
+  }
+
+  @Nullable
+  protected <T> T fromJson(String json, Class<T> protoType) {
     try {
       Gson gson = new GsonBuilder()
           .registerTypeAdapterFactory(new WireTypeAdapterFactory())

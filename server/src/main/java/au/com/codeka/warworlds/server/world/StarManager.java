@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
+import au.com.codeka.warworlds.common.sim.Simulation;
 import au.com.codeka.warworlds.common.sim.StarModifier;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.ProtobufStore;
@@ -120,11 +121,10 @@ public class StarManager {
     return stars;
   }
 
-  public void modifyStar(WatchableObject<Star> star, StarModification modification) {
-    modifyStar(star, Lists.newArrayList(modification));
-  }
-
-  public void modifyStar(WatchableObject<Star> star, Collection<StarModification> modifications) {
+  public void modifyStar(
+      WatchableObject<Star> star,
+      Collection<StarModification> modifications,
+      @Nullable Simulation.LogHandler logHandler) {
     Map<Long, Star> auxStars = null;
     for (StarModification modification : modifications) {
       if (modification.star_id != null) {
@@ -136,17 +136,18 @@ public class StarManager {
       }
     }
 
-    modifyStar(star, auxStars == null ? null : auxStars.values(), modifications);
+    modifyStar(star, auxStars == null ? null : auxStars.values(), modifications, logHandler);
   }
 
-  public void modifyStar(
+  private void modifyStar(
       WatchableObject<Star> star,
       @Nullable Collection<Star> auxStars,
-      Collection<StarModification> modifications) {
+      Collection<StarModification> modifications,
+      @Nullable Simulation.LogHandler logHandler) {
     synchronized (star.lock) {
       Star.Builder starBuilder = star.get().newBuilder();
-      starModifier.modifyStar(starBuilder, auxStars, modifications);
-      completeActions(star, starBuilder);
+      starModifier.modifyStar(starBuilder, auxStars, modifications, logHandler);
+      completeActions(star, starBuilder, logHandler);
     }
   }
 
@@ -156,8 +157,13 @@ public class StarManager {
    *
    * @param star The {@link WatchableObject<Star>} of the star that we'll update.
    * @param starBuilder A simulated star that we need to finish up.
+   * @param logHandler An optional {@link Simulation.LogHandler} that we'll pass log messages
+   *                   through to. If null, we'll just do normal logging.
    */
-  public void completeActions(WatchableObject<Star> star, Star.Builder starBuilder) {
+  private void completeActions(
+      WatchableObject<Star> star,
+      Star.Builder starBuilder,
+      @Nullable Simulation.LogHandler logHandler) {
     // For any builds/moves/etc that finish in the future, make sure we schedule a job to
     // re-simulate the star then.
     Long nextSimulateTime = null;

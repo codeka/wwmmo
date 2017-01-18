@@ -181,21 +181,35 @@ $(function() {
       $("#modify-popup").hide();
     });
     $("#modify-ok").on("click", function() {
-      $("#modify-popup").hide();
-
       var json = {
-        type: parseInt($("#modify-popup select[name=type]").val()),
+        type: $("#modify-popup select[name=type]").val(),
         empire_id: parseInt($("#modify-popup select[name=empire_id]").val()),
         planet_index: parseInt($("#modify-popup select[name=planet_index]").val()),
         colony_id: parseInt($("#modify-popup select[name=colony_id]").val()),
         fleet_id: parseInt($("#modify-popup select[name=fleet_id]").val()),
         // TODO focus:
-        design_type: parseInt($("#modify-popup select[name=design_type]").val()),
+        design_type: $("#modify-popup select[name=design_type]").val(),
         count: parseInt($("#modify-popup input[name=count]").val()),
         // TODO star_id:
         // TODO fleet:
       };
-      alert(JSON.stringify(json));
+
+      // TODO: disable modify/cancel buttons.
+      $.ajax({
+        url: "/admin/ajax/starfield",
+        data: {
+          "action": "modify",
+          "id": id,
+          "modify": JSON.stringify(json)
+        },
+        method: "POST",
+        success: function(data) {
+          var html = $("#simulate-result-tmpl").applyTemplate(data);
+          $("#simulate-result").html(html);
+
+          $("#modify-popup").hide();
+        }
+      });
     });
   }
 
