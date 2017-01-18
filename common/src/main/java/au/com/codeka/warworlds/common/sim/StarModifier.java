@@ -176,6 +176,20 @@ public class StarModifier {
       }
     }
 
+    // First, if there's any fleets that are not friendly and aggressive, they should change to
+    // attacking as well.
+    for (int i = 0; i < star.fleets.size(); i++) {
+      Fleet fleet = star.fleets.get(i);
+      if (!FleetHelper.isFriendly(fleet, modification.empire_id)
+          && fleet.stance == Fleet.FLEET_STANCE.AGGRESSIVE) {
+        star.fleets.set(i, fleet.newBuilder()
+            .state(Fleet.FLEET_STATE.ATTACKING)
+            .state_start_time(System.currentTimeMillis())
+            .build());
+      }
+    }
+
+    // Now add the fleet itself.
     if (modification.fleet != null) {
       star.fleets.add(modification.fleet.newBuilder()
           .id(identifierGenerator.nextIdentifier())
