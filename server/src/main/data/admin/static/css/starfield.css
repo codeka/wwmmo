@@ -186,6 +186,7 @@ table td {
 
 .fleet {
   height: 64px;
+  clear: both;
 }
 
 .fleet-icon {
@@ -218,7 +219,7 @@ table td {
 
 #modify-popup {
   display: none;
-  position: absolute;
+  position: fixed;
   left: 50%;
   margin-left: -300px;
   width: 600px;
