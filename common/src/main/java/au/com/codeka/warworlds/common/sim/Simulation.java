@@ -567,10 +567,12 @@ public class Simulation {
               previousDamage = damageCounter.get(target.id);
               numShips -= previousDamage;
             }
-            log("      Target=[%d] numShips=%.4f <-- attack=%.4f", target.id, numShips, attack);
+            log("      Target=[%d] numShips=%.4f * %.2f <-- attack=%.4f",
+                target.id, numShips, design.base_defence, attack);
+            numShips *= design.base_defence;
             if (numShips >= attack) {
               // If there's more ships than we have attack capability, just apply the damage.
-              damageCounter.put(target.id, previousDamage + attack);
+              damageCounter.put(target.id, previousDamage + (attack / design.base_defence));
               attack -= numShips;
             } else {
               // If we have more attack capability than they have ships, they're dead.
