@@ -12,17 +12,25 @@ import android.widget.RelativeLayout;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.game.build.BuildHelper;
+import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.proto.Building;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.DesignHelper;
 
 /**
- * The view which displays the star and planets.
+ * The view which displays the big star and planets.
  */
 public class SolarSystemView extends RelativeLayout {
   public interface PlanetSelectedHandler {
@@ -129,6 +137,8 @@ public class SolarSystemView extends RelativeLayout {
       return;
     }
 
+    float density = getContext().getResources().getDisplayMetrics().density;
+
     for (int i = 0; i < planetInfos.length; i++) {
       PlanetInfo planetInfo = planetInfos[i];
 
@@ -148,8 +158,7 @@ public class SolarSystemView extends RelativeLayout {
       planetInfo.imageView = new ImageView(getContext());
 
       RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-          (int)(64 * getContext().getResources().getDisplayMetrics().density),
-          (int)(64 * getContext().getResources().getDisplayMetrics().density));
+          (int)(64 * density), (int)(64 * density));
       lp.topMargin = (int) centre.y - (lp.height / 2);
       lp.leftMargin = (int) centre.x - (lp.width / 2);
       planetInfo.imageView.setLayoutParams(lp);
@@ -164,16 +173,30 @@ public class SolarSystemView extends RelativeLayout {
 
       if (planetInfo.planet.colony != null) {
         for (Building building : planetInfo.planet.colony.buildings) {
-        //  BuildingDesign design = (BuildingDesign) DesignManager.i.getDesign(DesignKind.BUILDING, building.getDesignID());
-        //  if (design.showInSolarSystem()) {
-        //    planetInfo.buildings.add((Building) building);
-        //  }
+          Design design = DesignHelper.getDesign(building.design_type);
+          if (design.show_in_solar_system) {
+            planetInfo.buildings.add(building);
+          }
         }
+
+        RelativeLayout.LayoutParams lpColony = new RelativeLayout.LayoutParams(
+            (int)(20 * density),
+            (int)(20 * density));
+        lpColony.topMargin = (int) (centre.y + (lp.height / 2));
+        lpColony.leftMargin = (int) centre.x - (lpColony.width / 2);
+        planetInfo.colonyImageView = new ImageView(getContext());
+        planetInfo.colonyImageView.setLayoutParams(lpColony);
+        ImageHelper.bindEmpireShield(
+            planetInfo.colonyImageView,
+            EmpireManager.i.getEmpire(planetInfo.planet.colony.empire_id));
+        addView(planetInfo.colonyImageView);
       }
 
-      //if (!planetInfo.buildings.isEmpty()) {
-      //  Collections.sort(planetInfo.buildings, mBuildingDesignComparator);
-      //}
+      if (!planetInfo.buildings.isEmpty()) {
+        Collections.sort(
+            planetInfo.buildings,
+            (Building lhs, Building rhs) -> lhs.design_type.compareTo(rhs.design_type));
+      }
     }
 
     updateSelection();
@@ -229,9 +252,15 @@ public class SolarSystemView extends RelativeLayout {
 
   /** This class contains info about the planets we need to render and interact with. */
   private static class PlanetInfo {
-    public Planet planet;
-    public Vector2 centre;
-    public float distanceFromSun;
-    public ImageView imageView;
+    Planet planet;
+    Vector2 centre;
+    float distanceFromSun;
+    ImageView imageView;
+    ImageView colonyImageView;
+    List<Building> buildings;
+
+    PlanetInfo() {
+      buildings = new ArrayList<>();
+    }
   }
 }
