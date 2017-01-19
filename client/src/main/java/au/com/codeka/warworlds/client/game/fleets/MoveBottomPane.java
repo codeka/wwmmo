@@ -223,8 +223,8 @@ public class MoveBottomPane extends RelativeLayout {
         return;
       }
 
-      refreshMoveIndicator();
       destStar = star;
+      refreshMoveIndicator();
     }
 
     @Override

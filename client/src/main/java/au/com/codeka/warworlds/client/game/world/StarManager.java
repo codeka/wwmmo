@@ -66,7 +66,11 @@ public class StarManager {
 
       // Modify the star.
       Star.Builder starBuilder = star.newBuilder();
-      starModifier.modifyStar(starBuilder, auxiliaryStars, Lists.newArrayList(modification));
+      starModifier.modifyStar(
+          starBuilder,
+          auxiliaryStars,
+          Lists.newArrayList(modification),
+          null /* logHandler */);
 
       // Save the now-modified star.
       Star newStar = starBuilder.build();
