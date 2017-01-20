@@ -30,6 +30,7 @@
   <string name="stance">Stance</string>
   <string name="native_colony">Native</string>
   <string name="uncolonized">Uncolonized</string>
+  <string name="idle">idle</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to
