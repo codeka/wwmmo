@@ -54,7 +54,7 @@ public class StarfieldManager {
   }
 
   /** Number of milliseconds between updates to moving fleets. */
-  private static final long UPDATE_MOVING_FLEETS_TIME_MS = 10000L;
+  private static final long UPDATE_MOVING_FLEETS_TIME_MS = 2000L;
 
   private static final Log log = new Log("StarfieldManager");
   private final Scene scene;

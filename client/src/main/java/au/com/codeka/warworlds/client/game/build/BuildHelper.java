@@ -36,7 +36,10 @@ public class BuildHelper {
   public static String formatTimeRemaining(BuildRequest buildRequest) {
     float hours = (float)(buildRequest.end_time - System.currentTimeMillis()) / Time.HOUR;
     float minutes = hours * 60.0f;
-    if (minutes < 60.0f) {
+    if (minutes < 10.0f) {
+      return String.format(Locale.US, "%d mins %02d sec",
+          (int) Math.floor(minutes), (int) Math.ceil((minutes - Math.floor(minutes)) * 60.0f));
+    } else if (minutes < 60.0f) {
       return String.format(Locale.US, "%d mins", Math.round(minutes));
     } else if (hours < 10.0f) {
       return String.format(Locale.US, "%.0f hrs %.0f mins", Math.floor(hours), minutes - (Math.floor(hours) * 60.0f));

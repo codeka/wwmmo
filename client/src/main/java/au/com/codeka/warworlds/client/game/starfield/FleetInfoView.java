@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.client.game.starfield;
 
 import android.content.Context;
+import android.os.Handler;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.view.View;
@@ -30,7 +31,9 @@ import au.com.codeka.warworlds.common.sim.StarHelper;
 
 /** This view displays information about a fleet you've selected on the starfield view. */
 public class FleetInfoView extends FrameLayout {
-  private Context context;
+  private static final long REFRESH_DELAY_MS = 1000L;
+
+  private final Handler handler = new Handler();
   private View view;
   private Star star;
   private Fleet fleet;
@@ -41,7 +44,6 @@ public class FleetInfoView extends FrameLayout {
 
   public FleetInfoView(Context context, AttributeSet attrs) {
     super(context, attrs);
-    this.context = context;
 
     view = inflate(context, R.layout.starfield_fleet_info, null);
     addView(view);
@@ -71,6 +73,7 @@ public class FleetInfoView extends FrameLayout {
 
   public void setFleet(final Star star, final Fleet fleet) {
     this.fleet = fleet;
+    this.star = star;
     if (fleet == null) {
       return;
     }
@@ -80,8 +83,6 @@ public class FleetInfoView extends FrameLayout {
     final TextView fleetDesign = (TextView) findViewById(R.id.fleet_design);
     final TextView empireName = (TextView) findViewById(R.id.empire_name);
     final TextView fleetDestination = (TextView) findViewById(R.id.fleet_destination);
-    final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-    final TextView progressText = (TextView) findViewById(R.id.progress_text);
     final Button boostBtn = (Button) findViewById(R.id.boost_btn);
 
     empireName.setText("");
@@ -100,6 +101,23 @@ public class FleetInfoView extends FrameLayout {
     fleetDestination.setText(FleetListHelper.getFleetDestination(star, fleet, false));
     BuildHelper.setDesignIcon(design, fleetIcon);
 
+    //FleetUpgrade.BoostFleetUpgrade fleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");
+    //if (fleetUpgrade != null && !fleetUpgrade.isBoosting()) {
+    //  boostBtn.setEnabled(true);
+    //} else {
+      boostBtn.setEnabled(false);
+   // }
+    refreshFleet();
+  }
+
+  private void refreshFleet() {
+    if (!isAttachedToWindow()) {
+      return;
+    }
+
+    final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+    final TextView progressText = (TextView) findViewById(R.id.progress_text);
+
     Star destStar = StarManager.i.getStar(fleet.destination_star_id);
     if (destStar != null) {
       double distanceInParsecs = StarHelper.distanceBetween(star, destStar);
@@ -117,11 +135,6 @@ public class FleetInfoView extends FrameLayout {
       progressText.setText(Html.fromHtml(msg));
     }
 
-    //FleetUpgrade.BoostFleetUpgrade fleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");
-    //if (fleetUpgrade != null && !fleetUpgrade.isBoosting()) {
-    //  boostBtn.setEnabled(true);
-    //} else {
-      boostBtn.setEnabled(false);
-   // }
+    handler.postDelayed(this::refreshFleet, REFRESH_DELAY_MS);
   }
 }

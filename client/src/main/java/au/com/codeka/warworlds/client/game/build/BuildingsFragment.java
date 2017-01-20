@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.client.game.build;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,10 @@ import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Star;
 
 public class BuildingsFragment extends BuildFragment.BaseTabFragment {
+  private static final long REFRESH_DELAY_MS = 1000L;
+
+  private final Handler handler = new Handler();
+  private BuildingListAdapter adapter;
 
   @Override
   protected int getViewResourceId() {
@@ -39,7 +44,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    final BuildingListAdapter adapter = new BuildingListAdapter();
+    adapter = new BuildingListAdapter();
     adapter.setColony(getStar(), getColony());
     ListView buildingsList = (ListView) view.findViewById(R.id.building_list);
     buildingsList.setAdapter(adapter);
@@ -55,6 +60,18 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         }
       }
     });
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    handler.postDelayed(refreshRunnable, REFRESH_DELAY_MS);
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    handler.removeCallbacks(refreshRunnable);
   }
 
   /** This adapter is used to populate a list of buildings in a list view. */
@@ -326,10 +343,23 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
     }
   }
 
-  public static class ItemEntry {
-    public String title;
-    public BuildRequest buildRequest;
-    public Building building;
-    public Design design;
+  private final Runnable refreshRunnable = new Runnable() {
+    @Override
+    public void run() {
+      if (!isResumed()) {
+        return;
+      }
+
+      adapter.notifyDataSetChanged();
+
+      handler.postDelayed(refreshRunnable, REFRESH_DELAY_MS);
+    }
+  };
+
+  static class ItemEntry {
+    String title;
+    BuildRequest buildRequest;
+    Building building;
+    Design design;
   }
 }
