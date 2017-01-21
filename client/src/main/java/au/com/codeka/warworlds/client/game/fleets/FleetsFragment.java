@@ -135,6 +135,11 @@ public class FleetsFragment extends BaseFragment {
       public void onSplitClick() {
         showSplitPane();
       }
+
+      @Override
+      public void onMergeClick() {
+        showMergePane();
+      }
     }));
   }
 
@@ -174,6 +179,23 @@ public class FleetsFragment extends BaseFragment {
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.removeAllViews();
     bottomPane.addView(splitBottomPane);
+  }
+
+  private void showMergePane() {
+    if (adapter.getSelectedFleetId() == null) {
+      // No fleet selected, can't split.
+      return;
+    }
+    showStarfield(false /* visible */);
+
+    long fleetId = adapter.getSelectedFleetId();
+
+    MergeBottomPane mergeBottomPane = new MergeBottomPane(getContext(), this::showActionsPane);
+    mergeBottomPane.setFleet(star, fleetId);
+
+    TransitionManager.beginDelayedTransition(bottomPane);
+    bottomPane.removeAllViews();
+    bottomPane.addView(mergeBottomPane);
   }
 
   private void showStarfield(boolean visible) {

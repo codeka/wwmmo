@@ -13,37 +13,20 @@
   <TextView android:id="@+id/instructions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/fleet_move_instructions" />
-
-  <LinearLayout android:id="@+id/star_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_below="@id/instructions">
-    <TextView android:id="@+id/star_details_left"
-              android:layout_width="0dp"
-              android:layout_weight="1"
-              android:layout_height="wrap_content" />
-
-    <TextView android:id="@+id/star_details_right"
-              android:layout_width="0dp"
-              android:layout_weight="1"
-              android:layout_height="wrap_content" />
-  </LinearLayout>
+            android:text="@string/fleet_merge_instructions" />
 
   <Button
-      android:id="@+id/move_btn"
+      android:id="@+id/merge_btn"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginStart="4dp"
       android:layout_marginEnd="12dp"
       android:layout_marginTop="5dp"
       android:layout_marginBottom="5dp"
-      android:layout_below="@+id/star_details"
+      android:layout_below="@+id/instructions"
       android:layout_toEndOf="@id/separator"
       android:layout_alignParentEnd="true"
-      android:text="@string/move" />
-
+      android:text="@string/merge" />
 
   <Button
       android:id="@+id/cancel_btn"
@@ -53,7 +36,7 @@
       android:layout_marginEnd="4dp"
       android:layout_marginTop="5dp"
       android:layout_marginBottom="5dp"
-      android:layout_below="@+id/star_details"
+      android:layout_below="@+id/instructions"
       android:layout_toStartOf="@id/separator"
       android:layout_alignParentStart="true"
       android:text="@string/cancel" />

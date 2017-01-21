@@ -59,4 +59,7 @@
   <string name="fleet_move_instructions">
     Select the star you want to move your fleet to and click &quot;Move&quot;
   </string>
+  <string name="fleet_merge_instructions">
+    Select all of the fleets that you want to merge. You can only select fleets of the same type.
+  </string>
 </resources>

@@ -30,6 +30,7 @@ public class ActionBottomPane extends RelativeLayout {
   public interface Callback {
     void onMoveClick();
     void onSplitClick();
+    void onMergeClick();
   }
 
   private final Callback callback;
@@ -44,12 +45,18 @@ public class ActionBottomPane extends RelativeLayout {
     stanceSpinner.setAdapter(new StanceAdapter());
 
     findViewById(R.id.split_btn).setOnClickListener(this::onSplitClick);
+    findViewById(R.id.merge_btn).setOnClickListener(this::onMergeClick);
     findViewById(R.id.move_btn).setOnClickListener(this::onMoveClick);
   }
 
   /** Called when you click 'split'. */
   private void onSplitClick(View view) {
     callback.onSplitClick();
+  }
+
+  /** Called when you click 'merge'. */
+  private void onMergeClick(View view) {
+    callback.onMergeClick();
   }
 
   /** Called when you click 'move'. */
