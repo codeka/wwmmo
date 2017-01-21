@@ -60,7 +60,7 @@ public class ImageHelper {
     }
 
     return String.format(Locale.ENGLISH, "%srender/empire/%d/%dx%d/%s.png",
-        ServerUrl.getUrl(), empire.id, width, height, dpi);
+        ServerUrl.getUrl(), empire.id == null ? 0 : empire.id, width, height, dpi);
   }
 
   /** Gets the URL for fetching an empire's logo, with exact pixel dimensions (a.k.a. mdpi). */

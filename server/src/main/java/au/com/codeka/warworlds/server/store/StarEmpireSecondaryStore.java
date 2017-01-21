@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 
@@ -76,7 +77,14 @@ public class StarEmpireSecondaryStore {
         }
       }
 
-      // TODO: fleets
+      for (Fleet fleet : star.fleets) {
+        if (fleet.empire_id != null) {
+          long empireId = fleet.empire_id;
+          if (!empireIds.contains(empireId)) {
+            empireIds.add(empireId);
+          }
+        }
+      }
 
       for (long empireId : empireIds) {
         results.add(stars.encodeKey(empireId));

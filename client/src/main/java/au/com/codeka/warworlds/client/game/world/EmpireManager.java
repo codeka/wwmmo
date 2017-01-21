@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 import javax.annotation.Nonnull;
 
 import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.store.ProtobufStore;
 import au.com.codeka.warworlds.common.proto.Empire;
 
@@ -19,8 +20,14 @@ public class EmpireManager {
   /** Our current empire, will be null before we're connected. */
   @Nullable private Empire myEmpire;
 
+  /** A placeholder {@link Empire} for native empires. */
+  @Nullable private Empire nativeEmpire;
+
   private EmpireManager() {
     empires = App.i.getDataStore().empires();
+    nativeEmpire = new Empire.Builder()
+        .display_name(App.i.getString(R.string.native_colony))
+        .build();
   }
 
   /** Called by the server when we get the 'hello', and lets us know the empire. */
@@ -55,7 +62,10 @@ public class EmpireManager {
     return false;
   }
 
-  public Empire getEmpire(long id) {
+  public Empire getEmpire(Long id) {
+    if (id == null) {
+      return nativeEmpire;
+    }
     if (myEmpire != null && myEmpire.id.equals(id)) {
       return myEmpire;
     }
