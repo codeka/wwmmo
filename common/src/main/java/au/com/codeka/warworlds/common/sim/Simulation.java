@@ -126,7 +126,6 @@ public class Simulation {
           BuildRequest.Builder br = planet.colony.build_requests.get(j).newBuilder();
           if (predictionBuildRequest.id.equals(br.id)) {
             buildRequests.add(br
-                .progress(predictionBuildRequest.end_time <= now ? 1.0f : br.progress)
                 .end_time(predictionBuildRequest.end_time)
                 .build());
           }
@@ -290,7 +289,7 @@ public class Simulation {
       // based on the number of ACTUAL build requests they'll be working on this turn
       int numValidBuildRequests = 0;
       for (BuildRequest br : colony.build_requests) {
-        if (br.start_time > now) {
+        if (br.start_time > now + STEP_TIME) {
           continue;
         }
         if (br.progress >= 1.0f) {
@@ -321,7 +320,7 @@ public class Simulation {
           Design design = DesignHelper.getDesign(br.design_type);
 
           long startTime = br.start_time;
-          if (startTime > now || br.progress >= 1.0f) {
+          if (startTime > now + STEP_TIME || br.progress >= 1.0f) {
             completeBuildRequests.add(br.build());
             continue;
           }
@@ -335,8 +334,9 @@ public class Simulation {
           //  buildCost = upgrade.getBuildCost();
           //}
 
-          log("---- Building [design=%s %s] [count=%d] cost [workers=%d] [minerals=%d]",
-              design.design_kind, design.type, br.count, buildCost.population, buildCost.minerals);
+          log("---- Building [design=%s %s] [count=%d] cost [workers=%d] [minerals=%d] [start-time=%s]",
+              design.design_kind, design.type, br.count, buildCost.population, buildCost.minerals,
+              Time.format(br.start_time));
 
           // The total amount of time to build something is based on the number of workers it
           // requires, if you have the right number of workers and the right amount of minerals,
@@ -355,16 +355,29 @@ public class Simulation {
           log("     Progress: [this turn=%.4f] [total=%.4f]",
               progressThisTurn, br.progress + progressThisTurn);
 
+          // If it started half way through this step, the progress is lessened.
+          if (br.start_time > now) {
+            float fraction = ((float) startTime - now) / STEP_TIME;
+            progressThisTurn *= fraction;
+            log("    - reduced progress: %.2f (fraction=%.2f)", progressThisTurn, fraction);
+          }
+
           // what is the current amount of time we have now as a percentage of the total build
           // time?
           if (progressThisTurn + br.progress >= 1.0f) {
             // OK, we've finished! Work out how far into the step we completed.
             float unusedProgress = progressThisTurn + br.progress - 1.0f;
             float fractionProgress = (progressThisTurn - unusedProgress) / progressThisTurn;
+            long endTime = now;
+            if (br.start_time > now) {
+              endTime = br.start_time;
+            }
+            endTime += (long)(STEP_TIME * fractionProgress);
+
             log("     FINISHED! fraction-progress = %.2f, end-time=%s",
-                fractionProgress, Time.format(now + (long)(STEP_TIME * fractionProgress)));
+                fractionProgress, Time.format(endTime));
             br.progress(1.0f);
-            br.end_time(now + (long)(STEP_TIME * fractionProgress));
+            br.end_time(endTime);
             completeBuildRequests.add(br.build());
             continue;
           }

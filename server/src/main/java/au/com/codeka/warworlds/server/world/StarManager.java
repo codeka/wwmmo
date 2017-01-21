@@ -182,7 +182,7 @@ public class StarManager {
 
       ArrayList<BuildRequest> remainingBuildRequests = new ArrayList<>();
       for (BuildRequest br : planet.colony.build_requests) {
-        if (br.progress >= 1.0f) {
+        if (br.end_time <= now) {
           Design design = DesignHelper.getDesign(br.design_type);
           if (design.design_kind == Design.DesignKind.BUILDING) {
             starModifier.modifyStar(
