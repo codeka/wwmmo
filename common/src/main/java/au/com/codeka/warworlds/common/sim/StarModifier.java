@@ -59,10 +59,23 @@ public class StarModifier {
       @Nullable Collection<Star> auxStars,
       Collection<StarModification> modifications,
       @Nullable Simulation.LogHandler logHandler) {
+    if (logHandler == null) {
+      logHandler = new Simulation.LogHandler() {
+        @Override
+        public void setStarName(String starName) {
+        }
+
+        @Override
+        public void log(String message) {
+        }
+      };
+    }
+    logHandler.log("Applying modifications.");
+
     if (modifications.size() > 0) {
       new Simulation(false).simulate(star);
       for (StarModification modification : modifications) {
-        applyModification(star, auxStars, modification);
+        applyModification(star, auxStars, modification, logHandler);
       }
     }
     new Simulation(logHandler).simulate(star);
@@ -71,37 +84,43 @@ public class StarModifier {
   private void applyModification(
       Star.Builder star,
       @Nullable Collection<Star> auxStars,
-      StarModification modification) {
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
     switch (modification.type) {
       case COLONIZE:
-        applyColonize(star, modification);
+        applyColonize(star, modification, logHandler);
         return;
       case CREATE_FLEET:
-        applyCreateFleet(star, modification);
+        applyCreateFleet(star, modification, logHandler);
         return;
       case CREATE_BUILDING:
-        applyCreateBuilding(star, modification);
+        applyCreateBuilding(star, modification, logHandler);
         break;
       case ADJUST_FOCUS:
-        applyAdjustFocus(star, modification);
+        applyAdjustFocus(star, modification, logHandler);
         return;
       case ADD_BUILD_REQUEST:
-        applyAddBuildRequest(star, modification);
+        applyAddBuildRequest(star, modification, logHandler);
         return;
       case SPLIT_FLEET:
-        applySplitFleet(star, modification);
+        applySplitFleet(star, modification, logHandler);
         return;
       case MOVE_FLEET:
-        applyMoveFleet(star, auxStars, modification);
+        applyMoveFleet(star, auxStars, modification, logHandler);
         return;
       default:
+        logHandler.log("Unknown or unexpected modification type: " + modification.type);
         log.error("Unknown or unexpected modification type: %s", modification.type);
     }
   }
 
-  private void applyColonize(Star.Builder star, StarModification modification) {
+  private void applyColonize(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.COLONIZE));
+    logHandler.log(String.format("- colonizing planet #%d", modification.planet_index));
 
     // Destroy a colony ship, unless this is a native colony.
     if (modification.empire_id != null) {
@@ -125,6 +144,7 @@ public class StarModifier {
       }
 
       if (!found) {
+        logHandler.log("  no colonyship, cannot colonize.");
         return;
       }
     }
@@ -146,6 +166,9 @@ public class StarModifier {
                 .defence_bonus(1.0f)
                 .build())
             .build());
+    logHandler.log(String.format(
+        "  colonized: colony_id=%d",
+        star.planets.get(modification.planet_index).colony.id));
 
     // if there's no storage for this empire, add one with some defaults now.
     boolean hasStorage = false;
@@ -163,7 +186,10 @@ public class StarModifier {
     }
   }
 
-  private void applyCreateFleet(Star.Builder star, StarModification modification) {
+  private void applyCreateFleet(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.CREATE_FLEET));
 
@@ -178,6 +204,7 @@ public class StarModifier {
 
     // First, if there's any fleets that are not friendly and aggressive, they should change to
     // attacking as well.
+    int numAttacking = 0;
     for (int i = 0; i < star.fleets.size(); i++) {
       Fleet fleet = star.fleets.get(i);
       if (!FleetHelper.isFriendly(fleet, modification.empire_id)
@@ -186,10 +213,14 @@ public class StarModifier {
             .state(Fleet.FLEET_STATE.ATTACKING)
             .state_start_time(System.currentTimeMillis())
             .build());
+        numAttacking++;
       }
     }
 
     // Now add the fleet itself.
+    logHandler.log(String.format("- creating fleet (%s) numAttacking=%d",
+        attack ? "attacking" : "not attacking",
+        numAttacking));
     if (modification.fleet != null) {
       star.fleets.add(modification.fleet.newBuilder()
           .id(identifierGenerator.nextIdentifier())
@@ -211,12 +242,16 @@ public class StarModifier {
     }
   }
 
-  private void applyCreateBuilding(Star.Builder star, StarModification modification) {
+  private void applyCreateBuilding(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.CREATE_BUILDING));
 
     Planet planet = getPlanetWithColony(star, modification.colony_id);
     if (planet != null) {
+      logHandler.log(String.format("- creating building, colony_id=%d", modification.colony_id));
       Colony.Builder colony = planet.colony.newBuilder();
       colony.buildings.add(new Building.Builder()
           .design_type(modification.design_type)
@@ -225,49 +260,67 @@ public class StarModifier {
       star.planets.set(planet.index, planet.newBuilder()
           .colony(colony.build())
           .build());
+    } else {
+      // TODO: suspicious!
     }
   }
 
-  private void applyAdjustFocus(Star.Builder star, StarModification modification) {
+  private void applyAdjustFocus(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.ADJUST_FOCUS));
 
     Planet planet = getPlanetWithColony(star, modification.colony_id);
     if (planet != null) {
+      logHandler.log(String.format("- adjusting focus."));
       star.planets.set(planet.index, planet.newBuilder()
           .colony(planet.colony.newBuilder()
               .focus(modification.focus)
               .build())
           .build());
+    } else {
+      // TODO: suspicious!
     }
   }
 
-  private void applyAddBuildRequest(Star.Builder star, StarModification modification) {
+  private void applyAddBuildRequest(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST));
 
     Planet planet = getPlanetWithColony(star, modification.colony_id);
     if (planet != null) {
+      logHandler.log("- adding build request");
       Colony.Builder colonyBuilder = planet.colony.newBuilder();
       colonyBuilder.build_requests.add(new BuildRequest.Builder()
           .id(identifierGenerator.nextIdentifier())
           .design_type(modification.design_type)
-          .start_time(star.last_simulation)
+          .start_time(System.currentTimeMillis())
           .count(modification.count)
           .progress(0.0f)
           .build());
       star.planets.set(planet.index, planet.newBuilder()
           .colony(colonyBuilder.build())
           .build());
+    } else {
+      // TODO: suspicious!
     }
   }
 
-  private void applySplitFleet(Star.Builder star, StarModification modification) {
+  private void applySplitFleet(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.SPLIT_FLEET));
 
     int fleetIndex = findFleetIndex(star, modification.fleet_id);
     if (fleetIndex >= 0) {
+      logHandler.log("- splitting fleet");
       // Modify the existing fleet to change it's number of ships
       Fleet.Builder fleet = star.fleets.get(fleetIndex).newBuilder();
       star.fleets.set(fleetIndex, fleet
@@ -280,15 +333,19 @@ public class StarModifier {
           .id(identifierGenerator.nextIdentifier())
           .num_ships((float) modification.count)
           .build());
+    } else {
+      // TODO: suspicious!
     }
   }
 
   private void applyMoveFleet(
       Star.Builder star,
       Collection<Star> auxStars,
-      StarModification modification) {
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.MOVE_FLEET));
+    logHandler.log("- moving fleet");
 
     Star targetStar = null;
     for (Star s : auxStars) {
@@ -299,22 +356,22 @@ public class StarModifier {
     }
     if (targetStar == null) {
       // Not suspicious, the caller made a mistake not the user.
-      log.error(
-          "Target star #%d was not included in the auxiliary star list.", modification.star_id);
+      logHandler.log(String.format(
+          "  target star #%d was not included in the auxiliary star list.", modification.star_id));
       return;
     }
 
     int fleetIndex = findFleetIndex(star, modification.fleet_id);
     if (fleetIndex < 0) {
       // TODO: suspicious!
-      log.warning("No fleet with given ID on star.");
+      logHandler.log("  no fleet with given ID on star.");
       return;
     }
     Fleet fleet = star.fleets.get(fleetIndex);
 
     if (fleet.state != Fleet.FLEET_STATE.IDLE) {
       // TODO: suspicious?
-      log.warning("Fleet is not idle, can't move.");
+      logHandler.log("  fleet is not idle, can't move.");
       return;
     }
 
@@ -326,17 +383,18 @@ public class StarModifier {
     int storageIndex = StarHelper.getStorageIndex(star, fleet.empire_id);
     if (storageIndex < 0) {
       // No storage. TODO: some kind of portable fuel?
-      log.debug("No storages on this star.");
+      logHandler.log("  no storages on this star.");
       return;
     }
 
     EmpireStorage.Builder empireStorageBuilder = star.empire_stores.get(storageIndex).newBuilder();
     if (empireStorageBuilder.total_energy < fuel) {
-      log.debug(
-          "Not enough energy for move (%.2f < %.2f)", empireStorageBuilder.total_energy, fuel);
+      logHandler.log(String.format(
+          "  not enough energy for move (%.2f < %.2f)", empireStorageBuilder.total_energy, fuel));
       return;
     }
 
+    logHandler.log(String.format("  cost=%.2f", fuel));
     star.empire_stores.set(storageIndex, empireStorageBuilder
         .total_energy(empireStorageBuilder.total_energy - (float) fuel)
         .build());

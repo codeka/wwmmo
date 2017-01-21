@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.NormalRandom;
+import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
@@ -184,17 +185,27 @@ public class StarManager {
         if (br.progress >= 1.0f) {
           Design design = DesignHelper.getDesign(br.design_type);
           if (design.design_kind == Design.DesignKind.BUILDING) {
-            starModifier.modifyStar(starBuilder, new StarModification.Builder()
-                .type(StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
-                .colony_id(planet.colony.id)
-                .design_type(br.design_type)
-                .build());
+            starModifier.modifyStar(
+                starBuilder,
+                null,
+                Lists.newArrayList(new StarModification.Builder()
+                    .type(StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
+                    .colony_id(planet.colony.id)
+                    .empire_id(planet.colony.empire_id)
+                    .design_type(br.design_type)
+                    .build()),
+                logHandler);
           } else {
-            starModifier.modifyStar(starBuilder, new StarModification.Builder()
-                .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-                .design_type(br.design_type)
-                .count(br.count)
-                .build());
+            starModifier.modifyStar(
+                starBuilder,
+                null,
+                Lists.newArrayList(new StarModification.Builder()
+                    .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+                    .empire_id(planet.colony.empire_id)
+                    .design_type(br.design_type)
+                    .count(br.count)
+                    .build()),
+                logHandler);
           }
           // TODO: add a sitrep as well
         } else {
@@ -223,11 +234,15 @@ public class StarManager {
       WatchableObject<Star> destStar = getStar(fleet.destination_star_id);
       synchronized (destStar.lock) { // TODO: this could deadlock, need to lock in the same order
         Star.Builder destStarBuilder = destStar.get().newBuilder();
-        starModifier.modifyStar(destStarBuilder, new StarModification.Builder()
-            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-            .empire_id(fleet.empire_id)
-            .fleet(fleet)
-            .build());
+        starModifier.modifyStar(
+            destStarBuilder,
+            null,
+            Lists.newArrayList(new StarModification.Builder()
+                .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+                .empire_id(fleet.empire_id)
+                .fleet(fleet)
+                .build()),
+            logHandler);
         destStar.set(destStarBuilder.build());
       }
 

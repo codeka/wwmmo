@@ -125,7 +125,10 @@ public class Simulation {
         for (int j = 0; j < planet.colony.build_requests.size(); j++) {
           BuildRequest.Builder br = planet.colony.build_requests.get(j).newBuilder();
           if (predictionBuildRequest.id.equals(br.id)) {
-            buildRequests.add(br.end_time(predictionBuildRequest.end_time).build());
+            buildRequests.add(br
+                .progress(predictionBuildRequest.end_time <= now ? 1.0f : br.progress)
+                .end_time(predictionBuildRequest.end_time)
+                .build());
           }
         }
       }
@@ -355,10 +358,13 @@ public class Simulation {
           // what is the current amount of time we have now as a percentage of the total build
           // time?
           if (progressThisTurn + br.progress >= 1.0f) {
-            // OK, we've finished!
-            log("     FINISHED!");
+            // OK, we've finished! Work out how far into the step we completed.
+            float unusedProgress = progressThisTurn + br.progress - 1.0f;
+            float fractionProgress = (progressThisTurn - unusedProgress) / progressThisTurn;
+            log("     FINISHED! fraction-progress = %.2f, end-time=%s",
+                fractionProgress, Time.format(now + (long)(STEP_TIME * fractionProgress)));
             br.progress(1.0f);
-            br.end_time(now + STEP_TIME);
+            br.end_time(now + (long)(STEP_TIME * fractionProgress));
             completeBuildRequests.add(br.build());
             continue;
           }
