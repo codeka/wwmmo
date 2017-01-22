@@ -3,6 +3,6 @@
   <color name="default_highlight">#6cc4d6</color>
   <color name="list_item_pressed">#06333c</color>
   <color name="list_item_selected">#0c6476</color>
-  <color name="list_item_disabled"></color>
+  <color name="list_item_disabled">#516f76</color>
   <color name="list_item_normal">@color/default_background</color>
 </resources>
