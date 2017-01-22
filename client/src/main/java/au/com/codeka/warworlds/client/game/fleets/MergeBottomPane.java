@@ -22,6 +22,7 @@ public class MergeBottomPane extends RelativeLayout {
     void onCancel();
   }
 
+  private final FleetExpandableStarListAdapter adapter;
   private final Callback callback;
 
   /** The fleet we're splitting, may be null if {@link #setFleet(Star, long)} hasn't been called. */
@@ -31,14 +32,32 @@ public class MergeBottomPane extends RelativeLayout {
   /** The star of the fleet we're splitting. */
   @Nullable Star star;
 
-  public MergeBottomPane(Context context, @Nonnull Callback callback) {
+  public MergeBottomPane(
+      Context context,
+      FleetExpandableStarListAdapter adapter,
+      @Nonnull Callback callback) {
     super(context, null);
+    this.adapter = checkNotNull(adapter);
     this.callback = checkNotNull(callback);
 
     inflate(context, R.layout.ctrl_fleet_merge_bottom_pane, this);
     findViewById(R.id.merge_btn).setOnClickListener(this::onMergeClick);
     findViewById(R.id.cancel_btn).setOnClickListener(this::onCancelClick);
+  }
 
+  @Override
+  public void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    adapter.setMultiSelect(true);
+    adapter.disableFleets(
+        (testFleet) -> fleet != null && testFleet.design_type != fleet.design_type);
+  }
+
+  @Override
+  public void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+    adapter.setMultiSelect(false);
+    adapter.enableAllFleets();
   }
 
   /** Set the fleet we're merging to the one with the given ID on the given star. */

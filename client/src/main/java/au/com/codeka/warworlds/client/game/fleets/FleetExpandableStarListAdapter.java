@@ -7,9 +7,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -32,7 +38,14 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
   private final LayoutInflater inflater;
   private final long myEmpireId;
 
+  private boolean multiSelect;
   @Nullable private Long selectedFleetId;
+
+  /** A list of fleets that are currently selected, contains more than one in multi-select mode. */
+  private final Set<Long> selectedFleetIds = new HashSet<>();
+
+  /** A list of fleets which are currently disabled (you can't select them). */
+  private final Set<Long> disabledFleetIds = new HashSet<>();
 
   public FleetExpandableStarListAdapter(LayoutInflater inflater, StarCollection stars) {
     super(stars);
@@ -45,13 +58,70 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
     return selectedFleetId;
   }
 
+  public Collection<Long> getSelectedFleetIds() {
+    return selectedFleetIds;
+  }
+
+  /** Disable all fleets that match the given predicate. */
+  public void disableFleets(Predicate<Fleet> predicate) {
+    disabledFleetIds.clear();
+    for (int i = 0; i < getGroupCount(); i++) {
+      Star star = getStar(i);
+      for (Fleet fleet : star.fleets) {
+        if (fleet.empire_id != null && fleet.empire_id.equals(myEmpireId)) {
+          if (predicate.apply(fleet)) {
+            disabledFleetIds.add(fleet.id);
+          }
+        }
+      }
+    }
+  }
+
+  /** After disabling fleets, this will re-enable all fleets again. */
+  public void enableAllFleets() {
+    disabledFleetIds.clear();
+  }
+
+  /**
+   * Sets whether or not we'll allow multi-select.
+   *
+   * <p>When in multi-select mode, {@link #getSelectedFleetId()} will return the first
+   * selected fleet, and {@link #getSelectedFleetIds()} will return all of them. When not in
+   * multi-select mode, {@link #getSelectedFleetIds()} will return a list of the one selected fleet.
+   */
+  public void setMultiSelect(boolean multiSelect) {
+    this.multiSelect = multiSelect;
+    if (!multiSelect) {
+      selectedFleetIds.clear();
+      if (selectedFleetId != null) {
+        selectedFleetIds.add(selectedFleetId);
+      }
+    }
+  }
+
   public void setSelectedFleetId(@Nullable Long starId, @Nullable Long fleetId) {
     selectedFleetId = fleetId;
+    if (multiSelect) {
+      if (!selectedFleetIds.contains(fleetId)) {
+        selectedFleetIds.add(fleetId);
+      }
+    } else {
+      selectedFleetIds.clear();
+      selectedFleetIds.add(fleetId);
+    }
   }
 
   public void onItemClick(int groupPosition, int childPosition) {
     Fleet fleet = getChild(groupPosition, childPosition);
-    selectedFleetId = fleet.id;
+    if (multiSelect) {
+      if (!selectedFleetIds.remove(fleet.id)) {
+        selectedFleetIds.add(fleet.id);
+      }
+    } else {
+      selectedFleetId = fleet.id;
+      selectedFleetIds.clear();
+      selectedFleetIds.add(fleet.id);
+    }
     notifyDataSetChanged();
   }
 
@@ -154,7 +224,9 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
         FleetListHelper.populateFleetRow(
             (ViewGroup) view,star, fleet, DesignHelper.getDesign(fleet.design_type));
 
-        if (selectedFleetId != null && selectedFleetId.equals(fleet.id)) {
+        if (disabledFleetIds.contains(fleet.id)) {
+
+        } else if (selectedFleetIds.contains(fleet.id)) {
           view.setBackgroundResource(R.color.list_item_selected);
         } else {
           view.setBackgroundResource(android.R.color.transparent);

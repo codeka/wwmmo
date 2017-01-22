@@ -190,7 +190,8 @@ public class FleetsFragment extends BaseFragment {
 
     long fleetId = adapter.getSelectedFleetId();
 
-    MergeBottomPane mergeBottomPane = new MergeBottomPane(getContext(), this::showActionsPane);
+    MergeBottomPane mergeBottomPane =
+        new MergeBottomPane(getContext(), adapter, this::showActionsPane);
     mergeBottomPane.setFleet(star, fleetId);
 
     TransitionManager.beginDelayedTransition(bottomPane);
