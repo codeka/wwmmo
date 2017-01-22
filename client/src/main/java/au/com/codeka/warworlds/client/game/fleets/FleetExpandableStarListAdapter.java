@@ -225,7 +225,7 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
             (ViewGroup) view,star, fleet, DesignHelper.getDesign(fleet.design_type));
 
         if (disabledFleetIds.contains(fleet.id)) {
-
+          view.setBackgroundResource(R.color.list_item_disabled);
         } else if (selectedFleetIds.contains(fleet.id)) {
           view.setBackgroundResource(R.color.list_item_selected);
         } else {
