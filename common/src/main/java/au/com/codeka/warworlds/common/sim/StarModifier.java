@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.annotation.Nullable;
 
@@ -70,7 +71,7 @@ public class StarModifier {
         }
       };
     }
-    logHandler.log("Applying modifications.");
+    logHandler.log("Applying " + modifications.size() + " modifications.");
 
     if (modifications.size() > 0) {
       new Simulation(false).simulate(star);
@@ -104,6 +105,9 @@ public class StarModifier {
         return;
       case SPLIT_FLEET:
         applySplitFleet(star, modification, logHandler);
+        return;
+      case MERGE_FLEET:
+        applyMergeFleet(star, modification, logHandler);
         return;
       case MOVE_FLEET:
         applyMoveFleet(star, auxStars, modification, logHandler);
@@ -338,6 +342,62 @@ public class StarModifier {
     }
   }
 
+  private void applyMergeFleet(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
+    Preconditions.checkArgument(
+        modification.type.equals(StarModification.MODIFICATION_TYPE.MERGE_FLEET));
+
+    int fleetIndex = findFleetIndex(star, modification.fleet_id);
+    if (fleetIndex >= 0) {
+      Fleet.Builder fleet = star.fleets.get(fleetIndex).newBuilder();
+      if (fleet.state != Fleet.FLEET_STATE.IDLE) {
+        logHandler.log(String.format(Locale.US,
+            "  main fleet %d is %s, cannot merge.", fleet.id, fleet.state));
+      }
+
+      for (int i = 0; i < star.fleets.size(); i++) {
+        Fleet thisFleet = star.fleets.get(i);
+        if (thisFleet.id.equals(fleet.id)) {
+          continue;
+        }
+        if (modification.additional_fleet_ids.contains(thisFleet.id)) {
+          if (!thisFleet.design_type.equals(fleet.design_type)) {
+            // TODO: suspicious! wrong fleet type.
+            logHandler.log(String.format(Locale.US,
+                "  fleet #%d not the same design_type as #%d (%s vs. %s)",
+                thisFleet.id, fleet.id, thisFleet.design_type, fleet.design_type));
+            return;
+          }
+
+          if (thisFleet.state != Fleet.FLEET_STATE.IDLE) {
+            // Suspicious? nah, just skip it.
+            logHandler.log(String.format(Locale.US,
+                "  fleet %d is %s, cannot merge.", thisFleet.id, thisFleet.state));
+            continue;
+          }
+
+          // TODO: make sure it has the same upgrades, otherwise we have to remove it.
+
+          fleet.num_ships(fleet.num_ships + thisFleet.num_ships);
+          logHandler.log(String.format(Locale.US,
+              "  removing fleet %d (num_ships=%.2f)", thisFleet.id, thisFleet.num_ships));
+
+          // Remove this fleet, and keep going.
+          star.fleets.remove(i);
+          i--;
+        }
+      }
+
+      // fleetIndex might've changed since we've been deleting fleets.
+      logHandler.log(String.format(Locale.US,
+          "  updated fleet count of main fleet: %.2f", fleet.num_ships));
+      fleetIndex = findFleetIndex(star, fleet.id);
+      star.fleets.set(fleetIndex, fleet.build());
+    }
+  }
+
   private void applyMoveFleet(
       Star.Builder star,
       Collection<Star> auxStars,
@@ -356,7 +416,7 @@ public class StarModifier {
     }
     if (targetStar == null) {
       // Not suspicious, the caller made a mistake not the user.
-      logHandler.log(String.format(
+      logHandler.log(String.format(Locale.US,
           "  target star #%d was not included in the auxiliary star list.", modification.star_id));
       return;
     }

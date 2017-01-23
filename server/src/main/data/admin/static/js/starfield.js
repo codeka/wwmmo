@@ -181,6 +181,14 @@ $(function() {
       $("#modify-popup").hide();
     });
     $("#modify-ok").on("click", function() {
+      var additionalFleetIds = [];
+      var additionalFleetIdsStrings =
+          $("#modify-popup input[name=additional_fleet_ids]").val().split(",");
+      for (var i in additionalFleetIdsStrings) {
+        if (additionalFleetIds[i]) {
+          additionalFleetIds.push(parseInt(additionalFleetIdsStrings[i]));
+        }
+      }
       var json = {
         type: $("#modify-popup select[name=type]").val(),
         empire_id: parseInt($("#modify-popup select[name=empire_id]").val()),
@@ -192,6 +200,7 @@ $(function() {
         count: parseInt($("#modify-popup input[name=count]").val()),
         // TODO star_id:
         // TODO fleet:
+        additional_fleet_ids: additionalFleetIds,
       };
 
       // TODO: disable modify/cancel buttons.

@@ -103,6 +103,7 @@
           <div class="fleet">
             <div class="fleet-icon"><img src="/admin/img/sprites/<%= design.image_url %>" /></div>
             <div>
+              #<%= fleets[i].id %>
               <img data-empireid="<%= fleets[i].empire_id %>" width="16" height="16" />
               <b><span data-empireid="<%= fleets[i].empire_id %>">...</span></b>
               <%= design.display_name %> x <%= fleets[i].num_ships %>
@@ -133,6 +134,8 @@
             <option>CREATE_FLEET</option>
             <option>ADD_BUILD_REQUEST</option>
             <option>CREATE_BUILDING</option>
+            <option>SPLIT_FLEET</option>
+            <option>MERGE_FLEET</option>
             <option>MOVE_FLEET</option>
           </select>
           <dt>Empire
@@ -172,11 +175,13 @@
             <option>WORMHOLE_DISRUPTOR</option>
           </select>
           <dt>Count
-          <dd><input name="count" type="number"/>
+          <dd><input name="count" type="number" />
           <dt>Target Star
           <dd>TODO?
           <dt>Fleet
           <dd>TODO?
+          <dt>Additional fleets
+          <dd><input name="additional_fleet_ids" type="text" />
         </dl>
         <div class="buttons">
           <a href="javascript:;" id="modify-cancel">Cancel</a> &bull;

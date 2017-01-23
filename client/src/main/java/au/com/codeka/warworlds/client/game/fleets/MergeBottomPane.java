@@ -4,15 +4,21 @@ import android.content.Context;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
-import au.com.codeka.warworlds.common.sim.DesignHelper;
+import au.com.codeka.warworlds.common.proto.StarModification;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Iterables.filter;
 
 /**
  * Bottom pane of the fleets view that contains the "merge" function.
@@ -77,6 +83,26 @@ public class MergeBottomPane extends RelativeLayout {
   }
 
   private void onMergeClick(View view) {
+    if (star == null || fleet == null) {
+      return;
+    }
+
+
+    if (adapter.getSelectedFleetId() == null) {
+      return;
+    }
+    long selectedFleetId = adapter.getSelectedFleetId();
+
+    List<Long> additionalFleetIds = Lists.newArrayList(
+        filter(adapter.getSelectedFleetIds(), (Long fleetId) -> selectedFleetId != fleetId));
+    if (additionalFleetIds.size() > 0) {
+      StarManager.i.updateStar(star, new StarModification.Builder()
+          .type(StarModification.MODIFICATION_TYPE.MERGE_FLEET)
+          .fleet_id(fleet.id)
+          .additional_fleet_ids(additionalFleetIds)
+          .build());
+    }
+
     callback.onCancel();
   }
 
