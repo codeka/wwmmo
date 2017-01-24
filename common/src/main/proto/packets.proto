@@ -10,6 +10,8 @@ message Packet {
   optional WatchSectorsPacket watch_sectors = 2;
   optional StarUpdatedPacket star_updated = 3;
   optional ModifyStarPacket modify_star = 4;
+  optional RequestEmpirePacket request_empire = 5;
+  optional EmpireDetailsPacket empire_details = 6;
 }
 
 // The "hello" packet that's sent by the client when it first connects to the game socket.
@@ -40,4 +42,16 @@ message StarUpdatedPacket {
 message ModifyStarPacket {
   optional int64 star_id = 1;
   repeated StarModification modification = 2;
+}
+
+// Requests details about an empire, or empires.
+message RequestEmpirePacket {
+  // The ID of the empire you want details of. Required.
+  repeated int64 empire_id = 1;
+}
+
+// The response to a RequestEmpirePacket, contains details of the empire(s) you requested.
+message EmpireDetailsPacket {
+  // The empire(s) that you requested in RequestEmpirePacket.
+  repeated Empire empires = 1;
 }
