@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.opengl;
 
 import android.opengl.Matrix;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.animation.DecelerateInterpolator;
 
 /**
@@ -95,8 +96,8 @@ public class Camera {
    * @param silent If true, we will not call the listener.
    */
   public void translate(float x, float y, boolean silent) {
-    x /= zoomAmount;
-    y /= zoomAmount;
+    x /= (zoomAmount * 0.5f);
+    y /= (zoomAmount * 0.5f);
     translateX += x;
     translateY += y;
     if (listener != null && !silent) {
