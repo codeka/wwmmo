@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.build.BuildHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
+import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -35,15 +36,34 @@ public class FleetListHelper {
    * @param design The ship's {@link Design}.
    */
   public static CharSequence getFleetName(@Nullable Fleet fleet, Design design) {
+    return getFleetName(fleet == null ? 1 : (int) Math.ceil(fleet.num_ships), design);
+  }
+
+  /**
+   * Gets the name of a fleet.
+   *
+   * @param buildRequest The {@link BuildRequest} that we're building, used to get the count.
+   * @param design The ship's {@link Design}.
+   */
+  public static CharSequence getFleetName(@Nullable BuildRequest buildRequest, Design design) {
+    return getFleetName(buildRequest == null ? 1 : buildRequest.count, design);
+  }
+
+  /**
+   * Gets the name of a fleet.
+   *
+   * @param count The number of ships in this fleet.
+   * @param design The ship's {@link Design}.
+   */
+  private static CharSequence getFleetName(int count, Design design) {
     SpannableStringBuilder ssb = new SpannableStringBuilder();
-    if (fleet == null) {
+    if (count <= 1) {
       String text = String.format(Locale.ENGLISH, "%s",
           DesignHelper.getDesignName(design, false /* plural */));
       ssb.append(text);
-    } else /*if (fleet.upgrades.size() == 0) */ {
+    } else /*if (upgrades.size() == 0) */ {
       String text = String.format(Locale.ENGLISH, "%d × %s",
-          (int) Math.ceil(fleet.num_ships),
-          DesignHelper.getDesignName(design, fleet.num_ships > 1 /* plural */));
+          count, DesignHelper.getDesignName(design, count > 1 /* plural */));
       ssb.append(text);
     } /*else {
       String text = String.format(Locale.ENGLISH, "%d ×", (int) Math.ceil(fleet.getNumShips()));
@@ -57,6 +77,7 @@ public class FleetListHelper {
     }*/
     return ssb;
   }
+
 
   /** Gets the destination text for the given fleet, or null if the fleet is not moving. */
   @Nullable

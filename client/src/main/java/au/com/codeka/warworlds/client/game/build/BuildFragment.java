@@ -7,7 +7,9 @@ import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TabHost;
 import android.widget.TextView;
 
@@ -64,6 +66,9 @@ public class BuildFragment extends BaseFragment {
   private TextView buildName;
   private TextView buildDescription;
 
+  private SeekBar buildCountSeek;
+  private EditText buildCount;
+
   public static Bundle createArguments(long starId, int planetIndex) {
     Bundle args = new Bundle();
     args.putLong(STAR_ID_KEY, starId);
@@ -92,12 +97,25 @@ public class BuildFragment extends BaseFragment {
     buildName = (TextView) view.findViewById(R.id.build_name);
     buildDescription = (TextView) view.findViewById(R.id.build_description);
 
-    view.findViewById(R.id.build_button).setOnClickListener(new View.OnClickListener() {
+    buildCountSeek = (SeekBar) view.findViewById(R.id.build_count_seek);
+    buildCount = (EditText) view.findViewById(R.id.build_count_edit);
+    buildCountSeek.setMax(1000);
+    buildCountSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override
-      public void onClick(View view) {
-        build();
+      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        buildCount.setText(String.format(Locale.US, "%d", progress));
+      }
+
+      @Override
+      public void onStartTrackingTouch(SeekBar seekBar) {
+      }
+
+      @Override
+      public void onStopTrackingTouch(SeekBar seekBar) {
       }
     });
+
+    view.findViewById(R.id.build_button).setOnClickListener(v -> build());
   }
 
   @Override
@@ -125,6 +143,9 @@ public class BuildFragment extends BaseFragment {
     BuildHelper.setDesignIcon(design, buildIcon);
     buildName.setText(design.display_name);
     buildDescription.setText(Html.fromHtml(design.description));
+
+    buildCount.setText("1");
+    buildCountSeek.setProgress(1);
   }
 
   public void hideBuildSheet() {
@@ -137,12 +158,24 @@ public class BuildFragment extends BaseFragment {
   /** Start building the thing we currently have showing. */
   public void build() {
     if (currentDesign != null) {
+      String str = buildCount.getText().toString();
+      int count = 0;
+      try {
+        count = Integer.parseInt(str);
+      } catch (NumberFormatException e) {
+        count = 0;
+      }
+
+      if (count <= 0) {
+        return;
+      }
+
       Colony colony = colonies.get(viewPager.getCurrentItem());
       StarManager.i.updateStar(star, new StarModification.Builder()
           .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
           .colony_id(colony.id)
           .design_type(currentDesign.type)
-          .count(1)
+          .count(count)
           .build());
     }
 
@@ -166,7 +199,7 @@ public class BuildFragment extends BaseFragment {
     Empire myEmpire = EmpireManager.i.getMyEmpire();
     for (Planet planet : star.planets) {
       if (planet.colony != null && planet.colony.empire_id != null
-          && myEmpire != null && planet.colony.empire_id.equals(myEmpire.id)) {
+          && planet.colony.empire_id.equals(myEmpire.id)) {
         colonies.add(planet.colony);
       }
     }

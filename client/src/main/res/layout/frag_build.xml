@@ -9,17 +9,14 @@
                android:transitionName="planet_icon"
                android:layout_width="48dp"
                android:layout_height="48dp"
-               android:layout_alignParentLeft="true"
                android:layout_alignParentStart="true"
                android:layout_alignParentTop="true"
-               android:layout_marginRight="4dp"
                android:layout_marginEnd="4dp" />
 
     <TextView android:id="@+id/planet_name"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_alignTop="@+id/planet_icon"
-              android:layout_toRightOf="@+id/planet_icon"
               android:layout_toEndOf="@+id/planet_icon"
               android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -27,7 +24,6 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_below="@+id/planet_name"
-              android:layout_alignLeft="@+id/planet_name"
               android:layout_alignStart="@+id/planet_name"
               android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -48,7 +44,6 @@
             android:id="@+id/build_icon"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true" />
 
@@ -57,7 +52,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@id/build_icon"
             android:layout_toEndOf="@id/build_icon"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -65,7 +59,6 @@
             android:id="@+id/build_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/build_name"
             android:layout_alignStart="@id/build_name"
             android:layout_below="@id/build_name"/>
 
@@ -73,7 +66,6 @@
                      android:layout_width="match_parent"
                      android:layout_height="wrap_content"
                      android:layout_below="@id/build_description"
-                     android:layout_toRightOf="@id/build_icon"
                      android:layout_toEndOf="@id/build_icon">
             <RelativeLayout
                 android:id="@+id/build_count_container"
@@ -95,18 +87,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/build_count_label"
-                    android:layout_toLeftOf="@+id/build_count_edit"
                     android:layout_toStartOf="@+id/build_count_edit"
-                    android:layout_marginRight="10dp"
                     android:layout_marginEnd="10dp"
-                    android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true" />
 
                 <EditText
                     android:id="@+id/build_count_edit"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
                     android:layout_alignBottom="@id/build_count_seek"
                     android:inputType="number" >
@@ -129,9 +117,7 @@
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_alignBaseline="@+id/upgrade_current_level_label"
-                          android:layout_toRightOf="@+id/upgrade_current_level_label"
                           android:layout_toEndOf="@+id/upgrade_current_level_label"
-                          android:layout_marginLeft="10dp"
                           android:layout_marginStart="10dp" />
 
             </RelativeLayout>
@@ -151,9 +137,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/build_timetobuild_label"
-            android:layout_toRightOf="@id/build_timetobuild_label"
             android:layout_toEndOf="@id/build_timetobuild_label"
-            android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -162,7 +146,6 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_below="@+id/build_timetobuild_label"
-            android:layout_alignRight="@+id/build_timetobuild_label"
             android:layout_alignEnd="@+id/build_timetobuild_label"
             android:src="@drawable/mining" />
 
@@ -171,9 +154,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/build_timetobuild_label"
-            android:layout_toRightOf="@id/build_timetobuild_label"
             android:layout_toEndOf="@id/build_timetobuild_label"
-            android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -182,13 +163,10 @@
             android:layout_width="100dp"
             android:layout_height="30dp"
             android:layout_below="@id/build_mineralstobuild"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_marginBottom="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
             android:text="@string/build" />
-
     </RelativeLayout>
 </RelativeLayout>
 

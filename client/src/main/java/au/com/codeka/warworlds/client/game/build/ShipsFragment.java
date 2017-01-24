@@ -284,7 +284,11 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
           levelLabel.setVisibility(View.VISIBLE);
         }
 
-        row1.setText(FleetListHelper.getFleetName(fleet, design));
+        if (fleet == null) {
+          row1.setText(FleetListHelper.getFleetName(buildRequest, design));
+        } else {
+          row1.setText(FleetListHelper.getFleetName(fleet, design));
+        }
         if (buildRequest != null) {
           String verb = (fleet == null ? "Building" : "Upgrading");
           row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
@@ -308,9 +312,9 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
 
           progress.setVisibility(View.GONE);
           if (upgrades.length() == 0) {
-            row2.setText(Html.fromHtml(String.format(Locale.US, "Upgrades: <i>none</i>")));
+            row2.setText(Html.fromHtml("Upgrades: <i>none</i>"));
           } else {
-            row2.setText(String.format(Locale.US, "Upgrades: " + upgrades));
+            row2.setText(String.format(Locale.US, "Upgrades: %s", upgrades));
           }
 
           String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
@@ -343,7 +347,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
         Design design = entry.design;
         BuildHelper.setDesignIcon(design, icon);
 
-        row1.setText(FleetListHelper.getFleetName(null, design));
+        row1.setText(FleetListHelper.getFleetName((Fleet) null, design));
         String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
         row2.setText(Html.fromHtml(requiredHtml));
 
@@ -355,24 +359,24 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
   }
 
   public static class ItemEntry {
-    public Design design;
-    public Fleet fleet;
-    public BuildRequest buildRequest;
-    public String heading;
+    Design design;
+    Fleet fleet;
+    BuildRequest buildRequest;
+    String heading;
 
-    public ItemEntry(Design design) {
+    ItemEntry(Design design) {
       this.design = design;
     }
 
-    public ItemEntry(BuildRequest buildRequest) {
+    ItemEntry(BuildRequest buildRequest) {
       this.buildRequest = buildRequest;
     }
 
-    public ItemEntry(Fleet fleet) {
+    ItemEntry(Fleet fleet) {
       this.fleet = fleet;
     }
 
-    public ItemEntry(String heading) {
+    ItemEntry(String heading) {
       this.heading = heading;
     }
   }
