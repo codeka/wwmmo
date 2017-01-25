@@ -131,7 +131,7 @@ public class FleetInfoView extends FrameLayout {
 
       String msg = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
           distanceInParsecs * fractionRemaining,
-          TimeFormatter.create().format(eta - startTime));
+          TimeFormatter.create().format(eta - System.currentTimeMillis()));
       progressText.setText(Html.fromHtml(msg));
     }
 
