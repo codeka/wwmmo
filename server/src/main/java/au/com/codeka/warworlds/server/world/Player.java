@@ -6,12 +6,15 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket;
 import au.com.codeka.warworlds.common.proto.ModifyStarPacket;
 import au.com.codeka.warworlds.common.proto.Packet;
+import au.com.codeka.warworlds.common.proto.RequestEmpirePacket;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -40,7 +43,7 @@ public class Player {
   private final WatchableObject.Watcher<Star> starWatcher;
 
   public Player(Connection connection, WatchableObject<Empire> empire) {
-    log.setPrefix(String.format("[%d %s]", empire.get().id, empire.get().display_name));
+    log.setPrefix(String.format(Locale.US, "[%d %s]", empire.get().id, empire.get().display_name));
 
     this.connection = Preconditions.checkNotNull(connection);
     this.empire = Preconditions.checkNotNull(empire);
@@ -56,12 +59,13 @@ public class Player {
     TaskRunner.i.runTask(this::onPostConnect, Threads.BACKGROUND);
   }
 
-
   public void onPacket(Packet pkt) {
     if (pkt.watch_sectors != null) {
       onWatchSectorsPacket(pkt.watch_sectors);
     } else if (pkt.modify_star != null) {
       onModifyStar(pkt.modify_star);
+    } else if (pkt.request_empire != null) {
+      onRequestEmpire(pkt.request_empire);
     }
   }
 
@@ -118,5 +122,18 @@ public class Player {
   private void onModifyStar(ModifyStarPacket pkt) {
     WatchableObject<Star> star = StarManager.i.getStar(pkt.star_id);
     StarManager.i.modifyStar(star, pkt.modification, null /* logHandler */);
+  }
+
+  private void onRequestEmpire(RequestEmpirePacket pkt) {
+    List<Empire> empires = new ArrayList<>();
+    for (long id : pkt.empire_id) {
+      WatchableObject<Empire> empire = EmpireManager.i.getEmpire(id);
+      empires.add(empire.get());
+    }
+    connection.send(new Packet.Builder()
+        .empire_details(new EmpireDetailsPacket.Builder()
+            .empires(empires)
+            .build())
+        .build());
   }
 }
