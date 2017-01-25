@@ -20,13 +20,7 @@
       android:layout_height="40dp"
       android:visibility="gone" />
 
-  <!--au.com.codeka.warworlds.ctrl.MiniChatView
-      android:id="@+id/mini_chat"
-      android:layout_height="50dp"
-      android:layout_width="fill_parent"
-      android:layout_above="@+id/bottom_pane"
-      android:layout_marginBottom="-4px" /-->
-  <View
+  <au.com.codeka.warworlds.client.ctrl.ChatMiniView
       android:id="@+id/mini_chat"
       android:layout_height="50dp"
       android:layout_width="fill_parent"
