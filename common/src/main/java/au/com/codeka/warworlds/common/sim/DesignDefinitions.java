@@ -122,7 +122,7 @@ public class DesignDefinitions {
           .combat_priority(10)
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
-          .fuel_cost_per_px(0.02f)
+          .fuel_cost_per_px(0.005f)
           .image_url("fighter.png")
           .speed_px_per_hour(768.0f)
           .upgrades(Lists.newArrayList(
@@ -165,7 +165,7 @@ public class DesignDefinitions {
           .combat_priority(50)
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
-          .fuel_cost_per_px(0.02f)
+          .fuel_cost_per_px(0.005f)
           .image_url("troopcarrier.png")
           .speed_px_per_hour(600.0f)
           .build(),
