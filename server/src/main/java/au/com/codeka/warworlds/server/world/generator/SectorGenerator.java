@@ -125,7 +125,7 @@ public class SectorGenerator {
     ArrayList<Planet> planets = generatePlanets(classification);
 
     return new Star.Builder()
-        .id(DataStore.i.stars().nextIdentifier())
+        .id(DataStore.i.seq().nextIdentifier())
         .classification(classification)
         .name(new NameGenerator().generate(random))
         .offset_x((int) ((SectorManager.SECTOR_SIZE - 64) * point.x) + 32)

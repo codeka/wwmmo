@@ -1,116 +1,160 @@
 package au.com.codeka.warworlds.server.store;
 
-import com.google.common.base.Preconditions;
-import com.sleepycat.je.Cursor;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
-import com.sleepycat.je.Sequence;
-import com.sleepycat.je.SequenceConfig;
-import com.sleepycat.je.utilint.Pair;
-
-import java.nio.ByteBuffer;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Locale;
 
 import au.com.codeka.warworlds.common.Log;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Base storage object for {@link ProtobufStore} and some of the other stores.
  *
- * K is the type of the keys we'll store in this store, V is the type of the value.
+ * <p>Each {@link BaseStore} represents a single on-disk file, opening the store will load the
+ * database, ensure that it's the correct version and upgrade the version if it's not. You can then
+ * use {@link #newReader} and {@link #newWriter} for creating readers/writers into the data store.
  */
-public abstract class BaseStore<K, V> {
-  protected final Database db;
-  protected Sequence seq;
+public abstract class BaseStore {
+  private static final Log log = new Log("BaseStore");
+  private final String fileName;
 
-  public BaseStore(Database db) {
-    this.db = Preconditions.checkNotNull(db);
+  private Connection conn;
+
+  BaseStore(String fileName) {
+    this.fileName = checkNotNull(fileName);
   }
 
-  public void put(K key, V value) {
-    db.put(null, encodeKey(key), encodeValue(value));
+  void open() throws StoreException {
+    try {
+      conn = DriverManager.getConnection("jdbc:sqlite:data/store/" + fileName);
+    } catch(SQLException e) {
+      throw new StoreException(e);
+    }
+    ensureVersion();
   }
 
-  public V get(K key) {
-    DatabaseEntry value = new DatabaseEntry();
-    if (db.get(null, encodeKey(key), value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-      return decodeValue(value);
-    } else {
-      return null;
+  void close() throws StoreException {
+    try {
+      conn.close();
+    } catch (SQLException e) {
+      throw new StoreException(e);
     }
   }
 
-  public boolean delete(K key) {
-    return (db.delete(null, encodeKey(key)) == OperationStatus.SUCCESS);
+  protected StoreReader newReader() {
+    return new StoreReader();
   }
 
-  /** Gets the number of entries in this store. */
-  public long count() {
-    return db.count();
+  protected StoreWriter newWriter() {
+    return new StoreWriter();
   }
 
-  /** Search the store and return all values. */
-  public StoreCursor search() {
-    return new StoreCursor(db.openCursor(null, null));
-  }
+  /**
+   * Called when the database is opened. Sub classes should implement this to perform any on-disk
+   * upgrades required to get the database up to the current version.
+   *
+   * @param diskVersion The version of the database on-disk. A value of 0 indicates that the data
+   *                    is brand-new on disk and all data structures should be created.
+   * @return The new version to return as the on-disk version. Must be > 0 and >= the value passed
+   *         in as diskVersion.
+   */
+  protected abstract int onOpen(int diskVersion) throws StoreException;
 
-  public long nextIdentifier() {
-    synchronized (db) {
-      if (seq == null) {
-        SequenceConfig seqConfig = new SequenceConfig();
-        seqConfig.setAllowCreate(true);
-        seqConfig.setInitialValue(100);
-        ByteBuffer bb =
-            ByteBuffer.allocate(4).put(StoreHelper.SEQUENCE_MARKER).put("ids".getBytes());
-        seq = db.openSequence(null, new DatabaseEntry(bb.array()), seqConfig);
-      }
-    }
-    return seq.get(null, 1);
-  }
-
-  public void close() {
-    db.close();
-  }
-
-  protected abstract DatabaseEntry encodeKey(K key);
-  protected abstract DatabaseEntry encodeValue(V value);
-  protected abstract K decodeKey(DatabaseEntry databaseEntry);
-  protected abstract V decodeValue(DatabaseEntry databaseEntry);
-
-  /** A cursor for looping through all the values in a store. */
-  public class StoreCursor implements AutoCloseable {
-    private final Cursor cursor;
-    private final DatabaseEntry key = new DatabaseEntry();
-    private final DatabaseEntry value = new DatabaseEntry();
-
-    public StoreCursor(Cursor cursor) {
-      this.cursor = cursor;
-    }
-
-    public Pair<K, V> first() {
-      if (cursor.getFirst(key, value, LockMode.DEFAULT) != OperationStatus.SUCCESS) {
-        return null;
-      }
-
-      return new Pair<>(decodeKey(key), decodeValue(value));
-    }
-
-    public Pair<K, V> next() {
-      K k = null;
-      while (k == null) {
-        if (cursor.getNext(key, value, LockMode.DEFAULT) != OperationStatus.SUCCESS) {
-          return null;
+  /** Check that the version of the database on disk is the same as the version we expect. */
+  private void ensureVersion() throws StoreException {
+    int currVersion = 0;
+    try (Statement stmt = conn.createStatement()) {
+      String sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='version'";
+      try (ResultSet rs = stmt.executeQuery(sql)) {
+        if (rs.next()) {
+          try (ResultSet rs2 = stmt.executeQuery("SELECT val FROM version")) {
+            if (rs2.next()) {
+              currVersion = rs2.getInt(1);
+            }
+          }
         }
-
-        k = decodeKey(key);
       }
-
-      return new Pair<>(k, decodeValue(value));
+    } catch (SQLException e) {
+      throw new StoreException(e);
     }
 
-    @Override
-    public void close() {
-      cursor.close();
+    log.debug("%s version: %d", fileName, currVersion);
+    int newVersion = onOpen(currVersion);
+    if (newVersion == 0 || newVersion < currVersion) {
+      throw new StoreException(String.format(Locale.US,
+          "Version returned from onOpen must be > 0 and >= the previous value. newVersion=%d, currVersion=%d",
+          newVersion, currVersion));
+    }
+
+    // Store the new version on disk as well
+    if (newVersion != currVersion) {
+      try (Statement stmt = conn.createStatement()) {
+        if (currVersion == 0) {
+          stmt.executeUpdate("CREATE TABLE version (val INTEGER)");
+          stmt.executeUpdate("INSERT INTO version (val) VALUES (0)");
+        }
+        stmt.executeUpdate(String.format(Locale.US, "UPDATE version SET val=%d", newVersion));
+        log.debug("%s new version: %d", fileName, newVersion);
+      } catch (SQLException e) {
+        throw new StoreException(e);
+      }
+    }
+  }
+
+  /** A helper class for reading from the data store. */
+  protected class StoreReader {
+
+  }
+
+  /** A helper class for writing to the data store. */
+  protected class StoreWriter {
+    private PreparedStatement stmt;
+
+    /**
+     * We store any errors we get building the statement and throw it when it comes time to execute.
+     * In reality, it should be rare, since it would be an indication of programming error. */
+    private SQLException e;
+
+    private StoreWriter() {
+    }
+
+    public StoreWriter stmt(String sql) {
+      try {
+        stmt = conn.prepareStatement(sql);
+      } catch (SQLException e) {
+        log.error("Unexpected error preparing statement.", e);
+        this.e = e;
+      }
+      return this;
+    }
+
+    public StoreWriter param(int index, String value) {
+      checkNotNull(stmt, "stmt() must be called before param()");
+      try {
+        stmt.setString(index, value);
+      } catch (SQLException e) {
+        log.error("Unexpected error setting parameter.", e);
+        this.e = e;
+      }
+      return this;
+    }
+
+    public void execute() throws StoreException {
+      if (e != null) {
+        throw new StoreException(e);
+      }
+
+      checkNotNull(stmt, "stmt() must be called before param()");
+      try {
+        stmt.execute();
+      } catch (SQLException e) {
+        throw new StoreException(e);
+      }
     }
   }
 }

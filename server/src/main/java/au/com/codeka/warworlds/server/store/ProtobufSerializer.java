@@ -1,18 +1,15 @@
 package au.com.codeka.warworlds.server.store;
 
-import com.sleepycat.je.DatabaseEntry;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.common.Log;
 
 /**
- * A mapdb serializer for serializing protocol buffer messages.
+ * A serializer for serializing protocol buffer messages.
  */
 public class ProtobufSerializer<M extends Message<?, ?>> {
   private static final Log log = new Log("ProtobufSerializer");
@@ -27,13 +24,13 @@ public class ProtobufSerializer<M extends Message<?, ?>> {
     }
   }
 
-  public DatabaseEntry serialize(M value) {
-    return new DatabaseEntry(value.encode());
+  public byte[] serialize(M value) {
+    return value.encode();
   }
 
-  public M deserialize(DatabaseEntry entry) {
+  public M deserialize(byte[] value) {
     try {
-      return protoAdapter.decode(entry.getData());
+      return protoAdapter.decode(value);
     } catch (IOException e) {
       log.error("Exception deserializing protobuf.", e);
       throw new RuntimeException(e);

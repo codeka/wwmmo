@@ -33,14 +33,14 @@ public class AccountsServlet extends ProtobufHttpServlet {
 
     // Reserve for ourselves an entry in the empire name map. If this fails, it meas there's already
     // an empire with the given name
-    if (!DataStore.i.uniqueEmpireNames().putIfNotExist(req.empire_name, -1L)) {
-      log.info("Could not create new account, empire name already exists: '%s'", req.empire_name);
-      writeProtobuf(response,
-          new NewAccountResponse.Builder()
-              .message("An empire with that name already exists.")
-              .build());
-      return;
-    }
+//    if (!DataStore.i.uniqueEmpireNames().putIfNotExist(req.empire_name, -1L)) {
+//      log.info("Could not create new account, empire name already exists: '%s'", req.empire_name);
+//      writeProtobuf(response,
+//          new NewAccountResponse.Builder()
+//              .message("An empire with that name already exists.")
+//              .build());
+//      return;
+//    }
 
     // Generate a cookie for the user to authenticate with in the future.
     String cookie = generateCookie();
@@ -51,7 +51,7 @@ public class AccountsServlet extends ProtobufHttpServlet {
       // Some kind of unexpected error creating the empire.
       writeProtobuf(response,
           new NewAccountResponse.Builder()
-              .message("An error occured while creating your empire, please try again.")
+              .message("An error occurred while creating your empire, please try again.")
               .build());
       return;
     }

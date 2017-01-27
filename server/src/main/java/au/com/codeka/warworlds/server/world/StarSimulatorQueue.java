@@ -5,9 +5,8 @@ import com.google.api.client.util.Lists;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.Star;
-import au.com.codeka.warworlds.common.sim.Simulation;
 import au.com.codeka.warworlds.server.store.DataStore;
-import au.com.codeka.warworlds.server.store.StarQueueSecondaryStore;
+import au.com.codeka.warworlds.server.store.StarsStore;
 
 /**
  * This class manages the star simulation queue, and schedules stars to be simulated at the
@@ -18,12 +17,12 @@ public class StarSimulatorQueue {
   private static final Log log = new Log("StarSimulatorQueue");
 
   private final Thread thread;
-  private final StarQueueSecondaryStore queue;
+  private final StarsStore stars;
   private boolean running;
   private final Object pinger = new Object();
 
   private StarSimulatorQueue() {
-    queue = DataStore.i.starsQueue();
+    stars = DataStore.i.stars();
     thread = new Thread(this::run, "StarSimulateQueue");
   }
 
@@ -52,7 +51,7 @@ public class StarSimulatorQueue {
   private void run() {
     log.info("Star simulator queue starting up.");
     while (running) {
-      Star star = queue.next(null);
+      Star star = stars.nextStarForSimulate();
 
       long waitTime;
       if (star == null) {

@@ -1,20 +1,9 @@
 package au.com.codeka.warworlds.server.store;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
-import com.sleepycat.je.Transaction;
-
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 
 import javax.annotation.Nullable;
 
@@ -32,22 +21,15 @@ import au.com.codeka.warworlds.common.proto.Star;
  * objects (stars and colonies, etc). We also need to be able to store things like the list of
  * currently-empty sectors, the current bounds of the universe and so on.
  */
-public class SectorsStore {
-  private static final DatabaseEntry UNGENERATED_SECTORS_KEY =
-      new DatabaseEntry("ungenerated-sectors".getBytes(Charset.defaultCharset()));
-  private static final DatabaseEntry EMPTY_SECTORS_KEY =
-      new DatabaseEntry("empty-sectors".getBytes(Charset.defaultCharset()));
-  private static final DatabaseEntry UNIVERSE_BOUNDS_KEY =
-      new DatabaseEntry("universe-bounds".getBytes(Charset.defaultCharset()));
-
+public class SectorsStore extends BaseStore {
   private final Log log = new Log("SectorsStore");
-  private final Database db;
   private final ProtobufStore<Star> starsStore;
   private final ProtobufSerializer<IdentifierArray> idsArraySerializer;
   private final ProtobufSerializer<SectorCoordArray> sectorCoordArraySerializer;
 
-  public SectorsStore(Database db, ProtobufStore<Star> starsStore) {
-    this.db = Preconditions.checkNotNull(db);
+  public SectorsStore(String fileName, ProtobufStore<Star> starsStore) {
+    super(fileName);
+
     this.starsStore = Preconditions.checkNotNull(starsStore);
     idsArraySerializer = new ProtobufSerializer<>(IdentifierArray.class);
     sectorCoordArraySerializer = new ProtobufSerializer<>(SectorCoordArray.class);
@@ -59,23 +41,11 @@ public class SectorsStore {
    */
   @Nullable
   public Sector getSector(long x, long y) {
-    DatabaseEntry key = makeKey(x, y);
-    DatabaseEntry value = new DatabaseEntry();
-    OperationStatus status = db.get(null, key, value, LockMode.DEFAULT);
-    if (status != OperationStatus.SUCCESS) {
-      return null;
-    }
-    List<Long> ids = idsArraySerializer.deserialize(value).ids;
-
-    ArrayList<Star> stars = new ArrayList<>();
-    for (long id : ids) {
-      stars.add(Preconditions.checkNotNull(starsStore.get(id)));
-    }
-
+    // TODO
     return new Sector.Builder()
         .x(x)
         .y(y)
-        .stars(stars)
+        .stars(new ArrayList<>())
         .build();
   }
 
@@ -89,13 +59,8 @@ public class SectorsStore {
     ArrayList<Long> ids = new ArrayList<>();
     for (Star star : sector.stars) {
       ids.add(star.id);
-      starsStore.put(star.id, star);
+      //starsStore.put(star.id, star);
     }
-
-    DatabaseEntry key = makeKey(sector.x, sector.y);
-    DatabaseEntry value =
-        idsArraySerializer.serialize(new IdentifierArray.Builder().ids(ids).build());
-    db.put(null, key, value);
 
     SectorCoord coord = new SectorCoord.Builder().x(sector.x).y(sector.y).build();
     addEmptySector(coord);
@@ -109,37 +74,8 @@ public class SectorsStore {
    */
   @Nullable
   public SectorCoord getEmptySector() {
-    DatabaseEntry value = new DatabaseEntry();
-    if (db.get(null, EMPTY_SECTORS_KEY, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-      List<SectorCoord> coords = sectorCoordArraySerializer.deserialize(value).coords;
-      if (log.isDebugEnabled()) {
-        StringBuilder msg = new StringBuilder();
-        msg.append("Empty sectors: ");
-        for (int i = 0; i < coords.size(); i++) {
-          if (i != 0) {
-            msg.append(", ");
-          }
-          msg.append(String.format(Locale.US, "[%d,%d]", coords.get(i).x, coords.get(i).y));
-        }
-        log.debug(msg.toString());
-      }
-
-      // Find the one closest to (0,0)
-      SectorCoord closest = null;
-      float closestDistance = 0;
-      for (SectorCoord coord : coords) {
-        // square of the distance, actually, but it doesn't matter
-        float distance = (coord.x * coord.x) + (coord.y * coord.y);
-        if (closest == null || distance < closestDistance) {
-          closest = coord;
-          closestDistance = distance;
-        }
-      }
-
-      return closest;
-    } else {
-      return null;
-    }
+    // TODO:
+    return new SectorCoord.Builder().x(0L).y(0L).build();
   }
 
   /**
@@ -147,37 +83,7 @@ public class SectorsStore {
    * from {@link #getEmptySector()}.
    */
   public void removeEmptySector(SectorCoord coord) {
-    Transaction trans = db.getEnvironment().beginTransaction(null, null);
-    try {
-      DatabaseEntry value = new DatabaseEntry();
-      if (db.get(null, EMPTY_SECTORS_KEY, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-        List<SectorCoord> coords = sectorCoordArraySerializer.deserialize(value).coords;
-        coords = new ArrayList<>(
-            Collections2.filter(coords, e -> !(coord.x.equals(e.x) && coord.y.equals(e.y))));
-        if (log.isDebugEnabled()) {
-          StringBuilder msg = new StringBuilder();
-          msg.append("Empty sectors: ");
-          for (int i = 0; i < coords.size(); i++) {
-            if (i != 0) {
-              msg.append(", ");
-            }
-            msg.append(String.format(Locale.US, "[%d,%d]", coords.get(i).x, coords.get(i).y));
-          }
-          log.debug(msg.toString());
-        }
-        db.put(
-            trans,
-            EMPTY_SECTORS_KEY,
-            sectorCoordArraySerializer.serialize(
-                new SectorCoordArray.Builder().coords(coords).build()));
-        trans.commit();
-        trans = null;
-      }
-    } finally {
-      if (trans != null) {
-        trans.abort();
-      }
-    }
+    // TODO
   }
 
   /**
@@ -190,46 +96,13 @@ public class SectorsStore {
    */
   public List<SectorCoord> getUngeneratedSectors(int minSectors) {
     HashSet<SectorCoord> coords = new HashSet<>();
-
-    while (coords.size() < minSectors) {
-      DatabaseEntry value = new DatabaseEntry();
-      if (db.get(null, UNGENERATED_SECTORS_KEY, value, LockMode.DEFAULT)
-          == OperationStatus.SUCCESS) {
-        for (SectorCoord coord : sectorCoordArraySerializer.deserialize(value).coords) {
-          coords.add(coord);
-        }
-      }
-
-      if (coords.size() < minSectors) {
-        expandUniverse();
-      }
-    }
-
+    // TODO
     return new ArrayList<>(coords);
   }
 
   /** Adds the given {@link SectorCoord} to our list of empty sectors. */
   private void addEmptySector(SectorCoord coord) {
-    Transaction trans = db.getEnvironment().beginTransaction(null, null);
-    try {
-      List<SectorCoord> coords;
-      DatabaseEntry value = new DatabaseEntry();
-      if (db.get(trans, EMPTY_SECTORS_KEY, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-        coords = new ArrayList<>(sectorCoordArraySerializer.deserialize(value).coords);
-      } else {
-        coords = new ArrayList<>();
-      }
-      coords.add(coord);
-      value = sectorCoordArraySerializer.serialize(
-          new SectorCoordArray.Builder().coords(coords).build());
-      db.put(trans, EMPTY_SECTORS_KEY, value);
-      trans.commit();
-      trans = null;
-    } finally {
-      if (trans != null) {
-        trans.abort();
-      }
-    }
+    //TODO
   }
 
   /**
@@ -237,104 +110,19 @@ public class SectorsStore {
    * generated.
    */
   private void expandUniverse() {
-    Transaction trans = db.getEnvironment().beginTransaction(null, null);
-    try {
-      List<SectorCoord> bounds;
-      DatabaseEntry value = new DatabaseEntry();
-      if (db.get(trans, UNIVERSE_BOUNDS_KEY, value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-        bounds = sectorCoordArraySerializer.deserialize(value).coords;
-        Preconditions.checkState(bounds.size() == 2,
-            "Expected universe bounds to be size==2, found size==%d", bounds.size());
-
-        bounds = Lists.newArrayList(
-            new SectorCoord.Builder()
-                .x(bounds.get(0).x - 1)
-                .y(bounds.get(0).y - 1)
-                .build(),
-            new SectorCoord.Builder()
-                .x(bounds.get(1).x + 1)
-                .y(bounds.get(1).y + 1)
-                .build());
-
-      } else {
-        bounds = Lists.newArrayList(
-            new SectorCoord.Builder().x(0L).y(0L).build(),
-            new SectorCoord.Builder().x(0L).y(0L).build());
-      }
-
-      value = sectorCoordArraySerializer.serialize(
-          new SectorCoordArray.Builder().coords(bounds).build());
-      db.put(trans, UNIVERSE_BOUNDS_KEY, value);
-
-      // Now save the newly-created ungenerated sectors.
-      List<SectorCoord> coords;
-      value = new DatabaseEntry();
-      if (db.get(trans, UNGENERATED_SECTORS_KEY, value, LockMode.DEFAULT)
-          == OperationStatus.SUCCESS) {
-        coords = new ArrayList<>(sectorCoordArraySerializer.deserialize(value).coords);
-      } else {
-        coords = new ArrayList<>();
-      }
-      for (long x = bounds.get(0).x; x <= bounds.get(1).x; x++) {
-        coords.add(new SectorCoord.Builder().x(x).y(bounds.get(0).y).build());
-        coords.add(new SectorCoord.Builder().x(x).y(bounds.get(1).y).build());
-      }
-      for (long y = bounds.get(0).y; y <= bounds.get(1).y; y++) {
-        coords.add(new SectorCoord.Builder().x(bounds.get(0).x).y(y).build());
-        coords.add(new SectorCoord.Builder().x(bounds.get(1).x).y(y).build());
-      }
-      db.put(
-          trans,
-          UNGENERATED_SECTORS_KEY,
-          sectorCoordArraySerializer.serialize(
-              new SectorCoordArray.Builder().coords(coords).build()));
-
-      trans.commit();
-      trans = null;
-    } finally {
-      if (trans != null) {
-        trans.abort();
-      }
-    }
+    //TODO
   }
 
   /**
    * Remove the given {@link SectorCoord} from the "ungenerated" sectors list.
    */
   private void removeUngeneratedSector(SectorCoord coord) {
-    Transaction trans = db.getEnvironment().beginTransaction(null, null);
-    try {
-      List<SectorCoord> coords;
-      DatabaseEntry value = new DatabaseEntry();
-      if (db.get(trans, UNGENERATED_SECTORS_KEY, value, LockMode.DEFAULT)
-          == OperationStatus.SUCCESS) {
-        coords = new ArrayList<>(sectorCoordArraySerializer.deserialize(value).coords);
-      } else {
-        return;
-      }
-      for (int i = 0; i < coords.size(); i++) {
-        if (coords.get(i).equals(coord)) {
-          coords.remove(i);
-          break;
-        }
-      }
-      db.put(
-          trans,
-          UNGENERATED_SECTORS_KEY,
-          sectorCoordArraySerializer.serialize(
-              new SectorCoordArray.Builder().coords(coords).build()));
-
-      trans.commit();
-      trans = null;
-    } finally {
-      if (trans != null) {
-        trans.abort();
-      }
-    }
+    //TODO
   }
 
-  private DatabaseEntry makeKey(long x, long y) {
-    String key = String.format(Locale.US, "sector:%d,%d", x, y);
-    return new DatabaseEntry(key.getBytes(Charset.defaultCharset()));
+  @Override
+  protected int onOpen(int diskVersion) throws StoreException {
+    // TODO
+    return 1;
   }
 }

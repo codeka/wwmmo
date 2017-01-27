@@ -13,9 +13,7 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.NormalRandom;
-import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
-import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -25,9 +23,7 @@ import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.sim.Simulation;
 import au.com.codeka.warworlds.common.sim.StarModifier;
 import au.com.codeka.warworlds.server.store.DataStore;
-import au.com.codeka.warworlds.server.store.ProtobufStore;
-import au.com.codeka.warworlds.server.store.StarEmpireSecondaryStore;
-import au.com.codeka.warworlds.server.store.StarQueueSecondaryStore;
+import au.com.codeka.warworlds.server.store.StarsStore;
 
 /**
  * Manages stars and keeps the up-to-date in the data store.
@@ -36,17 +32,13 @@ public class StarManager {
   private static final Log log = new Log("StarManager");
   public static final StarManager i = new StarManager();
 
-  private final ProtobufStore<Star> store;
-  private final StarQueueSecondaryStore queue;
-  private final StarEmpireSecondaryStore empireSecondaryStore;
+  private final StarsStore store;
   private final HashMap<Long, WatchableObject<Star>> stars = new HashMap<>();
   private final StarModifier starModifier;
 
   private StarManager() {
     store = DataStore.i.stars();
-    queue = DataStore.i.starsQueue();
-    empireSecondaryStore = DataStore.i.starEmpireSecondaryStore();
-    starModifier = new StarModifier(store::nextIdentifier);
+    starModifier = new StarModifier(() -> DataStore.i.seq().nextIdentifier());
   }
 
   public WatchableObject<Star> getStar(long id) {
@@ -109,15 +101,8 @@ public class StarManager {
 
   public ArrayList<WatchableObject<Star>> getStarsForEmpire(long empireId) {
     ArrayList<WatchableObject<Star>> stars = new ArrayList<>();
-    try (StarEmpireSecondaryStore.StarIterable iter =
-             empireSecondaryStore.getStarsForEmpire(null, empireId)) {
-      if (iter == null) {
-        return stars;
-      }
-
-      for (Star star : iter) {
-        stars.add(getStar(star.id));
-      }
+    for (Long id : store.getStarsForEmpire(empireId)) {
+      stars.add(getStar(id));
     }
     return stars;
   }

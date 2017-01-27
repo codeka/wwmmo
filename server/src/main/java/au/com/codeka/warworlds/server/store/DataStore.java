@@ -1,39 +1,33 @@
 package au.com.codeka.warworlds.server.store;
 
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseConfig;
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.je.Transaction;
-
 import java.io.File;
 
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.Account;
-import au.com.codeka.warworlds.common.proto.AdminUser;
 import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.common.proto.Star;
 
-/** Wraps our reference to MapDB's data store objects. */
+/** Wraps our references to the various data store objects. */
 public class DataStore {
   private static final Log log = new Log("DataStore");
   public static final DataStore i = new DataStore();
 
-  private Environment env;
-  private StringProtobufStore<Account> accounts;
+  private AccountsStore accounts;
   private ProtobufStore<Empire> empires;
   private SectorsStore sectors;
-  private ProtobufStore<Star> stars;
-  private StarQueueSecondaryStore starsQueue;
-  private StarEmpireSecondaryStore starEmpireSecondaryStore;
-  private UniqueNameStore uniqueEmpireNames;
-  private StringProtobufStore<AdminUser> adminUsers;
+  private StarsStore stars;
+  private AdminUsersStore adminUsers;
+  private SequenceStore seq;
 
   private DataStore() {
   }
 
   public void open() {
+    // Make sure we open the sqlite JDBC driver.
+    try {
+      Class.forName("org.sqlite.JDBC");
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException("Error loading SQLITE JDBC driver.", e);
+    }
+
     File home = new File("data/store");
     if (!home.exists()) {
       if (!home.mkdirs()) {
@@ -42,52 +36,41 @@ public class DataStore {
     }
 
     try {
-      EnvironmentConfig envConfig = new EnvironmentConfig();
-      envConfig.setAllowCreate(true);
-      envConfig.setTransactional(true);
-      env = new Environment(home, envConfig);
+      adminUsers = new AdminUsersStore("admin.db");
+      adminUsers.open();
 
-      DatabaseConfig dbConfig = new DatabaseConfig();
-      dbConfig.setAllowCreate(true);
-      dbConfig.setTransactional(true);
+      accounts = new AccountsStore("accounts.db");
+      accounts.open();
 
-      Database db = env.openDatabase(null, "accounts", dbConfig);
-      accounts = new StringProtobufStore<>(db, Account.class);
+      empires = new ProtobufStore<>("empires.db", Empire.class);
+      empires.open();
 
-      db = env.openDatabase(null, "empires", dbConfig);
-      empires = new ProtobufStore<>(db, Empire.class);
+      stars = new StarsStore("stars.db");
+      stars.open();
 
-      db = env.openDatabase(null, "stars", dbConfig);
-      stars = new ProtobufStore<>(db, Star.class);
-      starsQueue = new StarQueueSecondaryStore(env, db, stars);
-      starEmpireSecondaryStore = new StarEmpireSecondaryStore(env, db, stars);
+      seq = new SequenceStore("seq.db");
+      seq.open();
 
-      db = env.openDatabase(null, "sectors", dbConfig);
-      sectors = new SectorsStore(db, stars);
-
-      db = env.openDatabase(null, "uniqueEmpireNames", dbConfig);
-      uniqueEmpireNames = new UniqueNameStore(db);
-
-      db = env.openDatabase(null, "adminUsers", dbConfig);
-      adminUsers = new StringProtobufStore<>(db, AdminUser.class);
-    } catch (DatabaseException e) {
+      sectors = new SectorsStore("sectors.db", stars);
+      sectors.open();
+    } catch (StoreException e) {
       log.error("Error creating databases.", e);
       throw new RuntimeException(e);
     }
   }
 
   public void close() {
-    uniqueEmpireNames.close();
-    accounts.close();
-    empires.close();
-    env.close();
+    try {
+      stars.close();
+//      uniqueEmpireNames.close();
+//      accounts.close();
+//      empires.close();
+    } catch (StoreException e) {
+      log.error("Error closing databases.", e);
+    }
   }
 
-  public Transaction beginTransaction() {
-    return env.beginTransaction(null, null);
-  }
-
-  public StringProtobufStore<Account> accounts() {
+  public AccountsStore accounts() {
     return accounts;
   }
 
@@ -95,27 +78,19 @@ public class DataStore {
     return empires;
   }
 
+  public SequenceStore seq() {
+    return seq;
+  }
+
   public SectorsStore sectors() {
     return sectors;
   }
 
-  public ProtobufStore<Star> stars() {
+  public StarsStore stars() {
     return stars;
   }
 
-  public StarQueueSecondaryStore starsQueue() {
-    return starsQueue;
-  }
-
-  public StarEmpireSecondaryStore starEmpireSecondaryStore() {
-    return starEmpireSecondaryStore;
-  }
-
-  public UniqueNameStore uniqueEmpireNames() {
-    return uniqueEmpireNames;
-  }
-
-  public StringProtobufStore<AdminUser> adminUsers() {
+  public AdminUsersStore adminUsers() {
     return adminUsers;
   }
 }

@@ -14,6 +14,7 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.ProtobufStore;
+import au.com.codeka.warworlds.server.store.SequenceStore;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
 
 /**
@@ -22,11 +23,9 @@ import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
 public class EmpireManager {
   public static final EmpireManager i = new EmpireManager();
 
-  private ProtobufStore<Empire> empires;
   private final Map<Long, WatchableObject<Empire>> watchedEmpires;
 
   private EmpireManager() {
-    empires = DataStore.i.empires();
     watchedEmpires = new HashMap<>();
   }
 
@@ -34,7 +33,7 @@ public class EmpireManager {
     synchronized (watchedEmpires) {
       WatchableObject<Empire> watchableEmpire = watchedEmpires.get(id);
       if (watchableEmpire == null) {
-        watchableEmpire = watchEmpire(empires.get(id));
+        watchableEmpire = watchEmpire(DataStore.i.empires().get(id));
       }
       return watchableEmpire;
     }
@@ -68,7 +67,7 @@ public class EmpireManager {
    */
   @Nullable
   public WatchableObject<Empire> createEmpire(String name, NewStarFinder newStarFinder) {
-    long id = empires.nextIdentifier();
+    long id = DataStore.i.seq().nextIdentifier();
 
     WatchableObject<Star> star = StarManager.i.getStar(newStarFinder.getStar().id);
     StarManager.i.modifyStar(star, Lists.newArrayList(
@@ -108,7 +107,7 @@ public class EmpireManager {
         .id(id)
         .home_star(newStarFinder.getStar())
         .build();
-    empires.put(id, empire);
+    DataStore.i.empires().put(id, empire);
 
     DataStore.i.sectors().removeEmptySector(
         new SectorCoord.Builder().x(star.get().sector_x).y(star.get().sector_y).build());
