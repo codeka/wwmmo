@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+  <android.support.v4.view.ViewPager
+      android:id="@+id/pager"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_marginBottom="32dp">
+  </android.support.v4.view.ViewPager>
+
+  <RelativeLayout
+      android:id="@+id/bottom_pane"
+      style="@style/BottomPane"
+      android:transitionName="bottom_pane"
+      android:layout_width="match_parent"
+      android:layout_height="36dp"
+      android:layout_gravity="bottom">
+
+    <EditText android:id="@+id/chat_text"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_centerVertical="true"
+              android:layout_toStartOf="@+id/chat_send"
+              android:inputType="textLongMessage"
+              android:imeActionLabel="Send">
+    </EditText>
+
+    <Button android:id="@+id/chat_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="@string/send" />
+  </RelativeLayout>
+
+</FrameLayout>

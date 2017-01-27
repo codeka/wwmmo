@@ -18,6 +18,8 @@ import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.SharedViewHolder;
+import au.com.codeka.warworlds.client.ctrl.ChatMiniView;
+import au.com.codeka.warworlds.client.game.chat.ChatFragment;
 import au.com.codeka.warworlds.client.game.empire.EmpireFragment;
 import au.com.codeka.warworlds.client.game.fleets.FleetListSimple;
 import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
@@ -41,6 +43,7 @@ public class StarfieldFragment extends BaseFragment {
   private SelectionDetailsView selectionDetailsView;
   private Button allianceBtn;
   private Button empireBtn;
+  private ChatMiniView chatMiniView;
 
   @Override
   protected int getViewResourceId() {
@@ -54,6 +57,7 @@ public class StarfieldFragment extends BaseFragment {
     bottomPane = (ViewGroup) view.findViewById(R.id.bottom_pane);
     allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
     empireBtn = (Button) view.findViewById(R.id.empire_btn);
+    chatMiniView = (ChatMiniView) view.findViewById(R.id.mini_chat);
 
     selectionDetailsView.setHandlers(
         new PlanetListSimple.PlanetSelectedHandler() { // planetSelectHandler
@@ -106,17 +110,22 @@ public class StarfieldFragment extends BaseFragment {
           }
         });
 
-    empireBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
+    chatMiniView.setCallback(roomId -> {
+      getFragmentTransitionManager().replaceFragment(
+          ChatFragment.class,
+          new Bundle() /* TODO: args */,
+          SharedViewHolder.builder()
+              .addSharedView(R.id.bottom_pane, "bottom_pane")
+              .build());
+    });
+
+    empireBtn.setOnClickListener(v ->
         getFragmentTransitionManager().replaceFragment(
             EmpireFragment.class,
             EmpireFragment.createArguments(),
             SharedViewHolder.builder()
                 .addSharedView(R.id.bottom_pane, "bottom_pane")
-                .build());
-      }
-    });
+                .build()));
 
     starfieldManager = ((MainActivity) getActivity()).getStarfieldManager();
     if (starfieldManager.getSelectedStar() != null) {

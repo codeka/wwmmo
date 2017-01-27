@@ -32,6 +32,7 @@
   <string name="uncolonized">Uncolonized</string>
   <string name="idle">idle</string>
   <string name="level">Level</string>
+  <string name="send">Send</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to

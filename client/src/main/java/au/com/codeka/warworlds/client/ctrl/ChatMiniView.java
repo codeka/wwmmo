@@ -12,22 +12,32 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.game.chat.ChatFragment;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.proto.Empire;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A view that contains the last couple of chat messages, and expands to the full
  * {@link ChatFragment} when you tap it.
  */
 public class ChatMiniView extends RelativeLayout {
+  public interface Callback {
+    void showChat(@Nullable Long conversationId);
+  }
+
   private static final int MAX_ROWS = 10;
 
   private final ScrollView scrollView;
   private final LinearLayout msgsContainer;
   private final Button unreadMsgCount;
 
+  private Callback callback;
   private boolean autoTranslate;
 
   public ChatMiniView(Context context, AttributeSet attrs) {
@@ -48,15 +58,15 @@ public class ChatMiniView extends RelativeLayout {
     refreshUnreadCountButton();
 
     msgsContainer.setOnClickListener(v -> {
-//      Intent intent = new Intent(mContext, ChatActivity.class);
-//      mContext.startActivity(intent);
+      checkNotNull(callback);
+      callback.showChat(null /* conversationId */);
     });
     msgsContainer.setClickable(true);
 
     unreadMsgCount.setOnClickListener(v -> {
-      // move to the first conversation with an unread message
-//      Intent intent = new Intent(mContext, ChatActivity.class);
+      checkNotNull(callback);
 
+      // move to the first conversation with an unread message
 //      List<ChatConversation> conversations = ChatManager.i.getConversations();
 //      for (int i = 0; i < conversations.size(); i++) {
 //        if (conversations.get(i).getUnreadCount() > 0) {
@@ -66,9 +76,12 @@ public class ChatMiniView extends RelativeLayout {
  //       }
  //     }
 
- //     mContext.startActivity(intent);
+      callback.showChat(null /* TODO: conversationId */);
     });
+  }
 
+  public void setCallback(Callback callback) {
+    this.callback = checkNotNull(callback);
   }
 
   @Override
