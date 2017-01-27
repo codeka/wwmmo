@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.Log;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -46,11 +48,11 @@ public abstract class BaseStore {
     }
   }
 
-  protected StoreReader newReader() {
+  StoreReader newReader() {
     return new StoreReader();
   }
 
-  protected StoreWriter newWriter() {
+  StoreWriter newWriter() {
     return new StoreWriter();
   }
 
@@ -106,42 +108,54 @@ public abstract class BaseStore {
     }
   }
 
-  /** A helper class for reading from the data store. */
-  protected class StoreReader {
-
-  }
-
-  /** A helper class for writing to the data store. */
-  protected class StoreWriter {
-    private PreparedStatement stmt;
+  /**
+   * Base class for {@link StoreReader} and {@link StoreWriter} that handling building the query.
+   */
+  class StatementBuilder<T extends StatementBuilder> {
+    protected PreparedStatement stmt;
 
     /**
      * We store any errors we get building the statement and throw it when it comes time to execute.
-     * In reality, it should be rare, since it would be an indication of programming error. */
-    private SQLException e;
+     * In reality, it should be rare, since it would be an indication of programming error.
+     */
+    protected SQLException e;
 
-    private StoreWriter() {
+    private StatementBuilder() {
     }
 
-    public StoreWriter stmt(String sql) {
+    @SuppressWarnings("unchecked")
+    public T stmt(String sql) {
       try {
         stmt = conn.prepareStatement(sql);
       } catch (SQLException e) {
         log.error("Unexpected error preparing statement.", e);
         this.e = e;
       }
-      return this;
+      return (T) this;
     }
 
-    public StoreWriter param(int index, String value) {
+    @SuppressWarnings("unchecked")
+    public T param(int index, String value) {
       checkNotNull(stmt, "stmt() must be called before param()");
       try {
-        stmt.setString(index, value);
+        stmt.setString(index + 1, value);
       } catch (SQLException e) {
         log.error("Unexpected error setting parameter.", e);
         this.e = e;
       }
-      return this;
+      return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T param(int index, byte[] value) {
+      checkNotNull(stmt, "stmt() must be called before param()");
+      try {
+        stmt.setBytes(index + 1, value);
+      } catch (SQLException e) {
+        log.error("Unexpected error setting parameter.", e);
+        this.e = e;
+      }
+      return (T) this;
     }
 
     public void execute() throws StoreException {
@@ -156,5 +170,59 @@ public abstract class BaseStore {
         throw new StoreException(e);
       }
     }
+  }
+
+  class QueryResult implements AutoCloseable {
+    private final ResultSet rs;
+
+    public QueryResult(ResultSet rs) {
+      this.rs = rs;
+    }
+
+    public boolean next() throws StoreException {
+      try {
+        return rs.next();
+      } catch (SQLException e) {
+        throw new StoreException(e);
+      }
+    }
+
+    public int getInt(int columnIndex) throws StoreException {
+      try {
+        return rs.getInt(columnIndex + 1);
+      } catch (SQLException e) {
+        throw new StoreException(e);
+      }
+    }
+
+    public byte[] getBytes(int columnIndex) throws StoreException {
+      try {
+        return rs.getBytes(columnIndex + 1);
+      } catch (SQLException e) {
+        throw new StoreException(e);
+      }
+    }
+
+    @Override
+    public void close() throws Exception {
+      rs.close();
+    }
+  }
+
+  /** A helper class for reading from the data store. */
+  class StoreReader extends StatementBuilder<StoreReader> {
+    public QueryResult query() throws StoreException {
+      execute();
+      try {
+        return new QueryResult(stmt.getResultSet());
+      } catch (SQLException e) {
+        throw new StoreException(e);
+      }
+    }
+  }
+
+  /** A helper class for writing to the data store. */
+  class StoreWriter extends StatementBuilder<StoreWriter> {
+
   }
 }
