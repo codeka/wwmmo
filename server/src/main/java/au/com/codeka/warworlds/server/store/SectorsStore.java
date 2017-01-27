@@ -23,14 +23,12 @@ import au.com.codeka.warworlds.common.proto.Star;
  */
 public class SectorsStore extends BaseStore {
   private final Log log = new Log("SectorsStore");
-  private final ProtobufStore<Star> starsStore;
   private final ProtobufSerializer<IdentifierArray> idsArraySerializer;
   private final ProtobufSerializer<SectorCoordArray> sectorCoordArraySerializer;
 
-  public SectorsStore(String fileName, ProtobufStore<Star> starsStore) {
+  public SectorsStore(String fileName) {
     super(fileName);
 
-    this.starsStore = Preconditions.checkNotNull(starsStore);
     idsArraySerializer = new ProtobufSerializer<>(IdentifierArray.class);
     sectorCoordArraySerializer = new ProtobufSerializer<>(SectorCoordArray.class);
   }
@@ -41,12 +39,12 @@ public class SectorsStore extends BaseStore {
    */
   @Nullable
   public Sector getSector(long x, long y) {
-    // TODO
-    return new Sector.Builder()
-        .x(x)
-        .y(y)
-        .stars(new ArrayList<>())
-        .build();
+    ArrayList<Star> stars = DataStore.i.stars().getStarsForSector(x, y);
+    if (stars.isEmpty()) {
+      return null;
+    }
+
+    return new Sector.Builder().x(x).y(y).stars(stars).build();
   }
 
   /**
@@ -56,10 +54,8 @@ public class SectorsStore extends BaseStore {
    * TODO: make this a transaction. Can you even do that across databases?
    */
   public void createSector(Sector sector) {
-    ArrayList<Long> ids = new ArrayList<>();
     for (Star star : sector.stars) {
-      ids.add(star.id);
-      //starsStore.put(star.id, star);
+      DataStore.i.stars().put(star.id, star);
     }
 
     SectorCoord coord = new SectorCoord.Builder().x(sector.x).y(sector.y).build();
@@ -122,7 +118,12 @@ public class SectorsStore extends BaseStore {
 
   @Override
   protected int onOpen(int diskVersion) throws StoreException {
-    // TODO
-    return 1;
+    if (diskVersion == 0) {
+      newWriter()
+          .stmt("CREATE TABLE sectors (x INTEGER, y INTEGER)")
+          .execute();
+      diskVersion ++;
+    }
+    return diskVersion;
   }
 }

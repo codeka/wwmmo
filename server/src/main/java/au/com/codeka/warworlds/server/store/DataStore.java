@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.store;
 
 import java.io.File;
+import java.sql.DriverManager;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
@@ -10,12 +11,12 @@ public class DataStore {
   private static final Log log = new Log("DataStore");
   public static final DataStore i = new DataStore();
 
-  private AccountsStore accounts;
-  private ProtobufStore<Empire> empires;
-  private SectorsStore sectors;
-  private StarsStore stars;
-  private AdminUsersStore adminUsers;
-  private SequenceStore seq;
+  private final AccountsStore accounts = new AccountsStore("accounts.db");
+  private final AdminUsersStore adminUsers = new AdminUsersStore("admin.db");
+  private final ProtobufStore<Empire> empires = new ProtobufStore<>("empires.db", Empire.class);
+  private final SequenceStore seq = new SequenceStore("seq.db");
+  private final SectorsStore sectors = new SectorsStore("sectors.db");
+  private final StarsStore stars = new StarsStore("stars.db");
 
   private DataStore() {
   }
@@ -36,23 +37,12 @@ public class DataStore {
     }
 
     try {
-      adminUsers = new AdminUsersStore("admin.db");
-      adminUsers.open();
-
-      accounts = new AccountsStore("accounts.db");
       accounts.open();
-
-      empires = new ProtobufStore<>("empires.db", Empire.class);
+      adminUsers.open();
       empires.open();
-
-      stars = new StarsStore("stars.db");
-      stars.open();
-
-      seq = new SequenceStore("seq.db");
       seq.open();
-
-      sectors = new SectorsStore("sectors.db", stars);
       sectors.open();
+      stars.open();
     } catch (StoreException e) {
       log.error("Error creating databases.", e);
       throw new RuntimeException(e);
@@ -62,12 +52,18 @@ public class DataStore {
   public void close() {
     try {
       stars.close();
-//      uniqueEmpireNames.close();
-//      accounts.close();
-//      empires.close();
+      sectors.close();
+      seq.close();
+      empires.close();
+      adminUsers.close();
+      accounts.close();
     } catch (StoreException e) {
       log.error("Error closing databases.", e);
     }
+  }
+
+  public AdminUsersStore adminUsers() {
+    return adminUsers;
   }
 
   public AccountsStore accounts() {
@@ -88,9 +84,5 @@ public class DataStore {
 
   public StarsStore stars() {
     return stars;
-  }
-
-  public AdminUsersStore adminUsers() {
-    return adminUsers;
   }
 }

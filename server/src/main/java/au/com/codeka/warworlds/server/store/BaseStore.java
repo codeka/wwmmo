@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLType;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
@@ -135,10 +137,14 @@ public abstract class BaseStore {
     }
 
     @SuppressWarnings("unchecked")
-    public T param(int index, String value) {
+    public T param(int index, @Nullable String value) {
       checkNotNull(stmt, "stmt() must be called before param()");
       try {
-        stmt.setString(index + 1, value);
+        if (value == null) {
+          stmt.setNull(index + 1, Types.VARCHAR);
+        } else {
+          stmt.setString(index + 1, value);
+        }
       } catch (SQLException e) {
         log.error("Unexpected error setting parameter.", e);
         this.e = e;
@@ -147,10 +153,30 @@ public abstract class BaseStore {
     }
 
     @SuppressWarnings("unchecked")
-    public T param(int index, byte[] value) {
+    public T param(int index, @Nullable Long value) {
       checkNotNull(stmt, "stmt() must be called before param()");
       try {
-        stmt.setBytes(index + 1, value);
+        if (value == null) {
+          stmt.setNull(index + 1, Types.INTEGER);
+        } else {
+          stmt.setLong(index + 1, value);
+        }
+      } catch (SQLException e) {
+        log.error("Unexpected error setting parameter.", e);
+        this.e = e;
+      }
+      return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T param(int index, @Nullable byte[] value) {
+      checkNotNull(stmt, "stmt() must be called before param()");
+      try {
+        if (value == null) {
+          stmt.setNull(index + 1, Types.BLOB);
+        } else {
+          stmt.setBytes(index + 1, value);
+        }
       } catch (SQLException e) {
         log.error("Unexpected error setting parameter.", e);
         this.e = e;
@@ -190,6 +216,14 @@ public abstract class BaseStore {
     public int getInt(int columnIndex) throws StoreException {
       try {
         return rs.getInt(columnIndex + 1);
+      } catch (SQLException e) {
+        throw new StoreException(e);
+      }
+    }
+
+    public long getLong(int columnIndex) throws StoreException {
+      try {
+        return rs.getLong(columnIndex + 1);
       } catch (SQLException e) {
         throw new StoreException(e);
       }
