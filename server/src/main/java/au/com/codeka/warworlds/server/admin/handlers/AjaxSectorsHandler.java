@@ -8,6 +8,7 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.server.admin.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.EmpireManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
@@ -31,7 +32,7 @@ public class AjaxSectorsHandler extends AjaxHandler {
   }
 
   private void handleFindEmptyRequest() {
-    setResponseJson(DataStore.i.sectors().getEmptySector());
+    setResponseJson(DataStore.i.sectors().findSectorByState(SectorsStore.SectorState.Empty));
   }
 
   private void handleCreateEmpireRequest() {
@@ -46,7 +47,7 @@ public class AjaxSectorsHandler extends AjaxHandler {
     if (xs != null && ys != null) {
       coord = new SectorCoord.Builder().x(Long.parseLong(xs)).y(Long.parseLong(ys)).build();
     } else {
-      coord = DataStore.i.sectors().getEmptySector();
+      coord = DataStore.i.sectors().findSectorByState(SectorsStore.SectorState.Empty);
       if (coord == null) {
         resp.log("No empty sector found.");
         setResponseGson(resp);

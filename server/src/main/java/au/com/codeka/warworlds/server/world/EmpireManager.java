@@ -14,6 +14,7 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.ProtobufStore;
+import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.store.SequenceStore;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
 
@@ -109,8 +110,9 @@ public class EmpireManager {
         .build();
     DataStore.i.empires().put(id, empire);
 
-    DataStore.i.sectors().removeEmptySector(
-        new SectorCoord.Builder().x(star.get().sector_x).y(star.get().sector_y).build());
+    DataStore.i.sectors().updateSectorState(
+        new SectorCoord.Builder().x(star.get().sector_x).y(star.get().sector_y).build(),
+        SectorsStore.SectorState.NonEmpty);
 
     return watchEmpire(empire);
   }

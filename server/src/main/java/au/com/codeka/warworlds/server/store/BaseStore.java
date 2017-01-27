@@ -153,6 +153,22 @@ public abstract class BaseStore {
     }
 
     @SuppressWarnings("unchecked")
+    public T param(int index, @Nullable Double value) {
+      checkNotNull(stmt, "stmt() must be called before param()");
+      try {
+        if (value == null) {
+          stmt.setNull(index + 1, Types.DOUBLE);
+        } else {
+          stmt.setDouble(index + 1, value);
+        }
+      } catch (SQLException e) {
+        log.error("Unexpected error setting parameter.", e);
+        this.e = e;
+      }
+      return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
     public T param(int index, @Nullable Long value) {
       checkNotNull(stmt, "stmt() must be called before param()");
       try {
@@ -160,6 +176,22 @@ public abstract class BaseStore {
           stmt.setNull(index + 1, Types.INTEGER);
         } else {
           stmt.setLong(index + 1, value);
+        }
+      } catch (SQLException e) {
+        log.error("Unexpected error setting parameter.", e);
+        this.e = e;
+      }
+      return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T param(int index, @Nullable Integer value) {
+      checkNotNull(stmt, "stmt() must be called before param()");
+      try {
+        if (value == null) {
+          stmt.setNull(index + 1, Types.INTEGER);
+        } else {
+          stmt.setInt(index + 1, value);
         }
       } catch (SQLException e) {
         log.error("Unexpected error setting parameter.", e);

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.store;
 
-import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,14 +22,34 @@ import au.com.codeka.warworlds.common.proto.Star;
  */
 public class SectorsStore extends BaseStore {
   private final Log log = new Log("SectorsStore");
-  private final ProtobufSerializer<IdentifierArray> idsArraySerializer;
-  private final ProtobufSerializer<SectorCoordArray> sectorCoordArraySerializer;
+
+  public enum SectorState {
+    Empty(1),
+    NonEmpty(2),
+    Abandoned(3);
+
+    private int value;
+
+    SectorState(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
+
+    public static SectorState fromValue(int value) {
+      for (SectorState state : values()) {
+        if (state.getValue() == value) {
+          return state;
+        }
+      }
+      return Empty;
+    }
+  }
 
   public SectorsStore(String fileName) {
     super(fileName);
-
-    idsArraySerializer = new ProtobufSerializer<>(IdentifierArray.class);
-    sectorCoordArraySerializer = new ProtobufSerializer<>(SectorCoordArray.class);
   }
 
   /**
@@ -58,28 +77,54 @@ public class SectorsStore extends BaseStore {
       DataStore.i.stars().put(star.id, star);
     }
 
-    SectorCoord coord = new SectorCoord.Builder().x(sector.x).y(sector.y).build();
-    addEmptySector(coord);
-    removeUngeneratedSector(coord);
+    try {
+      newWriter()
+          .stmt("INSERT INTO sectors (x, y, distance_to_centre, state) VALUES (?, ?, ?, ?)")
+          .param(0, sector.x)
+          .param(1, sector.y)
+          .param(2, Math.sqrt(sector.x * sector.x + sector.y * sector.y))
+          .param(3, SectorState.Empty.getValue())
+          .execute();
+    } catch (StoreException e) {
+      log.error("Unexpected.", e);
+    }
   }
 
   /**
-   * Returns a single empty sector, as close to the center of the universe as possible.
+   * Finds a sector in the given state, as close to the center of the universe as possible.
    *
-   * @return The {@link SectorCoord} of an empty sector, or null if there are no empty sectors left.
+   * @return The {@link SectorCoord} of a sector in the given state, or null if no such sector is
+   *         found.
    */
   @Nullable
-  public SectorCoord getEmptySector() {
-    // TODO:
-    return new SectorCoord.Builder().x(0L).y(0L).build();
+  public SectorCoord findSectorByState(SectorState state) {
+    try (QueryResult res = newReader()
+        .stmt("SELECT x, y FROM sectors WHERE state = ? ORDER BY distance_to_centre ASC")
+        .param(0, state.getValue())
+        .query()) {
+      if (res.next()) {
+        return new SectorCoord.Builder().x(res.getLong(0)).y(res.getLong(1)).build();
+      }
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+    }
+    return null;
   }
 
   /**
-   * Remove the given {@link SectorCoord} from the "empty" set: we'll no longer return that sector
-   * from {@link #getEmptySector()}.
+   * Update the given sector's state.
    */
-  public void removeEmptySector(SectorCoord coord) {
-    // TODO
+  public void updateSectorState(SectorCoord coord, SectorState state) {
+    try {
+      newWriter()
+          .stmt("UPDATE sectors SET state = ? WHERE x = ? AND y = ?")
+          .param(0, state.getValue())
+          .param(1, coord.x)
+          .param(2, coord.y)
+          .execute();
+    } catch (StoreException e) {
+      log.error("Unexpected.", e);
+    }
   }
 
   /**
@@ -94,11 +139,6 @@ public class SectorsStore extends BaseStore {
     HashSet<SectorCoord> coords = new HashSet<>();
     // TODO
     return new ArrayList<>(coords);
-  }
-
-  /** Adds the given {@link SectorCoord} to our list of empty sectors. */
-  private void addEmptySector(SectorCoord coord) {
-    //TODO
   }
 
   /**
@@ -120,7 +160,11 @@ public class SectorsStore extends BaseStore {
   protected int onOpen(int diskVersion) throws StoreException {
     if (diskVersion == 0) {
       newWriter()
-          .stmt("CREATE TABLE sectors (x INTEGER, y INTEGER)")
+          .stmt("CREATE TABLE sectors (" +
+                "  x INTEGER," +
+                "  y INTEGER," +
+                "  distance_to_centre FLOAT," +
+                "  state INTEGER)")
           .execute();
       diskVersion ++;
     }

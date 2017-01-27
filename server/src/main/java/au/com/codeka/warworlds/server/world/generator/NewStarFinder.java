@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.SectorManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 
@@ -57,7 +58,7 @@ public class NewStarFinder {
 
     if (!findStar()) {
       // Make sure the coord there isn't counted as being empty any more.
-      DataStore.i.sectors().removeEmptySector(coord);
+      DataStore.i.sectors().updateSectorState(coord, SectorsStore.SectorState.NonEmpty);
 
       // Expand the universe, for good measure.
       new SectorGenerator().expandUniverse();
@@ -115,7 +116,7 @@ public class NewStarFinder {
 
   private boolean findStar() {
     if (coord == null) {
-      coord = DataStore.i.sectors().getEmptySector();
+      coord = DataStore.i.sectors().findSectorByState(SectorsStore.SectorState.Empty);
     }
     if (coord == null) {
       log.debug("No empty sector.");
