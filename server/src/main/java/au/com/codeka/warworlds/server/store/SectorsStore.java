@@ -7,10 +7,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.IdentifierArray;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
-import au.com.codeka.warworlds.common.proto.SectorCoordArray;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
