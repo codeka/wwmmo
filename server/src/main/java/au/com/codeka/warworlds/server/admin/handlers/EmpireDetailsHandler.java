@@ -18,6 +18,9 @@ public class EmpireDetailsHandler extends AdminHandler {
   public void get() throws RequestException {
     long id = Long.parseLong(getUrlParameter("id"));
     Empire empire = DataStore.i.empires().get(id);
+    if (empire == null) {
+      throw new RequestException(404);
+    }
 
     ArrayList<Star> stars = new ArrayList<>();
     for (Long starId : DataStore.i.stars().getStarsForEmpire(empire.id)) {

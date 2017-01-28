@@ -11,15 +11,8 @@ import au.com.codeka.warworlds.server.store.DataStore;
 public class EmpiresHandler extends AdminHandler {
   @Override
   public void get() throws RequestException {
-  //  BaseStore<Long, Empire>.StoreCursor cursor = DataStore.i.empires().search();
-  //  Pair<Long, Empire> pair;
-  //  ArrayList<Empire> empires = new ArrayList<>();
-  //  while ((pair = cursor.next()) != null) {
-  //    empires.add(pair.second());
-  //  }
-
     render("empires/index.html", ImmutableMap.<String, Object>builder()
-        .put("empires", null/*empires*/)
+        .put("empires", DataStore.i.empires().search())
         .build());
   }
 }

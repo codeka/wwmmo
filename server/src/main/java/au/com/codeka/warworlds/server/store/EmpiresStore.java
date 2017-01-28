@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server.store;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
@@ -19,7 +22,7 @@ public class EmpiresStore extends BaseStore {
   public Empire get(long id) {
     try (
         QueryResult res = newReader()
-            .stmt("SELECT value FROM protos WHERE id = ?")
+            .stmt("SELECT empire FROM empires WHERE id = ?")
             .param(0, id)
             .query()
     ) {
@@ -30,6 +33,22 @@ public class EmpiresStore extends BaseStore {
       log.error("Unexpected.", e);
     }
     return null;
+  }
+
+  public List<Empire> search() {
+    ArrayList<Empire> empires = new ArrayList<>();
+    try (
+        QueryResult res = newReader()
+            .stmt("SELECT empire FROM empires")
+            .query()
+        ) {
+      while (res.next()) {
+        empires.add(Empire.ADAPTER.decode(res.getBytes(0)));
+      }
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+    }
+    return empires;
   }
 
   public void put(long id, Empire empire) {

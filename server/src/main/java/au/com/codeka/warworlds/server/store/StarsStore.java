@@ -67,7 +67,7 @@ public class StarsStore extends BaseStore {
           .param(0, id)
           .execute();
 
-      StoreWriter writer = newWriter()
+      StoreWriter writer = newWriter(trans)
           .stmt("INSERT INTO star_empires (empire_id, star_id) VALUES (?, ?)")
           .param(1, id);
       for (Long empireId : empireIds) {
