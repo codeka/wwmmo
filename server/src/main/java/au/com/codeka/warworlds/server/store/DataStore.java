@@ -13,7 +13,7 @@ public class DataStore {
 
   private final AccountsStore accounts = new AccountsStore("accounts.db");
   private final AdminUsersStore adminUsers = new AdminUsersStore("admin.db");
-  private final ProtobufStore<Empire> empires = new ProtobufStore<>("empires.db", Empire.class);
+  private final EmpiresStore empires = new EmpiresStore("empires.db");
   private final SequenceStore seq = new SequenceStore("seq.db");
   private final SectorsStore sectors = new SectorsStore("sectors.db");
   private final StarsStore stars = new StarsStore("stars.db");
@@ -70,7 +70,7 @@ public class DataStore {
     return accounts;
   }
 
-  public ProtobufStore<Empire> empires() {
+  public EmpiresStore empires() {
     return empires;
   }
 

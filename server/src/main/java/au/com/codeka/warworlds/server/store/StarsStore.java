@@ -8,18 +8,16 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
- * A special {@link ProtobufStore} for storing stars, including some extra indices for special
- * queries that we can do.
+ * A store for storing stars, including some extra indices for special queries that we can do.
  */
-public class StarsStore extends ProtobufStore<Star> {
+public class StarsStore extends BaseStore {
   private static final Log log = new Log("StarsStore");
 
   StarsStore(String fileName) {
-    super(fileName, Star.class);
+    super(fileName);
   }
 
   @Nullable
-  @Override
   public Star get(long id) {
     try (QueryResult res =
              newReader().stmt("SELECT star FROM stars WHERE id = ?").param(0, id).query()) {
@@ -32,7 +30,6 @@ public class StarsStore extends ProtobufStore<Star> {
     return null;
   }
 
-  @Override
   public void put(long id, Star star) {
     try {
       newWriter()
@@ -75,10 +72,6 @@ public class StarsStore extends ProtobufStore<Star> {
     return new ArrayList<>();
   }
 
-  /**
-   * We override the {@link ProtobufStore#onOpen(int)} with our own version that adds the extra
-   * columns and indices that we care about.
-   */
   @Override
   protected int onOpen(int diskVersion) throws StoreException {
     if (diskVersion == 0) {

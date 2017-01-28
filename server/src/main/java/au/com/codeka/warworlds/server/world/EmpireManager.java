@@ -13,9 +13,7 @@ import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.server.store.DataStore;
-import au.com.codeka.warworlds.server.store.ProtobufStore;
 import au.com.codeka.warworlds.server.store.SectorsStore;
-import au.com.codeka.warworlds.server.store.SequenceStore;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
 
 /**
