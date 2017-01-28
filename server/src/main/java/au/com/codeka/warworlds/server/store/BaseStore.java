@@ -114,7 +114,8 @@ public abstract class BaseStore {
    * Base class for {@link StoreReader} and {@link StoreWriter} that handling building the query.
    */
   class StatementBuilder<T extends StatementBuilder> {
-    protected PreparedStatement stmt;
+    String sql;
+    PreparedStatement stmt;
 
     /**
      * We store any errors we get building the statement and throw it when it comes time to execute.
@@ -126,7 +127,8 @@ public abstract class BaseStore {
     }
 
     @SuppressWarnings("unchecked")
-    public T stmt(String sql) {
+    T stmt(String sql) {
+      this.sql = checkNotNull(sql);
       try {
         stmt = conn.prepareStatement(sql);
       } catch (SQLException e) {
@@ -137,7 +139,7 @@ public abstract class BaseStore {
     }
 
     @SuppressWarnings("unchecked")
-    public T param(int index, @Nullable String value) {
+    T param(int index, @Nullable String value) {
       checkNotNull(stmt, "stmt() must be called before param()");
       try {
         if (value == null) {
@@ -153,7 +155,7 @@ public abstract class BaseStore {
     }
 
     @SuppressWarnings("unchecked")
-    public T param(int index, @Nullable Double value) {
+    T param(int index, @Nullable Double value) {
       checkNotNull(stmt, "stmt() must be called before param()");
       try {
         if (value == null) {
@@ -169,7 +171,7 @@ public abstract class BaseStore {
     }
 
     @SuppressWarnings("unchecked")
-    public T param(int index, @Nullable Long value) {
+    T param(int index, @Nullable Long value) {
       checkNotNull(stmt, "stmt() must be called before param()");
       try {
         if (value == null) {
@@ -185,7 +187,7 @@ public abstract class BaseStore {
     }
 
     @SuppressWarnings("unchecked")
-    public T param(int index, @Nullable Integer value) {
+    T param(int index, @Nullable Integer value) {
       checkNotNull(stmt, "stmt() must be called before param()");
       try {
         if (value == null) {
@@ -201,7 +203,7 @@ public abstract class BaseStore {
     }
 
     @SuppressWarnings("unchecked")
-    public T param(int index, @Nullable byte[] value) {
+    T param(int index, @Nullable byte[] value) {
       checkNotNull(stmt, "stmt() must be called before param()");
       try {
         if (value == null) {
@@ -216,28 +218,41 @@ public abstract class BaseStore {
       return (T) this;
     }
 
-    public void execute() throws StoreException {
+    void execute() throws StoreException {
       if (e != null) {
         throw new StoreException(e);
       }
 
       checkNotNull(stmt, "stmt() must be called before param()");
+      long startTime = System.nanoTime();
       try {
         stmt.execute();
       } catch (SQLException e) {
         throw new StoreException(e);
+      } finally {
+        long endTime = System.nanoTime();
+        log.debug("%.2fms %s", (endTime - startTime) / 1000000.0, debugSql(sql));
       }
+    }
+
+    private String debugSql(String sql) {
+      sql = sql.replace("\n", " ");
+      sql = sql.replaceAll(" +", " ");
+      if (sql.length() > 70) {
+        sql = sql.substring(0, 68) + "...";
+      }
+      return sql;
     }
   }
 
   class QueryResult implements AutoCloseable {
     private final ResultSet rs;
 
-    public QueryResult(ResultSet rs) {
+    QueryResult(ResultSet rs) {
       this.rs = rs;
     }
 
-    public boolean next() throws StoreException {
+    boolean next() throws StoreException {
       try {
         return rs.next();
       } catch (SQLException e) {
@@ -245,7 +260,7 @@ public abstract class BaseStore {
       }
     }
 
-    public int getInt(int columnIndex) throws StoreException {
+    int getInt(int columnIndex) throws StoreException {
       try {
         return rs.getInt(columnIndex + 1);
       } catch (SQLException e) {
@@ -253,7 +268,7 @@ public abstract class BaseStore {
       }
     }
 
-    public long getLong(int columnIndex) throws StoreException {
+    long getLong(int columnIndex) throws StoreException {
       try {
         return rs.getLong(columnIndex + 1);
       } catch (SQLException e) {
@@ -261,7 +276,7 @@ public abstract class BaseStore {
       }
     }
 
-    public byte[] getBytes(int columnIndex) throws StoreException {
+    byte[] getBytes(int columnIndex) throws StoreException {
       try {
         return rs.getBytes(columnIndex + 1);
       } catch (SQLException e) {
@@ -277,7 +292,7 @@ public abstract class BaseStore {
 
   /** A helper class for reading from the data store. */
   class StoreReader extends StatementBuilder<StoreReader> {
-    public QueryResult query() throws StoreException {
+    QueryResult query() throws StoreException {
       execute();
       try {
         return new QueryResult(stmt.getResultSet());
