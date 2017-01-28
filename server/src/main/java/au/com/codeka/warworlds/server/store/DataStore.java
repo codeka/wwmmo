@@ -1,10 +1,8 @@
 package au.com.codeka.warworlds.server.store;
 
 import java.io.File;
-import java.sql.DriverManager;
 
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.Empire;
 
 /** Wraps our references to the various data store objects. */
 public class DataStore {
