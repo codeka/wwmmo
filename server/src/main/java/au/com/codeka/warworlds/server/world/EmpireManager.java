@@ -30,11 +30,16 @@ public class EmpireManager {
     watchedEmpires = new HashMap<>();
   }
 
+  @Nullable
   public WatchableObject<Empire> getEmpire(long id) {
     synchronized (watchedEmpires) {
       WatchableObject<Empire> watchableEmpire = watchedEmpires.get(id);
       if (watchableEmpire == null) {
-        watchableEmpire = watchEmpire(DataStore.i.empires().get(id));
+        Empire empire = DataStore.i.empires().get(id);
+        if (empire == null) {
+          return null;
+        }
+        watchableEmpire = watchEmpire(empire);
       }
       return watchableEmpire;
     }
