@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
 import javax.sql.PooledConnection;
 
 import au.com.codeka.warworlds.common.Log;
@@ -63,12 +64,24 @@ public abstract class BaseStore {
     // TODO: close? dataSource
   }
 
+  protected Transaction newTransaction() {
+    return new Transaction(dataSource);
+  }
+
   protected StoreReader newReader() {
-    return new StoreReader(dataSource);
+    return new StoreReader(dataSource, null);
+  }
+
+  protected StoreReader newReader(@Nullable Transaction transaction) {
+    return new StoreReader(dataSource, transaction);
   }
 
   protected StoreWriter newWriter() {
-    return new StoreWriter(dataSource);
+    return new StoreWriter(dataSource, null);
+  }
+
+  protected StoreWriter newWriter(@Nullable Transaction transaction) {
+    return new StoreWriter(dataSource, transaction);
   }
 
   /**

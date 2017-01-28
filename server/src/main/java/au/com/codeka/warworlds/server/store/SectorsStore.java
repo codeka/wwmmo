@@ -12,6 +12,7 @@ import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
+import au.com.codeka.warworlds.server.store.base.Transaction;
 
 /**
  * Sectors store is a special store for storing the details of the sectors.
@@ -85,17 +86,7 @@ public class SectorsStore extends BaseStore {
       DataStore.i.stars().put(star.id, star);
     }
 
-    try {
-      newWriter()
-          .stmt("INSERT INTO sectors (x, y, distance_to_centre, state) VALUES (?, ?, ?, ?)")
-          .param(0, sector.x)
-          .param(1, sector.y)
-          .param(2, Math.sqrt(sector.x * sector.x + sector.y * sector.y))
-          .param(3, SectorState.Empty.getValue())
-          .execute();
-    } catch (StoreException e) {
-      log.error("Unexpected.", e);
-    }
+    updateSectorState(new SectorCoord.Builder().x(sector.x).y(sector.y).build(), SectorState.Empty);
   }
 
   /**
@@ -159,62 +150,74 @@ public class SectorsStore extends BaseStore {
    * generated.
    */
   public void expandUniverse() {
-    // Find the current bounds of the universe.
-    long minX = 0, minY = 0, maxX = 0, maxY = 0;
-    try (
-        QueryResult res = newReader()
-            .stmt("SELECT MIN(x), MIN(y), MAX(x), MAX(y) FROM sectors")
-            .query()
-    ) {
-      if (res.next()) {
-        minX = res.getLong(0);
-        minY = res.getLong(1);
-        maxX = res.getLong(2);
-        maxY = res.getLong(3);
-      }
-    } catch (Exception e) {
-      log.error("Unexpected.", e);
-    }
-
-    // Find any sectors that are missing within that bounds.
-    ArrayList<SectorCoord> missing = new ArrayList<>();
-    for (long y = minY; y <= maxY; y++) {
-      Set<Long> xs = new HashSet<>();
+    try (Transaction trans = newTransaction()) {
+      // Find the current bounds of the universe.
+      long minX = 0, minY = 0, maxX = 0, maxY = 0;
       try (
-          QueryResult res = newReader()
-              .stmt("SELECT x FROM sectors WHERE y = ?")
-              .param(0, y)
+          QueryResult res = newReader(trans)
+              .stmt("SELECT MIN(x), MIN(y), MAX(x), MAX(y) FROM sectors")
               .query()
       ) {
-        while (res.next()) {
-          xs.add(res.getLong(0));
+        if (res.next()) {
+          minX = res.getLong(0);
+          minY = res.getLong(1);
+          maxX = res.getLong(2);
+          maxY = res.getLong(3);
         }
       } catch (Exception e) {
         log.error("Unexpected.", e);
       }
 
-      for (long x = minX; x <= maxX; x++) {
-        if (!xs.contains(x)) {
-          missing.add(new SectorCoord.Builder().x(x).y(y).build());
+      // Find any sectors that are missing within that bounds.
+      ArrayList<SectorCoord> missing = new ArrayList<>();
+      for (long y = minY; y <= maxY; y++) {
+        Set<Long> xs = new HashSet<>();
+        try (
+            QueryResult res = newReader(trans)
+                .stmt("SELECT x FROM sectors WHERE y = ?")
+                .param(0, y)
+                .query()
+        ) {
+          while (res.next()) {
+            xs.add(res.getLong(0));
+          }
+        } catch (Exception e) {
+          log.error("Unexpected.", e);
+        }
+
+        for (long x = minX; x <= maxX; x++) {
+          if (!xs.contains(x)) {
+            missing.add(new SectorCoord.Builder().x(x).y(y).build());
+          }
         }
       }
-    }
 
-    // If there's no (or not many) gaps, expand the universe by one and add all of those instead.
-    if (missing.size() < 10) {
-      for (long x = minX - 1; x <= maxX + 1; x++) {
-        missing.add(new SectorCoord.Builder().x(x).y(minY - 1).build());
-        missing.add(new SectorCoord.Builder().x(x).y(maxY + 1).build());
+      // If there's no (or not many) gaps, expand the universe by one and add all of those instead.
+      if (missing.size() < 10) {
+        for (long x = minX - 1; x <= maxX + 1; x++) {
+          missing.add(new SectorCoord.Builder().x(x).y(minY - 1).build());
+          missing.add(new SectorCoord.Builder().x(x).y(maxY + 1).build());
+        }
+        for (long y = minY; y <= maxY; y++) {
+          missing.add(new SectorCoord.Builder().x(minX - 1).y(y).build());
+          missing.add(new SectorCoord.Builder().x(maxX + 1).y(y).build());
+        }
       }
-      for (long y = minY; y <= maxY; y++) {
-        missing.add(new SectorCoord.Builder().x(minX - 1).y(y).build());
-        missing.add(new SectorCoord.Builder().x(maxX + 1).y(y).build());
-      }
-    }
 
-    // Now add all the new sectors
-    for (SectorCoord coord : missing) {
-      updateSectorState(coord, SectorState.New);
+      // Now add all the new sectors.
+      for (SectorCoord coord : missing) {
+        newWriter()
+            .stmt("INSERT INTO sectors (x, y, distance_to_centre, state) VALUES (?, ?, ?, ?)")
+            .param(0, coord.x)
+            .param(1, coord.y)
+            .param(2, Math.sqrt(coord.x * coord.x + coord.y * coord.y))
+            .param(3, SectorState.New.getValue())
+            .execute();
+      }
+
+      trans.commit();
+    } catch(Exception e) {
+      log.error("Unexpected.", e);
     }
   }
 

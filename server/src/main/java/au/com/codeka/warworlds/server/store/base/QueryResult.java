@@ -1,19 +1,20 @@
 package au.com.codeka.warworlds.server.store.base;
 
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.sql.PooledConnection;
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.server.store.StoreException;
 
 public class QueryResult implements AutoCloseable {
-  private final PooledConnection pooledConn;
+  @Nullable private final Connection conn;
   private final ResultSet rs;
 
-  QueryResult(PooledConnection pooledConn, ResultSet rs) {
-    this.pooledConn = pooledConn;
+  QueryResult(@Nullable Connection conn, ResultSet rs) {
+    this.conn = conn;
     this.rs = rs;
   }
 
@@ -52,6 +53,8 @@ public class QueryResult implements AutoCloseable {
   @Override
   public void close() throws Exception {
     rs.close();
-    pooledConn.close();
+    if (conn != null) {
+      conn.close();
+    }
   }
 }

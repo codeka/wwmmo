@@ -2,9 +2,11 @@ package au.com.codeka.warworlds.server.store.base;
 
 import org.sqlite.javax.SQLiteConnectionPoolDataSource;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 import javax.sql.PooledConnection;
@@ -18,12 +20,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Base class for {@link StoreReader} and {@link StoreWriter} that handling building the query.
  */
 @SuppressWarnings("unchecked")
-class StatementBuilder<T extends StatementBuilder> {
+class StatementBuilder<T extends StatementBuilder> implements AutoCloseable {
   private static final Log log = new Log("StatementBuilder");
 
+  @Nullable protected final Transaction transaction;
   protected PreparedStatement stmt;
-  protected PooledConnection pooledConnection;
+  protected Connection conn;
   private String sql;
+  private ArrayList<Object> params;
 
   /**
    * We store any errors we get building the statement and throw it when it comes time to execute.
@@ -31,9 +35,15 @@ class StatementBuilder<T extends StatementBuilder> {
    */
   protected SQLException e;
 
-  StatementBuilder(SQLiteConnectionPoolDataSource dataSource) {
+  StatementBuilder(SQLiteConnectionPoolDataSource dataSource, @Nullable Transaction transaction) {
+    this.transaction = transaction;
+
     try {
-      pooledConnection = dataSource.getPooledConnection();
+      if (transaction == null) {
+        conn = dataSource.getPooledConnection().getConnection();
+      } else {
+        conn = transaction.getConnection();
+      }
     } catch (SQLException e) {
       log.error("Unexpected.", e);
     }
@@ -42,7 +52,8 @@ class StatementBuilder<T extends StatementBuilder> {
   public T stmt(String sql) {
     this.sql = checkNotNull(sql);
     try {
-      stmt = pooledConnection.getConnection().prepareStatement(sql);
+      stmt = conn.prepareStatement(sql);
+      params = new ArrayList<>();
     } catch (SQLException e) {
       log.error("Unexpected error preparing statement.", e);
       this.e = e;
@@ -58,6 +69,7 @@ class StatementBuilder<T extends StatementBuilder> {
       } else {
         stmt.setString(index + 1, value);
       }
+      saveParam(index, value);
     } catch (SQLException e) {
       log.error("Unexpected error setting parameter.", e);
       this.e = e;
@@ -73,6 +85,7 @@ class StatementBuilder<T extends StatementBuilder> {
       } else {
         stmt.setDouble(index + 1, value);
       }
+      saveParam(index, value);
     } catch (SQLException e) {
       log.error("Unexpected error setting parameter.", e);
       this.e = e;
@@ -88,6 +101,7 @@ class StatementBuilder<T extends StatementBuilder> {
       } else {
         stmt.setLong(index + 1, value);
       }
+      saveParam(index, value);
     } catch (SQLException e) {
       log.error("Unexpected error setting parameter.", e);
       this.e = e;
@@ -103,6 +117,7 @@ class StatementBuilder<T extends StatementBuilder> {
       } else {
         stmt.setInt(index + 1, value);
       }
+      saveParam(index, value);
     } catch (SQLException e) {
       log.error("Unexpected error setting parameter.", e);
       this.e = e;
@@ -118,6 +133,7 @@ class StatementBuilder<T extends StatementBuilder> {
       } else {
         stmt.setBytes(index + 1, value);
       }
+      saveParam(index, value);
     } catch (SQLException e) {
       log.error("Unexpected error setting parameter.", e);
       this.e = e;
@@ -138,16 +154,40 @@ class StatementBuilder<T extends StatementBuilder> {
       throw new StoreException(e);
     } finally {
       long endTime = System.nanoTime();
-      log.debug("%.2fms %s", (endTime - startTime) / 1000000.0, debugSql(sql));
+      log.debug("%.2fms %s", (endTime - startTime) / 1000000.0, debugSql(sql, params));
     }
   }
 
-  private String debugSql(String sql) {
+  @Override
+  public void close() throws StoreException {
+    if (transaction != null) {
+      try {
+        conn.close();
+      } catch(SQLException e) {
+        throw new StoreException(e);
+      }
+    }
+  }
+
+  private void saveParam(int index, Object value) {
+    while (params.size() <= index) {
+      params.add(null);
+    }
+    params.set(index, value);
+  }
+
+  private static String debugSql(String sql, ArrayList<Object> params) {
     sql = sql.replace("\n", " ");
     sql = sql.replaceAll(" +", " ");
     if (sql.length() > 70) {
       sql = sql.substring(0, 68) + "...";
     }
+
+    for (int i = 0; i < params.size(); i++) {
+      sql += " ; ";
+      sql += params.get(i);
+    }
+
     return sql;
   }
 }

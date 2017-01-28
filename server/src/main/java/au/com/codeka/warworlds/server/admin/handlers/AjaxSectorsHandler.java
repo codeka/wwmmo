@@ -26,6 +26,9 @@ public class AjaxSectorsHandler extends AjaxHandler {
       case "create-empire":
         handleCreateEmpireRequest();
         break;
+      case "expand":
+        handleExpandRequest();
+        break;
       default:
         throw new RequestException(400, "Unknown action: " + getRequest().getParameter("action"));
     }
@@ -72,6 +75,10 @@ public class AjaxSectorsHandler extends AjaxHandler {
     }
 
     setResponseGson(resp);
+  }
+
+  private void handleExpandRequest() {
+    DataStore.i.sectors().expandUniverse();
   }
 
   /** Class that's sent to the client via Gson-encoder. */

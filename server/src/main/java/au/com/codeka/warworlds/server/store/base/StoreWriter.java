@@ -3,24 +3,21 @@ package au.com.codeka.warworlds.server.store.base;
 
 import org.sqlite.javax.SQLiteConnectionPoolDataSource;
 
-import java.sql.SQLException;
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.server.store.StoreException;
 
 /** A helper class for writing to the data store. */
 public class StoreWriter extends StatementBuilder<StoreWriter> {
-  StoreWriter(SQLiteConnectionPoolDataSource dataSource) {
-    super(dataSource);
+  StoreWriter(SQLiteConnectionPoolDataSource dataSource, @Nullable Transaction transaction) {
+    super(dataSource, transaction);
   }
 
   @Override
   public void execute() throws StoreException {
     super.execute();
-
-    try {
-      pooledConnection.close();
-    } catch (SQLException e) {
-      throw new StoreException(e);
+    if (transaction == null) {
+      close();
     }
   }
 }

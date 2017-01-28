@@ -39,3 +39,15 @@ function createEmpire(name, x, y) {
     }
   });
 }
+
+function expandUniverse() {
+  $.ajax({
+    url: "/admin/ajax/sectors",
+    data: {
+      "action": "expand",
+    },
+    success: function(data) {
+      $("#result").html("Done.");
+    }
+  });
+}
