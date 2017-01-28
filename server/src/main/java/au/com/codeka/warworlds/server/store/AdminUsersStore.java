@@ -7,7 +7,8 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.AdminUser;
-import javafx.scene.AmbientLight;
+import au.com.codeka.warworlds.server.store.base.BaseStore;
+import au.com.codeka.warworlds.server.store.base.QueryResult;
 
 /**
  * A store for storing admin users in the backend.

@@ -14,6 +14,7 @@ import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.SectorManager;
 
 /**
@@ -111,12 +112,20 @@ public class SectorGenerator {
 
   /** Expands the universe by (at least) one sector. */
   public void expandUniverse() {
-    final int NUM_TO_GENERATE = 50;
+    expandUniverse(50);
+  }
 
-    List<SectorCoord> coords = DataStore.i.sectors().getUngeneratedSectors(NUM_TO_GENERATE);
-    for (int i = 0; i < NUM_TO_GENERATE; i++) {
-      SectorCoord coord = coords.remove(coords.size() - 1);
+  private void expandUniverse(int numToGenerate) {
+    List<SectorCoord> coords =
+        DataStore.i.sectors().findSectorsByState(SectorsStore.SectorState.New, numToGenerate);
+    for (SectorCoord coord : coords) {
       generate(coord.x, coord.y);
+      numToGenerate --;
+    }
+
+    if (numToGenerate > 0) {
+      DataStore.i.sectors().expandUniverse();
+      expandUniverse(numToGenerate);
     }
   }
 

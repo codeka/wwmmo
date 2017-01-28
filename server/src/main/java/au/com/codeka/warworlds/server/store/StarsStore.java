@@ -6,6 +6,8 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.server.store.base.BaseStore;
+import au.com.codeka.warworlds.server.store.base.QueryResult;
 
 /**
  * A store for storing stars, including some extra indices for special queries that we can do.

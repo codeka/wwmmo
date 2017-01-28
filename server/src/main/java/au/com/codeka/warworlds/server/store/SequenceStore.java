@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server.store;
 
+import au.com.codeka.warworlds.server.store.base.BaseStore;
+import au.com.codeka.warworlds.server.store.base.QueryResult;
+
 /**
  * A store for storing a sequence of unique IDs. To keep this performant, we only query/update the
  * actual data store in batches. Each time we increment the counter in the data store by

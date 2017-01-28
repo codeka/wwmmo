@@ -2,7 +2,7 @@ package au.com.codeka.warworlds.server.store;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -10,6 +10,8 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.server.store.base.BaseStore;
+import au.com.codeka.warworlds.server.store.base.QueryResult;
 
 /**
  * Sectors store is a special store for storing the details of the sectors.
@@ -22,8 +24,16 @@ public class SectorsStore extends BaseStore {
   private final Log log = new Log("SectorsStore");
 
   public enum SectorState {
+    /** A brand new sector, hasn't even had stars generated for it yet. */
+    New(0),
+
+    /** An empty sector, only stars with native colonies exist. */
     Empty(1),
+
+    /** A normal sector, has stars with colonies. */
     NonEmpty(2),
+
+    /** An abandoned sector, has stars with colonies that have been abandoned by a player. */
     Abandoned(3);
 
     private int value;
@@ -96,17 +106,36 @@ public class SectorsStore extends BaseStore {
    */
   @Nullable
   public SectorCoord findSectorByState(SectorState state) {
+    ArrayList<SectorCoord> sectorCoords = findSectorsByState(state, 1);
+    if (sectorCoords.isEmpty()) {
+      return null;
+    }
+    return sectorCoords.get(0);
+  }
+
+  /**
+   * Find the top {@code count} sectors in the given state, ordered by how far they are from the
+   * center of the universe.
+   *
+   * @param state The {@link SectorState} you want to find sectors in.
+   * @param count The number of sectors to return.
+   * @return An array of {@link SectorCoord} of at most {@code count} sectors, ordered by their
+   *         distance to the center of the universe.
+   */
+  public ArrayList<SectorCoord> findSectorsByState(SectorState state, int count) {
     try (QueryResult res = newReader()
         .stmt("SELECT x, y FROM sectors WHERE state = ? ORDER BY distance_to_centre ASC")
         .param(0, state.getValue())
         .query()) {
-      if (res.next()) {
-        return new SectorCoord.Builder().x(res.getLong(0)).y(res.getLong(1)).build();
+      ArrayList<SectorCoord> coords = new ArrayList<>(count);
+      while (res.next() && coords.size() < count) {
+        coords.add(new SectorCoord.Builder().x(res.getLong(0)).y(res.getLong(1)).build());
       }
+      return coords;
     } catch (Exception e) {
       log.error("Unexpected.", e);
     }
-    return null;
+    return new ArrayList<>();
   }
 
   /**
@@ -126,32 +155,67 @@ public class SectorsStore extends BaseStore {
   }
 
   /**
-   * Gets a list of sectors that we haven't currently generated yet. The sectors will be as close
-   * to the center of the universe as possible, and serve as good candidates for new empires.
-   *
-   * @param minSectors The minimum number of sectors you want. We'll make sure to return at least
-   *                   that number (though maybe more).
-   * @return A list of {@link SectorCoord}s for each ungenerated sector.
-   */
-  public List<SectorCoord> getUngeneratedSectors(int minSectors) {
-    HashSet<SectorCoord> coords = new HashSet<>();
-    // TODO
-    return new ArrayList<>(coords);
-  }
-
-  /**
    * Expands the universe, making it one bigger than before, and creating a bunch of sectors to be
    * generated.
    */
-  private void expandUniverse() {
-    //TODO
-  }
+  public void expandUniverse() {
+    // Find the current bounds of the universe.
+    long minX = 0, minY = 0, maxX = 0, maxY = 0;
+    try (
+        QueryResult res = newReader()
+            .stmt("SELECT MIN(x), MIN(y), MAX(x), MAX(y) FROM sectors")
+            .query()
+    ) {
+      if (res.next()) {
+        minX = res.getLong(0);
+        minY = res.getLong(1);
+        maxX = res.getLong(2);
+        maxY = res.getLong(3);
+      }
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+    }
 
-  /**
-   * Remove the given {@link SectorCoord} from the "ungenerated" sectors list.
-   */
-  private void removeUngeneratedSector(SectorCoord coord) {
-    //TODO
+    // Find any sectors that are missing within that bounds.
+    ArrayList<SectorCoord> missing = new ArrayList<>();
+    for (long y = minY; y <= maxY; y++) {
+      Set<Long> xs = new HashSet<>();
+      try (
+          QueryResult res = newReader()
+              .stmt("SELECT x FROM sectors WHERE y = ?")
+              .param(0, y)
+              .query()
+      ) {
+        while (res.next()) {
+          xs.add(res.getLong(0));
+        }
+      } catch (Exception e) {
+        log.error("Unexpected.", e);
+      }
+
+      for (long x = minX; x <= maxX; x++) {
+        if (!xs.contains(x)) {
+          missing.add(new SectorCoord.Builder().x(x).y(y).build());
+        }
+      }
+    }
+
+    // If there's no (or not many) gaps, expand the universe by one and add all of those instead.
+    if (missing.size() < 10) {
+      for (long x = minX - 1; x <= maxX + 1; x++) {
+        missing.add(new SectorCoord.Builder().x(x).y(minY - 1).build());
+        missing.add(new SectorCoord.Builder().x(x).y(maxY + 1).build());
+      }
+      for (long y = minY; y <= maxY; y++) {
+        missing.add(new SectorCoord.Builder().x(minX - 1).y(y).build());
+        missing.add(new SectorCoord.Builder().x(maxX + 1).y(y).build());
+      }
+    }
+
+    // Now add all the new sectors
+    for (SectorCoord coord : missing) {
+      updateSectorState(coord, SectorState.New);
+    }
   }
 
   @Override
@@ -164,6 +228,7 @@ public class SectorsStore extends BaseStore {
                 "  distance_to_centre FLOAT," +
                 "  state INTEGER)")
           .execute();
+
       diskVersion ++;
     }
     return diskVersion;
