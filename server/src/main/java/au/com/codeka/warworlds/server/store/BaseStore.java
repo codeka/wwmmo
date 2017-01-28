@@ -1,16 +1,17 @@
 package au.com.codeka.warworlds.server.store;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import org.sqlite.SQLiteConfig;
+import org.sqlite.javax.SQLiteConnectionPoolDataSource;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLType;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
+import javax.sql.PooledConnection;
 
 import au.com.codeka.warworlds.common.Log;
 
@@ -27,7 +28,7 @@ public abstract class BaseStore {
   private static final Log log = new Log("BaseStore");
   private final String fileName;
 
-  private Connection conn;
+  private SQLiteConnectionPoolDataSource dataSource;
 
   BaseStore(String fileName) {
     this.fileName = checkNotNull(fileName);
@@ -35,7 +36,25 @@ public abstract class BaseStore {
 
   void open() throws StoreException {
     try {
-      conn = DriverManager.getConnection("jdbc:sqlite:data/store/" + fileName);
+      SQLiteConfig config = new SQLiteConfig();
+
+      // Disable fsync calls, trusting that the filesystem will do the right thing. It's not always
+      // the best assumption, but we are file with losing ~1 day of data (basically, the time
+      // between backups). Additionally, switch to write-ahead-logging for the journal. We could
+      // turn it off completely as well, and rely on backups in the event of data loss, but that's
+      // slightly more painful for development (where "crashes" are more likely).
+      config.setSynchronous(SQLiteConfig.SynchronousMode.OFF);
+      config.setJournalMode(SQLiteConfig.JournalMode.WAL);
+
+      // Increase the cache size, we have plenty of memory on the server.
+      config.setCacheSize(2048);
+
+      // Enforce foreign key constraints (for some reason, the default is off)
+      config.enforceForeignKeys(true);
+
+      dataSource = new SQLiteConnectionPoolDataSource(config);
+      dataSource.getPooledConnection();
+      dataSource.setUrl("jdbc:sqlite:data/store/" + fileName);
     } catch(SQLException e) {
       throw new StoreException(e);
     }
@@ -43,11 +62,7 @@ public abstract class BaseStore {
   }
 
   void close() throws StoreException {
-    try {
-      conn.close();
-    } catch (SQLException e) {
-      throw new StoreException(e);
-    }
+    // TODO: close? dataSource
   }
 
   StoreReader newReader() {
@@ -72,7 +87,13 @@ public abstract class BaseStore {
   /** Check that the version of the database on disk is the same as the version we expect. */
   private void ensureVersion() throws StoreException {
     int currVersion = 0;
-    try (Statement stmt = conn.createStatement()) {
+    PooledConnection conn = null;
+    try {
+      conn = dataSource.getPooledConnection();
+    } catch (SQLException e) {
+      return;
+    }
+    try (Statement stmt = conn.getConnection().createStatement()) {
       String sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='version'";
       try (ResultSet rs = stmt.executeQuery(sql)) {
         if (rs.next()) {
@@ -97,7 +118,7 @@ public abstract class BaseStore {
 
     // Store the new version on disk as well
     if (newVersion != currVersion) {
-      try (Statement stmt = conn.createStatement()) {
+      try (Statement stmt = conn.getConnection().createStatement()) {
         if (currVersion == 0) {
           stmt.executeUpdate("CREATE TABLE version (val INTEGER)");
           stmt.executeUpdate("INSERT INTO version (val) VALUES (0)");
@@ -116,6 +137,7 @@ public abstract class BaseStore {
   class StatementBuilder<T extends StatementBuilder> {
     String sql;
     PreparedStatement stmt;
+    PooledConnection pooledConnection;
 
     /**
      * We store any errors we get building the statement and throw it when it comes time to execute.
@@ -124,13 +146,18 @@ public abstract class BaseStore {
     protected SQLException e;
 
     private StatementBuilder() {
+      try {
+        pooledConnection = dataSource.getPooledConnection();
+      } catch (SQLException e) {
+        log.error("Unexpected.", e);
+      }
     }
 
     @SuppressWarnings("unchecked")
     T stmt(String sql) {
       this.sql = checkNotNull(sql);
       try {
-        stmt = conn.prepareStatement(sql);
+        stmt = pooledConnection.getConnection().prepareStatement(sql);
       } catch (SQLException e) {
         log.error("Unexpected error preparing statement.", e);
         this.e = e;
@@ -246,9 +273,11 @@ public abstract class BaseStore {
   }
 
   class QueryResult implements AutoCloseable {
+    private final PooledConnection pooledConn;
     private final ResultSet rs;
 
-    QueryResult(ResultSet rs) {
+    QueryResult(PooledConnection pooledConn, ResultSet rs) {
+      this.pooledConn = pooledConn;
       this.rs = rs;
     }
 
@@ -287,6 +316,7 @@ public abstract class BaseStore {
     @Override
     public void close() throws Exception {
       rs.close();
+      pooledConn.close();
     }
   }
 
@@ -295,7 +325,7 @@ public abstract class BaseStore {
     QueryResult query() throws StoreException {
       execute();
       try {
-        return new QueryResult(stmt.getResultSet());
+        return new QueryResult(pooledConnection, stmt.getResultSet());
       } catch (SQLException e) {
         throw new StoreException(e);
       }
@@ -304,6 +334,15 @@ public abstract class BaseStore {
 
   /** A helper class for writing to the data store. */
   class StoreWriter extends StatementBuilder<StoreWriter> {
+    @Override
+    public void execute() throws StoreException {
+      super.execute();
 
+      try {
+        pooledConnection.close();
+      } catch (SQLException e) {
+        throw new StoreException(e);
+      }
+    }
   }
 }
