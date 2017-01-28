@@ -18,7 +18,7 @@ public class StarHelper {
   @Nullable
   public static EmpireStorage getStorage(Star star, long empireId) {
     for (EmpireStorage empireStorage : star.empire_stores) {
-      if (empireStorage.empire_id.equals(empireId)) {
+      if (empireStorage.empire_id != null && empireStorage.empire_id.equals(empireId)) {
         return empireStorage;
       }
     }
@@ -31,7 +31,8 @@ public class StarHelper {
    */
   public static int getStorageIndex(Star.Builder star, long empireId) {
     for (int i = 0; i < star.empire_stores.size(); i++) {
-      if (star.empire_stores.get(i).empire_id.equals(empireId)) {
+      if (star.empire_stores.get(i).empire_id != null
+          && star.empire_stores.get(i).empire_id.equals(empireId)) {
         return i;
       }
     }
