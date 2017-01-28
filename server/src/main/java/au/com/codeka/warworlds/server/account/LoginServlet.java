@@ -44,6 +44,11 @@ public class LoginServlet extends ProtobufHttpServlet {
       return;
     }
     WatchableObject<Empire> empire = EmpireManager.i.getEmpire(account.empire_id);
+    if (empire == null) {
+      log.warning("No empire with ID %d", account.empire_id);
+      response.setStatus(404);
+      return;
+    }
 
     // Tell the server socket to expect a connection from this client.
     ServerSocketManager.i.addPendingConnection(account, empire, null /* encryptionKey */);
