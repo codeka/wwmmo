@@ -116,6 +116,8 @@ public class SectorGenerator {
   }
 
   private void expandUniverse(int numToGenerate) {
+    log.debug("Expanding universe by %d", numToGenerate);
+
     List<SectorCoord> coords =
         DataStore.i.sectors().findSectorsByState(SectorsStore.SectorState.New, numToGenerate);
     for (SectorCoord coord : coords) {

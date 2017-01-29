@@ -46,19 +46,12 @@ public class AjaxSectorsHandler extends AjaxHandler {
     CreateEmpireResponse resp = new CreateEmpireResponse();
     resp.empireName = name;
 
-    SectorCoord coord;
+    SectorCoord coord = null;
     if (xs != null && ys != null) {
       coord = new SectorCoord.Builder().x(Long.parseLong(xs)).y(Long.parseLong(ys)).build();
-    } else {
-      coord = DataStore.i.sectors().findSectorByState(SectorsStore.SectorState.Empty);
-      if (coord == null) {
-        resp.log("No empty sector found.");
-        setResponseGson(resp);
-        return;
-      }
+      resp.sectorX = coord.x;
+      resp.sectorY = coord.y;
     }
-    resp.sectorX = coord.x;
-    resp.sectorY = coord.y;
 
     NewStarFinder newStarFinder = new NewStarFinder(new Log(resp::log), coord);
     if (!newStarFinder.findStarForNewEmpire()) {
@@ -66,6 +59,9 @@ public class AjaxSectorsHandler extends AjaxHandler {
       setResponseGson(resp);
       return;
     }
+
+    resp.sectorX = newStarFinder.getStar().sector_x;
+    resp.sectorY = newStarFinder.getStar().sector_y;
 
     WatchableObject<Empire> empire = EmpireManager.i.createEmpire(name, newStarFinder);
     if (empire == null) {

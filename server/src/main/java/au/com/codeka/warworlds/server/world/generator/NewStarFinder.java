@@ -13,6 +13,8 @@ import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.SectorManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Find a star which is suitable for a new empire.
  *
@@ -26,7 +28,7 @@ import au.com.codeka.warworlds.server.world.WatchableObject;
 public class NewStarFinder {
   private final Log log;
 
-  private SectorCoord coord;
+  @Nullable private SectorCoord coord;
   private Star star;
   private int planetIndex;
 
@@ -41,7 +43,7 @@ public class NewStarFinder {
     this(null);
   }
 
-  public NewStarFinder(SectorCoord coord) {
+  public NewStarFinder(@Nullable SectorCoord coord) {
     this.log = new Log("NewStarFinder");
     this.coord = coord;
   }
@@ -56,18 +58,20 @@ public class NewStarFinder {
       return true;
     }
 
-    if (!findStar()) {
-      // Make sure the coord there isn't counted as being empty any more.
-      DataStore.i.sectors().updateSectorState(coord, SectorsStore.SectorState.NonEmpty);
-
+    boolean found = findStar();
+    if (!found) {
       // Expand the universe, for good measure.
       new SectorGenerator().expandUniverse();
 
       // And try again.
-      return findStar();
+      found = findStar();
     }
 
-    return true;
+    if (found) {
+      // Make sure the coord there isn't counted as being empty any more.
+      DataStore.i.sectors().updateSectorState(coord, SectorsStore.SectorState.NonEmpty);
+    }
+    return found;
   }
 
   /**

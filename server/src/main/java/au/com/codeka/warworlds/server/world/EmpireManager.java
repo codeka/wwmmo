@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
@@ -20,6 +21,7 @@ import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
  * Manages empires, keeps them loaded and ensure they get saved to the data store at the right time.
  */
 public class EmpireManager {
+  private static final Log log = new Log("EmpireManager");
   public static final EmpireManager i = new EmpireManager();
 
   private final Map<Long, WatchableObject<Empire>> watchedEmpires;
@@ -52,6 +54,7 @@ public class EmpireManager {
    */
   @Nullable
   public WatchableObject<Empire> createEmpire(String name) {
+    log.info("Creating new empire %s", name);
     NewStarFinder newStarFinder = new NewStarFinder();
     if (!newStarFinder.findStarForNewEmpire()) {
       return null;
