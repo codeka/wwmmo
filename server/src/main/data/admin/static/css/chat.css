@@ -1,0 +1,31 @@
+
+#messages {
+  position: absolute;
+  top: 48pt;
+  left: 0;
+  right: 300px;
+  bottom: 30pt;
+  background-color: #222;
+}
+
+#rooms {
+  position: absolute;
+  top: 48pt;
+  right: 0;
+  width: 300px;
+  bottom: 0;
+  background-color: #333;
+}
+
+#send {
+  position: absolute;
+  left: 0;
+  height: 30pt;
+  bottom: 0;
+  right: 300px;
+}
+
+#send input {
+  width: 99%;
+  margin-top: 2pt
+}
