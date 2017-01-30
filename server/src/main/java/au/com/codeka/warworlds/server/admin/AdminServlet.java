@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.admin.handlers.AdminLoginHandler;
+import au.com.codeka.warworlds.server.admin.handlers.AjaxChatHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxDesignsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxEmpireHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxSectorsHandler;
@@ -50,6 +51,7 @@ public class AdminServlet extends GenericServlet {
       new Route("/users", UsersHandler.class),
       new Route("/users/create", UsersCreateHandler.class),
       new Route("/chat", ChatHandler.class),
+      new Route("/ajax/chat", AjaxChatHandler.class),
       new Route("/ajax/empire", AjaxEmpireHandler.class),
       new Route("/ajax/designs", AjaxDesignsHandler.class),
       new Route("/ajax/sectors", AjaxSectorsHandler.class),
