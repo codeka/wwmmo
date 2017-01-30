@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.world;
+package au.com.codeka.warworlds.server.world.chat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.world.WatchableObject;
 
 /**
  * Manages chat rooms and stuff.

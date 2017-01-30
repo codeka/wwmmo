@@ -3,7 +3,7 @@ package au.com.codeka.warworlds.server.admin.handlers;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 import au.com.codeka.warworlds.server.admin.RequestException;
-import au.com.codeka.warworlds.server.world.ChatManager;
+import au.com.codeka.warworlds.server.world.chat.ChatManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 
 /**
