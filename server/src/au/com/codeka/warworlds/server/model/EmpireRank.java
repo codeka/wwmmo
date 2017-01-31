@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.model;
 
 import java.sql.SQLException;
+import java.math.BigInteger;
 
 import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -16,11 +17,11 @@ public class EmpireRank extends BaseEmpireRank {
 
         try {
             mRank = res.getInt("rank");
-            mTotalStars = res.getInt("total_stars");
-            mTotalColonies = res.getInt("total_colonies");
-            mTotalBuildings = res.getInt("total_buildings");
-            mTotalShips = res.getInt("total_ships");
-            mTotalPopulation = res.getInt("total_population");
+            mTotalStars = BigInteger.valueOf(res.getLong("total_stars"));
+            mTotalColonies = BigInteger.valueOf(res.getLong("total_colonies"));
+            mTotalBuildings = BigInteger.valueOf(res.getLong("total_buildings"));
+            mTotalShips = BigInteger.valueOf(res.getLong("total_ships"));
+            mTotalPopulation = BigInteger.valueOf(res.getLong("total_population"));
         } catch (SQLException e) {
             // these may not exist... doesn't matter
         }
@@ -30,19 +31,19 @@ public class EmpireRank extends BaseEmpireRank {
         return mEmpireID;
     }
 
-    public void setTotalShips(int num) {
+    public void setTotalShips(BigInteger num) {
         mTotalShips = num;
     }
-    public void setTotalBuildings(int num) {
+    public void setTotalBuildings(BigInteger num) {
         mTotalBuildings = num;
     }
-    public void setTotalColonies(int num) {
+    public void setTotalColonies(BigInteger num) {
         mTotalColonies = num;
     }
-    public void setTotalStars(int num) {
+    public void setTotalStars(BigInteger num) {
         mTotalStars = num;
     }
-    public void setTotalPopulation(int num) {
+    public void setTotalPopulation(BigInteger num) {
         mTotalPopulation = num;
     }
 }
