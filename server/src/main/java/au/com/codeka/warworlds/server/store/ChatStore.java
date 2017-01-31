@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server.store;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
@@ -31,6 +34,15 @@ public class ChatStore extends BaseStore {
     } catch (StoreException e) {
       log.error("Unexpected.", e);
     }
+  }
+
+  /**
+   * Gets all of the messages in the given room between the given start time and end time, ordered
+   * most recent message last.
+   */
+  public List<ChatMessage> getMessages(Long roomId, long startTime, long endTime) {
+    // TODO
+    return new ArrayList<>();
   }
 
   @Override
