@@ -36,6 +36,13 @@ public class Room {
     return room;
   }
 
+  public void send(ChatMessage msg) {
+    // TODO: make sure we're inserting in the right place
+    history.add(msg);
+
+    DataStore.i.chat().send(room, msg);
+  }
+
   /**
    * Get the {@link ChatMessage}s send between startTime and endTime. ordered most recent message
    * last.

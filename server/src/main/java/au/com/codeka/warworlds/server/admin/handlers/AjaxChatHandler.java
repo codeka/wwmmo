@@ -12,12 +12,8 @@ import au.com.codeka.warworlds.server.world.chat.ChatManager;
  */
 public class AjaxChatHandler extends AjaxHandler {
   @Override
-  public void post() throws RequestException {
+  public void get() throws RequestException {
     switch (getRequest().getParameter("action")) {
-      case "send":
-        String msg = getRequest().getParameter("msg");
-        handleSendRequest(msg);
-        break;
       case "recv":
         Long roomId = null;
         if (getRequest().getParameter("roomId") != null) {
@@ -26,6 +22,18 @@ public class AjaxChatHandler extends AjaxHandler {
         long lastMsgTime = Long.parseLong(getRequest().getParameter("lastMsgTime"));
 
         handleRecvRequest(roomId, lastMsgTime);
+        break;
+      default:
+        throw new RequestException(400, "Unknown action: " + getRequest().getParameter("action"));
+    }
+  }
+
+  @Override
+  public void post() throws RequestException {
+    switch (getRequest().getParameter("action")) {
+      case "send":
+        String msg = getRequest().getParameter("msg");
+        handleSendRequest(msg);
         break;
       default:
         throw new RequestException(400, "Unknown action: " + getRequest().getParameter("action"));
@@ -44,7 +52,6 @@ public class AjaxChatHandler extends AjaxHandler {
         ChatManager.i.getMessages(roomId, lastMsgId, System.currentTimeMillis());
     if (messages.isEmpty()) {
       // TODO: wait for a message before returning...
-      return;
     }
 
     setResponseJson(new ChatMessagesPacket.Builder()

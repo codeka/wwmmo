@@ -41,7 +41,7 @@ public class ChatManager {
         .id(DataStore.i.seq().nextIdentifier())
         .build();
 
-    DataStore.i.chat().send(room.getChatRoom(), msg);
+    room.send(msg);
   }
 
   /** Get the history of all messages in the given room, between the given start and end time. */
