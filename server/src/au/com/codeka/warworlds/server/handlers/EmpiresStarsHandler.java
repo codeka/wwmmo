@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.handlers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+import java.math.BigInteger;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
@@ -89,7 +90,7 @@ public class EmpiresStarsHandler extends RequestHandler {
     List<Star> stars = new StarController().getStars(starIdMap.keySet());
 
     Messages.EmpireStars.Builder pb = Messages.EmpireStars.newBuilder();
-    pb.setTotalStars(starIds.size());
+    pb.setTotalStars(BigInteger.valueOf(starIds.size()));
     for (Star star : stars) {
       if (!isAdmin()) {
         // no need to filter by buildings, these are -- by definition -- our stars anyway
