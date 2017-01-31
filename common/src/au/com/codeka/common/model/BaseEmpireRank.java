@@ -5,30 +5,30 @@ import java.math.BigInteger;
 
 public class BaseEmpireRank {
     protected String mEmpireKey;
-    protected BigInteger mTotalStars = BigInteger.valueOf(0);
-    protected BigInteger mTotalColonies = BigInteger.valueOf(0);
-    protected BigInteger mTotalBuildings = BigInteger.valueOf(0);
-    protected BigInteger mTotalShips = BigInteger.valueOf(0);
-    protected BigInteger mTotalPopulation = BigInteger.valueOf(0);
+    protected long mTotalStars;
+    protected long mTotalColonies;
+    protected long mTotalBuildings;
+    protected long mTotalShips;
+    protected long mTotalPopulation;
     protected int mRank;
     protected int mLastRank;
 
     public String getEmpireKey() {
         return mEmpireKey;
     }
-    public BigInteger getTotalStars() {
+    public long getTotalStars() {
         return mTotalStars;
     }
-    public BigInteger getTotalColonies() {
+    public long getTotalColonies() {
         return mTotalColonies;
     }
-    public BigInteger getTotalBuildings() {
+    public long getTotalBuildings() {
         return mTotalBuildings;
     }
-    public BigInteger getTotalShips() {
+    public long getTotalShips() {
         return mTotalShips;
     }
-    public BigInteger getTotalPopulation() {
+    public long getTotalPopulation() {
         return mTotalPopulation;
     }
     public int getRank() {

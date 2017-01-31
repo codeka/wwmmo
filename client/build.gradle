@@ -11,11 +11,14 @@ repositories {
 
 dependencies {
   compile fileTree(include: '*.jar', dir: 'libs')
-  compile 'com.google.android.gms:play-services-base:8.4.0'
-  compile 'com.google.android.gms:play-services-ads:8.4.0'
+  compile 'com.google.android.gms:play-services-base:9.4.0'
+  compile 'com.google.android.gms:play-services-ads:9.4.0'
+  compile 'com.google.android.gms:play-services-auth:9.4.0'
   compile 'com.android.support:multidex:1.0.1'
-  compile 'com.android.support:support-v4:23.2.1'
-  compile 'com.android.support:appcompat-v7:23.2.1'
+  compile 'com.android.support:support-v4:24.2.0'
+  compile 'com.android.support:support-vector-drawable:24.2.0'
+  compile 'com.android.support:appcompat-v7:24.2.0'
+  compile 'com.android.support:design:24.2.0'
   compile 'com.squareup.okhttp:okhttp:2.2.0'
   compile project(':common')
   compile project(':control-field')
@@ -23,8 +26,8 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
 
     // TODO: remove the dependency on this.
     useLibrary 'org.apache.http.legacy'
@@ -33,6 +36,7 @@ android {
         multiDexEnabled true
         minSdkVersion 9
         targetSdkVersion 23
+        vectorDrawables.useSupportLibrary = true
     }
 
     packagingOptions {

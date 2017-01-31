@@ -33,7 +33,7 @@ public class UpdateRanksCronJob extends CronJob {
             SqlResult res = stmt.select();
             while (res.next()) {
                 int empireID = res.getInt(1);
-                BigInteger totalShips = BigInteger.valueOf(res.getLong(2));
+                long totalShips = res.getLong(2);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -46,7 +46,7 @@ public class UpdateRanksCronJob extends CronJob {
             SqlResult res = stmt.select();
             while (res.next()) {
                 int empireID = res.getInt(1);
-                BigInteger totalBuildings = BigInteger.valueOf(res.getLong(2));
+                long totalBuildings = res.getLong(2);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -59,8 +59,8 @@ public class UpdateRanksCronJob extends CronJob {
             SqlResult res = stmt.select();
             while (res.next()) {
                 int empireID = res.getInt(1);
-                BigInteger totalColonies = BigInteger.valueOf(res.getLong(2));
-                BigInteger totalPopulation = BigInteger.valueOf(res.getLong(3));
+                long totalColonies = res.getLong(2);
+                long totalPopulation = res.getLong(3);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -81,7 +81,7 @@ public class UpdateRanksCronJob extends CronJob {
             SqlResult res = stmt.select();
             while (res.next()) {
                 int empireID = res.getInt(1);
-                BigInteger totalStars = BigInteger.valueOf(res.getLong(2));
+                long totalStars = res.getLong(2);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -93,21 +93,21 @@ public class UpdateRanksCronJob extends CronJob {
         Collections.sort(sortedRanks, new Comparator<EmpireRank>() {
             @Override
             public int compare(EmpireRank left, EmpireRank right) {
-                int diff = right.getTotalPopulation().subtract( left.getTotalPopulation() ).intValue();
+                long diff = right.getTotalPopulation() - left.getTotalPopulation();
 
                 if (diff != 0)
-                    return diff;
+                    return (int) diff;
 
-                diff = right.getTotalColonies().subtract( left.getTotalColonies() ).intValue();
+                diff = right.getTotalColonies() - left.getTotalColonies();
                 if (diff != 0)
-                    return diff;
+                    return (int) diff;
 
-                diff = right.getTotalStars().subtract( left.getTotalStars() ).intValue();
+                diff = right.getTotalStars() - left.getTotalStars();
                 if (diff != 0)
-                    return diff;
+                    return (int) diff;
 
-                diff = right.getTotalShips().subtract( left.getTotalShips() ).intValue();
-                return diff;
+                diff = right.getTotalShips() - left.getTotalShips();
+                return (int) diff;
             }
         });
 
@@ -128,11 +128,11 @@ public class UpdateRanksCronJob extends CronJob {
                 for (EmpireRank rank : sortedRanks) {
                     stmt.setInt(1, rank.getEmpireID());
                     stmt.setInt(2, rankValue);
-                    stmt.setLong(3, rank.getTotalStars().longValue());
-                    stmt.setLong(4, rank.getTotalColonies().longValue());
-                    stmt.setLong(5, rank.getTotalBuildings().longValue());
-                    stmt.setLong(6, rank.getTotalShips().longValue());
-                    stmt.setLong(7, rank.getTotalPopulation().longValue());
+                    stmt.setLong(3, rank.getTotalStars());
+                    stmt.setLong(4, rank.getTotalColonies());
+                    stmt.setLong(5, rank.getTotalBuildings());
+                    stmt.setLong(6, rank.getTotalShips());
+                    stmt.setLong(7, rank.getTotalPopulation());
                     stmt.update();
 
                     rankValue ++;

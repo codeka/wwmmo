@@ -90,7 +90,7 @@ public class EmpiresStarsHandler extends RequestHandler {
     List<Star> stars = new StarController().getStars(starIdMap.keySet());
 
     Messages.EmpireStars.Builder pb = Messages.EmpireStars.newBuilder();
-    pb.setTotalStars(BigInteger.valueOf(starIds.size()));
+    pb.setTotalStars(starIds.size());
     for (Star star : stars) {
       if (!isAdmin()) {
         // no need to filter by buildings, these are -- by definition -- our stars anyway
