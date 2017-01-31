@@ -2,6 +2,7 @@
 // source: messages.proto
 
 package au.com.codeka.common.protobuf;
+import java.math.BigInteger;
 
 public final class Messages {
   private Messages() {}
@@ -322,7 +323,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -338,7 +339,7 @@ public final class Messages {
         getMessageBytes() {
       java.lang.Object ref = message_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         message_ = b;
@@ -365,7 +366,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -381,7 +382,7 @@ public final class Messages {
         getLastUpdateBytes() {
       java.lang.Object ref = lastUpdate_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         lastUpdate_ = b;
@@ -672,7 +673,7 @@ public final class Messages {
           getMessageBytes() {
         java.lang.Object ref = message_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           message_ = b;
@@ -746,7 +747,7 @@ public final class Messages {
           getLastUpdateBytes() {
         java.lang.Object ref = lastUpdate_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           lastUpdate_ = b;
@@ -1367,7 +1368,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -1383,7 +1384,7 @@ public final class Messages {
         getErrorMessageBytes() {
       java.lang.Object ref = errorMessage_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         errorMessage_ = b;
@@ -1707,7 +1708,7 @@ public final class Messages {
           getErrorMessageBytes() {
         java.lang.Object ref = errorMessage_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           errorMessage_ = b;
@@ -1980,7 +1981,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -1996,7 +1997,7 @@ public final class Messages {
         getSkuBytes() {
       java.lang.Object ref = sku_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         sku_ = b;
@@ -2023,7 +2024,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -2039,7 +2040,7 @@ public final class Messages {
         getTokenBytes() {
       java.lang.Object ref = token_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         token_ = b;
@@ -2066,7 +2067,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -2082,7 +2083,7 @@ public final class Messages {
         getOrderIdBytes() {
       java.lang.Object ref = orderId_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         orderId_ = b;
@@ -2109,7 +2110,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -2125,7 +2126,7 @@ public final class Messages {
         getPriceBytes() {
       java.lang.Object ref = price_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         price_ = b;
@@ -2152,7 +2153,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -2168,7 +2169,7 @@ public final class Messages {
         getDeveloperPayloadBytes() {
       java.lang.Object ref = developerPayload_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         developerPayload_ = b;
@@ -2518,7 +2519,7 @@ public final class Messages {
           getSkuBytes() {
         java.lang.Object ref = sku_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           sku_ = b;
@@ -2592,7 +2593,7 @@ public final class Messages {
           getTokenBytes() {
         java.lang.Object ref = token_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           token_ = b;
@@ -2666,7 +2667,7 @@ public final class Messages {
           getOrderIdBytes() {
         java.lang.Object ref = orderId_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           orderId_ = b;
@@ -2740,7 +2741,7 @@ public final class Messages {
           getPriceBytes() {
         java.lang.Object ref = price_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           price_ = b;
@@ -2814,7 +2815,7 @@ public final class Messages {
           getDeveloperPayloadBytes() {
         java.lang.Object ref = developerPayload_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           developerPayload_ = b;
@@ -3006,7 +3007,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -3022,7 +3023,7 @@ public final class Messages {
         getUserEmailBytes() {
       java.lang.Object ref = userEmail_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         userEmail_ = b;
@@ -3295,7 +3296,7 @@ public final class Messages {
           getUserEmailBytes() {
         java.lang.Object ref = userEmail_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           userEmail_ = b;
@@ -3397,7 +3398,7 @@ public final class Messages {
     /**
      * <code>optional int32 total_stars = 4;</code>
      */
-    int getTotalStars();
+    BigInteger getTotalStars();
 
     // optional int32 total_colonies = 5;
     /**
@@ -3407,7 +3408,7 @@ public final class Messages {
     /**
      * <code>optional int32 total_colonies = 5;</code>
      */
-    int getTotalColonies();
+    BigInteger getTotalColonies();
 
     // optional int32 total_ships = 6;
     /**
@@ -3417,7 +3418,7 @@ public final class Messages {
     /**
      * <code>optional int32 total_ships = 6;</code>
      */
-    int getTotalShips();
+    BigInteger getTotalShips();
 
     // optional int32 total_buildings = 7;
     /**
@@ -3427,7 +3428,7 @@ public final class Messages {
     /**
      * <code>optional int32 total_buildings = 7;</code>
      */
-    int getTotalBuildings();
+    BigInteger getTotalBuildings();
 
     // optional int32 total_population = 8;
     /**
@@ -3437,7 +3438,7 @@ public final class Messages {
     /**
      * <code>optional int32 total_population = 8;</code>
      */
-    int getTotalPopulation();
+    BigInteger getTotalPopulation();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.EmpireRank}
@@ -3512,27 +3513,27 @@ public final class Messages {
             }
             case 32: {
               bitField0_ |= 0x00000008;
-              totalStars_ = input.readInt32();
+              totalStars_ = BigInteger.valueOf(input.readInt64());
               break;
             }
             case 40: {
               bitField0_ |= 0x00000010;
-              totalColonies_ = input.readInt32();
+              totalColonies_ = BigInteger.valueOf(input.readInt64());
               break;
             }
             case 48: {
               bitField0_ |= 0x00000020;
-              totalShips_ = input.readInt32();
+              totalShips_ = BigInteger.valueOf(input.readInt64());
               break;
             }
             case 56: {
               bitField0_ |= 0x00000040;
-              totalBuildings_ = input.readInt32();
+              totalBuildings_ = BigInteger.valueOf(input.readInt64());
               break;
             }
             case 64: {
               bitField0_ |= 0x00000080;
-              totalPopulation_ = input.readInt32();
+              totalPopulation_ = BigInteger.valueOf(input.readInt64());
               break;
             }
           }
@@ -3592,7 +3593,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -3608,7 +3609,7 @@ public final class Messages {
         getEmpireKeyBytes() {
       java.lang.Object ref = empireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireKey_ = b;
@@ -3652,7 +3653,7 @@ public final class Messages {
 
     // optional int32 total_stars = 4;
     public static final int TOTAL_STARS_FIELD_NUMBER = 4;
-    private int totalStars_;
+    private BigInteger totalStars_;
     /**
      * <code>optional int32 total_stars = 4;</code>
      */
@@ -3662,13 +3663,13 @@ public final class Messages {
     /**
      * <code>optional int32 total_stars = 4;</code>
      */
-    public int getTotalStars() {
+    public BigInteger getTotalStars() {
       return totalStars_;
     }
 
     // optional int32 total_colonies = 5;
     public static final int TOTAL_COLONIES_FIELD_NUMBER = 5;
-    private int totalColonies_;
+    private BigInteger totalColonies_;
     /**
      * <code>optional int32 total_colonies = 5;</code>
      */
@@ -3678,13 +3679,13 @@ public final class Messages {
     /**
      * <code>optional int32 total_colonies = 5;</code>
      */
-    public int getTotalColonies() {
+    public BigInteger getTotalColonies() {
       return totalColonies_;
     }
 
     // optional int32 total_ships = 6;
     public static final int TOTAL_SHIPS_FIELD_NUMBER = 6;
-    private int totalShips_;
+    private BigInteger totalShips_;
     /**
      * <code>optional int32 total_ships = 6;</code>
      */
@@ -3694,13 +3695,13 @@ public final class Messages {
     /**
      * <code>optional int32 total_ships = 6;</code>
      */
-    public int getTotalShips() {
+    public BigInteger getTotalShips() {
       return totalShips_;
     }
 
     // optional int32 total_buildings = 7;
     public static final int TOTAL_BUILDINGS_FIELD_NUMBER = 7;
-    private int totalBuildings_;
+    private BigInteger totalBuildings_;
     /**
      * <code>optional int32 total_buildings = 7;</code>
      */
@@ -3710,13 +3711,13 @@ public final class Messages {
     /**
      * <code>optional int32 total_buildings = 7;</code>
      */
-    public int getTotalBuildings() {
+    public BigInteger getTotalBuildings() {
       return totalBuildings_;
     }
 
     // optional int32 total_population = 8;
     public static final int TOTAL_POPULATION_FIELD_NUMBER = 8;
-    private int totalPopulation_;
+    private BigInteger totalPopulation_;
     /**
      * <code>optional int32 total_population = 8;</code>
      */
@@ -3726,7 +3727,7 @@ public final class Messages {
     /**
      * <code>optional int32 total_population = 8;</code>
      */
-    public int getTotalPopulation() {
+    public BigInteger getTotalPopulation() {
       return totalPopulation_;
     }
 
@@ -3734,11 +3735,11 @@ public final class Messages {
       empireKey_ = "";
       rank_ = 0;
       lastRank_ = 0;
-      totalStars_ = 0;
-      totalColonies_ = 0;
-      totalShips_ = 0;
-      totalBuildings_ = 0;
-      totalPopulation_ = 0;
+      totalStars_ = BigInteger.valueOf(0);
+      totalColonies_ = BigInteger.valueOf(0);
+      totalShips_ = BigInteger.valueOf(0);
+      totalBuildings_ = BigInteger.valueOf(0);
+      totalPopulation_ = BigInteger.valueOf(0);
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3762,19 +3763,19 @@ public final class Messages {
         output.writeInt32(3, lastRank_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeInt32(4, totalStars_);
+        output.writeInt64(4, totalStars_.longValue());
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeInt32(5, totalColonies_);
+        output.writeInt64(5, totalColonies_.longValue());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeInt32(6, totalShips_);
+        output.writeInt64(6, totalShips_).longValue();
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeInt32(7, totalBuildings_);
+        output.writeInt64(7, totalBuildings_.longValue());
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeInt32(8, totalPopulation_);
+        output.writeInt64(8, totalPopulation_.longValue());
       }
       getUnknownFields().writeTo(output);
     }
@@ -3799,23 +3800,23 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, totalStars_);
+          .computeInt64Size(4, totalStars_.longValue());
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(5, totalColonies_);
+          .computeInt64Size(5, totalColonies_.longValue());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, totalShips_);
+          .computeInt64Size(6, totalShips_.longValue());
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(7, totalBuildings_);
+          .computeInt64Size(7, totalBuildings_.longValue());
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(8, totalPopulation_);
+          .computeInt64Size(8, totalPopulation_.longValue());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3944,15 +3945,15 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000002);
         lastRank_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        totalStars_ = 0;
+        totalStars_ = BigInteger.valueOf(0);
         bitField0_ = (bitField0_ & ~0x00000008);
-        totalColonies_ = 0;
+        totalColonies_ = BigInteger.valueOf(0);
         bitField0_ = (bitField0_ & ~0x00000010);
-        totalShips_ = 0;
+        totalShips_ = BigInteger.valueOf(0);
         bitField0_ = (bitField0_ & ~0x00000020);
-        totalBuildings_ = 0;
+        totalBuildings_ = BigInteger.valueOf(0);
         bitField0_ = (bitField0_ & ~0x00000040);
-        totalPopulation_ = 0;
+        totalPopulation_ = BigInteger.valueOf(0);
         bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
@@ -4112,7 +4113,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -4224,7 +4225,7 @@ public final class Messages {
       }
 
       // optional int32 total_stars = 4;
-      private int totalStars_ ;
+      private BigInteger totalStars_ ;
       /**
        * <code>optional int32 total_stars = 4;</code>
        */
@@ -4234,13 +4235,13 @@ public final class Messages {
       /**
        * <code>optional int32 total_stars = 4;</code>
        */
-      public int getTotalStars() {
+      public BigInteger getTotalStars() {
         return totalStars_;
       }
       /**
        * <code>optional int32 total_stars = 4;</code>
        */
-      public Builder setTotalStars(int value) {
+      public Builder setTotalStars(BigInteger value) {
         bitField0_ |= 0x00000008;
         totalStars_ = value;
         onChanged();
@@ -4251,13 +4252,13 @@ public final class Messages {
        */
       public Builder clearTotalStars() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        totalStars_ = 0;
+        totalStars_ = BigInteger.valueOf(0);
         onChanged();
         return this;
       }
 
       // optional int32 total_colonies = 5;
-      private int totalColonies_ ;
+      private BigInteger totalColonies_ ;
       /**
        * <code>optional int32 total_colonies = 5;</code>
        */
@@ -4267,13 +4268,13 @@ public final class Messages {
       /**
        * <code>optional int32 total_colonies = 5;</code>
        */
-      public int getTotalColonies() {
+      public BigInteger getTotalColonies() {
         return totalColonies_;
       }
       /**
        * <code>optional int32 total_colonies = 5;</code>
        */
-      public Builder setTotalColonies(int value) {
+      public Builder setTotalColonies(BigInteger value) {
         bitField0_ |= 0x00000010;
         totalColonies_ = value;
         onChanged();
@@ -4284,13 +4285,13 @@ public final class Messages {
        */
       public Builder clearTotalColonies() {
         bitField0_ = (bitField0_ & ~0x00000010);
-        totalColonies_ = 0;
+        totalColonies_ = BigInteger.valueOf(0);
         onChanged();
         return this;
       }
 
       // optional int32 total_ships = 6;
-      private int totalShips_ ;
+      private BigInteger totalShips_ ;
       /**
        * <code>optional int32 total_ships = 6;</code>
        */
@@ -4300,13 +4301,13 @@ public final class Messages {
       /**
        * <code>optional int32 total_ships = 6;</code>
        */
-      public int getTotalShips() {
+      public BigInteger getTotalShips() {
         return totalShips_;
       }
       /**
        * <code>optional int32 total_ships = 6;</code>
        */
-      public Builder setTotalShips(int value) {
+      public Builder setTotalShips(BigInteger value) {
         bitField0_ |= 0x00000020;
         totalShips_ = value;
         onChanged();
@@ -4317,13 +4318,13 @@ public final class Messages {
        */
       public Builder clearTotalShips() {
         bitField0_ = (bitField0_ & ~0x00000020);
-        totalShips_ = 0;
+        totalShips_ = BigInteger.valueOf(0);
         onChanged();
         return this;
       }
 
       // optional int32 total_buildings = 7;
-      private int totalBuildings_ ;
+      private BigInteger totalBuildings_ ;
       /**
        * <code>optional int32 total_buildings = 7;</code>
        */
@@ -4333,13 +4334,13 @@ public final class Messages {
       /**
        * <code>optional int32 total_buildings = 7;</code>
        */
-      public int getTotalBuildings() {
+      public BigInteger getTotalBuildings() {
         return totalBuildings_;
       }
       /**
        * <code>optional int32 total_buildings = 7;</code>
        */
-      public Builder setTotalBuildings(int value) {
+      public Builder setTotalBuildings(BigInteger value) {
         bitField0_ |= 0x00000040;
         totalBuildings_ = value;
         onChanged();
@@ -4350,13 +4351,13 @@ public final class Messages {
        */
       public Builder clearTotalBuildings() {
         bitField0_ = (bitField0_ & ~0x00000040);
-        totalBuildings_ = 0;
+        totalBuildings_ = BigInteger.valueOf(0);
         onChanged();
         return this;
       }
 
       // optional int32 total_population = 8;
-      private int totalPopulation_ ;
+      private BigInteger totalPopulation_ ;
       /**
        * <code>optional int32 total_population = 8;</code>
        */
@@ -4366,13 +4367,13 @@ public final class Messages {
       /**
        * <code>optional int32 total_population = 8;</code>
        */
-      public int getTotalPopulation() {
+      public BigInteger getTotalPopulation() {
         return totalPopulation_;
       }
       /**
        * <code>optional int32 total_population = 8;</code>
        */
-      public Builder setTotalPopulation(int value) {
+      public Builder setTotalPopulation(BigInteger value) {
         bitField0_ |= 0x00000080;
         totalPopulation_ = value;
         onChanged();
@@ -4383,7 +4384,7 @@ public final class Messages {
        */
       public Builder clearTotalPopulation() {
         bitField0_ = (bitField0_ & ~0x00000080);
-        totalPopulation_ = 0;
+        totalPopulation_ = BigInteger.valueOf(0);
         onChanged();
         return this;
       }
@@ -4406,7 +4407,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireRank> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireRank>
         getRanksList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
@@ -4419,7 +4420,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder>
         getRanksOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
@@ -4556,7 +4557,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder>
         getRanksOrBuilderList() {
       return ranks_;
     }
@@ -4835,7 +4836,7 @@ public final class Messages {
               ranksBuilder_ = null;
               ranks_ = other.ranks_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              ranksBuilder_ = 
+              ranksBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getRanksFieldBuilder() : null;
             } else {
@@ -5068,7 +5069,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder>
            getRanksOrBuilderList() {
         if (ranksBuilder_ != null) {
           return ranksBuilder_.getMessageOrBuilderList();
@@ -5094,12 +5095,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireRank.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireRank.Builder>
            getRanksBuilderList() {
         return getRanksFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.EmpireRank, au.com.codeka.common.protobuf.Messages.EmpireRank.Builder, au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.EmpireRank, au.com.codeka.common.protobuf.Messages.EmpireRank.Builder, au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder>
           getRanksFieldBuilder() {
         if (ranksBuilder_ == null) {
           ranksBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -5289,7 +5290,7 @@ public final class Messages {
      * May not be set, but if it is this is all of the fleets owned by this empire
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Fleet> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Fleet>
         getFleetsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 6;</code>
@@ -5314,7 +5315,7 @@ public final class Messages {
      * May not be set, but if it is this is all of the fleets owned by this empire
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
         getFleetsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 6;</code>
@@ -5334,7 +5335,7 @@ public final class Messages {
      * May not be set, but if it si this is all of the colonies owned by the empire
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Colony> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Colony>
         getColoniesList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 7;</code>
@@ -5359,7 +5360,7 @@ public final class Messages {
      * May not be set, but if it si this is all of the colonies owned by the empire
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
         getColoniesOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 7;</code>
@@ -5379,7 +5380,7 @@ public final class Messages {
      * May not be set, but if it is then this will be all the build requests currently in progress
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest>
         getBuildRequestsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest build_requests = 10;</code>
@@ -5404,7 +5405,7 @@ public final class Messages {
      * May not be set, but if it is then this will be all the build requests currently in progress
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
         getBuildRequestsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest build_requests = 10;</code>
@@ -5914,7 +5915,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -5935,7 +5936,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -5970,7 +5971,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -5990,7 +5991,7 @@ public final class Messages {
         getDisplayNameBytes() {
       java.lang.Object ref = displayName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         displayName_ = b;
@@ -6025,7 +6026,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -6045,7 +6046,7 @@ public final class Messages {
         getUserBytes() {
       java.lang.Object ref = user_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         user_ = b;
@@ -6080,7 +6081,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -6100,7 +6101,7 @@ public final class Messages {
         getEmailBytes() {
       java.lang.Object ref = email_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         email_ = b;
@@ -6146,7 +6147,7 @@ public final class Messages {
      * May not be set, but if it is this is all of the fleets owned by this empire
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
         getFleetsOrBuilderList() {
       return fleets_;
     }
@@ -6202,7 +6203,7 @@ public final class Messages {
      * May not be set, but if it si this is all of the colonies owned by the empire
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
         getColoniesOrBuilderList() {
       return colonies_;
     }
@@ -6258,7 +6259,7 @@ public final class Messages {
      * May not be set, but if it is then this will be all the build requests currently in progress
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
         getBuildRequestsOrBuilderList() {
       return buildRequests_;
     }
@@ -6999,7 +7000,7 @@ public final class Messages {
               fleetsBuilder_ = null;
               fleets_ = other.fleets_;
               bitField0_ = (bitField0_ & ~0x00000020);
-              fleetsBuilder_ = 
+              fleetsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getFleetsFieldBuilder() : null;
             } else {
@@ -7025,7 +7026,7 @@ public final class Messages {
               coloniesBuilder_ = null;
               colonies_ = other.colonies_;
               bitField0_ = (bitField0_ & ~0x00000040);
-              coloniesBuilder_ = 
+              coloniesBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getColoniesFieldBuilder() : null;
             } else {
@@ -7051,7 +7052,7 @@ public final class Messages {
               buildRequestsBuilder_ = null;
               buildRequests_ = other.buildRequests_;
               bitField0_ = (bitField0_ & ~0x00000080);
-              buildRequestsBuilder_ = 
+              buildRequestsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getBuildRequestsFieldBuilder() : null;
             } else {
@@ -7151,7 +7152,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -7252,7 +7253,7 @@ public final class Messages {
           getDisplayNameBytes() {
         java.lang.Object ref = displayName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           displayName_ = b;
@@ -7350,7 +7351,7 @@ public final class Messages {
           getUserBytes() {
         java.lang.Object ref = user_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           user_ = b;
@@ -7448,7 +7449,7 @@ public final class Messages {
           getEmailBytes() {
         java.lang.Object ref = email_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           email_ = b;
@@ -7796,7 +7797,7 @@ public final class Messages {
        * May not be set, but if it is this is all of the fleets owned by this empire
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
            getFleetsOrBuilderList() {
         if (fleetsBuilder_ != null) {
           return fleetsBuilder_.getMessageOrBuilderList();
@@ -7834,12 +7835,12 @@ public final class Messages {
        * May not be set, but if it is this is all of the fleets owned by this empire
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Fleet.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Fleet.Builder>
            getFleetsBuilderList() {
         return getFleetsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Fleet, au.com.codeka.common.protobuf.Messages.Fleet.Builder, au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Fleet, au.com.codeka.common.protobuf.Messages.Fleet.Builder, au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
           getFleetsFieldBuilder() {
         if (fleetsBuilder_ == null) {
           fleetsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -8108,7 +8109,7 @@ public final class Messages {
        * May not be set, but if it si this is all of the colonies owned by the empire
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
            getColoniesOrBuilderList() {
         if (coloniesBuilder_ != null) {
           return coloniesBuilder_.getMessageOrBuilderList();
@@ -8146,12 +8147,12 @@ public final class Messages {
        * May not be set, but if it si this is all of the colonies owned by the empire
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Colony.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Colony.Builder>
            getColoniesBuilderList() {
         return getColoniesFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Colony, au.com.codeka.common.protobuf.Messages.Colony.Builder, au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Colony, au.com.codeka.common.protobuf.Messages.Colony.Builder, au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
           getColoniesFieldBuilder() {
         if (coloniesBuilder_ == null) {
           coloniesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -8420,7 +8421,7 @@ public final class Messages {
        * May not be set, but if it is then this will be all the build requests currently in progress
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
            getBuildRequestsOrBuilderList() {
         if (buildRequestsBuilder_ != null) {
           return buildRequestsBuilder_.getMessageOrBuilderList();
@@ -8458,12 +8459,12 @@ public final class Messages {
        * May not be set, but if it is then this will be all the build requests currently in progress
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest.Builder>
            getBuildRequestsBuilderList() {
         return getBuildRequestsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.BuildRequest, au.com.codeka.common.protobuf.Messages.BuildRequest.Builder, au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.BuildRequest, au.com.codeka.common.protobuf.Messages.BuildRequest.Builder, au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
           getBuildRequestsFieldBuilder() {
         if (buildRequestsBuilder_ == null) {
           buildRequestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -8670,7 +8671,7 @@ public final class Messages {
        * </pre>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.EmpireRank, au.com.codeka.common.protobuf.Messages.EmpireRank.Builder, au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.EmpireRank, au.com.codeka.common.protobuf.Messages.EmpireRank.Builder, au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder>
           getRankFieldBuilder() {
         if (rankBuilder_ == null) {
           rankBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -8841,7 +8842,7 @@ public final class Messages {
        * </pre>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Star, au.com.codeka.common.protobuf.Messages.Star.Builder, au.com.codeka.common.protobuf.Messages.StarOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Star, au.com.codeka.common.protobuf.Messages.Star.Builder, au.com.codeka.common.protobuf.Messages.StarOrBuilder>
           getHomeStarFieldBuilder() {
         if (homeStarBuilder_ == null) {
           homeStarBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -8994,7 +8995,7 @@ public final class Messages {
        * </pre>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Alliance, au.com.codeka.common.protobuf.Messages.Alliance.Builder, au.com.codeka.common.protobuf.Messages.AllianceOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Alliance, au.com.codeka.common.protobuf.Messages.Alliance.Builder, au.com.codeka.common.protobuf.Messages.AllianceOrBuilder>
           getAllianceFieldBuilder() {
         if (allianceBuilder_ == null) {
           allianceBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -9176,7 +9177,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Empire empires = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Empire> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Empire>
         getEmpiresList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Empire empires = 1;</code>
@@ -9189,7 +9190,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Empire empires = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireOrBuilder>
         getEmpiresOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Empire empires = 1;</code>
@@ -9310,7 +9311,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Empire empires = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireOrBuilder>
         getEmpiresOrBuilderList() {
       return empires_;
     }
@@ -9557,7 +9558,7 @@ public final class Messages {
               empiresBuilder_ = null;
               empires_ = other.empires_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              empiresBuilder_ = 
+              empiresBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getEmpiresFieldBuilder() : null;
             } else {
@@ -9787,7 +9788,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Empire empires = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireOrBuilder>
            getEmpiresOrBuilderList() {
         if (empiresBuilder_ != null) {
           return empiresBuilder_.getMessageOrBuilderList();
@@ -9813,12 +9814,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Empire empires = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Empire.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Empire.Builder>
            getEmpiresBuilderList() {
         return getEmpiresFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Empire, au.com.codeka.common.protobuf.Messages.Empire.Builder, au.com.codeka.common.protobuf.Messages.EmpireOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Empire, au.com.codeka.common.protobuf.Messages.Empire.Builder, au.com.codeka.common.protobuf.Messages.EmpireOrBuilder>
           getEmpiresFieldBuilder() {
         if (empiresBuilder_ == null) {
           empiresBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -10080,7 +10081,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -10096,7 +10097,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -10123,7 +10124,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -10139,7 +10140,7 @@ public final class Messages {
         getEmpireKeyBytes() {
       java.lang.Object ref = empireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireKey_ = b;
@@ -10214,7 +10215,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -10230,7 +10231,7 @@ public final class Messages {
         getReasonBytes() {
       java.lang.Object ref = reason_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         reason_ = b;
@@ -10626,7 +10627,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -10700,7 +10701,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -10873,7 +10874,7 @@ public final class Messages {
           getReasonBytes() {
         java.lang.Object ref = reason_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           reason_ = b;
@@ -10969,7 +10970,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireCashAuditEntry entries = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry>
         getEntriesList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireCashAuditEntry entries = 1;</code>
@@ -10982,7 +10983,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireCashAuditEntry entries = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntryOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntryOrBuilder>
         getEntriesOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireCashAuditEntry entries = 1;</code>
@@ -11103,7 +11104,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireCashAuditEntry entries = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntryOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntryOrBuilder>
         getEntriesOrBuilderList() {
       return entries_;
     }
@@ -11350,7 +11351,7 @@ public final class Messages {
               entriesBuilder_ = null;
               entries_ = other.entries_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              entriesBuilder_ = 
+              entriesBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getEntriesFieldBuilder() : null;
             } else {
@@ -11580,7 +11581,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireCashAuditEntry entries = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntryOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntryOrBuilder>
            getEntriesOrBuilderList() {
         if (entriesBuilder_ != null) {
           return entriesBuilder_.getMessageOrBuilderList();
@@ -11606,12 +11607,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireCashAuditEntry entries = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry.Builder>
            getEntriesBuilderList() {
         return getEntriesFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry, au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry.Builder, au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntryOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry, au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry.Builder, au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntryOrBuilder>
           getEntriesFieldBuilder() {
         if (entriesBuilder_ == null) {
           entriesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -11840,7 +11841,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -11856,7 +11857,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -11883,7 +11884,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -11899,7 +11900,7 @@ public final class Messages {
         getNewNameBytes() {
       java.lang.Object ref = newName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         newName_ = b;
@@ -11926,7 +11927,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -11942,7 +11943,7 @@ public final class Messages {
         getOldNameBytes() {
       java.lang.Object ref = oldName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         oldName_ = b;
@@ -12302,7 +12303,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -12376,7 +12377,7 @@ public final class Messages {
           getNewNameBytes() {
         java.lang.Object ref = newName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           newName_ = b;
@@ -12450,7 +12451,7 @@ public final class Messages {
           getOldNameBytes() {
         java.lang.Object ref = oldName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           oldName_ = b;
@@ -12599,7 +12600,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.PurchaseInfo purchase_info = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.PurchaseInfo, au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder, au.com.codeka.common.protobuf.Messages.PurchaseInfoOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.PurchaseInfo, au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder, au.com.codeka.common.protobuf.Messages.PurchaseInfoOrBuilder>
           getPurchaseInfoFieldBuilder() {
         if (purchaseInfoBuilder_ == null) {
           purchaseInfoBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -12802,7 +12803,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -12818,7 +12819,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -13173,7 +13174,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -13358,7 +13359,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.PurchaseInfo purchase_info = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.PurchaseInfo, au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder, au.com.codeka.common.protobuf.Messages.PurchaseInfoOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.PurchaseInfo, au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder, au.com.codeka.common.protobuf.Messages.PurchaseInfoOrBuilder>
           getPurchaseInfoFieldBuilder() {
         if (purchaseInfoBuilder_ == null) {
           purchaseInfoBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -13875,7 +13876,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.PurchaseInfo purchase_info = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.PurchaseInfo, au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder, au.com.codeka.common.protobuf.Messages.PurchaseInfoOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.PurchaseInfo, au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder, au.com.codeka.common.protobuf.Messages.PurchaseInfoOrBuilder>
           getPurchaseInfoFieldBuilder() {
         if (purchaseInfoBuilder_ == null) {
           purchaseInfoBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -13906,7 +13907,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireBuildingStatistics.DesignCount counts = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount>
         getCountsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireBuildingStatistics.DesignCount counts = 1;</code>
@@ -13919,7 +13920,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireBuildingStatistics.DesignCount counts = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCountOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCountOrBuilder>
         getCountsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireBuildingStatistics.DesignCount counts = 1;</code>
@@ -14181,7 +14182,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -14197,7 +14198,7 @@ public final class Messages {
           getDesignIdBytes() {
         java.lang.Object ref = designId_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           designId_ = b;
@@ -14498,7 +14499,7 @@ public final class Messages {
             getDesignIdBytes() {
           java.lang.Object ref = designId_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             designId_ = b;
@@ -14599,7 +14600,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireBuildingStatistics.DesignCount counts = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCountOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCountOrBuilder>
         getCountsOrBuilderList() {
       return counts_;
     }
@@ -14853,7 +14854,7 @@ public final class Messages {
               countsBuilder_ = null;
               counts_ = other.counts_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              countsBuilder_ = 
+              countsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getCountsFieldBuilder() : null;
             } else {
@@ -15083,7 +15084,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireBuildingStatistics.DesignCount counts = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCountOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCountOrBuilder>
            getCountsOrBuilderList() {
         if (countsBuilder_ != null) {
           return countsBuilder_.getMessageOrBuilderList();
@@ -15109,12 +15110,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireBuildingStatistics.DesignCount counts = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount.Builder>
            getCountsBuilderList() {
         return getCountsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount, au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount.Builder, au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCountOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount, au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount.Builder, au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCountOrBuilder>
           getCountsFieldBuilder() {
         if (countsBuilder_ == null) {
           countsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -15632,7 +15633,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.PurchaseInfo purchase_info = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.PurchaseInfo, au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder, au.com.codeka.common.protobuf.Messages.PurchaseInfoOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.PurchaseInfo, au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder, au.com.codeka.common.protobuf.Messages.PurchaseInfoOrBuilder>
           getPurchaseInfoFieldBuilder() {
         if (purchaseInfoBuilder_ == null) {
           purchaseInfoBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -15673,7 +15674,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.EmpireAltEmpire alt_empire = 2;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire>
         getAltEmpireList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.EmpireAltEmpire alt_empire = 2;</code>
@@ -15686,7 +15687,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.EmpireAltEmpire alt_empire = 2;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpireOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpireOrBuilder>
         getAltEmpireOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.EmpireAltEmpire alt_empire = 2;</code>
@@ -15698,7 +15699,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.DeviceInfo device = 3;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo>
         getDeviceList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.DeviceInfo device = 3;</code>
@@ -15711,7 +15712,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.DeviceInfo device = 3;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfoOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfoOrBuilder>
         getDeviceOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.DeviceInfo device = 3;</code>
@@ -16038,7 +16039,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -16054,7 +16055,7 @@ public final class Messages {
           getEmpireNameBytes() {
         java.lang.Object ref = empireName_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireName_ = b;
@@ -16081,7 +16082,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -16097,7 +16098,7 @@ public final class Messages {
           getUserEmailBytes() {
         java.lang.Object ref = userEmail_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           userEmail_ = b;
@@ -16467,7 +16468,7 @@ public final class Messages {
             getEmpireNameBytes() {
           java.lang.Object ref = empireName_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             empireName_ = b;
@@ -16541,7 +16542,7 @@ public final class Messages {
             getUserEmailBytes() {
           java.lang.Object ref = userEmail_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             userEmail_ = b;
@@ -16841,7 +16842,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -16857,7 +16858,7 @@ public final class Messages {
           getDeviceIdBytes() {
         java.lang.Object ref = deviceId_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceId_ = b;
@@ -16884,7 +16885,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -16900,7 +16901,7 @@ public final class Messages {
           getDeviceManufacturerBytes() {
         java.lang.Object ref = deviceManufacturer_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceManufacturer_ = b;
@@ -16927,7 +16928,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -16943,7 +16944,7 @@ public final class Messages {
           getDeviceModelBytes() {
         java.lang.Object ref = deviceModel_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceModel_ = b;
@@ -16970,7 +16971,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -16986,7 +16987,7 @@ public final class Messages {
           getDeviceBuildBytes() {
         java.lang.Object ref = deviceBuild_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceBuild_ = b;
@@ -17013,7 +17014,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -17029,7 +17030,7 @@ public final class Messages {
           getDeviceVersionBytes() {
         java.lang.Object ref = deviceVersion_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceVersion_ = b;
@@ -17373,7 +17374,7 @@ public final class Messages {
             getDeviceIdBytes() {
           java.lang.Object ref = deviceId_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             deviceId_ = b;
@@ -17447,7 +17448,7 @@ public final class Messages {
             getDeviceManufacturerBytes() {
           java.lang.Object ref = deviceManufacturer_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             deviceManufacturer_ = b;
@@ -17521,7 +17522,7 @@ public final class Messages {
             getDeviceModelBytes() {
           java.lang.Object ref = deviceModel_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             deviceModel_ = b;
@@ -17595,7 +17596,7 @@ public final class Messages {
             getDeviceBuildBytes() {
           java.lang.Object ref = deviceBuild_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             deviceBuild_ = b;
@@ -17669,7 +17670,7 @@ public final class Messages {
             getDeviceVersionBytes() {
           java.lang.Object ref = deviceVersion_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             deviceVersion_ = b;
@@ -17754,7 +17755,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.EmpireAltEmpire alt_empire = 2;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpireOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpireOrBuilder>
         getAltEmpireOrBuilderList() {
       return altEmpire_;
     }
@@ -17790,7 +17791,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.DeviceInfo device = 3;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfoOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfoOrBuilder>
         getDeviceOrBuilderList() {
       return device_;
     }
@@ -18085,7 +18086,7 @@ public final class Messages {
               altEmpireBuilder_ = null;
               altEmpire_ = other.altEmpire_;
               bitField0_ = (bitField0_ & ~0x00000002);
-              altEmpireBuilder_ = 
+              altEmpireBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getAltEmpireFieldBuilder() : null;
             } else {
@@ -18111,7 +18112,7 @@ public final class Messages {
               deviceBuilder_ = null;
               device_ = other.device_;
               bitField0_ = (bitField0_ & ~0x00000004);
-              deviceBuilder_ = 
+              deviceBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getDeviceFieldBuilder() : null;
             } else {
@@ -18374,7 +18375,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.EmpireAltEmpire alt_empire = 2;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpireOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpireOrBuilder>
            getAltEmpireOrBuilderList() {
         if (altEmpireBuilder_ != null) {
           return altEmpireBuilder_.getMessageOrBuilderList();
@@ -18400,12 +18401,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.EmpireAltEmpire alt_empire = 2;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire.Builder>
            getAltEmpireBuilderList() {
         return getAltEmpireFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire, au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire.Builder, au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpireOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire, au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire.Builder, au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpireOrBuilder>
           getAltEmpireFieldBuilder() {
         if (altEmpireBuilder_ == null) {
           altEmpireBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -18614,7 +18615,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.DeviceInfo device = 3;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfoOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfoOrBuilder>
            getDeviceOrBuilderList() {
         if (deviceBuilder_ != null) {
           return deviceBuilder_.getMessageOrBuilderList();
@@ -18640,12 +18641,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireAltAccounts.DeviceInfo device = 3;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo.Builder>
            getDeviceBuilderList() {
         return getDeviceFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo, au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo.Builder, au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfoOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo, au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo.Builder, au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfoOrBuilder>
           getDeviceFieldBuilder() {
         if (deviceBuilder_ == null) {
           deviceBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -19213,7 +19214,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.Star star = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Star, au.com.codeka.common.protobuf.Messages.Star.Builder, au.com.codeka.common.protobuf.Messages.StarOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Star, au.com.codeka.common.protobuf.Messages.Star.Builder, au.com.codeka.common.protobuf.Messages.StarOrBuilder>
           getStarFieldBuilder() {
         if (starBuilder_ == null) {
           starBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -19277,7 +19278,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireStar stars = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireStar> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireStar>
         getStarsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireStar stars = 1;</code>
@@ -19290,7 +19291,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireStar stars = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireStarOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireStarOrBuilder>
         getStarsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireStar stars = 1;</code>
@@ -19306,7 +19307,7 @@ public final class Messages {
     /**
      * <code>optional int32 total_stars = 2;</code>
      */
-    int getTotalStars();
+    BigInteger getTotalStars();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.EmpireStars}
@@ -19369,7 +19370,7 @@ public final class Messages {
             }
             case 16: {
               bitField0_ |= 0x00000001;
-              totalStars_ = input.readInt32();
+              totalStars_ = BigInteger.valueOf( input.readInt64() );
               break;
             }
           }
@@ -19427,7 +19428,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpireStar stars = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireStarOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireStarOrBuilder>
         getStarsOrBuilderList() {
       return stars_;
     }
@@ -19453,7 +19454,7 @@ public final class Messages {
 
     // optional int32 total_stars = 2;
     public static final int TOTAL_STARS_FIELD_NUMBER = 2;
-    private int totalStars_;
+    private BigInteger totalStars_;
     /**
      * <code>optional int32 total_stars = 2;</code>
      */
@@ -19463,13 +19464,13 @@ public final class Messages {
     /**
      * <code>optional int32 total_stars = 2;</code>
      */
-    public int getTotalStars() {
+    public BigInteger getTotalStars() {
       return totalStars_;
     }
 
     private void initFields() {
       stars_ = java.util.Collections.emptyList();
-      totalStars_ = 0;
+      totalStars_ = BigInteger.valueOf(0);
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -19487,7 +19488,7 @@ public final class Messages {
         output.writeMessage(1, stars_.get(i));
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(2, totalStars_);
+        output.writeInt64(2, totalStars_.longValue());
       }
       getUnknownFields().writeTo(output);
     }
@@ -19504,7 +19505,7 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, totalStars_);
+          .computeInt64Size(2, totalStars_.longValue());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -19629,7 +19630,7 @@ public final class Messages {
         } else {
           starsBuilder_.clear();
         }
-        totalStars_ = 0;
+        totalStars_ = BigInteger.valueOf(0);
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
@@ -19706,7 +19707,7 @@ public final class Messages {
               starsBuilder_ = null;
               stars_ = other.stars_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              starsBuilder_ = 
+              starsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getStarsFieldBuilder() : null;
             } else {
@@ -19939,7 +19940,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireStar stars = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireStarOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireStarOrBuilder>
            getStarsOrBuilderList() {
         if (starsBuilder_ != null) {
           return starsBuilder_.getMessageOrBuilderList();
@@ -19965,12 +19966,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.EmpireStar stars = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireStar.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireStar.Builder>
            getStarsBuilderList() {
         return getStarsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.EmpireStar, au.com.codeka.common.protobuf.Messages.EmpireStar.Builder, au.com.codeka.common.protobuf.Messages.EmpireStarOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.EmpireStar, au.com.codeka.common.protobuf.Messages.EmpireStar.Builder, au.com.codeka.common.protobuf.Messages.EmpireStarOrBuilder>
           getStarsFieldBuilder() {
         if (starsBuilder_ == null) {
           starsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -19985,7 +19986,7 @@ public final class Messages {
       }
 
       // optional int32 total_stars = 2;
-      private int totalStars_ ;
+      private BigInteger totalStars_ ;
       /**
        * <code>optional int32 total_stars = 2;</code>
        */
@@ -20001,7 +20002,7 @@ public final class Messages {
       /**
        * <code>optional int32 total_stars = 2;</code>
        */
-      public Builder setTotalStars(int value) {
+      public Builder setTotalStars(BigInteger value) {
         bitField0_ |= 0x00000002;
         totalStars_ = value;
         onChanged();
@@ -20012,7 +20013,7 @@ public final class Messages {
        */
       public Builder clearTotalStars() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        totalStars_ = 0;
+        totalStars_ = BigInteger.valueOf(0);
         onChanged();
         return this;
       }
@@ -20361,7 +20362,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -20381,7 +20382,7 @@ public final class Messages {
         getDeviceModelBytes() {
       java.lang.Object ref = deviceModel_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         deviceModel_ = b;
@@ -20416,7 +20417,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -20436,7 +20437,7 @@ public final class Messages {
         getDeviceManufacturerBytes() {
       java.lang.Object ref = deviceManufacturer_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         deviceManufacturer_ = b;
@@ -20471,7 +20472,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -20491,7 +20492,7 @@ public final class Messages {
         getDeviceBuildBytes() {
       java.lang.Object ref = deviceBuild_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         deviceBuild_ = b;
@@ -20528,7 +20529,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -20549,7 +20550,7 @@ public final class Messages {
         getDeviceVersionBytes() {
       java.lang.Object ref = deviceVersion_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         deviceVersion_ = b;
@@ -21023,7 +21024,7 @@ public final class Messages {
           getDeviceModelBytes() {
         java.lang.Object ref = deviceModel_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceModel_ = b;
@@ -21121,7 +21122,7 @@ public final class Messages {
           getDeviceManufacturerBytes() {
         java.lang.Object ref = deviceManufacturer_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceManufacturer_ = b;
@@ -21219,7 +21220,7 @@ public final class Messages {
           getDeviceBuildBytes() {
         java.lang.Object ref = deviceBuild_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceBuild_ = b;
@@ -21320,7 +21321,7 @@ public final class Messages {
           getDeviceVersionBytes() {
         java.lang.Object ref = deviceVersion_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceVersion_ = b;
@@ -21621,7 +21622,7 @@ public final class Messages {
      * starfield view centred on one of your own colonies...
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Colony> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Colony>
         getColoniesList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 3;</code>
@@ -21649,7 +21650,7 @@ public final class Messages {
      * starfield view centred on one of your own colonies...
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
         getColoniesOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 3;</code>
@@ -21759,7 +21760,7 @@ public final class Messages {
      * client is able to track them itself.
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest>
         getBuildRequestsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest build_requests = 9;</code>
@@ -21787,7 +21788,7 @@ public final class Messages {
      * client is able to track them itself.
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
         getBuildRequestsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest build_requests = 9;</code>
@@ -22140,7 +22141,7 @@ public final class Messages {
      * starfield view centred on one of your own colonies...
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
         getColoniesOrBuilderList() {
       return colonies_;
     }
@@ -22252,7 +22253,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -22268,7 +22269,7 @@ public final class Messages {
         getEmpireResetReasonBytes() {
       java.lang.Object ref = empireResetReason_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireResetReason_ = b;
@@ -22337,7 +22338,7 @@ public final class Messages {
      * client is able to track them itself.
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
         getBuildRequestsOrBuilderList() {
       return buildRequests_;
     }
@@ -22842,7 +22843,7 @@ public final class Messages {
               coloniesBuilder_ = null;
               colonies_ = other.colonies_;
               bitField0_ = (bitField0_ & ~0x00000004);
-              coloniesBuilder_ = 
+              coloniesBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getColoniesFieldBuilder() : null;
             } else {
@@ -22882,7 +22883,7 @@ public final class Messages {
               buildRequestsBuilder_ = null;
               buildRequests_ = other.buildRequests_;
               bitField0_ = (bitField0_ & ~0x00000080);
-              buildRequestsBuilder_ = 
+              buildRequestsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getBuildRequestsFieldBuilder() : null;
             } else {
@@ -23070,7 +23071,7 @@ public final class Messages {
        * </pre>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.MessageOfTheDay, au.com.codeka.common.protobuf.Messages.MessageOfTheDay.Builder, au.com.codeka.common.protobuf.Messages.MessageOfTheDayOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.MessageOfTheDay, au.com.codeka.common.protobuf.Messages.MessageOfTheDay.Builder, au.com.codeka.common.protobuf.Messages.MessageOfTheDayOrBuilder>
           getMotdFieldBuilder() {
         if (motdBuilder_ == null) {
           motdBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -23232,7 +23233,7 @@ public final class Messages {
        * </pre>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Empire, au.com.codeka.common.protobuf.Messages.Empire.Builder, au.com.codeka.common.protobuf.Messages.EmpireOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Empire, au.com.codeka.common.protobuf.Messages.Empire.Builder, au.com.codeka.common.protobuf.Messages.EmpireOrBuilder>
           getEmpireFieldBuilder() {
         if (empireBuilder_ == null) {
           empireBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -23515,7 +23516,7 @@ public final class Messages {
        * starfield view centred on one of your own colonies...
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
            getColoniesOrBuilderList() {
         if (coloniesBuilder_ != null) {
           return coloniesBuilder_.getMessageOrBuilderList();
@@ -23556,12 +23557,12 @@ public final class Messages {
        * starfield view centred on one of your own colonies...
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Colony.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Colony.Builder>
            getColoniesBuilderList() {
         return getColoniesFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Colony, au.com.codeka.common.protobuf.Messages.Colony.Builder, au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Colony, au.com.codeka.common.protobuf.Messages.Colony.Builder, au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
           getColoniesFieldBuilder() {
         if (coloniesBuilder_ == null) {
           coloniesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -23718,7 +23719,7 @@ public final class Messages {
           getEmpireResetReasonBytes() {
         java.lang.Object ref = empireResetReason_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireResetReason_ = b;
@@ -23912,7 +23913,7 @@ public final class Messages {
        * </pre>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics, au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.Builder, au.com.codeka.common.protobuf.Messages.EmpireBuildingStatisticsOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics, au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.Builder, au.com.codeka.common.protobuf.Messages.EmpireBuildingStatisticsOrBuilder>
           getBuildingStatisticsFieldBuilder() {
         if (buildingStatisticsBuilder_ == null) {
           buildingStatisticsBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -24195,7 +24196,7 @@ public final class Messages {
        * client is able to track them itself.
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
            getBuildRequestsOrBuilderList() {
         if (buildRequestsBuilder_ != null) {
           return buildRequestsBuilder_.getMessageOrBuilderList();
@@ -24236,12 +24237,12 @@ public final class Messages {
        * client is able to track them itself.
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest.Builder>
            getBuildRequestsBuilderList() {
         return getBuildRequestsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.BuildRequest, au.com.codeka.common.protobuf.Messages.BuildRequest.Builder, au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.BuildRequest, au.com.codeka.common.protobuf.Messages.BuildRequest.Builder, au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
           getBuildRequestsFieldBuilder() {
         if (buildRequestsBuilder_ == null) {
           buildRequestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -24817,7 +24818,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -24838,7 +24839,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -24875,7 +24876,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -24896,7 +24897,7 @@ public final class Messages {
         getDeviceIdBytes() {
       java.lang.Object ref = deviceId_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         deviceId_ = b;
@@ -24935,7 +24936,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -24957,7 +24958,7 @@ public final class Messages {
         getGcmRegistrationIdBytes() {
       java.lang.Object ref = gcmRegistrationId_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         gcmRegistrationId_ = b;
@@ -24992,7 +24993,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -25012,7 +25013,7 @@ public final class Messages {
         getDeviceModelBytes() {
       java.lang.Object ref = deviceModel_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         deviceModel_ = b;
@@ -25047,7 +25048,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -25067,7 +25068,7 @@ public final class Messages {
         getDeviceManufacturerBytes() {
       java.lang.Object ref = deviceManufacturer_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         deviceManufacturer_ = b;
@@ -25102,7 +25103,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -25122,7 +25123,7 @@ public final class Messages {
         getDeviceBuildBytes() {
       java.lang.Object ref = deviceBuild_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         deviceBuild_ = b;
@@ -25159,7 +25160,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -25180,7 +25181,7 @@ public final class Messages {
         getDeviceVersionBytes() {
       java.lang.Object ref = deviceVersion_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         deviceVersion_ = b;
@@ -25219,7 +25220,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -25241,7 +25242,7 @@ public final class Messages {
         getUserBytes() {
       java.lang.Object ref = user_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         user_ = b;
@@ -25663,7 +25664,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -25767,7 +25768,7 @@ public final class Messages {
           getDeviceIdBytes() {
         java.lang.Object ref = deviceId_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceId_ = b;
@@ -25874,7 +25875,7 @@ public final class Messages {
           getGcmRegistrationIdBytes() {
         java.lang.Object ref = gcmRegistrationId_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           gcmRegistrationId_ = b;
@@ -25978,7 +25979,7 @@ public final class Messages {
           getDeviceModelBytes() {
         java.lang.Object ref = deviceModel_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceModel_ = b;
@@ -26076,7 +26077,7 @@ public final class Messages {
           getDeviceManufacturerBytes() {
         java.lang.Object ref = deviceManufacturer_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceManufacturer_ = b;
@@ -26174,7 +26175,7 @@ public final class Messages {
           getDeviceBuildBytes() {
         java.lang.Object ref = deviceBuild_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceBuild_ = b;
@@ -26275,7 +26276,7 @@ public final class Messages {
           getDeviceVersionBytes() {
         java.lang.Object ref = deviceVersion_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           deviceVersion_ = b;
@@ -26382,7 +26383,7 @@ public final class Messages {
           getUserBytes() {
         java.lang.Object ref = user_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           user_ = b;
@@ -26463,7 +26464,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.DeviceRegistration registrations = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.DeviceRegistration> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.DeviceRegistration>
         getRegistrationsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.DeviceRegistration registrations = 1;</code>
@@ -26476,7 +26477,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.DeviceRegistration registrations = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.DeviceRegistrationOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.DeviceRegistrationOrBuilder>
         getRegistrationsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.DeviceRegistration registrations = 1;</code>
@@ -26602,7 +26603,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.DeviceRegistration registrations = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.DeviceRegistrationOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.DeviceRegistrationOrBuilder>
         getRegistrationsOrBuilderList() {
       return registrations_;
     }
@@ -26854,7 +26855,7 @@ public final class Messages {
               registrationsBuilder_ = null;
               registrations_ = other.registrations_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              registrationsBuilder_ = 
+              registrationsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getRegistrationsFieldBuilder() : null;
             } else {
@@ -27084,7 +27085,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.DeviceRegistration registrations = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.DeviceRegistrationOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.DeviceRegistrationOrBuilder>
            getRegistrationsOrBuilderList() {
         if (registrationsBuilder_ != null) {
           return registrationsBuilder_.getMessageOrBuilderList();
@@ -27110,12 +27111,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.DeviceRegistration registrations = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.DeviceRegistration.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.DeviceRegistration.Builder>
            getRegistrationsBuilderList() {
         return getRegistrationsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.DeviceRegistration, au.com.codeka.common.protobuf.Messages.DeviceRegistration.Builder, au.com.codeka.common.protobuf.Messages.DeviceRegistrationOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.DeviceRegistration, au.com.codeka.common.protobuf.Messages.DeviceRegistration.Builder, au.com.codeka.common.protobuf.Messages.DeviceRegistrationOrBuilder>
           getRegistrationsFieldBuilder() {
         if (registrationsBuilder_ == null) {
           registrationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -27704,7 +27705,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -27720,7 +27721,7 @@ public final class Messages {
         getNameBytes() {
       java.lang.Object ref = name_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         name_ = b;
@@ -27747,7 +27748,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -27763,7 +27764,7 @@ public final class Messages {
         getValueBytes() {
       java.lang.Object ref = value_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         value_ = b;
@@ -28055,7 +28056,7 @@ public final class Messages {
           getNameBytes() {
         java.lang.Object ref = name_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           name_ = b;
@@ -28129,7 +28130,7 @@ public final class Messages {
           getValueBytes() {
         java.lang.Object ref = value_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           value_ = b;
@@ -28192,7 +28193,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Notification> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Notification>
         getNotificationsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 1;</code>
@@ -28205,7 +28206,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder>
         getNotificationsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 1;</code>
@@ -28326,7 +28327,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder>
         getNotificationsOrBuilderList() {
       return notifications_;
     }
@@ -28573,7 +28574,7 @@ public final class Messages {
               notificationsBuilder_ = null;
               notifications_ = other.notifications_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              notificationsBuilder_ = 
+              notificationsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getNotificationsFieldBuilder() : null;
             } else {
@@ -28803,7 +28804,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder>
            getNotificationsOrBuilderList() {
         if (notificationsBuilder_ != null) {
           return notificationsBuilder_.getMessageOrBuilderList();
@@ -28829,12 +28830,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Notification.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Notification.Builder>
            getNotificationsBuilderList() {
         return getNotificationsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Notification, au.com.codeka.common.protobuf.Messages.Notification.Builder, au.com.codeka.common.protobuf.Messages.NotificationOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Notification, au.com.codeka.common.protobuf.Messages.Notification.Builder, au.com.codeka.common.protobuf.Messages.NotificationOrBuilder>
           getNotificationsFieldBuilder() {
         if (notificationsBuilder_ == null) {
           notificationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -28876,7 +28877,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 2;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Notification> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Notification>
         getNotificationsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 2;</code>
@@ -28889,7 +28890,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 2;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder>
         getNotificationsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 2;</code>
@@ -29037,7 +29038,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 2;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder>
         getNotificationsOrBuilderList() {
       return notifications_;
     }
@@ -29308,7 +29309,7 @@ public final class Messages {
               notificationsBuilder_ = null;
               notifications_ = other.notifications_;
               bitField0_ = (bitField0_ & ~0x00000002);
-              notificationsBuilder_ = 
+              notificationsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getNotificationsFieldBuilder() : null;
             } else {
@@ -29574,7 +29575,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 2;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.NotificationOrBuilder>
            getNotificationsOrBuilderList() {
         if (notificationsBuilder_ != null) {
           return notificationsBuilder_.getMessageOrBuilderList();
@@ -29600,12 +29601,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Notification notifications = 2;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Notification.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Notification.Builder>
            getNotificationsBuilderList() {
         return getNotificationsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Notification, au.com.codeka.common.protobuf.Messages.Notification.Builder, au.com.codeka.common.protobuf.Messages.NotificationOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Notification, au.com.codeka.common.protobuf.Messages.Notification.Builder, au.com.codeka.common.protobuf.Messages.NotificationOrBuilder>
           getNotificationsFieldBuilder() {
         if (notificationsBuilder_ == null) {
           notificationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -30068,7 +30069,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -30084,7 +30085,7 @@ public final class Messages {
         getMessageBytes() {
       java.lang.Object ref = message_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         message_ = b;
@@ -30111,7 +30112,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -30127,7 +30128,7 @@ public final class Messages {
         getEmpireKeyBytes() {
       java.lang.Object ref = empireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireKey_ = b;
@@ -30170,7 +30171,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -30186,7 +30187,7 @@ public final class Messages {
         getAllianceKeyBytes() {
       java.lang.Object ref = allianceKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         allianceKey_ = b;
@@ -30223,7 +30224,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -30244,7 +30245,7 @@ public final class Messages {
         getMessageEnBytes() {
       java.lang.Object ref = messageEn_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         messageEn_ = b;
@@ -30750,7 +30751,7 @@ public final class Messages {
           getMessageBytes() {
         java.lang.Object ref = message_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           message_ = b;
@@ -30824,7 +30825,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -30931,7 +30932,7 @@ public final class Messages {
           getAllianceKeyBytes() {
         java.lang.Object ref = allianceKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           allianceKey_ = b;
@@ -31020,7 +31021,7 @@ public final class Messages {
           getMessageEnBytes() {
         java.lang.Object ref = messageEn_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           messageEn_ = b;
@@ -31220,7 +31221,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatMessage messages = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.ChatMessage> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.ChatMessage>
         getMessagesList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatMessage messages = 1;</code>
@@ -31233,7 +31234,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatMessage messages = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatMessageOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatMessageOrBuilder>
         getMessagesOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatMessage messages = 1;</code>
@@ -31354,7 +31355,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatMessage messages = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatMessageOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatMessageOrBuilder>
         getMessagesOrBuilderList() {
       return messages_;
     }
@@ -31601,7 +31602,7 @@ public final class Messages {
               messagesBuilder_ = null;
               messages_ = other.messages_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              messagesBuilder_ = 
+              messagesBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getMessagesFieldBuilder() : null;
             } else {
@@ -31831,7 +31832,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.ChatMessage messages = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatMessageOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatMessageOrBuilder>
            getMessagesOrBuilderList() {
         if (messagesBuilder_ != null) {
           return messagesBuilder_.getMessageOrBuilderList();
@@ -31857,12 +31858,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.ChatMessage messages = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.ChatMessage.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.ChatMessage.Builder>
            getMessagesBuilderList() {
         return getMessagesFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.ChatMessage, au.com.codeka.common.protobuf.Messages.ChatMessage.Builder, au.com.codeka.common.protobuf.Messages.ChatMessageOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.ChatMessage, au.com.codeka.common.protobuf.Messages.ChatMessage.Builder, au.com.codeka.common.protobuf.Messages.ChatMessageOrBuilder>
           getMessagesFieldBuilder() {
         if (messagesBuilder_ == null) {
           messagesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -32310,7 +32311,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatConversationParticipant participants = 2;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.ChatConversationParticipant> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.ChatConversationParticipant>
         getParticipantsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatConversationParticipant participants = 2;</code>
@@ -32323,7 +32324,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatConversationParticipant participants = 2;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationParticipantOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationParticipantOrBuilder>
         getParticipantsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatConversationParticipant participants = 2;</code>
@@ -32471,7 +32472,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatConversationParticipant participants = 2;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationParticipantOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationParticipantOrBuilder>
         getParticipantsOrBuilderList() {
       return participants_;
     }
@@ -32742,7 +32743,7 @@ public final class Messages {
               participantsBuilder_ = null;
               participants_ = other.participants_;
               bitField0_ = (bitField0_ & ~0x00000002);
-              participantsBuilder_ = 
+              participantsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getParticipantsFieldBuilder() : null;
             } else {
@@ -33005,7 +33006,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.ChatConversationParticipant participants = 2;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationParticipantOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationParticipantOrBuilder>
            getParticipantsOrBuilderList() {
         if (participantsBuilder_ != null) {
           return participantsBuilder_.getMessageOrBuilderList();
@@ -33031,12 +33032,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.ChatConversationParticipant participants = 2;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.ChatConversationParticipant.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.ChatConversationParticipant.Builder>
            getParticipantsBuilderList() {
         return getParticipantsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.ChatConversationParticipant, au.com.codeka.common.protobuf.Messages.ChatConversationParticipant.Builder, au.com.codeka.common.protobuf.Messages.ChatConversationParticipantOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.ChatConversationParticipant, au.com.codeka.common.protobuf.Messages.ChatConversationParticipant.Builder, au.com.codeka.common.protobuf.Messages.ChatConversationParticipantOrBuilder>
           getParticipantsFieldBuilder() {
         if (participantsBuilder_ == null) {
           participantsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -33068,7 +33069,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatConversation conversations = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.ChatConversation> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.ChatConversation>
         getConversationsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatConversation conversations = 1;</code>
@@ -33081,7 +33082,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatConversation conversations = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationOrBuilder>
         getConversationsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatConversation conversations = 1;</code>
@@ -33202,7 +33203,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ChatConversation conversations = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationOrBuilder>
         getConversationsOrBuilderList() {
       return conversations_;
     }
@@ -33449,7 +33450,7 @@ public final class Messages {
               conversationsBuilder_ = null;
               conversations_ = other.conversations_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              conversationsBuilder_ = 
+              conversationsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getConversationsFieldBuilder() : null;
             } else {
@@ -33679,7 +33680,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.ChatConversation conversations = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ChatConversationOrBuilder>
            getConversationsOrBuilderList() {
         if (conversationsBuilder_ != null) {
           return conversationsBuilder_.getMessageOrBuilderList();
@@ -33705,12 +33706,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.ChatConversation conversations = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.ChatConversation.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.ChatConversation.Builder>
            getConversationsBuilderList() {
         return getConversationsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.ChatConversation, au.com.codeka.common.protobuf.Messages.ChatConversation.Builder, au.com.codeka.common.protobuf.Messages.ChatConversationOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.ChatConversation, au.com.codeka.common.protobuf.Messages.ChatConversation.Builder, au.com.codeka.common.protobuf.Messages.ChatConversationOrBuilder>
           getConversationsFieldBuilder() {
         if (conversationsBuilder_ == null) {
           conversationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -34281,7 +34282,7 @@ public final class Messages {
      * the collection of stars in this sector.
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Star> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Star>
         getStarsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Star stars = 3;</code>
@@ -34306,7 +34307,7 @@ public final class Messages {
      * the collection of stars in this sector.
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder>
         getStarsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Star stars = 3;</code>
@@ -34326,7 +34327,7 @@ public final class Messages {
      * a collection of colonies in this sector (TODO: full colony details? probably not needed...)
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Colony> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Colony>
         getColoniesList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 4;</code>
@@ -34351,7 +34352,7 @@ public final class Messages {
      * a collection of colonies in this sector (TODO: full colony details? probably not needed...)
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
         getColoniesOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 4;</code>
@@ -34371,7 +34372,7 @@ public final class Messages {
      * a collection of fleets in this sector
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Fleet> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Fleet>
         getFleetsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 6;</code>
@@ -34396,7 +34397,7 @@ public final class Messages {
      * a collection of fleets in this sector
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
         getFleetsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 6;</code>
@@ -34638,7 +34639,7 @@ public final class Messages {
      * the collection of stars in this sector.
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder>
         getStarsOrBuilderList() {
       return stars_;
     }
@@ -34694,7 +34695,7 @@ public final class Messages {
      * a collection of colonies in this sector (TODO: full colony details? probably not needed...)
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
         getColoniesOrBuilderList() {
       return colonies_;
     }
@@ -34750,7 +34751,7 @@ public final class Messages {
      * a collection of fleets in this sector
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
         getFleetsOrBuilderList() {
       return fleets_;
     }
@@ -35115,7 +35116,7 @@ public final class Messages {
               starsBuilder_ = null;
               stars_ = other.stars_;
               bitField0_ = (bitField0_ & ~0x00000008);
-              starsBuilder_ = 
+              starsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getStarsFieldBuilder() : null;
             } else {
@@ -35141,7 +35142,7 @@ public final class Messages {
               coloniesBuilder_ = null;
               colonies_ = other.colonies_;
               bitField0_ = (bitField0_ & ~0x00000010);
-              coloniesBuilder_ = 
+              coloniesBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getColoniesFieldBuilder() : null;
             } else {
@@ -35167,7 +35168,7 @@ public final class Messages {
               fleetsBuilder_ = null;
               fleets_ = other.fleets_;
               bitField0_ = (bitField0_ & ~0x00000020);
-              fleetsBuilder_ = 
+              fleetsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getFleetsFieldBuilder() : null;
             } else {
@@ -35592,7 +35593,7 @@ public final class Messages {
        * the collection of stars in this sector.
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder>
            getStarsOrBuilderList() {
         if (starsBuilder_ != null) {
           return starsBuilder_.getMessageOrBuilderList();
@@ -35630,12 +35631,12 @@ public final class Messages {
        * the collection of stars in this sector.
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Star.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Star.Builder>
            getStarsBuilderList() {
         return getStarsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Star, au.com.codeka.common.protobuf.Messages.Star.Builder, au.com.codeka.common.protobuf.Messages.StarOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Star, au.com.codeka.common.protobuf.Messages.Star.Builder, au.com.codeka.common.protobuf.Messages.StarOrBuilder>
           getStarsFieldBuilder() {
         if (starsBuilder_ == null) {
           starsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -35904,7 +35905,7 @@ public final class Messages {
        * a collection of colonies in this sector (TODO: full colony details? probably not needed...)
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
            getColoniesOrBuilderList() {
         if (coloniesBuilder_ != null) {
           return coloniesBuilder_.getMessageOrBuilderList();
@@ -35942,12 +35943,12 @@ public final class Messages {
        * a collection of colonies in this sector (TODO: full colony details? probably not needed...)
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Colony.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Colony.Builder>
            getColoniesBuilderList() {
         return getColoniesFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Colony, au.com.codeka.common.protobuf.Messages.Colony.Builder, au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Colony, au.com.codeka.common.protobuf.Messages.Colony.Builder, au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
           getColoniesFieldBuilder() {
         if (coloniesBuilder_ == null) {
           coloniesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -36216,7 +36217,7 @@ public final class Messages {
        * a collection of fleets in this sector
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
            getFleetsOrBuilderList() {
         if (fleetsBuilder_ != null) {
           return fleetsBuilder_.getMessageOrBuilderList();
@@ -36254,12 +36255,12 @@ public final class Messages {
        * a collection of fleets in this sector
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Fleet.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Fleet.Builder>
            getFleetsBuilderList() {
         return getFleetsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Fleet, au.com.codeka.common.protobuf.Messages.Fleet.Builder, au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Fleet, au.com.codeka.common.protobuf.Messages.Fleet.Builder, au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
           getFleetsFieldBuilder() {
         if (fleetsBuilder_ == null) {
           fleetsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -36442,7 +36443,7 @@ public final class Messages {
      * of stars in a sector)
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Planet> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Planet>
         getPlanetsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Planet planets = 9;</code>
@@ -36470,7 +36471,7 @@ public final class Messages {
      * of stars in a sector)
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder>
         getPlanetsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Planet planets = 9;</code>
@@ -36491,7 +36492,7 @@ public final class Messages {
      * collection of colonies on our planet(s)
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Colony> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Colony>
         getColoniesList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 10;</code>
@@ -36516,7 +36517,7 @@ public final class Messages {
      * collection of colonies on our planet(s)
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
         getColoniesOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 10;</code>
@@ -36536,7 +36537,7 @@ public final class Messages {
      * collection of buildings in our colonies.
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Building> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Building>
         getBuildingsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Building buildings = 13;</code>
@@ -36561,7 +36562,7 @@ public final class Messages {
      * collection of buildings in our colonies.
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildingOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildingOrBuilder>
         getBuildingsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Building buildings = 13;</code>
@@ -36581,7 +36582,7 @@ public final class Messages {
      * collection of EmpirePresences details the presences of the empire(s) in this solar system.
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.EmpirePresence> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.EmpirePresence>
         getEmpiresList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpirePresence empires = 14;</code>
@@ -36606,7 +36607,7 @@ public final class Messages {
      * collection of EmpirePresences details the presences of the empire(s) in this solar system.
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpirePresenceOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpirePresenceOrBuilder>
         getEmpiresOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.EmpirePresence empires = 14;</code>
@@ -36626,7 +36627,7 @@ public final class Messages {
      * collection of BuildRequests for colonies in this star
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest>
         getBuildRequestsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest build_requests = 15;</code>
@@ -36651,7 +36652,7 @@ public final class Messages {
      * collection of BuildRequests for colonies in this star
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
         getBuildRequestsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest build_requests = 15;</code>
@@ -36671,7 +36672,7 @@ public final class Messages {
      * List of fleets located in this star
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Fleet> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Fleet>
         getFleetsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 16;</code>
@@ -36696,7 +36697,7 @@ public final class Messages {
      * List of fleets located in this star
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
         getFleetsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 16;</code>
@@ -37964,7 +37965,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -37984,7 +37985,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -38059,7 +38060,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -38079,7 +38080,7 @@ public final class Messages {
         getNameBytes() {
       java.lang.Object ref = name_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         name_ = b;
@@ -38199,7 +38200,7 @@ public final class Messages {
      * of stars in a sector)
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder>
         getPlanetsOrBuilderList() {
       return planets_;
     }
@@ -38258,7 +38259,7 @@ public final class Messages {
      * collection of colonies on our planet(s)
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
         getColoniesOrBuilderList() {
       return colonies_;
     }
@@ -38314,7 +38315,7 @@ public final class Messages {
      * collection of buildings in our colonies.
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildingOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildingOrBuilder>
         getBuildingsOrBuilderList() {
       return buildings_;
     }
@@ -38370,7 +38371,7 @@ public final class Messages {
      * collection of EmpirePresences details the presences of the empire(s) in this solar system.
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpirePresenceOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpirePresenceOrBuilder>
         getEmpiresOrBuilderList() {
       return empires_;
     }
@@ -38426,7 +38427,7 @@ public final class Messages {
      * collection of BuildRequests for colonies in this star
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
         getBuildRequestsOrBuilderList() {
       return buildRequests_;
     }
@@ -38482,7 +38483,7 @@ public final class Messages {
      * List of fleets located in this star
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
         getFleetsOrBuilderList() {
       return fleets_;
     }
@@ -39192,7 +39193,7 @@ public final class Messages {
               planetsBuilder_ = null;
               planets_ = other.planets_;
               bitField0_ = (bitField0_ & ~0x00000100);
-              planetsBuilder_ = 
+              planetsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getPlanetsFieldBuilder() : null;
             } else {
@@ -39218,7 +39219,7 @@ public final class Messages {
               coloniesBuilder_ = null;
               colonies_ = other.colonies_;
               bitField0_ = (bitField0_ & ~0x00000200);
-              coloniesBuilder_ = 
+              coloniesBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getColoniesFieldBuilder() : null;
             } else {
@@ -39244,7 +39245,7 @@ public final class Messages {
               buildingsBuilder_ = null;
               buildings_ = other.buildings_;
               bitField0_ = (bitField0_ & ~0x00000400);
-              buildingsBuilder_ = 
+              buildingsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getBuildingsFieldBuilder() : null;
             } else {
@@ -39270,7 +39271,7 @@ public final class Messages {
               empiresBuilder_ = null;
               empires_ = other.empires_;
               bitField0_ = (bitField0_ & ~0x00000800);
-              empiresBuilder_ = 
+              empiresBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getEmpiresFieldBuilder() : null;
             } else {
@@ -39296,7 +39297,7 @@ public final class Messages {
               buildRequestsBuilder_ = null;
               buildRequests_ = other.buildRequests_;
               bitField0_ = (bitField0_ & ~0x00001000);
-              buildRequestsBuilder_ = 
+              buildRequestsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getBuildRequestsFieldBuilder() : null;
             } else {
@@ -39322,7 +39323,7 @@ public final class Messages {
               fleetsBuilder_ = null;
               fleets_ = other.fleets_;
               bitField0_ = (bitField0_ & ~0x00002000);
-              fleetsBuilder_ = 
+              fleetsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getFleetsFieldBuilder() : null;
             } else {
@@ -39410,7 +39411,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -39590,7 +39591,7 @@ public final class Messages {
           getNameBytes() {
         java.lang.Object ref = name_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           name_ = b;
@@ -40100,7 +40101,7 @@ public final class Messages {
        * of stars in a sector)
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder>
            getPlanetsOrBuilderList() {
         if (planetsBuilder_ != null) {
           return planetsBuilder_.getMessageOrBuilderList();
@@ -40141,12 +40142,12 @@ public final class Messages {
        * of stars in a sector)
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Planet.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Planet.Builder>
            getPlanetsBuilderList() {
         return getPlanetsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Planet, au.com.codeka.common.protobuf.Messages.Planet.Builder, au.com.codeka.common.protobuf.Messages.PlanetOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Planet, au.com.codeka.common.protobuf.Messages.Planet.Builder, au.com.codeka.common.protobuf.Messages.PlanetOrBuilder>
           getPlanetsFieldBuilder() {
         if (planetsBuilder_ == null) {
           planetsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -40415,7 +40416,7 @@ public final class Messages {
        * collection of colonies on our planet(s)
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
            getColoniesOrBuilderList() {
         if (coloniesBuilder_ != null) {
           return coloniesBuilder_.getMessageOrBuilderList();
@@ -40453,12 +40454,12 @@ public final class Messages {
        * collection of colonies on our planet(s)
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Colony.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Colony.Builder>
            getColoniesBuilderList() {
         return getColoniesFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Colony, au.com.codeka.common.protobuf.Messages.Colony.Builder, au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Colony, au.com.codeka.common.protobuf.Messages.Colony.Builder, au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
           getColoniesFieldBuilder() {
         if (coloniesBuilder_ == null) {
           coloniesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -40727,7 +40728,7 @@ public final class Messages {
        * collection of buildings in our colonies.
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildingOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildingOrBuilder>
            getBuildingsOrBuilderList() {
         if (buildingsBuilder_ != null) {
           return buildingsBuilder_.getMessageOrBuilderList();
@@ -40765,12 +40766,12 @@ public final class Messages {
        * collection of buildings in our colonies.
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Building.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Building.Builder>
            getBuildingsBuilderList() {
         return getBuildingsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Building, au.com.codeka.common.protobuf.Messages.Building.Builder, au.com.codeka.common.protobuf.Messages.BuildingOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Building, au.com.codeka.common.protobuf.Messages.Building.Builder, au.com.codeka.common.protobuf.Messages.BuildingOrBuilder>
           getBuildingsFieldBuilder() {
         if (buildingsBuilder_ == null) {
           buildingsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -41039,7 +41040,7 @@ public final class Messages {
        * collection of EmpirePresences details the presences of the empire(s) in this solar system.
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpirePresenceOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpirePresenceOrBuilder>
            getEmpiresOrBuilderList() {
         if (empiresBuilder_ != null) {
           return empiresBuilder_.getMessageOrBuilderList();
@@ -41077,12 +41078,12 @@ public final class Messages {
        * collection of EmpirePresences details the presences of the empire(s) in this solar system.
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpirePresence.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpirePresence.Builder>
            getEmpiresBuilderList() {
         return getEmpiresFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.EmpirePresence, au.com.codeka.common.protobuf.Messages.EmpirePresence.Builder, au.com.codeka.common.protobuf.Messages.EmpirePresenceOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.EmpirePresence, au.com.codeka.common.protobuf.Messages.EmpirePresence.Builder, au.com.codeka.common.protobuf.Messages.EmpirePresenceOrBuilder>
           getEmpiresFieldBuilder() {
         if (empiresBuilder_ == null) {
           empiresBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -41351,7 +41352,7 @@ public final class Messages {
        * collection of BuildRequests for colonies in this star
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
            getBuildRequestsOrBuilderList() {
         if (buildRequestsBuilder_ != null) {
           return buildRequestsBuilder_.getMessageOrBuilderList();
@@ -41389,12 +41390,12 @@ public final class Messages {
        * collection of BuildRequests for colonies in this star
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest.Builder>
            getBuildRequestsBuilderList() {
         return getBuildRequestsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.BuildRequest, au.com.codeka.common.protobuf.Messages.BuildRequest.Builder, au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.BuildRequest, au.com.codeka.common.protobuf.Messages.BuildRequest.Builder, au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
           getBuildRequestsFieldBuilder() {
         if (buildRequestsBuilder_ == null) {
           buildRequestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -41663,7 +41664,7 @@ public final class Messages {
        * List of fleets located in this star
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
            getFleetsOrBuilderList() {
         if (fleetsBuilder_ != null) {
           return fleetsBuilder_.getMessageOrBuilderList();
@@ -41701,12 +41702,12 @@ public final class Messages {
        * List of fleets located in this star
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Fleet.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Fleet.Builder>
            getFleetsBuilderList() {
         return getFleetsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Fleet, au.com.codeka.common.protobuf.Messages.Fleet.Builder, au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Fleet, au.com.codeka.common.protobuf.Messages.Fleet.Builder, au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
           getFleetsFieldBuilder() {
         if (fleetsBuilder_ == null) {
           fleetsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -41971,7 +41972,7 @@ public final class Messages {
        * </pre>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.CombatReport, au.com.codeka.common.protobuf.Messages.CombatReport.Builder, au.com.codeka.common.protobuf.Messages.CombatReportOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.CombatReport, au.com.codeka.common.protobuf.Messages.CombatReport.Builder, au.com.codeka.common.protobuf.Messages.CombatReportOrBuilder>
           getCurrentCombatReportFieldBuilder() {
         if (currentCombatReportBuilder_ == null) {
           currentCombatReportBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -42088,7 +42089,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.Star.StarExtra extra = 20;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Star.StarExtra, au.com.codeka.common.protobuf.Messages.Star.StarExtra.Builder, au.com.codeka.common.protobuf.Messages.Star.StarExtraOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Star.StarExtra, au.com.codeka.common.protobuf.Messages.Star.StarExtra.Builder, au.com.codeka.common.protobuf.Messages.Star.StarExtraOrBuilder>
           getExtraFieldBuilder() {
         if (extraBuilder_ == null) {
           extraBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -42119,7 +42120,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Star stars = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Star> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Star>
         getStarsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Star stars = 1;</code>
@@ -42132,7 +42133,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Star stars = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder>
         getStarsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Star stars = 1;</code>
@@ -42253,7 +42254,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Star stars = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder>
         getStarsOrBuilderList() {
       return stars_;
     }
@@ -42500,7 +42501,7 @@ public final class Messages {
               starsBuilder_ = null;
               stars_ = other.stars_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              starsBuilder_ = 
+              starsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getStarsFieldBuilder() : null;
             } else {
@@ -42730,7 +42731,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Star stars = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.StarOrBuilder>
            getStarsOrBuilderList() {
         if (starsBuilder_ != null) {
           return starsBuilder_.getMessageOrBuilderList();
@@ -42756,12 +42757,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Star stars = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Star.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Star.Builder>
            getStarsBuilderList() {
         return getStarsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Star, au.com.codeka.common.protobuf.Messages.Star.Builder, au.com.codeka.common.protobuf.Messages.StarOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Star, au.com.codeka.common.protobuf.Messages.Star.Builder, au.com.codeka.common.protobuf.Messages.StarOrBuilder>
           getStarsFieldBuilder() {
         if (starsBuilder_ == null) {
           starsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -43064,7 +43065,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -43080,7 +43081,7 @@ public final class Messages {
         getStarKeyBytes() {
       java.lang.Object ref = starKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starKey_ = b;
@@ -43107,7 +43108,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -43123,7 +43124,7 @@ public final class Messages {
         getOldNameBytes() {
       java.lang.Object ref = oldName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         oldName_ = b;
@@ -43150,7 +43151,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -43166,7 +43167,7 @@ public final class Messages {
         getNewNameBytes() {
       java.lang.Object ref = newName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         newName_ = b;
@@ -43193,7 +43194,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -43209,7 +43210,7 @@ public final class Messages {
         getDEPRECATEDPurchaseOrderIdBytes() {
       java.lang.Object ref = dEPRECATEDPurchaseOrderId_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         dEPRECATEDPurchaseOrderId_ = b;
@@ -43252,7 +43253,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -43268,7 +43269,7 @@ public final class Messages {
         getDEPRECATEDPurchaseDeveloperPayloadBytes() {
       java.lang.Object ref = dEPRECATEDPurchaseDeveloperPayload_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         dEPRECATEDPurchaseDeveloperPayload_ = b;
@@ -43295,7 +43296,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -43311,7 +43312,7 @@ public final class Messages {
         getDEPRECATEDPurchasePriceBytes() {
       java.lang.Object ref = dEPRECATEDPurchasePrice_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         dEPRECATEDPurchasePrice_ = b;
@@ -43744,7 +43745,7 @@ public final class Messages {
           getStarKeyBytes() {
         java.lang.Object ref = starKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starKey_ = b;
@@ -43818,7 +43819,7 @@ public final class Messages {
           getOldNameBytes() {
         java.lang.Object ref = oldName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           oldName_ = b;
@@ -43892,7 +43893,7 @@ public final class Messages {
           getNewNameBytes() {
         java.lang.Object ref = newName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           newName_ = b;
@@ -43966,7 +43967,7 @@ public final class Messages {
           getDEPRECATEDPurchaseOrderIdBytes() {
         java.lang.Object ref = dEPRECATEDPurchaseOrderId_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           dEPRECATEDPurchaseOrderId_ = b;
@@ -44073,7 +44074,7 @@ public final class Messages {
           getDEPRECATEDPurchaseDeveloperPayloadBytes() {
         java.lang.Object ref = dEPRECATEDPurchaseDeveloperPayload_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           dEPRECATEDPurchaseDeveloperPayload_ = b;
@@ -44147,7 +44148,7 @@ public final class Messages {
           getDEPRECATEDPurchasePriceBytes() {
         java.lang.Object ref = dEPRECATEDPurchasePrice_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           dEPRECATEDPurchasePrice_ = b;
@@ -44296,7 +44297,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.PurchaseInfo purchase_info = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.PurchaseInfo, au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder, au.com.codeka.common.protobuf.Messages.PurchaseInfoOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.PurchaseInfo, au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder, au.com.codeka.common.protobuf.Messages.PurchaseInfoOrBuilder>
           getPurchaseInfoFieldBuilder() {
         if (purchaseInfoBuilder_ == null) {
           purchaseInfoBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -45952,7 +45953,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Planet planets = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Planet> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Planet>
         getPlanetsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Planet planets = 1;</code>
@@ -45965,7 +45966,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Planet planets = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder>
         getPlanetsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Planet planets = 1;</code>
@@ -46092,7 +46093,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Planet planets = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder>
         getPlanetsOrBuilderList() {
       return planets_;
     }
@@ -46345,7 +46346,7 @@ public final class Messages {
               planetsBuilder_ = null;
               planets_ = other.planets_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              planetsBuilder_ = 
+              planetsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getPlanetsFieldBuilder() : null;
             } else {
@@ -46575,7 +46576,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Planet planets = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.PlanetOrBuilder>
            getPlanetsOrBuilderList() {
         if (planetsBuilder_ != null) {
           return planetsBuilder_.getMessageOrBuilderList();
@@ -46601,12 +46602,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Planet planets = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Planet.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Planet.Builder>
            getPlanetsBuilderList() {
         return getPlanetsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Planet, au.com.codeka.common.protobuf.Messages.Planet.Builder, au.com.codeka.common.protobuf.Messages.PlanetOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Planet, au.com.codeka.common.protobuf.Messages.Planet.Builder, au.com.codeka.common.protobuf.Messages.PlanetOrBuilder>
           getPlanetsFieldBuilder() {
         if (planetsBuilder_ == null) {
           planetsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -46638,7 +46639,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Sector sectors = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Sector> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Sector>
         getSectorsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Sector sectors = 1;</code>
@@ -46651,7 +46652,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Sector sectors = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.SectorOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.SectorOrBuilder>
         getSectorsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Sector sectors = 1;</code>
@@ -46777,7 +46778,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Sector sectors = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.SectorOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.SectorOrBuilder>
         getSectorsOrBuilderList() {
       return sectors_;
     }
@@ -47029,7 +47030,7 @@ public final class Messages {
               sectorsBuilder_ = null;
               sectors_ = other.sectors_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              sectorsBuilder_ = 
+              sectorsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getSectorsFieldBuilder() : null;
             } else {
@@ -47259,7 +47260,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Sector sectors = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.SectorOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.SectorOrBuilder>
            getSectorsOrBuilderList() {
         if (sectorsBuilder_ != null) {
           return sectorsBuilder_.getMessageOrBuilderList();
@@ -47285,12 +47286,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Sector sectors = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Sector.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Sector.Builder>
            getSectorsBuilderList() {
         return getSectorsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Sector, au.com.codeka.common.protobuf.Messages.Sector.Builder, au.com.codeka.common.protobuf.Messages.SectorOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Sector, au.com.codeka.common.protobuf.Messages.Sector.Builder, au.com.codeka.common.protobuf.Messages.SectorOrBuilder>
           getSectorsFieldBuilder() {
         if (sectorsBuilder_ == null) {
           sectorsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -47597,7 +47598,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -47613,7 +47614,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -47640,7 +47641,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -47656,7 +47657,7 @@ public final class Messages {
         getEmpireKeyBytes() {
       java.lang.Object ref = empireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireKey_ = b;
@@ -47683,7 +47684,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -47699,7 +47700,7 @@ public final class Messages {
         getStarKeyBytes() {
       java.lang.Object ref = starKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starKey_ = b;
@@ -48242,7 +48243,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -48316,7 +48317,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -48390,7 +48391,7 @@ public final class Messages {
           getStarKeyBytes() {
         java.lang.Object ref = starKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starKey_ = b;
@@ -49625,7 +49626,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -49645,7 +49646,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -49680,7 +49681,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -49700,7 +49701,7 @@ public final class Messages {
         getEmpireKeyBytes() {
       java.lang.Object ref = empireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireKey_ = b;
@@ -49735,7 +49736,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -49755,7 +49756,7 @@ public final class Messages {
         getStarKeyBytes() {
       java.lang.Object ref = starKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starKey_ = b;
@@ -50620,7 +50621,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -50718,7 +50719,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -50816,7 +50817,7 @@ public final class Messages {
           getStarKeyBytes() {
         java.lang.Object ref = starKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starKey_ = b;
@@ -51513,7 +51514,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Colony> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Colony>
         getColoniesList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 1;</code>
@@ -51526,7 +51527,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
         getColoniesOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 1;</code>
@@ -51652,7 +51653,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
         getColoniesOrBuilderList() {
       return colonies_;
     }
@@ -51904,7 +51905,7 @@ public final class Messages {
               coloniesBuilder_ = null;
               colonies_ = other.colonies_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              coloniesBuilder_ = 
+              coloniesBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getColoniesFieldBuilder() : null;
             } else {
@@ -52134,7 +52135,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
            getColoniesOrBuilderList() {
         if (coloniesBuilder_ != null) {
           return coloniesBuilder_.getMessageOrBuilderList();
@@ -52160,12 +52161,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Colony colonies = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Colony.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Colony.Builder>
            getColoniesBuilderList() {
         return getColoniesFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Colony, au.com.codeka.common.protobuf.Messages.Colony.Builder, au.com.codeka.common.protobuf.Messages.ColonyOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Colony, au.com.codeka.common.protobuf.Messages.Colony.Builder, au.com.codeka.common.protobuf.Messages.ColonyOrBuilder>
           getColoniesFieldBuilder() {
         if (coloniesBuilder_ == null) {
           coloniesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -52796,7 +52797,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -52812,7 +52813,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -52849,7 +52850,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -52870,7 +52871,7 @@ public final class Messages {
         getColonyKeyBytes() {
       java.lang.Object ref = colonyKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         colonyKey_ = b;
@@ -52905,7 +52906,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -52925,7 +52926,7 @@ public final class Messages {
         getEmpireKeyBytes() {
       java.lang.Object ref = empireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireKey_ = b;
@@ -52960,7 +52961,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -52980,7 +52981,7 @@ public final class Messages {
         getStarKeyBytes() {
       java.lang.Object ref = starKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starKey_ = b;
@@ -53047,7 +53048,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -53067,7 +53068,7 @@ public final class Messages {
         getDesignNameBytes() {
       java.lang.Object ref = designName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         designName_ = b;
@@ -53198,7 +53199,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -53220,7 +53221,7 @@ public final class Messages {
         getExistingBuildingKeyBytes() {
       java.lang.Object ref = existingBuildingKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         existingBuildingKey_ = b;
@@ -53287,7 +53288,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -53303,7 +53304,7 @@ public final class Messages {
         getUpgradeIdBytes() {
       java.lang.Object ref = upgradeId_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         upgradeId_ = b;
@@ -53338,7 +53339,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -53358,7 +53359,7 @@ public final class Messages {
         getNotesBytes() {
       java.lang.Object ref = notes_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         notes_ = b;
@@ -53900,7 +53901,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -53989,7 +53990,7 @@ public final class Messages {
           getColonyKeyBytes() {
         java.lang.Object ref = colonyKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           colonyKey_ = b;
@@ -54090,7 +54091,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -54188,7 +54189,7 @@ public final class Messages {
           getStarKeyBytes() {
         java.lang.Object ref = starKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starKey_ = b;
@@ -54355,7 +54356,7 @@ public final class Messages {
           getDesignNameBytes() {
         java.lang.Object ref = designName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           designName_ = b;
@@ -54647,7 +54648,7 @@ public final class Messages {
           getExistingBuildingKeyBytes() {
         java.lang.Object ref = existingBuildingKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           existingBuildingKey_ = b;
@@ -54821,7 +54822,7 @@ public final class Messages {
           getUpgradeIdBytes() {
         java.lang.Object ref = upgradeId_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           upgradeId_ = b;
@@ -54907,7 +54908,7 @@ public final class Messages {
           getNotesBytes() {
         java.lang.Object ref = notes_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           notes_ = b;
@@ -54982,7 +54983,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest requests = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest>
         getRequestsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest requests = 1;</code>
@@ -54995,7 +54996,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest requests = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
         getRequestsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest requests = 1;</code>
@@ -55121,7 +55122,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.BuildRequest requests = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
         getRequestsOrBuilderList() {
       return requests_;
     }
@@ -55373,7 +55374,7 @@ public final class Messages {
               requestsBuilder_ = null;
               requests_ = other.requests_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              requestsBuilder_ = 
+              requestsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getRequestsFieldBuilder() : null;
             } else {
@@ -55603,7 +55604,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.BuildRequest requests = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
            getRequestsOrBuilderList() {
         if (requestsBuilder_ != null) {
           return requestsBuilder_.getMessageOrBuilderList();
@@ -55629,12 +55630,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.BuildRequest requests = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.BuildRequest.Builder>
            getRequestsBuilderList() {
         return getRequestsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.BuildRequest, au.com.codeka.common.protobuf.Messages.BuildRequest.Builder, au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.BuildRequest, au.com.codeka.common.protobuf.Messages.BuildRequest.Builder, au.com.codeka.common.protobuf.Messages.BuildRequestOrBuilder>
           getRequestsFieldBuilder() {
         if (requestsBuilder_ == null) {
           requestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -55934,7 +55935,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -55954,7 +55955,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -55989,7 +55990,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -56009,7 +56010,7 @@ public final class Messages {
         getColonyKeyBytes() {
       java.lang.Object ref = colonyKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         colonyKey_ = b;
@@ -56044,7 +56045,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -56064,7 +56065,7 @@ public final class Messages {
         getDesignNameBytes() {
       java.lang.Object ref = designName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         designName_ = b;
@@ -56123,7 +56124,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -56143,7 +56144,7 @@ public final class Messages {
         getNotesBytes() {
       java.lang.Object ref = notes_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         notes_ = b;
@@ -56502,7 +56503,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -56600,7 +56601,7 @@ public final class Messages {
           getColonyKeyBytes() {
         java.lang.Object ref = colonyKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           colonyKey_ = b;
@@ -56698,7 +56699,7 @@ public final class Messages {
           getDesignNameBytes() {
         java.lang.Object ref = designName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           designName_ = b;
@@ -56845,7 +56846,7 @@ public final class Messages {
           getNotesBytes() {
         java.lang.Object ref = notes_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           notes_ = b;
@@ -57069,7 +57070,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -57085,7 +57086,7 @@ public final class Messages {
         getUpgradeIdBytes() {
       java.lang.Object ref = upgradeId_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         upgradeId_ = b;
@@ -57112,7 +57113,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -57128,7 +57129,7 @@ public final class Messages {
         getExtraBytes() {
       java.lang.Object ref = extra_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         extra_ = b;
@@ -57420,7 +57421,7 @@ public final class Messages {
           getUpgradeIdBytes() {
         java.lang.Object ref = upgradeId_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           upgradeId_ = b;
@@ -57494,7 +57495,7 @@ public final class Messages {
           getExtraBytes() {
         java.lang.Object ref = extra_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           extra_ = b;
@@ -57879,7 +57880,7 @@ public final class Messages {
      * a collection of upgrades to this fleet
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.FleetUpgrade> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.FleetUpgrade>
         getUpgradesList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.FleetUpgrade upgrades = 16;</code>
@@ -57904,7 +57905,7 @@ public final class Messages {
      * a collection of upgrades to this fleet
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetUpgradeOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetUpgradeOrBuilder>
         getUpgradesOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.FleetUpgrade upgrades = 16;</code>
@@ -58365,7 +58366,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -58385,7 +58386,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -58420,7 +58421,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -58440,7 +58441,7 @@ public final class Messages {
         getEmpireKeyBytes() {
       java.lang.Object ref = empireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireKey_ = b;
@@ -58501,7 +58502,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -58521,7 +58522,7 @@ public final class Messages {
         getDesignNameBytes() {
       java.lang.Object ref = designName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         designName_ = b;
@@ -58628,7 +58629,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -58649,7 +58650,7 @@ public final class Messages {
         getStarKeyBytes() {
       java.lang.Object ref = starKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starKey_ = b;
@@ -58676,7 +58677,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -58692,7 +58693,7 @@ public final class Messages {
         getDestinationStarKeyBytes() {
       java.lang.Object ref = destinationStarKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         destinationStarKey_ = b;
@@ -58727,7 +58728,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -58747,7 +58748,7 @@ public final class Messages {
         getTargetFleetKeyBytes() {
       java.lang.Object ref = targetFleetKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         targetFleetKey_ = b;
@@ -58774,7 +58775,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -58790,7 +58791,7 @@ public final class Messages {
         getTargetColonyKeyBytes() {
       java.lang.Object ref = targetColonyKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         targetColonyKey_ = b;
@@ -58928,7 +58929,7 @@ public final class Messages {
      * a collection of upgrades to this fleet
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetUpgradeOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetUpgradeOrBuilder>
         getUpgradesOrBuilderList() {
       return upgrades_;
     }
@@ -58989,7 +58990,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -59009,7 +59010,7 @@ public final class Messages {
         getNotesBytes() {
       java.lang.Object ref = notes_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         notes_ = b;
@@ -59549,7 +59550,7 @@ public final class Messages {
               upgradesBuilder_ = null;
               upgrades_ = other.upgrades_;
               bitField0_ = (bitField0_ & ~0x00010000);
-              upgradesBuilder_ = 
+              upgradesBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getUpgradesFieldBuilder() : null;
             } else {
@@ -59630,7 +59631,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -59728,7 +59729,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -59879,7 +59880,7 @@ public final class Messages {
           getDesignNameBytes() {
         java.lang.Object ref = designName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           designName_ = b;
@@ -60126,7 +60127,7 @@ public final class Messages {
           getStarKeyBytes() {
         java.lang.Object ref = starKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starKey_ = b;
@@ -60215,7 +60216,7 @@ public final class Messages {
           getDestinationStarKeyBytes() {
         java.lang.Object ref = destinationStarKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           destinationStarKey_ = b;
@@ -60301,7 +60302,7 @@ public final class Messages {
           getTargetFleetKeyBytes() {
         java.lang.Object ref = targetFleetKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           targetFleetKey_ = b;
@@ -60387,7 +60388,7 @@ public final class Messages {
           getTargetColonyKeyBytes() {
         java.lang.Object ref = targetColonyKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           targetColonyKey_ = b;
@@ -60911,7 +60912,7 @@ public final class Messages {
        * a collection of upgrades to this fleet
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetUpgradeOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetUpgradeOrBuilder>
            getUpgradesOrBuilderList() {
         if (upgradesBuilder_ != null) {
           return upgradesBuilder_.getMessageOrBuilderList();
@@ -60949,12 +60950,12 @@ public final class Messages {
        * a collection of upgrades to this fleet
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.FleetUpgrade.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.FleetUpgrade.Builder>
            getUpgradesBuilderList() {
         return getUpgradesFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.FleetUpgrade, au.com.codeka.common.protobuf.Messages.FleetUpgrade.Builder, au.com.codeka.common.protobuf.Messages.FleetUpgradeOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.FleetUpgrade, au.com.codeka.common.protobuf.Messages.FleetUpgrade.Builder, au.com.codeka.common.protobuf.Messages.FleetUpgradeOrBuilder>
           getUpgradesFieldBuilder() {
         if (upgradesBuilder_ == null) {
           upgradesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -61009,7 +61010,7 @@ public final class Messages {
           getNotesBytes() {
         java.lang.Object ref = notes_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           notes_ = b;
@@ -61084,7 +61085,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Fleet> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Fleet>
         getFleetsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 1;</code>
@@ -61097,7 +61098,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
         getFleetsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 1;</code>
@@ -61218,7 +61219,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
         getFleetsOrBuilderList() {
       return fleets_;
     }
@@ -61465,7 +61466,7 @@ public final class Messages {
               fleetsBuilder_ = null;
               fleets_ = other.fleets_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              fleetsBuilder_ = 
+              fleetsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getFleetsFieldBuilder() : null;
             } else {
@@ -61695,7 +61696,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
            getFleetsOrBuilderList() {
         if (fleetsBuilder_ != null) {
           return fleetsBuilder_.getMessageOrBuilderList();
@@ -61721,12 +61722,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Fleet fleets = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Fleet.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Fleet.Builder>
            getFleetsBuilderList() {
         return getFleetsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Fleet, au.com.codeka.common.protobuf.Messages.Fleet.Builder, au.com.codeka.common.protobuf.Messages.FleetOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Fleet, au.com.codeka.common.protobuf.Messages.Fleet.Builder, au.com.codeka.common.protobuf.Messages.FleetOrBuilder>
           getFleetsFieldBuilder() {
         if (fleetsBuilder_ == null) {
           fleetsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -62274,7 +62275,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -62294,7 +62295,7 @@ public final class Messages {
         getStarKeyBytes() {
       java.lang.Object ref = starKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starKey_ = b;
@@ -62353,7 +62354,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -62373,7 +62374,7 @@ public final class Messages {
         getMergeFleetKeyBytes() {
       java.lang.Object ref = mergeFleetKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         mergeFleetKey_ = b;
@@ -63008,7 +63009,7 @@ public final class Messages {
           getStarKeyBytes() {
         java.lang.Object ref = starKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starKey_ = b;
@@ -63158,7 +63159,7 @@ public final class Messages {
           getMergeFleetKeyBytes() {
         java.lang.Object ref = mergeFleetKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           mergeFleetKey_ = b;
@@ -63645,7 +63646,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -63665,7 +63666,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -63700,7 +63701,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -63720,7 +63721,7 @@ public final class Messages {
         getEmpireKeyBytes() {
       java.lang.Object ref = empireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireKey_ = b;
@@ -63755,7 +63756,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -63775,7 +63776,7 @@ public final class Messages {
         getStarKeyBytes() {
       java.lang.Object ref = starKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starKey_ = b;
@@ -64181,7 +64182,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -64279,7 +64280,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -64377,7 +64378,7 @@ public final class Messages {
           getStarKeyBytes() {
         java.lang.Object ref = starKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starKey_ = b;
@@ -64553,7 +64554,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ScoutReport reports = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.ScoutReport> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.ScoutReport>
         getReportsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ScoutReport reports = 1;</code>
@@ -64566,7 +64567,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ScoutReport reports = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ScoutReportOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ScoutReportOrBuilder>
         getReportsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ScoutReport reports = 1;</code>
@@ -64687,7 +64688,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ScoutReport reports = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ScoutReportOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ScoutReportOrBuilder>
         getReportsOrBuilderList() {
       return reports_;
     }
@@ -64934,7 +64935,7 @@ public final class Messages {
               reportsBuilder_ = null;
               reports_ = other.reports_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              reportsBuilder_ = 
+              reportsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getReportsFieldBuilder() : null;
             } else {
@@ -65164,7 +65165,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.ScoutReport reports = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ScoutReportOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ScoutReportOrBuilder>
            getReportsOrBuilderList() {
         if (reportsBuilder_ != null) {
           return reportsBuilder_.getMessageOrBuilderList();
@@ -65190,12 +65191,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.ScoutReport reports = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.ScoutReport.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.ScoutReport.Builder>
            getReportsBuilderList() {
         return getReportsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.ScoutReport, au.com.codeka.common.protobuf.Messages.ScoutReport.Builder, au.com.codeka.common.protobuf.Messages.ScoutReportOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.ScoutReport, au.com.codeka.common.protobuf.Messages.ScoutReport.Builder, au.com.codeka.common.protobuf.Messages.ScoutReportOrBuilder>
           getReportsFieldBuilder() {
         if (reportsBuilder_ == null) {
           reportsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -65252,7 +65253,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetSummary fleets = 3;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary>
         getFleetsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetSummary fleets = 3;</code>
@@ -65265,7 +65266,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetSummary fleets = 3;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummaryOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummaryOrBuilder>
         getFleetsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetSummary fleets = 3;</code>
@@ -65277,7 +65278,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord fleets_joined = 4;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord>
         getFleetsJoinedList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord fleets_joined = 4;</code>
@@ -65290,7 +65291,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord fleets_joined = 4;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecordOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecordOrBuilder>
         getFleetsJoinedOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord fleets_joined = 4;</code>
@@ -65302,7 +65303,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord fleets_targetted = 5;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord>
         getFleetsTargettedList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord fleets_targetted = 5;</code>
@@ -65315,7 +65316,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord fleets_targetted = 5;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecordOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecordOrBuilder>
         getFleetsTargettedOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord fleets_targetted = 5;</code>
@@ -65327,7 +65328,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord fleets_attacked = 6;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord>
         getFleetsAttackedList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord fleets_attacked = 6;</code>
@@ -65340,7 +65341,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord fleets_attacked = 6;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecordOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecordOrBuilder>
         getFleetsAttackedOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord fleets_attacked = 6;</code>
@@ -65352,7 +65353,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord fleets_damaged = 7;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord>
         getFleetsDamagedList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord fleets_damaged = 7;</code>
@@ -65365,7 +65366,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord fleets_damaged = 7;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecordOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecordOrBuilder>
         getFleetsDamagedOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord fleets_damaged = 7;</code>
@@ -65769,7 +65770,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -65785,7 +65786,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -65812,7 +65813,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -65828,7 +65829,7 @@ public final class Messages {
           getDesignIdBytes() {
         java.lang.Object ref = designId_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           designId_ = b;
@@ -66280,7 +66281,7 @@ public final class Messages {
             getEmpireKeyBytes() {
           java.lang.Object ref = empireKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             empireKey_ = b;
@@ -66354,7 +66355,7 @@ public final class Messages {
             getDesignIdBytes() {
           java.lang.Object ref = designId_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             designId_ = b;
@@ -68401,7 +68402,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -68417,7 +68418,7 @@ public final class Messages {
         getStarKeyBytes() {
       java.lang.Object ref = starKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starKey_ = b;
@@ -68455,7 +68456,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetSummary fleets = 3;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummaryOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummaryOrBuilder>
         getFleetsOrBuilderList() {
       return fleets_;
     }
@@ -68491,7 +68492,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord fleets_joined = 4;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecordOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecordOrBuilder>
         getFleetsJoinedOrBuilderList() {
       return fleetsJoined_;
     }
@@ -68527,7 +68528,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord fleets_targetted = 5;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecordOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecordOrBuilder>
         getFleetsTargettedOrBuilderList() {
       return fleetsTargetted_;
     }
@@ -68563,7 +68564,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord fleets_attacked = 6;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecordOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecordOrBuilder>
         getFleetsAttackedOrBuilderList() {
       return fleetsAttacked_;
     }
@@ -68599,7 +68600,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord fleets_damaged = 7;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecordOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecordOrBuilder>
         getFleetsDamagedOrBuilderList() {
       return fleetsDamaged_;
     }
@@ -68986,7 +68987,7 @@ public final class Messages {
               fleetsBuilder_ = null;
               fleets_ = other.fleets_;
               bitField0_ = (bitField0_ & ~0x00000004);
-              fleetsBuilder_ = 
+              fleetsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getFleetsFieldBuilder() : null;
             } else {
@@ -69012,7 +69013,7 @@ public final class Messages {
               fleetsJoinedBuilder_ = null;
               fleetsJoined_ = other.fleetsJoined_;
               bitField0_ = (bitField0_ & ~0x00000008);
-              fleetsJoinedBuilder_ = 
+              fleetsJoinedBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getFleetsJoinedFieldBuilder() : null;
             } else {
@@ -69038,7 +69039,7 @@ public final class Messages {
               fleetsTargettedBuilder_ = null;
               fleetsTargetted_ = other.fleetsTargetted_;
               bitField0_ = (bitField0_ & ~0x00000010);
-              fleetsTargettedBuilder_ = 
+              fleetsTargettedBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getFleetsTargettedFieldBuilder() : null;
             } else {
@@ -69064,7 +69065,7 @@ public final class Messages {
               fleetsAttackedBuilder_ = null;
               fleetsAttacked_ = other.fleetsAttacked_;
               bitField0_ = (bitField0_ & ~0x00000020);
-              fleetsAttackedBuilder_ = 
+              fleetsAttackedBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getFleetsAttackedFieldBuilder() : null;
             } else {
@@ -69090,7 +69091,7 @@ public final class Messages {
               fleetsDamagedBuilder_ = null;
               fleetsDamaged_ = other.fleetsDamaged_;
               bitField0_ = (bitField0_ & ~0x00000040);
-              fleetsDamagedBuilder_ = 
+              fleetsDamagedBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getFleetsDamagedFieldBuilder() : null;
             } else {
@@ -69154,7 +69155,7 @@ public final class Messages {
           getStarKeyBytes() {
         java.lang.Object ref = starKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starKey_ = b;
@@ -69427,7 +69428,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetSummary fleets = 3;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummaryOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummaryOrBuilder>
            getFleetsOrBuilderList() {
         if (fleetsBuilder_ != null) {
           return fleetsBuilder_.getMessageOrBuilderList();
@@ -69453,12 +69454,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetSummary fleets = 3;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary.Builder>
            getFleetsBuilderList() {
         return getFleetsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary, au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary.Builder, au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummaryOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary, au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary.Builder, au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummaryOrBuilder>
           getFleetsFieldBuilder() {
         if (fleetsBuilder_ == null) {
           fleetsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -69667,7 +69668,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord fleets_joined = 4;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecordOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecordOrBuilder>
            getFleetsJoinedOrBuilderList() {
         if (fleetsJoinedBuilder_ != null) {
           return fleetsJoinedBuilder_.getMessageOrBuilderList();
@@ -69693,12 +69694,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord fleets_joined = 4;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord.Builder>
            getFleetsJoinedBuilderList() {
         return getFleetsJoinedFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord, au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord.Builder, au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord, au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord.Builder, au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecordOrBuilder>
           getFleetsJoinedFieldBuilder() {
         if (fleetsJoinedBuilder_ == null) {
           fleetsJoinedBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -69907,7 +69908,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord fleets_targetted = 5;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecordOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecordOrBuilder>
            getFleetsTargettedOrBuilderList() {
         if (fleetsTargettedBuilder_ != null) {
           return fleetsTargettedBuilder_.getMessageOrBuilderList();
@@ -69933,12 +69934,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord fleets_targetted = 5;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord.Builder>
            getFleetsTargettedBuilderList() {
         return getFleetsTargettedFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord, au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord.Builder, au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord, au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord.Builder, au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecordOrBuilder>
           getFleetsTargettedFieldBuilder() {
         if (fleetsTargettedBuilder_ == null) {
           fleetsTargettedBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -70147,7 +70148,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord fleets_attacked = 6;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecordOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecordOrBuilder>
            getFleetsAttackedOrBuilderList() {
         if (fleetsAttackedBuilder_ != null) {
           return fleetsAttackedBuilder_.getMessageOrBuilderList();
@@ -70173,12 +70174,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord fleets_attacked = 6;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord.Builder>
            getFleetsAttackedBuilderList() {
         return getFleetsAttackedFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord, au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord.Builder, au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord, au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord.Builder, au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecordOrBuilder>
           getFleetsAttackedFieldBuilder() {
         if (fleetsAttackedBuilder_ == null) {
           fleetsAttackedBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -70387,7 +70388,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord fleets_damaged = 7;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecordOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecordOrBuilder>
            getFleetsDamagedOrBuilderList() {
         if (fleetsDamagedBuilder_ != null) {
           return fleetsDamagedBuilder_.getMessageOrBuilderList();
@@ -70413,12 +70414,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord fleets_damaged = 7;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord.Builder>
            getFleetsDamagedBuilderList() {
         return getFleetsDamagedFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord, au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord.Builder, au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord, au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord.Builder, au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecordOrBuilder>
           getFleetsDamagedFieldBuilder() {
         if (fleetsDamagedBuilder_ == null) {
           fleetsDamagedBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -70602,7 +70603,7 @@ public final class Messages {
      * A page of CombatRound objects that represent this set of results
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound>
         getRoundsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound rounds = 8;</code>
@@ -70627,7 +70628,7 @@ public final class Messages {
      * A page of CombatRound objects that represent this set of results
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRoundOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRoundOrBuilder>
         getRoundsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatRound rounds = 8;</code>
@@ -70810,7 +70811,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -70826,7 +70827,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -70853,7 +70854,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -70869,7 +70870,7 @@ public final class Messages {
         getStarKeyBytes() {
       java.lang.Object ref = starKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starKey_ = b;
@@ -71055,7 +71056,7 @@ public final class Messages {
      * A page of CombatRound objects that represent this set of results
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRoundOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRoundOrBuilder>
         getRoundsOrBuilderList() {
       return rounds_;
     }
@@ -71472,7 +71473,7 @@ public final class Messages {
               roundsBuilder_ = null;
               rounds_ = other.rounds_;
               bitField0_ = (bitField0_ & ~0x00000080);
-              roundsBuilder_ = 
+              roundsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getRoundsFieldBuilder() : null;
             } else {
@@ -71536,7 +71537,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -71610,7 +71611,7 @@ public final class Messages {
           getStarKeyBytes() {
         java.lang.Object ref = starKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starKey_ = b;
@@ -72299,7 +72300,7 @@ public final class Messages {
        * A page of CombatRound objects that represent this set of results
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRoundOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatRoundOrBuilder>
            getRoundsOrBuilderList() {
         if (roundsBuilder_ != null) {
           return roundsBuilder_.getMessageOrBuilderList();
@@ -72337,12 +72338,12 @@ public final class Messages {
        * A page of CombatRound objects that represent this set of results
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatRound.Builder>
            getRoundsBuilderList() {
         return getRoundsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.CombatRound, au.com.codeka.common.protobuf.Messages.CombatRound.Builder, au.com.codeka.common.protobuf.Messages.CombatRoundOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.CombatRound, au.com.codeka.common.protobuf.Messages.CombatRound.Builder, au.com.codeka.common.protobuf.Messages.CombatRoundOrBuilder>
           getRoundsFieldBuilder() {
         if (roundsBuilder_ == null) {
           roundsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -72374,7 +72375,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatReport reports = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.CombatReport> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.CombatReport>
         getReportsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatReport reports = 1;</code>
@@ -72387,7 +72388,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatReport reports = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatReportOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatReportOrBuilder>
         getReportsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatReport reports = 1;</code>
@@ -72508,7 +72509,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CombatReport reports = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatReportOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatReportOrBuilder>
         getReportsOrBuilderList() {
       return reports_;
     }
@@ -72755,7 +72756,7 @@ public final class Messages {
               reportsBuilder_ = null;
               reports_ = other.reports_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              reportsBuilder_ = 
+              reportsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getReportsFieldBuilder() : null;
             } else {
@@ -72985,7 +72986,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatReport reports = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatReportOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CombatReportOrBuilder>
            getReportsOrBuilderList() {
         if (reportsBuilder_ != null) {
           return reportsBuilder_.getMessageOrBuilderList();
@@ -73011,12 +73012,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CombatReport reports = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatReport.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.CombatReport.Builder>
            getReportsBuilderList() {
         return getReportsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.CombatReport, au.com.codeka.common.protobuf.Messages.CombatReport.Builder, au.com.codeka.common.protobuf.Messages.CombatReportOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.CombatReport, au.com.codeka.common.protobuf.Messages.CombatReport.Builder, au.com.codeka.common.protobuf.Messages.CombatReportOrBuilder>
           getReportsFieldBuilder() {
         if (reportsBuilder_ == null) {
           reportsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -73690,7 +73691,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -73706,7 +73707,7 @@ public final class Messages {
           getDesignIdBytes() {
         java.lang.Object ref = designId_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           designId_ = b;
@@ -73749,7 +73750,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -73765,7 +73766,7 @@ public final class Messages {
           getBuildRequestKeyBytes() {
         java.lang.Object ref = buildRequestKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           buildRequestKey_ = b;
@@ -74126,7 +74127,7 @@ public final class Messages {
             getDesignIdBytes() {
           java.lang.Object ref = designId_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             designId_ = b;
@@ -74233,7 +74234,7 @@ public final class Messages {
             getBuildRequestKeyBytes() {
           java.lang.Object ref = buildRequestKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             buildRequestKey_ = b;
@@ -74479,7 +74480,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -74495,7 +74496,7 @@ public final class Messages {
           getFleetKeyBytes() {
         java.lang.Object ref = fleetKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           fleetKey_ = b;
@@ -74522,7 +74523,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -74538,7 +74539,7 @@ public final class Messages {
           getFleetDesignIdBytes() {
         java.lang.Object ref = fleetDesignId_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           fleetDesignId_ = b;
@@ -74581,7 +74582,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -74597,7 +74598,7 @@ public final class Messages {
           getScoutReportKeyBytes() {
         java.lang.Object ref = scoutReportKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           scoutReportKey_ = b;
@@ -74924,7 +74925,7 @@ public final class Messages {
             getFleetKeyBytes() {
           java.lang.Object ref = fleetKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             fleetKey_ = b;
@@ -74998,7 +74999,7 @@ public final class Messages {
             getFleetDesignIdBytes() {
           java.lang.Object ref = fleetDesignId_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             fleetDesignId_ = b;
@@ -75105,7 +75106,7 @@ public final class Messages {
             getScoutReportKeyBytes() {
           java.lang.Object ref = scoutReportKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             scoutReportKey_ = b;
@@ -75352,7 +75353,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -75368,7 +75369,7 @@ public final class Messages {
           getFleetKeyBytes() {
         java.lang.Object ref = fleetKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           fleetKey_ = b;
@@ -75395,7 +75396,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -75411,7 +75412,7 @@ public final class Messages {
           getFleetDesignIdBytes() {
         java.lang.Object ref = fleetDesignId_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           fleetDesignId_ = b;
@@ -75454,7 +75455,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -75470,7 +75471,7 @@ public final class Messages {
           getCombatReportKeyBytes() {
         java.lang.Object ref = combatReportKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           combatReportKey_ = b;
@@ -75798,7 +75799,7 @@ public final class Messages {
             getFleetKeyBytes() {
           java.lang.Object ref = fleetKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             fleetKey_ = b;
@@ -75872,7 +75873,7 @@ public final class Messages {
             getFleetDesignIdBytes() {
           java.lang.Object ref = fleetDesignId_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             fleetDesignId_ = b;
@@ -75979,7 +75980,7 @@ public final class Messages {
             getCombatReportKeyBytes() {
           java.lang.Object ref = combatReportKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             combatReportKey_ = b;
@@ -76186,7 +76187,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -76202,7 +76203,7 @@ public final class Messages {
           getFleetDesignIdBytes() {
         java.lang.Object ref = fleetDesignId_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           fleetDesignId_ = b;
@@ -76229,7 +76230,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -76245,7 +76246,7 @@ public final class Messages {
           getCombatReportKeyBytes() {
         java.lang.Object ref = combatReportKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           combatReportKey_ = b;
@@ -76532,7 +76533,7 @@ public final class Messages {
             getFleetDesignIdBytes() {
           java.lang.Object ref = fleetDesignId_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             fleetDesignId_ = b;
@@ -76606,7 +76607,7 @@ public final class Messages {
             getCombatReportKeyBytes() {
           java.lang.Object ref = combatReportKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             combatReportKey_ = b;
@@ -76848,7 +76849,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -76864,7 +76865,7 @@ public final class Messages {
           getFleetKeyBytes() {
         java.lang.Object ref = fleetKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           fleetKey_ = b;
@@ -76891,7 +76892,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -76907,7 +76908,7 @@ public final class Messages {
           getFleetDesignIdBytes() {
         java.lang.Object ref = fleetDesignId_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           fleetDesignId_ = b;
@@ -76950,7 +76951,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -76966,7 +76967,7 @@ public final class Messages {
           getCombatReportKeyBytes() {
         java.lang.Object ref = combatReportKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           combatReportKey_ = b;
@@ -77289,7 +77290,7 @@ public final class Messages {
             getFleetKeyBytes() {
           java.lang.Object ref = fleetKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             fleetKey_ = b;
@@ -77363,7 +77364,7 @@ public final class Messages {
             getFleetDesignIdBytes() {
           java.lang.Object ref = fleetDesignId_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             fleetDesignId_ = b;
@@ -77470,7 +77471,7 @@ public final class Messages {
             getCombatReportKeyBytes() {
           java.lang.Object ref = combatReportKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             combatReportKey_ = b;
@@ -77677,7 +77678,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -77693,7 +77694,7 @@ public final class Messages {
           getColonyKeyBytes() {
         java.lang.Object ref = colonyKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           colonyKey_ = b;
@@ -77720,7 +77721,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -77736,7 +77737,7 @@ public final class Messages {
           getEnemyEmpireKeyBytes() {
         java.lang.Object ref = enemyEmpireKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           enemyEmpireKey_ = b;
@@ -78023,7 +78024,7 @@ public final class Messages {
             getColonyKeyBytes() {
           java.lang.Object ref = colonyKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             colonyKey_ = b;
@@ -78097,7 +78098,7 @@ public final class Messages {
             getEnemyEmpireKeyBytes() {
           java.lang.Object ref = enemyEmpireKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             enemyEmpireKey_ = b;
@@ -78319,7 +78320,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -78335,7 +78336,7 @@ public final class Messages {
           getColonyKeyBytes() {
         java.lang.Object ref = colonyKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           colonyKey_ = b;
@@ -78362,7 +78363,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -78378,7 +78379,7 @@ public final class Messages {
           getEnemyEmpireKeyBytes() {
         java.lang.Object ref = enemyEmpireKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           enemyEmpireKey_ = b;
@@ -78698,7 +78699,7 @@ public final class Messages {
             getColonyKeyBytes() {
           java.lang.Object ref = colonyKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             colonyKey_ = b;
@@ -78772,7 +78773,7 @@ public final class Messages {
             getEnemyEmpireKeyBytes() {
           java.lang.Object ref = enemyEmpireKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             enemyEmpireKey_ = b;
@@ -78992,7 +78993,7 @@ public final class Messages {
         if (ref instanceof java.lang.String) {
           return (java.lang.String) ref;
         } else {
-          com.google.protobuf.ByteString bs = 
+          com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
@@ -79008,7 +79009,7 @@ public final class Messages {
           getColonyKeyBytes() {
         java.lang.Object ref = colonyKey_;
         if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           colonyKey_ = b;
@@ -79276,7 +79277,7 @@ public final class Messages {
             getColonyKeyBytes() {
           java.lang.Object ref = colonyKey_;
           if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString b =
                 com.google.protobuf.ByteString.copyFromUtf8(
                     (java.lang.String) ref);
             colonyKey_ = b;
@@ -79350,7 +79351,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -79366,7 +79367,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -79393,7 +79394,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -79409,7 +79410,7 @@ public final class Messages {
         getEmpireKeyBytes() {
       java.lang.Object ref = empireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireKey_ = b;
@@ -79452,7 +79453,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -79468,7 +79469,7 @@ public final class Messages {
         getStarKeyBytes() {
       java.lang.Object ref = starKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starKey_ = b;
@@ -79521,7 +79522,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -79542,7 +79543,7 @@ public final class Messages {
         getRealmBytes() {
       java.lang.Object ref = realm_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         realm_ = b;
@@ -80293,7 +80294,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -80367,7 +80368,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -80474,7 +80475,7 @@ public final class Messages {
           getStarKeyBytes() {
         java.lang.Object ref = starKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starKey_ = b;
@@ -80596,7 +80597,7 @@ public final class Messages {
           getRealmBytes() {
         java.lang.Object ref = realm_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           realm_ = b;
@@ -80760,7 +80761,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord build_complete_record = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord, au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord, au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecordOrBuilder>
           getBuildCompleteRecordFieldBuilder() {
         if (buildCompleteRecordBuilder_ == null) {
           buildCompleteRecordBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -80877,7 +80878,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.MoveCompleteRecord move_complete_record = 7;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord, au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord, au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecordOrBuilder>
           getMoveCompleteRecordFieldBuilder() {
         if (moveCompleteRecordBuilder_ == null) {
           moveCompleteRecordBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -80994,7 +80995,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetUnderAttackRecord fleet_under_attack_record = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord, au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord, au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecordOrBuilder>
           getFleetUnderAttackRecordFieldBuilder() {
         if (fleetUnderAttackRecordBuilder_ == null) {
           fleetUnderAttackRecordBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -81111,7 +81112,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetDestroyedRecord fleet_destroyed_record = 9;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord, au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord, au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecordOrBuilder>
           getFleetDestroyedRecordFieldBuilder() {
         if (fleetDestroyedRecordBuilder_ == null) {
           fleetDestroyedRecordBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -81228,7 +81229,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetVictoriousRecord fleet_victorious_record = 10;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord, au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord, au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecordOrBuilder>
           getFleetVictoriousRecordFieldBuilder() {
         if (fleetVictoriousRecordBuilder_ == null) {
           fleetVictoriousRecordBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -81345,7 +81346,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyDestroyedRecord colony_destroyed_record = 11;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord, au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord, au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecordOrBuilder>
           getColonyDestroyedRecordFieldBuilder() {
         if (colonyDestroyedRecordBuilder_ == null) {
           colonyDestroyedRecordBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -81462,7 +81463,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyAttackedRecord colony_attacked_record = 12;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord, au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord, au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecordOrBuilder>
           getColonyAttackedRecordFieldBuilder() {
         if (colonyAttackedRecordBuilder_ == null) {
           colonyAttackedRecordBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -81579,7 +81580,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.StarRunOutOfGoodsRecord star_ran_out_of_goods_record = 13;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord, au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord, au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord.Builder, au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecordOrBuilder>
           getStarRanOutOfGoodsRecordFieldBuilder() {
         if (starRanOutOfGoodsRecordBuilder_ == null) {
           starRanOutOfGoodsRecordBuilder_ = new com.google.protobuf.SingleFieldBuilder<
@@ -81610,7 +81611,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.SituationReport situation_reports = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.SituationReport> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.SituationReport>
         getSituationReportsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.SituationReport situation_reports = 1;</code>
@@ -81623,7 +81624,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.SituationReport situation_reports = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.SituationReportOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.SituationReportOrBuilder>
         getSituationReportsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.SituationReport situation_reports = 1;</code>
@@ -81777,7 +81778,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.SituationReport situation_reports = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.SituationReportOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.SituationReportOrBuilder>
         getSituationReportsOrBuilderList() {
       return situationReports_;
     }
@@ -81826,7 +81827,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -81846,7 +81847,7 @@ public final class Messages {
         getCursorBytes() {
       java.lang.Object ref = cursor_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         cursor_ = b;
@@ -82095,7 +82096,7 @@ public final class Messages {
               situationReportsBuilder_ = null;
               situationReports_ = other.situationReports_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              situationReportsBuilder_ = 
+              situationReportsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getSituationReportsFieldBuilder() : null;
             } else {
@@ -82330,7 +82331,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.SituationReport situation_reports = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.SituationReportOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.SituationReportOrBuilder>
            getSituationReportsOrBuilderList() {
         if (situationReportsBuilder_ != null) {
           return situationReportsBuilder_.getMessageOrBuilderList();
@@ -82356,12 +82357,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.SituationReport situation_reports = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.SituationReport.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.SituationReport.Builder>
            getSituationReportsBuilderList() {
         return getSituationReportsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.SituationReport, au.com.codeka.common.protobuf.Messages.SituationReport.Builder, au.com.codeka.common.protobuf.Messages.SituationReportOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.SituationReport, au.com.codeka.common.protobuf.Messages.SituationReport.Builder, au.com.codeka.common.protobuf.Messages.SituationReportOrBuilder>
           getSituationReportsFieldBuilder() {
         if (situationReportsBuilder_ == null) {
           situationReportsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -82416,7 +82417,7 @@ public final class Messages {
           getCursorBytes() {
         java.lang.Object ref = cursor_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           cursor_ = b;
@@ -83147,7 +83148,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -83163,7 +83164,7 @@ public final class Messages {
         getFleetDesignIdBytes() {
       java.lang.Object ref = fleetDesignId_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         fleetDesignId_ = b;
@@ -83222,7 +83223,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -83238,7 +83239,7 @@ public final class Messages {
         getStarNameBytes() {
       java.lang.Object ref = starName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         starName_ = b;
@@ -83289,7 +83290,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -83309,7 +83310,7 @@ public final class Messages {
         getBuildDesignIdBytes() {
       java.lang.Object ref = buildDesignId_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         buildDesignId_ = b;
@@ -83376,7 +83377,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -83396,7 +83397,7 @@ public final class Messages {
         getAllianceNameBytes() {
       java.lang.Object ref = allianceName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         allianceName_ = b;
@@ -84175,7 +84176,7 @@ public final class Messages {
           getFleetDesignIdBytes() {
         java.lang.Object ref = fleetDesignId_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           fleetDesignId_ = b;
@@ -84315,7 +84316,7 @@ public final class Messages {
           getStarNameBytes() {
         java.lang.Object ref = starName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           starName_ = b;
@@ -84434,7 +84435,7 @@ public final class Messages {
           getBuildDesignIdBytes() {
         java.lang.Object ref = buildDesignId_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           buildDesignId_ = b;
@@ -84598,7 +84599,7 @@ public final class Messages {
           getAllianceNameBytes() {
         java.lang.Object ref = allianceName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           allianceName_ = b;
@@ -84673,7 +84674,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.CashAuditRecord> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.CashAuditRecord>
         getRecordsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
@@ -84686,7 +84687,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder>
         getRecordsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
@@ -84807,7 +84808,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder>
         getRecordsOrBuilderList() {
       return records_;
     }
@@ -85054,7 +85055,7 @@ public final class Messages {
               recordsBuilder_ = null;
               records_ = other.records_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              recordsBuilder_ = 
+              recordsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getRecordsFieldBuilder() : null;
             } else {
@@ -85284,7 +85285,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder>
            getRecordsOrBuilderList() {
         if (recordsBuilder_ != null) {
           return recordsBuilder_.getMessageOrBuilderList();
@@ -85310,12 +85311,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder>
            getRecordsBuilderList() {
         return getRecordsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.CashAuditRecord, au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder, au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.CashAuditRecord, au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder, au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder>
           getRecordsFieldBuilder() {
         if (recordsBuilder_ == null) {
           recordsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -85474,7 +85475,7 @@ public final class Messages {
      * If set, the actual collection of members
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.AllianceMember> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.AllianceMember>
         getMembersList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.AllianceMember members = 6;</code>
@@ -85499,7 +85500,7 @@ public final class Messages {
      * If set, the actual collection of members
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceMemberOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceMemberOrBuilder>
         getMembersOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.AllianceMember members = 6;</code>
@@ -85715,7 +85716,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -85731,7 +85732,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -85766,7 +85767,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -85786,7 +85787,7 @@ public final class Messages {
         getNameBytes() {
       java.lang.Object ref = name_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         name_ = b;
@@ -85845,7 +85846,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -85865,7 +85866,7 @@ public final class Messages {
         getCreatorEmpireKeyBytes() {
       java.lang.Object ref = creatorEmpireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         creatorEmpireKey_ = b;
@@ -85943,7 +85944,7 @@ public final class Messages {
      * If set, the actual collection of members
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceMemberOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceMemberOrBuilder>
         getMembersOrBuilderList() {
       return members_;
     }
@@ -86397,7 +86398,7 @@ public final class Messages {
               membersBuilder_ = null;
               members_ = other.members_;
               bitField0_ = (bitField0_ & ~0x00000040);
-              membersBuilder_ = 
+              membersBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getMembersFieldBuilder() : null;
             } else {
@@ -86467,7 +86468,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -86553,7 +86554,7 @@ public final class Messages {
           getNameBytes() {
         java.lang.Object ref = name_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           name_ = b;
@@ -86700,7 +86701,7 @@ public final class Messages {
           getCreatorEmpireKeyBytes() {
         java.lang.Object ref = creatorEmpireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           creatorEmpireKey_ = b;
@@ -87110,7 +87111,7 @@ public final class Messages {
        * If set, the actual collection of members
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceMemberOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceMemberOrBuilder>
            getMembersOrBuilderList() {
         if (membersBuilder_ != null) {
           return membersBuilder_.getMessageOrBuilderList();
@@ -87148,12 +87149,12 @@ public final class Messages {
        * If set, the actual collection of members
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceMember.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceMember.Builder>
            getMembersBuilderList() {
         return getMembersFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.AllianceMember, au.com.codeka.common.protobuf.Messages.AllianceMember.Builder, au.com.codeka.common.protobuf.Messages.AllianceMemberOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.AllianceMember, au.com.codeka.common.protobuf.Messages.AllianceMember.Builder, au.com.codeka.common.protobuf.Messages.AllianceMemberOrBuilder>
           getMembersFieldBuilder() {
         if (membersBuilder_ == null) {
           membersBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -87291,7 +87292,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Alliance alliances = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.Alliance> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.Alliance>
         getAlliancesList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Alliance alliances = 1;</code>
@@ -87304,7 +87305,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Alliance alliances = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceOrBuilder>
         getAlliancesOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Alliance alliances = 1;</code>
@@ -87425,7 +87426,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.Alliance alliances = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceOrBuilder>
         getAlliancesOrBuilderList() {
       return alliances_;
     }
@@ -87672,7 +87673,7 @@ public final class Messages {
               alliancesBuilder_ = null;
               alliances_ = other.alliances_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              alliancesBuilder_ = 
+              alliancesBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getAlliancesFieldBuilder() : null;
             } else {
@@ -87902,7 +87903,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Alliance alliances = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceOrBuilder>
            getAlliancesOrBuilderList() {
         if (alliancesBuilder_ != null) {
           return alliancesBuilder_.getMessageOrBuilderList();
@@ -87928,12 +87929,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.Alliance alliances = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.Alliance.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.Alliance.Builder>
            getAlliancesBuilderList() {
         return getAlliancesFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.Alliance, au.com.codeka.common.protobuf.Messages.Alliance.Builder, au.com.codeka.common.protobuf.Messages.AllianceOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.Alliance, au.com.codeka.common.protobuf.Messages.Alliance.Builder, au.com.codeka.common.protobuf.Messages.AllianceOrBuilder>
           getAlliancesFieldBuilder() {
         if (alliancesBuilder_ == null) {
           alliancesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -88256,7 +88257,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -88272,7 +88273,7 @@ public final class Messages {
         getKeyBytes() {
       java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         key_ = b;
@@ -88299,7 +88300,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -88315,7 +88316,7 @@ public final class Messages {
         getEmpireKeyBytes() {
       java.lang.Object ref = empireKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         empireKey_ = b;
@@ -88342,7 +88343,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -88358,7 +88359,7 @@ public final class Messages {
         getAllianceKeyBytes() {
       java.lang.Object ref = allianceKey_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         allianceKey_ = b;
@@ -88730,7 +88731,7 @@ public final class Messages {
           getKeyBytes() {
         java.lang.Object ref = key_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           key_ = b;
@@ -88804,7 +88805,7 @@ public final class Messages {
           getEmpireKeyBytes() {
         java.lang.Object ref = empireKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           empireKey_ = b;
@@ -88878,7 +88879,7 @@ public final class Messages {
           getAllianceKeyBytes() {
         java.lang.Object ref = allianceKey_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           allianceKey_ = b;
@@ -89180,7 +89181,7 @@ public final class Messages {
      * the votes we've received for this request so far.
      * </pre>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequestVote> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequestVote>
         getVoteList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
@@ -89205,7 +89206,7 @@ public final class Messages {
      * the votes we've received for this request so far.
      * </pre>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder>
         getVoteOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
@@ -89715,7 +89716,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -89731,7 +89732,7 @@ public final class Messages {
         getMessageBytes() {
       java.lang.Object ref = message_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         message_ = b;
@@ -89870,7 +89871,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -89890,7 +89891,7 @@ public final class Messages {
         getNewNameBytes() {
       java.lang.Object ref = newName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         newName_ = b;
@@ -89920,7 +89921,7 @@ public final class Messages {
      * the votes we've received for this request so far.
      * </pre>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder>
         getVoteOrBuilderList() {
       return vote_;
     }
@@ -90389,7 +90390,7 @@ public final class Messages {
               voteBuilder_ = null;
               vote_ = other.vote_;
               bitField0_ = (bitField0_ & ~0x00001000);
-              voteBuilder_ = 
+              voteBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getVoteFieldBuilder() : null;
             } else {
@@ -90621,7 +90622,7 @@ public final class Messages {
           getMessageBytes() {
         java.lang.Object ref = message_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           message_ = b;
@@ -90926,7 +90927,7 @@ public final class Messages {
           getNewNameBytes() {
         java.lang.Object ref = newName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           newName_ = b;
@@ -91238,7 +91239,7 @@ public final class Messages {
        * the votes we've received for this request so far.
        * </pre>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder>
            getVoteOrBuilderList() {
         if (voteBuilder_ != null) {
           return voteBuilder_.getMessageOrBuilderList();
@@ -91276,12 +91277,12 @@ public final class Messages {
        * the votes we've received for this request so far.
        * </pre>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder>
            getVoteBuilderList() {
         return getVoteFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.AllianceRequestVote, au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder, au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.AllianceRequestVote, au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder, au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder>
           getVoteFieldBuilder() {
         if (voteBuilder_ == null) {
           voteBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -91313,7 +91314,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequest> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequest>
         getRequestsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
@@ -91326,7 +91327,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder>
         getRequestsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
@@ -91468,7 +91469,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder>
         getRequestsOrBuilderList() {
       return requests_;
     }
@@ -91509,7 +91510,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -91525,7 +91526,7 @@ public final class Messages {
         getCursorBytes() {
       java.lang.Object ref = cursor_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         cursor_ = b;
@@ -91774,7 +91775,7 @@ public final class Messages {
               requestsBuilder_ = null;
               requests_ = other.requests_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              requestsBuilder_ = 
+              requestsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getRequestsFieldBuilder() : null;
             } else {
@@ -92009,7 +92010,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder>
            getRequestsOrBuilderList() {
         if (requestsBuilder_ != null) {
           return requestsBuilder_.getMessageOrBuilderList();
@@ -92035,12 +92036,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder>
            getRequestsBuilderList() {
         return getRequestsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.AllianceRequest, au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder, au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.AllianceRequest, au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder, au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder>
           getRequestsFieldBuilder() {
         if (requestsBuilder_ == null) {
           requestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
@@ -92083,7 +92084,7 @@ public final class Messages {
           getCursorBytes() {
         java.lang.Object ref = cursor_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           cursor_ = b;
@@ -93376,7 +93377,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93392,7 +93393,7 @@ public final class Messages {
         getAndroidVersionBytes() {
       java.lang.Object ref = androidVersion_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         androidVersion_ = b;
@@ -93419,7 +93420,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93435,7 +93436,7 @@ public final class Messages {
         getPhoneModelBytes() {
       java.lang.Object ref = phoneModel_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         phoneModel_ = b;
@@ -93462,7 +93463,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93478,7 +93479,7 @@ public final class Messages {
         getPackageNameBytes() {
       java.lang.Object ref = packageName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         packageName_ = b;
@@ -93505,7 +93506,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93521,7 +93522,7 @@ public final class Messages {
         getAppVersionBytes() {
       java.lang.Object ref = appVersion_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         appVersion_ = b;
@@ -93548,7 +93549,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93564,7 +93565,7 @@ public final class Messages {
         getStackTraceBytes() {
       java.lang.Object ref = stackTrace_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         stackTrace_ = b;
@@ -93591,7 +93592,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93607,7 +93608,7 @@ public final class Messages {
         getMessageBytes() {
       java.lang.Object ref = message_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         message_ = b;
@@ -93666,7 +93667,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93682,7 +93683,7 @@ public final class Messages {
         getContextBytes() {
       java.lang.Object ref = context_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         context_ = b;
@@ -93709,7 +93710,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93725,7 +93726,7 @@ public final class Messages {
         getExceptionClassBytes() {
       java.lang.Object ref = exceptionClass_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         exceptionClass_ = b;
@@ -93832,7 +93833,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93848,7 +93849,7 @@ public final class Messages {
         getLogOutputBytes() {
       java.lang.Object ref = logOutput_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         logOutput_ = b;
@@ -93875,7 +93876,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93891,7 +93892,7 @@ public final class Messages {
         getServerRequestQsBytes() {
       java.lang.Object ref = serverRequestQs_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         serverRequestQs_ = b;
@@ -93918,7 +93919,7 @@ public final class Messages {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -93934,7 +93935,7 @@ public final class Messages {
         getServerRequestUserAgentBytes() {
       java.lang.Object ref = serverRequestUserAgent_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         serverRequestUserAgent_ = b;
@@ -94511,7 +94512,7 @@ public final class Messages {
           getAndroidVersionBytes() {
         java.lang.Object ref = androidVersion_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           androidVersion_ = b;
@@ -94585,7 +94586,7 @@ public final class Messages {
           getPhoneModelBytes() {
         java.lang.Object ref = phoneModel_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           phoneModel_ = b;
@@ -94659,7 +94660,7 @@ public final class Messages {
           getPackageNameBytes() {
         java.lang.Object ref = packageName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           packageName_ = b;
@@ -94733,7 +94734,7 @@ public final class Messages {
           getAppVersionBytes() {
         java.lang.Object ref = appVersion_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           appVersion_ = b;
@@ -94807,7 +94808,7 @@ public final class Messages {
           getStackTraceBytes() {
         java.lang.Object ref = stackTrace_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           stackTrace_ = b;
@@ -94881,7 +94882,7 @@ public final class Messages {
           getMessageBytes() {
         java.lang.Object ref = message_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           message_ = b;
@@ -95021,7 +95022,7 @@ public final class Messages {
           getContextBytes() {
         java.lang.Object ref = context_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           context_ = b;
@@ -95095,7 +95096,7 @@ public final class Messages {
           getExceptionClassBytes() {
         java.lang.Object ref = exceptionClass_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           exceptionClass_ = b;
@@ -95334,7 +95335,7 @@ public final class Messages {
           getLogOutputBytes() {
         java.lang.Object ref = logOutput_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           logOutput_ = b;
@@ -95408,7 +95409,7 @@ public final class Messages {
           getServerRequestQsBytes() {
         java.lang.Object ref = serverRequestQs_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           serverRequestQs_ = b;
@@ -95482,7 +95483,7 @@ public final class Messages {
           getServerRequestUserAgentBytes() {
         java.lang.Object ref = serverRequestUserAgent_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           serverRequestUserAgent_ = b;
@@ -95545,7 +95546,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.ErrorReport> 
+    java.util.List<au.com.codeka.common.protobuf.Messages.ErrorReport>
         getReportsList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
@@ -95558,7 +95559,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder> 
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder>
         getReportsOrBuilderList();
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
@@ -95679,7 +95680,7 @@ public final class Messages {
     /**
      * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder> 
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder>
         getReportsOrBuilderList() {
       return reports_;
     }
@@ -95926,7 +95927,7 @@ public final class Messages {
               reportsBuilder_ = null;
               reports_ = other.reports_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              reportsBuilder_ = 
+              reportsBuilder_ =
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getReportsFieldBuilder() : null;
             } else {
@@ -96156,7 +96157,7 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder> 
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder>
            getReportsOrBuilderList() {
         if (reportsBuilder_ != null) {
           return reportsBuilder_.getMessageOrBuilderList();
@@ -96182,12 +96183,12 @@ public final class Messages {
       /**
        * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.ErrorReport.Builder> 
+      public java.util.List<au.com.codeka.common.protobuf.Messages.ErrorReport.Builder>
            getReportsBuilderList() {
         return getReportsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.ErrorReport, au.com.codeka.common.protobuf.Messages.ErrorReport.Builder, au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder> 
+          au.com.codeka.common.protobuf.Messages.ErrorReport, au.com.codeka.common.protobuf.Messages.ErrorReport.Builder, au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder>
           getReportsFieldBuilder() {
         if (reportsBuilder_ == null) {
           reportsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<

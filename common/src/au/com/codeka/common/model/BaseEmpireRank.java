@@ -1,33 +1,34 @@
 package au.com.codeka.common.model;
 
 import au.com.codeka.common.protobuf.Messages;
+import java.math.BigInteger;
 
 public class BaseEmpireRank {
     protected String mEmpireKey;
-    protected int mTotalStars;
-    protected int mTotalColonies;
-    protected int mTotalBuildings;
-    protected int mTotalShips;
-    protected int mTotalPopulation;
+    protected BigInteger mTotalStars = BigInteger.valueOf(0);
+    protected BigInteger mTotalColonies = BigInteger.valueOf(0);
+    protected BigInteger mTotalBuildings = BigInteger.valueOf(0);
+    protected BigInteger mTotalShips = BigInteger.valueOf(0);
+    protected BigInteger mTotalPopulation = BigInteger.valueOf(0);
     protected int mRank;
     protected int mLastRank;
 
     public String getEmpireKey() {
         return mEmpireKey;
     }
-    public int getTotalStars() {
+    public BigInteger getTotalStars() {
         return mTotalStars;
     }
-    public int getTotalColonies() {
+    public BigInteger getTotalColonies() {
         return mTotalColonies;
     }
-    public int getTotalBuildings() {
+    public BigInteger getTotalBuildings() {
         return mTotalBuildings;
     }
-    public int getTotalShips() {
+    public BigInteger getTotalShips() {
         return mTotalShips;
     }
-    public int getTotalPopulation() {
+    public BigInteger getTotalPopulation() {
         return mTotalPopulation;
     }
     public int getRank() {
