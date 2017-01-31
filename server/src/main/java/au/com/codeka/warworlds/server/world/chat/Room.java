@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.world.chat;
 import java.util.ArrayList;
 import java.util.List;
 
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 import au.com.codeka.warworlds.server.store.DataStore;
@@ -13,6 +14,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * All the details we need about room, all the participants and so on.
  */
 public class Room {
+  private static final Log log = new Log("Room");
+
   private final ChatRoom room;
   private final Object lock = new Object();
 
@@ -38,7 +41,9 @@ public class Room {
 
   public void send(ChatMessage msg) {
     // TODO: make sure we're inserting in the right place
-    history.add(msg);
+    synchronized (lock) {
+      history.add(msg);
+    }
 
     DataStore.i.chat().send(room, msg);
   }
@@ -49,9 +54,11 @@ public class Room {
    */
   public List<ChatMessage> getMessages(long startTime, long endTime) {
     synchronized (lock) {
+      log.debug("historyStarTime=%d starTime=%d", historyStartTime, startTime);
       if (historyStartTime > startTime) {
         List<ChatMessage> messages =
             DataStore.i.chat().getMessages(room.id, startTime, historyStartTime);
+        log.debug("adding %d msgs into history", messages.size());
         history.addAll(0, messages);
         historyStartTime = startTime;
       }

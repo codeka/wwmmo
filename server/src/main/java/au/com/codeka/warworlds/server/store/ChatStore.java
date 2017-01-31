@@ -7,6 +7,8 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
+import au.com.codeka.warworlds.server.store.base.QueryResult;
+import au.com.codeka.warworlds.server.store.base.StoreReader;
 
 /**
  * A store that holds all the chat messages.
@@ -41,8 +43,27 @@ public class ChatStore extends BaseStore {
    * most recent message last.
    */
   public List<ChatMessage> getMessages(Long roomId, long startTime, long endTime) {
-    // TODO
-    return new ArrayList<>();
+    StoreReader reader = newReader();
+    if (roomId == null) {
+      reader.stmt("SELECT msg FROM messages WHERE room_id IS NULL AND date > ? AND date <= ?")
+          .param(0, startTime)
+          .param(1, endTime);
+    } else {
+      reader.stmt("SELECT msg FROM messages WHERE room_id = ? AND date > ? AND date <= ?")
+          .param(0, roomId)
+          .param(1, startTime)
+          .param(2, endTime);
+    }
+
+    ArrayList<ChatMessage> msgs = new ArrayList<>();
+    try (QueryResult res = reader.query()) {
+      while (res.next()) {
+        msgs.add(ChatMessage.ADAPTER.decode(res.getBytes(0)));
+      }
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+    }
+    return msgs;
   }
 
   @Override
