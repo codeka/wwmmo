@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket;
 import au.com.codeka.warworlds.common.proto.ModifyStarPacket;
@@ -23,6 +24,8 @@ import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
 import au.com.codeka.warworlds.server.concurrency.TaskRunner;
 import au.com.codeka.warworlds.server.concurrency.Threads;
 import au.com.codeka.warworlds.server.net.Connection;
+import au.com.codeka.warworlds.server.world.chat.ChatManager;
+import au.com.codeka.warworlds.server.world.chat.Participant;
 
 /** Represents a currently-connected player. */
 public class Player {
@@ -80,6 +83,16 @@ public class Player {
         (System.nanoTime() - startTime) / 1000000L);
 
     // TODO: send to player
+
+    // Register this player with the chat system so that we get notified of messages.
+    ChatManager.i.connectPlayer(empire.get().id, chatCallback);
+  }
+
+  /**
+   * Called when the client disconnects from us.
+   */
+  public void onDisconnect() {
+    ChatManager.i.disconnectPlayer(empire.get().id);
   }
 
   private void onWatchSectorsPacket(WatchSectorsPacket pkt) {
@@ -136,4 +149,11 @@ public class Player {
             .build())
         .build());
   }
+
+  private final Participant.OnlineCallback chatCallback = new Participant.OnlineCallback() {
+    @Override
+    public void onChatMessage(ChatMessage msg) {
+      log.info("ChatMessage: %s", msg.message);
+    }
+  };
 }

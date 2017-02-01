@@ -22,6 +22,9 @@ public class Room {
   /** The current history, most recent message last. */
   private final List<ChatMessage> history;
 
+  /** The {@link Participant}s in this room. */
+  private final List<Participant> participants;
+
   /**
    * The time that we have history loaded back until. We only load history as it's requested, and
    * not further back than needed. Mostly we don't need to keep history from much before when we're
@@ -33,6 +36,7 @@ public class Room {
     this.room = checkNotNull(room);
     this.historyStartTime = System.currentTimeMillis();
     this.history = new ArrayList<>();
+    this.participants = new ArrayList<>();
   }
 
   public ChatRoom getChatRoom() {
@@ -45,7 +49,25 @@ public class Room {
       history.add(msg);
     }
 
+    synchronized (participants) {
+      for (Participant participant : participants) {
+        participant.onMessage(msg);
+      }
+    }
+
     DataStore.i.chat().send(room, msg);
+  }
+
+  public void addParticipant(Participant participant) {
+    synchronized (participants) {
+      participants.add(participant);
+    }
+  }
+
+  public void removeParticipant(Participant participant) {
+    synchronized (participants) {
+      participants.remove(participant);
+    }
   }
 
   /**

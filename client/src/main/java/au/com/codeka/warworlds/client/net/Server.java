@@ -193,13 +193,21 @@ public class Server {
       };
 
   private final PacketDecoder.PacketHandler packetDecodeHandler =
-      (decoder, packet, encodedSize) -> {
-        String packetDebug = PacketDebug.getPacketDebug(packet, encodedSize);
-        App.i.getEventBus().publish(new ServerPacketEvent(
-            packet, encodedSize, ServerPacketEvent.Direction.Received, packetDebug));
-        log.debug("<< %s", packetDebug);
+      new PacketDecoder.PacketHandler() {
+        @Override
+        public void onPacket(PacketDecoder decoder, Packet pkt, int encodedSize) {
+          String packetDebug = PacketDebug.getPacketDebug(pkt, encodedSize);
+          App.i.getEventBus().publish(new ServerPacketEvent(
+              pkt, encodedSize, ServerPacketEvent.Direction.Received, packetDebug));
+          log.debug("<< %s", packetDebug);
 
-        packetDispatcher.dispatch(packet);
+          packetDispatcher.dispatch(pkt);
+        }
+
+        @Override
+        public void onDisconnect() {
+          // TODO: disconnected
+        }
       };
 
   private void updateState(ServerStateEvent.ConnectionState state) {

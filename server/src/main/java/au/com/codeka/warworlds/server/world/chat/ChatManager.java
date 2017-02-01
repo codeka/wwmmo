@@ -10,7 +10,8 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 import au.com.codeka.warworlds.server.store.DataStore;
-import au.com.codeka.warworlds.server.world.WatchableObject;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Manages chat rooms and stuff.
@@ -19,6 +20,7 @@ public class ChatManager {
   private static final Log log = new Log("ChatManager");
   public static final ChatManager i = new ChatManager();
 
+  private final Map<Long, Participant> participants = new HashMap<>();
   private final Map<Long, Room> rooms = new HashMap<>();
   private final Room globalRoom;
 
@@ -48,6 +50,34 @@ public class ChatManager {
   public List<ChatMessage> getMessages(@Nullable Long roomId, long startTime, long endTime) {
     Room room = getRoom(roomId);
     return room.getMessages(startTime, endTime);
+  }
+
+  /** Called when a player connects. We'll start sending them messages and stuff. */
+  public void connectPlayer(long empireId, Participant.OnlineCallback callback) {
+    Participant participant;
+    synchronized (participants) {
+      participant = participants.get(empireId);
+      if (participant == null) {
+        participant = new Participant(empireId);
+        participants.put(empireId, participant);
+      }
+    }
+
+    // Players are only in the global room when they first connect.
+    globalRoom.addParticipant(participant);
+
+    participant.setOnlineCallback(callback);
+  }
+
+  /** Called when a player disconnects. */
+  public void disconnectPlayer(long empireId) {
+    Participant participant;
+    synchronized (participants) {
+      participant = checkNotNull(participants.get(empireId));
+    }
+
+    globalRoom.removeParticipant(participant);
+    participant.setOnlineCallback(null);
   }
 
   /**
