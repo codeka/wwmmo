@@ -22,6 +22,7 @@ import java.util.Locale;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
+import au.com.codeka.warworlds.client.game.world.ChatManager;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 
@@ -211,11 +212,11 @@ public class ChatFragment extends BaseFragment {
       return;
     }
 
-    ChatRoom room = rooms.get(viewPager.getCurrentItem());
+    //ChatRoom room = rooms.get(viewPager.getCurrentItem());
 
     ChatMessage.Builder chatMessageBuilder = new ChatMessage.Builder()
         .message(chatMsg.getText().toString())
-        .room_id(room.id);
+        .room_id(null /* room.id */);
 
     // if this is our first chat after the update ...
 //    if (!Util.getSharedPreferences().getBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
@@ -230,7 +231,7 @@ public class ChatFragment extends BaseFragment {
 //    }
 
     chatMsg.setText("");
-//    ChatManager.i.postMessage(msg);
+    ChatManager.i.sendMessage(chatMessageBuilder.build());
   }
 
   private void showConfirmAutoTranslateDialog() {

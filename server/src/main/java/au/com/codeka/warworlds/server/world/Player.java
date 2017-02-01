@@ -10,7 +10,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.debug.PacketDebug;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
+import au.com.codeka.warworlds.common.proto.ChatMessagesPacket;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket;
 import au.com.codeka.warworlds.common.proto.ModifyStarPacket;
@@ -69,6 +71,10 @@ public class Player {
       onModifyStar(pkt.modify_star);
     } else if (pkt.request_empire != null) {
       onRequestEmpire(pkt.request_empire);
+    } else if (pkt.chat_msgs != null) {
+      onChatMessages(pkt.chat_msgs);
+    } else {
+      log.error("Unknown/unexpected packet. %s", PacketDebug.getPacketDebug(pkt));
     }
   }
 
@@ -141,7 +147,9 @@ public class Player {
     List<Empire> empires = new ArrayList<>();
     for (long id : pkt.empire_id) {
       WatchableObject<Empire> empire = EmpireManager.i.getEmpire(id);
-      empires.add(empire.get());
+      if (empire != null) {
+        empires.add(empire.get());
+      }
     }
     connection.send(new Packet.Builder()
         .empire_details(new EmpireDetailsPacket.Builder()
@@ -150,10 +158,29 @@ public class Player {
         .build());
   }
 
+  private void onChatMessages(ChatMessagesPacket pkt) {
+    if (pkt.messages.size() != 1) {
+      // TODO: suspicious, should be only one chat message.
+      log.error("Didn't get the expected 1 chat message. Got %d.", pkt.messages.size());
+      return;
+    }
+
+    ChatManager.i.send(null /* TODO */, pkt.messages.get(0).newBuilder()
+        .date_posted(System.currentTimeMillis())
+        .empire_id(empire.get().id)
+        .action(ChatMessage.MessageAction.Normal)
+        .room_id(null /* TODO */)
+        .build());
+  }
+
   private final Participant.OnlineCallback chatCallback = new Participant.OnlineCallback() {
     @Override
     public void onChatMessage(ChatMessage msg) {
-      log.info("ChatMessage: %s", msg.message);
+      connection.send(new Packet.Builder()
+          .chat_msgs(new ChatMessagesPacket.Builder()
+              .messages(Lists.newArrayList(msg))
+              .build())
+          .build());
     }
   };
 }
