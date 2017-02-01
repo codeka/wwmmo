@@ -21,7 +21,7 @@ $(function() {
   });
   $("#send input").focus();
 
-  var lastMsgTime = new Date().getTime() - (3600000 /* 1 hour */);
+  var lastMsgTime = new Date().getTime() - (3600000 /* 1 hour */ * 24);
 
   function appendMessage(msg) {
     var dt = new Date(msg.date_posted);

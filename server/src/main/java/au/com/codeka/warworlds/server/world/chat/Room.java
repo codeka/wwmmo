@@ -54,11 +54,9 @@ public class Room {
    */
   public List<ChatMessage> getMessages(long startTime, long endTime) {
     synchronized (lock) {
-      log.debug("historyStarTime=%d starTime=%d", historyStartTime, startTime);
       if (historyStartTime > startTime) {
         List<ChatMessage> messages =
             DataStore.i.chat().getMessages(room.id, startTime, historyStartTime);
-        log.debug("adding %d msgs into history", messages.size());
         history.addAll(0, messages);
         historyStartTime = startTime;
       }
