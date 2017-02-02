@@ -34,7 +34,8 @@ message ChatMessage {
 // A room is a private chat between two or more participants.
 message ChatRoom {
   optional int64 id = 1;
-  repeated ChatParticipant participants = 2;
+  optional string name = 2;
+  repeated ChatParticipant participants = 3;
 }
 
 // Refers to a participant of a chat room.

@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 
 import au.com.codeka.warworlds.client.concurrency.TaskRunner;
 import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.client.game.world.ChatManager;
 import au.com.codeka.warworlds.client.net.Server;
 import au.com.codeka.warworlds.client.store.DataStore;
 import au.com.codeka.warworlds.client.util.eventbus.EventBus;
@@ -45,6 +46,7 @@ public class App extends Application {
     server.connect();
     dataStore.open(this);
     StarManager.i.create();
+    ChatManager.i.create();
 
     log.info("App.onCreate() complete.");
   }

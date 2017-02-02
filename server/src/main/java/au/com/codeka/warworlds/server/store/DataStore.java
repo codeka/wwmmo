@@ -11,6 +11,7 @@ public class DataStore {
 
   private final AccountsStore accounts = new AccountsStore("accounts.db");
   private final AdminUsersStore adminUsers = new AdminUsersStore("admin.db");
+  private final ChatStore chat = new ChatStore("chat.db");
   private final EmpiresStore empires = new EmpiresStore("empires.db");
   private final SequenceStore seq = new SequenceStore("seq.db");
   private final SectorsStore sectors = new SectorsStore("sectors.db");
@@ -37,6 +38,7 @@ public class DataStore {
     try {
       accounts.open();
       adminUsers.open();
+      chat.open();
       empires.open();
       seq.open();
       sectors.open();
@@ -53,6 +55,7 @@ public class DataStore {
       sectors.close();
       seq.close();
       empires.close();
+      chat.close();
       adminUsers.close();
       accounts.close();
     } catch (StoreException e) {
@@ -66,6 +69,10 @@ public class DataStore {
 
   public AccountsStore accounts() {
     return accounts;
+  }
+
+  public ChatStore chat() {
+    return chat;
   }
 
   public EmpiresStore empires() {

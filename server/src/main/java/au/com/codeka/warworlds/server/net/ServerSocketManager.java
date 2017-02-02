@@ -51,9 +51,9 @@ public class ServerSocketManager {
    * Adds a pending connection from the given {@link Account}, with the given expected encryption
    * key. If nothing connects within CONNECTION_TIMEOUT_MS, we'll drop this pending connection.
    *
-   * @param account
-   * @param empire
-   * @param encryptionKey
+   * @param account The {@link Account} that's connecting.
+   * @param empire The {@link Empire} that's connecting.
+   * @param encryptionKey The player's encryption key.
    */
   public void addPendingConnection(
       Account account, WatchableObject<Empire> empire, byte[] encryptionKey) {
@@ -61,6 +61,8 @@ public class ServerSocketManager {
   }
 
   public void stop() {
+    log.info("Server socket stopping.");
+
     try {
       serverSocket.close();
     } catch (IOException e) {
@@ -121,6 +123,11 @@ public class ServerSocketManager {
       log.info("GameSocket connection received for empire #%d %s",
           pkt.hello.empire_id, pendingConnection.getEmpire().get().display_name);
       connections.put(pkt.hello.empire_id, pendingConnection.connect(socket, decoder, outs));
+    }
+
+    @Override
+    public void onDisconnect() {
+      log.warning("Client disconnected while waiting for 'hello' packet.");
     }
   }
 

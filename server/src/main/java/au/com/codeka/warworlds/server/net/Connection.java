@@ -69,6 +69,11 @@ public class Connection implements PacketDecoder.PacketHandler {
     TaskRunner.i.runTask(() -> player.onPacket(packet), Threads.BACKGROUND);
   }
 
+  @Override
+  public void onDisconnect() {
+    TaskRunner.i.runTask(() -> player.onDisconnect(), Threads.BACKGROUND);
+  }
+
   private PacketEncoder.PacketHandler packetEncodeHandler = new PacketEncoder.PacketHandler() {
     @Override
     public void onPacket(Packet packet, int encodedSize) {

@@ -16,6 +16,7 @@ public class PacketDecoder {
 
   public interface PacketHandler {
     void onPacket(PacketDecoder decoder, Packet pkt, int encodedSize);
+    void onDisconnect();
   }
 
   private final BufferedSource source;
@@ -51,6 +52,7 @@ public class PacketDecoder {
         }
       } catch(IOException e) {
         log.warning("Error decoding packet.", e);
+        handler.onDisconnect();
       }
     }
   };

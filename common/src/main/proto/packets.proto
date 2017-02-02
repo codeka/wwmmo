@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.common.proto;
 
 import "common.proto";
+import "chat.proto";
 import "empire.proto";
 import "star.proto";
 
@@ -12,6 +13,7 @@ message Packet {
   optional ModifyStarPacket modify_star = 4;
   optional RequestEmpirePacket request_empire = 5;
   optional EmpireDetailsPacket empire_details = 6;
+  optional ChatMessagesPacket chat_msgs = 7;
 }
 
 // The "hello" packet that's sent by the client when it first connects to the game socket.
@@ -60,4 +62,10 @@ message RequestEmpirePacket {
 message EmpireDetailsPacket {
   // The empire(s) that you requested in RequestEmpirePacket.
   repeated Empire empires = 1;
+}
+
+// A bunch of chat messages. If sending to the server, should contain only a single message. If
+// being received from the server, could contain multiple messages for multiple rooms.
+message ChatMessagesPacket {
+  repeated ChatMessage messages = 1;
 }

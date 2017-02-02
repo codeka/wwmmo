@@ -10,6 +10,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.debug.PacketDebug;
+import au.com.codeka.warworlds.common.proto.ChatMessage;
+import au.com.codeka.warworlds.common.proto.ChatMessagesPacket;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket;
 import au.com.codeka.warworlds.common.proto.ModifyStarPacket;
@@ -23,6 +26,8 @@ import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
 import au.com.codeka.warworlds.server.concurrency.TaskRunner;
 import au.com.codeka.warworlds.server.concurrency.Threads;
 import au.com.codeka.warworlds.server.net.Connection;
+import au.com.codeka.warworlds.server.world.chat.ChatManager;
+import au.com.codeka.warworlds.server.world.chat.Participant;
 
 /** Represents a currently-connected player. */
 public class Player {
@@ -66,6 +71,10 @@ public class Player {
       onModifyStar(pkt.modify_star);
     } else if (pkt.request_empire != null) {
       onRequestEmpire(pkt.request_empire);
+    } else if (pkt.chat_msgs != null) {
+      onChatMessages(pkt.chat_msgs);
+    } else {
+      log.error("Unknown/unexpected packet. %s", PacketDebug.getPacketDebug(pkt));
     }
   }
 
@@ -80,6 +89,16 @@ public class Player {
         (System.nanoTime() - startTime) / 1000000L);
 
     // TODO: send to player
+
+    // Register this player with the chat system so that we get notified of messages.
+    ChatManager.i.connectPlayer(empire.get().id, chatCallback);
+  }
+
+  /**
+   * Called when the client disconnects from us.
+   */
+  public void onDisconnect() {
+    ChatManager.i.disconnectPlayer(empire.get().id);
   }
 
   private void onWatchSectorsPacket(WatchSectorsPacket pkt) {
@@ -128,7 +147,9 @@ public class Player {
     List<Empire> empires = new ArrayList<>();
     for (long id : pkt.empire_id) {
       WatchableObject<Empire> empire = EmpireManager.i.getEmpire(id);
-      empires.add(empire.get());
+      if (empire != null) {
+        empires.add(empire.get());
+      }
     }
     connection.send(new Packet.Builder()
         .empire_details(new EmpireDetailsPacket.Builder()
@@ -136,4 +157,30 @@ public class Player {
             .build())
         .build());
   }
+
+  private void onChatMessages(ChatMessagesPacket pkt) {
+    if (pkt.messages.size() != 1) {
+      // TODO: suspicious, should be only one chat message.
+      log.error("Didn't get the expected 1 chat message. Got %d.", pkt.messages.size());
+      return;
+    }
+
+    ChatManager.i.send(null /* TODO */, pkt.messages.get(0).newBuilder()
+        .date_posted(System.currentTimeMillis())
+        .empire_id(empire.get().id)
+        .action(ChatMessage.MessageAction.Normal)
+        .room_id(null /* TODO */)
+        .build());
+  }
+
+  private final Participant.OnlineCallback chatCallback = new Participant.OnlineCallback() {
+    @Override
+    public void onChatMessage(ChatMessage msg) {
+      connection.send(new Packet.Builder()
+          .chat_msgs(new ChatMessagesPacket.Builder()
+              .messages(Lists.newArrayList(msg))
+              .build())
+          .build());
+    }
+  };
 }
