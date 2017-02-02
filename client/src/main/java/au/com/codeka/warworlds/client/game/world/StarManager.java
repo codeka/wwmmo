@@ -55,6 +55,15 @@ public class StarManager {
     return stars.getMyStars();
   }
 
+  /**
+   * Gets the most recent value of last_simulation out of all our empire's stars. This is sent to
+   * the server in the {@link au.com.codeka.warworlds.common.proto.HelloPacket}, so that the server
+   * can update us on all our stars that have been updated since we last connected.
+   */
+  public Long getLastSimulationOfOurStar() {
+    return stars.getLastSimulationOfOurStar();
+  }
+
   public void updateStar(final Star star, final StarModification modification) {
     App.i.getTaskRunner().runTask(() -> {
       // If there's any auxiliary stars, grab them now, too.

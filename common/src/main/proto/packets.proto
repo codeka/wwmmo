@@ -19,6 +19,12 @@ message HelloPacket {
   // The ID of the empire you're connecting as. You should already know this from the response to
   // the login request.
   optional int64 empire_id = 1;
+
+  // The most recent "last_simulation" time we have for any of our stars. The server will send us
+  // an update on all of our stars with a last_simulation newer than this value. This does mean
+  // that any stars that *were* ours before this simulation but are no longer ours will simply
+  // not be updated, but that's probably acceptable.
+  optional int64 our_star_last_simulation = 2;
 }
 
 // Requests that we want updates about all stars in sectors between (left,top) and (right,bottom)

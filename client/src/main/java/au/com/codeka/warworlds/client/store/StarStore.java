@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 
@@ -49,6 +50,23 @@ public class StarStore extends BaseStore<Long, Star> {
         null /* groupBy */,
         null /* having */,
         null /* orderBy */));
+  }
+
+  /**
+   * Gets the most recent value of last_simulation out of all our empire's stars. See {@link
+   * au.com.codeka.warworlds.client.game.world.StarManager} for details.
+   */
+  public Long getLastSimulationOfOurStar() {
+    SQLiteDatabase db = helper.getReadableDatabase();
+    try (Cursor cursor = db.query(
+        false, name, new String[]{ "last_simulation" }, "my_empire=1",
+        null, null, null, "last_simulation DESC", null)) {
+      if (cursor.moveToFirst()) {
+        return cursor.getLong(0);
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -107,6 +125,11 @@ public class StarStore extends BaseStore<Long, Star> {
         if (planet.colony.empire_id.equals(myEmpire.id)) {
           return true;
         }
+      }
+    }
+    for (Fleet fleet : star.fleets) {
+      if (fleet.empire_id != null && fleet.empire_id.equals(myEmpire.id)) {
+        return true;
       }
     }
     return false;
