@@ -6,6 +6,7 @@ import java.util.List;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
+import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatMessagesPacket;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
@@ -23,6 +24,30 @@ public class ChatManager {
 
   public void create() {
     // TODO?
+  }
+
+  /**
+   * Get the time of the most recent chat we have stored. When we connect to the server, we'll send
+   * this value over so that it can update us on any chats that have happened since then.
+   *
+   * <p>So that we're not overwhelmed, we'll never return a value that's more than three days old.
+   * If our most recent chat was more than three days ago, we'll need to clear out our cache and
+   * rebuild it on-demand as you scroll back.
+   */
+  public long getLastChatTime() {
+    long threeDaysAgo = System.currentTimeMillis() - (3 * Time.DAY);
+
+    long lastChatTime = App.i.getDataStore().chat().getLastChatTime();
+    if (lastChatTime == 0) {
+      return threeDaysAgo;
+    }
+
+    if (lastChatTime < threeDaysAgo) {
+      App.i.getDataStore().chat().removeHistory();
+      return threeDaysAgo;
+    }
+
+    return lastChatTime;
   }
 
   /** Get the list of rooms that we're in. */

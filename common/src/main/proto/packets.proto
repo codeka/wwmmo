@@ -27,6 +27,10 @@ message HelloPacket {
   // that any stars that *were* ours before this simulation but are no longer ours will simply
   // not be updated, but that's probably acceptable.
   optional int64 our_star_last_simulation = 2;
+
+  // The most time of the recent chat message that we have stored. We'll send you all the chat
+  // messages that you should've seen that's newer than this.
+  optional int64 last_chat_time = 3;
 }
 
 // Requests that we want updates about all stars in sectors between (left,top) and (right,bottom)

@@ -58,10 +58,11 @@ public class StarStore extends BaseStore {
    * au.com.codeka.warworlds.client.game.world.StarManager} for details.
    */
   public Long getLastSimulationOfOurStar() {
-    SQLiteDatabase db = helper.getReadableDatabase();
-    try (Cursor cursor = db.query(
-        false, name, new String[]{ "last_simulation" }, "my_empire=1",
-        null, null, null, "last_simulation DESC", null)) {
+    try (
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.query(
+            false, name, new String[]{ "last_simulation" }, "my_empire=1",
+            null, null, null, "last_simulation DESC", null)) {
       if (cursor.moveToFirst()) {
         return cursor.getLong(0);
       }
@@ -74,10 +75,11 @@ public class StarStore extends BaseStore {
    * Gets the {@link Star} with the given ID, or {@code null} if it's not found.
    */
   public Star get(long key) {
-    SQLiteDatabase db = helper.getReadableDatabase();
-    try (Cursor cursor = db.query(false, name, new String[]{ "value" },
-        "key = ?", new String[]{ Long.toString(key) },
-        null, null, null, null)) {
+    try (
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.query(
+            false, name, new String[]{ "value" }, "key = ?", new String[]{ Long.toString(key) },
+            null, null, null, null)) {
       if (cursor.moveToFirst()) {
         try {
           return Star.ADAPTER.decode(cursor.getBlob(0));
@@ -94,31 +96,33 @@ public class StarStore extends BaseStore {
    * Puts the given value to the data store.
    */
   public void put(long id, @Nonnull Star star, @Nonnull Empire myEmpire) {
-    SQLiteDatabase db = helper.getWritableDatabase();
-    ContentValues contentValues = new ContentValues();
-    contentValues.put("key", id);
-    contentValues.put("my_empire", isMyStar(star, myEmpire) ? 1 : 0);
-    contentValues.put("last_simulation", star.last_simulation);
-    contentValues.put("value", star.encode());
-    db.insertWithOnConflict(name, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+    try (SQLiteDatabase db = helper.getWritableDatabase()) {
+      ContentValues contentValues = new ContentValues();
+      contentValues.put("key", id);
+      contentValues.put("my_empire", isMyStar(star, myEmpire) ? 1 : 0);
+      contentValues.put("last_simulation", star.last_simulation);
+      contentValues.put("value", star.encode());
+      db.insertWithOnConflict(name, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+    }
   }
 
   /** Puts all of the given values into the data store in a single transaction. */
   public void putAll(Map<Long, Star> values, @Nonnull Empire myEmpire) {
-    SQLiteDatabase db = helper.getWritableDatabase();
-    db.beginTransaction();
-    try {
-      ContentValues contentValues = new ContentValues();
-      for (Map.Entry<Long, Star> kvp : values.entrySet()) {
-        contentValues.put("key", kvp.getKey());
-        contentValues.put("my_empire", isMyStar(kvp.getValue(), myEmpire) ? 1 : 0);
-        contentValues.put("last_simulation", kvp.getValue().last_simulation);
-        contentValues.put("value", kvp.getValue().encode());
-        db.insertWithOnConflict(name, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+    try (SQLiteDatabase db = helper.getWritableDatabase()) {
+      db.beginTransaction();
+      try {
+        ContentValues contentValues = new ContentValues();
+        for (Map.Entry<Long, Star> kvp : values.entrySet()) {
+          contentValues.put("key", kvp.getKey());
+          contentValues.put("my_empire", isMyStar(kvp.getValue(), myEmpire) ? 1 : 0);
+          contentValues.put("last_simulation", kvp.getValue().last_simulation);
+          contentValues.put("value", kvp.getValue().encode());
+          db.insertWithOnConflict(name, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+        db.setTransactionSuccessful();
+      } finally {
+        db.endTransaction();
       }
-      db.setTransactionSuccessful();
-    } finally {
-      db.endTransaction();
     }
   }
 

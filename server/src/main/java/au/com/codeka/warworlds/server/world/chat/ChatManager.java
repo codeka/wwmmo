@@ -52,8 +52,15 @@ public class ChatManager {
     return room.getMessages(startTime, endTime);
   }
 
-  /** Called when a player connects. We'll start sending them messages and stuff. */
-  public void connectPlayer(long empireId, Participant.OnlineCallback callback) {
+  /**
+   * Called when a player connects. We'll start sending them messages and stuff.
+   *
+   * @param empireId The ID of the empire connecting.
+   * @param lastChatTime The time this player last received a chat message. We'll straight away
+   *                     send them any new ones since then.
+   * @param callback A callback to call to send chat messages across.
+   */
+  public void connectPlayer(long empireId, long lastChatTime, Participant.OnlineCallback callback) {
     Participant participant;
     synchronized (participants) {
       participant = participants.get(empireId);
@@ -65,6 +72,10 @@ public class ChatManager {
 
     // Players are only in the global room when they first connect.
     globalRoom.addParticipant(participant);
+
+    // TODO: rooms
+    List<ChatMessage> msgs = globalRoom.getMessages(lastChatTime, System.currentTimeMillis());
+    callback.onChatMessage(msgs);
 
     participant.setOnlineCallback(callback);
   }

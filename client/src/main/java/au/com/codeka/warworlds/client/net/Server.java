@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.client.game.world.ChatManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
@@ -121,6 +122,7 @@ public class Server {
           .hello(new HelloPacket.Builder()
               .empire_id(loginResponse.empire.id)
               .our_star_last_simulation(StarManager.i.getLastSimulationOfOurStar())
+              .last_chat_time(ChatManager.i.getLastChatTime())
               .build())
           .build());
 

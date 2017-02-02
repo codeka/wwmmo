@@ -1,5 +1,9 @@
 package au.com.codeka.warworlds.server.world.chat;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.proto.ChatMessage;
@@ -12,8 +16,8 @@ import au.com.codeka.warworlds.common.proto.ChatMessage;
 public class Participant {
   /** This interface is given to us when the player is online. */
   public interface OnlineCallback {
-    /** Called when a {@link ChatMessage} is sent to a room we're in. */
-    void onChatMessage(ChatMessage msg);
+    /** Called when {@link ChatMessage}s is sent to a room we're in. */
+    void onChatMessage(List<ChatMessage> msgs);
   }
 
   private final long empireId;
@@ -34,7 +38,7 @@ public class Participant {
 
   public void onMessage(ChatMessage msg) {
     if (callback != null) {
-      callback.onChatMessage(msg);
+      callback.onChatMessage(Lists.newArrayList(msg));
     }
   }
 }

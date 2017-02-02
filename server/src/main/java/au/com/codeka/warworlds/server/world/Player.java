@@ -115,7 +115,7 @@ public class Player {
     }
 
     // Register this player with the chat system so that we get notified of messages.
-    ChatManager.i.connectPlayer(empire.get().id, chatCallback);
+    ChatManager.i.connectPlayer(empire.get().id, helloPacket.last_chat_time, chatCallback);
   }
 
   /**
@@ -199,10 +199,10 @@ public class Player {
 
   private final Participant.OnlineCallback chatCallback = new Participant.OnlineCallback() {
     @Override
-    public void onChatMessage(ChatMessage msg) {
+    public void onChatMessage(List<ChatMessage> msgs) {
       connection.send(new Packet.Builder()
           .chat_msgs(new ChatMessagesPacket.Builder()
-              .messages(Lists.newArrayList(msg))
+              .messages(msgs)
               .build())
           .build());
     }

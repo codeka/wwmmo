@@ -51,15 +51,16 @@ public class ChatStore extends BaseStore {
 
   /** Adds the given messages to the store. */
   public void addMessages(List<ChatMessage> msgs) {
-    for (ChatMessage msg : msgs) {
-      SQLiteDatabase db = helper.getWritableDatabase();
+    try (SQLiteDatabase db = helper.getWritableDatabase()) {
       ContentValues contentValues = new ContentValues();
-      contentValues.put("id", msg.id);
-      contentValues.put("room_id", msg.room_id);
-      contentValues.put("date_posted", msg.date_posted);
-      contentValues.put("msg", msg.encode());
-      db.insertWithOnConflict(
-          name + "_messages", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+      for (ChatMessage msg : msgs) {
+        contentValues.put("id", msg.id);
+        contentValues.put("room_id", msg.room_id);
+        contentValues.put("date_posted", msg.date_posted);
+        contentValues.put("msg", msg.encode());
+        db.insertWithOnConflict(
+            name + "_messages", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+      }
     }
   }
 
@@ -81,14 +82,16 @@ public class ChatStore extends BaseStore {
     queryArgs[index] = String.format(Locale.US, "%d", endTime);
 
     ArrayList<ChatMessage> msgs = new ArrayList<>();
-    try (Cursor cursor = helper.getReadableDatabase().query(
-        name + "_messages",
-        new String[] { "msg" } /* columns */,
-        query /* selection */,
-        queryArgs/* selectionArgs */,
-        null /* groupBy */,
-        null /* having */,
-        "date_posted DESC" /* orderBy */)) {
+    try (
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = helper.getReadableDatabase().query(
+            name + "_messages",
+            new String[] { "msg" } /* columns */,
+            query /* selection */,
+            queryArgs/* selectionArgs */,
+            null /* groupBy */,
+            null /* having */,
+            "date_posted DESC" /* orderBy */)) {
       while (cursor.moveToNext()) {
         msgs.add(ChatMessage.ADAPTER.decode(cursor.getBlob(0)));
       }
@@ -96,5 +99,25 @@ public class ChatStore extends BaseStore {
       log.error("Error fetching chat messages.", e);
     }
     return msgs;
+  }
+
+  public long getLastChatTime() {
+    try (
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.query(
+            false, name + "_messages", new String[]{ "date_posted" }, null,
+            null, null, null, "date_posted DESC", null)) {
+      if (cursor.moveToFirst()) {
+        return cursor.getLong(0);
+      }
+    }
+
+    return 0;
+  }
+
+  public void removeHistory() {
+    try (SQLiteDatabase db = helper.getReadableDatabase()) {
+      db.execSQL("DELETE FROM " + name + "_messages");
+    }
   }
 }
