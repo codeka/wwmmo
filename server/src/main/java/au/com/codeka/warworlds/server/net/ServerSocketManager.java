@@ -122,7 +122,9 @@ public class ServerSocketManager {
 
       log.info("GameSocket connection received for empire #%d %s",
           pkt.hello.empire_id, pendingConnection.getEmpire().get().display_name);
-      connections.put(pkt.hello.empire_id, pendingConnection.connect(socket, decoder, outs));
+      connections.put(
+          pkt.hello.empire_id,
+          pendingConnection.connect(pkt.hello, socket, decoder, outs));
     }
 
     @Override

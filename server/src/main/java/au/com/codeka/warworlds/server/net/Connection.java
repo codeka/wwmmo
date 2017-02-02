@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.common.net.PacketDecoder;
 import au.com.codeka.warworlds.common.net.PacketEncoder;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.HelloPacket;
 import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.server.concurrency.TaskRunner;
 import au.com.codeka.warworlds.server.concurrency.Threads;
@@ -31,6 +32,7 @@ public class Connection implements PacketDecoder.PacketHandler {
   private final Player player;
 
   public Connection(
+      HelloPacket helloPacket,
       Account account,
       WatchableObject<Empire> empire,
       byte[] encryptionKey,
@@ -45,7 +47,7 @@ public class Connection implements PacketDecoder.PacketHandler {
     this.decoder = decoder;
     decoder.setPacketHandler(this);
 
-    player = new Player(this, empire);
+    player = new Player(this, helloPacket, empire);
   }
 
   public void start() {

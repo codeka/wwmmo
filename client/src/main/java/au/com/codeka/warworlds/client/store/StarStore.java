@@ -35,6 +35,7 @@ public class StarStore extends BaseStore<Long, Star> {
         "CREATE TABLE " + name + " ("
             + "  key INTEGER PRIMARY KEY,"
             + "  my_empire INTEGER," // 1 if my empire has something on this star, 0 if not.
+            + "  last_simulation INTEGER,"
             + "  value BLOB)");
   }
 
@@ -97,6 +98,7 @@ public class StarStore extends BaseStore<Long, Star> {
     ContentValues contentValues = new ContentValues();
     contentValues.put("key", id);
     contentValues.put("my_empire", isMyStar(star, myEmpire) ? 1 : 0);
+    contentValues.put("last_simulation", star.last_simulation);
     contentValues.put("value", star.encode());
     db.insertWithOnConflict(name, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
   }
@@ -110,6 +112,7 @@ public class StarStore extends BaseStore<Long, Star> {
       for (Map.Entry<Long, Star> kvp : values.entrySet()) {
         contentValues.put("key", kvp.getKey());
         contentValues.put("my_empire", isMyStar(kvp.getValue(), myEmpire) ? 1 : 0);
+        contentValues.put("last_simulation", kvp.getValue().last_simulation);
         contentValues.put("value", kvp.getValue().encode());
         db.insertWithOnConflict(name, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
       }

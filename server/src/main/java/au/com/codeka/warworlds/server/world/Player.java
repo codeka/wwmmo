@@ -15,6 +15,7 @@ import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatMessagesPacket;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket;
+import au.com.codeka.warworlds.common.proto.HelloPacket;
 import au.com.codeka.warworlds.common.proto.ModifyStarPacket;
 import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.common.proto.RequestEmpirePacket;
@@ -29,11 +30,14 @@ import au.com.codeka.warworlds.server.net.Connection;
 import au.com.codeka.warworlds.server.world.chat.ChatManager;
 import au.com.codeka.warworlds.server.world.chat.Participant;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /** Represents a currently-connected player. */
 public class Player {
   private static final Log log = new Log("Player");
 
   private final Connection connection;
+  private final HelloPacket helloPacket;
 
   /** The {@link Empire} this player belongs to. */
   private final WatchableObject<Empire> empire;
@@ -47,11 +51,12 @@ public class Player {
   /** The {@link WatchableObject.Watcher} which we'll be watching stars with. */
   private final WatchableObject.Watcher<Star> starWatcher;
 
-  public Player(Connection connection, WatchableObject<Empire> empire) {
+  public Player(Connection connection, HelloPacket helloPacket, WatchableObject<Empire> empire) {
     log.setPrefix(String.format(Locale.US, "[%d %s]", empire.get().id, empire.get().display_name));
 
-    this.connection = Preconditions.checkNotNull(connection);
-    this.empire = Preconditions.checkNotNull(empire);
+    this.helloPacket = checkNotNull(helloPacket);
+    this.connection = checkNotNull(connection);
+    this.empire = checkNotNull(empire);
 
     starWatcher = star -> {
       connection.send(new Packet.Builder()
@@ -88,7 +93,26 @@ public class Player {
     log.debug("Fetched %d stars for empire %d in %dms", stars.size(), empire.get().id,
         (System.nanoTime() - startTime) / 1000000L);
 
-    // TODO: send to player
+    // Of the player's stars, send them all the ones that have been updated since their
+    // last_simulation.
+    ArrayList<Star> updatedStars = new ArrayList<>();
+    for (WatchableObject<Star> star : stars) {
+      if (helloPacket.our_star_last_simulation == null
+          || (star.get().last_simulation != null
+              && star.get().last_simulation > helloPacket.our_star_last_simulation)) {
+        updatedStars.add(star.get());
+      }
+    }
+    if (!updatedStars.isEmpty()) {
+      log.debug("%d updated stars, sending update packet.", updatedStars.size());
+      connection.send(new Packet.Builder()
+          .star_updated(new StarUpdatedPacket.Builder()
+              .stars(updatedStars)
+              .build())
+          .build());
+    } else {
+      log.debug("No updated stars, not sending update packet.");
+    }
 
     // Register this player with the chat system so that we get notified of messages.
     ChatManager.i.connectPlayer(empire.get().id, chatCallback);
