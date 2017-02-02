@@ -1,18 +1,10 @@
 package au.com.codeka.warworlds.client.store;
 
-import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.util.Map;
-
-import javax.annotation.Nonnull;
-
-/**
- * Base class for "store" class that has key type K and value type V.
- */
-public abstract class BaseStore<K, V> {
+/** Base class for "store" class. */
+public abstract class BaseStore {
   private final String name;
   private final SQLiteOpenHelper helper;
 

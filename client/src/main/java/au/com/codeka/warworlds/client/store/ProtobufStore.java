@@ -12,7 +12,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 /** Class for storing protos in a sqlite key-value store, keyed by a long id. */
-public class ProtobufStore<M extends Message<?, ?>> extends BaseStore<Long, M> {
+public class ProtobufStore<M extends Message<?, ?>> extends BaseStore {
   private final String name;
   private final ProtobufSerializer<M> serializer;
   private final SQLiteOpenHelper helper;

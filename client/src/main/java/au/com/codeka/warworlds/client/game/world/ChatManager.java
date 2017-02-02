@@ -34,15 +34,9 @@ public class ChatManager {
         .build());
   }
 
-  public List<ChatMessage> getMessages(ChatRoom room) {
-    return Lists.newArrayList(
-        new ChatMessage.Builder()
-            .empire_id(null)
-            .message("Hello World")
-            .date_posted(System.currentTimeMillis())
-            .action(ChatMessage.MessageAction.Normal)
-            .build()
-    );
+  public List<ChatMessage> getMessages(ChatRoom room, long startTime, long endTime) {
+    // TODO: if we don't have any, ask some from the server.
+    return App.i.getDataStore().chat().getMessages(room.id, startTime, endTime);
   }
 
   /** Send the given {@link ChatMessage} to the server. */
@@ -57,9 +51,8 @@ public class ChatManager {
   private final Object eventListener = new Object() {
     @EventHandler
     public void onChatMessagesPacket(ChatMessagesPacket pkt) {
-      for (ChatMessage msg : pkt.messages) {
-
-      }
+      App.i.getDataStore().chat().addMessages(pkt.messages);
+      App.i.getEventBus().publish(new ChatMessagesUpdatedEvent());
     }
   };
 }

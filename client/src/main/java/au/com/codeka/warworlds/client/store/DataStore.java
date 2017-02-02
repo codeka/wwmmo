@@ -26,6 +26,10 @@ public class DataStore {
     return helper.starStore;
   }
 
+  public ChatStore chat() {
+    return helper.chatStore;
+  }
+
   /**
    * Most of our data stores are basically long-&gt;blob mappings stored in a sqlite database. This
    * class manages a single instance of a sqlite database.
@@ -33,11 +37,13 @@ public class DataStore {
   private static class StoreHelper extends SQLiteOpenHelper {
     private ProtobufStore<Empire> empireStore;
     private StarStore starStore;
+    private ChatStore chatStore;
 
     public StoreHelper(Context applicationContext) {
       super(applicationContext, "objects.db", null, 1);
       empireStore = new ProtobufStore<>("empires", Empire.class, this);
       starStore = new StarStore("stars", this);
+      chatStore = new ChatStore("chat", this);
 
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
         setWriteAheadLoggingEnabled(true);
@@ -52,12 +58,14 @@ public class DataStore {
     public void onCreate(SQLiteDatabase db) {
       empireStore.onCreate(db);
       starStore.onCreate(db);
+      chatStore.onCreate(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
       empireStore.onUpgrade(db, oldVersion, newVersion);
       starStore.onUpgrade(db, oldVersion, newVersion);
+      chatStore.onUpgrade(db, oldVersion, newVersion);
     }
   }
 }

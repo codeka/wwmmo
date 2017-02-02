@@ -19,7 +19,7 @@ import au.com.codeka.warworlds.common.proto.Star;
  * Specialization of {@link BaseStore} which stores stars. We have a custom class here because
  * we want to add some extra columns for indexing.
  */
-public class StarStore extends BaseStore<Long, Star> {
+public class StarStore extends BaseStore {
   private final String name;
   private final SQLiteOpenHelper helper;
 

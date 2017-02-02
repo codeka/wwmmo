@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import au.com.codeka.warworlds.client.App;
@@ -46,6 +47,9 @@ public class RoomFragment extends BaseFragment {
   private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("h:mm a", Locale.US);
   private static final SimpleDateFormat DATE_FORMAT =
       new SimpleDateFormat("EE, dd MMM yyyy", Locale.US);
+
+  /** Number of milliseconds worth of messages to fetch each time. */
+  private static final long FETCH_TIME_MS = 6L * 3600L * 1000L;
 
   private ChatRoom room;
   private ChatAdapter chatAdapter;
@@ -145,7 +149,8 @@ public class RoomFragment extends BaseFragment {
   }
 
   private void refreshMessages() {
-    ArrayList<ChatMessage> allMessages = new ArrayList<>(ChatManager.i.getMessages(room));
+    long now = System.currentTimeMillis();
+    List<ChatMessage> allMessages = ChatManager.i.getMessages(room, now - FETCH_TIME_MS, now);
     chatAdapter.setMessages(allMessages);
   }
 
@@ -219,7 +224,7 @@ public class RoomFragment extends BaseFragment {
       entries = new ArrayList<>();
     }
 
-    public void setMessages(ArrayList<ChatMessage> messages) {
+    public void setMessages(List<ChatMessage> messages) {
       entries.clear();
       if (!noMoreChats) {
         // we always add an empty entry to mark the end of the messages,  unless there's no
