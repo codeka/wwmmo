@@ -553,7 +553,6 @@ public class StarController {
                     for (BaseColony colony : toRemove) {
                         stmt.setInt(1, ((Colony) colony).getID());
                         stmt.update();
-                        toRemove.add(colony);
                     }
                 }
 
