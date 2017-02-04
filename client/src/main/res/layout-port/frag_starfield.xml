@@ -9,17 +9,6 @@
       android:layout_height="50dp"
       android:layout_alignParentTop="true" />
 
-  <!--au.com.codeka.warworlds.ctrl.SelectionView
-      android:id="@+id/selection"
-      android:layout_width="40dp"
-      android:layout_height="40dp"
-      android:visibility="gone" /-->
-  <View
-      android:id="@+id/selection"
-      android:layout_width="40dp"
-      android:layout_height="40dp"
-      android:visibility="gone" />
-
   <au.com.codeka.warworlds.client.ctrl.ChatMiniView
       android:id="@+id/mini_chat"
       android:layout_height="50dp"
@@ -47,7 +36,6 @@
         style="@style/Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:text="@string/empire" />
@@ -58,9 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="5dp"
         android:layout_marginEnd="5dp"
-        android:layout_toLeftOf="@+id/empire_btn"
         android:layout_toStartOf="@+id/empire_btn"
         android:text="@string/sitrep" />
 
@@ -68,10 +54,8 @@
             style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
             android:layout_marginEnd="5dp"
             android:layout_alignTop="@id/sitrep_btn"
-            android:layout_toLeftOf="@+id/sitrep_btn"
             android:layout_toStartOf="@+id/sitrep_btn"
             android:text="@string/alliance" />
 
@@ -88,10 +72,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignTop="@id/alliance_btn"
-        android:layout_toLeftOf="@+id/alliance_btn"
         android:layout_toStartOf="@+id/alliance_btn" />
 
   </RelativeLayout>

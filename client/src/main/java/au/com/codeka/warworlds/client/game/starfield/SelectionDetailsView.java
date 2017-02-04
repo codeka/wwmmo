@@ -49,12 +49,13 @@ public class SelectionDetailsView extends FrameLayout {
     planetList = (PlanetListSimple) findViewById(R.id.planet_list);
     fleetList = (FleetListSimple) findViewById(R.id.fleet_list);
 
-    findViewById(R.id.wormhole_locate).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (destStar != null && zoomToStarHandler != null) {
-          zoomToStarHandler.onZoomToStar(destStar);
-        }
+    if (isInEditMode()) {
+      return;
+    }
+
+    findViewById(R.id.wormhole_locate).setOnClickListener(v -> {
+      if (destStar != null && zoomToStarHandler != null) {
+        zoomToStarHandler.onZoomToStar(destStar);
       }
     });
   }
@@ -62,12 +63,20 @@ public class SelectionDetailsView extends FrameLayout {
   @Override
   public void onAttachedToWindow() {
     super.onAttachedToWindow();
+    if (isInEditMode()) {
+      return;
+    }
+
     App.i.getEventBus().register(eventListener);
   }
 
   @Override
   public void onDetachedFromWindow() {
     super.onDetachedFromWindow();
+    if (isInEditMode()) {
+      return;
+    }
+
     App.i.getEventBus().unregister(eventListener);
   }
 
@@ -240,14 +249,6 @@ public class SelectionDetailsView extends FrameLayout {
       }
       refreshWormholeDetails();
     }
-/*
-    @EventHandler
-    public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
-      if (star == null) {
-        return;
-      }
-      refreshWormholeDetails();
-    }*/
   };
 
   public interface ZoomToStarHandler {
