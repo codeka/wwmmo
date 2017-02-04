@@ -36,6 +36,8 @@
   <string name="send">Send</string>
   <string name="global">Global</string>
   <string name="new_group">New Group</string>
+  <string name="intel">Intel.</string>
+  <string name="locate">Locate</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to

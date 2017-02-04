@@ -3,8 +3,8 @@ package au.com.codeka.warworlds.client.game.starfield;
 import android.content.Context;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
@@ -29,7 +29,7 @@ import au.com.codeka.warworlds.common.sim.StarHelper;
 /**
  * The bottom pane when you have a star selected.
  */
-public class StarSelectedBottomPane extends RelativeLayout {
+public class StarSelectedBottomPane extends FrameLayout {
   public interface Callback {
     void onEmpireClicked(View view);
     void onSitrepClicked(View view);

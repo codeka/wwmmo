@@ -5,9 +5,9 @@ import android.os.Handler;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -33,7 +33,7 @@ import au.com.codeka.warworlds.common.sim.StarHelper;
 /**
  * Bottom pane for when you have a fleet selected.
  */
-public class FleetSelectedBottomPane extends RelativeLayout {
+public class FleetSelectedBottomPane extends FrameLayout {
   public interface Callback {
     void onEmpireClicked(View view);
     void onSitrepClicked(View view);
@@ -43,7 +43,6 @@ public class FleetSelectedBottomPane extends RelativeLayout {
   private static final long REFRESH_DELAY_MS = 1000L;
 
   private final Handler handler = new Handler();
-  private final Callback callback;
   private Star star;
   private Fleet fleet;
 
@@ -56,7 +55,6 @@ public class FleetSelectedBottomPane extends RelativeLayout {
 
     inflate(context, R.layout.starfield_bottom_pane_fleet, this);
 
-    this.callback = callback;
     this.fleet = fleet;
     this.star = star;
 
