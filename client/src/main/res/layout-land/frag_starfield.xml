@@ -17,7 +17,7 @@
         android:layout_above="@+id/infobar"
         android:layout_toStartOf="@+id/bottom_pane" />
 
-    <View
+    <au.com.codeka.warworlds.client.ctrl.InfobarView
         android:id="@+id/infobar"
         style="@style/BottomPane"
         android:layout_width="match_parent"
