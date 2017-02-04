@@ -173,7 +173,21 @@ public class StarfieldFragment extends BaseFragment {
   }
 
   private void showFleetSelectedBottomPane(Star star, Fleet fleet) {
-    FleetSelectedBottomPane fleetSelectedBottomPane = new FleetSelectedBottomPane(getContext());
+    FleetSelectedBottomPane fleetSelectedBottomPane = new FleetSelectedBottomPane(
+        getContext(), star, fleet, new FleetSelectedBottomPane.Callback() {
+      @Override
+      public void onEmpireClicked(View view) {
+        onEmpireClick();
+      }
+
+      @Override
+      public void onSitrepClicked(View view) {
+      }
+
+      @Override
+      public void onAllianceClicked(View view) {
+      }
+    });
 
     TransitionManager.beginDelayedTransition(stuff);
     bottomPane.removeAllViews();
