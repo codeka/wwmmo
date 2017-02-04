@@ -34,13 +34,13 @@ public class SendBottomPane extends RelativeLayout {
     message = (EditText) findViewById(R.id.message);
     findViewById(R.id.send_btn).setOnClickListener(this::onSendClick);
 
-    message.setOnEditorActionListener((v, actionId, event) -> {
-      if (actionId == EditorInfo.IME_NULL) {
-        onSendClick(v);
-        return true;
-      }
-      return false;
-    });
+ //   message.setOnEditorActionListener((v, actionId, event) -> {
+ //     if (actionId == EditorInfo.IME_NULL) {
+ //       onSendClick(v);
+ //       return true;
+ //     }
+ //     return false;
+ //   });
 
   }
 
