@@ -26,12 +26,36 @@ $(function() {
   function appendMessage(msg) {
     var dt = new Date(msg.date_posted);
     var div = $("<div class=\"msg\"/>");
-    div.html(dt + " " + msg.message);
+
+    var header = $("<div class=\"header\" />");
+    if (msg.empire_id) {
+      var img = $("<img />")
+         .attr("data-empireid", msg.empire_id)
+         .attr("width", "16")
+         .attr("height", "16");
+      var span = $("<span />")
+         .attr("data-empireid", msg.empire_id);
+      header.append($("<div class=\"empire\">").append(img).append(span));
+    }
+    header.append($("<time timestamp=\"" + msg.date_posted + "\"></time>"));
+    div.append(header);
+
+    var content = $("<div class=\"content\">").html(msg.message);
+    if (!msg.empire_id) {
+      content.addClass("server");
+    }
+    div.append(content);
 
     $("#messages").append(div);
     if (lastMsgTime < msg.date_posted) {
       lastMsgTime = msg.date_posted;
     }
+
+    fixTimes();
+    if (msg.empire_id != null) {
+      empireStore.getEmpire(msg.empire_id);
+    }
+    div.get(0).scrollIntoView();
   }
 
   setInterval(function() {

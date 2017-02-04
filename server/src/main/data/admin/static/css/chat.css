@@ -6,6 +6,7 @@
   right: 300px;
   bottom: 30pt;
   background-color: #222;
+  overflow: scroll;
 }
 
 #rooms {
@@ -28,4 +29,22 @@
 #send input {
   width: 99%;
   margin-top: 2pt
+}
+
+.msg .header {
+  border-top: solid 1px #333;
+  height: 20px;
+}
+
+.msg .header time {
+  float: right;
+}
+
+.msg .header div {
+  float: left;
+}
+
+.msg .content.server {
+  font-weight: bold;
+  color: #0ff;
 }
