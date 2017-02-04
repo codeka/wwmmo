@@ -29,6 +29,7 @@ import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.game.world.ChatManager;
+import au.com.codeka.warworlds.client.game.world.ChatMessagesUpdatedEvent;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
@@ -59,6 +60,8 @@ public class RoomFragment extends BaseFragment {
   private boolean noMoreChats;
   private View headerContent;
   private Button unreadCountBtn;
+
+  private long newestMessageTime;
 
   public static Bundle createArguments(ChatRoom room) {
     Bundle bundle = new Bundle();
@@ -151,7 +154,27 @@ public class RoomFragment extends BaseFragment {
   private void refreshMessages() {
     long now = System.currentTimeMillis();
     List<ChatMessage> allMessages = ChatManager.i.getMessages(room, now - FETCH_TIME_MS, now);
+    for (int i = 0; i < allMessages.size(); i++) {
+      if (i == 0 || allMessages.get(i).date_posted > newestMessageTime) {
+        newestMessageTime = allMessages.get(i).date_posted;
+      }
+    }
     chatAdapter.setMessages(allMessages);
+  }
+
+  /**
+   * This is called when we're notified that chat messages have been updated. We'll append new
+   * ones to the end and old ones to the beginning.
+   */
+  private void updateMessages() {
+    List<ChatMessage> newerMessages = ChatManager.i.getMessages(
+        room, newestMessageTime, System.currentTimeMillis());
+    for (int i = 0; i < newerMessages.size(); i++) {
+      if (newerMessages.get(i).date_posted > newestMessageTime) {
+        newestMessageTime = newerMessages.get(i).date_posted;
+      }
+    }
+    chatAdapter.appendMessages(newerMessages);
   }
 
   private void fetchChatItems() {/*
@@ -193,14 +216,15 @@ public class RoomFragment extends BaseFragment {
     });
   */}
 
-  private void appendMessage(final ChatMessage msg) {
-    chatAdapter.appendMessage(msg);
-  }
-
   private Object eventHandler = new Object() {
     @EventHandler
     public void onEmpireUpdated(Empire empire) {
       chatAdapter.notifyDataSetChanged();
+    }
+
+    @EventHandler
+    public void onChatMessagesUpdated(ChatMessagesUpdatedEvent event) {
+      updateMessages();
     }
 /*
     @EventHandler
@@ -232,13 +256,17 @@ public class RoomFragment extends BaseFragment {
         entries.add(new ItemEntry());
       }
 
-      for (ChatMessage msg : messages) {
-        appendMessage(msg);
+      appendMessages(messages);
+    }
+
+    public void appendMessages(List<ChatMessage> msgs) {
+      for (ChatMessage msg : msgs) {
+        appendMessage(msg, false);
       }
       notifyDataSetChanged();
     }
 
-    public void appendMessage(ChatMessage msg) {
+    public void appendMessage(ChatMessage msg, boolean notify) {
       boolean needsDateHeader = false;
       if (entries.size() == 0) {
         needsDateHeader = true;
@@ -257,7 +285,9 @@ public class RoomFragment extends BaseFragment {
         entries.add(new ItemEntry(msg.date_posted));
       }
       entries.add(new ItemEntry(msg));
-      notifyDataSetChanged();
+      if (notify) {
+        notifyDataSetChanged();
+      }
     }
 
     @Override
