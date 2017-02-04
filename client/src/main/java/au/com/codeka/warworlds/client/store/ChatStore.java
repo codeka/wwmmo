@@ -105,7 +105,6 @@ public class ChatStore extends BaseStore {
     return msgs;
   }
 
-
   /** Gets count messages starting from startTime and going back in time. */
   public List<ChatMessage> getMessagesAfter(Long roomId, long time) {
     String query;
@@ -134,6 +133,30 @@ public class ChatStore extends BaseStore {
             null /* groupBy */,
             null /* having */,
             "date_posted DESC" /* orderBy */)) {
+      while (cursor.moveToNext()) {
+        msgs.add(ChatMessage.ADAPTER.decode(cursor.getBlob(0)));
+      }
+      Collections.reverse(msgs); // Make it oldest-first.
+    } catch (IOException e) {
+      log.error("Error fetching chat messages.", e);
+    }
+    return msgs;
+  }
+
+  /** Gets all messages, regardless of room, from the given start time. */
+  public List<ChatMessage> getMessages(long time, int count) {
+    ArrayList<ChatMessage> msgs = new ArrayList<>();
+    try (
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.query(
+            name + "_messages",
+            new String[] { "msg" } /* columns */,
+            "date_posted <= ?" /* selection */,
+            new String[] { String.format(Locale.US, "%d", time) } /* selectionArgs */,
+            null /* groupBy */,
+            null /* having */,
+            "date_posted DESC" /* orderBy */,
+            String.format(Locale.US, "%d", count))) {
       while (cursor.moveToNext()) {
         msgs.add(ChatMessage.ADAPTER.decode(cursor.getBlob(0)));
       }

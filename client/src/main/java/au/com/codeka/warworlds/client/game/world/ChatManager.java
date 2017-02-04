@@ -72,6 +72,11 @@ public class ChatManager {
     return App.i.getDataStore().chat().getMessagesAfter(room.id, time);
   }
 
+  /** Gets all messages, regardless of room, from the given start time. */
+  public List<ChatMessage> getMessages(long startTime, int count) {
+    return App.i.getDataStore().chat().getMessages(startTime, count);
+  }
+
   /** Send the given {@link ChatMessage} to the server. */
   public void sendMessage(ChatMessage msg) {
     App.i.getServer().send(new Packet.Builder()

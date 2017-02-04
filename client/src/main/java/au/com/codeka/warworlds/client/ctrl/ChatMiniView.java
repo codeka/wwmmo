@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.ctrl;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -17,7 +18,11 @@ import javax.annotation.Nullable;
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.chat.ChatFragment;
+import au.com.codeka.warworlds.client.game.chat.ChatHelper;
+import au.com.codeka.warworlds.client.game.world.ChatManager;
+import au.com.codeka.warworlds.client.game.world.ChatMessagesUpdatedEvent;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
+import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.Empire;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -107,24 +112,24 @@ public class ChatMiniView extends RelativeLayout {
 
   private void refreshMessages() {
     msgsContainer.removeAllViews();
-//    for(ChatMessage msg : ChatManager.i.getRecentMessages().getMessages()) {
-//      appendMessage(msg);
-//    }
+    for(ChatMessage msg : ChatManager.i.getMessages(System.currentTimeMillis(), MAX_ROWS)) {
+      appendMessage(msg);
+    }
   }
-/*
+
   private void appendMessage(final ChatMessage msg) {
-    TextView tv = new TextView(mContext);
-    tv.setText(Html.fromHtml(msg.format(true, false, mAutoTranslate)));
+    TextView tv = new TextView(getContext());
+    tv.setText(Html.fromHtml(ChatHelper.format(msg, true, false, autoTranslate)));
     tv.setTag(msg);
 
-    while (mMsgsContainer.getChildCount() >= MAX_ROWS) {
-      mMsgsContainer.removeViewAt(0);
+    while (msgsContainer.getChildCount() >= MAX_ROWS) {
+      msgsContainer.removeViewAt(0);
     }
-    mMsgsContainer.addView(tv);
+    msgsContainer.addView(tv);
 
     scrollToBottom();
   }
-*/
+
   private void scrollToBottom() {
     scrollView.postDelayed(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN), 1);
   }
@@ -153,23 +158,17 @@ public class ChatMiniView extends RelativeLayout {
     public void onEmpireUpdated(Empire empire) {
       for (int i = 0; i < msgsContainer.getChildCount(); i++) {
         TextView tv = (TextView) msgsContainer.getChildAt(i);
-//        ChatMessage msg = (ChatMessage) tv.getTag();
-//        if (msg != null && msg.getEmpireID() == empire.getID()) {
-//          tv.setText(Html.fromHtml(msg.format(true, false, mAutoTranslate)));
-//        }
+        ChatMessage msg = (ChatMessage) tv.getTag();
+        if (msg != null && msg.empire_id != null && msg.empire_id.equals(empire.id)) {
+          tv.setText(Html.fromHtml(ChatHelper.format(msg, true, false, autoTranslate)));
+        }
       }
       scrollToBottom();
     }
 
-//    @EventHandler
-//    public void onMessageAdded(ChatManager.MessageAddedEvent event) {
-//      appendMessage(event.msg);
-//      refreshUnreadCountButton();
-//    }
-
-//    @EventHandler
-//    public void onUnreadMessageCountUpdated(ChatManager.UnreadMessageCountUpdatedEvent event) {
-//      refreshUnreadCountButton();
-//    }
+    @EventHandler
+    public void onMessagesUpdatedEvent(ChatMessagesUpdatedEvent event) {
+      refreshMessages();
+    }
   };
 }
