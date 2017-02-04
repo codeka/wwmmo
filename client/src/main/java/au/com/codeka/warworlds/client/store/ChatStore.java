@@ -84,14 +84,14 @@ public class ChatStore extends BaseStore {
     ArrayList<ChatMessage> msgs = new ArrayList<>();
     try (
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = helper.getReadableDatabase().query(
+        Cursor cursor = db.query(
             name + "_messages",
             new String[] { "msg" } /* columns */,
             query /* selection */,
             queryArgs/* selectionArgs */,
             null /* groupBy */,
             null /* having */,
-            "date_posted DESC" /* orderBy */)) {
+            "date_posted ASC" /* orderBy */)) {
       while (cursor.moveToNext()) {
         msgs.add(ChatMessage.ADAPTER.decode(cursor.getBlob(0)));
       }

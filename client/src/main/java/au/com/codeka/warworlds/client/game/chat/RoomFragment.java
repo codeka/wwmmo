@@ -50,7 +50,7 @@ public class RoomFragment extends BaseFragment {
       new SimpleDateFormat("EE, dd MMM yyyy", Locale.US);
 
   /** Number of milliseconds worth of messages to fetch each time. */
-  private static final long FETCH_TIME_MS = 6L * 3600L * 1000L;
+  private static final long FETCH_TIME_MS = 6L * 3600L * 1000L; // 6 hours
 
   private ChatRoom room;
   private ChatAdapter chatAdapter;
@@ -168,7 +168,7 @@ public class RoomFragment extends BaseFragment {
    */
   private void updateMessages() {
     List<ChatMessage> newerMessages = ChatManager.i.getMessages(
-        room, newestMessageTime, System.currentTimeMillis());
+        room, newestMessageTime, System.currentTimeMillis() + 1000L);
     for (int i = 0; i < newerMessages.size(); i++) {
       if (newerMessages.get(i).date_posted > newestMessageTime) {
         newestMessageTime = newerMessages.get(i).date_posted;
