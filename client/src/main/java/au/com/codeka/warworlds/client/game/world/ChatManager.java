@@ -59,9 +59,16 @@ public class ChatManager {
         .build());
   }
 
-  public List<ChatMessage> getMessages(ChatRoom room, long startTime, long endTime) {
+  /** Gets count messages starting from startTime and going back in time. */
+  public List<ChatMessage> getMessages(ChatRoom room, long startTime, int count) {
     // TODO: if we don't have any, ask some from the server.
-    return App.i.getDataStore().chat().getMessages(room.id, startTime, endTime);
+    return App.i.getDataStore().chat().getMessages(room.id, startTime, count);
+  }
+
+  /** Gets all messages newer than time. */
+  public List<ChatMessage> getMessagesAfter(ChatRoom room, long time) {
+    // TODO: if we don't have any, ask some from the server.
+    return App.i.getDataStore().chat().getMessagesAfter(room.id, time);
   }
 
   /** Send the given {@link ChatMessage} to the server. */

@@ -49,8 +49,8 @@ public class RoomFragment extends BaseFragment {
   private static final SimpleDateFormat DATE_FORMAT =
       new SimpleDateFormat("EE, dd MMM yyyy", Locale.US);
 
-  /** Number of milliseconds worth of messages to fetch each time. */
-  private static final long FETCH_TIME_MS = 6L * 3600L * 1000L; // 6 hours
+  /** Number of messages to fetch in a batch. */
+  private static final int BATCH_SIZE = 10;
 
   private ChatRoom room;
   private ChatAdapter chatAdapter;
@@ -153,7 +153,7 @@ public class RoomFragment extends BaseFragment {
 
   private void refreshMessages() {
     long now = System.currentTimeMillis();
-    List<ChatMessage> allMessages = ChatManager.i.getMessages(room, now - FETCH_TIME_MS, now);
+    List<ChatMessage> allMessages = ChatManager.i.getMessages(room, now, BATCH_SIZE);
     for (int i = 0; i < allMessages.size(); i++) {
       if (i == 0 || allMessages.get(i).date_posted > newestMessageTime) {
         newestMessageTime = allMessages.get(i).date_posted;
@@ -167,8 +167,7 @@ public class RoomFragment extends BaseFragment {
    * ones to the end and old ones to the beginning.
    */
   private void updateMessages() {
-    List<ChatMessage> newerMessages = ChatManager.i.getMessages(
-        room, newestMessageTime, System.currentTimeMillis() + 1000L);
+    List<ChatMessage> newerMessages = ChatManager.i.getMessagesAfter(room, newestMessageTime);
     for (int i = 0; i < newerMessages.size(); i++) {
       if (newerMessages.get(i).date_posted > newestMessageTime) {
         newestMessageTime = newerMessages.get(i).date_posted;
