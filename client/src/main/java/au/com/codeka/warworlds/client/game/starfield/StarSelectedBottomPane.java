@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.StarHelper;
@@ -35,6 +36,7 @@ public class StarSelectedBottomPane extends FrameLayout {
     void onSitrepClicked(View view);
     void onAllianceClicked(View view);
     void onStarClicked(Star star, @Nullable Planet planet);
+    void onFleetClicked(Star star, Fleet fleet);
   }
 
   private final PlanetListSimple planetList;
@@ -63,9 +65,9 @@ public class StarSelectedBottomPane extends FrameLayout {
     starIcon = (ImageView) findViewById(R.id.star_icon);
     renameButton = (Button) findViewById(R.id.rename_btn);
 
-    planetList.setPlanetSelectedHandler(planet -> {
-      callback.onStarClicked(this.star, planet);
-    });
+    planetList.setPlanetSelectedHandler(planet -> callback.onStarClicked(this.star, planet));
+
+    fleetList.setFleetSelectedHandler(fleet -> callback.onFleetClicked(this.star, fleet));
 
     if (isInEditMode()) {
       return;

@@ -56,33 +56,7 @@ public class StarfieldFragment extends BaseFragment {
   //  allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
  //   empireBtn = (Button) view.findViewById(R.id.empire_btn);
     chatMiniView = (ChatMiniView) view.findViewById(R.id.mini_chat);
-/*
-    selectionDetailsView.setHandlers(
-        planet -> { // Selected planet.
-          Star star = selectionDetailsView.getStar();
-          getFragmentTransitionManager().replaceFragment(
-              SolarSystemFragment.class,
-              SolarSystemFragment.createArguments(star.id, star.planets.indexOf(planet)),
-              SharedViewHolder.builder()
-                  .addSharedView(R.id.bottom_pane, "bottom_pane")
-                  .build());
-        }, fleet -> { // Selected fleet.
-          Star star = selectionDetailsView.getStar();
-          getFragmentTransitionManager().replaceFragment(
-              FleetsFragment.class,
-              FleetsFragment.createArguments(star.id, fleet.id),
-              SharedViewHolder.builder()
-                  .addSharedView(R.id.bottom_pane, "bottom_pane")
-                  .build());
-         }, v -> { // "Rename" clicked.
 
-         }, v -> { // "View" clicked.
-         }, v -> { // "Intel." clicked.
-
-         }, star -> { // "Zoom to star".
-
-         });
-*/
     chatMiniView.setCallback(roomId -> {
       getFragmentTransitionManager().replaceFragment(
           ChatFragment.class,
@@ -161,6 +135,16 @@ public class StarfieldFragment extends BaseFragment {
         getFragmentTransitionManager().replaceFragment(
             SolarSystemFragment.class,
             SolarSystemFragment.createArguments(star.id),
+            SharedViewHolder.builder()
+                .addSharedView(R.id.bottom_pane, "bottom_pane")
+                .build());
+      }
+
+      @Override
+      public void onFleetClicked(Star star, Fleet fleet) {
+        getFragmentTransitionManager().replaceFragment(
+            FleetsFragment.class,
+            FleetsFragment.createArguments(star.id, fleet.id),
             SharedViewHolder.builder()
                 .addSharedView(R.id.bottom_pane, "bottom_pane")
                 .build());
