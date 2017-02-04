@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+
+import com.transitionseverywhere.TransitionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +28,7 @@ import au.com.codeka.warworlds.common.proto.ChatRoom;
 public class ChatFragment extends BaseFragment {
   private ChatPagerAdapter chatPagerAdapter;
   private ViewPager viewPager;
-  private EditText chatMsg;
-  private Button sendButton;
+  private FrameLayout bottomPane;
 
   private List<ChatRoom> rooms;
   private Handler handler;
@@ -39,20 +41,12 @@ public class ChatFragment extends BaseFragment {
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     viewPager = (ViewPager) view.findViewById(R.id.pager);
-    chatMsg = (EditText) view.findViewById(R.id.chat_text);
-    sendButton = (Button) view.findViewById(R.id.chat_send);
+    bottomPane = (FrameLayout) view.findViewById(R.id.bottom_pane);
 
-    chatMsg.setOnEditorActionListener((v, actionId, event) -> {
-      if (actionId == EditorInfo.IME_NULL) {
-        onSendClick(v);
-        return true;
-      }
-      return false;
-    });
-
-    sendButton.setOnClickListener(this::onSendClick);
     chatPagerAdapter = new ChatPagerAdapter(getFragmentManager());
     viewPager.setAdapter(chatPagerAdapter);
+
+    showSendPane();
   }
 
   @Override
@@ -189,14 +183,10 @@ public class ChatFragment extends BaseFragment {
     }
   }
 
-  private void onSendClick(View view) {
-    if (chatMsg.getText().toString().isEmpty()) {
-      return;
-    }
-
+  private void sendMessage(String msg) {
     ChatRoom room = rooms.get(viewPager.getCurrentItem());
     ChatMessage.Builder chatMessageBuilder = new ChatMessage.Builder()
-        .message(chatMsg.getText().toString())
+        .message(msg)
         .room_id(room.id);
 
     // if this is our first chat after the update ...
@@ -211,7 +201,6 @@ public class ChatFragment extends BaseFragment {
 //      }
 //    }
 
-    chatMsg.setText("");
     ChatManager.i.sendMessage(chatMessageBuilder.build());
   }
 
@@ -242,4 +231,14 @@ public class ChatFragment extends BaseFragment {
     }
     return true;
   }
+
+  /** Show the default, send, pane. */
+  private void showSendPane() {
+    SendBottomPane sendBottomPane = new SendBottomPane(getContext(), this::sendMessage);
+
+    TransitionManager.beginDelayedTransition(bottomPane);
+    bottomPane.removeAllViews();
+    bottomPane.addView(sendBottomPane);
+  }
+
 }

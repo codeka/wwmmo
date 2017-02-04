@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.game.chat.SendBottomPane;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
