@@ -39,10 +39,8 @@ public class StarfieldFragment extends BaseFragment {
 
   private StarfieldManager starfieldManager;
 
+  private ViewGroup stuff;
   private ViewGroup bottomPane;
-  private SelectionDetailsView selectionDetailsView;
-  private Button allianceBtn;
-  private Button empireBtn;
   private ChatMiniView chatMiniView;
 
   @Override
@@ -53,63 +51,38 @@ public class StarfieldFragment extends BaseFragment {
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    selectionDetailsView = (SelectionDetailsView) view.findViewById(R.id.selection_details);
+  //  selectionDetailsView = (SelectionDetailsView) view.findViewById(R.id.selection_details);
     bottomPane = (ViewGroup) view.findViewById(R.id.bottom_pane);
-    allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
-    empireBtn = (Button) view.findViewById(R.id.empire_btn);
+  //  allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
+ //   empireBtn = (Button) view.findViewById(R.id.empire_btn);
     chatMiniView = (ChatMiniView) view.findViewById(R.id.mini_chat);
-
+/*
     selectionDetailsView.setHandlers(
-        new PlanetListSimple.PlanetSelectedHandler() { // planetSelectHandler
-          @Override
-          public void onPlanetSelected(Planet planet) {
-            Star star = selectionDetailsView.getStar();
-            getFragmentTransitionManager().replaceFragment(
-                SolarSystemFragment.class,
-                SolarSystemFragment.createArguments(star.id, star.planets.indexOf(planet)),
-                SharedViewHolder.builder()
-                    .addSharedView(R.id.bottom_pane, "bottom_pane")
-                    .build());
-          }
-        }, new FleetListSimple.FleetSelectedHandler() { // fleetSelectHandler
-          @Override
-          public void onFleetSelected(Fleet fleet) {
-            Star star = selectionDetailsView.getStar();
-            getFragmentTransitionManager().replaceFragment(
-                FleetsFragment.class,
-                FleetsFragment.createArguments(star.id, fleet.id),
-                SharedViewHolder.builder()
-                    .addSharedView(R.id.bottom_pane, "bottom_pane")
-                    .build());
-           }
-        }, new View.OnClickListener() { // renameClickListener
-          @Override
-          public void onClick(View v) {
+        planet -> { // Selected planet.
+          Star star = selectionDetailsView.getStar();
+          getFragmentTransitionManager().replaceFragment(
+              SolarSystemFragment.class,
+              SolarSystemFragment.createArguments(star.id, star.planets.indexOf(planet)),
+              SharedViewHolder.builder()
+                  .addSharedView(R.id.bottom_pane, "bottom_pane")
+                  .build());
+        }, fleet -> { // Selected fleet.
+          Star star = selectionDetailsView.getStar();
+          getFragmentTransitionManager().replaceFragment(
+              FleetsFragment.class,
+              FleetsFragment.createArguments(star.id, fleet.id),
+              SharedViewHolder.builder()
+                  .addSharedView(R.id.bottom_pane, "bottom_pane")
+                  .build());
+         }, v -> { // "Rename" clicked.
 
-          }
-        }, new View.OnClickListener() { // viewClickListener
-          @Override
-          public void onClick(View v) {
-            Star star = selectionDetailsView.getStar();
-            getFragmentTransitionManager().replaceFragment(
-                SolarSystemFragment.class,
-                SolarSystemFragment.createArguments(star.id),
-                SharedViewHolder.builder()
-                    .addSharedView(R.id.bottom_pane, "bottom_pane")
-                    .build());
-          }
-        }, new View.OnClickListener() { // intelClickListener
-          @Override
-          public void onClick(View v) {
+         }, v -> { // "View" clicked.
+         }, v -> { // "Intel." clicked.
 
-          }
-        }, new SelectionDetailsView.ZoomToStarHandler() { // zoomToStarHandler
-          @Override
-          public void onZoomToStar(Star star) {
+         }, star -> { // "Zoom to star".
 
-          }
-        });
-
+         });
+*/
     chatMiniView.setCallback(roomId -> {
       getFragmentTransitionManager().replaceFragment(
           ChatFragment.class,
@@ -119,21 +92,14 @@ public class StarfieldFragment extends BaseFragment {
               .build());
     });
 
-    empireBtn.setOnClickListener(v ->
-        getFragmentTransitionManager().replaceFragment(
-            EmpireFragment.class,
-            EmpireFragment.createArguments(),
-            SharedViewHolder.builder()
-                .addSharedView(R.id.bottom_pane, "bottom_pane")
-                .build()));
-
     starfieldManager = ((MainActivity) getActivity()).getStarfieldManager();
     if (starfieldManager.getSelectedStar() != null) {
-      showBottomPane();
-      selectionDetailsView.showStar(starfieldManager.getSelectedStar());
+      showStarSelectedBottomPane(starfieldManager.getSelectedStar());
     } else {
-      hideBottomPane(false);
+      showEmptyBottomPane(true);
     }
+
+    stuff = (ViewGroup) view.findViewById(R.id.stuff);
   }
 
   @Override
@@ -148,82 +114,104 @@ public class StarfieldFragment extends BaseFragment {
     starfieldManager.removeTapListener(tapListener);
   }
 
-  private void hideBottomPane(boolean instant) {
-    applyBottomPaneAnimation(false, instant);
-  }
-
-  private void showBottomPane() {
-    applyBottomPaneAnimation(true, false);
-  }
-
-  private boolean isPortrait() {
-    return getResources().getBoolean(R.bool.is_portrait);
-  }
-
-  private void applyBottomPaneAnimation(boolean isOpen, boolean instant) {
-    float dp;
-    if (isPortrait()) {
-      if (isOpen) {
-        dp = 180;
-      } else {
-        dp = 34;
+  private void showEmptyBottomPane(boolean instant) {
+    EmptyBottomPane emptyBottomPane = new EmptyBottomPane(getContext(),
+        new EmptyBottomPane.Callback() {
+      @Override
+      public void onEmpireClicked(View view) {
+        onEmpireClick();
       }
-    } else {
-      if (isOpen) {
-        dp = 200;
-      } else {
-        dp = 100;
-      }
-    }
 
-    Resources r = getResources();
-    float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+      @Override
+      public void onSitrepClicked(View view) {
+        onSitrepClick();
+      }
+
+      @Override
+      public void onAllianceClicked(View view) {
+        onAllianceClick();
+      }
+    });
 
     if (!instant) {
-      Transition transition = new AutoTransition()
-          .setInterpolator(new AccelerateDecelerateInterpolator());
-      TransitionManager.beginDelayedTransition(bottomPane, transition);
+      TransitionManager.beginDelayedTransition(stuff);
     }
-    if (isPortrait()) {
-      bottomPane.getLayoutParams().height = (int) px;
-    } else {
-      RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) allianceBtn.getLayoutParams();
-      if (isOpen) {
-        // NB: removeRule is not available until API level 17 :/
-        lp.addRule(RelativeLayout.BELOW, 0);
-        lp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 1);
-        lp.topMargin =
-            (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 34, r.getDisplayMetrics());
-      } else {
-        lp.addRule(RelativeLayout.BELOW, R.id.empire_btn);
-        lp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-        lp.topMargin =
-            (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, r.getDisplayMetrics());
+    bottomPane.removeAllViews();
+    bottomPane.addView(emptyBottomPane);
+  }
+
+  private void showStarSelectedBottomPane(Star star) {
+    StarSelectedBottomPane starSelectedBottomPane = new StarSelectedBottomPane(
+        getContext(), star, new StarSelectedBottomPane.Callback() {
+      @Override
+      public void onEmpireClicked(View view) {
+        onEmpireClick();
       }
 
-      bottomPane.getLayoutParams().width = (int) px;
-    }
-    bottomPane.requestLayout();
+      @Override
+      public void onSitrepClicked(View view) {
+      }
+
+      @Override
+      public void onAllianceClicked(View view) {
+      }
+
+      @Override
+      public void onStarClicked(Star star, @Nullable Planet planet) {
+        getFragmentTransitionManager().replaceFragment(
+            SolarSystemFragment.class,
+            SolarSystemFragment.createArguments(star.id),
+            SharedViewHolder.builder()
+                .addSharedView(R.id.bottom_pane, "bottom_pane")
+                .build());
+      }
+    });
+
+    TransitionManager.beginDelayedTransition(stuff);
+    bottomPane.removeAllViews();
+    bottomPane.addView(starSelectedBottomPane);
+  }
+
+  private void showFleetSelectedBottomPane(Star star, Fleet fleet) {
+    FleetSelectedBottomPane fleetSelectedBottomPane = new FleetSelectedBottomPane(getContext());
+
+    TransitionManager.beginDelayedTransition(stuff);
+    bottomPane.removeAllViews();
+    bottomPane.addView(fleetSelectedBottomPane);
+  }
+
+  private void onEmpireClick() {
+    getFragmentTransitionManager().replaceFragment(
+        EmpireFragment.class,
+        EmpireFragment.createArguments(),
+        SharedViewHolder.builder()
+            .addSharedView(R.id.bottom_pane, "bottom_pane")
+            .build());
+  }
+
+  private void onSitrepClick() {
+  }
+
+  private void onAllianceClick() {
   }
 
   private final StarfieldManager.TapListener tapListener = new StarfieldManager.TapListener() {
     @Override
     public void onStarTapped(@Nullable Star star) {
       if (star == null) {
-        hideBottomPane(false);
+        showEmptyBottomPane(false);
       } else {
-        showBottomPane();
-        selectionDetailsView.showStar(star);
+        showStarSelectedBottomPane(star);
+//        selectionDetailsView.showStar(star);
       }
     }
 
     @Override
     public void onFleetTapped(@Nullable Star star, @Nullable Fleet fleet) {
       if (fleet == null) {
-        hideBottomPane(false);
+        showEmptyBottomPane(false);
       } else {
-        showBottomPane();
-        selectionDetailsView.showFleet(star, fleet);
+        showFleetSelectedBottomPane(star, fleet);
       }
     }
   };
