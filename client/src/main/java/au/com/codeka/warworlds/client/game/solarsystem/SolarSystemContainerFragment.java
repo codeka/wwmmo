@@ -1,11 +1,11 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -15,7 +15,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -33,10 +32,13 @@ import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
+import au.com.codeka.warworlds.client.store.StarCursor;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Star;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Base fragment for the solar system, which contains the drawer, and lets us switch between stars.
@@ -132,15 +134,9 @@ public class SolarSystemContainerFragment extends BaseFragment {
   }
 
   @Override
-  public void onStart() {
-    super.onStart();
+  public void onResume() {
+    super.onResume();
     getFragmentActivity().getSupportActionBar().show();
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    getFragmentActivity().getSupportActionBar().hide();
   }
 
 //  @Override
@@ -178,6 +174,7 @@ public class SolarSystemContainerFragment extends BaseFragment {
   @Override
   public void onPause() {
     super.onPause();
+    getFragmentActivity().getSupportActionBar().hide();
 //    StarManager.eventBus.unregister(eventHandler);
   }
 
@@ -220,25 +217,27 @@ public class SolarSystemContainerFragment extends BaseFragment {
   }
 
   private void refreshTitle() {
+    ActionBar actionBar = checkNotNull(getFragmentActivity().getSupportActionBar());
     if (drawerLayout.isDrawerOpen(drawer)) {
-//      getSupportActionBar().setTitle("Star Search");
+      actionBar.setTitle("Star Search");
     } else if (star == null) {
-//      getSupportActionBar().setTitle("Star Name");
+      actionBar.setTitle("Star Name");
     } else {
-//      getSupportActionBar().setTitle(star.getName());
+      actionBar.setTitle(star.name);
     }
   }
 
   private Object eventHandler = new Object() {
     @EventHandler
     public void onStarUpdated(Star s) {
-      if (s.id == star.id) {
+      if (s.id.equals(star.id)) {
         star = s;
         if (waitingForStarToShow) {
           waitingForStarToShow = false;
           showStar(star, null);
         } else {
-          //getSupportActionBar().setTitle(star.getName());
+          ActionBar actionBar = checkNotNull(getFragmentActivity().getSupportActionBar());
+          actionBar.setTitle(star.name);
         }
       }
 
@@ -251,7 +250,7 @@ public class SolarSystemContainerFragment extends BaseFragment {
 
   private static class SearchListAdapter extends BaseAdapter {
     private LayoutInflater inflater;
-//    private EmpireStarsFetcher fetcher;
+    private StarCursor cursor;
 
     public SearchListAdapter(LayoutInflater inflater) {
       this.inflater = inflater;
@@ -261,9 +260,9 @@ public class SolarSystemContainerFragment extends BaseFragment {
      * This should be called whenever the drawer is opened.
      */
     public void onShow() {
- //     if (fetcher == null) {
- //       setEmpireStarsFetcher(new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Everything, null));
-//      }
+      if (cursor == null) {
+        cursor = StarManager.i.getMyStars();
+      }
     }
 
   /*  public void setEmpireStarsFetcher(EmpireStarsFetcher fetcher) {
@@ -289,8 +288,8 @@ public class SolarSystemContainerFragment extends BaseFragment {
     public int getItemViewType(int position) {
       if (position == lastStars.size() - 1) {
         return 1;
-   //   } else if (fetcher != null && fetcher.getNumStars() == 0) {
-   //     return 2;
+      } else if (cursor != null && cursor.getSize() == 0) {
+        return 2;
       } else {
         return 0;
       }
@@ -299,13 +298,13 @@ public class SolarSystemContainerFragment extends BaseFragment {
     @Override
     public int getCount() {
       int count = lastStars.size() - 1;
-  /*    if (fetcher != null) {
-        if (fetcher.getNumStars() == 0) {
+      if (cursor != null) {
+        if (cursor.getSize() == 0) {
           count += 2;
         } else {
-          count += fetcher.getNumStars() + 1; // +1 for the spacer view
+          count += cursor.getSize() + 1; // +1 for the spacer view
         }
-      }*/
+      }
       return count;
     }
 
@@ -313,12 +312,12 @@ public class SolarSystemContainerFragment extends BaseFragment {
     public Object getItem(int position) {
       if (position < lastStars.size()) {
         return lastStars.get(position + 1);
-      } else /*if (position == lastStars.size() - 1)*/ {
+      } else if (position == lastStars.size() - 1) {
         return null;
-    //  } else if (fetcher.getNumStars() == 0) {
-  //      return null;
-  //    } else {
-   //     return fetcher.getStar(position - lastStars.size());
+      } else if (cursor.getSize() == 0) {
+        return null;
+      } else {
+        return cursor.getValue(position - lastStars.size());
       }
     }
 
@@ -336,10 +335,10 @@ public class SolarSystemContainerFragment extends BaseFragment {
           view = new View(inflater.getContext());
           view.setLayoutParams(
               new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 20));
-  //      } else if (fetcher != null && fetcher.getNumStars() == 0 && position >= lastStars.size()) {
-   //       // if we don't have any stars yet, show a loading spinner
-   //       view = inflater.inflate(R.layout.solarsystem_starlist_loading, parent, false);
-        } else {
+        } /*else if (cursor != null && cursor.getSize() == 0 && position >= lastStars.size()) {
+          // if we don't have any stars yet, show a loading spinner
+          view = inflater.inflate(R.layout.solarsystem_starlist_loading, parent, false);
+        } */else {
           view = inflater.inflate(R.layout.solarsystem_starlist_row, parent, false);
         }
       }
