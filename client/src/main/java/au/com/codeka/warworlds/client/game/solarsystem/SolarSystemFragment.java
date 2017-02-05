@@ -508,6 +508,7 @@ public class SolarSystemFragment extends BaseFragment {
         + ColonyHelper.getMaxPopulation(planet);
     populationCountTextView.setText(Html.fromHtml(pop));
 
+    colonyFocusView.setVisibility(View.VISIBLE);
     colonyFocusView.refresh(star, planet.colony);
   }
 

@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.game.build.BuildHelper;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
@@ -70,6 +69,10 @@ public class SolarSystemView extends RelativeLayout {
   }
 
   public void setStar(Star star) {
+    if (isInEditMode()) {
+      return;
+    }
+
     ViewBackgroundGenerator.setBackground(this, onBackgroundDrawHandler, star.id);
     removeAllViews();
     addView(selectionIndicator);
