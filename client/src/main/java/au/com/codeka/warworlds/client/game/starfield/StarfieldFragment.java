@@ -24,6 +24,7 @@ import au.com.codeka.warworlds.client.game.empire.EmpireFragment;
 import au.com.codeka.warworlds.client.game.fleets.FleetListSimple;
 import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
 import au.com.codeka.warworlds.client.game.fleets.FleetsFragment;
+import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemContainerFragment;
 import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemFragment;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -133,10 +134,11 @@ public class StarfieldFragment extends BaseFragment {
       @Override
       public void onStarClicked(Star star, @Nullable Planet planet) {
         getFragmentTransitionManager().replaceFragment(
-            SolarSystemFragment.class,
+            SolarSystemContainerFragment.class,
             SolarSystemFragment.createArguments(star.id),
             SharedViewHolder.builder()
                 .addSharedView(R.id.bottom_pane, "bottom_pane")
+                //.addSharedView(R.id.top_pane, "top_pane")
                 .build());
       }
 

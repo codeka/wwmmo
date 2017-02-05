@@ -4,11 +4,14 @@
     android:layout_height="match_parent"
     android:id="@+id/stuff">
 
-  <View
-      android:id="@+id/ad"
+  <FrameLayout
+      android:id="@+id/top_pane"
+      android:transitionName="top_pane"
+      style="@style/TopPane"
       android:layout_width="match_parent"
-      android:layout_height="50dp"
-      android:layout_alignParentTop="true" />
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true">
+  </FrameLayout>
 
   <au.com.codeka.warworlds.client.ctrl.ChatMiniView
       android:id="@+id/mini_chat"

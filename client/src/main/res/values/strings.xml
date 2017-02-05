@@ -69,4 +69,7 @@
   <string name="fleet_merge_instructions">
     Select all of the fleets that you want to merge. You can only select fleets of the same type.
   </string>
+
+  <string name="drawer_open">Open navigation drawer</string>
+  <string name="drawer_close">Close navigation drawer</string>
 </resources>

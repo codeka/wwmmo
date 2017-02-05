@@ -44,7 +44,7 @@ import au.com.codeka.warworlds.common.sim.ColonyHelper;
 public class SolarSystemFragment extends BaseFragment {
   private static final Log log = new Log("SolarSystemFragment");
 
-  private static final String STAR_ID_KEY = "StarID";
+  public static final String STAR_ID_KEY = "StarID";
   private static final String PLANET_INDEX_KEY = "PlanetIndex";
 
   private Star star;
@@ -230,6 +230,21 @@ public class SolarSystemFragment extends BaseFragment {
                 .build());
       }
     });
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+
+    getFragmentActivity().getSupportActionBar().show();
+    getFragmentActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getFragmentActivity().getSupportActionBar().setHomeButtonEnabled(true);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    getFragmentActivity().getSupportActionBar().hide();
   }
 
   @Override
