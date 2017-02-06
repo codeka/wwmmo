@@ -233,21 +233,6 @@ public class SolarSystemFragment extends BaseFragment {
   }
 
   @Override
-  public void onStart() {
-    super.onStart();
-
-    getFragmentActivity().getSupportActionBar().show();
-    getFragmentActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    getFragmentActivity().getSupportActionBar().setHomeButtonEnabled(true);
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    getFragmentActivity().getSupportActionBar().hide();
-  }
-
-  @Override
   public void onResume() {
     super.onResume();
     Bundle args = getArguments();

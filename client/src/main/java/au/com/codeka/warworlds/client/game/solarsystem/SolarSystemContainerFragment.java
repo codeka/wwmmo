@@ -35,6 +35,7 @@ import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.store.StarCursor;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -46,6 +47,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Each star is represented by a {@link SolarSystemFragment}.
  */
 public class SolarSystemContainerFragment extends BaseFragment {
+  private static final Log log = new Log("SolarSystemContainerFra");
+
   private DrawerLayout drawerLayout;
   private View drawer;
   private ActionBarDrawerToggle drawerToggle;
@@ -90,15 +93,13 @@ public class SolarSystemContainerFragment extends BaseFragment {
           public void onDrawerClosed(View view) {
             super.onDrawerClosed(view);
             refreshTitle();
-            getFragmentActivity().supportInvalidateOptionsMenu();
           }
 
           @Override
           public void onDrawerOpened(View drawerView) {
             super.onDrawerOpened(drawerView);
             refreshTitle();
-            getFragmentActivity().supportInvalidateOptionsMenu();
-            searchListAdapter.onShow();
+            searchListAdapter.setCursor(StarManager.i.getMyStars());
           }
         };
     drawerLayout.setDrawerListener(drawerToggle);
@@ -139,17 +140,13 @@ public class SolarSystemContainerFragment extends BaseFragment {
     super.onResume();
     App.i.getEventBus().register(eventHandler);
 
+    log.debug("SolarSystemContainerFragment.onResume");
+
     ActionBar actionBar = checkNotNull(getFragmentActivity().getSupportActionBar());
     actionBar.show();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+    actionBar.setHomeButtonEnabled(true);
   }
-
-//  @Override
-//  public boolean onCreateOptionsMenu(Menu menu) {
-//    // Inflate the menu items for use in the action bar
-//    MenuInflater inflater = getMenuInflater();
-//    inflater.inflate(R.menu.solarsystem_menu, menu);
- //   return super.onCreateOptionsMenu(menu);
- // }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
@@ -157,27 +154,14 @@ public class SolarSystemContainerFragment extends BaseFragment {
       return true;
     }
 
-/*    switch (item.getItemId()) {
-      case R.id.menu_locate:
-        Intent intent = new Intent(this, StarfieldActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        if (star != null) {
-          intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
-          intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
-          intent.putExtra("au.com.codeka.warworlds.OffsetX", star.getOffsetX());
-          intent.putExtra("au.com.codeka.warworlds.OffsetY", star.getOffsetY());
-          intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-        }
-        startActivity(intent);
-        break;
-    }
-*/
     return super.onOptionsItemSelected(item);
   }
 
   @Override
   public void onPause() {
     super.onPause();
+
+    log.debug("SolarSystemContainerFragment.onPause");
     ActionBar actionBar = checkNotNull(getFragmentActivity().getSupportActionBar());
     actionBar.hide();
 
@@ -224,6 +208,11 @@ public class SolarSystemContainerFragment extends BaseFragment {
 
   private void refreshTitle() {
     ActionBar actionBar = checkNotNull(getFragmentActivity().getSupportActionBar());
+    log.debug("Refreshing title. isDrawerOpen=%s star=%s actionBar.isShowing=%s",
+        drawerLayout.isDrawerOpen(drawer) ? "true" : "false",
+        star == null ? "??" : star.name,
+        actionBar.isShowing() ? "true" : "false");
+
     if (drawerLayout.isDrawerOpen(drawer)) {
       actionBar.setTitle("Star Search");
     } else if (star == null) {
@@ -261,12 +250,10 @@ public class SolarSystemContainerFragment extends BaseFragment {
       this.inflater = inflater;
     }
 
-    /** This should be called whenever the drawer is opened. */
-    public void onShow() {
-      if (cursor == null) {
-        cursor = StarManager.i.getMyStars();
-        notifyDataSetChanged();
-      }
+    /** Sets the {@link StarCursor} that we'll use to display stars. */
+    public void setCursor(StarCursor cursor) {
+      this.cursor = checkNotNull(cursor);
+      notifyDataSetChanged();
     }
 
     @Override
