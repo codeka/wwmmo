@@ -27,6 +27,7 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
@@ -136,7 +137,10 @@ public class SolarSystemContainerFragment extends BaseFragment {
   @Override
   public void onResume() {
     super.onResume();
-    getFragmentActivity().getSupportActionBar().show();
+    App.i.getEventBus().register(eventHandler);
+
+    ActionBar actionBar = checkNotNull(getFragmentActivity().getSupportActionBar());
+    actionBar.show();
   }
 
 //  @Override
@@ -174,8 +178,10 @@ public class SolarSystemContainerFragment extends BaseFragment {
   @Override
   public void onPause() {
     super.onPause();
-    getFragmentActivity().getSupportActionBar().hide();
-//    StarManager.eventBus.unregister(eventHandler);
+    ActionBar actionBar = checkNotNull(getFragmentActivity().getSupportActionBar());
+    actionBar.hide();
+
+    App.i.getEventBus().unregister(eventHandler);
   }
 
   private void performSearch(String search) {
@@ -240,11 +246,6 @@ public class SolarSystemContainerFragment extends BaseFragment {
           actionBar.setTitle(star.name);
         }
       }
-
-//      if (searchListAdapter.getStarsFetcher() == null || searchListAdapter.getStarsFetcher()
- //         .hasStarID(star.getID())) {
- //       searchListAdapter.notifyDataSetChanged();
- //     }
     }
   };
 
@@ -252,46 +253,34 @@ public class SolarSystemContainerFragment extends BaseFragment {
     private LayoutInflater inflater;
     private StarCursor cursor;
 
+    private final int VIEW_TYPE_STAR = 0;
+    private final int VIEW_TYPE_SEPARATOR = 1;
+    private final int NUM_VIEW_TYPES = 2;
+    
     public SearchListAdapter(LayoutInflater inflater) {
       this.inflater = inflater;
     }
 
-    /**
-     * This should be called whenever the drawer is opened.
-     */
+    /** This should be called whenever the drawer is opened. */
     public void onShow() {
       if (cursor == null) {
+
         cursor = StarManager.i.getMyStars();
+        notifyDataSetChanged();
       }
     }
 
-  /*  public void setEmpireStarsFetcher(EmpireStarsFetcher fetcher) {
-      if (this.fetcher != null) {
-        this.fetcher.eventBus.unregister(eventHandler);
-      }
-      this.fetcher = fetcher;
-      this.fetcher.eventBus.register(eventHandler);
-      this.fetcher.getStars(0, 20);
-      notifyDataSetChanged();
-    }*/
-
-  //  public EmpireStarsFetcher getStarsFetcher() {
- //     return fetcher;
-  //  }
-
     @Override
     public int getViewTypeCount() {
-      return 3;
+      return NUM_VIEW_TYPES;
     }
 
     @Override
     public int getItemViewType(int position) {
       if (position == lastStars.size() - 1) {
-        return 1;
-      } else if (cursor != null && cursor.getSize() == 0) {
-        return 2;
+        return VIEW_TYPE_SEPARATOR;
       } else {
-        return 0;
+        return VIEW_TYPE_STAR;
       }
     }
 
@@ -299,22 +288,16 @@ public class SolarSystemContainerFragment extends BaseFragment {
     public int getCount() {
       int count = lastStars.size() - 1;
       if (cursor != null) {
-        if (cursor.getSize() == 0) {
-          count += 2;
-        } else {
-          count += cursor.getSize() + 1; // +1 for the spacer view
-        }
+        count += cursor.getSize() + 1; // +1 for the spacer view
       }
       return count;
     }
 
     @Override
     public Object getItem(int position) {
-      if (position < lastStars.size()) {
+      if (position < lastStars.size() - 1) {
         return lastStars.get(position + 1);
       } else if (position == lastStars.size() - 1) {
-        return null;
-      } else if (cursor.getSize() == 0) {
         return null;
       } else {
         return cursor.getValue(position - lastStars.size());
@@ -335,18 +318,14 @@ public class SolarSystemContainerFragment extends BaseFragment {
           view = new View(inflater.getContext());
           view.setLayoutParams(
               new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 20));
-        } /*else if (cursor != null && cursor.getSize() == 0 && position >= lastStars.size()) {
-          // if we don't have any stars yet, show a loading spinner
-          view = inflater.inflate(R.layout.solarsystem_starlist_loading, parent, false);
-        } */else {
+        } else {
           view = inflater.inflate(R.layout.solarsystem_starlist_row, parent, false);
         }
       }
 
-//      if (position == lastStars.size() - 1 || (fetcher != null && fetcher.getNumStars() == 0
-//          && position >= lastStars.size())) {
-//        return view;
-//      }
+      if (position == lastStars.size() - 1) {
+        return view;
+      }
 
       Star star = (Star) getItem(position);
       ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
@@ -395,9 +374,9 @@ public class SolarSystemContainerFragment extends BaseFragment {
           } else {
             starGoodsDelta.setTextColor(Color.GREEN);
           }
-          starGoodsTotal.setText(String
-              .format(Locale.ENGLISH, "%d / %d", Math.round(storage.total_goods),
-                  Math.round(storage.max_goods)));
+          starGoodsTotal.setText(String.format(Locale.ENGLISH, "%d / %d",
+              Math.round(storage.total_goods),
+              Math.round(storage.max_goods)));
 
           starMineralsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
               storage.minerals_delta_per_hour < 0 ? "-" : "+",
@@ -407,19 +386,12 @@ public class SolarSystemContainerFragment extends BaseFragment {
           } else {
             starMineralsDelta.setTextColor(Color.GREEN);
           }
-          starMineralsTotal.setText(String
-              .format(Locale.ENGLISH, "%d / %d", Math.round(storage.total_minerals),
-                  Math.round(storage.max_minerals)));
+          starMineralsTotal.setText(String.format(Locale.ENGLISH, "%d / %d",
+              Math.round(storage.total_minerals),
+              Math.round(storage.max_minerals)));
         }
       }
       return view;
     }
-
-    private Object eventHandler = new Object() {
-//      @EventHandler
-//      public void onEmpireStarsFetched(EmpireStarsFetcher.StarsFetchedEvent event) {
-//        notifyDataSetChanged();
- //     }
-    };
   }
 }
