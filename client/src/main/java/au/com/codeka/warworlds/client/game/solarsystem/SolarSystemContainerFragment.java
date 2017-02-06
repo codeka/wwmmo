@@ -256,7 +256,7 @@ public class SolarSystemContainerFragment extends BaseFragment {
     private final int VIEW_TYPE_STAR = 0;
     private final int VIEW_TYPE_SEPARATOR = 1;
     private final int NUM_VIEW_TYPES = 2;
-    
+
     public SearchListAdapter(LayoutInflater inflater) {
       this.inflater = inflater;
     }
@@ -264,7 +264,6 @@ public class SolarSystemContainerFragment extends BaseFragment {
     /** This should be called whenever the drawer is opened. */
     public void onShow() {
       if (cursor == null) {
-
         cursor = StarManager.i.getMyStars();
         notifyDataSetChanged();
       }
@@ -365,7 +364,12 @@ public class SolarSystemContainerFragment extends BaseFragment {
           }
         }
 
-        if (storage != null) {
+        if (storage == null) {
+          starGoodsDelta.setText("");
+          starGoodsTotal.setText("");
+          starMineralsDelta.setText("");
+          starMineralsTotal.setText("");
+        } else {
           starGoodsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
               storage.goods_delta_per_hour < 0 ? "-" : "+",
               Math.abs(Math.round(storage.goods_delta_per_hour))));
