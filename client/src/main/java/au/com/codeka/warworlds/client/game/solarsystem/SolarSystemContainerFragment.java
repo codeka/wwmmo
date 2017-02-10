@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -105,12 +107,19 @@ public class SolarSystemContainerFragment extends BaseFragment {
     drawerLayout.setDrawerListener(drawerToggle);
 
     final EditText searchBox = (EditText) view.findViewById(R.id.search_text);
-    searchBox.setOnEditorActionListener((v, actionId, event) -> {
-      if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-        performSearch(searchBox.getText().toString());
-        return true;
+    searchBox.addTextChangedListener(new TextWatcher() {
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+        performSearch(s.toString());
       }
-      return false;
+
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+      }
     });
 
     ImageButton searchBtn = (ImageButton) view.findViewById(R.id.search_button);
@@ -169,8 +178,7 @@ public class SolarSystemContainerFragment extends BaseFragment {
   }
 
   private void performSearch(String search) {
-//    searchListAdapter.setEmpireStarsFetcher(
-//        new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Everything, search));
+    searchListAdapter.setCursor(StarManager.i.searchMyStars(search));
   }
 
   public void showStar(Star star, @Nullable Bundle args) {

@@ -55,6 +55,10 @@ public class StarManager {
     return stars.getMyStars();
   }
 
+  public StarCursor searchMyStars(String search) {
+    return stars.searchMyStars(search);
+  }
+
   /**
    * Gets the most recent value of last_simulation out of all our empire's stars. This is sent to
    * the server in the {@link au.com.codeka.warworlds.common.proto.HelloPacket}, so that the server

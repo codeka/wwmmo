@@ -36,7 +36,10 @@ public class StarStore extends BaseStore {
             + "  key INTEGER PRIMARY KEY,"
             + "  my_empire INTEGER," // 1 if my empire has something on this star, 0 if not.
             + "  last_simulation INTEGER,"
+            + "  name STRING,"
             + "  value BLOB)");
+    db.execSQL(
+        "CREATE INDEX IX_" + name + "_my_empire_name ON " + name + " (my_empire, name)");
   }
 
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -48,6 +51,18 @@ public class StarStore extends BaseStore {
         new String[] { "value" } /* columns */,
         "my_empire = 1" /* selection */,
         null /* selectionArgs */,
+        null /* groupBy */,
+        null /* having */,
+        null /* orderBy */));
+  }
+
+  public StarCursor searchMyStars(String search) {
+    String likeOperand = search.replace("%", "%%") + "%";
+    return new StarCursor(helper.getReadableDatabase().query(
+        name,
+        new String[] { "value" } /* columns */,
+        "my_empire = 1 AND name LIKE ?" /* selection */,
+        new String[] { likeOperand } /* selectionArgs */,
         null /* groupBy */,
         null /* having */,
         null /* orderBy */));
