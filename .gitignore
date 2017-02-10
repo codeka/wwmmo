@@ -6,6 +6,7 @@
 
 # Make sure keystore.jks never gets added to source control, it's SEKRET!
 keystore.jks
+signing.properties
 
 # These are generated from the .proto files.
 common/src/main/java/au/com/codeka/warworlds/common/proto/
