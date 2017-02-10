@@ -16,20 +16,26 @@ import au.com.codeka.warworlds.server.store.base.QueryResult;
 public class AdminUsersStore extends BaseStore {
   private static final Log log = new Log("AdminUsersStore");
 
+  private int count = -1;
+
   AdminUsersStore(String fileName) {
     super(fileName);
   }
 
   /** Returns the total number of users in the admin users store. */
   public int count() {
-    try(QueryResult res = newReader().stmt("SELECT COUNT(*) FROM users").query()) {
-      if (res.next()) {
-        return res.getInt(0);
+    if (count == -1) {
+      count = 0;
+      try (QueryResult res = newReader().stmt("SELECT COUNT(*) FROM users").query()) {
+        if (res.next()) {
+          count = res.getInt(0);
+        }
+      } catch (Exception e) {
+        log.error("Unexpected.", e);
       }
-    } catch (Exception e) {
-      log.error("Unexpected.", e);
     }
-    return 0;
+
+    return count;
   }
 
   /** Gets the {@link AdminUser} with the given identifier, or null if the user doesn't exist. */
@@ -69,6 +75,7 @@ public class AdminUsersStore extends BaseStore {
           .param(0, email)
           .param(1, adminUser.encode())
           .execute();
+      count = -1; // Reset it so it gets recaculated.
     } catch (StoreException e) {
       log.error("Unexpected.", e);
     }
