@@ -13,6 +13,16 @@
       android:supportsRtl="true"
       android:hardwareAccelerated="true"
       android:theme="@style/WarWorlds">
+
+    <!-- This is used when no icon is set for incoming notification messages. -->
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@drawable/status_icon" />
+    <!-- This is used when no color is set for the incoming notification message. -->
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_color"
+        android:resource="@color/default_background" />
+
     <activity
         android:name="MainActivity"
         android:theme="@style/WarWorlds.NoActionBar">
@@ -22,6 +32,16 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
-  </application>
 
+    <service android:name=".DeviceIdService">
+      <intent-filter>
+        <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+      </intent-filter>
+    </service>
+    <service android:name=".MessagingService">
+      <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+      </intent-filter>
+    </service>
+  </application>
 </manifest>
