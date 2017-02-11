@@ -72,4 +72,13 @@
 
   <string name="drawer_open">Open navigation drawer</string>
   <string name="drawer_close">Close navigation drawer</string>
+
+  <!-- The following are for facebook login. -->
+  <string name="facebook_application_id" translatable="false">175503015846337</string>
+  <string name="facebook_login_protocol_scheme" translatable="false">fb175503015846337</string>
+
+  <!-- The following are for twitter login. -->
+  <string name="twitter_consumer_key" translatable="false">hQ5vB7D9V2P8IdMF1Cdy46QoF</string>
+  <string name="twitter_consumer_secret" translatable="false">jNPQTu6n89kav0r65h5W7NF3CnsXk3NYGYUIJfkaDWqJsKc2iU</string>
+
 </resources>

@@ -8,10 +8,6 @@ buildscript {
   }
 }
 
-repositories {
-  mavenCentral()
-}
-
 import org.ajoberstar.grgit.Grgit
 
 apply plugin: 'com.android.application'
@@ -107,6 +103,7 @@ dependencies {
   compile "com.google.android.gms:play-services-base:10.0.1"
   compile 'com.google.firebase:firebase-core:10.0.1'
   compile 'com.google.firebase:firebase-messaging:10.0.1'
+  compile 'com.firebaseui:firebase-ui-auth:1.1.1'
   compile 'com.google.guava:guava:19.0'
   compile 'com.squareup.picasso:picasso:2.5.2'
 }

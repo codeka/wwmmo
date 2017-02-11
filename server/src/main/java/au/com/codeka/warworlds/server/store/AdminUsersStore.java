@@ -93,7 +93,6 @@ public class AdminUsersStore extends BaseStore {
     }
   }
 
-
   @Override
   protected int onOpen(int diskVersion) throws StoreException {
     if (diskVersion == 0) {

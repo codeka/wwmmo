@@ -11,7 +11,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.ErrorCodes;
+import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.ResultCodes;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Document;
@@ -55,6 +60,9 @@ public class WelcomeFragment extends BaseFragment {
   /** URL of RSS content to fetch and display in the motd view. */
   private static final String MOTD_RSS = "http://www.war-worlds.com/forum/announcements/rss";
 
+  /* Result code for when we sign in. */
+  private static final int RC_SIGN_IN = 3564;
+
   private Button startButton;
   private TextView connectionStatus;
   private TextView empireName;
@@ -82,46 +90,26 @@ public class WelcomeFragment extends BaseFragment {
 
     refreshWelcomeMessage();
 
-    optionsButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        getFragmentTransitionManager().replaceFragment(GameSettingsFragment.class);
-      }
-    });
+    optionsButton.setOnClickListener(v ->
+        getFragmentTransitionManager().replaceFragment(GameSettingsFragment.class));
 
-    startButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        getFragmentTransitionManager().replaceFragment(StarfieldFragment.class);
-      }
-    });
+    startButton.setOnClickListener(v ->
+        getFragmentTransitionManager().replaceFragment(StarfieldFragment.class));
 
-    Preconditions.checkNotNull(view.findViewById(R.id.help_btn)).setOnClickListener(
-        new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
-            startActivity(i);
-          }
+    Preconditions.checkNotNull(view.findViewById(R.id.help_btn)).setOnClickListener(v -> {
+          Intent i = new Intent(Intent.ACTION_VIEW);
+          i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
+          startActivity(i);
         });
 
-    Preconditions.checkNotNull(view.findViewById(R.id.website_btn)).setOnClickListener(
-        new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse("http://www.war-worlds.com/"));
-            startActivity(i);
-          }
+    Preconditions.checkNotNull(view.findViewById(R.id.website_btn)).setOnClickListener(v -> {
+          Intent i = new Intent(Intent.ACTION_VIEW);
+          i.setData(Uri.parse("http://www.war-worlds.com/"));
+          startActivity(i);
         });
 
     Preconditions.checkNotNull(view.findViewById(R.id.reauth_btn)).setOnClickListener(
-        new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            onReauthClick();
-          }
-        });
+        v -> onReauthClick());
   }
 
   @Override
@@ -161,9 +149,54 @@ public class WelcomeFragment extends BaseFragment {
     App.i.getEventBus().unregister(eventHandler);
   }
 
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+
+    if (requestCode == RC_SIGN_IN) {
+      IdpResponse response = IdpResponse.fromResultIntent(data);
+
+      // Successfully signed in
+      if (resultCode == ResultCodes.OK) {
+        // TODO: success!
+        return;
+      } else {
+        // Sign in failed.
+        if (response == null) {
+          // TODO: User pressed back button.
+          return;
+        }
+
+        if (response.getErrorCode() == ErrorCodes.NO_NETWORK) {
+          // TODO: no internet connection.
+          return;
+        }
+
+        if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
+          // TODO: unknown error.
+          return;
+        }
+      }
+
+      // TODO: some other error.
+    }
+  }
+
   private void onReauthClick() {
-    //final Intent intent = new Intent(getActivity(), AccountsActivity.class);
-    //startActivity(intent);
+    startActivityForResult(
+        AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setProviders(Lists.newArrayList(
+                new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
+                new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
+                new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build(),
+                new AuthUI.IdpConfig.Builder(AuthUI.TWITTER_PROVIDER).build()
+            ))
+            .setTosUrl("http://www.war-worlds.com/terms-of-service")
+            .setTheme(R.style.WarWorlds)
+            .build(),
+        RC_SIGN_IN
+    );
   }
 
   private void maybeShowSignInPrompt() {
