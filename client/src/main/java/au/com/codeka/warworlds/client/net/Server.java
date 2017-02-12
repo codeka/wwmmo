@@ -42,7 +42,7 @@ public class Server {
 
   private final PacketDispatcher packetDispatcher = new PacketDispatcher();
   @Nonnull private ServerStateEvent currState =
-      new ServerStateEvent("", ServerStateEvent.ConnectionState.DISCONNECTED);
+      new ServerStateEvent("", ServerStateEvent.ConnectionState.DISCONNECTED, null);
 
   /** The socket that's connected to the server. Null if we're not connected. */
   @Nullable private Socket gameSocket;
@@ -81,7 +81,7 @@ public class Server {
       return;
     }
 
-    updateState(ServerStateEvent.ConnectionState.CONNECTING);
+    updateState(ServerStateEvent.ConnectionState.CONNECTING, null);
 
     // First of all, we'll want to wait for firebase to authenticate the user (if they've logged
     // in previously).
@@ -157,7 +157,13 @@ public class Server {
         disconnect();
       } else {
         LoginResponse loginResponse = checkNotNull(request.getBody(LoginResponse.class));
-        connectGameSocket(loginResponse);
+        if (loginResponse.status != LoginResponse.LoginStatus.SUCCESS) {
+          updateState(ServerStateEvent.ConnectionState.ERROR, loginResponse.status);
+          log.error("Error logging in, got login status: %s", loginResponse.status);
+          disconnect();
+        } else {
+          connectGameSocket(loginResponse);
+        }
       }
     }, Threads.BACKGROUND);
   }
@@ -187,7 +193,7 @@ public class Server {
       EmpireManager.i.onHello(loginResponse.empire);
 
       reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS;
-      updateState(ServerStateEvent.ConnectionState.CONNECTED);
+      updateState(ServerStateEvent.ConnectionState.CONNECTED, loginResponse.status);
 
       while (oldQueuedPackets != null && !oldQueuedPackets.isEmpty()) {
         send(oldQueuedPackets.remove());
@@ -235,15 +241,17 @@ public class Server {
       queuedPackets = new ArrayDeque<>();
     }
 
-    updateState(ServerStateEvent.ConnectionState.DISCONNECTED);
-    App.i.getTaskRunner().runTask(() -> {
-      reconnectTimeMs *= 2;
-      if (reconnectTimeMs > MAX_RECONNECT_TIME_MS) {
-        reconnectTimeMs = MAX_RECONNECT_TIME_MS;
-      }
+    if (currState.getState() != ServerStateEvent.ConnectionState.ERROR) {
+      updateState(ServerStateEvent.ConnectionState.DISCONNECTED, null);
+      App.i.getTaskRunner().runTask(() -> {
+        reconnectTimeMs *= 2;
+        if (reconnectTimeMs > MAX_RECONNECT_TIME_MS) {
+          reconnectTimeMs = MAX_RECONNECT_TIME_MS;
+        }
 
-      connect();
-    }, Threads.BACKGROUND, reconnectTimeMs);
+        connect();
+      }, Threads.BACKGROUND, reconnectTimeMs);
+    }
   }
 
   private final PacketEncoder.PacketHandler packetEncodeHandler =
@@ -272,8 +280,10 @@ public class Server {
         }
       };
 
-  private void updateState(ServerStateEvent.ConnectionState state) {
-    currState = new ServerStateEvent(ServerUrl.getUrl(), state);
+  private void updateState(
+      ServerStateEvent.ConnectionState state,
+      @Nullable LoginResponse.LoginStatus loginStatus) {
+    currState = new ServerStateEvent(ServerUrl.getUrl(), state, loginStatus);
     App.i.getEventBus().publish(currState);
   }
 }
