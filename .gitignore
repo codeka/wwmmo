@@ -15,6 +15,7 @@ common/src/main/java/au/com/codeka/warworlds/common/proto/
 server/src/main/data/cache/*
 server/src/main/data/store/*
 server/src/main/data/config-debug.json
+server/src/main/data/firebase.json
 client/signing.properties
 client/*.apk
 

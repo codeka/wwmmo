@@ -1,9 +1,15 @@
 package au.com.codeka.warworlds.server;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseCredentials;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+
+import java.io.FileInputStream;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.account.AccountsServlet;
@@ -23,10 +29,12 @@ public class Program {
     DataStore.i.open();
 
     try {
-      //new SchemaUpdater().verifySchema();
-      //ErrorReportingLoggingHandler.setup();
-      //DesignManager.setup();
-      //NameGenerator.setup();
+      FileInputStream firebaseCertificate = new FileInputStream("data/firebase.json");
+      FirebaseOptions options = new FirebaseOptions.Builder()
+          .setCredential(FirebaseCredentials.fromCertificate(firebaseCertificate))
+          .setDatabaseUrl("https://wwmmo-93bac.firebaseio.com")
+          .build();
+      FirebaseApp.initializeApp(options);
 
       if (args.length >= 2 && args[0].equals("cron")) {
         String extra = null;

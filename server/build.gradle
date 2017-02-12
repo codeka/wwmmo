@@ -22,6 +22,7 @@ dependencies {
   compile 'com.google.api-client:google-api-client-gson:1.19.1'
   compile 'com.google.code.findbugs:jsr305:3.0.0'
   compile 'com.google.code.gson:gson:2.6.2'
+  compile 'com.google.firebase:firebase-admin:4.1.1'
   compile 'com.google.guava:guava:19.0'
   compile 'com.squareup.wire:wire-gson-support:2.1.2'
   compile 'org.eclipse.jetty:jetty-server:9.4.0.v20161208'

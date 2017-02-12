@@ -1,5 +1,11 @@
 package au.com.codeka.warworlds.client.net;
 
+import android.support.annotation.NonNull;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -10,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.world.ChatManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
@@ -76,6 +83,56 @@ public class Server {
 
     updateState(ServerStateEvent.ConnectionState.CONNECTING);
 
+    // First of all, we'll want to wait for firebase to authenticate the user (if they've logged
+    // in previously).
+    FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+  }
+
+  private final FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+      FirebaseUser user = firebaseAuth.getCurrentUser();
+      login(user);
+
+      firebaseAuth.removeAuthStateListener(authStateListener);
+    }
+  };
+
+  /**
+   * Connects to the server to log this user in.
+   *
+   * <p>The server will check the firebase user credentials (if supplied) are associated with the
+   * empire cookie we've got saved. If everything checks out, it'll give us the hostname and port
+   * to connect to.
+   *
+   * <p>If there's some sort of mismatch on the server, we may need to work something out.
+   *
+   * @param user The {@link FirebaseUser} you've authenticated as (can be null if you haven't
+   *             authenticated with firebase yet -- that's OK, anonymous empires don't need to be
+   *             authenticated).
+   */
+  private void login(@Nullable FirebaseUser user) {
+    final String cookie = GameSettings.i.getString(GameSettings.Key.COOKIE);
+    log.debug("Logging in with cookie: %s");
+
+    if (user != null) {
+      user.getToken(true).addOnCompleteListener(task -> {
+        if (task.isSuccessful()) {
+          String token = task.getResult().getToken();
+          log.debug("Got firebase token for %s: %s", user.getEmail(), token);
+          login(cookie, token);
+        } else {
+          // TODO: error getting token
+          log.warning("Error getting token.", task.getException());
+        }
+      });
+    } else {
+      log.debug("Anonymous login, no user token.");
+      login(cookie, null);
+    }
+  }
+
+  private void login(@Nonnull String cookie, @Nullable String token) {
     App.i.getTaskRunner().runTask(() -> {
       log.info("Logging in: %s", ServerUrl.getLoginUrl());
       HttpRequest request = new HttpRequest.Builder()
@@ -83,6 +140,7 @@ public class Server {
           .method(HttpRequest.Method.POST)
           .body(new LoginRequest.Builder()
               .cookie(cookie)
+              .token(token)
               .build().encode())
           .build();
       if (request.getResponseCode() != 200) {

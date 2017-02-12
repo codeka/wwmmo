@@ -8,7 +8,9 @@
   <string name="website">Website</string>
   <string name="realm_label">Realm: %s</string>
   <string name="switch_realm">Switch Realm</string>
-  <string name="switch_user">Switch User</string>
+  <string name="reauth_sign_in">Sign in</string>
+  <string name="reauth_switch_user">Switch user</string>
+  <string name="reauth_loading">...</string>
   <string name="options">Options</string>
   <string name="cancel">Cancel</string>
   <string name="done">Done</string>
@@ -73,12 +75,6 @@
   <string name="drawer_open">Open navigation drawer</string>
   <string name="drawer_close">Close navigation drawer</string>
 
-  <!-- The following are for facebook login. -->
-  <string name="facebook_application_id" translatable="false">175503015846337</string>
-  <string name="facebook_login_protocol_scheme" translatable="false">fb175503015846337</string>
-
-  <!-- The following are for twitter login. -->
-  <string name="twitter_consumer_key" translatable="false">hQ5vB7D9V2P8IdMF1Cdy46QoF</string>
-  <string name="twitter_consumer_secret" translatable="false">jNPQTu6n89kav0r65h5W7NF3CnsXk3NYGYUIJfkaDWqJsKc2iU</string>
-
+  <string name="sign_in_failed_cancelled">Sign in cancelled.</string>
+  <string name="sign_in_failed_error">Sign in error, please try again later.</string>
 </resources>

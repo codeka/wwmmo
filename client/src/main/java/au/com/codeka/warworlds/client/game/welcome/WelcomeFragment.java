@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,6 +19,8 @@ import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.ResultCodes;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Document;
@@ -50,6 +54,8 @@ import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * The "Welcome" activity is what you see when you first start the game, it has a view for showing
  * news, letting you change your empire and so on.
@@ -63,7 +69,9 @@ public class WelcomeFragment extends BaseFragment {
   /* Result code for when we sign in. */
   private static final int RC_SIGN_IN = 3564;
 
+  private View rootView;
   private Button startButton;
+  private Button reauthButton;
   private TextView connectionStatus;
   private TextView empireName;
   private ImageView empireIcon;
@@ -77,16 +85,18 @@ public class WelcomeFragment extends BaseFragment {
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+    rootView = view;
     ViewBackgroundGenerator.setBackground(view);
 
-    startButton = (Button) Preconditions.checkNotNull(view.findViewById(R.id.start_btn));
-    motdView = (TransparentWebView) Preconditions.checkNotNull(view.findViewById(R.id.motd));
-    empireName = (TextView) Preconditions.checkNotNull(view.findViewById(R.id.empire_name));
-    empireIcon = (ImageView) Preconditions.checkNotNull(view.findViewById(R.id.empire_icon));
+    startButton = (Button) checkNotNull(view.findViewById(R.id.start_btn));
+    reauthButton = (Button) view.findViewById(R.id.reauth_btn);
+    motdView = (TransparentWebView) checkNotNull(view.findViewById(R.id.motd));
+    empireName = (TextView) checkNotNull(view.findViewById(R.id.empire_name));
+    empireIcon = (ImageView) checkNotNull(view.findViewById(R.id.empire_icon));
     connectionStatus =
-        (TextView) Preconditions.checkNotNull(view.findViewById(R.id.connection_status));
+        (TextView) checkNotNull(view.findViewById(R.id.connection_status));
     final Button optionsButton =
-        (Button) Preconditions.checkNotNull(view.findViewById(R.id.options_btn));
+        (Button) checkNotNull(view.findViewById(R.id.options_btn));
 
     refreshWelcomeMessage();
 
@@ -96,25 +106,26 @@ public class WelcomeFragment extends BaseFragment {
     startButton.setOnClickListener(v ->
         getFragmentTransitionManager().replaceFragment(StarfieldFragment.class));
 
-    Preconditions.checkNotNull(view.findViewById(R.id.help_btn)).setOnClickListener(v -> {
+    checkNotNull(view.findViewById(R.id.help_btn)).setOnClickListener(v -> {
           Intent i = new Intent(Intent.ACTION_VIEW);
           i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
           startActivity(i);
         });
 
-    Preconditions.checkNotNull(view.findViewById(R.id.website_btn)).setOnClickListener(v -> {
+    checkNotNull(view.findViewById(R.id.website_btn)).setOnClickListener(v -> {
           Intent i = new Intent(Intent.ACTION_VIEW);
           i.setData(Uri.parse("http://www.war-worlds.com/"));
           startActivity(i);
         });
 
-    Preconditions.checkNotNull(view.findViewById(R.id.reauth_btn)).setOnClickListener(
-        v -> onReauthClick());
+    reauthButton.setOnClickListener(v -> onReauthClick());
   }
 
   @Override
   public void onResume() {
     super.onResume();
+
+    FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
     startButton.setEnabled(false);
     updateServerState(App.i.getServer().getCurrState());
@@ -147,6 +158,8 @@ public class WelcomeFragment extends BaseFragment {
   public void onPause() {
     super.onPause();
     App.i.getEventBus().unregister(eventHandler);
+
+    FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
   }
 
   @Override
@@ -156,29 +169,19 @@ public class WelcomeFragment extends BaseFragment {
     if (requestCode == RC_SIGN_IN) {
       IdpResponse response = IdpResponse.fromResultIntent(data);
 
-      // Successfully signed in
       if (resultCode == ResultCodes.OK) {
-        // TODO: success!
-        return;
+        // Successfully signed in, contact the server to verify the account and see whether they
+        // already have an empire associated with that account.
+        associateIdentityWithEmpire(response);
       } else {
         // Sign in failed.
         if (response == null) {
-          // TODO: User pressed back button.
+          Snackbar.make(rootView, R.string.sign_in_failed_cancelled, Snackbar.LENGTH_SHORT).show();
           return;
         }
 
-        if (response.getErrorCode() == ErrorCodes.NO_NETWORK) {
-          // TODO: no internet connection.
-          return;
-        }
-
-        if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-          // TODO: unknown error.
-          return;
-        }
+        Snackbar.make(rootView, R.string.sign_in_failed_error, Snackbar.LENGTH_SHORT).show();
       }
-
-      // TODO: some other error.
     }
   }
 
@@ -197,6 +200,14 @@ public class WelcomeFragment extends BaseFragment {
             .build(),
         RC_SIGN_IN
     );
+  }
+
+  private void associateIdentityWithEmpire(IdpResponse response) {
+    String emailAddr = response.getEmail();
+    String idpToken = response.getIdpToken();
+
+    log.info(
+        "Attempting to associated email address %s (token %s) with server.", emailAddr, idpToken);
   }
 
   private void maybeShowSignInPrompt() {
@@ -231,73 +242,65 @@ public class WelcomeFragment extends BaseFragment {
   }
 
   private void refreshWelcomeMessage() {
-    App.i.getTaskRunner().runTask(new Runnable() {
-      @Override
-      public void run() {
-        InputStream ins;
-        try {
-          ins = UrlFetcher.fetchStream(MOTD_RSS);
-        } catch (IOException e) {
-          log.warning("Error loading MOTD: %s", MOTD_RSS, e);
-          return;
-        }
-
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-        builderFactory.setValidating(false);
-
-        Document doc;
-        try {
-          DocumentBuilder builder = builderFactory.newDocumentBuilder();
-          doc = builder.parse(ins);
-        } catch (Exception e) {
-          log.warning("Error parsing MOTD: %s", MOTD_RSS, e);
-          return;
-        }
-
-        SimpleDateFormat inputFormat =
-            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-        SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy h:mm a", Locale.US);
-
-        final StringBuilder motd = new StringBuilder();
-        if (doc != null) {
-          NodeList itemNodes = doc.getElementsByTagName("item");
-          for (int i = 0; i < itemNodes.getLength(); i++) {
-            Element itemElem = (Element) itemNodes.item(i);
-            String title = itemElem.getElementsByTagName("title").item(0).getTextContent();
-            String content = itemElem.getElementsByTagName("description").item(0).getTextContent();
-            String pubDate = itemElem.getElementsByTagName("pubDate").item(0).getTextContent();
-            String link = itemElem.getElementsByTagName("link").item(0).getTextContent();
-
-            try {
-              Date date = inputFormat.parse(pubDate);
-              motd.append("<h1>");
-              motd.append(outputFormat.format(date));
-              motd.append("</h1>");
-            } catch (ParseException e) {
-              // Shouldn't ever happen.
-            }
-
-            motd.append("<h2>");
-            motd.append(title);
-            motd.append("</h2>");
-            motd.append(content);
-            motd.append("<div style=\"text-align: right; border-bottom: dashed 1px #fff; "
-                + "padding-bottom: 4px;\">");
-            motd.append("<a href=\"");
-            motd.append(link);
-            motd.append("\">");
-            motd.append("View forum post");
-            motd.append("</a></div>");
-          }
-        }
-
-        App.i.getTaskRunner().runTask(new Runnable() {
-          @Override
-          public void run() {
-            updateWelcomeMessage(motd.toString());
-          }
-        }, Threads.UI);
+    App.i.getTaskRunner().runTask(() -> {
+      InputStream ins;
+      try {
+        ins = UrlFetcher.fetchStream(MOTD_RSS);
+      } catch (IOException e) {
+        log.warning("Error loading MOTD: %s", MOTD_RSS, e);
+        return;
       }
+
+      DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+      builderFactory.setValidating(false);
+
+      Document doc;
+      try {
+        DocumentBuilder builder = builderFactory.newDocumentBuilder();
+        doc = builder.parse(ins);
+      } catch (Exception e) {
+        log.warning("Error parsing MOTD: %s", MOTD_RSS, e);
+        return;
+      }
+
+      SimpleDateFormat inputFormat =
+          new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+      SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy h:mm a", Locale.US);
+
+      final StringBuilder motd = new StringBuilder();
+      if (doc != null) {
+        NodeList itemNodes = doc.getElementsByTagName("item");
+        for (int i = 0; i < itemNodes.getLength(); i++) {
+          Element itemElem = (Element) itemNodes.item(i);
+          String title = itemElem.getElementsByTagName("title").item(0).getTextContent();
+          String content = itemElem.getElementsByTagName("description").item(0).getTextContent();
+          String pubDate = itemElem.getElementsByTagName("pubDate").item(0).getTextContent();
+          String link = itemElem.getElementsByTagName("link").item(0).getTextContent();
+
+          try {
+            Date date = inputFormat.parse(pubDate);
+            motd.append("<h1>");
+            motd.append(outputFormat.format(date));
+            motd.append("</h1>");
+          } catch (ParseException e) {
+            // Shouldn't ever happen.
+          }
+
+          motd.append("<h2>");
+          motd.append(title);
+          motd.append("</h2>");
+          motd.append(content);
+          motd.append("<div style=\"text-align: right; border-bottom: dashed 1px #fff; "
+              + "padding-bottom: 4px;\">");
+          motd.append("<a href=\"");
+          motd.append(link);
+          motd.append("\">");
+          motd.append("View forum post");
+          motd.append("</a></div>");
+        }
+      }
+
+      App.i.getTaskRunner().runTask(() -> updateWelcomeMessage(motd.toString()), Threads.UI);
     }, Threads.BACKGROUND);
   }
 
@@ -320,6 +323,15 @@ public class WelcomeFragment extends BaseFragment {
     }
   }
 
+  private final FirebaseAuth.AuthStateListener authStateListener = firebaseAuth -> {
+    FirebaseUser user = firebaseAuth.getCurrentUser();
+    if (user == null) {
+      reauthButton.setText(R.string.reauth_sign_in);
+    } else {
+      reauthButton.setText(R.string.reauth_switch_user);
+    }
+  };
+
   private Object eventHandler = new Object() {
     @EventHandler
     public void onServerStateUpdated(ServerStateEvent event) {
@@ -329,7 +341,7 @@ public class WelcomeFragment extends BaseFragment {
     @EventHandler
     public void onEmpireUpdated(Empire empire) {
       Empire myEmpire = EmpireManager.i.getMyEmpire();
-      if (myEmpire != null && myEmpire.id.equals(empire.id)) {
+      if (myEmpire.id.equals(empire.id)) {
         refreshEmpireDetails(empire);
       }
     }
