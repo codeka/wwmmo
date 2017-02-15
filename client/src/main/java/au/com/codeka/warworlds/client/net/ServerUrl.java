@@ -36,8 +36,10 @@ public class ServerUrl {
     }
   }
 
-  public static String getLoginUrl() {
-    String url = getUrl();
-    return url + "login";
+  public static String getUrl(String path) {
+    if (path.startsWith("/")) {
+      path = path.substring(1);
+    }
+    return getUrl() + path;
   }
 }

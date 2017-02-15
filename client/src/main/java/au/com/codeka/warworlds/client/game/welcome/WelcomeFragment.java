@@ -43,8 +43,11 @@ import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
+import au.com.codeka.warworlds.client.net.HttpRequest;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldFragment;
+import au.com.codeka.warworlds.client.net.ServerUrl;
+import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.Version;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
@@ -52,7 +55,11 @@ import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.AccountAssociateRequest;
+import au.com.codeka.warworlds.common.proto.AccountAssociateResponse;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.LoginRequest;
+import au.com.codeka.warworlds.common.proto.LoginResponse;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -169,10 +176,12 @@ public class WelcomeFragment extends BaseFragment {
     if (requestCode == RC_SIGN_IN) {
       IdpResponse response = IdpResponse.fromResultIntent(data);
 
-      if (resultCode == ResultCodes.OK) {
+      if (response != null && resultCode == ResultCodes.OK) {
         // Successfully signed in, contact the server to verify the account and see whether they
         // already have an empire associated with that account.
-        associateIdentityWithEmpire(response);
+        associateIdentityWithEmpire(
+            GameSettings.i.getString(GameSettings.Key.COOKIE),
+            response.getIdpToken());
       } else {
         // Sign in failed.
         if (response == null) {
@@ -202,12 +211,32 @@ public class WelcomeFragment extends BaseFragment {
     );
   }
 
-  private void associateIdentityWithEmpire(IdpResponse response) {
-    String emailAddr = response.getEmail();
-    String idpToken = response.getIdpToken();
+  private void associateIdentityWithEmpire(String cookie, String token) {
+    log.info("Attempting to associate identity with empire. token: %s", token);
 
-    log.info(
-        "Attempting to associated email address %s (token %s) with server.", emailAddr, idpToken);
+    App.i.getTaskRunner().runTask(() -> {
+      HttpRequest request = new HttpRequest.Builder()
+          .url(ServerUrl.getUrl("/accounts/associate"))
+          .method(HttpRequest.Method.POST)
+          .body(new AccountAssociateRequest.Builder()
+              .cookie(cookie)
+              .token(token)
+              .build().encode())
+          .build();
+      if (request.getResponseCode() != 200) {
+        log.error("Error associating request: %d", request.getResponseCode(), request.getException());
+      } else {
+        final AccountAssociateResponse response =
+            checkNotNull(request.getBody(AccountAssociateResponse.class));
+        App.i.getTaskRunner().runTask(() -> {
+          if (response.status != AccountAssociateResponse.AccountAssociateStatus.SUCCESS) {
+            // TODO: show error.
+          } else {
+            // TODO: success!
+          }
+        }, Threads.UI);
+      }
+    }, Threads.BACKGROUND);
   }
 
   private void maybeShowSignInPrompt() {
@@ -317,9 +346,39 @@ public class WelcomeFragment extends BaseFragment {
       connectionStatus.setText(msg);
       startButton.setEnabled(true);
     } else {
+      if (event.getState() == ServerStateEvent.ConnectionState.ERROR) {
+        handleConnectionError(event);
+      }
       String msg = String.format("%s - %s", event.getUrl(), event.getState());
       connectionStatus.setText(msg);
       startButton.setEnabled(false);
+    }
+  }
+
+  /**
+   * Called when get notified that there was some error connecting to the server. Sometimes we'll
+   * be able to fix the error and try again.
+   */
+  private void handleConnectionError(ServerStateEvent event) {
+    if (event.getLoginStatus() == null) {
+      // Nothing we can do.
+      log.debug("Got an error, but login status is null.");
+      return;
+    }
+
+    if (event.getLoginStatus() == LoginResponse.LoginStatus.ACCOUNT_ANONYMOUS) {
+      // The account on the server is anonymous, but we've logged in to firebase. Maybe some error
+      // associating the account happened last time, anyway we can try again.
+      FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+      if (user == null) {
+        // We should be logged in, otherwise we could not have got this error.
+        log.error("Not ACCOUNT_ANONYMOUS error, but we don't seem to be logged in!");
+        return;
+      }
+
+      user.getToken(true).addOnCompleteListener(
+          task -> associateIdentityWithEmpire(
+              GameSettings.i.getString(GameSettings.Key.COOKIE), task.getResult().getToken()));
     }
   }
 

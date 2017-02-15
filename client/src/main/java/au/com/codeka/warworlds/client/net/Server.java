@@ -134,9 +134,9 @@ public class Server {
 
   private void login(@Nonnull String cookie, @Nullable String token) {
     App.i.getTaskRunner().runTask(() -> {
-      log.info("Logging in: %s", ServerUrl.getLoginUrl());
+      log.info("Logging in: %s", ServerUrl.getUrl("/login"));
       HttpRequest request = new HttpRequest.Builder()
-          .url(ServerUrl.getLoginUrl())
+          .url(ServerUrl.getUrl("/login"))
           .method(HttpRequest.Method.POST)
           .body(new LoginRequest.Builder()
               .cookie(cookie)

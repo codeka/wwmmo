@@ -32,13 +32,31 @@ public class AccountsStore extends BaseStore {
     return null;
   }
 
+  @Nullable
+  public Account getByUid(String uid) {
+    try (
+        QueryResult res = newReader()
+            .stmt("SELECT account FROM accounts WHERE uid = ?")
+            .param(0, uid)
+            .query()
+    ) {
+      if (res.next()) {
+        return Account.ADAPTER.decode(res.getBytes(0));
+      }
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+    }
+    return null;
+  }
+
   public void put(String cookie, Account account) {
     try {
       newWriter()
-          .stmt("INSERT OR REPLACE INTO accounts (email, cookie, account) VALUES (?, ?, ?)")
-          .param(0, (String) null)
+          .stmt("INSERT OR REPLACE INTO accounts (email, cookie, uid, account) VALUES (?, ?, ?, ?)")
+          .param(0, account.email)
           .param(1, cookie)
-          .param(2, account.encode())
+          .param(2, account.uid)
+          .param(3, account.encode())
           .execute();
     } catch (StoreException e) {
       log.error("Unexpected.", e);
@@ -56,6 +74,20 @@ public class AccountsStore extends BaseStore {
           .execute();
       newWriter()
           .stmt("CREATE UNIQUE INDEX UIX_accounts_email ON accounts (email)")
+          .execute();
+      diskVersion++;
+    } else if (diskVersion == 1) {
+      newWriter()
+          .stmt("ALTER TABLE accounts ADD COLUMN uid STRING")
+          .execute();
+      newWriter()
+          .stmt("DROP INDEX IX_accounts_cookie")
+          .execute();
+      newWriter()
+          .stmt("CREATE UNIQUE INDEX IX_accounts_cookie ON accounts(cookie)")
+          .execute();
+      newWriter()
+          .stmt("CREATE UNIQUE INDEX IX_accounts_uid ON accounts (uid)")
           .execute();
       diskVersion++;
     }

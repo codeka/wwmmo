@@ -31,17 +31,6 @@ public class AccountsServlet extends ProtobufHttpServlet {
     NewAccountRequest req = NewAccountRequest.ADAPTER.decode(request.getInputStream());
     log.info("Creating new account: %s", req.empire_name);
 
-    // Reserve for ourselves an entry in the empire name map. If this fails, it meas there's already
-    // an empire with the given name
-//    if (!DataStore.i.uniqueEmpireNames().putIfNotExist(req.empire_name, -1L)) {
-//      log.info("Could not create new account, empire name already exists: '%s'", req.empire_name);
-//      writeProtobuf(response,
-//          new NewAccountResponse.Builder()
-//              .message("An empire with that name already exists.")
-//              .build());
-//      return;
-//    }
-
     // Generate a cookie for the user to authenticate with in the future.
     String cookie = generateCookie();
 
