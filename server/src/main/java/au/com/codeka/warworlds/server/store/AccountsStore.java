@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.store;
 
+import java.util.ArrayList;
+
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
@@ -47,6 +49,22 @@ public class AccountsStore extends BaseStore {
       log.error("Unexpected.", e);
     }
     return null;
+  }
+
+  public ArrayList<Account> search(/* TODO: search string, pagination etc */) {
+    ArrayList<Account> accounts = new ArrayList<>();
+    try (
+        QueryResult res = newReader()
+            .stmt("SELECT account FROM accounts")
+            .query()
+    ) {
+      while (res.next()) {
+        accounts.add(Account.ADAPTER.decode(res.getBytes(0)));
+      }
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+    }
+    return accounts;
   }
 
   public void put(String cookie, Account account) {

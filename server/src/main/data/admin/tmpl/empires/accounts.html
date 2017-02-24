@@ -1,0 +1,14 @@
+{% extends "skeleton.html" %}
+{% block title %}Accounts{% endblock %}
+{% block head %}
+<script type="text/javascript" src="/admin/js/tmpl.js"></script>
+<script type="text/javascript" src="/admin/js/time.js"></script>
+<script>
+</script>
+{% endblock %}
+{% block content %}
+<h1>Accounts</h1>
+{% for account in accounts %}
+<p>{{ account.empire_id }} <a href="/admin/empires/{{ empire.id }}">{{ empires[account.empire_id].display_name }}</a></p>
+{% endfor %}
+{% endblock %}
