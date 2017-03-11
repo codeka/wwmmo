@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("about","fo",{copy:"Copyright \x26copy; $1. All rights reserved.",dlgTitle:"Um CKEditor",help:"Kekka $1 fyri hjálp.",moreInfo:"Licens upplýsingar finnast á heimasíðu okkara:",title:"Um CKEditor",userGuide:"CKEditor Brúkaravegleiðing"});

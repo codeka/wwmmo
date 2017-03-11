@@ -1,0 +1,200 @@
+{% extends "skeleton.html" %}
+{% block title %}Starfield{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="/admin/css/starfield.css">
+  <script type="text/javascript" src="/admin/js/tmpl.js"></script>
+  <script type="text/javascript" src="/admin/js/empirestore.js"></script>
+  <script type="text/javascript" src="/admin/js/starfield.js"></script>
+  <script type="text/javascript" src="/admin/js/designs.js"></script>
+  <script type="text/javascript" src="/admin/js/time.js"></script>
+{% endblock %}
+{% block content %}
+  <h1>Starfield</h1>
+  <div class="left-column">
+    <div id="starfield-container">
+      <a href="javascript:;" id="starfield-up-btn">⬆</a>
+      <a href="javascript:;" id="starfield-left-btn">⬅</a>
+      <a href="javascript:;" id="starfield-right-btn">➡</a>
+      <a href="javascript:;" id="starfield-down-btn">⬇</a>
+      <div id="starfield"></div>
+    </div>
+    <fieldset id="search">
+      <legend>Search</legend>
+      <div id="xy">
+        <input name="x" type="number" value="0">,
+        <input name="y" type="number" value="0">
+        <button>Jump</button>
+      </div>
+    </fieldset>
+  </div>
+  <div class="right-column">
+    <div id="star-details"></div>
+    <script id="star-details-tmpl" type="text/html">
+      <div class="star-big star-big-<%= classification.toLowerCase() %>"></div>
+      <h1><%= name %></h1>
+      <div class="details"><%= id %> [<%= sector_x %>,<%= sector_y %>] (<%= offset_x %>,<%= offset_y %>)</div>
+      <div class="planets">
+        <% for (var i in planets) { %>
+          <div class="planet">
+            <div class="planet-icon"><img src="/render/planet/<%= id %>/<%= i %>/64x64/mdpi.png" width="64" height="64"></div>
+            <div class="planet-details">
+              <h2><%= toTitleCase(planets[i].planet_type) %></h2>
+              <ul>
+                <li>Population: <span class="congeniality"><span style="width: <%= Math.min(100, planets[i].population_congeniality / 10) %>%"></span></span> <%= planets[i].population_congeniality %></li>
+                <li>Farming: <span class="congeniality"><span style="width: <%= Math.min(100, planets[i].farming_congeniality) %>%"></span></span> <%= planets[i].farming_congeniality %></li>
+                <li>Mining: <span class="congeniality"><span style="width: <%= Math.min(100, planets[i].mining_congeniality) %>%"></span></span> <%= planets[i].mining_congeniality %></li>
+                <li>Energy: <span class="congeniality"><span style="width: <%= Math.min(100, planets[i].energy_congeniality) %>%"></span></span> <%= planets[i].energy_congeniality %></li>
+              </ul>
+            </div>
+          </div>
+          <% if (planets[i].colony) { %>
+            <div class="colony">
+              <img data-empireid="<%= planets[i].colony.empire_id %>" width="24" height="24">
+              <h2><span data-empireid="<%= planets[i].colony.empire_id %>">...</span></h2>
+              <table>
+                <tr>
+                  <th>Focus</th>
+                  <th>Buildings</th>
+                  <th>Build queue</th>
+                </tr>
+                <tr>
+                  <td>
+                    <div><img src="/admin/img/focus/farming.png" width="16" height="16"> <%= Math.round(planets[i].colony.focus.farming * 100) %>%</div>
+                    <div><img src="/admin/img/focus/mining.png" width="16" height="16"> <%= Math.round(planets[i].colony.focus.mining * 100) %>%</div>
+                    <div><img src="/admin/img/focus/energy.png" width="16" height="16"> <%= Math.round(planets[i].colony.focus.energy * 100) %>%</div>
+                    <div><img src="/admin/img/focus/construction.png" width="16" height="16"> <%= Math.round(planets[i].colony.focus.construction * 100) %>%</div>
+                  </td>
+                  <td>
+                    <% for (var j in planets[i].colony.buildings) { %>
+                    <div class="building-entry">
+                      <% var design = Designs.get(planets[i].colony.buildings[j].design_type); %>
+                      <img src="/admin/img/sprites/<%= design.image_url %>" />
+                      <div><%= design.display_name %> lvl <%= planets[i].colony.buildings[j].level %></div>
+                    </div>
+                    <% } %>
+                    <% if (planets[i].colony.buildings == null || planets[i].colony.buildings.length == 0) { %>
+                    <i>None</i>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% for (var j in planets[i].colony.build_requests) { %>
+                      <div class="build-queue-entry">
+                        <% var design = Designs.get(planets[i].colony.build_requests[j].design_type); %>
+                        <img src="/admin/img/sprites/<%= design.image_url %>" />
+                        <div><%= design.display_name %> x <%= planets[i].colony.build_requests[j].count %></div>
+                        <div><%= Math.round(planets[i].colony.build_requests[j].progress * 100) %> % complete</div>
+                        <div><time timestamp="<%= planets[i].colony.build_requests[j].end_time %>"></time></div>
+                      </div>
+                    <% } %>
+                    <% if (planets[i].colony.build_requests == null || planets[i].colony.build_requests.length == 0) { %>
+                      <i>None</i>
+                    <% } %>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <% empireStore.getEmpire(planets[i].colony.empire_id); %>
+          <% } %>
+        <% } %>
+      </div>
+      <div class="fleets">
+        <% for (var i in fleets ) { %>
+          <% var design = Designs.get(fleets[i].design_type); %>
+          <div class="fleet">
+            <div class="fleet-icon"><img src="/admin/img/sprites/<%= design.image_url %>" /></div>
+            <div>
+              #<%= fleets[i].id %>
+              <img data-empireid="<%= fleets[i].empire_id %>" width="16" height="16" />
+              <b><span data-empireid="<%= fleets[i].empire_id %>">...</span></b>
+              <%= design.display_name %> x <%= fleets[i].num_ships %>
+            </div>
+            <div>
+              <%= fleets[i].state %> <% if (fleets[i].state == "MOVING") { %>
+                <%= fleets[i].destination_star_id %>
+                <b>ETA:</b>
+                <time timestamp="<%= fleets[i].eta %>" class="timer">
+              <% } %>
+            </div>
+          </div>
+          <% empireStore.getEmpire(fleets[i].empire_id); %>
+        <% } %>
+      </div>
+      <div class="simulate">
+        <a href="javascript:simulate(<%= id %>);">Simulate</a> &bull;
+        <a href="javascript:modify(<%= id %>);">Modify</a>
+        <div id="simulate-result"></div>
+      </div>
+      <div id="modify-popup">
+        <h3>Modify star</h3>
+        <dl>
+          <dt>Modification type
+          <dd><select name="type">
+            <option>COLONIZE</option>
+            <option>ADJUST_FOCUS</option>
+            <option>CREATE_FLEET</option>
+            <option>ADD_BUILD_REQUEST</option>
+            <option>CREATE_BUILDING</option>
+            <option>SPLIT_FLEET</option>
+            <option>MERGE_FLEET</option>
+            <option>MOVE_FLEET</option>
+          </select>
+          <dt>Empire
+          <!-- TODO: use autocomplete -->
+          <dd><select name="empire_id">
+            <option>TODO: pre-populate</option>
+          </select>
+          <dt>Planet index
+          <dd><select name="planet_index">
+            <option>TODO: pre-populate</option>
+          </select>
+          <dt>Colony
+          <dd><select name="colony_id">
+            <option>TODO: pre-populate</option>
+          </select>
+          <dt>Fleet
+          <dd><select name="fleet_id">
+            <option>TODO: pre-populate</option>
+          </select>
+          <dt>Focus
+          <dd>TODO?
+          <dt>Design
+          <dd><select name="design_type">
+            <option value="">N/A</option>
+            <option>COLONY_SHIP</option>
+            <option>SCOUT</option>
+            <option>FIGHTER</option>
+            <option>TROOP_CARRIER</option>
+            <option>WORMHOLE_GENERATOR</option>
+            <option>SHIPYARD</option>
+            <option>SILO</option>
+            <option>RESEARCH</option>
+            <option>GROUND_SHIELD</option>
+            <option>BIOSPHERE</option>
+            <option>HQ</option>
+            <option>RADAR</option>
+            <option>WORMHOLE_DISRUPTOR</option>
+          </select>
+          <dt>Count
+          <dd><input name="count" type="number" />
+          <dt>Target Star
+          <dd>TODO?
+          <dt>Fleet
+          <dd>TODO?
+          <dt>Additional fleets
+          <dd><input name="additional_fleet_ids" type="text" />
+        </dl>
+        <div class="buttons">
+          <a href="javascript:;" id="modify-cancel">Cancel</a> &bull;
+          <a href="javascript:;" id="modify-ok">Modify</a>
+        </div>
+      </div>
+    </script>
+    <script id="simulate-result-tmpl" type="text/html">
+      <h3>Timing</h3>
+      <div>Load: <%= loadTime %>ms</div>
+      <div>Simulate: <%= simulateTime %>ms</div>
+      <h3>Logs</h3>
+      <div style="white-space: pre;"><%= logMessages %></div>
+    </script>
+  </div>
+{% endblock %}

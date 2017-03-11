@@ -1,19 +1,10 @@
 package au.com.codeka.warworlds.client.store;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteStatement;
 import android.os.Build;
 
-import com.google.common.base.Preconditions;
-import com.squareup.wire.Message;
-
-import java.io.File;
-
-import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Star;
 
@@ -31,8 +22,12 @@ public class DataStore {
     return helper.empireStore;
   }
 
-  public ProtobufStore<Star> stars() {
+  public StarStore stars() {
     return helper.starStore;
+  }
+
+  public ChatStore chat() {
+    return helper.chatStore;
   }
 
   /**
@@ -41,12 +36,14 @@ public class DataStore {
    */
   private static class StoreHelper extends SQLiteOpenHelper {
     private ProtobufStore<Empire> empireStore;
-    private ProtobufStore<Star> starStore;
+    private StarStore starStore;
+    private ChatStore chatStore;
 
     public StoreHelper(Context applicationContext) {
       super(applicationContext, "objects.db", null, 1);
       empireStore = new ProtobufStore<>("empires", Empire.class, this);
-      starStore = new ProtobufStore<>("stars", Star.class, this);
+      starStore = new StarStore("stars", this);
+      chatStore = new ChatStore("chat", this);
 
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
         setWriteAheadLoggingEnabled(true);
@@ -61,10 +58,14 @@ public class DataStore {
     public void onCreate(SQLiteDatabase db) {
       empireStore.onCreate(db);
       starStore.onCreate(db);
+      chatStore.onCreate(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+      empireStore.onUpgrade(db, oldVersion, newVersion);
+      starStore.onUpgrade(db, oldVersion, newVersion);
+      chatStore.onUpgrade(db, oldVersion, newVersion);
     }
   }
 }

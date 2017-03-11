@@ -9,6 +9,25 @@ tasks.withType(JavaCompile) {
   targetCompatibility = "1.7"
 }
 
+task buildProto() {
+  def protos = []
+  fileTree(dir: "src/main/proto").matching { include "*.proto" }.visit {
+    FileVisitDetails details ->
+      protos << details.file.name
+  }
+
+  javaexec {
+    main = "-jar"
+    args = [
+        "libs/wire-compiler-2.1.2-jar-with-dependencies.jar",
+        "--proto_path=src/main/proto",
+        "--java_out=src/main/java",
+    ] + protos
+  }
+}
+
+compileJava.dependsOn buildProto
+
 dependencies {
   compile fileTree(dir: 'libs', include: ['*.jar'])
   compile 'com.squareup.wire:wire-runtime:2.1.2'

@@ -1,0 +1,144 @@
+
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="RelativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <TextView
+      android:id="@+id/stored_energy"
+      android:layout_width="wrap_content"
+      android:layout_height="16dp"
+      android:layout_alignParentEnd="true"
+      android:layout_alignParentTop="true"
+      android:gravity="center|end"
+      android:paddingLeft="4dp"
+      android:paddingRight="4dp"
+      android:background="#000"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      tools:text="750" />
+
+  <TextView
+      android:id="@+id/total_energy"
+      android:layout_width="wrap_content"
+      android:layout_height="12dp"
+      android:layout_alignEnd="@+id/stored_energy"
+      android:layout_below="@+id/stored_energy"
+      android:gravity="center|end"
+      android:background="#000"
+      android:textSize="10sp"
+      tools:text="/ 1000" />
+
+  <TextView
+      android:id="@+id/delta_energy"
+      android:layout_width="wrap_content"
+      android:layout_height="12dp"
+      android:layout_alignEnd="@+id/total_energy"
+      android:layout_below="@+id/total_energy"
+      android:gravity="center|end"
+      android:background="#000"
+      android:textColor="#0f0"
+      android:textSize="10sp"
+      tools:text="+10/hr" />
+
+  <ImageView
+      android:id="@+id/stored_energy_icon"
+      android:layout_width="16dp"
+      android:layout_height="16dp"
+      android:background="#000"
+      android:layout_toStartOf="@+id/stored_energy"
+      android:layout_alignParentTop="true"
+      android:src="@drawable/energy" />
+
+
+  <TextView
+      android:id="@+id/stored_goods"
+      android:layout_width="wrap_content"
+      android:layout_height="16dp"
+      android:layout_toStartOf="@+id/stored_energy_icon"
+      android:layout_alignParentTop="true"
+      android:gravity="center|end"
+      android:paddingLeft="4dp"
+      android:paddingRight="4dp"
+      android:background="#000"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      tools:text="750" />
+
+  <TextView
+      android:id="@+id/total_goods"
+      android:layout_width="wrap_content"
+      android:layout_height="12dp"
+      android:layout_alignEnd="@+id/stored_goods"
+      android:layout_below="@+id/stored_goods"
+      android:gravity="center|end"
+      android:background="#000"
+      android:textSize="10sp"
+      tools:text="/ 1000" />
+
+  <TextView
+      android:id="@+id/delta_goods"
+      android:layout_width="wrap_content"
+      android:layout_height="12dp"
+      android:layout_alignEnd="@+id/total_goods"
+      android:layout_below="@+id/total_goods"
+      android:gravity="center|end"
+      android:background="#000"
+      android:textColor="#0f0"
+      android:textSize="10sp"
+      tools:text="+10/hr" />
+
+  <ImageView
+      android:id="@+id/stored_goods_icon"
+      android:layout_width="16dp"
+      android:layout_height="16dp"
+      android:background="#000"
+      android:layout_toStartOf="@+id/stored_goods"
+      android:layout_alignParentTop="true"
+      android:src="@drawable/farming" />
+
+  <TextView
+      android:id="@+id/stored_minerals"
+      android:layout_width="wrap_content"
+      android:layout_height="16dp"
+      android:layout_toStartOf="@+id/stored_goods_icon"
+      android:layout_alignParentTop="true"
+      android:gravity="center|end"
+      android:paddingLeft="4dp"
+      android:paddingRight="4dp"
+      android:background="#000"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      tools:text="750" />
+
+  <TextView
+      android:id="@+id/total_minerals"
+      android:layout_width="wrap_content"
+      android:layout_height="12dp"
+      android:layout_alignEnd="@+id/stored_minerals"
+      android:layout_below="@+id/stored_minerals"
+      android:gravity="center|end"
+      android:background="#000"
+      android:textSize="10sp"
+      tools:text="/ 1000" />
+
+  <TextView
+      android:id="@+id/delta_minerals"
+      android:layout_width="wrap_content"
+      android:layout_height="12dp"
+      android:layout_alignEnd="@+id/total_minerals"
+      android:layout_below="@+id/total_minerals"
+      android:gravity="center|end"
+      android:background="#000"
+      android:textColor="#0f0"
+      android:textSize="10sp"
+      tools:text="+10/hr" />
+
+  <ImageView
+      android:id="@+id/stored_minerals_icon"
+      android:layout_width="16dp"
+      android:layout_height="16dp"
+      android:background="#000"
+      android:layout_toStartOf="@+id/stored_minerals"
+      android:layout_alignParentTop="true"
+      android:src="@drawable/mining" />
+</merge>

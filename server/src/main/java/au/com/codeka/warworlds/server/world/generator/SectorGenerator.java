@@ -14,6 +14,7 @@ import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.SectorManager;
 
 /**
@@ -96,13 +97,7 @@ public class SectorGenerator {
 
     ArrayList<Star> stars = new ArrayList<>();
     for (Vector2 point : points) {
-      Star star = generateStar(coord, point);
-      log.debug("  '%s'", star.name);
-      for (Planet p : star.planets) {
-        log.debug("    %s p=%d m=%d f=%d e=%d", p.planet_type, p.population_congeniality,
-            p.mining_congeniality, p.farming_congeniality, p.energy_congeniality);
-      }
-      stars.add(star);
+      stars.add(generateStar(coord, point));
     }
 
     Sector sector = new Sector.Builder()
@@ -117,12 +112,22 @@ public class SectorGenerator {
 
   /** Expands the universe by (at least) one sector. */
   public void expandUniverse() {
-    final int NUM_TO_GENERATE = 50;
+    expandUniverse(50);
+  }
 
-    List<SectorCoord> coords = DataStore.i.sectors().getUngeneratedSectors(NUM_TO_GENERATE);
-    for (int i = 0; i < NUM_TO_GENERATE; i++) {
-      SectorCoord coord = coords.remove(coords.size() - 1);
+  private void expandUniverse(int numToGenerate) {
+    log.debug("Expanding universe by %d", numToGenerate);
+
+    List<SectorCoord> coords =
+        DataStore.i.sectors().findSectorsByState(SectorsStore.SectorState.New, numToGenerate);
+    for (SectorCoord coord : coords) {
       generate(coord.x, coord.y);
+      numToGenerate --;
+    }
+
+    if (numToGenerate > 0) {
+      DataStore.i.sectors().expandUniverse();
+      expandUniverse(numToGenerate);
     }
   }
 
@@ -131,7 +136,7 @@ public class SectorGenerator {
     ArrayList<Planet> planets = generatePlanets(classification);
 
     return new Star.Builder()
-        .id(DataStore.i.stars().nextIdentifier())
+        .id(DataStore.i.seq().nextIdentifier())
         .classification(classification)
         .name(new NameGenerator().generate(random))
         .offset_x((int) ((SectorManager.SECTOR_SIZE - 64) * point.x) + 32)

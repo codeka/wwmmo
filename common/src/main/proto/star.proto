@@ -100,8 +100,24 @@ message Star {
     optional int64 empire_id = 4;
   }
   optional Wormhole wormhole = 20;
+
+  // A list of the recent CombatReports, detailing combat on this star.
+  repeated CombatReport combat_reports = 21;
 }
 
+// A CombatReport is used to detail the results of combat. Combat occurs when an opposing fleet
+// arrives at a star. We keep at most 10 combat reports per star (after a while, they don't really
+// matter any more).
+message CombatReport {
+  // The time the combat happened.
+  optional int64 time = 1;
+
+  // The list of fleets that existed before the combat began.
+  repeated Fleet fleets_before = 2;
+
+  // The list of fleets that remained after the combat completed.
+  repeated Fleet fleets_after = 3;
+}
 
 // Represents a planet in the star system. A planet orbits a Star which in turn belongs
 // to a Sector.
@@ -178,7 +194,8 @@ message StarModification {
     ADJUST_FOCUS = 2;
 
     // Create a new fleet, ignored if sent from client.
-    // empire_id, design_type and count are required.
+    // empire_id and either (design_type and count) or (fleet) are required. If fleet is specified,
+    // the new fleet will be a copy of the given fleet.
     CREATE_FLEET = 3;
 
     // Add a build request, start building it.
@@ -189,14 +206,33 @@ message StarModification {
     // Create a new building, ignored if sent from client.
     // empire_id, colony_id, design_type are required.
     CREATE_BUILDING = 5;
+
+    // Split a fleet in two. In this case, count refers to the number of ships to take out and
+    // create a new fleet with. The remaining ships will stay in this fleet.
+    // empire_id, fleet_id and count are required.
+    SPLIT_FLEET = 6;
+
+    // Merge two or more fleets into one. If any fleets have upgrades, then the upgrade will be kept
+    // only if ALL fleets have the upgrade.
+    // empire_id, fleet_id and additional_fleet_ids are required.
+    MERGE_FLEET = 7;
+
+    // Begin a "fleet move" to a new star. The move will take time, at which point the server will
+    // issue a MOVE_FLEET_COMPLETE modification to complete the operation.
+    // empire_id, fleet_id, star_id (with the target star) are required.
+    MOVE_FLEET = 8;
   }
   optional MODIFICATION_TYPE type = 1;
 
   optional int64 empire_id = 2;
   optional int32 planet_index = 3;
   optional int64 colony_id = 4;
+  optional int64 fleet_id = 5;
 
-  optional ColonyFocus focus = 5;
-  optional Design.DesignType design_type = 6;
-  optional int32 count = 7;
+  optional ColonyFocus focus = 6;
+  optional Design.DesignType design_type = 7;
+  optional int32 count = 8;
+  optional int64 star_id = 9;
+  optional Fleet fleet = 10;
+  repeated int64 additional_fleet_ids = 11;
 }

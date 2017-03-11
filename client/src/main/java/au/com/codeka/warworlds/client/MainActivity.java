@@ -10,11 +10,11 @@ import com.google.common.base.Preconditions;
 import au.com.codeka.warworlds.client.activity.BaseFragmentActivity;
 import au.com.codeka.warworlds.client.ctrl.DebugView;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
-import au.com.codeka.warworlds.client.starfield.StarfieldManager;
+import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.util.GameSettings;
-import au.com.codeka.warworlds.client.welcome.CreateEmpireFragment;
-import au.com.codeka.warworlds.client.welcome.WarmWelcomeFragment;
-import au.com.codeka.warworlds.client.welcome.WelcomeFragment;
+import au.com.codeka.warworlds.client.game.welcome.CreateEmpireFragment;
+import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeFragment;
+import au.com.codeka.warworlds.client.game.welcome.WelcomeFragment;
 import au.com.codeka.warworlds.common.Log;
 
 public class MainActivity extends BaseFragmentActivity {

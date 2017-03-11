@@ -8,7 +8,9 @@
   <string name="website">Website</string>
   <string name="realm_label">Realm: %s</string>
   <string name="switch_realm">Switch Realm</string>
-  <string name="switch_user">Switch User</string>
+  <string name="reauth_sign_in">Sign in</string>
+  <string name="reauth_switch_user">Switch user</string>
+  <string name="reauth_loading">...</string>
   <string name="options">Options</string>
   <string name="cancel">Cancel</string>
   <string name="done">Done</string>
@@ -16,6 +18,7 @@
   <string name="empire">Empire</string>
   <string name="sitrep">Sit. Rep.</string>
   <string name="view">View</string>
+  <string name="rename">Rename</string>
   <string name="alliance">Alliance</string>
   <string name="build">Build</string>
   <string name="focus">Focus</string>
@@ -23,10 +26,20 @@
   <string name="attack">Attack</string>
   <string name="save">Save</string>
   <string name="colonize">Colonize</string>
+  <string name="colonized">Colonized</string>
   <string name="merge">Merge</string>
   <string name="split">Split</string>
   <string name="move">Move</string>
   <string name="stance">Stance</string>
+  <string name="native_colony">Native</string>
+  <string name="uncolonized">Uncolonized</string>
+  <string name="idle">idle</string>
+  <string name="level">Level</string>
+  <string name="send">Send</string>
+  <string name="global">Global</string>
+  <string name="new_group">New Group</string>
+  <string name="intel">Intel.</string>
+  <string name="locate">Locate</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to
@@ -51,4 +64,17 @@
 
   <string name="pref_category_debug">Debug</string>
   <string name="pref_server_url">Server URL</string>
+
+  <string name="fleet_move_instructions">
+    Select the star you want to move your fleet to and click &quot;Move&quot;
+  </string>
+  <string name="fleet_merge_instructions">
+    Select all of the fleets that you want to merge. You can only select fleets of the same type.
+  </string>
+
+  <string name="drawer_open">Open navigation drawer</string>
+  <string name="drawer_close">Close navigation drawer</string>
+
+  <string name="sign_in_failed_cancelled">Sign in cancelled.</string>
+  <string name="sign_in_failed_error">Sign in error, please try again later.</string>
 </resources>

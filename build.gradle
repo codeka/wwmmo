@@ -1,9 +1,23 @@
-
 buildscript {
-    repositories {
-        mavenCentral()
+  repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+      url 'https://maven.fabric.io/public'
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:2.2.3'
+    classpath 'com.google.gms:google-services:3.0.0'
+  }
+}
+
+allprojects {
+  repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+      url 'https://maven.fabric.io/public'
     }
+  }
 }

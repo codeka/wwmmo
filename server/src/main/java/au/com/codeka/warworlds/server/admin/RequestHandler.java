@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.AdminRole;
 
 /**
  * This is the base class for the game's request handlers. It handles some common tasks such as
@@ -64,7 +65,10 @@ public class RequestHandler {
     this.response.setStatus(200);
 
     try {
-      onBeforeHandle();
+      if (!onBeforeHandle()) {
+        return;
+      }
+
       if (request.getMethod().equals("GET")) {
         get();
       } else if (request.getMethod().equals("POST")) {
@@ -86,10 +90,14 @@ public class RequestHandler {
   }
 
   /**
-   * This is called before the get(), put(), etc methods but after the request
-   * is set up, ready to go.
+   * This is called before the get(), put(), etc methods but after the request is set up, ready to
+   * go.
+   *
+   * @return true if we should continue processing the request, false if not. If you return false
+   *     then you should have set response headers, status code and so on already.
    */
-  protected void onBeforeHandle() {
+  protected boolean onBeforeHandle() {
+    return true;
   }
 
   protected void get() throws RequestException {
@@ -214,22 +222,15 @@ public class RequestHandler {
   }
 
   /**
-   * Checks whether the current user is in the given role. If the user is not an admin, then they
-   * are -- by definition -- not in any roles.
-   *//*
-  protected boolean isInRole(BackendUser.Role role) throws RequestException {
-    if (session == null || !session.isAdmin()) {
+   * Checks whether the current user is in the given role.
+   */
+  protected boolean isInRole(AdminRole role) throws RequestException {
+    if (session == null) {
       return false;
     }
 
-    BackendUser backendUser = new AdminController().getBackendUser(session.getActualEmail());
-    if (backendUser == null) {
-      // should  be impossible if it's really an admin user...
-      throw new RequestException(500, "This is impossible.");
-    }
-
-    return backendUser.isInRole(role);
-  }*/
+    return session.isInRole(role);
+  }
 
   @Nullable
   private <T> T getRequestJson(Class<T> protoType) {
@@ -242,6 +243,11 @@ public class RequestHandler {
       return null;
     }
 
+    return fromJson(json, protoType);
+  }
+
+  @Nullable
+  protected <T> T fromJson(String json, Class<T> protoType) {
     try {
       Gson gson = new GsonBuilder()
           .registerTypeAdapterFactory(new WireTypeAdapterFactory())

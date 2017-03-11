@@ -7,7 +7,6 @@
         android:id="@+id/icon_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/design_row1"
         android:layout_alignBottom="@+id/design_row3">
@@ -15,10 +14,8 @@
             android:id="@+id/building_icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="4dp"
             android:layout_marginEnd="4dp" />
     </RelativeLayout>
 
@@ -27,7 +24,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/icon_container"
         android:layout_toEndOf="@+id/icon_container"
         android:gravity="center_vertical" />
 
@@ -36,7 +32,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/design_row1"
-        android:layout_toRightOf="@+id/icon_container"
         android:layout_toEndOf="@+id/icon_container"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -44,7 +39,6 @@
         android:id="@+id/design_row3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/icon_container"
         android:layout_toEndOf="@+id/icon_container"
         android:layout_below="@id/design_row2"
         android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -56,45 +50,36 @@
         android:layout_height="10dp"
         android:layout_below="@id/design_row2"
         android:layout_marginTop="4dp"
-        android:layout_marginRight="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_toRightOf="@+id/icon_container"
         android:layout_toEndOf="@+id/icon_container" />
 
     <TextView
         android:id="@+id/notes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@id/icon_container"
         android:layout_margin="4dp"
-        android:layout_toLeftOf="@+id/build_level_label"
         android:layout_toStartOf="@+id/build_level_label"
         android:ellipsize="end"
-        android:singleLine="true"
-        android:text="Blah blah blah, notes, yada yada yada. More notes."
+        android:maxLines="1"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#666666" />
 
     <TextView android:id="@+id/build_level"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_alignParentRight="true"
               android:layout_alignParentEnd="true"
-              android:layout_marginRight="6dp"
               android:layout_marginEnd="6dp"
               android:layout_centerVertical="true"
               android:textSize="30sp"
-              android:text="1" />
+              android:text="" />
     <TextView android:id="@+id/build_level_label"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_toLeftOf="@+id/build_level"
               android:layout_toStartOf="@+id/build_level"
-              android:layout_marginRight="6dp"
               android:layout_marginEnd="6dp"
               android:layout_centerVertical="true"
-              android:text="Level:" />
+              android:text="@string/level" />
 
 </RelativeLayout>

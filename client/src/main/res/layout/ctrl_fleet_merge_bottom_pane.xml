@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+       tools:parentTag="RelativeLayout"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content">
+
+  <View android:id="@+id/separator"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:layout_centerHorizontal="true" />
+
+  <TextView android:id="@+id/instructions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fleet_merge_instructions" />
+
+  <Button
+      android:id="@+id/merge_btn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="4dp"
+      android:layout_marginEnd="12dp"
+      android:layout_marginTop="5dp"
+      android:layout_marginBottom="5dp"
+      android:layout_below="@+id/instructions"
+      android:layout_toEndOf="@id/separator"
+      android:layout_alignParentEnd="true"
+      android:text="@string/merge" />
+
+  <Button
+      android:id="@+id/cancel_btn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="12dp"
+      android:layout_marginEnd="4dp"
+      android:layout_marginTop="5dp"
+      android:layout_marginBottom="5dp"
+      android:layout_below="@+id/instructions"
+      android:layout_toStartOf="@id/separator"
+      android:layout_alignParentStart="true"
+      android:text="@string/cancel" />
+
+</merge>

@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,11 +21,15 @@ import au.com.codeka.carrot.interpret.InterpretException;
 import au.com.codeka.carrot.lib.Filter;
 import au.com.codeka.carrot.template.TemplateEngine;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.AdminRole;
 import au.com.codeka.warworlds.server.admin.RequestException;
 import au.com.codeka.warworlds.server.admin.RequestHandler;
 import au.com.codeka.warworlds.server.admin.Session;
+import au.com.codeka.warworlds.server.store.DataStore;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
 
@@ -48,40 +53,66 @@ public class AdminHandler extends RequestHandler {
   }
 
   @Override
-  public void onBeforeHandle() {
-    if (requiresSession() && getSessionNoError() == null) {
-      // If we require a session, make sure we're authenticated.
-      authenticate();
+  public boolean onBeforeHandle() {
+    Collection<AdminRole> requiredRoles = getRequiredRoles();
+    if (requiredRoles != null) {
+      Session session = getSessionNoError();
+      if (session == null) {
+        authenticate();
+        return false;
+      } else {
+        boolean inRoles = false;
+        for (AdminRole role : requiredRoles) {
+          inRoles = inRoles || session.isInRole(role);
+        }
+        if (!inRoles) {
+          // you're not in a required role.
+          log.warning("User '%s' is not in any required role: %s",
+              session.getEmail(), requiredRoles);
+          redirect("/admin");
+          return false;
+        }
+      }
     }
+
+    return true;
   }
 
   @Override
   protected void handleException(RequestException e) {
     try {
-      TreeMap<String, Object> data = new TreeMap<String, Object>();
-      data.put("exception", e);
-      data.put("stack_trace", Throwables.getStackTraceAsString(e));
-      render("exception.html", data);
+      render("exception.html", ImmutableMap.<String, Object>builder()
+          .put("exception", e)
+          .put("stack_trace", Throwables.getStackTraceAsString(e))
+          .build());
+      e.populate(getResponse());
     } catch (Exception e2) {
       log.error("Error loading exception.html template.", e2);
       setResponseText(e2.toString());
     }
   }
 
-  protected boolean requiresSession() {
-    return true;
+  /**
+   * Gets a collection of roles, one of which the current user must be in to access this handler.
+   */
+  protected Collection<AdminRole> getRequiredRoles() {
+    return Lists.newArrayList(AdminRole.ADMINISTRATOR);
   }
 
   protected void render(String path, @Nullable Map<String, Object> data) throws RequestException {
     if (data == null) {
       data = new TreeMap<>();
     }
+    if (data instanceof ImmutableMap) {
+      data = new TreeMap<>(data); // make it mutable again...
+    }
 
     data.put("realm", getRealm());
     Session session = getSessionNoError();
     if (session != null) {
-      data.put("logged_in_user", session.getEmail());
+      data.put("session", session);
     }
+    data.put("num_backend_users", DataStore.i.adminUsers().count());
 
     getResponse().setContentType("text/html");
     getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
@@ -200,13 +231,12 @@ public class AdminHandler extends RequestHandler {
     @Override
     public Object filter(Object object, CarrotInterpreter interpreter, String... args)
         throws InterpretException {
-      //if (object instanceof BackendUser) {
-      //  BackendUser.Role role = BackendUser.Role.valueOf(args[0]);
-      //  return ((BackendUser) object).isInRole(role);
-      //}
-      return true;
+      if (object instanceof Session) {
+        AdminRole role = AdminRole.valueOf(args[0]);
+        return ((Session) object).isInRole(role);
+      }
 
-      //throw new InterpretException("Expected a BackendUser, not " + object);
+      throw new InterpretException("Expected a Session, not " + object);
     }
   }
 }

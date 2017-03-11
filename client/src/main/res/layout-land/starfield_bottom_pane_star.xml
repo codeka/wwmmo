@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+       android:layout_width="200dp"
+       android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/star_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        tools:src="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/star_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/star_icon"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        tools:text="Star Name" />
+
+    <TextView android:id="@+id/star_kind"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@+id/star_name"
+              android:layout_toEndOf="@+id/star_icon"
+              android:textSize="12sp"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              tools:text="Kind" />
+
+    <Button android:id="@+id/rename_btn"
+            style="@style/Button"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@id/star_name"
+            android:text="@string/rename" />
+
+    <Button android:id="@+id/view_btn"
+            style="@style/Button"
+            android:layout_width="92dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/star_icon"
+            android:layout_marginStart="4dp"
+            android:text="@string/view" />
+
+    <Button android:id="@+id/scout_report_btn"
+            style="@style/Button"
+            android:layout_width="92dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/star_icon"
+            android:layout_marginEnd="4dp"
+            android:text="@string/intel" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/view_btn"
+        android:layout_alignParentBottom="true">
+        <RelativeLayout android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+            <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
+                android:id="@+id/fleet_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:orientation="vertical" />
+
+            <View android:id="@+id/fleet_planet_separator1"
+                  android:layout_width="match_parent"
+                  android:layout_below="@+id/fleet_list"
+                  android:layout_height="10dp" />
+
+            <View android:id="@+id/fleet_planet_separator2"
+                  android:layout_width="match_parent"
+                  android:layout_height="1px"
+                  android:layout_below="@+id/fleet_planet_separator1"
+                  android:background="#33ffffff" />
+
+            <au.com.codeka.warworlds.client.ctrl.PlanetListSimple
+                android:id="@+id/planet_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fleet_planet_separator2"
+                android:orientation="vertical" />
+
+            <RelativeLayout
+                android:id="@+id/wormhole_details"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:id="@+id/empire_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="4dp"
+                    tools:src="@drawable/app_icon" />
+                <TextView
+                    android:id="@+id/empire_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/empire_icon"
+                    android:layout_alignTop="@id/empire_icon"
+                    android:layout_marginStart="8dp"
+                    tools:text="Empire name"/>
+                <TextView
+                    android:id="@+id/destination_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/empire_icon"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="4dp"
+                    tools:text="-> Another wormhole" />
+                <Button
+                    android:id="@+id/wormhole_locate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/destination_name"
+                    android:layout_marginTop="8dp"
+                    android:layout_centerHorizontal="true"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:text="@string/locate" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+    </ScrollView>
+
+    <RelativeLayout
+    android:id="@+id/bottom_buttons"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true" >
+
+    <Button
+        android:id="@+id/sitrep_btn"
+        style="@style/Button"
+        android:layout_width="92dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:text="@string/sitrep" />
+
+    <Button
+        android:id="@+id/empire_btn"
+        style="@style/Button"
+        android:layout_width="92dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_below="@+id/sitrep_btn"
+        android:layout_alignParentStart="true"
+        android:text="@string/empire" />
+
+    <Button android:id="@+id/alliance_btn"
+            style="@style/Button"
+            android:layout_width="92dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="34dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:text="@string/alliance" />
+    </RelativeLayout>
+</RelativeLayout>

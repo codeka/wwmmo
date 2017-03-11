@@ -9,10 +9,21 @@ var empireStore = (function() {
   var empires = {};
 
   function defaultCallback(empire) {
-    $("span[data-empireid]").each(function(i, elem) {
+    $("span[data-empireid], img[data-empireid]").each(function(i, elem) {
       var $this = $(this);
       if ($this.data("empireid") == empire.id) {
-        $this.html(empire.display_name);
+        if (this.tagName == "SPAN") {
+          if ($this.data("nolink") == "1") {
+            $this.html(empire.display_name);
+          } else {
+            $this.html("<a href=\"/admin/empires/" + empire.id + "\">" + empire.display_name + "</a>");
+          }
+        } else if (this.tagName == "IMG") {
+          $this.attr("src", "/render/empire/"
+              + empire.id + "/"
+              + $this.attr("width") + "x" + $this.attr("height")
+              + "/mdpi.png");
+        }
       }
     });
   }
@@ -23,6 +34,15 @@ var empireStore = (function() {
     getEmpire: function(empireId, callback) {
       if (typeof callback === "undefined") {
         callback = defaultCallback;
+      }
+      if (!empireId) {
+        setTimeout(function() {
+          callback({
+            id: 0,
+            display_name: "Native"
+          });
+        });
+        return;
       }
 
       // If we have a cached empire already, just return that and we're done.
@@ -58,6 +78,11 @@ var empireStore = (function() {
           }
         }
       });
+    },
+
+    // Gets all of the empires that we have stored.
+    getAllEmpires: function() {
+      return empires;
     }
   }
 })();

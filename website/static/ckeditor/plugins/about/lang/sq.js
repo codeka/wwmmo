@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("about","sq",{copy:"Të drejtat  e kopjimit \x26copy; $1. Të gjitha të drejtat e rezervuara.",dlgTitle:"Rreth CKEditor",help:"Kontrollo $1 për ndihmë.",moreInfo:"Për informacione rreth licencave shih faqen tonë:",title:"Rreth CKEditor",userGuide:"Udhëzuesi i Shfrytëzuesit të CKEditor"});

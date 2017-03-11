@@ -19,9 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_toRightOf="@+id/title_icon"
         android:layout_toEndOf="@+id/title_icon"
         android:text="@string/app_name"
         style="@style/TitleText" />
@@ -33,12 +31,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
-        android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:layout_marginEnd="@dimen/tablet_margin_5dp"
         android:layout_below="@+id/title_icon"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:text="@string/website" />
 
@@ -49,12 +44,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginRight="5dp"
         android:layout_marginEnd="5dp"
-        android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginStart="@dimen/tablet_margin_5dp"
         android:layout_below="@+id/title_icon"
-        android:layout_toLeftOf="@id/website_btn"
         android:layout_toStartOf="@id/website_btn"
         android:text="@string/how_to_play" />
 
@@ -63,11 +55,8 @@
         android:layout_width="135dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/website_btn"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
-        android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:layout_marginEnd="@dimen/tablet_margin_5dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -76,9 +65,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_below="@id/website_btn"
-        android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
-        android:layout_toLeftOf="@id/empire_name"
         android:layout_toStartOf="@id/empire_name" />
 
     <Button
@@ -87,14 +74,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
-        android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:layout_marginEnd="@dimen/tablet_margin_5dp"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/empire_name"
-        android:text="@string/switch_user" />
+        android:text="@string/reauth_loading" />
     
     <Button
         android:id="@+id/options_btn"
@@ -102,11 +86,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginRight="5dp"
         android:layout_marginEnd="5dp"
-        android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginStart="@dimen/tablet_margin_5dp"
-        android:layout_toLeftOf="@+id/reauth_btn"
         android:layout_toStartOf="@+id/reauth_btn"
         android:layout_below="@id/empire_name"
         android:text="@string/options" />
@@ -120,7 +101,6 @@
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginRight="@dimen/tablet_margin_5dp"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:text="@string/start_game" />
@@ -130,9 +110,7 @@
         android:layout_width="330dp"
         android:layout_height="wrap_content"
         android:layout_above="@id/start_btn"
-        android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:layout_marginEnd="@dimen/tablet_margin_5dp"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:gravity="center" />
 
@@ -142,11 +120,8 @@
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_below="@id/title_icon"
-        android:layout_toLeftOf="@+id/start_btn"
         android:layout_toStartOf="@+id/start_btn"
-        android:layout_marginLeft="@dimen/tablet_margin"
         android:layout_marginStart="@dimen/tablet_margin"
-        android:layout_marginRight="5dp"
         android:layout_marginEnd="5dp" />
 
 </RelativeLayout>

@@ -25,12 +25,14 @@
 
     <section id="navmenu"><div class="navmenu-bg">
       <div class="user-details">
-        <div>{{ logged_in_user }}</div>
+        <div>{{ session.email }}</div>
       </div>
       <ul>
         <li><a href="/admin">Dashboard</a>
+        {% if session|isinrole:ADMINISTRATOR %}
         <li><a href="/admin/users">Users</a>
-        {% if backend_user|isinrole:ChatRead %}
+        {% endif %}
+        {% if session|isinrole:CHAT %}
         <li><span><span>Chat</span></span>
           <ul>
             <li><a href="/admin/chat">Messages</a>
@@ -38,31 +40,19 @@
             <li><a href="/admin/chat/sinbin">Sinbin</a>
           </ul>
         {% endif %}
-        <li><span><span>Actions</span></span>
-          <ul>
-            <li><a href="/admin/actions/move-star">Move Star</a>
-            <li><a href="/admin/actions/create-fleet">Create Fleet</a>
-            <li><a href="/admin/actions/reset-empire">Reset Empire</a>
-          </ul>
+        {% if session|isinrole:EMPIRE %}
         <li><span><span>Empires</span></span>
           <ul>
-            <li><a href="/admin/empire/search">Search</a>
-            <li><a href="/admin/empire/shields">Shields</a>
-            <li><a href="/admin/empire/alts">Alt Accounts</a>
-            <li><a href="/admin/empire/ban">Ban Empire</a>
+            <li><a href="/admin/empires">View</a>
           </ul>
-        <li><span><span>Alliances</span></span>
+          {% endif %}
+        {% if session|isinrole:STARFIELD %}
+        <li><span><span>Starfield</span></span>
           <ul>
-            <li><a href="/admin/alliance/search">Search</a>
+            <li><a href="/admin/starfield">View</a>
+            <li><a href="/admin/sectors">Sectors</a>
           </ul>
-        <li><span><span>Debug</span></span>
-          <ul>
-            <li><a href="/admin/debug/starfield">Starfield</a>
-            <li><a href="/admin/debug/colonies">Colonies</a>
-            <li><a href="/admin/debug/reports">Reports</a>
-            <li><a href="/admin/debug/purchases">Purchases</a>
-            <li><a href="/admin/debug/error-reports">Error Reports</a>
-          </ul>
+        {% endif %}
       </ul>
     </div></section>
 

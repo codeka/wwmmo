@@ -6,6 +6,7 @@ import java.net.Socket;
 import au.com.codeka.warworlds.common.net.PacketDecoder;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.HelloPacket;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 
 /**
@@ -24,8 +25,19 @@ public class PendingConnection {
   }
 
   /** Called when the user actually connects to the game socket, returns a {@link Connection}. */
-  public Connection connect(Socket socket, PacketDecoder decoder, OutputStream outs) {
-    Connection conn = new Connection(account, empire, encryptionKey, socket, decoder, outs);
+  public Connection connect(
+      HelloPacket helloPacket,
+      Socket socket,
+      PacketDecoder decoder,
+      OutputStream outs) {
+    Connection conn = new Connection(
+        helloPacket,
+        account,
+        empire,
+        encryptionKey,
+        socket,
+        decoder,
+        outs);
     conn.start();
     return conn;
   }

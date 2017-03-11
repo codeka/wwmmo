@@ -5,11 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,8 +15,8 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.world.EmpireManager;
-import au.com.codeka.warworlds.client.world.ImageHelper;
+import au.com.codeka.warworlds.client.game.world.EmpireManager;
+import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -57,13 +55,10 @@ public class PlanetListSimple extends LinearLayout {
 
   private void refresh() {
     if (onClickListener == null) {
-      onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          Planet planet = (Planet) v.getTag();
-          if (planetSelectedHandler != null) {
-            planetSelectedHandler.onPlanetSelected(planet);
-          }
+      onClickListener = v -> {
+        Planet planet = (Planet) v.getTag();
+        if (planetSelectedHandler != null) {
+          planetSelectedHandler.onPlanetSelected(planet);
         }
       };
     }
@@ -71,14 +66,10 @@ public class PlanetListSimple extends LinearLayout {
     planets = new ArrayList<>(star.planets);
 
     removeAllViews();
-    LayoutInflater inflater = (LayoutInflater) context.getSystemService
-        (Context.LAYOUT_INFLATER_SERVICE);
+    LayoutInflater inflater =
+        (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     Empire myEmpire = EmpireManager.i.getMyEmpire();
-    if (myEmpire == null) {
-      return;
-    }
-
     HashSet<Long> empires = new HashSet<>();
     for (Fleet fleet : star.fleets) {
       if (fleet.empire_id == null) {
@@ -134,8 +125,6 @@ public class PlanetListSimple extends LinearLayout {
     Picasso.with(getContext())
         .load(ImageHelper.getPlanetImageUrl(getContext(), star, planetIndex, 32, 32))
         .into(icon);
-    //Sprite sprite = pim.getSprite(planet);
-    //icon.setImageDrawable(new SpriteDrawable(sprite));
 
     TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
     planetTypeTextView.setText(planet.planet_type.toString());
@@ -143,11 +132,16 @@ public class PlanetListSimple extends LinearLayout {
     Colony colony = planet.colony;
     final TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
     if (colony != null) {
-      /*Empire empire = EmpireManager.i.getEmpire(colony.getEmpireID());
-      if (empire != null) {
-        colonyTextView.setText(empire.getDisplayName());
-      } else*/ {
-        colonyTextView.setText("Colonized");
+      if (colony.empire_id == null) {
+        colonyTextView.setText(getContext().getString(R.string.native_colony));
+      } else {
+        Empire empire = EmpireManager.i.getEmpire(colony.empire_id);
+        if (empire != null) {
+          colonyTextView.setText(empire.display_name);
+        } else {
+          colonyTextView.setText(context.getString(R.string.colonized));
+          // TODO: update when the empire comes around.
+        }
       }
     } else {
       colonyTextView.setText("");
@@ -164,16 +158,17 @@ public class PlanetListSimple extends LinearLayout {
     final TextView empireName = (TextView) view.findViewById(R.id.starfield_planet_type);
     final TextView allianceName = (TextView) view.findViewById(R.id.starfield_planet_colony);
 
-    /*Empire empire = EmpireManager.i.getEmpire(empireID);
+    Empire empire = EmpireManager.i.getEmpire(empireID);
     if (empire != null) {
-      Bitmap bmp = EmpireShieldManager.i.getShield(context, empire);
-      icon.setImageBitmap(bmp);
+      Picasso.with(getContext())
+          .load(ImageHelper.getEmpireImageUrl(getContext(), empire, 32, 32))
+          .into(icon);
 
-      empireName.setText(empire.getDisplayName());
-      if (empire.getAlliance() != null) {
-        allianceName.setText(empire.getAlliance().getName());
-      }
-    }*/
+      empireName.setText(empire.display_name);
+//      if (empire.alliance != null) {
+//        allianceName.setText(empire.alliance.name);
+//      }
+    }
 
     view.setOnClickListener(onClickListener);
     view.setTag(empireID);

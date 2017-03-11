@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.opengl;
 
-import java.util.concurrent.TimeUnit;
-
 /** Helper class for keep track of framerate and such. */
 public class FrameCounter {
   /**

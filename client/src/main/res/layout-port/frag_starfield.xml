@@ -1,105 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/stuff">
 
-  <View
-      android:id="@+id/ad"
+  <FrameLayout
+      android:id="@+id/top_pane"
+      android:transitionName="top_pane"
+      style="@style/TopPane"
       android:layout_width="match_parent"
-      android:layout_height="50dp"
-      android:layout_alignParentTop="true" />
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true">
+  </FrameLayout>
 
-  <!--au.com.codeka.warworlds.ctrl.SelectionView
-      android:id="@+id/selection"
-      android:layout_width="40dp"
-      android:layout_height="40dp"
-      android:visibility="gone" /-->
-  <View
-      android:id="@+id/selection"
-      android:layout_width="40dp"
-      android:layout_height="40dp"
-      android:visibility="gone" />
-
-  <!--au.com.codeka.warworlds.ctrl.MiniChatView
-      android:id="@+id/mini_chat"
-      android:layout_height="50dp"
-      android:layout_width="fill_parent"
-      android:layout_above="@+id/bottom_pane"
-      android:layout_marginBottom="-4px" /-->
-  <View
+  <au.com.codeka.warworlds.client.ctrl.ChatMiniView
       android:id="@+id/mini_chat"
       android:layout_height="50dp"
       android:layout_width="fill_parent"
       android:layout_above="@+id/bottom_pane"
       android:layout_marginBottom="-4px" />
 
-  <RelativeLayout
+  <FrameLayout
       android:id="@+id/bottom_pane"
       android:transitionName="bottom_pane"
       style="@style/BottomPane"
       android:layout_width="match_parent"
-      android:layout_height="180dp"
-      android:layout_alignParentBottom="true"
-      android:baselineAligned="false">
-
-    <au.com.codeka.warworlds.client.starfield.SelectionDetailsView
-        android:id="@+id/selection_details"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/empire_btn" />
-
-    <Button
-        android:id="@+id/empire_btn"
-        style="@style/Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:text="@string/empire" />
-
-    <Button
-        android:id="@+id/sitrep_btn"
-        style="@style/Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_toLeftOf="@+id/empire_btn"
-        android:layout_toStartOf="@+id/empire_btn"
-        android:text="@string/sitrep" />
-
-    <Button android:id="@+id/alliance_btn"
-            style="@style/Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_alignTop="@id/sitrep_btn"
-            android:layout_toLeftOf="@+id/sitrep_btn"
-            android:layout_toStartOf="@+id/sitrep_btn"
-            android:text="@string/alliance" />
-
-    <!--au.com.codeka.warworlds.ctrl.InfobarView
-        android:id="@+id/infobar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignTop="@id/alliance_btn"
-        android:layout_toLeftOf="@+id/alliance_btn" /-->
-    <View
-        android:id="@+id/infobar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignTop="@id/alliance_btn"
-        android:layout_toLeftOf="@+id/alliance_btn"
-        android:layout_toStartOf="@+id/alliance_btn" />
-
-  </RelativeLayout>
-
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true">
+  </FrameLayout>
 </RelativeLayout>

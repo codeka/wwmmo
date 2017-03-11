@@ -53,7 +53,7 @@ message Fleet {
   optional FLEET_STANCE stance = 10;
 
   // This is used internally by the server, it'll never appear in a response from the server.
-  optional int64 time_destroyed = 11;
+  optional bool is_destroyed = 11;
   optional bool block_notification_on_destroy = 12;
 
   // This is the date/time of the last battle this fleet was victorious in, it's mostly useless on

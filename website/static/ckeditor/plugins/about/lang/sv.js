@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("about","sv",{copy:"Copyright \x26copy; $1. Alla rättigheter reserverade.",dlgTitle:"Om CKEditor",help:"Se $1 för hjälp.",moreInfo:"För information om licensiering besök vår hemsida:",title:"Om CKEditor",userGuide:"CKEditor användarmanual"});

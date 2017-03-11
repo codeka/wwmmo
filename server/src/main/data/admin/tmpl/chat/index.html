@@ -1,0 +1,17 @@
+{% extends "skeleton.html" %}
+{% block title %}Chat{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="/admin/css/chat.css">
+<script type="text/javascript" src="/admin/js/tmpl.js"></script>
+<script type="text/javascript" src="/admin/js/time.js"></script>
+<script type="text/javascript" src="/admin/js/empirestore.js"></script>
+<script type="text/javascript" src="/admin/js/chat.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Chat</h1>
+<div id="messages"></div>
+<div id="rooms"></div>
+<div id="send">
+  <input type="text" name="msg">
+</div>
+{% endblock %}

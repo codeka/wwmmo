@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * An enumeration of the thread types within War Worlds. Has some helper methods to ensure you run
  * on a particular thread.
@@ -47,27 +49,35 @@ public enum Threads {
   @Nullable private ThreadPool threadPool;
 
   public void setThread(@NonNull Thread thread, @NonNull TaskQueue taskQueue) {
-    Preconditions.checkState(!isInitialized || this.taskQueue == taskQueue);
+    checkState(!isInitialized || this.taskQueue == taskQueue);
     this.thread = thread;
     this.taskQueue = taskQueue;
     this.isInitialized = true;
   }
 
   public void setThread(@NonNull Thread thread, @NonNull Handler handler) {
-    Preconditions.checkState(!isInitialized);
+    checkState(!isInitialized);
     this.thread = thread;
     this.handler = handler;
     this.isInitialized = true;
   }
 
+  /** Reset this thread, unassociate it from the current thread, handler, task queue combo. */
+  public void resetThread() {
+    thread = null;
+    handler = null;
+    taskQueue = null;
+    isInitialized = false;
+  }
+
   public void setThreadPool(@NonNull ThreadPool threadPool) {
-    Preconditions.checkState(!isInitialized);
+    checkState(!isInitialized);
     this.threadPool = threadPool;
     this.isInitialized = true;
   }
 
   public boolean isCurrentThread() {
-    Preconditions.checkState(isInitialized);
+    checkState(isInitialized);
 
     if (thread != null) {
       return thread == Thread.currentThread();

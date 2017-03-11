@@ -2,13 +2,20 @@
 # Temp files
 *~
 *.class
+*.pyc
 
 # Make sure keystore.jks never gets added to source control, it's SEKRET!
 keystore.jks
+signing.properties
 
+# These are generated from the .proto files.
+common/src/main/java/au/com/codeka/warworlds/common/proto/
+
+# A bunch of data files.
 server/src/main/data/cache/*
 server/src/main/data/store/*
 server/src/main/data/config-debug.json
+server/src/main/data/firebase.json
 client/signing.properties
 client/*.apk
 
@@ -25,6 +32,6 @@ captures/
 /*/build/
 
 
-#Ignore generated android code
+# Ignore generated android code
 ** gen/
 gen/

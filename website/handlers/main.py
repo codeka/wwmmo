@@ -25,6 +25,11 @@ class PrivacyPolicyPage(handlers.BaseHandler):
     self.render("privacy-policy.html", {})
 
 
+class TermsOfServicePage(handlers.BaseHandler):
+  def get(self):
+    self.render("terms-of-service.html", {})
+
+
 class BlobUploadUrlPage(handlers.BaseHandler):
   def get(self):
     """Gets a new upload URL for uploading blobs."""
@@ -162,6 +167,7 @@ class DonateThanksPage(handlers.BaseHandler):
 
 app = webapp.WSGIApplication([("/", HomePage),
                               ("/privacy-policy", PrivacyPolicyPage),
+                              ("/terms-of-service", TermsOfServicePage),
                               ("/blob/upload-url", BlobUploadUrlPage),
                               ("/blob/upload-complete", BlobUploadCompletePage),
                               ("/blob/([^/]+)", BlobPage),

@@ -186,9 +186,13 @@ public class ViewBackgroundGenerator {
     private Bitmap gasBitmap;
 
     public BackgroundRenderer(Context context) {
-      AssetManager assetMgr = context.getAssets();
-      starfieldBitmap = loadBitmap(assetMgr, "stars/starfield.png");
-      gasBitmap = loadBitmap(assetMgr, "stars/gas.png");
+      try {
+        AssetManager assetMgr = context.getAssets();
+        starfieldBitmap = loadBitmap(assetMgr, "stars/starfield.png");
+        gasBitmap = loadBitmap(assetMgr, "stars/gas.png");
+      } catch (Exception e) {
+        // Ignore.
+      }
     }
 
     /**
@@ -196,7 +200,6 @@ public class ViewBackgroundGenerator {
      * again later.
      */
     private void render(Bitmap bmp, long seed) {
-      log.warning("RENDERING");
       // start off black
       Canvas canvas = new Canvas(bmp);
       canvas.drawColor(Color.BLACK);

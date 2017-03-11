@@ -12,6 +12,9 @@ public class AjaxEmpireHandler extends AdminHandler {
     if (getRequest().getParameter("id") != null) {
       long empireId = Long.parseLong(getRequest().getParameter("id"));
       WatchableObject<Empire> empire = EmpireManager.i.getEmpire(empireId);
+      if (empire == null) {
+        throw new RequestException(404);
+      }
       setResponseJson(empire.get());
     }
   }

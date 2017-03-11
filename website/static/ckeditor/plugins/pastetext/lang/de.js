@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("pastetext","de",{button:"Als Klartext einfügen",title:"Als Klartext einfügen"});

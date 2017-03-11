@@ -1,93 +1,93 @@
 package au.com.codeka.warworlds.server.store;
 
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseConfig;
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.je.Transaction;
-
 import java.io.File;
 
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.common.proto.Star;
 
-/** Wraps our reference to MapDB's data store objects. */
+/** Wraps our references to the various data store objects. */
 public class DataStore {
   private static final Log log = new Log("DataStore");
   public static final DataStore i = new DataStore();
 
-  private Environment env;
-  private AccountsStore accounts;
-  private ProtobufStore<Empire> empires;
-  private SectorsStore sectors;
-  private ProtobufStore<Star> stars;
-  private StarQueueSecondaryStore starsQueue;
-  private UniqueNameStore uniqueEmpireNames;
+  private final AccountsStore accounts = new AccountsStore("accounts.db");
+  private final AdminUsersStore adminUsers = new AdminUsersStore("admin.db");
+  private final ChatStore chat = new ChatStore("chat.db");
+  private final EmpiresStore empires = new EmpiresStore("empires.db");
+  private final SequenceStore seq = new SequenceStore("seq.db");
+  private final SectorsStore sectors = new SectorsStore("sectors.db");
+  private final StarsStore stars = new StarsStore("stars.db");
 
   private DataStore() {
+  }
+
+  public void open() {
+    // Make sure we open the sqlite JDBC driver.
     try {
-      EnvironmentConfig envConfig = new EnvironmentConfig();
-      envConfig.setAllowCreate(true);
-      envConfig.setTransactional(true);
-      env = new Environment(new File("data/store"), envConfig);
+      Class.forName("org.sqlite.JDBC");
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException("Error loading SQLITE JDBC driver.", e);
+    }
 
-      DatabaseConfig dbConfig = new DatabaseConfig();
-      dbConfig.setAllowCreate(true);
-      dbConfig.setTransactional(true);
+    File home = new File("data/store");
+    if (!home.exists()) {
+      if (!home.mkdirs()) {
+        throw new RuntimeException("Error creating directories for data store.");
+      }
+    }
 
-      Database db = env.openDatabase(null, "accounts", dbConfig);
-      accounts = new AccountsStore(db);
-
-      db = env.openDatabase(null, "empires", dbConfig);
-      empires = new ProtobufStore<>(db, Empire.class);
-
-      db = env.openDatabase(null, "stars", dbConfig);
-      stars = new ProtobufStore<>(db, Star.class);
-      starsQueue = new StarQueueSecondaryStore(env, db, stars);
-
-      db = env.openDatabase(null, "sectors", dbConfig);
-      sectors = new SectorsStore(db, stars);
-
-      db = env.openDatabase(null, "uniqueEmpireNames", dbConfig);
-      uniqueEmpireNames = new UniqueNameStore(db);
-    } catch (DatabaseException e) {
+    try {
+      accounts.open();
+      adminUsers.open();
+      chat.open();
+      empires.open();
+      seq.open();
+      sectors.open();
+      stars.open();
+    } catch (StoreException e) {
       log.error("Error creating databases.", e);
       throw new RuntimeException(e);
     }
   }
 
   public void close() {
-    uniqueEmpireNames.close();
-    accounts.close();
-    empires.close();
-    env.close();
+    try {
+      stars.close();
+      sectors.close();
+      seq.close();
+      empires.close();
+      chat.close();
+      adminUsers.close();
+      accounts.close();
+    } catch (StoreException e) {
+      log.error("Error closing databases.", e);
+    }
   }
 
-  public Transaction beginTransaction() {
-    return env.beginTransaction(null, null);
+  public AdminUsersStore adminUsers() {
+    return adminUsers;
   }
 
   public AccountsStore accounts() {
     return accounts;
   }
 
-  public ProtobufStore<Empire> empires() {
+  public ChatStore chat() {
+    return chat;
+  }
+
+  public EmpiresStore empires() {
     return empires;
+  }
+
+  public SequenceStore seq() {
+    return seq;
   }
 
   public SectorsStore sectors() {
     return sectors;
   }
 
-  public ProtobufStore<Star> stars() {
+  public StarsStore stars() {
     return stars;
-  }
-
-  public StarQueueSecondaryStore starsQueue() { return starsQueue; }
-
-  public UniqueNameStore uniqueEmpireNames() {
-    return uniqueEmpireNames;
   }
 }

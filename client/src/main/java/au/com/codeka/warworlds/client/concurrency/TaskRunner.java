@@ -28,7 +28,7 @@ public class TaskRunner {
   }
 
   /** Run a task after the given delay. */
-  public void runTask(final Runnable runnable, final Threads thread, int delayMs) {
+  public void runTask(final Runnable runnable, final Threads thread, long delayMs) {
     if (delayMs == 0) {
       runTask(runnable, thread);
     } else {

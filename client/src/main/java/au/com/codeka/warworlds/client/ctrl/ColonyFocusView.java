@@ -11,6 +11,7 @@ import com.squareup.wire.Wire;
 import java.util.Locale;
 
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Star;
 
@@ -61,14 +62,9 @@ public class ColonyFocusView extends FrameLayout {
     constructionFocus.setProgress((int) (100.0f * colony.focus.construction));
     TextView constructionValue =
         (TextView) findViewById(R.id.solarsystem_colony_construction_value);
-    int numBuildRequests = 0;
-//    for (BuildRequest buildRequest : this.star.getBuildRequests()) {
-//      if (buildRequest.getColonyKey().equals(this.colony.getKey())) {
-//        numBuildRequests++;
-//      }
-//    }
+    int numBuildRequests = colony.build_requests == null ? 0 : colony.build_requests.size();
     if (numBuildRequests == 0) {
-      constructionValue.setText("idle");
+      constructionValue.setText(getContext().getString(R.string.idle));
     } else {
       constructionValue.setText(String.format(Locale.US, "Q: %d", numBuildRequests));
     }

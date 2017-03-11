@@ -4,25 +4,27 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
 
-import com.google.common.base.Preconditions;
 import com.squareup.wire.Message;
 
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 /** Class for storing protos in a sqlite key-value store, keyed by a long id. */
-public class ProtobufStore<M extends Message<?, ?>> {
+public class ProtobufStore<M extends Message<?, ?>> extends BaseStore {
   private final String name;
-  private final SQLiteOpenHelper helper;
   private final ProtobufSerializer<M> serializer;
+  private final SQLiteOpenHelper helper;
 
   public ProtobufStore(String name, Class<M> protoClass, SQLiteOpenHelper helper) {
-    this.name = Preconditions.checkNotNull(name);
-    this.helper = Preconditions.checkNotNull(helper);
+    super(name, helper);
+    this.name = name;
+    this.helper = helper;
     this.serializer = new ProtobufSerializer<>(protoClass);
   }
 
+  @Override
   public void onCreate(SQLiteDatabase db) {
     db.execSQL(
         "CREATE TABLE " + name + " ("
@@ -30,23 +32,27 @@ public class ProtobufStore<M extends Message<?, ?>> {
             + "  value BLOB)");
   }
 
-  public M get(long id) {
+
+  /**
+   * Gets the value with the given ID, or {@code null} if it's not found.
+   */
+  public M get(long key) {
     SQLiteDatabase db = helper.getReadableDatabase();
-    Cursor cursor = db.query(false, name, new String[] {"value"},
-        "key = ?", new String[] {Long.toString(id)},
-        null, null, null, null);
-    try {
+    try (Cursor cursor = db.query(false, name, new String[]{ "value" },
+        "key = ?", new String[]{ Long.toString(key) },
+        null, null, null, null)) {
       if (cursor.moveToFirst()) {
         return serializer.deserialize(cursor.getBlob(0));
       }
-    } finally {
-      cursor.close();
     }
 
     return null;
   }
 
-  public void put(long id, M value) {
+  /**
+   * Puts the given value to the data store.
+   */
+  public void put(long id, @Nonnull M value) {
     SQLiteDatabase db = helper.getWritableDatabase();
     ContentValues values = new ContentValues();
     values.put("key", id);

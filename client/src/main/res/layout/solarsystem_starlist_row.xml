@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical">
+
+  <ImageView
+      android:id="@+id/star_icon"
+      android:layout_width="40dp"
+      android:layout_height="40dp"
+      android:layout_alignParentStart="true"
+      android:layout_marginEnd="4dp"
+      tools:src="@drawable/app_icon" />
+
+  <TextView
+      android:id="@+id/star_name"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toEndOf="@+id/star_icon"
+      android:textAppearance="?android:attr/textAppearanceMedium"
+      tools:text="Star Name" />
+
+  <TextView
+      android:id="@+id/star_type"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/star_name"
+      android:layout_toEndOf="@+id/star_icon"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      tools:text="Black Hole" />
+
+  <ImageView
+      android:id="@+id/farming_icon"
+      android:layout_width="18dp"
+      android:layout_height="18dp"
+      android:layout_alignTop="@+id/star_icon"
+      android:layout_marginTop="1dp"
+      android:layout_marginEnd="4dp"
+      android:layout_alignParentEnd="true"
+      android:src="@drawable/farming" />
+
+  <TextView
+      android:id="@+id/star_goods_delta"
+      android:layout_width="wrap_content"
+      android:layout_height="20dp"
+      android:layout_toStartOf="@id/farming_icon"
+      android:layout_alignTop="@+id/star_icon"
+      android:layout_marginEnd="4dp"
+      android:gravity="center"
+      android:textColor="#0f0"
+      android:textSize="10sp"
+      tools:text="+10" />
+
+  <TextView
+      android:id="@+id/star_goods_total"
+      android:layout_width="wrap_content"
+      android:layout_height="20dp"
+      android:layout_alignTop="@+id/star_icon"
+      android:layout_toStartOf="@id/star_goods_delta"
+      android:layout_marginEnd="5dp"
+      android:gravity="center"
+      tools:text="1000"
+      android:textAppearance="?android:attr/textAppearanceSmall" />
+
+  <ImageView
+      android:id="@+id/mining_icon"
+      android:layout_width="18dp"
+      android:layout_height="18dp"
+      android:layout_alignBottom="@+id/star_icon"
+      android:layout_marginBottom="1dp"
+      android:layout_marginEnd="4dp"
+      android:layout_alignParentEnd="true"
+      android:src="@drawable/mining" />
+
+  <TextView
+      android:id="@+id/star_minerals_delta"
+      android:layout_width="wrap_content"
+      android:layout_height="20dp"
+      android:layout_toStartOf="@id/mining_icon"
+      android:layout_alignBottom="@+id/star_icon"
+      android:layout_marginEnd="4dp"
+      android:gravity="center"
+      android:textColor="#0f0"
+      android:textSize="10sp"
+      tools:text="+10" />
+
+  <TextView
+      android:id="@+id/star_minerals_total"
+      android:layout_width="wrap_content"
+      android:layout_height="20dp"
+      android:layout_alignBottom="@+id/star_icon"
+      android:layout_toStartOf="@id/star_minerals_delta"
+      android:layout_marginEnd="5dp"
+      android:gravity="center"
+      tools:text="1000"
+      android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</RelativeLayout>

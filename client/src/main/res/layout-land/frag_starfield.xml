@@ -1,100 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/stuff">
 
     <View
         android:id="@+id/ad"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_toLeftOf="@+id/bottom_pane"
         android:layout_toStartOf="@+id/bottom_pane"
         android:layout_alignParentTop="true" />
 
-    <View
-        android:id="@+id/selection"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:visibility="gone" />
-
-    <View
+    <au.com.codeka.warworlds.client.ctrl.ChatMiniView
         android:id="@+id/mini_chat"
         android:layout_height="50dp"
         android:layout_width="fill_parent"
         android:layout_above="@+id/infobar"
-        android:layout_toLeftOf="@+id/bottom_pane"
         android:layout_toStartOf="@+id/bottom_pane" />
 
-    <View
+    <au.com.codeka.warworlds.client.ctrl.InfobarView
         android:id="@+id/infobar"
         style="@style/BottomPane"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/bottom_pane"
         android:layout_toStartOf="@+id/bottom_pane"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <RelativeLayout
         android:id="@+id/bottom_pane"
         android:transitionName="bottom_pane"
         style="@style/RightPane"
-        android:layout_width="200dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:baselineAligned="false">
-
-        <au.com.codeka.warworlds.client.starfield.SelectionDetailsView
-            android:id="@+id/selection_details"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/bottom_buttons" />
-
-        <RelativeLayout
-            android:id="@+id/bottom_buttons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true" >
-
-            <Button
-                android:id="@+id/sitrep_btn"
-                style="@style/Button"
-                android:layout_width="92dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:text="@string/sitrep" />
-
-            <Button
-                android:id="@+id/empire_btn"
-                style="@style/Button"
-                android:layout_width="92dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_below="@+id/sitrep_btn"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:text="@string/empire" />
-
-            <Button android:id="@+id/alliance_btn"
-                    style="@style/Button"
-                    android:layout_width="92dp"
-                    android:layout_height="30dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginRight="4dp"
-                    android:layout_marginTop="34dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:text="@string/alliance" />
-        </RelativeLayout>
+        android:layout_alignParentEnd="true">
     </RelativeLayout>
 
 </RelativeLayout>

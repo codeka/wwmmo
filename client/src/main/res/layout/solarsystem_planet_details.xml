@@ -1,0 +1,97 @@
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="FrameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <Button
+      android:id="@+id/empty_view_btn"
+      style="@style/Button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/view"
+      android:visibility="gone" />
+
+  <RelativeLayout
+      android:id="@+id/enemy_colony_details"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:visibility="gone">
+    <ImageView
+        android:id="@+id/enemy_empire_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginStart="6dp"
+        tools:src="@drawable/app_icon"/>
+    <TextView
+        android:id="@+id/enemy_empire_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/enemy_empire_icon"
+        android:layout_marginTop="6dp"
+        android:layout_marginStart="6dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:maxLines="1"
+        android:ellipsize="end"
+        tools:text="Empire name"/>
+    <TextView
+        android:id="@+id/enemy_empire_defence"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/enemy_empire_icon"
+        android:layout_below="@id/enemy_empire_name"
+        android:layout_marginStart="6dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="1234" />
+    <Button
+        android:id="@+id/enemy_empire_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/enemy_empire_icon"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="@string/view" />
+  </RelativeLayout>
+
+  <RelativeLayout
+      android:id="@+id/solarsystem_colony_details"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+    <au.com.codeka.warworlds.client.ctrl.ColonyFocusView
+        android:id="@+id/colony_focus_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+    <View android:id="@+id/colony_center_marker"
+          android:layout_width="2dp"
+          android:layout_height="2dp"
+          android:layout_below="@id/colony_focus_view"
+          android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/solarsystem_colony_build"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/colony_focus_view"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/colony_center_marker"
+        android:layout_margin="8dp"
+        android:text="@string/build" />
+
+    <Button
+        android:id="@+id/solarsystem_colony_focus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/colony_focus_view"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/colony_center_marker"
+        android:layout_margin="8dp"
+        android:text="@string/focus" />
+  </RelativeLayout>
+</merge>

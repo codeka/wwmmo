@@ -8,13 +8,22 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Collection;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.AdminRole;
 import au.com.codeka.warworlds.server.admin.RequestException;
 
 /** Simple handler for handling static files (and 'templated' HTML files with no templated data). */
 public class FileHandler extends AdminHandler {
   private final Log log = new Log("AdminGenericHandler");
+
+  /** Any role can visit static files. */
+  @Override
+  protected Collection<AdminRole> getRequiredRoles() {
+    return Arrays.asList(AdminRole.values());
+  }
 
   @Override
   protected void get() throws RequestException {
@@ -49,5 +58,10 @@ public class FileHandler extends AdminHandler {
     } catch (IOException e) {
       log.error("Error sending static file!", e);
     }
+  }
+
+  @Override
+  public void post() throws RequestException {
+    throw new RequestException(404);
   }
 }

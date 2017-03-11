@@ -1,0 +1,29 @@
+{% extends "skeleton.html" %}
+{% block title %}Users{% endblock %}
+{% block head %}{% endblock %}
+{% block content %}
+<h1>Create User</h1>
+<fieldset>
+  <form method="post">
+    <dl>
+      <dt><label for="email_addr">Email address</label></dt>
+      <dd><input type="email" name="email_addr" id="email_addr"></dd>
+
+      <dt>Role</dt>
+      <dd>{% for role_name in all_roles %}
+        <div>
+          <input type="checkbox" id="role_{{role_name}}" name="{{role_name}}">
+          <label for="role_{{role_name}}">{{role_name}}</label>
+        </div>
+      {% endfor %}</dd>
+
+      {% if error %}
+        <dt class="error">{{ error }}</dt>
+      {% else %}
+        <dt>&nbsp;</dt>
+      {% endif %}
+      <dd><input type="submit" value="Create"></dd>
+    </dl>
+  </form>
+</fieldset>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "skeleton.html" %}
+{% block title %}Users{% endblock %}
+{% block head %}
+<script type="text/javascript" src="/admin/js/tmpl.js"></script>
+<script type="text/javascript" src="/admin/js/time.js"></script>
+<script>
+  function deleteUser(emailAddr) {
+    if (confirm("Are you sure you want to delete " + emailAddr + "?")) {
+      $.ajax({
+        url: "/admin/ajax/users",
+        method: "POST",
+        data: {
+          "action": "delete",
+          "email_addr": emailAddr
+        },
+        success: function(data) {
+          location.reload();
+        }
+      });
+    }
+  }
+</script>
+{% endblock %}
+{% block content %}
+<h1>Users</h1>
+<table>
+  <tr>
+    <th>Email</th>
+    <th>Roles</th>
+    <th></th>
+  </tr>
+  {% for user in users %}
+    <tr>
+      <td>{{ user.email_addr }}</td>
+      <td>{{ user.roles }}</td>
+      <td><a href="javascript:deleteUser('{{user.email_addr}}');">Delete</a></td>
+    </tr>
+  {% endfor %}
+</table>
+
+<p><a href="/admin/users/create">New user</a></p>
+{% endblock %}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+       android:layout_width="100dp"
+       android:layout_height="wrap_content">
+
+  <Button
+      android:id="@+id/empire_btn"
+      style="@style/Button"
+      android:transitionName="empire_btn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="5dp"
+      android:layout_marginEnd="5dp"
+      android:layout_marginBottom="5dp"
+      android:layout_above="@+id/sitrep_btn"
+      android:text="@string/empire" />
+
+  <Button
+      android:id="@+id/sitrep_btn"
+      style="@style/Button"
+      android:transitionName="sitrep_btn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="5dp"
+      android:layout_marginEnd="5dp"
+      android:layout_marginBottom="5dp"
+      android:layout_above="@+id/alliance_btn"
+      android:text="@string/sitrep" />
+
+  <Button
+      android:id="@+id/alliance_btn"
+      style="@style/Button"
+      android:transitionName="alliance_btn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="5dp"
+      android:layout_marginEnd="5dp"
+      android:layout_alignParentBottom="true"
+      android:text="@string/alliance" />
+
+</RelativeLayout>

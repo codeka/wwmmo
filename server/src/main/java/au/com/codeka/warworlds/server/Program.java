@@ -1,11 +1,18 @@
 package au.com.codeka.warworlds.server;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseCredentials;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import java.io.FileInputStream;
+
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.server.account.AccountAssociateServlet;
 import au.com.codeka.warworlds.server.account.AccountsServlet;
 import au.com.codeka.warworlds.server.account.LoginServlet;
 import au.com.codeka.warworlds.server.admin.AdminServlet;
@@ -20,11 +27,15 @@ public class Program {
   public static void main(String[] args) throws Exception {
     //Configuration.loadConfig();
     LogImpl.setup();
+    DataStore.i.open();
+
     try {
-      //new SchemaUpdater().verifySchema();
-      //ErrorReportingLoggingHandler.setup();
-      //DesignManager.setup();
-      //NameGenerator.setup();
+      FileInputStream firebaseCertificate = new FileInputStream("data/firebase.json");
+      FirebaseOptions options = new FirebaseOptions.Builder()
+          .setCredential(FirebaseCredentials.fromCertificate(firebaseCertificate))
+          .setDatabaseUrl("https://wwmmo-93bac.firebaseio.com")
+          .build();
+      FirebaseApp.initializeApp(options);
 
       if (args.length >= 2 && args[0].equals("cron")) {
         String extra = null;
@@ -67,6 +78,7 @@ public class Program {
       server.setHandler(context);
 
       context.addServlet(new ServletHolder(AccountsServlet.class), "/accounts");
+      context.addServlet(new ServletHolder(AccountAssociateServlet.class), "/accounts/associate");
       context.addServlet(new ServletHolder(LoginServlet.class), "/login");
       context.addServlet(new ServletHolder(RendererServlet.class), "/render/*");
       context.addServlet(new ServletHolder(AdminServlet.class), "/admin/*");

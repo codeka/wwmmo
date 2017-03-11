@@ -1,6 +1,6 @@
 package au.com.codeka.warworlds.server.world.generator;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -9,12 +9,15 @@ import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.SectorManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
-import au.com.codeka.warworlds.server.world.generator.SectorGenerator;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Find a star which is suitable for a new empire.
+ *
  * <p>When a new player joins the game, we want to find a star for their initial colony. We need to
  * choose a star that's close to other players, but not <i>too</i> close as to make them an easy
  * target.
@@ -23,7 +26,9 @@ import au.com.codeka.warworlds.server.world.generator.SectorGenerator;
  * appropriate one.
  */
 public class NewStarFinder {
-  private final Log log = new Log("NewStarFinder");
+  private final Log log;
+
+  @Nullable private SectorCoord coord;
   private Star star;
   private int planetIndex;
 
@@ -34,18 +39,39 @@ public class NewStarFinder {
     return planetIndex;
   }
 
+  public NewStarFinder() {
+    this(null);
+  }
+
+  public NewStarFinder(@Nullable SectorCoord coord) {
+    this.log = new Log("NewStarFinder");
+    this.coord = coord;
+  }
+
+  public NewStarFinder(Log log, @Nullable SectorCoord coord) {
+    this.log = log;
+    this.coord = coord;
+  }
+
   public boolean findStarForNewEmpire() {
     if (findAbandonedStar()) {
       return true;
     }
 
-    if (!findStar()) {
-      // Expand the universe then try again.
+    boolean found = findStar();
+    if (!found) {
+      // Expand the universe, for good measure.
       new SectorGenerator().expandUniverse();
-      return findStar();
+
+      // And try again.
+      found = findStar();
     }
 
-    return true;
+    if (found) {
+      // Make sure the coord there isn't counted as being empty any more.
+      DataStore.i.sectors().updateSectorState(coord, SectorsStore.SectorState.NonEmpty);
+    }
+    return found;
   }
 
   /**
@@ -93,20 +119,25 @@ public class NewStarFinder {
   }
 
   private boolean findStar() {
-    SectorCoord coord = DataStore.i.sectors().getEmptySector();
     if (coord == null) {
+      coord = DataStore.i.sectors().findSectorByState(SectorsStore.SectorState.Empty);
+    }
+    if (coord == null) {
+      log.debug("No empty sector.");
       return false;
     }
 
     WatchableObject<Sector> sector = SectorManager.i.getSector(coord);
     Star star = findHighestScoreStar(sector.get());
     if (star == null) {
+      log.debug("No stars found.");
       return false;
     }
 
     // if we get here, then we've found the star. Also find which planet to put the colony on.
     this.star = star;
     findPlanetOnStar(star);
+    log.debug("Found a star: %d %s (sector: %d,%d)", star.id, star.name, coord.x, coord.y);
     return true;
   }
 
@@ -146,7 +177,7 @@ public class NewStarFinder {
       double score = scoreStar(sector, star);
       if (score > highestScore) {
         highestScore = score;
-        highestScoreStar = (Star) star;
+        highestScoreStar = star;
       }
     }
 

@@ -1,9 +1,16 @@
 package au.com.codeka.warworlds.server.admin;
 
+import com.google.common.collect.Lists;
+
 import org.joda.time.DateTime;
 
 import java.security.SecureRandom;
 import java.util.HashMap;
+
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.AdminRole;
+import au.com.codeka.warworlds.common.proto.AdminUser;
+import au.com.codeka.warworlds.server.store.DataStore;
 
 /**
  * Manages sessions in the admin backend. We keep current sessions live in memory, and don't bother
@@ -11,6 +18,7 @@ import java.util.HashMap;
  * authenticate).
  */
 public class SessionManager {
+  private static final Log log = new Log("SessionManager");
   public static final SessionManager i = new SessionManager();
 
   private static final char[] COOKIE_CHARS =
@@ -21,13 +29,27 @@ public class SessionManager {
 
   public Session authenticate(String emailAddr) {
     // TODO: expire old sessions
-    Session session = new Session(generateCookie(), emailAddr, DateTime.now());
+    AdminUser user;
+    if (DataStore.i.adminUsers().count() == 0) {
+      // If you don't have any users, then everybody who authenticates is in all roles.
+      user = new AdminUser.Builder()
+          .email_addr(emailAddr)
+          .roles(Lists.newArrayList(AdminRole.values()))
+          .build();
+    } else {
+      user = DataStore.i.adminUsers().get(emailAddr);
+      if (user == null) {
+        log.warning("User '%s' is not a valid admin user.", emailAddr);
+        return null;
+      }
+    }
+
+    Session session = new Session(generateCookie(), user, DateTime.now());
     sessions.put(session.getCookie(), session);
     return session;
   }
 
   public Session getSession(String cookie) {
-    // TODO: update session datetime
     return sessions.get(cookie);
   }
 

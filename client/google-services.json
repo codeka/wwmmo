@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "110304633160",
+    "firebase_url": "https://wwmmo-93bac.firebaseio.com",
+    "project_id": "wwmmo-93bac",
+    "storage_bucket": "wwmmo-93bac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110304633160:android:5567f5b28f012608",
+        "android_client_info": {
+          "package_name": "au.com.codeka.warworlds2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "110304633160-tj811p2e5768vv6ps3t98hl9c9h4aaig.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4Z3zzkeKyIlkPagNgAVNipPVSTD7oi4s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "110304633160-tj811p2e5768vv6ps3t98hl9c9h4aaig.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

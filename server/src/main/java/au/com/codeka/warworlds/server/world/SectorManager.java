@@ -8,6 +8,9 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import au.com.codeka.warworlds.common.Time;
+import au.com.codeka.warworlds.common.proto.Fleet;
+import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -43,6 +46,50 @@ public class SectorManager {
         }
       }
       return sector;
+    }
+  }
+
+  /**
+   * Go through all of the stars in the given {@link Sector} and make sure any stars which are
+   * eligible for a native colony have one.
+   */
+  public void verifyNativeColonies(WatchableObject<Sector> sector) {
+    for (Star star : sector.get().stars) {
+      // If there's any fleets on it, it's not eligible.
+      if (star.fleets.size() > 0) {
+        continue;
+      }
+
+      // If there's any colonies, it's also not eligible.
+      int numColonies = 0;
+      for (Planet planet: star.planets) {
+        if (planet.colony != null) {
+          numColonies ++;
+        }
+      }
+      if (numColonies > 0) {
+        continue;
+      }
+
+      // If it was emptied < 3 days ago, it's not eligible.
+      if (star.time_emptied != null
+          && (System.currentTimeMillis() - star.time_emptied) < (3 * Time.DAY)) {
+        continue;
+      }
+
+      // If there's no planets with a population congeniality above 500, it's not eligible.
+      int numEligiblePlanets = 0;
+      for (Planet planet: star.planets) {
+        if (planet.population_congeniality > 500) {
+          numEligiblePlanets ++;
+        }
+      }
+      if (numEligiblePlanets == 0) {
+        continue;
+      }
+
+      // Looks like it's eligible, let's do it.
+      StarManager.i.addNativeColonies(star.id);
     }
   }
 
