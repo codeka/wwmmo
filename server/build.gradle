@@ -16,7 +16,6 @@ apply plugin: 'application'
 apply plugin: 'org.hidetake.ssh'
 
 dependencies {
-  compile 'au.com.codeka:carrot:1.0.1'
   compile 'joda-time:joda-time:2.3'
   compile 'com.google.api-client:google-api-client:1.19.1'
   compile 'com.google.api-client:google-api-client-gson:1.19.1'
@@ -28,6 +27,7 @@ dependencies {
   compile 'org.eclipse.jetty:jetty-server:9.4.0.v20161208'
   compile 'org.eclipse.jetty.websocket:websocket-server:9.4.0.v20161208'
   compile 'org.xerial:sqlite-jdbc:3.16.1'
+  compile project(':carrot')
   compile project(':common')
   compile project(':planet-render')
 }

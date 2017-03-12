@@ -1,9 +1,9 @@
 {% extends "skeleton.html" %}
-{% block title %}Dashboard{% endblock %}
-{% block head %}
+{% block "title" %}Dashboard{% endblock %}
+{% block "head" %}
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 {% endblock %}
-{% block content %}
+{% block "content" %}
   <h1>Active Empires</h1>
   <div id="graph" style="width: 100%; margin: 0 auto;"></div>
   <script type="text/javascript">
@@ -22,7 +22,7 @@
       dataTable.addColumn("number", "New Signups");
       dataTable.addRows([
       {% for entry in graph_data %}
-        [new Date({{entry.year}}, {{entry.month|add:'1'}}, {{entry.day}}), {{entry.oneda|default:'0'}}, {{entry.sevenda|default:'0'}}, {{entry.signups|default:'0'}}],
+        [new Date({{entry.year}}, {{entry.month + 1}}, {{entry.day}}), {{entry.oneda}}, {{entry.sevenda}}, {{entry.signups}}],
       {% endfor %}
       ]);
 

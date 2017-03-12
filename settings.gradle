@@ -1,2 +1,7 @@
-include ':server', ':client', ':common', ':planet-render'
+include ':common'
+include ':client'
+include ':planet-render'
+include ':server'
 
+include ':carrot'
+project(':carrot').projectDir = new File(settingsDir, '../../carrot/git')

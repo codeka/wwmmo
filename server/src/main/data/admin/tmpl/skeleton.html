@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>War Worlds &bull; {% block title %}Backend{% endblock %}</title>
+    <title>War Worlds &bull; {% block "title" %}Backend{% endblock %}</title>
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="/admin/css/site.css">
     <link rel="stylesheet" href="/admin/css/site-mobile.css" media="only screen and (max-width: 900px)" />
     <link rel="icon" href="/admin/favicon.ico" />
     <script src="/admin/js/jquery-2.2.3.min.js"></script>
     <script src="/admin/js/main.js"></script>
-    {% block head %}{% endblock %}
+    {% block "head" %}{% endblock %}
   </head>
   <body>
     <section id="header"><div class="header-bg">
       <div id="navmenu-toggle">≡</div>
       <img src="/admin/img/logo.png" width="38" height="38" alt="Logo" />
       <h1>War Worlds</h1>
-    {% if num_backend_users|equal:0 %}
+    {% if num_backend_users == 0 %}
       <div class="no-backend-users-warning">
         You have no backend users defined, that's <em>really bad</em>, and you should
         <a href="/admin/users">create one now</a>.
@@ -29,10 +29,10 @@
       </div>
       <ul>
         <li><a href="/admin">Dashboard</a>
-        {% if session|isinrole:ADMINISTRATOR %}
+        {% if Session.isInRole(session, "ADMINISTRATOR") %}
         <li><a href="/admin/users">Users</a>
         {% endif %}
-        {% if session|isinrole:CHAT %}
+        {% if Session.isInRole(session, "CHAT") %}
         <li><span><span>Chat</span></span>
           <ul>
             <li><a href="/admin/chat">Messages</a>
@@ -40,14 +40,14 @@
             <li><a href="/admin/chat/sinbin">Sinbin</a>
           </ul>
         {% endif %}
-        {% if session|isinrole:EMPIRE %}
+        {% if Session.isInRole(session, "EMPIRE") %}
         <li><span><span>Empires</span></span>
           <ul>
             <li><a href="/admin/accounts">Accounts</a>
             <li><a href="/admin/empires">View</a>
           </ul>
-          {% endif %}
-        {% if session|isinrole:STARFIELD %}
+        {% endif %}
+        {% if Session.isInRole(session, "STARFIELD") %}
         <li><span><span>Starfield</span></span>
           <ul>
             <li><a href="/admin/starfield">View</a>
@@ -57,7 +57,7 @@
       </ul>
     </div></section>
 
-    <div id="maincontent">{% block content %}{% endblock %}</div>
+    <div id="maincontent">{% block "content" %}{% endblock %}</div>
     <div id="popup-scrim"></div>
   </body>
 </html>

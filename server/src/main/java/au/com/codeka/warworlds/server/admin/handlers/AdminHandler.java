@@ -6,20 +6,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.text.DecimalFormat;
 import java.util.Collection;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.joda.time.DateTime;
-
-import au.com.codeka.carrot.base.CarrotException;
+import au.com.codeka.carrot.CarrotEngine;
+import au.com.codeka.carrot.CarrotException;
 import au.com.codeka.carrot.resource.FileResourceLocater;
-import au.com.codeka.carrot.interpret.CarrotInterpreter;
-import au.com.codeka.carrot.interpret.InterpretException;
-import au.com.codeka.carrot.lib.Filter;
-import au.com.codeka.carrot.template.TemplateEngine;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.AdminRole;
 import au.com.codeka.warworlds.server.admin.RequestException;
@@ -36,20 +29,15 @@ import javax.annotation.Nullable;
 public class AdminHandler extends RequestHandler {
   private final Log log = new Log("AdminHandler");
 
-  private static final TemplateEngine TEMPLATE_ENGINE;
+  private static final CarrotEngine CARROT_ENGINE = new CarrotEngine();
   static {
-    TEMPLATE_ENGINE = new TemplateEngine();
-
-    TEMPLATE_ENGINE.getConfiguration().setResourceLocater(
+    CARROT_ENGINE.getConfig().setResourceLocater(
         new FileResourceLocater(
-            TEMPLATE_ENGINE.getConfiguration(),
+            CARROT_ENGINE.getConfig(),
             new File("data/admin/tmpl").getAbsolutePath()));
-    TEMPLATE_ENGINE.getConfiguration().setEncoding("utf-8");
+    CARROT_ENGINE.getConfig().setEncoding("utf-8");
 
-    TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new NumberFilter());
-    TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new AttrEscapeFilter());
-    TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new LocalDateFilter());
-    TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new IsInRoleFilter());
+    CARROT_ENGINE.getGlobalBindings().put("Session", new SessionHelper());
   }
 
   @Override
@@ -117,7 +105,7 @@ public class AdminHandler extends RequestHandler {
     getResponse().setContentType("text/html");
     getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
     try {
-      getResponse().getWriter().write(TEMPLATE_ENGINE.process(path, data));
+      getResponse().getWriter().write(CARROT_ENGINE.process(path, data));
     } catch (CarrotException | IOException e) {
       log.error("Error rendering template!", e);
       throw new RequestException(e);
@@ -153,6 +141,14 @@ public class AdminHandler extends RequestHandler {
     redirect(redirectUrl);
   }
 
+  private static class SessionHelper {
+    @SuppressWarnings("unused") // Used by template engine.
+    public boolean isInRole(Session session, String roleName) throws CarrotException {
+      AdminRole role = AdminRole.valueOf(roleName);
+      return session.isInRole(role);
+    }
+  }
+/*
   private static class NumberFilter implements Filter {
     private static final DecimalFormat FORMAT = new DecimalFormat("#,##0");
 
@@ -220,23 +216,5 @@ public class AdminHandler extends RequestHandler {
 
       throw new InterpretException("Expected a DateTime.");
     }
-  }
-
-  private static class IsInRoleFilter implements Filter {
-    @Override
-    public String getName() {
-      return "isinrole";
-    }
-
-    @Override
-    public Object filter(Object object, CarrotInterpreter interpreter, String... args)
-        throws InterpretException {
-      if (object instanceof Session) {
-        AdminRole role = AdminRole.valueOf(args[0]);
-        return ((Session) object).isInRole(role);
-      }
-
-      throw new InterpretException("Expected a Session, not " + object);
-    }
-  }
+  }*/
 }
