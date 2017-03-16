@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.handlers;
 import java.util.ArrayList;
 
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
@@ -55,12 +56,16 @@ public class StarHandler extends RequestHandler {
       throw new RequestException(400);
     }
 
+    if (star_rename_request_pb.getNewName().trim().length() > Configuration.i.getLimits().maxStarNameLength()) {
+      throw new RequestException(400, "Star name too long.");
+    }
+
     if (!star_rename_request_pb.hasPurchaseInfo()) {
       // if there's no purchase info then you must be renaming a wormhole, and it must be
       // one belonging to your alliance.
       Star star = new StarController().getStar(starID);
       if (star.getWormholeExtra() == null) {
-        throw new RequestException(400, "You are you allowed to rename this star.");
+        throw new RequestException(400, "You are not allowed to rename this star.");
       }
 
       Star.WormholeExtra wormhole = star.getWormholeExtra();

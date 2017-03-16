@@ -37,6 +37,9 @@
     // maximum length an alliance name can be, in unicode characters
     "maxAllianceNameLength": 80,
 
+    // maximum length a star name can be.
+    "maxStarName": 40,
+
     // maximum ratio of emojis:text in chat messages, only counted if the message is > 8 characters
     // long (which would allow you to send an all-emoji message if it consisted of <= 4 emojis).
     // 20% is the default.
