@@ -131,13 +131,19 @@ public class Configuration {
 
   public static class LimitsConfiguration {
     @Expose private int maxEmpireNameLength;
+    @Expose private double maxEmojiRatio;
 
     public LimitsConfiguration() {
       maxEmpireNameLength = 40;
+      maxEmojiRatio = 0.2;
     }
 
     public int maxEmpireNameLength() {
       return maxEmpireNameLength;
+    }
+
+    public double getMaxEmojiRatio() {
+      return maxEmojiRatio;
     }
   }
 }
