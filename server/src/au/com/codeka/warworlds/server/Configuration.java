@@ -131,15 +131,21 @@ public class Configuration {
 
   public static class LimitsConfiguration {
     @Expose private int maxEmpireNameLength;
+    @Expose private int maxAllianceNameLength;
     @Expose private double maxEmojiRatio;
 
     public LimitsConfiguration() {
       maxEmpireNameLength = 40;
+      maxAllianceNameLength = 80;
       maxEmojiRatio = 0.2;
     }
 
     public int maxEmpireNameLength() {
       return maxEmpireNameLength;
+    }
+
+    public int maxAllianceNameLength() {
+      return maxAllianceNameLength;
     }
 
     public double getMaxEmojiRatio() {
