@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -127,6 +128,10 @@ public class EmpireController {
   }
 
   public void update(Empire empire) throws RequestException {
+    if (empire.getDisplayName().length() > Configuration.i.getLimits().maxEmpireNameLength()) {
+      throw new RequestException(400, "Empire name is too long.");
+    }
+
     try (SqlStmt stmt = db.prepare("UPDATE empires SET name = ? WHERE id = ?")) {
       stmt.setString(1, empire.getDisplayName());
       stmt.setInt(2, empire.getID());
@@ -254,6 +259,11 @@ public class EmpireController {
     if (empire.getDisplayName().trim().equals("")) {
       throw new RequestException(400, Messages.GenericError.ErrorCode.CannotCreateEmpireBlankName,
           "You must give your empire a name.");
+    }
+
+    if (empire.getDisplayName().length() > Configuration.i.getLimits().maxEmpireNameLength()) {
+      throw new RequestException(400, Messages.GenericError.ErrorCode.UnknownError,
+          "Empire name is too long.");
     }
 
     NewEmpireStarFinder starFinder = new NewEmpireStarFinder();

@@ -6,6 +6,7 @@ import java.io.FileReader;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 import com.google.gson.stream.JsonReader;
 
 /**
@@ -29,12 +30,17 @@ public class Configuration {
     i = gson.fromJson(jsonReader, Configuration.class);
   }
 
-  private String realmName;
-  private String dataDirectory;
-  private int listenPort;
-  private Integer numStarSimulationThreads;
-  private DatabaseConfiguration database;
-  private SinbinConfiguration sinbin;
+  @Expose private String realmName;
+  @Expose private String dataDirectory;
+  @Expose private int listenPort;
+  @Expose private Integer numStarSimulationThreads;
+  @Expose private DatabaseConfiguration database;
+  @Expose private SinbinConfiguration sinbin;
+  @Expose private LimitsConfiguration limits;
+
+  public Configuration() {
+    limits = new LimitsConfiguration();
+  }
 
   public String getRealmName() {
     return realmName;
@@ -63,13 +69,17 @@ public class Configuration {
     return sinbin;
   }
 
+  public LimitsConfiguration getLimits() {
+    return limits;
+  }
+
   public static class DatabaseConfiguration {
-    private String server;
-    private int port;
-    private String database;
-    private String schema;
-    private String username;
-    private String password;
+    @Expose private String server;
+    @Expose private int port;
+    @Expose private String database;
+    @Expose private String schema;
+    @Expose private String username;
+    @Expose private String password;
 
     public String getServer() {
       return server;
@@ -97,10 +107,10 @@ public class Configuration {
   }
 
   public static class SinbinConfiguration {
-    private boolean enabled;
-    private int uniqueEmpireVotes;
-    private int voteTimeSeconds;
-    private int maxVotesPerDay;
+    @Expose private boolean enabled;
+    @Expose private int uniqueEmpireVotes;
+    @Expose private int voteTimeSeconds;
+    @Expose private int maxVotesPerDay;
 
     public boolean isEnabled() {
       return enabled;
@@ -116,6 +126,18 @@ public class Configuration {
 
     public int getMaxVotesPerDay() {
       return maxVotesPerDay;
+    }
+  }
+
+  public static class LimitsConfiguration {
+    @Expose private int maxEmpireNameLength;
+
+    public LimitsConfiguration() {
+      maxEmpireNameLength = 40;
+    }
+
+    public int maxEmpireNameLength() {
+      return maxEmpireNameLength;
     }
   }
 }
