@@ -70,7 +70,7 @@ public class AdminHandler extends RequestHandler {
   protected void handleException(RequestException e) {
     try {
       render("exception.html", ImmutableMap.<String, Object>builder()
-          .put("exception", e)
+          .put("e", e)
           .put("stack_trace", Throwables.getStackTraceAsString(e))
           .build());
       e.populate(getResponse());
