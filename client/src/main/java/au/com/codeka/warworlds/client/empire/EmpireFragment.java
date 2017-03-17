@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.TabbedBaseFragment;
-import au.com.codeka.warworlds.client.fleets.FleetsFragment;
+import au.com.codeka.warworlds.client.game.fleets.FleetsFragment;
 
 /**
  * The empire fragment contains a tab view which lets you view all your fleets, colonies, etc.
