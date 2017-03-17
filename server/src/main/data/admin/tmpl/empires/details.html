@@ -1,17 +1,16 @@
 {% extends "skeleton.html" %}
-{% block title %}Empires{% endblock %}
-{% block head %}
-<script type="text/javascript" src="/admin/js/tmpl.js"></script>
-<script type="text/javascript" src="/admin/js/time.js"></script>
-<script>
-</script>
-{% endblock %}
-{% block content %}
-<h1>{{ empire.display_name }}</h1>
+{% block "title" %}Empires{% end %}
+{% block "head" %}
+  <script type="text/javascript" src="/admin/js/tmpl.js"></script>
+  <script type="text/javascript" src="/admin/js/time.js"></script>
+  <script>
+  </script>
+{% end %}
+{% block "content" %}
+  <h1>{{ empire.display_name }}</h1>
 
-<h2>Stars</h2>
-{% for star in stars %}
-  <p>star {{star.id}} {{star.name}} (sector={{star.sector_x}}, {{star.sector_y}})</p>
-{% endfor %}
-
-{% endblock %}
+  <h2>Stars</h2>
+  {% for star in stars %}
+    <p>star {{star.id}} {{star.name}} (sector={{star.sector_x}}, {{star.sector_y}})</p>
+  {% end %}
+{% end %}

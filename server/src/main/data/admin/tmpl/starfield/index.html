@@ -1,14 +1,14 @@
 {% extends "skeleton.html" %}
-{% block title %}Starfield{% endblock %}
-{% block head %}
+{% block "title" %}Starfield{% end %}
+{% block "head" %}
   <link rel="stylesheet" href="/admin/css/starfield.css">
   <script type="text/javascript" src="/admin/js/tmpl.js"></script>
   <script type="text/javascript" src="/admin/js/empirestore.js"></script>
   <script type="text/javascript" src="/admin/js/starfield.js"></script>
   <script type="text/javascript" src="/admin/js/designs.js"></script>
   <script type="text/javascript" src="/admin/js/time.js"></script>
-{% endblock %}
-{% block content %}
+{% end %}
+{% block "content" %}
   <h1>Starfield</h1>
   <div class="left-column">
     <div id="starfield-container">
@@ -197,4 +197,4 @@
       <div style="white-space: pre;"><%= logMessages %></div>
     </script>
   </div>
-{% endblock %}
+{% end %}

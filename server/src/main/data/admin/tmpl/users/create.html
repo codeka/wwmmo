@@ -1,7 +1,6 @@
 {% extends "skeleton.html" %}
-{% block title %}Users{% endblock %}
-{% block head %}{% endblock %}
-{% block content %}
+{% block "title" %}Users{% end %}
+{% block "content" %}
 <h1>Create User</h1>
 <fieldset>
   <form method="post">
@@ -15,15 +14,15 @@
           <input type="checkbox" id="role_{{role_name}}" name="{{role_name}}">
           <label for="role_{{role_name}}">{{role_name}}</label>
         </div>
-      {% endfor %}</dd>
+      {% end %}</dd>
 
       {% if error %}
         <dt class="error">{{ error }}</dt>
       {% else %}
         <dt>&nbsp;</dt>
-      {% endif %}
+      {% end %}
       <dd><input type="submit" value="Create"></dd>
     </dl>
   </form>
 </fieldset>
-{% endblock %}
+{% end %}

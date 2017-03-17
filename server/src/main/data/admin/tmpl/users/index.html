@@ -1,6 +1,6 @@
 {% extends "skeleton.html" %}
-{% block title %}Users{% endblock %}
-{% block head %}
+{% block "title" %}Users{% end %}
+{% block "head" %}
 <script type="text/javascript" src="/admin/js/tmpl.js"></script>
 <script type="text/javascript" src="/admin/js/time.js"></script>
 <script>
@@ -20,8 +20,8 @@
     }
   }
 </script>
-{% endblock %}
-{% block content %}
+{% end %}
+{% block "content" %}
 <h1>Users</h1>
 <table>
   <tr>
@@ -35,8 +35,8 @@
       <td>{{ user.roles }}</td>
       <td><a href="javascript:deleteUser('{{user.email_addr}}');">Delete</a></td>
     </tr>
-  {% endfor %}
+  {% end %}
 </table>
 
 <p><a href="/admin/users/create">New user</a></p>
-{% endblock %}
+{% end %}
