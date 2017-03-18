@@ -37,6 +37,7 @@ import au.com.codeka.warworlds.client.net.HttpRequest;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.client.net.ServerUrl;
+import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.Version;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
@@ -65,7 +66,7 @@ public class WelcomeFragment extends BaseFragment {
 
   private View rootView;
   private Button startButton;
-  private Button reauthButton;
+  private Button signInButton;
   private TextView connectionStatus;
   private TextView empireName;
   private ImageView empireIcon;
@@ -83,7 +84,7 @@ public class WelcomeFragment extends BaseFragment {
     ViewBackgroundGenerator.setBackground(view);
 
     startButton = (Button) checkNotNull(view.findViewById(R.id.start_btn));
-    reauthButton = (Button) view.findViewById(R.id.reauth_btn);
+    signInButton = (Button) view.findViewById(R.id.signin_btn);
     motdView = (TransparentWebView) checkNotNull(view.findViewById(R.id.motd));
     empireName = (TextView) checkNotNull(view.findViewById(R.id.empire_name));
     empireIcon = (ImageView) checkNotNull(view.findViewById(R.id.empire_icon));
@@ -112,7 +113,12 @@ public class WelcomeFragment extends BaseFragment {
           startActivity(i);
         });
 
-    //reauthButton.setOnClickListener(v -> onReauthClick());
+    if (GameSettings.i.getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
+      signInButton.setTag(R.string.signin);
+    } else {
+      signInButton.setText(R.string.switch_user);
+    }
+    signInButton.setOnClickListener(v -> onSignInClick());
   }
 
   @Override
@@ -144,6 +150,10 @@ public class WelcomeFragment extends BaseFragment {
     Picasso.with(getContext())
         .load(ImageHelper.getEmpireImageUrl(getContext(), empire, 20, 20))
         .into(empireIcon);
+  }
+
+  private void onSignInClick() {
+    getFragmentTransitionManager().replaceFragment(SignInFragment.class);
   }
 
   @Override

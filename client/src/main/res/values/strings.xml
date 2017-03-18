@@ -8,9 +8,8 @@
   <string name="website">Website</string>
   <string name="realm_label">Realm: %s</string>
   <string name="switch_realm">Switch Realm</string>
-  <string name="reauth_sign_in">Sign in</string>
-  <string name="reauth_switch_user">Switch user</string>
-  <string name="reauth_loading">...</string>
+  <string name="signin">Sign in</string>
+  <string name="switch_user">Switch user</string>
   <string name="options">Options</string>
   <string name="cancel">Cancel</string>
   <string name="done">Done</string>
@@ -77,4 +76,9 @@
 
   <string name="sign_in_failed_cancelled">Sign in cancelled.</string>
   <string name="sign_in_failed_error">Sign in error, please try again later.</string>
+  <string name="signin_help">
+    Enter an email address. We\'ll send you an email to verify it and then your account will be
+    associated with that address. You will be able to log in to this account from another device,
+    and you\'ll be able to recover it later as well.
+  </string>
 </resources>

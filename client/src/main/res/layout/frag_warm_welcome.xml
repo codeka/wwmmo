@@ -20,10 +20,8 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_alignParentEnd="true"
-      android:layout_alignParentRight="true"
       android:layout_alignParentTop="true"
       android:layout_toEndOf="@+id/title_icon"
-      android:layout_toRightOf="@+id/title_icon"
       android:text="@string/app_name" />
 
   <Button
@@ -53,7 +51,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_weight="1"
@@ -65,7 +62,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_weight="1"

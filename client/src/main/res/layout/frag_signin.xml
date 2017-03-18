@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false">
+
+  <ImageView
+      android:id="@+id/title_icon"
+      android:transitionName="title_icon"
+      android:layout_width="50dp"
+      android:layout_height="50dp"
+      android:layout_margin="5dp"
+      android:src="@drawable/app_icon"/>
+
+  <TextView
+      android:id="@+id/title"
+      android:transitionName="title"
+      style="@style/TitleText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentEnd="true"
+      android:layout_alignParentTop="true"
+      android:layout_toEndOf="@+id/title_icon"
+      android:text="@string/app_name" />
+
+  <TextView
+      android:id="@+id/signin_help"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/title"
+      android:layout_marginTop="16dp"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp"
+      android:text="@string/signin_help" />
+
+  <EditText
+      android:id="@+id/email"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/signin_help"
+      android:inputType="textEmailAddress" />
+
+  <View
+      android:id="@+id/separator"
+      android:layout_width="1dp"
+      android:layout_height="1dp"
+      android:layout_centerHorizontal="true"/>
+
+  <Button
+      android:id="@+id/signin_btn"
+      android:transitionName="start_btn"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:layout_below="@id/email"
+      android:layout_toRightOf="@id/separator"
+      android:layout_marginBottom="5dp"
+      android:layout_marginStart="5dp"
+      android:layout_marginEnd="@dimen/tablet_margin_5dp"
+      android:layout_marginTop="5dp"
+      android:text="@string/signin"/>
+
+  <Button
+      android:id="@+id/cancel_btn"
+      android:transitionName="cancel_btn"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:layout_below="@id/email"
+      android:layout_toLeftOf="@id/separator"
+      android:layout_marginBottom="5dp"
+      android:layout_marginStart="@dimen/tablet_margin_5dp"
+      android:layout_marginEnd="5dp"
+      android:layout_marginTop="5dp"
+      android:text="@string/cancel"/>
+
+</RelativeLayout>

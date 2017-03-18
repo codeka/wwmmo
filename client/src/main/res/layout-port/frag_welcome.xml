@@ -86,7 +86,7 @@
         android:text="@string/options" />
 
     <Button
-        android:id="@+id/reauth_btn"
+        android:id="@+id/signin_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -96,7 +96,7 @@
         android:layout_toEndOf="@+id/separator"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/empire_name"
-        android:text="@string/reauth_loading" />
+        android:text="@string/signin" />
 
     <Button
         android:id="@+id/start_btn"
@@ -122,7 +122,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/connection_status"
-        android:layout_below="@id/reauth_btn"
+        android:layout_below="@id/signin_btn"
         android:layout_marginLeft="@dimen/tablet_margin"
         android:layout_marginRight="@dimen/tablet_margin" />
 

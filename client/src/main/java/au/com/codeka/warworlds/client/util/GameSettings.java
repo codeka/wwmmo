@@ -41,6 +41,9 @@ public class GameSettings {
     /** The cookie used to authenicate with the server. */
     COOKIE(ValueType.STRING, ""),
 
+    /** If you've associated with an email address, this is it. */
+    EMAIL_ADDR(ValueType.STRING, ""),
+
     /** The base URL of the server. */
     SERVER(ValueType.STRING, BuildConfig.DEFAULT_SERVER),
 
