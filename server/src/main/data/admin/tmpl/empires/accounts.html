@@ -1,14 +1,14 @@
 {% extends "skeleton.html" %}
-{% block "title" %}Accounts{% endblock %}
+{% block "title" %}Accounts{% end %}
 {% block "head" %}
-<script type="text/javascript" src="/admin/js/tmpl.js"></script>
-<script type="text/javascript" src="/admin/js/time.js"></script>
-<script>
-</script>
-{% endblock %}
+  <script type="text/javascript" src="/admin/js/tmpl.js"></script>
+  <script type="text/javascript" src="/admin/js/time.js"></script>
+  <script>
+  </script>
+{% end %}
 {% block "content" %}
-<h1>Accounts</h1>
-{% for account in accounts %}
-<p>{{ account.empire_id }} <a href="/admin/empires/{{ account.empire_id }}">{{ empires[account.empire_id].display_name }}</a></p>
-{% endfor %}
-{% endblock %}
+  <h1>Accounts</h1>
+  {% for account in accounts %}
+  <p>{{ account.empire_id }} <a href="/admin/empires/{{ account.empire_id }}">{{ empires[account.empire_id].display_name }}</a></p>
+  {% end %}
+{% end %}

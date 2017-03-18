@@ -5,22 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.ErrorCodes;
-import com.firebase.ui.auth.IdpResponse;
-import com.firebase.ui.auth.ResultCodes;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Document;
@@ -47,7 +37,6 @@ import au.com.codeka.warworlds.client.net.HttpRequest;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.client.net.ServerUrl;
-import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.Version;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
@@ -58,8 +47,6 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.AccountAssociateRequest;
 import au.com.codeka.warworlds.common.proto.AccountAssociateResponse;
 import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.common.proto.LoginRequest;
-import au.com.codeka.warworlds.common.proto.LoginResponse;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -125,14 +112,12 @@ public class WelcomeFragment extends BaseFragment {
           startActivity(i);
         });
 
-    reauthButton.setOnClickListener(v -> onReauthClick());
+    //reauthButton.setOnClickListener(v -> onReauthClick());
   }
 
   @Override
   public void onResume() {
     super.onResume();
-
-    FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
     startButton.setEnabled(false);
     updateServerState(App.i.getServer().getCurrState());
@@ -165,50 +150,6 @@ public class WelcomeFragment extends BaseFragment {
   public void onPause() {
     super.onPause();
     App.i.getEventBus().unregister(eventHandler);
-
-    FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
-  }
-
-  @Override
-  public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-
-    if (requestCode == RC_SIGN_IN) {
-      IdpResponse response = IdpResponse.fromResultIntent(data);
-
-      if (response != null && resultCode == ResultCodes.OK) {
-        // Successfully signed in, contact the server to verify the account and see whether they
-        // already have an empire associated with that account.
-        associateIdentityWithEmpire(
-            GameSettings.i.getString(GameSettings.Key.COOKIE),
-            response.getIdpToken());
-      } else {
-        // Sign in failed.
-        if (response == null) {
-          Snackbar.make(rootView, R.string.sign_in_failed_cancelled, Snackbar.LENGTH_SHORT).show();
-          return;
-        }
-
-        Snackbar.make(rootView, R.string.sign_in_failed_error, Snackbar.LENGTH_SHORT).show();
-      }
-    }
-  }
-
-  private void onReauthClick() {
-    startActivityForResult(
-        AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setProviders(Lists.newArrayList(
-                new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-                new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
-                new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build(),
-                new AuthUI.IdpConfig.Builder(AuthUI.TWITTER_PROVIDER).build()
-            ))
-            .setTosUrl("http://www.war-worlds.com/terms-of-service")
-            .setTheme(R.style.WarWorlds)
-            .build(),
-        RC_SIGN_IN
-    );
   }
 
   private void associateIdentityWithEmpire(String cookie, String token) {
@@ -366,30 +307,7 @@ public class WelcomeFragment extends BaseFragment {
       return;
     }
 
-    if (event.getLoginStatus() == LoginResponse.LoginStatus.ACCOUNT_ANONYMOUS) {
-      // The account on the server is anonymous, but we've logged in to firebase. Maybe some error
-      // associating the account happened last time, anyway we can try again.
-      FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-      if (user == null) {
-        // We should be logged in, otherwise we could not have got this error.
-        log.error("Not ACCOUNT_ANONYMOUS error, but we don't seem to be logged in!");
-        return;
-      }
-
-      user.getToken(true).addOnCompleteListener(
-          task -> associateIdentityWithEmpire(
-              GameSettings.i.getString(GameSettings.Key.COOKIE), task.getResult().getToken()));
-    }
   }
-
-  private final FirebaseAuth.AuthStateListener authStateListener = firebaseAuth -> {
-    FirebaseUser user = firebaseAuth.getCurrentUser();
-    if (user == null) {
-      reauthButton.setText(R.string.reauth_sign_in);
-    } else {
-      reauthButton.setText(R.string.reauth_switch_user);
-    }
-  };
 
   private Object eventHandler = new Object() {
     @EventHandler
@@ -404,15 +322,5 @@ public class WelcomeFragment extends BaseFragment {
         refreshEmpireDetails(empire);
       }
     }
-
-/*    @EventHandler
-    public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
-      // if it's the same as our empire, we'll need to update the icon we're currently showing.
-      MyEmpire empire = EmpireManager.i.getEmpire();
-      if (event.id == Integer.parseInt(empire.getKey())) {
-        ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
-        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
-      }
-    }*/
   };
 }
