@@ -54,9 +54,6 @@ message Account {
 message LoginRequest {
   // Your login cookie. Required.
   optional string cookie = 1;
-
-  // Firebase token, used for authenticated clients.
-  optional string token = 2;
 }
 
 // This is sent from the /login endpoing in response to a LoginRequest.
@@ -66,15 +63,6 @@ message LoginResponse {
 
     // Login was successful.
     SUCCESS = 1;
-
-    // The account associated with the cookie is not anonymous, but no firebase token was supplied.
-    ACCOUNT_NOT_ANONYMOUS = 2;
-
-    // The account is associated with a different firebase user.
-    ACCOUNT_TOKEN_MISMATCH = 3;
-
-    // The account is anonymous, but a firebase token was supplied.
-    ACCOUNT_ANONYMOUS = 4;
   }
   optional LoginStatus status = 1;
 
