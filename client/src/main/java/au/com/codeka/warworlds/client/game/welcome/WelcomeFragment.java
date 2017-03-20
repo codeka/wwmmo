@@ -33,10 +33,8 @@ import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
-import au.com.codeka.warworlds.client.net.HttpRequest;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldFragment;
-import au.com.codeka.warworlds.client.net.ServerUrl;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.Version;
@@ -45,8 +43,6 @@ import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.AccountAssociateRequest;
-import au.com.codeka.warworlds.common.proto.AccountAssociateResponse;
 import au.com.codeka.warworlds.common.proto.Empire;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -60,9 +56,6 @@ public class WelcomeFragment extends BaseFragment {
 
   /** URL of RSS content to fetch and display in the motd view. */
   private static final String MOTD_RSS = "http://www.war-worlds.com/forum/announcements/rss";
-
-  /* Result code for when we sign in. */
-  private static final int RC_SIGN_IN = 3564;
 
   private View rootView;
   private Button startButton;
@@ -160,34 +153,6 @@ public class WelcomeFragment extends BaseFragment {
   public void onPause() {
     super.onPause();
     App.i.getEventBus().unregister(eventHandler);
-  }
-
-  private void associateIdentityWithEmpire(String cookie, String token) {
-    log.info("Attempting to associate identity with empire. token: %s", token);
-
-    App.i.getTaskRunner().runTask(() -> {
-      HttpRequest request = new HttpRequest.Builder()
-          .url(ServerUrl.getUrl("/accounts/associate"))
-          .method(HttpRequest.Method.POST)
-          .body(new AccountAssociateRequest.Builder()
-              .cookie(cookie)
-              .token(token)
-              .build().encode())
-          .build();
-      if (request.getResponseCode() != 200) {
-        log.error("Error associating request: %d", request.getResponseCode(), request.getException());
-      } else {
-        final AccountAssociateResponse response =
-            checkNotNull(request.getBody(AccountAssociateResponse.class));
-        App.i.getTaskRunner().runTask(() -> {
-          if (response.status != AccountAssociateResponse.AccountAssociateStatus.SUCCESS) {
-            // TODO: show error.
-          } else {
-            // TODO: success!
-          }
-        }, Threads.UI);
-      }
-    }, Threads.BACKGROUND);
   }
 
   private void maybeShowSignInPrompt() {

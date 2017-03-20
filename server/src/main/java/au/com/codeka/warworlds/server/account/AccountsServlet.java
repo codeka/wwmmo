@@ -14,16 +14,13 @@ import au.com.codeka.warworlds.common.proto.NewAccountRequest;
 import au.com.codeka.warworlds.common.proto.NewAccountResponse;
 import au.com.codeka.warworlds.server.ProtobufHttpServlet;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.util.CookieHelper;
 import au.com.codeka.warworlds.server.world.EmpireManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 
 /** Accounts servlet for creating new accounts on the server. */
 public class AccountsServlet extends ProtobufHttpServlet {
   private final Log log = new Log("AccountsServlet");
-
-  private static final char[] COOKIE_CHARS =
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
-  private static final int COOKIE_LENGTH = 40;
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -32,7 +29,7 @@ public class AccountsServlet extends ProtobufHttpServlet {
     log.info("Creating new account: %s", req.empire_name);
 
     // Generate a cookie for the user to authenticate with in the future.
-    String cookie = generateCookie();
+    String cookie = CookieHelper.generateCookie();
 
     // Create the empire itself.
     WatchableObject<Empire> empire = EmpireManager.i.createEmpire(req.empire_name);
@@ -57,15 +54,4 @@ public class AccountsServlet extends ProtobufHttpServlet {
             .build());
   }
 
-  /** Generates a cookie, which is basically just a long-ish string of random bytes. */
-  private String generateCookie() {
-    // generate a random string for the session cookie
-    SecureRandom rand = new SecureRandom();
-    StringBuilder cookie = new StringBuilder();
-    for (int i = 0; i < COOKIE_LENGTH; i++) {
-      cookie.append(COOKIE_CHARS[rand.nextInt(COOKIE_CHARS.length)]);
-    }
-
-    return cookie.toString();
-  }
 }

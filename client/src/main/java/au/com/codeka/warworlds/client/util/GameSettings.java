@@ -31,6 +31,18 @@ public class GameSettings {
     AllowNone,
   }
 
+  /** An enumeration for the current state of the sign in process. */
+  public enum SignInState {
+    /** The initial state: you're an 'anonymous' user, with no email address. */
+    ANONYMOUS,
+
+    /** You've entered an email address, but we're currently awaiting your verification. */
+    AWAITING_VERIFICATION,
+
+    /** You've verified your email address. */
+    VERIFIED,
+  }
+
   public enum Key {
     /** If true, we'll automatically translate chat messages to English. */
     CHAT_AUTO_TRANSLATE(ValueType.BOOLEAN, false),
@@ -43,6 +55,9 @@ public class GameSettings {
 
     /** If you've associated with an email address, this is it. */
     EMAIL_ADDR(ValueType.STRING, ""),
+
+    /** Your current {@link SignInState}. */
+    SIGN_IN_STATE(SignInState.ANONYMOUS),
 
     /** The base URL of the server. */
     SERVER(ValueType.STRING, BuildConfig.DEFAULT_SERVER),

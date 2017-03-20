@@ -58,7 +58,7 @@
       android:layout_marginStart="5dp"
       android:layout_marginEnd="@dimen/tablet_margin_5dp"
       android:layout_marginTop="5dp"
-      android:text="@string/signin"/>
+      android:text="@string/next"/>
 
   <Button
       android:id="@+id/cancel_btn"

@@ -1,9 +1,6 @@
 package au.com.codeka.warworlds.server.account;
 
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseToken;
 
 import java.io.IOException;
 
@@ -16,12 +13,14 @@ import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.AccountAssociateRequest;
 import au.com.codeka.warworlds.common.proto.AccountAssociateResponse;
 import au.com.codeka.warworlds.server.ProtobufHttpServlet;
+import au.com.codeka.warworlds.server.admin.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
-import au.com.codeka.warworlds.server.util.TaskFuture;
+import au.com.codeka.warworlds.server.util.CookieHelper;
+import au.com.codeka.warworlds.server.util.EmailHelper;
 
 /**
- * This servlet handles /accounts/associate, which is used to associate an account with a firebase
- * user.
+ * This servlet handles /accounts/associate, which is used to associate an account with an email
+ * address.
  */
 public class AccountAssociateServlet extends ProtobufHttpServlet {
   private static Log log = new Log("AccountAssociateServlet");
@@ -31,10 +30,6 @@ public class AccountAssociateServlet extends ProtobufHttpServlet {
       throws ServletException, IOException {
     AccountAssociateRequest req = AccountAssociateRequest.ADAPTER.decode(request.getInputStream());
 
-    FirebaseToken token;
-    ListenableFuture<FirebaseToken> firebaseTokenFuture =
-        new TaskFuture<>(FirebaseAuth.getInstance().verifyIdToken(req.token));
-
     Account account = DataStore.i.accounts().get(req.cookie);
     if (account == null) {
       log.warning("Could not associate account, no account for cookie: %s", req.cookie);
@@ -42,47 +37,59 @@ public class AccountAssociateServlet extends ProtobufHttpServlet {
       return;
     }
 
-    try {
-      token = Futures.get(firebaseTokenFuture, Exception.class);
-    } catch (Exception e) {
-      log.warning("Could not associate account, error fetching FirebaseToken.", e);
-      response.setStatus(401);
-      return;
-    }
+    String emailAddr = req.email_addr;
+    String canonicalEmailAddr = EmailHelper.canonicalizeEmailAddress(emailAddr);
+    log.info("Attempting to associate empire #%d with '%s' (canonical: %s)",
+        account.empire_id, emailAddr, canonicalEmailAddr);
 
     AccountAssociateResponse.Builder resp = new AccountAssociateResponse.Builder();
-    if (account.uid != null && account.uid.equals(token.getUid())) {
-      log.info("Account is already associated with this firebase user, not doing anything");
-      resp.status(AccountAssociateResponse.AccountAssociateStatus.SUCCESS);
-    } else if (account.uid != null) {
-      log.warning(
-          "Account is already associated with another firebase, cannot associated with this one.");
-      // Note: even if they're asked us to force this connection, we can't do it.
-      resp.status(AccountAssociateResponse.AccountAssociateStatus.ACCOUNT_ALREADY_ASSOCIATED);
-    } else {
-      // The account is not associated with anybody, so we can associate it with this token. But
-      // first, we must make sure this firebase user isn't already associated with something else.
-      Account otherAccount = DataStore.i.accounts().getByUid(token.getUid());
-      if (otherAccount != null && !req.force) {
-        log.warning(
-            "User '%s' already associated with empire #%d, cannot associate it with new account",
-            token.getEmail(), otherAccount.empire_id);
-        resp.status(AccountAssociateResponse.AccountAssociateStatus.TOKEN_ALREADY_ASSOCIATED);
-      } else {
-        if (otherAccount != null) {
-          // they're forcing us.
-          log.info("User '%s' already associated with empire #%d, but forcing new association.",
-              token.getEmail(), otherAccount.empire_id);
-        }
 
-        account = account.newBuilder()
-            .uid(token.getUid())
-            .email(token.getEmail())
-            .build();
-        DataStore.i.accounts().put(req.cookie, account);
-        resp.status(AccountAssociateResponse.AccountAssociateStatus.SUCCESS);
+    // See if there's already one associated with this email address.
+    Account existingAccount = DataStore.i.accounts().getByEmailAddr(canonicalEmailAddr);
+    if (existingAccount != null) {
+      if (req.force != null && req.force) {
+        log.info("Un-associating existing account (empire: #%d) first...",
+            existingAccount.empire_id);
+        // TODO: don't do this until they've verified the email address...
+      } else {
+        log.info("Returning EMAIL_ALREADY_ASSOCIATED");
+        resp.status(AccountAssociateResponse.AccountAssociateStatus.EMAIL_ALREADY_ASSOCIATED);
+        writeProtobuf(response, resp.build());
+        return;
       }
     }
+
+    // If this account already has an email address
+    if (account.email_canonical != null && !account.email_canonical.equals(canonicalEmailAddr)) {
+      if (req.force != null && req.force) {
+        log.info("Removing old email address from this account (%s) to add new one (%s)",
+            account.email, emailAddr);
+        // TODO: should we do this before they verify?
+      } else {
+        if (account.email_status == Account.EmailStatus.VERIFIED) {
+          log.info("Returning ACCOUNT_ALREADY_ASSOCIATED");
+          resp.status(AccountAssociateResponse.AccountAssociateStatus.ACCOUNT_ALREADY_ASSOCIATED);
+          writeProtobuf(response, resp.build());
+          return;
+        } else {
+          // it's not verified, so just overwrite it.
+          log.info("Already associated with an unverified email, we'll just ignore that.");
+        }
+      }
+    }
+
+    String verificationCode = CookieHelper.generateCookie();
+    // TODO: send the verification email.
+
+    log.info("Saving new account.");
+    account = account.newBuilder()
+        .email(emailAddr)
+        .email_canonical(canonicalEmailAddr)
+        .email_status(Account.EmailStatus.UNVERIFIED)
+        .email_verification_code(verificationCode)
+        .build();
+    DataStore.i.accounts().put(req.cookie, account);
+    resp.status(AccountAssociateResponse.AccountAssociateStatus.SUCCESS);
 
     writeProtobuf(response, resp.build());
   }

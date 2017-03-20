@@ -12,12 +12,12 @@ message NewAccountResponse {
   optional string message = 2;
 }
 
-// The request for /accounts/associate requests to associate a firebase user with an account.
+// The request for /accounts/associate requests to associate an email address with an account.
 message AccountAssociateRequest {
   optional string cookie = 1;
-  optional string token = 2;
+  optional string email_addr = 2;
 
-  // If the token is associated with another account, or the empire already has an account
+  // If the email address is associated with another account, or the empire already has an email
   // associated with it, we'll return an error unless force is true, in which case we'll do it
   // anyway.
   optional bool force = 3;
@@ -28,13 +28,13 @@ message AccountAssociateResponse {
     STATUS_UNKNOWN = 0;
     SUCCESS = 1;
 
-    // The account is already associated with another firebase user, and cannot be associated with
+    // The account is already associated with another email address, and cannot be associated with
     // this one.
     ACCOUNT_ALREADY_ASSOCIATED = 2;
 
-    // The firebase user is already associated with a different account, cannot be associated with
-    // this new account, unless the user specified force=true in the request.
-    TOKEN_ALREADY_ASSOCIATED = 3;
+    // The email address is already associated with a different account, cannot be associated with
+    // this new account.
+    EMAIL_ALREADY_ASSOCIATED = 3;
   }
   optional AccountAssociateStatus status = 1;
 }
@@ -44,10 +44,25 @@ message AccountAssociateResponse {
 message Account {
   optional int64 empire_id = 1;
 
-  // If this account is associated with a firebase user, this will be the user's UID & email
-  // address.
-  optional string uid = 2;
-  optional string email = 3;
+  // If this account is associated with an email address, this is the email address they actually
+  // entered (and the one we should send email notifications to, etc.
+  optional string email = 2;
+
+  // We do some basic "canonicalization" of email address so that you can't just sign up with
+  // automtic aliases or something (e.g. in gmail foo@gmail.com and foo+bar@gmail.com are actually
+  // the same account). This is only fairly basic, and not really meant to be totally secure.
+  optional string email_canonical = 3;
+
+  // The status of the email address. Only verified email addresses "count".
+  enum EmailStatus {
+    EMAIL_STATUS_UNKNOWN = 0;
+    UNVERIFIED = 1;
+    VERIFIED = 2;
+  }
+  optional EmailStatus email_status = 4;
+
+  // The code we generated and sent the user to verify their email address.
+  optional string email_verification_code = 5;
 }
 
 // This is sent to the /login endpoint in order to log in to the server.

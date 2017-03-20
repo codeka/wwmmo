@@ -81,4 +81,13 @@
     associated with that address. You will be able to log in to this account from another device,
     and you\'ll be able to recover it later as well.
   </string>
+  <string name="signin_code_help">
+    We\'re going to send you an email, please click the link in the email to verify that it\'s your
+    email address and then come back here.
+  </string>
+  <string name="signin_complete_help">
+    Thanks for verifying your email address, verification is now complete and you can continue
+    playing War Worlds. If you access your account through another device using the same email
+    address, the game will be automatically synchronised between the two devices automatically.
+  </string>
 </resources>

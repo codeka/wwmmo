@@ -12,6 +12,17 @@ body {
   color: #fff;
 }
 
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+table td {
+  border: solid 1px #666;
+  margin: 0;
+  padding: 2px;
+}
+
 th {
  text-align: left;
 }
