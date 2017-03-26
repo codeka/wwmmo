@@ -1,15 +1,9 @@
 package au.com.codeka.warworlds.server;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.FirebaseCredentials;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-
-import java.io.FileInputStream;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.account.AccountAssociateServlet;
@@ -28,40 +22,6 @@ public class Program {
     //Configuration.loadConfig();
     LogImpl.setup();
     DataStore.i.open();
-
-    try {
-      FileInputStream firebaseCertificate = new FileInputStream("data/firebase.json");
-      FirebaseOptions options = new FirebaseOptions.Builder()
-          .setCredential(FirebaseCredentials.fromCertificate(firebaseCertificate))
-          .setDatabaseUrl("https://wwmmo-93bac.firebaseio.com")
-          .build();
-      FirebaseApp.initializeApp(options);
-
-      if (args.length >= 2 && args[0].equals("cron")) {
-        String extra = null;
-        if (args.length >= 3) {
-          extra = args[2];
-        }
-        cronMain(args[1], extra);
-      } else {
-        gameMain();
-      }
-    } catch (Exception e) {
-      log.error("Exception on main thread, aborting.", e);
-    } finally {
-      log.info("Shutting down.");
-      DataStore.i.close();
-    }
-  }
-
-  private static void cronMain(String method, String extra) throws Exception {
-    //CronJob job = CronJobRegistry.getJob(method);
-    //if (job != null) {
-    //  job.run(extra);
-    //}
-  }
-
-  private static void gameMain() throws Exception {
     StarSimulatorQueue.i.start();
     ServerSocketManager.i.start();
 
@@ -86,9 +46,14 @@ public class Program {
       server.start();
       log.info("Server started on http://localhost:%d/", port);
       server.join();
+
+    } catch (Exception e) {
+      log.error("Exception on main thread, aborting.", e);
     } finally {
+      log.info("Shutting down.");
       ServerSocketManager.i.stop();
       StarSimulatorQueue.i.stop();
+      DataStore.i.close();
     }
   }
 }
