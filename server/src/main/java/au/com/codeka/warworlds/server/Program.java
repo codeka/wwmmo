@@ -19,14 +19,14 @@ public class Program {
   private static final Log log = new Log("Runner");
 
   public static void main(String[] args) throws Exception {
-    //Configuration.loadConfig();
     LogImpl.setup();
+    Configuration.i.load();
     DataStore.i.open();
     StarSimulatorQueue.i.start();
     ServerSocketManager.i.start();
 
     try {
-      int port = 8080;//Configuration.i.getListenPort();
+      int port = Configuration.i.getListenPort();
 
       Server server = new Server();
       ServerConnector connector = new ServerConnector(server);
