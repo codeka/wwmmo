@@ -17,6 +17,7 @@ import au.com.codeka.warworlds.server.admin.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.CookieHelper;
 import au.com.codeka.warworlds.server.util.EmailHelper;
+import au.com.codeka.warworlds.server.world.AccountManager;
 
 /**
  * This servlet handles /accounts/associate, which is used to associate an account with an email
@@ -79,7 +80,6 @@ public class AccountAssociateServlet extends ProtobufHttpServlet {
     }
 
     String verificationCode = CookieHelper.generateCookie();
-    // TODO: send the verification email.
 
     log.info("Saving new account.");
     account = account.newBuilder()
@@ -88,6 +88,8 @@ public class AccountAssociateServlet extends ProtobufHttpServlet {
         .email_status(Account.EmailStatus.UNVERIFIED)
         .email_verification_code(verificationCode)
         .build();
+    AccountManager.i.sendVerificationEmail(account);
+
     DataStore.i.accounts().put(req.cookie, account);
     resp.status(AccountAssociateResponse.AccountAssociateStatus.SUCCESS);
 

@@ -26,6 +26,14 @@ public class QueryResult implements AutoCloseable {
     }
   }
 
+  public String getString(int columnIndex) throws StoreException {
+    try {
+      return rs.getString(columnIndex + 1);
+    } catch (SQLException e) {
+      throw new StoreException(e);
+    }
+  }
+
   public int getInt(int columnIndex) throws StoreException {
     try {
       return rs.getInt(columnIndex + 1);

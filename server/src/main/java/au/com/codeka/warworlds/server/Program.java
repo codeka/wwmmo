@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.server.admin.AdminServlet;
 import au.com.codeka.warworlds.server.net.ServerSocketManager;
 import au.com.codeka.warworlds.server.render.RendererServlet;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.util.SmtpHelper;
 import au.com.codeka.warworlds.server.world.StarSimulatorQueue;
 
 public class Program {
@@ -24,6 +25,7 @@ public class Program {
     DataStore.i.open();
     StarSimulatorQueue.i.start();
     ServerSocketManager.i.start();
+    SmtpHelper.i.start();
 
     try {
       int port = Configuration.i.getListenPort();
@@ -53,6 +55,7 @@ public class Program {
       log.info("Shutting down.");
       ServerSocketManager.i.stop();
       StarSimulatorQueue.i.stop();
+      SmtpHelper.i.stop();
       DataStore.i.close();
     }
   }

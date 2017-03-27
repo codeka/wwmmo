@@ -19,10 +19,11 @@ public class Configuration {
   public static final Configuration i = new Configuration();
   private static final Log log = new Log("Configuration");
 
-  @Expose
-  private int listenPort;
+  @Expose private int listenPort;
+  @Expose private SmtpConfig smtp;
 
   private Configuration() {
+    smtp = new SmtpConfig();
   }
 
   /** Loads the {@link Configuration} from the given file and sets it to {@code Configuration.i}. */
@@ -44,5 +45,43 @@ public class Configuration {
 
   public int getListenPort() {
     return listenPort;
+  }
+
+  public SmtpConfig getSmtp() {
+    return smtp;
+  }
+
+  public static class SmtpConfig {
+    @Expose private String host;
+    @Expose private int port;
+    @Expose private String username;
+    @Expose private String password;
+    @Expose private String senderAddr;
+
+    public SmtpConfig() {
+      host = "smtp-relay.gmail.com";
+      port = 587;
+      senderAddr = "noreply@war-worlds.com";
+    }
+
+    public String getHost() {
+      return host;
+    }
+
+    public int getPort() {
+      return port;
+    }
+
+    public String getUserName() {
+      return username;
+    }
+
+    public String getPassword() {
+      return password;
+    }
+
+    public String getSenderAddr() {
+      return senderAddr;
+    }
   }
 }

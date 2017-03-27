@@ -1,4 +1,14 @@
 {
   // The port that we'll be listening on.
-  "listenPort": 8080
+  "listenPort": 8080,
+
+  // Settings for sending outbound SMTP messages, the below are the defaults and what will be used
+  // if this block isn't present in the config.
+  "smtp": {
+    "host": "smtp-relay.gmail.com",
+    "port": 587,
+    "username": null,
+    "password": null,
+    "senderAddr": "noreply@war-worlds.com"
+  }
 }
