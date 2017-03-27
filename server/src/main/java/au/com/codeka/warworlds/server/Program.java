@@ -7,10 +7,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.html.HtmlServlet;
-import au.com.codeka.warworlds.server.html.account.AccountAssociateServlet;
-import au.com.codeka.warworlds.server.html.account.AccountVerifyServlet;
-import au.com.codeka.warworlds.server.html.account.AccountsServlet;
-import au.com.codeka.warworlds.server.html.account.LoginServlet;
+import au.com.codeka.warworlds.server.html.account.AccountAssociateHandler;
+import au.com.codeka.warworlds.server.html.account.AccountVerifyHandler;
+import au.com.codeka.warworlds.server.html.account.AccountsHandler;
+import au.com.codeka.warworlds.server.html.account.LoginHandler;
 import au.com.codeka.warworlds.server.admin.AdminServlet;
 import au.com.codeka.warworlds.server.net.ServerSocketManager;
 import au.com.codeka.warworlds.server.html.render.RendererServlet;
@@ -41,10 +41,6 @@ public class Program {
       context.setContextPath("/");
       server.setHandler(context);
 
-      context.addServlet(new ServletHolder(AccountsServlet.class), "/accounts");
-      context.addServlet(new ServletHolder(AccountAssociateServlet.class), "/accounts/associate");
-      context.addServlet(new ServletHolder(AccountVerifyServlet.class), "/accounts/verify");
-      context.addServlet(new ServletHolder(LoginServlet.class), "/login");
       context.addServlet(new ServletHolder(RendererServlet.class), "/render/*");
       context.addServlet(new ServletHolder(AdminServlet.class), "/admin/*");
       context.addServlet(new ServletHolder(HtmlServlet.class), "/*");

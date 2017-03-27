@@ -1,16 +1,11 @@
 package au.com.codeka.warworlds.server.html.account;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.AccountAssociateRequest;
 import au.com.codeka.warworlds.common.proto.AccountAssociateResponse;
-import au.com.codeka.warworlds.server.ProtobufHttpServlet;
+import au.com.codeka.warworlds.server.handlers.ProtobufRequestHandler;
+import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.CookieHelper;
 import au.com.codeka.warworlds.server.util.EmailHelper;
@@ -20,18 +15,17 @@ import au.com.codeka.warworlds.server.world.AccountManager;
  * This servlet handles /accounts/associate, which is used to associate an account with an email
  * address.
  */
-public class AccountAssociateServlet extends ProtobufHttpServlet {
-  private static Log log = new Log("AccountAssociateServlet");
+public class AccountAssociateHandler extends ProtobufRequestHandler {
+  private static Log log = new Log("AccountAssociateHandler");
 
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    AccountAssociateRequest req = AccountAssociateRequest.ADAPTER.decode(request.getInputStream());
+  public void post() throws RequestException {
+    AccountAssociateRequest req = readProtobuf(AccountAssociateRequest.class);
 
     Account account = DataStore.i.accounts().get(req.cookie);
     if (account == null) {
       log.warning("Could not associate account, no account for cookie: %s", req.cookie);
-      response.setStatus(401);
+      getResponse().setStatus(401);
       return;
     }
 
@@ -52,7 +46,7 @@ public class AccountAssociateServlet extends ProtobufHttpServlet {
       } else {
         log.info("Returning EMAIL_ALREADY_ASSOCIATED");
         resp.status(AccountAssociateResponse.AccountAssociateStatus.EMAIL_ALREADY_ASSOCIATED);
-        writeProtobuf(response, resp.build());
+        writeProtobuf(resp.build());
         return;
       }
     }
@@ -67,7 +61,7 @@ public class AccountAssociateServlet extends ProtobufHttpServlet {
         if (account.email_status == Account.EmailStatus.VERIFIED) {
           log.info("Returning ACCOUNT_ALREADY_ASSOCIATED");
           resp.status(AccountAssociateResponse.AccountAssociateStatus.ACCOUNT_ALREADY_ASSOCIATED);
-          writeProtobuf(response, resp.build());
+          writeProtobuf(resp.build());
           return;
         } else {
           // it's not verified, so just overwrite it.
@@ -90,6 +84,6 @@ public class AccountAssociateServlet extends ProtobufHttpServlet {
     DataStore.i.accounts().put(req.cookie, account);
     resp.status(AccountAssociateResponse.AccountAssociateStatus.SUCCESS);
 
-    writeProtobuf(response, resp.build());
+    writeProtobuf(resp.build());
   }
 }

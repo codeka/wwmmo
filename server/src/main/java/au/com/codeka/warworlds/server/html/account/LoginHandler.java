@@ -2,18 +2,13 @@ package au.com.codeka.warworlds.server.html.account;
 
 import com.google.common.base.Strings;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.LoginRequest;
 import au.com.codeka.warworlds.common.proto.LoginResponse;
-import au.com.codeka.warworlds.server.ProtobufHttpServlet;
+import au.com.codeka.warworlds.server.handlers.ProtobufRequestHandler;
+import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.net.ServerSocketManager;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.EmpireManager;
@@ -23,16 +18,15 @@ import au.com.codeka.warworlds.server.world.WatchableObject;
  * This servlet is posted to in order to "log in". You'll get a pointer to the socket to connect
  * to for the actual main game connection.
  */
-public class LoginServlet extends ProtobufHttpServlet {
-  private final Log log = new Log("LoginServlet");
+public class LoginHandler extends ProtobufRequestHandler {
+  private final Log log = new Log("LoginHandler");
 
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    LoginRequest req = LoginRequest.ADAPTER.decode(request.getInputStream());
+  public void post() throws RequestException {
+    LoginRequest req = readProtobuf(LoginRequest.class);
     if (Strings.isNullOrEmpty(req.cookie)) {
       log.warning("No cookie in request, not connected.");
-      response.setStatus(403);
+      getResponse().setStatus(403);
       return;
     }
 
@@ -40,14 +34,14 @@ public class LoginServlet extends ProtobufHttpServlet {
     Account account = DataStore.i.accounts().get(req.cookie);
     if (account == null) {
       log.warning("No account for cookie, not connecting: %s", req.cookie);
-      response.setStatus(401);
+      getResponse().setStatus(401);
       return;
     }
 
     WatchableObject<Empire> empire = EmpireManager.i.getEmpire(account.empire_id);
     if (empire == null) {
       log.warning("No empire with ID %d", account.empire_id);
-      response.setStatus(404);
+      getResponse().setStatus(404);
       return;
     }
 
@@ -57,6 +51,6 @@ public class LoginServlet extends ProtobufHttpServlet {
     ServerSocketManager.i.addPendingConnection(account, empire, null /* encryptionKey */);
 
     resp.port(8081).empire(empire.get());
-    writeProtobuf(response, resp.build());
+    writeProtobuf(resp.build());
   }
 }
