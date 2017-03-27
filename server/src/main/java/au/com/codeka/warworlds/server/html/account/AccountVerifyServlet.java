@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.account;
+package au.com.codeka.warworlds.server.html.account;
 
 import com.google.common.base.Strings;
 
@@ -16,7 +16,6 @@ import au.com.codeka.carrot.CarrotException;
 import au.com.codeka.carrot.resource.FileResourceLocater;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.ProtobufHttpServlet;
-import au.com.codeka.warworlds.server.admin.RequestException;
 
 /**
  * This servlet handles /accounts/verify, which is used to verify an email address.

@@ -1,7 +1,6 @@
-package au.com.codeka.warworlds.server.account;
+package au.com.codeka.warworlds.server.html.account;
 
 import java.io.IOException;
-import java.security.SecureRandom;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

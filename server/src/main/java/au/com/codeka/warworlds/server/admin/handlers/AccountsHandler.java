@@ -4,10 +4,15 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.server.admin.RequestException;
+import au.com.codeka.warworlds.server.admin.Session;
+import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
 
 /**

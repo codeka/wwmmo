@@ -1,25 +1,18 @@
 package au.com.codeka.warworlds.server.admin;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.servlet.GenericServlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.admin.handlers.AccountsHandler;
+import au.com.codeka.warworlds.server.admin.handlers.AdminHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AdminLoginHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxAccountsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxChatHandler;
@@ -30,18 +23,21 @@ import au.com.codeka.warworlds.server.admin.handlers.AjaxStarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxUsersHandler;
 import au.com.codeka.warworlds.server.admin.handlers.ChatHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DashboardHandler;
-import au.com.codeka.warworlds.server.admin.handlers.SectorsHandler;
-import au.com.codeka.warworlds.server.admin.handlers.StarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.EmpireDetailsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.EmpiresHandler;
-import au.com.codeka.warworlds.server.admin.handlers.FileHandler;
+import au.com.codeka.warworlds.server.admin.handlers.AdminFileHandler;
+import au.com.codeka.warworlds.server.admin.handlers.SectorsHandler;
+import au.com.codeka.warworlds.server.admin.handlers.StarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.UsersCreateHandler;
 import au.com.codeka.warworlds.server.admin.handlers.UsersHandler;
+import au.com.codeka.warworlds.server.handlers.HandlerServlet;
+import au.com.codeka.warworlds.server.handlers.RequestException;
+import au.com.codeka.warworlds.server.handlers.Route;
 
 /**
  * The {@link AdminServlet} is the root of all requests for the admin backend.
  */
-public class AdminServlet extends GenericServlet {
+public class AdminServlet extends HandlerServlet {
   private static final Log log = new Log("AdminServlet");
   private static final ArrayList<Route> ROUTES = Lists.newArrayList(
       new Route("/", DashboardHandler.class),
@@ -61,42 +57,24 @@ public class AdminServlet extends GenericServlet {
       new Route("/ajax/sectors", AjaxSectorsHandler.class),
       new Route("/ajax/starfield", AjaxStarfieldHandler.class),
       new Route("/ajax/users", AjaxUsersHandler.class),
-      new Route("/(?<path>.*)", FileHandler.class)
+      new Route("/(?<path>.*)", AdminFileHandler.class)
   );
 
-  @Override
-  public void service(ServletRequest request, ServletResponse response)
-      throws IOException, ServletException {
-    String path = ((HttpServletRequest) request).getPathInfo();
-    if (path == null) {
-      path = "/";
-    }
-
-    for (Route route : ROUTES) {
-      Matcher matcher = route.pattern.matcher(path);
-      if (matcher.matches()) {
-        handle(matcher, route, (HttpServletRequest) request, (HttpServletResponse) response);
-        return;
-      }
-    }
-
-    log.info(String.format("Could not find handler for URL: %s", path));
-    ((HttpServletResponse) response).setStatus(404);
+  public AdminServlet() {
+    super(ROUTES);
   }
 
-  private void handle(Matcher matcher, Route route, HttpServletRequest request,
+
+  protected void handle(
+      Matcher matcher,
+      Route route,
+      HttpServletRequest request,
       HttpServletResponse response) {
-    RequestHandler handler;
     try {
-      handler = (RequestHandler) route.handlerClass.newInstance();
-    } catch (Exception e) {
-      return; // should never happen.
-    }
-
-    Session session = getSession(request);
-
-    try {
-      handler.handle(matcher, route.extraOption, session, request, response);
+      Session session = getSession(request);
+      AdminHandler handler = (AdminHandler) route.createRequestHandler();
+      handler.setup(matcher, route.getExtraOption(), session, request, response);
+      handler.handle();
     } catch (RequestException e) {
       e.populate(response);
     }
@@ -118,21 +96,5 @@ public class AdminServlet extends GenericServlet {
     }
 
     return null;
-  }
-
-  private static class Route {
-    Pattern pattern;
-    Class<?> handlerClass;
-    String extraOption;
-
-    Route(@Nonnull String pattern, Class<?> handlerClass) {
-      this(pattern, handlerClass, null);
-    }
-
-    Route(@Nonnull String pattern, Class<?> handlerClass, String extraOption) {
-      this.pattern = Pattern.compile(Preconditions.checkNotNull(pattern));
-      this.handlerClass = handlerClass;
-      this.extraOption = extraOption;
-    }
   }
 }

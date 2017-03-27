@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.admin;
+package au.com.codeka.warworlds.server.handlers;
 
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.AdminRole;
+import au.com.codeka.warworlds.server.admin.Session;
 
 /**
  * This is the base class for the game's request handlers. It handles some common tasks such as
@@ -32,8 +33,19 @@ public class RequestHandler {
   private HttpServletRequest request;
   private HttpServletResponse response;
   private Matcher routeMatcher;
-  private Session session;
   private String extraOption;
+
+  /** Set up this {@link RequestHandler}, must be called before any other methods. */
+  public void setup(
+      Matcher routeMatcher,
+      String extraOption,
+      HttpServletRequest request,
+      HttpServletResponse response) {
+    this.routeMatcher = routeMatcher;
+    this.extraOption = extraOption;
+    this.request = request;
+    this.response = response;
+  }
 
   protected String getUrlParameter(String name) {
     try {
@@ -43,24 +55,13 @@ public class RequestHandler {
     }
   }
 
-  protected String getRealm() {
-    return getUrlParameter("realm");
-  }
-
   /** Gets the "extra" option that was passed in the route configuration. */
   @Nullable
   protected String getExtraOption() {
     return extraOption;
   }
 
-  public void handle(Matcher routeMatcher, String extraOption, Session session,
-      HttpServletRequest request, HttpServletResponse response) throws RequestException {
-    this.request = request;
-    this.response = response;
-    this.routeMatcher = routeMatcher;
-    this.extraOption = extraOption;
-    this.session = session;
-
+  public void handle() throws RequestException {
     // start off with status 200, but the handler might change it
     this.response.setStatus(200);
 
@@ -206,30 +207,6 @@ public class RequestHandler {
     } else {
       return requestURI.toString();
     }
-  }
-
-  protected Session getSession() throws RequestException {
-    if (session == null) {
-      throw new RequestException(403);
-    }
-
-    return session;
-  }
-
-  @Nullable
-  protected Session getSessionNoError() {
-    return session;
-  }
-
-  /**
-   * Checks whether the current user is in the given role.
-   */
-  protected boolean isInRole(AdminRole role) throws RequestException {
-    if (session == null) {
-      return false;
-    }
-
-    return session.isInRole(role);
   }
 
   @Nullable

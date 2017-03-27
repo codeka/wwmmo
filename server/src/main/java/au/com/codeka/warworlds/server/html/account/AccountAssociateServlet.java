@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.account;
+package au.com.codeka.warworlds.server.html.account;
 
 import java.io.IOException;
 

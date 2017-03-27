@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.admin;
+package au.com.codeka.warworlds.server.handlers;
 
 import java.util.Locale;
 

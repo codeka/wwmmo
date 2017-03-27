@@ -1,21 +1,14 @@
-package au.com.codeka.warworlds.server.render;
+package au.com.codeka.warworlds.server.html.render;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferInt;
-import java.awt.image.Raster;
-import java.awt.image.SinglePixelPackedSampleModel;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,16 +26,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import au.com.codeka.warworlds.common.Colour;
-import au.com.codeka.warworlds.common.Image;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector3;
-import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.planetrender.PlanetRenderer;
 import au.com.codeka.warworlds.planetrender.Template;
-import au.com.codeka.warworlds.server.world.EmpireManager;
 import au.com.codeka.warworlds.server.world.StarManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 

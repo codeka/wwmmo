@@ -20,7 +20,7 @@ import javax.servlet.http.Cookie;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.AdminRole;
-import au.com.codeka.warworlds.server.admin.RequestException;
+import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.admin.Session;
 import au.com.codeka.warworlds.server.admin.SessionManager;
 

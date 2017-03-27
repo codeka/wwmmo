@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.List;
 
 import au.com.codeka.warworlds.common.proto.AdminUser;
-import au.com.codeka.warworlds.server.admin.RequestException;
+import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
 
 /**

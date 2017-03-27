@@ -6,13 +6,14 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.server.account.AccountAssociateServlet;
-import au.com.codeka.warworlds.server.account.AccountVerifyServlet;
-import au.com.codeka.warworlds.server.account.AccountsServlet;
-import au.com.codeka.warworlds.server.account.LoginServlet;
+import au.com.codeka.warworlds.server.html.HtmlServlet;
+import au.com.codeka.warworlds.server.html.account.AccountAssociateServlet;
+import au.com.codeka.warworlds.server.html.account.AccountVerifyServlet;
+import au.com.codeka.warworlds.server.html.account.AccountsServlet;
+import au.com.codeka.warworlds.server.html.account.LoginServlet;
 import au.com.codeka.warworlds.server.admin.AdminServlet;
 import au.com.codeka.warworlds.server.net.ServerSocketManager;
-import au.com.codeka.warworlds.server.render.RendererServlet;
+import au.com.codeka.warworlds.server.html.render.RendererServlet;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.SmtpHelper;
 import au.com.codeka.warworlds.server.world.StarSimulatorQueue;
@@ -46,6 +47,7 @@ public class Program {
       context.addServlet(new ServletHolder(LoginServlet.class), "/login");
       context.addServlet(new ServletHolder(RendererServlet.class), "/render/*");
       context.addServlet(new ServletHolder(AdminServlet.class), "/admin/*");
+      context.addServlet(new ServletHolder(HtmlServlet.class), "/*");
 
       server.start();
       log.info("Server started on http://localhost:%d/", port);

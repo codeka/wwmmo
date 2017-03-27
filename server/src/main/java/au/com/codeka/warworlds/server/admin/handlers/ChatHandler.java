@@ -2,7 +2,7 @@ package au.com.codeka.warworlds.server.admin.handlers;
 
 import com.google.common.collect.ImmutableMap;
 
-import au.com.codeka.warworlds.server.admin.RequestException;
+import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
 
 /**
