@@ -45,6 +45,10 @@ public class Alliance extends BaseAlliance {
         return mID;
     }
 
+    public void setName(String name) {
+        mName = name;
+    }
+
     public boolean isEmpireMember(int empireID) {
         for (BaseAllianceMember baseAllianceMember : mMembers) {
             if (Integer.parseInt(baseAllianceMember.getEmpireKey()) == empireID) {

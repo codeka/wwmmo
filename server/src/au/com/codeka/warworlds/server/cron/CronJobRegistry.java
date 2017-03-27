@@ -11,13 +11,14 @@ public class CronJobRegistry {
     private static Map<String, Class<? extends CronJob>> sCronJobs;
 
     static {
-        sCronJobs = new TreeMap<String, Class<? extends CronJob>>();
+        sCronJobs = new TreeMap<>();
         sCronJobs.put("update-ranks", UpdateRanksCronJob.class);
         sCronJobs.put("purge-combat-reports", PurgeCombatReportsCronJob.class);
         sCronJobs.put("purge-sessions", PurgeSessionsCronJob.class);
         sCronJobs.put("find-abandoned-empires", FindAbandonedEmpiresCronJob.class);
         sCronJobs.put("find-alts", FindAltAccountsCronJob.class);
         sCronJobs.put("update-dashboard", UpdateDashboardCronJob.class);
+        sCronJobs.put("fix-names", FixNamesCronJob.class);
     }
 
     public static CronJob getJob(String name) {
