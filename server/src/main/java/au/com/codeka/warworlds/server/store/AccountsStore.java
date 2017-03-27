@@ -69,6 +69,23 @@ public class AccountsStore extends BaseStore {
     return null;
   }
 
+  @Nullable
+  public Account getByVerificationCode(String emailVerificationCode) {
+    try (
+        QueryResult res = newReader()
+            .stmt("SELECT account FROM accounts WHERE email_verification_code = ?")
+            .param(0, emailVerificationCode)
+            .query()
+    ) {
+      if (res.next()) {
+        return Account.ADAPTER.decode(res.getBytes(0));
+      }
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+    }
+    return null;
+  }
+
   public ArrayList<Account> search(/* TODO: search string, pagination etc */) {
     ArrayList<Account> accounts = new ArrayList<>();
     try (
@@ -115,7 +132,8 @@ public class AccountsStore extends BaseStore {
           .stmt("CREATE UNIQUE INDEX UIX_accounts_email ON accounts (email)")
           .execute();
       diskVersion++;
-    } else if (diskVersion == 1) {
+    }
+    if (diskVersion == 1) {
       newWriter()
           .stmt("DROP INDEX IX_accounts_cookie")
           .execute();
@@ -123,30 +141,46 @@ public class AccountsStore extends BaseStore {
           .stmt("CREATE UNIQUE INDEX IX_accounts_cookie ON accounts (cookie)")
           .execute();
       diskVersion++;
-    } else if (diskVersion == 2) {
+    }
+    if (diskVersion == 2) {
       newWriter()
           .stmt("ALTER TABLE accounts ADD COLUMN empire_id INTEGER")
           .execute();
-      newWriter()
-          .stmt("CREATE UNIQUE INDEX IX_accounts_empire_id ON accounts (empire_id)");
 
-      // Now re-save all of the existing accounts so they get the new column.
-      QueryResult res = newReader()
-          .stmt("SELECT cookie, account FROM accounts")
-          .query();
-      while (res.next()) {
-        try {
-          String cookie = res.getString(0);
-          Account account = Account.ADAPTER.decode(res.getBytes(1));
-          put(cookie, account);
-        } catch (IOException e) {
-          throw new StoreException(e);
-        }
-      }
-
+      updateAllAccounts();
       diskVersion++;
+    }
+    if (diskVersion == 3) {
+      newWriter()
+          .stmt("ALTER TABLE accounts ADD COLUMN email_verification_code STRING")
+          .execute();;
+      newWriter()
+          .stmt("CREATE UNIQUE INDEX IX_accounts_empire_id ON accounts (empire_id)")
+          .execute();
+      newWriter()
+          .stmt("CREATE UNIQUE INDEX IX_accounts_email_verification_code ON accounts (email_verification_code)")
+          .execute();
+
+      updateAllAccounts();
+      diskVersion ++;
     }
 
     return diskVersion;
+  }
+
+  /** Called by {@link #onOpen} when we need to re-save the accounts (after adding a column) */
+  private void updateAllAccounts() throws StoreException {
+    QueryResult res = newReader()
+        .stmt("SELECT cookie, account FROM accounts")
+        .query();
+    while (res.next()) {
+      try {
+        String cookie = res.getString(0);
+        Account account = Account.ADAPTER.decode(res.getBytes(1));
+        put(cookie, account);
+      } catch (IOException e) {
+        throw new StoreException(e);
+      }
+    }
   }
 }

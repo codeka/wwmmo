@@ -7,6 +7,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.account.AccountAssociateServlet;
+import au.com.codeka.warworlds.server.account.AccountVerifyServlet;
 import au.com.codeka.warworlds.server.account.AccountsServlet;
 import au.com.codeka.warworlds.server.account.LoginServlet;
 import au.com.codeka.warworlds.server.admin.AdminServlet;
@@ -41,6 +42,7 @@ public class Program {
 
       context.addServlet(new ServletHolder(AccountsServlet.class), "/accounts");
       context.addServlet(new ServletHolder(AccountAssociateServlet.class), "/accounts/associate");
+      context.addServlet(new ServletHolder(AccountVerifyServlet.class), "/accounts/verify");
       context.addServlet(new ServletHolder(LoginServlet.class), "/login");
       context.addServlet(new ServletHolder(RendererServlet.class), "/render/*");
       context.addServlet(new ServletHolder(AdminServlet.class), "/admin/*");

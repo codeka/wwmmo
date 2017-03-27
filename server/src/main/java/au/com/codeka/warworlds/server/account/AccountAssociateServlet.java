@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.account;
 
-import com.google.common.util.concurrent.Futures;
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -13,7 +11,6 @@ import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.AccountAssociateRequest;
 import au.com.codeka.warworlds.common.proto.AccountAssociateResponse;
 import au.com.codeka.warworlds.server.ProtobufHttpServlet;
-import au.com.codeka.warworlds.server.admin.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.CookieHelper;
 import au.com.codeka.warworlds.server.util.EmailHelper;
