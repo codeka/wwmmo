@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.carrot.CarrotEngine;
 import au.com.codeka.carrot.CarrotException;
@@ -27,13 +26,12 @@ public class HtmlRequestHandler extends RequestHandler {
   }
 
   protected void render(
-      HttpServletResponse response,
       String tmplName,
       @Nullable Map<String, Object> data) throws RequestException {
-    response.setContentType("text/html");
-    response.setHeader("Content-Type", "text/html; charset=utf-8");
+    getResponse().setContentType("text/html");
+    getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
     try {
-      response.getWriter().write(CARROT_ENGINE.process(tmplName, data));
+      getResponse().getWriter().write(CARROT_ENGINE.process(tmplName, data));
     } catch (CarrotException | IOException e) {
       throw new RequestException(e);
     }

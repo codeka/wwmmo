@@ -1,15 +1,13 @@
 
 html, body {
   padding: 0; margin: 0;
-  width: 100%; height: 100%;
-  position: absolute;
 }
 
 body {
   font-family: arial, helvetica, verdana, sans-serif;
   overflow-x: hidden;
-  background: #000;
-  color: #fff;
+  background: #fff;
+  color: #333;
 }
 
 #header {
@@ -25,13 +23,23 @@ body {
 }
 
 #header img {
-  float: left;
-  margin: 9px 0 0 9px;
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  margin-left: -300px;
 }
 
 #header h1 {
   color: #fff;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin: 0 0 0 -240px;
   line-height: 56px;
-  margin: 0 0 0 96px;
   padding: 0;
+}
+
+#content {
+  width: 600px;
+  margin: 0 8px;
 }

@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
+import au.com.codeka.warworlds.server.util.Pair;
 
 /**
  * Stores information about {@link Account}s, indexed by cookie.
@@ -70,15 +71,15 @@ public class AccountsStore extends BaseStore {
   }
 
   @Nullable
-  public Account getByVerificationCode(String emailVerificationCode) {
+  public Pair<String, Account> getByVerificationCode(String emailVerificationCode) {
     try (
         QueryResult res = newReader()
-            .stmt("SELECT account FROM accounts WHERE email_verification_code = ?")
+            .stmt("SELECT cookie, account FROM accounts WHERE email_verification_code = ?")
             .param(0, emailVerificationCode)
             .query()
     ) {
       if (res.next()) {
-        return Account.ADAPTER.decode(res.getBytes(0));
+        return new Pair<>(res.getString(0), Account.ADAPTER.decode(res.getBytes(1)));
       }
     } catch (Exception e) {
       log.error("Unexpected.", e);
@@ -105,14 +106,17 @@ public class AccountsStore extends BaseStore {
   public void put(String cookie, Account account) {
     try {
       newWriter()
-          .stmt("INSERT OR REPLACE INTO accounts (email, cookie, empire_id, account) VALUES (?, ?, ?, ?)")
+          .stmt("INSERT OR REPLACE INTO accounts ("
+              + " email, cookie, empire_id, email_verification_code, account"
+              + ") VALUES (?, ?, ?, ?, ?)")
           .param(0,
               account.email_status == Account.EmailStatus.VERIFIED
                   ? account.email_canonical
                   : null)
           .param(1, cookie)
           .param(2, account.empire_id)
-          .param(3, account.encode())
+          .param(3, account.email_verification_code)
+          .param(4, account.encode())
           .execute();
     } catch (StoreException e) {
       log.error("Unexpected.", e);
@@ -161,7 +165,6 @@ public class AccountsStore extends BaseStore {
           .stmt("CREATE UNIQUE INDEX IX_accounts_email_verification_code ON accounts (email_verification_code)")
           .execute();
 
-      updateAllAccounts();
       diskVersion ++;
     }
 
