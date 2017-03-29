@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.CookieHelper;
 import au.com.codeka.warworlds.server.util.EmailHelper;
 import au.com.codeka.warworlds.server.world.AccountManager;
+import au.com.codeka.warworlds.server.world.WatchableObject;
 
 /**
  * This servlet handles /accounts/associate, which is used to associate an account with an email
@@ -73,6 +74,14 @@ public class AccountAssociateHandler extends ProtobufRequestHandler {
     String verificationCode = CookieHelper.generateCookie();
 
     log.info("Saving new account.");
+    WatchableObject<Account> watchableAccount = AccountManager.i.getAccount(account.empire_id);
+    if (watchableAccount == null) {
+      log.error("Couldn't get account from store: %d", account.empire_id);
+      resp.status(AccountAssociateResponse.AccountAssociateStatus.UNEXPECTED_ERROR);
+      writeProtobuf(resp.build());
+      return;
+    }
+
     account = account.newBuilder()
         .email(emailAddr)
         .email_canonical(canonicalEmailAddr)
@@ -81,9 +90,8 @@ public class AccountAssociateHandler extends ProtobufRequestHandler {
         .build();
     AccountManager.i.sendVerificationEmail(account);
 
-    DataStore.i.accounts().put(req.cookie, account);
+    watchableAccount.set(account);
     resp.status(AccountAssociateResponse.AccountAssociateStatus.SUCCESS);
-
     writeProtobuf(resp.build());
   }
 }

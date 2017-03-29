@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.admin.handlers;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.util.Pair;
 import au.com.codeka.warworlds.server.world.AccountManager;
 
 /**
@@ -13,12 +14,12 @@ public class AjaxAccountsHandler extends AjaxHandler {
   public void post() throws RequestException {
     if (getRequest().getParameter("action").equals("resend")) {
       long empireId = Long.parseLong(getRequest().getParameter("id"));
-      Account account = DataStore.i.accounts().getByEmpireId(empireId);
-      if (account == null) {
+      Pair<String, Account> pair = DataStore.i.accounts().getByEmpireId(empireId);
+      if (pair == null) {
         setResponseText("No account for empire #" + empireId);
         return;
       }
-      AccountManager.i.sendVerificationEmail(account);
+      AccountManager.i.sendVerificationEmail(pair.two);
       setResponseText("success");
     }
   }

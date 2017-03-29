@@ -54,15 +54,15 @@ public class AccountsStore extends BaseStore {
   }
 
   @Nullable
-  public Account getByEmpireId(long empireId) {
+  public Pair<String, Account> getByEmpireId(long empireId) {
     try (
         QueryResult res = newReader()
-            .stmt("SELECT account FROM accounts WHERE empire_id = ?")
+            .stmt("SELECT cookie, account FROM accounts WHERE empire_id = ?")
             .param(0, empireId)
             .query()
     ) {
       if (res.next()) {
-        return Account.ADAPTER.decode(res.getBytes(0));
+        return new Pair<>(res.getString(0), Account.ADAPTER.decode(res.getBytes(0)));
       }
     } catch (Exception e) {
       log.error("Unexpected.", e);
