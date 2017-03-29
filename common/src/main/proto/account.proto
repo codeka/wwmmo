@@ -38,6 +38,9 @@ message AccountAssociateResponse {
 
     // Some other unexpected error.
     UNEXPECTED_ERROR = 4;
+
+    // The association hasn't happened yet.
+    NOT_VERIFIED = 5;
   }
   optional AccountAssociateStatus status = 1;
 }

@@ -8,6 +8,7 @@ import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.html.HtmlRequestHandler;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.Pair;
+import au.com.codeka.warworlds.server.world.AccountManager;
 
 /**
  * This servlet handles /accounts/verify, which is used to verify an email address.
@@ -32,12 +33,10 @@ public class AccountVerifyHandler extends HtmlRequestHandler {
       return;
     }
 
-    String cookie = pair.one;
-    Account account = pair.two.newBuilder()
+    AccountManager.i.getAccount(pair.two.empire_id).set(pair.two.newBuilder()
         .email_status(Account.EmailStatus.VERIFIED)
         .email_verification_code(null)
-        .build();
-    DataStore.i.accounts().put(cookie, account);
+        .build());
 
     render("account/verified-success.html", null);
   }

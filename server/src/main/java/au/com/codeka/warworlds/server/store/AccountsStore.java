@@ -62,7 +62,7 @@ public class AccountsStore extends BaseStore {
             .query()
     ) {
       if (res.next()) {
-        return new Pair<>(res.getString(0), Account.ADAPTER.decode(res.getBytes(0)));
+        return new Pair<>(res.getString(0), Account.ADAPTER.decode(res.getBytes(1)));
       }
     } catch (Exception e) {
       log.error("Unexpected.", e);

@@ -32,7 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SignInFragment extends BaseFragment {
   private static final Log log = new Log("SignInFragment");
 
-
+  private Button signInButton;
+  private Button cancelButton;
   private EditText emailText;
   private TextView signInHelp;
 
@@ -47,11 +48,11 @@ public class SignInFragment extends BaseFragment {
     ViewBackgroundGenerator.setBackground(view);
 
     signInHelp = (TextView) checkNotNull(view.findViewById(R.id.signin_help));
-    Button signInButton = (Button) checkNotNull(view.findViewById(R.id.signin_btn));
-    Button cancelButton = (Button) checkNotNull(view.findViewById(R.id.cancel_btn));
+    signInButton = (Button) checkNotNull(view.findViewById(R.id.signin_btn));
+    cancelButton = (Button) checkNotNull(view.findViewById(R.id.cancel_btn));
     emailText = (EditText) checkNotNull(view.findViewById(R.id.email));
     if (GameSettings.i.getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
-      signInButton.setTag(R.string.signin);
+      signInButton.setText(R.string.next);
     } else {
       signInButton.setText(R.string.switch_user);
     }
@@ -64,6 +65,12 @@ public class SignInFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
     updateState(null);
+
+    GameSettings.SignInState signInState =
+        GameSettings.i.getEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.class);
+    if (signInState == GameSettings.SignInState.AWAITING_VERIFICATION) {
+      checkVerficationStatus();
+    }
   }
 
   /** Updates the current state (or just refreshes the current state, if newState is null). */
@@ -84,13 +91,17 @@ public class SignInFragment extends BaseFragment {
         InputMethodManager imm =
             (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(emailText, InputMethodManager.SHOW_IMPLICIT);
+        signInButton.setEnabled(true);
         break;
       case AWAITING_VERIFICATION:
         signInHelp.setText(R.string.signin_code_help);
+        signInButton.setEnabled(false);
         emailText.setVisibility(View.GONE);
         break;
       case VERIFIED:
         signInHelp.setText(R.string.signin_complete_help);
+        signInButton.setEnabled(true);
+
         emailText.setVisibility(View.GONE);
         break;
       default:
@@ -106,7 +117,7 @@ public class SignInFragment extends BaseFragment {
         onSignInAnonymousState();
         break;
       case AWAITING_VERIFICATION:
-        onSignInAwaitingVerificationState();
+        // Shouldn't happen.
         break;
       case VERIFIED:
         onSignInVerifiedState();
@@ -173,10 +184,6 @@ public class SignInFragment extends BaseFragment {
     }, Threads.BACKGROUND);
   }
 
-  private void onSignInAwaitingVerificationState() {
-
-  }
-
   private void onSignInVerifiedState() {
 
   }
@@ -185,5 +192,32 @@ public class SignInFragment extends BaseFragment {
       AccountAssociateResponse.AccountAssociateStatus status,
       @Nullable String msg) {
 
+  }
+
+  private void checkVerficationStatus() {
+    Empire myEmpire = EmpireManager.i.getMyEmpire();
+    App.i.getTaskRunner().runTask(() -> {
+      HttpRequest request = new HttpRequest.Builder()
+          .url(ServerUrl.getUrl() + "accounts/associate?id=" + myEmpire.id)
+          .method(HttpRequest.Method.GET)
+          .build();
+      AccountAssociateResponse resp = request.getBody(AccountAssociateResponse.class);
+      if (resp == null) {
+        // TODO: report the error
+        log.error("Didn't get AccountAssociateResponse, as expected.", request.getException());
+        App.i.getTaskRunner().runTask(() ->
+                onSignInError(
+                    AccountAssociateResponse.AccountAssociateStatus.STATUS_UNKNOWN,
+                    "An unknown error occurred."),
+            Threads.UI);
+      } else if (resp.status != AccountAssociateResponse.AccountAssociateStatus.SUCCESS) {
+        // Just wait.
+      } else {
+        log.info("Associate successful, verification complete.");
+        App.i.getTaskRunner().runTask(
+            () -> updateState(GameSettings.SignInState.VERIFIED),
+            Threads.UI);
+      }
+    }, Threads.BACKGROUND);
   }
 }
