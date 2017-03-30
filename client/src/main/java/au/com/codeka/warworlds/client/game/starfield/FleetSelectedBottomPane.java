@@ -51,7 +51,7 @@ public class FleetSelectedBottomPane extends FrameLayout {
       Star star,
       Fleet fleet,
       @Nonnull Callback callback) {
-    super(context);
+    super(context, null);
 
     inflate(context, R.layout.starfield_bottom_pane_fleet, this);
 
