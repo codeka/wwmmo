@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
+import au.com.codeka.warworlds.common.proto.AccountAssociateResponse;
 import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.html.HtmlRequestHandler;
 import au.com.codeka.warworlds.server.store.DataStore;
@@ -31,6 +32,20 @@ public class AccountVerifyHandler extends HtmlRequestHandler {
       log.warning("No account found with verification code '%s'", emailVerificationCode);
       render("account/error-invalid-code.html", null);
       return;
+    }
+
+    // If there's already an associated account with this email address, mark it as abandoned now.
+    for (;;) {
+      Account existingAccount =
+          DataStore.i.accounts().getByVerifiedEmailAddr(pair.two.email_canonical);
+      if (existingAccount != null) {
+        AccountManager.i.getAccount(existingAccount.empire_id).set(
+            existingAccount.newBuilder()
+                .email_status(Account.EmailStatus.ABANDONED)
+                .build());
+      } else {
+        break;
+      }
     }
 
     AccountManager.i.getAccount(pair.two.empire_id).set(pair.two.newBuilder()

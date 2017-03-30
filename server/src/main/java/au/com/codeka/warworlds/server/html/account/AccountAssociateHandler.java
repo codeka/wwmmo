@@ -65,12 +65,11 @@ public class AccountAssociateHandler extends ProtobufRequestHandler {
     AccountAssociateResponse.Builder resp = new AccountAssociateResponse.Builder();
 
     // See if there's already one associated with this email address.
-    Account existingAccount = DataStore.i.accounts().getByEmailAddr(canonicalEmailAddr);
+    Account existingAccount = DataStore.i.accounts().getByVerifiedEmailAddr(canonicalEmailAddr);
     if (existingAccount != null) {
       if (req.force != null && req.force) {
-        log.info("Un-associating existing account (empire: #%d) first...",
-            existingAccount.empire_id);
-        // TODO: don't do this until they've verified the email address...
+        log.info("We're forcing this association (empire: #%d email=%s)...",
+            existingAccount.empire_id, existingAccount.email_canonical);
       } else {
         log.info("Returning EMAIL_ALREADY_ASSOCIATED");
         resp.status(AccountAssociateResponse.AccountAssociateStatus.EMAIL_ALREADY_ASSOCIATED);
@@ -102,15 +101,6 @@ public class AccountAssociateHandler extends ProtobufRequestHandler {
     String verificationCode = CookieHelper.generateCookie();
 
     log.info("Saving new account.");
-    WatchableObject<Account> watchableAccount =
-        AccountManager.i.getAccount(account.get().empire_id);
-    if (watchableAccount == null) {
-      log.error("Couldn't get account from store: %d", account.get().empire_id);
-      resp.status(AccountAssociateResponse.AccountAssociateStatus.UNEXPECTED_ERROR);
-      writeProtobuf(resp.build());
-      return;
-    }
-
     account.set(account.get().newBuilder()
         .email(emailAddr)
         .email_canonical(canonicalEmailAddr)

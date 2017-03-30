@@ -37,15 +37,18 @@ public class AccountsStore extends BaseStore {
   }
 
   @Nullable
-  public Account getByEmailAddr(String emailAddr) {
+  public Account getByVerifiedEmailAddr(String emailAddr) {
     try (
         QueryResult res = newReader()
             .stmt("SELECT account FROM accounts WHERE email = ?")
             .param(0, emailAddr)
             .query()
     ) {
-      if (res.next()) {
-        return Account.ADAPTER.decode(res.getBytes(0));
+      while (res.next()) {
+        Account acct = Account.ADAPTER.decode(res.getBytes(0));
+        if (acct.email_status == Account.EmailStatus.VERIFIED) {
+          return acct;
+        }
       }
     } catch (Exception e) {
       log.error("Unexpected.", e);
@@ -163,6 +166,19 @@ public class AccountsStore extends BaseStore {
           .execute();
       newWriter()
           .stmt("CREATE UNIQUE INDEX IX_accounts_email_verification_code ON accounts (email_verification_code)")
+          .execute();
+
+      diskVersion ++;
+    }
+    if (diskVersion == 4) {
+      // Email account needs to be non-unique (we could have unverified emails associated with
+      // multiple accounts). Email + email_status=VERIFIED needs to be unique, but we can't really
+      // do that with a simple index.
+      newWriter()
+          .stmt("DROP INDEX UIX_accounts_email")
+          .execute();
+      newWriter()
+          .stmt("CREATE INDEX IX_accounts_email ON accounts (email)")
           .execute();
 
       diskVersion ++;

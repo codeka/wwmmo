@@ -64,6 +64,9 @@ message Account {
     EMAIL_STATUS_UNKNOWN = 0;
     UNVERIFIED = 1;
     VERIFIED = 2;
+
+    // The address used to be associated with this account, but it was abandoned for another.
+    ABANDONED = 3;
   }
   optional EmailStatus email_status = 4;
 
