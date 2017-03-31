@@ -316,6 +316,7 @@ public class StarfieldManager {
 
   /** Called when a star is updated, we may need to update the sprite for it. */
   private void updateStar(Star star) {
+    Star oldStar = null;
     SceneObject container = sceneObjects.get(star.id);
     if (container == null) {
       container = new SceneObject(scene.getDimensionResolver());
@@ -328,6 +329,8 @@ public class StarfieldManager {
       float y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f);
       container.translate(x, -y);
     } else {
+      oldStar = ((SceneObjectInfo) container.getTag()).star;
+
       // Temporarily remove the container, and clear out it's children. We'll re-add them all.
       synchronized (scene.lock) {
         scene.getRootObject().removeChild(container);
@@ -351,6 +354,7 @@ public class StarfieldManager {
       sceneObjects.put(star.id, container);
     }
 
+    detachNonMovingFleets(oldStar, star);
     attachMovingFleets(star);
   }
 
@@ -477,6 +481,52 @@ public class StarfieldManager {
     synchronized (scene.lock) {
       scene.getRootObject().addChild(container);
       sceneObjects.put(fleet.id, container);
+    }
+  }
+
+  /** Detach any non-moving fleets that may have been moving previously. */
+  private void detachNonMovingFleets(@Nullable Star oldStar, Star star) {
+    // Remove any fleets that are no longer moving.
+    for (Fleet fleet : star.fleets) {
+      if (fleet.state != Fleet.FLEET_STATE.MOVING) {
+        SceneObject sceneObject = sceneObjects.get(fleet.id);
+        if (sceneObject != null) {
+          detachNonMovingFleet(fleet, sceneObject);
+        }
+      }
+    }
+
+    // Make sure to also do the same for fleets that are no longer on the star.
+    if (oldStar != null) {
+      for (Fleet oldFleet : oldStar.fleets) {
+        SceneObject sceneObject = sceneObjects.get(oldFleet.id);
+        if (sceneObject == null) {
+          // no need to see if we need to remove it if it doesn't exist...
+          continue;
+        }
+        boolean removed = true;
+        for (Fleet fleet : star.fleets) {
+          if (fleet.id.equals(oldFleet.id)) {
+            removed = false;
+            break;
+          }
+        }
+        if (removed) {
+          detachNonMovingFleet(oldFleet, sceneObject);
+        }
+      }
+    }
+  }
+
+  private void detachNonMovingFleet(Fleet fleet, SceneObject sceneObject) {
+    synchronized (scene.lock) {
+      sceneObject.getParent().removeChild(sceneObject);
+      sceneObjects.remove(fleet.id);
+    }
+
+    // If you had it selected, we'll need to un-select it.
+    if (selectedFleet != null && selectedFleet.id.equals(fleet.id)) {
+      setSelectedFleet(null, null);
     }
   }
 
