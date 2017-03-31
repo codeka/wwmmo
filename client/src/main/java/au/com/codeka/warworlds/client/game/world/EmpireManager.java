@@ -22,6 +22,8 @@ import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket;
 import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.common.proto.RequestEmpirePacket;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /** Manages empires. */
 public class EmpireManager {
   public static final EmpireManager i = new EmpireManager();
@@ -73,7 +75,7 @@ public class EmpireManager {
   /** Gets my empire, if my empire hasn't been set yet, IllegalStateException is thrown. */
   @Nonnull
   public Empire getMyEmpire() {
-    Preconditions.checkState(myEmpire != null);
+    checkState(myEmpire != null);
     return myEmpire;
   }
 
