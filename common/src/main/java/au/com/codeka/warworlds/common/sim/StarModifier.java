@@ -43,6 +43,13 @@ public class StarModifier {
     modifyStar(star, null, Lists.newArrayList(modification), null);
   }
 
+  public void modifyStar(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
+    modifyStar(star, null, Lists.newArrayList(modification), logHandler);
+  }
+
   /**
    * Modify a star, and possibly other auxiliary stars.
    *

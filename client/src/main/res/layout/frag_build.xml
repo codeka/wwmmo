@@ -96,7 +96,7 @@
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignBottom="@id/build_count_seek"
+                    android:layout_alignParentTop="true"
                     android:inputType="number" >
                     <requestFocus />
                 </EditText>

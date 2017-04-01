@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.game.build;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -18,6 +19,7 @@ import com.squareup.picasso.Picasso;
 import com.transitionseverywhere.TransitionManager;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -27,24 +29,35 @@ import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.TabbedBaseFragment;
+import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.opengl.DimensionResolver;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.TimeFormatter;
+import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
+import au.com.codeka.warworlds.common.sim.Simulation;
+import au.com.codeka.warworlds.common.sim.StarModifier;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Shows buildings and ships on a planet. You can swipe left/right to switch between your colonies
  * in this star.
  */
 public class BuildFragment extends BaseFragment {
+  private static final Log log = new Log("BuildFragment");
+
   private static final String STAR_ID_KEY = "StarID";
   private static final String PLANET_INDEX_KEY = "PlanetIndex";
 
@@ -65,6 +78,9 @@ public class BuildFragment extends BaseFragment {
   private ImageView buildIcon;
   private TextView buildName;
   private TextView buildDescription;
+  private TextView buildTime;
+  private TextView buildMinerals;
+  private ViewGroup buildCountContainer;
 
   private SeekBar buildCountSeek;
   private EditText buildCount;
@@ -96,24 +112,14 @@ public class BuildFragment extends BaseFragment {
     buildIcon = (ImageView) view.findViewById(R.id.build_icon);
     buildName = (TextView) view.findViewById(R.id.build_name);
     buildDescription = (TextView) view.findViewById(R.id.build_description);
+    buildCountContainer = (ViewGroup) view.findViewById(R.id.build_count_container);
+    buildTime = (TextView) view.findViewById(R.id.build_timetobuild);
+    buildMinerals = (TextView) view.findViewById(R.id.build_mineralstobuild);
 
     buildCountSeek = (SeekBar) view.findViewById(R.id.build_count_seek);
     buildCount = (EditText) view.findViewById(R.id.build_count_edit);
     buildCountSeek.setMax(1000);
-    buildCountSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-      @Override
-      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        buildCount.setText(String.format(Locale.US, "%d", progress));
-      }
-
-      @Override
-      public void onStartTrackingTouch(SeekBar seekBar) {
-      }
-
-      @Override
-      public void onStopTrackingTouch(SeekBar seekBar) {
-      }
-    });
+    buildCountSeek.setOnSeekBarChangeListener(buildCountSeekBarChangeListener);
 
     view.findViewById(R.id.build_button).setOnClickListener(v -> build());
   }
@@ -137,6 +143,9 @@ public class BuildFragment extends BaseFragment {
   public void showBuildSheet(Design design) {
     currentDesign = design;
 
+    buildCount.setText("1");
+    buildCountSeek.setProgress(1);
+
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -144,8 +153,12 @@ public class BuildFragment extends BaseFragment {
     buildName.setText(design.display_name);
     buildDescription.setText(Html.fromHtml(design.description));
 
-    buildCount.setText("1");
-    buildCountSeek.setProgress(1);
+    if (design.design_kind == Design.DesignKind.SHIP) {
+      // You can only build more than ship at a time (not buildings).
+      buildCountContainer.setVisibility(View.VISIBLE);
+    } else {
+      buildCountContainer.setVisibility(View.GONE);
+    }
   }
 
   public void hideBuildSheet() {
@@ -155,15 +168,69 @@ public class BuildFragment extends BaseFragment {
     buildIcon.setImageDrawable(null);
   }
 
+  private void updateBuildTime() {
+    App.i.getTaskRunner().runTask(() -> {
+      // Add the build request to a temporary copy of the star, simulate it and figure out the
+      // build time.
+      Star.Builder starBuilder = star.newBuilder();
+      Colony colony = checkNotNull(colonies.get(viewPager.getCurrentItem()));
+      Design design = checkNotNull(currentDesign);
+
+      int count = 1;
+      if (design.design_kind == Design.DesignKind.SHIP) {
+        count = Integer.parseInt(buildCount.getText().toString());
+      }
+
+      int planetIndex = 0;
+      for (int i = 0; i < star.planets.size(); i++) {
+        Planet planet = star.planets.get(i);
+        if (planet.colony != null && planet.colony.id.equals(colony.id)) {
+          planetIndex = i;
+        }
+      }
+
+      Empire myEmpire = EmpireManager.i.getMyEmpire();
+      new StarModifier(() -> 0).modifyStar(starBuilder,
+          new StarModification.Builder()
+              .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
+              .colony_id(colony.id)
+              .count(count)
+              .design_type(design.type)
+              // TODO: upgrades?
+              .build());
+      // find the build request with ID 0, that's our guy
+
+      Star updatedStar = starBuilder.build();
+      for (BuildRequest buildRequest : BuildHelper.getBuildRequests(updatedStar)) {
+        if (buildRequest.id == 0) {
+          App.i.getTaskRunner().runTask(() -> {
+            buildTime.setText(BuildHelper.formatTimeRemaining(buildRequest));
+            EmpireStorage newEmpireStorage = BuildHelper.getEmpireStorage(updatedStar, myEmpire.id);
+            EmpireStorage oldEmpireStorage = BuildHelper.getEmpireStorage(star, myEmpire.id);
+            if (newEmpireStorage != null && oldEmpireStorage != null) {
+              float mineralsDelta = newEmpireStorage.minerals_delta_per_hour
+                  - oldEmpireStorage.minerals_delta_per_hour;
+              buildMinerals.setText(String.format(Locale.US, "%s%.1f/hr",
+                  mineralsDelta < 0 ? "-" : "+", Math.abs(mineralsDelta)));
+              buildMinerals.setTextColor(mineralsDelta < 0 ? Color.RED : Color.GREEN);
+            } else {
+              buildMinerals.setText("");
+            }
+          }, Threads.UI);
+        }
+      }
+    }, Threads.BACKGROUND);
+  }
+
   /** Start building the thing we currently have showing. */
   public void build() {
     if (currentDesign != null) {
       String str = buildCount.getText().toString();
-      int count = 0;
+      int count;
       try {
         count = Integer.parseInt(str);
       } catch (NumberFormatException e) {
-        count = 0;
+        count = 1;
       }
 
       if (count <= 0) {
@@ -229,7 +296,7 @@ public class BuildFragment extends BaseFragment {
         planet = p;
       }
     }
-    Preconditions.checkNotNull(planet);
+    checkNotNull(planet);
 
     Picasso.with(getContext())
         .load(ImageHelper.getPlanetImageUrl(getContext(), star, planet.index, 64, 64))
@@ -250,6 +317,26 @@ public class BuildFragment extends BaseFragment {
           "Build queue: %d", buildQueueLength));
     }
   }
+
+  private final SeekBar.OnSeekBarChangeListener buildCountSeekBarChangeListener =
+      new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean userInitiated) {
+          if (!userInitiated) {
+            return;
+          }
+          buildCount.setText(String.format(Locale.US, "%d", progress));
+          updateBuildTime();
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
+      };
 
   public class ColonyPagerAdapter extends FragmentStatePagerAdapter {
     private BuildFragment buildFragment;
@@ -305,12 +392,7 @@ public class BuildFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
       super.onViewCreated(view, savedInstanceState);
 
-      getTabManager().setOnTabChangeListener(new TabHost.OnTabChangeListener() {
-        @Override
-        public void onTabChanged(String s) {
-          getBuildFragment().hideBuildSheet();
-        }
-      });
+      getTabManager().setOnTabChangeListener(s -> getBuildFragment().hideBuildSheet());
     }
 
     public BuildFragment getBuildFragment() {
