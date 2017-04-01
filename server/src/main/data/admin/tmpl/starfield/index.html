@@ -33,6 +33,38 @@
       <div class="star-big star-big-<%= classification.toLowerCase() %>"></div>
       <h1><%= name %></h1>
       <div class="details"><%= id %> [<%= sector_x %>,<%= sector_y %>] (<%= offset_x %>,<%= offset_y %>)</div>
+      <div class="stores">
+        <% for (var i in empire_stores) { %>
+          <div class="store">
+            <img data-empireid="<%= empire_stores[i].empire_id %>" width="16" height="16" />
+            <b><span data-empireid="<%= empire_stores[i].empire_id %>">...</span></b>
+            <span class="store-details">
+              <img src="/admin/img/focus/farming.png" width="16" height="16">
+              <%= Math.round(empire_stores[i].total_goods) %> / <%= Math.round(empire_stores[i].max_goods) %>
+              <span class="delta <% if (empire_stores[i].goods_delta_per_hour < 0) { %>negative<% } else { %>positive<% } %>">
+                <% if (empire_stores[i].goods_delta_per_hour > 0) { %>+<% } %><%= Math.round(empire_stores[i].goods_delta_per_hour) %> / hr
+              </span>
+            </span>
+
+            <span class="store-details">
+              <img src="/admin/img/focus/mining.png" width="16" height="16">
+              <%= Math.round(empire_stores[i].total_minerals) %> / <%= Math.round(empire_stores[i].max_minerals) %>
+              <span class="delta <% if (empire_stores[i].minerals_delta_per_hour < 0) { %>negative<% } else { %>positive<% } %>">
+                <% if (empire_stores[i].minerals_delta_per_hour > 0) { %>+<% } %><%= Math.round(empire_stores[i].minerals_delta_per_hour) %> / hr
+              </span>
+            </span>
+
+            <span class="store-details">
+              <img src="/admin/img/focus/energy.png" width="16" height="16">
+              <%= Math.round(empire_stores[i].total_energy) %> / <%= Math.round(empire_stores[i].max_energy) %>
+              <span class="delta <% if (empire_stores[i].energy_delta_per_hour < 0) { %>negative<% } else { %>positive<% } %>">
+                <% if (empire_stores[i].energy_delta_per_hour > 0) { %>+<% } %><%= Math.round(empire_stores[i].energy_delta_per_hour) %> / hr
+              </span>
+            </span>
+          </div>
+          <% empireStore.getEmpire(empire_stores[i].empire_id); %>
+        <% } %>
+      </div>
       <div class="planets">
         <% for (var i in planets) { %>
           <div class="planet">
