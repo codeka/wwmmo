@@ -177,6 +177,14 @@ public class StarfieldManager {
    * @param fleet The fleet.
    */
   public void setSelectedFleet(@Nullable Star star, @Nullable Fleet fleet) {
+    Threads.checkOnThread(Threads.UI);
+
+    log.debug("setSelectedFleet(%d %s, %d %sx%.1f)",
+        star == null ? 0 : star.id,
+        star == null ? "?" : star.name,
+        fleet == null ? 0 : fleet.id,
+        fleet == null ? "?" : fleet.design_type,
+        fleet == null ? 0 : fleet.num_ships);
     if (fleet != null) {
       selectionIndicatorSceneObject.setSize(60, 60);
       SceneObject sceneObject = sceneObjects.get(fleet.id);
@@ -486,21 +494,30 @@ public class StarfieldManager {
 
   /** Detach any non-moving fleets that may have been moving previously. */
   private void detachNonMovingFleets(@Nullable Star oldStar, Star star) {
+    log.debug("detachNonMovingFleets()");
+
     // Remove any fleets that are no longer moving.
     for (Fleet fleet : star.fleets) {
       if (fleet.state != Fleet.FLEET_STATE.MOVING) {
+        log.debug("%d Fleet %d (%s) is %s.", star.id, fleet.id, fleet.design_type, fleet.state);
         SceneObject sceneObject = sceneObjects.get(fleet.id);
         if (sceneObject != null) {
+          log.debug("%d ... and it has a SceneObject.", star.id);
           detachNonMovingFleet(fleet, sceneObject);
+        } else {
+          log.debug("%d ... but it doesn't have a SceneObject.", star.id);
         }
       }
     }
 
     // Make sure to also do the same for fleets that are no longer on the star.
     if (oldStar != null) {
+      log.debug("%d The oldStar is not null.", star.id);
       for (Fleet oldFleet : oldStar.fleets) {
         SceneObject sceneObject = sceneObjects.get(oldFleet.id);
         if (sceneObject == null) {
+          log.debug("%d Fleet %d (%s) doesn't have a SceneObject.",
+              star.id, oldFleet.id, oldFleet.design_type);
           // no need to see if we need to remove it if it doesn't exist...
           continue;
         }
@@ -512,21 +529,26 @@ public class StarfieldManager {
           }
         }
         if (removed) {
+          log.debug("%d The old fleet doesn't exist in the new fleet.", star.id);
           detachNonMovingFleet(oldFleet, sceneObject);
+        } else {
+          log.debug("%d The old fleet exists in the new fleet.", star.id);
         }
       }
+    } else {
+      log.debug("%d The oldStar is null.", star.id);
     }
   }
 
   private void detachNonMovingFleet(Fleet fleet, SceneObject sceneObject) {
+    // If you had it selected, we'll need to un-select it.
+    if (selectedFleet != null && selectedFleet.id.equals(fleet.id)) {
+      App.i.getTaskRunner().runTask(() -> setSelectedFleet(null, null), Threads.UI);
+    }
+
     synchronized (scene.lock) {
       sceneObject.getParent().removeChild(sceneObject);
       sceneObjects.remove(fleet.id);
-    }
-
-    // If you had it selected, we'll need to un-select it.
-    if (selectedFleet != null && selectedFleet.id.equals(fleet.id)) {
-      setSelectedFleet(null, null);
     }
   }
 
