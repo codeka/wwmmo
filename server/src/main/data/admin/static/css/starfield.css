@@ -252,8 +252,11 @@ table td {
   margin-left: -300px;
   width: 600px;
   top: 100px;
-  height: 500px;
   background: #000;
   padding: 10px;
   border: solid 1px #fff;
+}
+
+.simulate {
+  padding-bottom: 64px;
 }

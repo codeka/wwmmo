@@ -169,9 +169,9 @@
             <option>SPLIT_FLEET</option>
             <option>MERGE_FLEET</option>
             <option>MOVE_FLEET</option>
+            <option>DELETE_BUILD_REQUEST</option>
           </select>
           <dt>Empire
-          <!-- TODO: use autocomplete -->
           <dd><select name="empire_id">
             <option>TODO: pre-populate</option>
           </select>
@@ -187,8 +187,10 @@
           <dd><select name="fleet_id">
             <option>TODO: pre-populate</option>
           </select>
-          <dt>Focus
-          <dd>TODO?
+          <dt>Build request
+          <dd><select name="build_request_id">
+            <option>TODO: pre-populate</option>
+          </select>
           <dt>Design
           <dd><select name="design_type">
             <option value="">N/A</option>
@@ -208,10 +210,6 @@
           </select>
           <dt>Count
           <dd><input name="count" type="number" />
-          <dt>Target Star
-          <dd>TODO?
-          <dt>Fleet
-          <dd>TODO?
           <dt>Additional fleets
           <dd><input name="additional_fleet_ids" type="text" />
         </dl>

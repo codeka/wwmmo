@@ -76,6 +76,47 @@ $(function() {
     fixTimes();
   }
 
+  // Called to refresh which fields are visible, based on the modification type you've selected.
+  function refreshVisibleFields() {
+    var VISIBLE_FIELDS = {
+      "COLONIZE": ["empire_id", "planet_index"],
+      "ADJUST_FOCUS": [/*"empire_id", "colony_id", "focus"*/],
+      "CREATE_FLEET": ["empire_id", "design_kind", "count"],
+      "ADD_BUILD_REQUEST": ["empire_id", "colony_id", "design_type", "count"],
+      "CREATE_BUILDING": ["empire_id", "colony_id", "design_type"],
+      "SPLIT_FLEET": ["empire_id", "fleet_id", "count"],
+      "MERGE_FLEET": ["empire_id", "fleet_id", "additional_fleet_ids"],
+      "MOVE_FLEET": [/*"empire_id", "fleet_id", "star_id"*/],
+      "DELETE_BUILD_REQUEST": ["empire_id", "build_request_id"]
+    };
+
+    var type = $("#modify-popup select[name=type]").val()
+    var $parent = $("#modify-popup dl");
+
+    // The <dl> will be a bunch of <dt><dd> pairs. The <dd> will have a child that has a name
+    // attribute which is the name of the field we'll want to show/hide. If we want to hide the
+    // field, we need to hide both the <dt> and <dd>
+    $("dd", $parent).each(function (index, dd) {
+      $dd = $(dd);
+      $dt = $dd.prev();
+
+      $dd.find("[name]").each(function (_, input) {
+        var name = $(input).attr("name");
+        if (name == "type") {
+          return;
+        }
+
+        if (VISIBLE_FIELDS[type].indexOf(name) >= 0) {
+          $dd.show();
+          $dt.show();
+        } else {
+          $dd.hide();
+          $dt.hide();
+        }
+      });
+    });
+  }
+
   window.modify = function(id) {
     if (currStar == null) {
       return;
@@ -220,6 +261,11 @@ $(function() {
         }
       });
     });
+    $("#modify-popup select[name=type]").on("change", function() {
+      refreshVisibleFields();
+    });
+
+    refreshVisibleFields();
   }
 
   window.simulate = function(id) {
