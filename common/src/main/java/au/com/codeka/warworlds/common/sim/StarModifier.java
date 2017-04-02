@@ -1,9 +1,12 @@
 package au.com.codeka.warworlds.common.sim;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
@@ -109,6 +112,9 @@ public class StarModifier {
         return;
       case ADD_BUILD_REQUEST:
         applyAddBuildRequest(star, modification, logHandler);
+        return;
+      case DELETE_BUILD_REQUEST:
+        applyDeleteBuildRequest(star, modification, logHandler);
         return;
       case SPLIT_FLEET:
         applySplitFleet(star, modification, logHandler);
@@ -320,6 +326,52 @@ public class StarModifier {
     } else {
       // TODO: suspicious!
     }
+  }
+
+  private void applyDeleteBuildRequest(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
+    Preconditions.checkArgument(
+        modification.type.equals(StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST));
+
+    Planet planet = null;
+    BuildRequest buildRequest = null;
+    for (Planet p : star.planets) {
+      if (p.colony != null) {
+        for (BuildRequest br : p.colony.build_requests) {
+          if (br.id.equals(modification.build_request_id)) {
+            if (!p.colony.empire_id.equals(modification.empire_id)) {
+              // TODO: suspicious!
+              logHandler.log("! trying to delete wrong empire's build request!");
+              return;
+            }
+            planet = p;
+            buildRequest = br;
+            break;
+          }
+        }
+        if (planet != null) {
+          break;
+        }
+      }
+    }
+
+    if (planet == null) {
+      // TODO: suspicious? (maybe complete)
+      logHandler.log("Couldn't find build request with ID " + modification.build_request_id);
+      return;
+    }
+    final long idToDelete = buildRequest.id;
+
+    logHandler.log("- deleting build request");
+    Colony.Builder colonyBuilder = planet.colony.newBuilder();
+    colonyBuilder.build_requests(
+        Lists.newArrayList(
+            Iterables.filter(planet.colony.build_requests, (br) -> !br.id.equals(idToDelete))));
+    star.planets.set(planet.index, planet.newBuilder()
+        .colony(colonyBuilder.build())
+        .build());
   }
 
   private void applySplitFleet(

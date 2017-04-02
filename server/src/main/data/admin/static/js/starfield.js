@@ -73,7 +73,7 @@ $(function() {
     currStar = star;
     var html = $("#star-details-tmpl").applyTemplate(star);
     $("#star-details").html(html);
-    fixTimes();
+    time.refreshAll();
   }
 
   // Called to refresh which fields are visible, based on the modification type you've selected.
@@ -127,13 +127,16 @@ $(function() {
     var planetIndexSelect = $("#modify-popup select[name=planet_index]");
     var colonySelect = $("#modify-popup select[name=colony_id]");
     var fleetSelect = $("#modify-popup select[name=fleet_id]");
+    var buildRequestsSelect = $("#modify-popup select[name=build_request_id]");
     planetIndexSelect.empty();
     colonySelect.empty();
     fleetSelect.empty();
+    buildRequestsSelect.empty();
 
     planetIndexSelect.append($("<option>None</option>"));
     colonySelect.append($("<option>None</option>"));
     fleetSelect.append($("<option>None</option>"));
+    buildRequestsSelect.append($("<option>None</option>"));
     var empires = [];
 
     for (var i = 0; i < currStar.planets.length; i++) {
@@ -202,6 +205,27 @@ $(function() {
             }
           }
         });
+
+        for (var i = 0; i < currStar.planets.length; i++) {
+          var planet = currStar.planets[i];
+          if (planet.colony == null) {
+            continue;
+          }
+          if (planet.colony.empire_id != empire.id) {
+            continue;
+          }
+          for (var j = 0; j < planet.colony.build_requests.length; j++) {
+            var buildRequest = planet.colony.build_requests[j];
+            var html = empire.display_name + ": " + buildRequest.id + " " + buildRequest.design_type
+                + " x " + buildRequest.count
+                + " (progress=" + buildRequest.progress + " finish: " + time.formatTime(new Date(buildRequest.end_time)) + ")";
+            var opt = $("<option/>");
+            opt.attr("value", buildRequest.id);
+            opt.html(html);
+            buildRequestsSelect.append(opt);
+          }
+        }
+
       });
     });
 
@@ -242,6 +266,7 @@ $(function() {
         // TODO star_id:
         // TODO fleet:
         additional_fleet_ids: additionalFleetIds,
+        build_request_id: parseInt($("#modify-popup select[name=build_request_id]").val())
       };
 
       // TODO: disable modify/cancel buttons.
