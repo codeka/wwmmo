@@ -48,11 +48,15 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ItemEntry entry = (ItemEntry) shipListAdapter.getItem(position);
-        if (entry.fleet == null /*&& entry.buildRequest == null*/) {
+        if (entry.fleet == null && entry.buildRequest == null) {
+          // It's a new fleet
           getBuildFragment().showBuildSheet(entry.design);
-        } else if (entry.fleet != null /*&& entry.buildRequest == null*/) {
+        } else if (entry.fleet != null && entry.buildRequest == null) {
           // TODO: upgrade
           getBuildFragment().showBuildSheet(entry.design);
+        } else {
+          // It's an in-progress fleet
+          getBuildFragment().showProgressSheet(entry.fleet, entry.buildRequest);
         }
       }
     });

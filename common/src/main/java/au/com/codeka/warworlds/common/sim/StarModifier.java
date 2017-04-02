@@ -1,12 +1,11 @@
 package au.com.codeka.warworlds.common.sim;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
@@ -368,7 +367,12 @@ public class StarModifier {
     Colony.Builder colonyBuilder = planet.colony.newBuilder();
     colonyBuilder.build_requests(
         Lists.newArrayList(
-            Iterables.filter(planet.colony.build_requests, (br) -> !br.id.equals(idToDelete))));
+            Iterables.filter(planet.colony.build_requests, new Predicate<BuildRequest>() {
+              @Override
+              public boolean apply(@Nullable BuildRequest br) {
+                return !br.id.equals(idToDelete);
+              }
+            })));
     star.planets.set(planet.index, planet.newBuilder()
         .colony(colonyBuilder.build())
         .build());
