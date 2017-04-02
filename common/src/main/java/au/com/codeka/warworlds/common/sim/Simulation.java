@@ -243,7 +243,7 @@ public class Simulation {
       float goods =
           colony.population * colony.focus.farming * (planet.farming_congeniality / 100.0f);
       colony.delta_goods(goods);
-      storage.total_goods(storage.total_goods + goods * dt);
+      storage.total_goods(Math.max(0, storage.total_goods + goods * dt));
       goodsDeltaPerHour += goods;
       log("    Goods: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
           storage.total_goods, goods, goods * dt);
@@ -252,7 +252,7 @@ public class Simulation {
       float minerals =
           colony.population * colony.focus.mining * (planet.mining_congeniality / 100.0f);
       colony.delta_minerals(minerals);
-      storage.total_minerals(storage.total_minerals + minerals * dt);
+      storage.total_minerals(Math.max(0, storage.total_minerals + minerals * dt));
       mineralsDeltaPerHour += minerals;
       log("    Minerals: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
           storage.total_minerals, minerals, minerals * dt);
@@ -261,7 +261,7 @@ public class Simulation {
       float enegry =
           colony.population * colony.focus.energy * (planet.energy_congeniality / 100.0f);
       colony.delta_energy(enegry);
-      storage.total_energy(storage.total_energy + enegry * dt);
+      storage.total_energy(Math.max(0, storage.total_energy + enegry * dt));
       energyDeltaPerHour += enegry;
       log("    Energy: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
           storage.total_energy, enegry, enegry * dt);
@@ -342,8 +342,8 @@ public class Simulation {
           // requires, if you have the right number of workers and the right amount of minerals,
           // you can finish the build in one turn. We require whatever fraction of progress is left
           // of both minerals and workers.
-          float totalWorkersRequired = buildCost.population * (1.0f - br.progress);
-          float totalMineralsRequired = buildCost.minerals * (1.0f - br.progress);
+          float totalWorkersRequired = buildCost.population * (1.0f - br.progress) * br.count;
+          float totalMineralsRequired = buildCost.minerals * (1.0f - br.progress) * br.count;
           log("     Required: [population=%.2f] [minerals=%.2f]",
               totalWorkersRequired, totalMineralsRequired);
 
@@ -384,14 +384,14 @@ public class Simulation {
 
           // work hasn't finished yet, so lets estimate how long it will take now
           float remainingWorkersRequired =
-              buildCost.population * (1.0f - br.progress - progressThisTurn);
+              buildCost.population * (1.0f - br.progress - progressThisTurn) * br.count;
           float remainingMineralsRequired =
-              buildCost.minerals * (1.0f - br.progress - progressThisTurn);
+              buildCost.minerals * (1.0f - br.progress - progressThisTurn) * br.count;
 
           float mineralsUsedThisTurn = totalMineralsRequired - remainingMineralsRequired;
-          storage.total_minerals(storage.total_minerals - mineralsUsedThisTurn);
+          storage.total_minerals(Math.max(0, storage.total_minerals - mineralsUsedThisTurn));
           mineralsDeltaPerHour -= mineralsUsedThisTurn;
-          log("     Used: [minerals=%.2f]", mineralsUsedThisTurn);
+          log("     Used: [minerals=%.4f]", mineralsUsedThisTurn);
 
           float timeForMineralsHours =
               remainingMineralsRequired / mineralsUsedThisTurn / (Time.HOUR / STEP_TIME);
