@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -182,14 +183,14 @@ public class StarModifier {
                 .defence_bonus(1.0f)
                 .build())
             .build());
-    logHandler.log(String.format(
+    logHandler.log(String.format(Locale.US,
         "  colonized: colony_id=%d",
         star.planets.get(modification.planet_index).colony.id));
 
     // if there's no storage for this empire, add one with some defaults now.
     boolean hasStorage = false;
     for (EmpireStorage storage : star.empire_stores) {
-      if (storage.empire_id != null && storage.empire_id.equals(modification.empire_id)) {
+      if (Objects.equals(storage.empire_id, modification.empire_id)) {
         hasStorage = true;
       }
     }

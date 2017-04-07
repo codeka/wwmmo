@@ -136,6 +136,13 @@ public class StarManager {
         }
       }
 
+      for (int i = 0; i < starBuilder.empire_stores.size(); i++) {
+        if (starBuilder.empire_stores.get(i).empire_id == null) {
+          starBuilder.empire_stores.remove(i);
+          i--;
+        }
+      }
+
       for (int i = 0; i < starBuilder.fleets.size(); i++) {
         if (starBuilder.fleets.get(i).empire_id == null) {
           starBuilder.fleets.remove(i);
