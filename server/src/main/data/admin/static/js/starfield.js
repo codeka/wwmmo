@@ -308,6 +308,22 @@ $(function() {
     })
   }
 
+  window.deleteStar = function(id) {
+    if (confirm("Are you sure you want to delete this star? This cannot be undone!")) {
+      $.ajax({
+        url: "/admin/ajax/starfield",
+        method: "POST",
+        data: {
+          "action": "delete",
+          "id": id
+        },
+        success: function(data) {
+          $("#xy button").click();
+        }
+      });
+    }
+  }
+
   $("#xy button").on("click", function() {
     $.ajax({
       url: "/admin/ajax/starfield",

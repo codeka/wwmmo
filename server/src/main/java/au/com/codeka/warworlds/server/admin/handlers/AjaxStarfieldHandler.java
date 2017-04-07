@@ -46,6 +46,12 @@ public class AjaxStarfieldHandler extends AjaxHandler {
         String modifyJson = getRequest().getParameter("modify");
         handleModifyRequest(starId, modifyJson);
         break;
+      case "delete":
+        starId = Long.parseLong(getRequest().getParameter("id"));
+        handleDeleteRequest(starId);
+        break;
+      default:
+        throw new RequestException(400, "Unknown action: " + getRequest().getParameter("action"));
     }
   }
 
@@ -64,6 +70,11 @@ public class AjaxStarfieldHandler extends AjaxHandler {
     log.debug("modify: " + modifyJson);
     StarModification modification = fromJson(modifyJson, StarModification.class);
     setResponseGson(modifyAndSimulate(starId, modification));
+  }
+
+  private void handleDeleteRequest(long starId) {
+    log.debug("delete star: %d", starId);
+    StarManager.i.deleteStar(starId);
   }
 
   private SimulateResponse modifyAndSimulate(long starId, @Nullable StarModification modification) {

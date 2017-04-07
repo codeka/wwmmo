@@ -17,6 +17,7 @@ import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
+import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
@@ -58,6 +59,23 @@ public class StarManager {
     }
 
     return watchableStar;
+  }
+
+  public void deleteStar(long id) {
+    WatchableObject<Star> watchableStar = stars.get(id);
+    Star star;
+    if (watchableStar != null) {
+      star = watchableStar.get();
+    } else {
+      star = store.get(id);
+    }
+    SectorCoord coord = new SectorCoord.Builder().x(star.sector_x).y(star.sector_y).build();
+
+    store.delete(id);
+    synchronized (stars) {
+      stars.remove(id);
+    }
+    SectorManager.i.forgetSector(coord);
   }
 
   /**
