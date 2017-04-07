@@ -5,6 +5,8 @@ $(function() {
   ].join("\n");
 
   var currStar = null;
+  var currSectorX = 0;
+  var currSectorY = 0;
 
   function renderSector(sector) {
     var container = $("#starfield");
@@ -318,25 +320,51 @@ $(function() {
           "id": id
         },
         success: function(data) {
-          $("#xy button").click();
+        refreshSector();
         }
       });
     }
   }
 
+  window.clearNatives = function(id) {
+    $.ajax({
+      url: "/admin/ajax/starfield",
+      method: "POST",
+      data: {
+        "action": "clearNatives",
+        "id": id
+      },
+      success: function(data) {
+        refreshSector();
+      }
+    });
+  }
+
   $("#xy button").on("click", function() {
+    currSectorX = $("#xy input[name=x]").val();
+    currSectorY = $("#xy input[name=y]").val();
+    refreshSector();
+  });
+
+  window.refreshSector = function() {
+    var currStarId = currStar == null ? 0 : currStar.id;
     $.ajax({
       url: "/admin/ajax/starfield",
       data: {
         "action": "xy",
-        "x": $("#xy input[name=x]").val(),
-        "y": $("#xy input[name=y]").val()
+        "x": currSectorX,
+        "y": currSectorY
       },
       success: function(data) {
         renderSector(data);
+        for (var index in data.stars) {
+          if (data.stars[index].id == currStarId) {
+            showStar(data.stars[index]);
+          }
+        }
       }
     });
-  });
+  }
 
   $("#starfield-container a").on("click", function() {
     var dx = 0;

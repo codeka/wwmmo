@@ -50,6 +50,10 @@ public class AjaxStarfieldHandler extends AjaxHandler {
         starId = Long.parseLong(getRequest().getParameter("id"));
         handleDeleteRequest(starId);
         break;
+      case "clearNatives":
+        starId = Long.parseLong(getRequest().getParameter("id"));
+        handleClearNativesRequest(starId);
+        break;
       default:
         throw new RequestException(400, "Unknown action: " + getRequest().getParameter("action"));
     }
@@ -75,6 +79,11 @@ public class AjaxStarfieldHandler extends AjaxHandler {
   private void handleDeleteRequest(long starId) {
     log.debug("delete star: %d", starId);
     StarManager.i.deleteStar(starId);
+  }
+
+  private void handleClearNativesRequest(long starId) {
+    log.debug("delete star: %d", starId);
+    StarManager.i.removeNativeColonies(starId);
   }
 
   private SimulateResponse modifyAndSimulate(long starId, @Nullable StarModification modification) {

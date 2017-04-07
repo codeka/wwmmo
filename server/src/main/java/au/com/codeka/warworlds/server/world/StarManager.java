@@ -117,6 +117,36 @@ public class StarManager {
     }
   }
 
+  /**
+   * Remove the native colonies (and fleets) from the star with the given ID. This is usually what
+   * we do just before putting a new empire on there.
+   */
+  public void removeNativeColonies(long id) {
+    WatchableObject<Star> star = getStar(id);
+    synchronized (star.lock) {
+      log.debug("Removing native colonies from star %d \"%s\"...", star.get().id, star.get().name);
+
+      Star.Builder starBuilder = star.get().newBuilder();
+      for (int i = 0; i < starBuilder.planets.size(); i++) {
+        if (starBuilder.planets.get(i).colony != null
+            && starBuilder.planets.get(i).colony.empire_id == null) {
+          starBuilder.planets.set(i, starBuilder.planets.get(i).newBuilder()
+              .colony(null)
+              .build());
+        }
+      }
+
+      for (int i = 0; i < starBuilder.fleets.size(); i++) {
+        if (starBuilder.fleets.get(i).empire_id == null) {
+          starBuilder.fleets.remove(i);
+          i--;
+        }
+      }
+
+      star.set(starBuilder.build());
+    }
+  }
+
   public ArrayList<WatchableObject<Star>> getStarsForEmpire(long empireId) {
     ArrayList<WatchableObject<Star>> stars = new ArrayList<>();
     for (Long id : store.getStarsForEmpire(empireId)) {
