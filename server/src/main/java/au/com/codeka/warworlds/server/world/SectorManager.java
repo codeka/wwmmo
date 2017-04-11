@@ -50,6 +50,17 @@ public class SectorManager {
   }
 
   /**
+   * Called in the very rare situations where we need to forget the whole sector (for example,
+   * when a star is deleted). Package private because we shouldn't normally want to call this
+   * directly.
+   */
+  void forgetSector(@Nonnull SectorCoord coord) {
+    synchronized (sectors) {
+      sectors.remove(coord);
+    }
+  }
+
+  /**
    * Go through all of the stars in the given {@link Sector} and make sure any stars which are
    * eligible for a native colony have one.
    */

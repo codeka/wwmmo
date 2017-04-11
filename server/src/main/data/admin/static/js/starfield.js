@@ -5,6 +5,8 @@ $(function() {
   ].join("\n");
 
   var currStar = null;
+  var currSectorX = 0;
+  var currSectorY = 0;
 
   function renderSector(sector) {
     var container = $("#starfield");
@@ -73,7 +75,48 @@ $(function() {
     currStar = star;
     var html = $("#star-details-tmpl").applyTemplate(star);
     $("#star-details").html(html);
-    fixTimes();
+    time.refreshAll();
+  }
+
+  // Called to refresh which fields are visible, based on the modification type you've selected.
+  function refreshVisibleFields() {
+    var VISIBLE_FIELDS = {
+      "COLONIZE": ["empire_id", "planet_index"],
+      "ADJUST_FOCUS": [/*"empire_id", "colony_id", "focus"*/],
+      "CREATE_FLEET": ["empire_id", "design_kind", "count"],
+      "ADD_BUILD_REQUEST": ["empire_id", "colony_id", "design_type", "count"],
+      "CREATE_BUILDING": ["empire_id", "colony_id", "design_type"],
+      "SPLIT_FLEET": ["empire_id", "fleet_id", "count"],
+      "MERGE_FLEET": ["empire_id", "fleet_id", "additional_fleet_ids"],
+      "MOVE_FLEET": [/*"empire_id", "fleet_id", "star_id"*/],
+      "DELETE_BUILD_REQUEST": ["empire_id", "build_request_id"]
+    };
+
+    var type = $("#modify-popup select[name=type]").val()
+    var $parent = $("#modify-popup dl");
+
+    // The <dl> will be a bunch of <dt><dd> pairs. The <dd> will have a child that has a name
+    // attribute which is the name of the field we'll want to show/hide. If we want to hide the
+    // field, we need to hide both the <dt> and <dd>
+    $("dd", $parent).each(function (index, dd) {
+      $dd = $(dd);
+      $dt = $dd.prev();
+
+      $dd.find("[name]").each(function (_, input) {
+        var name = $(input).attr("name");
+        if (name == "type") {
+          return;
+        }
+
+        if (VISIBLE_FIELDS[type].indexOf(name) >= 0) {
+          $dd.show();
+          $dt.show();
+        } else {
+          $dd.hide();
+          $dt.hide();
+        }
+      });
+    });
   }
 
   window.modify = function(id) {
@@ -86,13 +129,16 @@ $(function() {
     var planetIndexSelect = $("#modify-popup select[name=planet_index]");
     var colonySelect = $("#modify-popup select[name=colony_id]");
     var fleetSelect = $("#modify-popup select[name=fleet_id]");
+    var buildRequestsSelect = $("#modify-popup select[name=build_request_id]");
     planetIndexSelect.empty();
     colonySelect.empty();
     fleetSelect.empty();
+    buildRequestsSelect.empty();
 
     planetIndexSelect.append($("<option>None</option>"));
     colonySelect.append($("<option>None</option>"));
     fleetSelect.append($("<option>None</option>"));
+    buildRequestsSelect.append($("<option>None</option>"));
     var empires = [];
 
     for (var i = 0; i < currStar.planets.length; i++) {
@@ -161,6 +207,27 @@ $(function() {
             }
           }
         });
+
+        for (var i = 0; i < currStar.planets.length; i++) {
+          var planet = currStar.planets[i];
+          if (planet.colony == null) {
+            continue;
+          }
+          if (planet.colony.empire_id != empire.id) {
+            continue;
+          }
+          for (var j = 0; j < planet.colony.build_requests.length; j++) {
+            var buildRequest = planet.colony.build_requests[j];
+            var html = empire.display_name + ": " + buildRequest.id + " " + buildRequest.design_type
+                + " x " + buildRequest.count
+                + " (progress=" + buildRequest.progress + " finish: " + time.formatTime(new Date(buildRequest.end_time)) + ")";
+            var opt = $("<option/>");
+            opt.attr("value", buildRequest.id);
+            opt.html(html);
+            buildRequestsSelect.append(opt);
+          }
+        }
+
       });
     });
 
@@ -201,6 +268,7 @@ $(function() {
         // TODO star_id:
         // TODO fleet:
         additional_fleet_ids: additionalFleetIds,
+        build_request_id: parseInt($("#modify-popup select[name=build_request_id]").val())
       };
 
       // TODO: disable modify/cancel buttons.
@@ -220,6 +288,11 @@ $(function() {
         }
       });
     });
+    $("#modify-popup select[name=type]").on("change", function() {
+      refreshVisibleFields();
+    });
+
+    refreshVisibleFields();
   }
 
   window.simulate = function(id) {
@@ -237,19 +310,61 @@ $(function() {
     })
   }
 
+  window.deleteStar = function(id) {
+    if (confirm("Are you sure you want to delete this star? This cannot be undone!")) {
+      $.ajax({
+        url: "/admin/ajax/starfield",
+        method: "POST",
+        data: {
+          "action": "delete",
+          "id": id
+        },
+        success: function(data) {
+        refreshSector();
+        }
+      });
+    }
+  }
+
+  window.clearNatives = function(id) {
+    $.ajax({
+      url: "/admin/ajax/starfield",
+      method: "POST",
+      data: {
+        "action": "clearNatives",
+        "id": id
+      },
+      success: function(data) {
+        refreshSector();
+      }
+    });
+  }
+
   $("#xy button").on("click", function() {
+    currSectorX = $("#xy input[name=x]").val();
+    currSectorY = $("#xy input[name=y]").val();
+    refreshSector();
+  });
+
+  window.refreshSector = function() {
+    var currStarId = currStar == null ? 0 : currStar.id;
     $.ajax({
       url: "/admin/ajax/starfield",
       data: {
         "action": "xy",
-        "x": $("#xy input[name=x]").val(),
-        "y": $("#xy input[name=y]").val()
+        "x": currSectorX,
+        "y": currSectorY
       },
       success: function(data) {
         renderSector(data);
+        for (var index in data.stars) {
+          if (data.stars[index].id == currStarId) {
+            showStar(data.stars[index]);
+          }
+        }
       }
     });
-  });
+  }
 
   $("#starfield-container a").on("click", function() {
     var dx = 0;

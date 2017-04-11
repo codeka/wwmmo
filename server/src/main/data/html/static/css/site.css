@@ -1,0 +1,45 @@
+
+html, body {
+  padding: 0; margin: 0;
+}
+
+body {
+  font-family: arial, helvetica, verdana, sans-serif;
+  overflow-x: hidden;
+  background: #fff;
+  color: #333;
+}
+
+#header {
+  width: 100%;
+  background: rgb(37,37,37);
+  padding: 0; margin: 0;
+}
+
+#header div.header-bg {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAJ0lEQVQIW2NkQAOMGAI2NjYzgYJnjxw5MgskyQgU+A+kZwEF0kECALGKCgWXotQhAAAAAElFTkSuQmCC) repeat;
+  height: 56px;
+  position: relative;
+}
+
+#header img {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  margin-left: -300px;
+}
+
+#header h1 {
+  color: #fff;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin: 0 0 0 -240px;
+  line-height: 56px;
+  padding: 0;
+}
+
+#content {
+  width: 600px;
+  margin: 0 8px;
+}

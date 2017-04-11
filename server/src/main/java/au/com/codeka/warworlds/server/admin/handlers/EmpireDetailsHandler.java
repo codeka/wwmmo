@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Star;
-import au.com.codeka.warworlds.server.admin.RequestException;
+import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.StarManager;
 

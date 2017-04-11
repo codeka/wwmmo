@@ -51,7 +51,7 @@ $(function() {
       lastMsgTime = msg.date_posted;
     }
 
-    fixTimes();
+    time.refreshAll();
     if (msg.empire_id != null) {
       empireStore.getEmpire(msg.empire_id);
     }

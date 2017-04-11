@@ -1,10 +1,13 @@
 package au.com.codeka.warworlds.common.sim;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -41,6 +44,13 @@ public class StarModifier {
 
   public void modifyStar(Star.Builder star, StarModification modification) {
     modifyStar(star, null, Lists.newArrayList(modification), null);
+  }
+
+  public void modifyStar(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
+    modifyStar(star, null, Lists.newArrayList(modification), logHandler);
   }
 
   /**
@@ -102,6 +112,9 @@ public class StarModifier {
         return;
       case ADD_BUILD_REQUEST:
         applyAddBuildRequest(star, modification, logHandler);
+        return;
+      case DELETE_BUILD_REQUEST:
+        applyDeleteBuildRequest(star, modification, logHandler);
         return;
       case SPLIT_FLEET:
         applySplitFleet(star, modification, logHandler);
@@ -170,14 +183,14 @@ public class StarModifier {
                 .defence_bonus(1.0f)
                 .build())
             .build());
-    logHandler.log(String.format(
+    logHandler.log(String.format(Locale.US,
         "  colonized: colony_id=%d",
         star.planets.get(modification.planet_index).colony.id));
 
     // if there's no storage for this empire, add one with some defaults now.
     boolean hasStorage = false;
     for (EmpireStorage storage : star.empire_stores) {
-      if (storage.empire_id != null && storage.empire_id.equals(modification.empire_id)) {
+      if (Objects.equals(storage.empire_id, modification.empire_id)) {
         hasStorage = true;
       }
     }
@@ -313,6 +326,57 @@ public class StarModifier {
     } else {
       // TODO: suspicious!
     }
+  }
+
+  private void applyDeleteBuildRequest(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
+    Preconditions.checkArgument(
+        modification.type.equals(StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST));
+
+    Planet planet = null;
+    BuildRequest buildRequest = null;
+    for (Planet p : star.planets) {
+      if (p.colony != null) {
+        for (BuildRequest br : p.colony.build_requests) {
+          if (br.id.equals(modification.build_request_id)) {
+            if (!p.colony.empire_id.equals(modification.empire_id)) {
+              // TODO: suspicious!
+              logHandler.log("! trying to delete wrong empire's build request!");
+              return;
+            }
+            planet = p;
+            buildRequest = br;
+            break;
+          }
+        }
+        if (planet != null) {
+          break;
+        }
+      }
+    }
+
+    if (planet == null) {
+      // TODO: suspicious? (maybe complete)
+      logHandler.log("Couldn't find build request with ID " + modification.build_request_id);
+      return;
+    }
+    final long idToDelete = buildRequest.id;
+
+    logHandler.log("- deleting build request");
+    Colony.Builder colonyBuilder = planet.colony.newBuilder();
+    colonyBuilder.build_requests(
+        Lists.newArrayList(
+            Iterables.filter(planet.colony.build_requests, new Predicate<BuildRequest>() {
+              @Override
+              public boolean apply(@Nullable BuildRequest br) {
+                return !br.id.equals(idToDelete);
+              }
+            })));
+    star.planets.set(planet.index, planet.newBuilder()
+        .colony(colonyBuilder.build())
+        .build());
   }
 
   private void applySplitFleet(

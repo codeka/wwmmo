@@ -48,16 +48,13 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
     adapter.setColony(getStar(), getColony());
     ListView buildingsList = (ListView) view.findViewById(R.id.building_list);
     buildingsList.setAdapter(adapter);
-    buildingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ItemEntry entry = (ItemEntry) adapter.getItem(position);
-        if (entry.building == null && entry.buildRequest == null) {
-          getBuildFragment().showBuildSheet(entry.design);
-        } else if (entry.building != null && entry.buildRequest == null) {
-          // TODO: upgrade
-          getBuildFragment().showBuildSheet(entry.design);
-        }
+    buildingsList.setOnItemClickListener((parent, v, position, id) -> {
+      ItemEntry entry = (ItemEntry) adapter.getItem(position);
+      if (entry.building == null && entry.buildRequest == null) {
+        getBuildFragment().showBuildSheet(entry.design);
+      } else if (entry.building != null && entry.buildRequest == null) {
+        // TODO: upgrade
+        getBuildFragment().showBuildSheet(entry.design);
       }
     });
   }

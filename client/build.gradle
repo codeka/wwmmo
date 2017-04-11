@@ -28,9 +28,6 @@ android {
     targetSdkVersion 25
     versionCode getVersionCodeFromGit()
     versionName "2.0"
-    jackOptions {
-      enabled true
-    }
     multiDexEnabled true
   }
   compileOptions {
@@ -96,15 +93,15 @@ def getVersionCodeFromGit() {
 }
 
 dependencies {
-  compile project(':common')
   compile 'com.andkulikov:transitionseverywhere:1.6.3'
   compile 'com.android.support:appcompat-v7:25.3.0'
   compile 'com.android.support:preference-v7:25.3.0'
-  compile "com.google.android.gms:play-services-base:10.2.0"
+  compile 'com.google.android.gms:play-services-base:10.2.0'
   compile 'com.google.firebase:firebase-core:10.2.0'
   compile 'com.google.firebase:firebase-messaging:10.2.0'
   compile 'com.google.guava:guava:20.0'
   compile 'com.squareup.picasso:picasso:2.5.2'
+  compile project(':common')
 }
 
 apply plugin: 'com.google.gms.google-services'

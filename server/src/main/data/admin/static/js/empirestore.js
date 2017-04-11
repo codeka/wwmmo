@@ -54,7 +54,7 @@ var empireStore = (function() {
       // If we have one stored, we can return that for now, but we'll want to re-fetch from the
       // server anyway, to ensure we have the freshest.
       if (typeof storedEmpires[empireId] != "undefined") {
-        setTimeout(function() { callback(empires[empireId]); }, 0);
+        setTimeout(function() { callback(storedEmpires[empireId]); }, 0);
       }
 
       // If we already have a callback for this empireId, it means we're already fetching it, so

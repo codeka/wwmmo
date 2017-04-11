@@ -34,11 +34,20 @@
       android:layout_marginRight="@dimen/tablet_margin_5dp"
       android:text="@string/signin_help" />
 
+  <TextView
+      android:id="@+id/signin_error"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/signin_help"
+      android:layout_marginTop="16dp"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp" />
+
   <EditText
       android:id="@+id/email"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_below="@id/signin_help"
+      android:layout_below="@id/signin_error"
       android:inputType="textEmailAddress" />
 
   <View

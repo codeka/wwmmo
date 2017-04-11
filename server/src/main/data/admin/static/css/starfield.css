@@ -119,8 +119,35 @@ table td {
   margin-left: 20px;
 }
 
-.planets {
+.stores {
   margin-top: 80px;
+  border-top: 1px dotted #999;
+  padding-left: 64px;
+}
+
+.store-details {
+  width: 175px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+.store-details .delta {
+  font-size: 75%;
+}
+
+.store-details .delta.negative {
+  color: red;
+}
+.store-details .delta.positive {
+  color: green;
+}
+
+.planets {
+  border-top: 1px dotted #999;
+  margin-top: 20px;
 }
 
 .planets h2 {
@@ -181,7 +208,8 @@ table td {
 
 .fleets {
   height: 64px;
-  margin-left: 64px;
+  padding-left: 64px;
+  border-top: 1px dotted #999;
 }
 
 .fleet {
@@ -224,8 +252,11 @@ table td {
   margin-left: -300px;
   width: 600px;
   top: 100px;
-  height: 500px;
   background: #000;
   padding: 10px;
   border: solid 1px #fff;
+}
+
+.simulate {
+  padding-bottom: 64px;
 }

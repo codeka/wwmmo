@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.admin.handlers;
+package au.com.codeka.warworlds.server.handlers;
 
 import com.google.api.client.util.ByteStreams;
 
@@ -8,21 +8,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Collection;
 
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.AdminRole;
-import au.com.codeka.warworlds.server.admin.RequestException;
 
 /** Simple handler for handling static files (and 'templated' HTML files with no templated data). */
-public class FileHandler extends AdminHandler {
+public class FileHandler extends RequestHandler {
   private final Log log = new Log("AdminGenericHandler");
 
-  /** Any role can visit static files. */
-  @Override
-  protected Collection<AdminRole> getRequiredRoles() {
-    return Arrays.asList(AdminRole.values());
+  private final String basePath;
+
+  public FileHandler(String basePath) {
+    this.basePath = basePath;
   }
 
   @Override
@@ -49,11 +45,12 @@ public class FileHandler extends AdminHandler {
     getResponse().setHeader("Content-Type", contentType);
 
     try {
-      InputStream ins = new FileInputStream(new File("data/admin/static/" + path));
+      InputStream ins = new FileInputStream(new File(basePath + path));
       OutputStream outs = getResponse().getOutputStream();
       ByteStreams.copy(ins, outs);
       ins.close();
     } catch (FileNotFoundException e) {
+      log.error("Error", e);
       throw new RequestException(404, e.getMessage());
     } catch (IOException e) {
       log.error("Error sending static file!", e);

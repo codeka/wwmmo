@@ -53,16 +53,15 @@ public class ChatStore extends BaseStore {
 
   /** Adds the given messages to the store. */
   public void addMessages(List<ChatMessage> msgs) {
-    try (SQLiteDatabase db = helper.getWritableDatabase()) {
-      ContentValues contentValues = new ContentValues();
-      for (ChatMessage msg : msgs) {
-        contentValues.put("id", msg.id);
-        contentValues.put("room_id", msg.room_id);
-        contentValues.put("date_posted", msg.date_posted);
-        contentValues.put("msg", msg.encode());
-        db.insertWithOnConflict(
-            name + "_messages", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
-      }
+    SQLiteDatabase db = helper.getWritableDatabase();
+    ContentValues contentValues = new ContentValues();
+    for (ChatMessage msg : msgs) {
+      contentValues.put("id", msg.id);
+      contentValues.put("room_id", msg.room_id);
+      contentValues.put("date_posted", msg.date_posted);
+      contentValues.put("msg", msg.encode());
+      db.insertWithOnConflict(
+          name + "_messages", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
     }
   }
 
@@ -84,8 +83,8 @@ public class ChatStore extends BaseStore {
     queryArgs[index] = String.format(Locale.US, "%d", startTime);
 
     ArrayList<ChatMessage> msgs = new ArrayList<>();
+    SQLiteDatabase db = helper.getReadableDatabase();
     try (
-        SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.query(
             name + "_messages",
             new String[] { "msg" } /* columns */,
@@ -123,8 +122,8 @@ public class ChatStore extends BaseStore {
     queryArgs[index] = String.format(Locale.US, "%d", time);
 
     ArrayList<ChatMessage> msgs = new ArrayList<>();
+    SQLiteDatabase db = helper.getReadableDatabase();
     try (
-        SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.query(
             name + "_messages",
             new String[] { "msg" } /* columns */,
@@ -146,8 +145,8 @@ public class ChatStore extends BaseStore {
   /** Gets all messages, regardless of room, from the given start time. */
   public List<ChatMessage> getMessages(long time, int count) {
     ArrayList<ChatMessage> msgs = new ArrayList<>();
+    SQLiteDatabase db = helper.getReadableDatabase();
     try (
-        SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.query(
             name + "_messages",
             new String[] { "msg" } /* columns */,
@@ -168,8 +167,8 @@ public class ChatStore extends BaseStore {
   }
 
   public long getLastChatTime() {
+    SQLiteDatabase db = helper.getReadableDatabase();
     try (
-        SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.query(
             false, name + "_messages", new String[]{ "date_posted" }, null,
             null, null, null, "date_posted DESC", null)) {
@@ -182,8 +181,7 @@ public class ChatStore extends BaseStore {
   }
 
   public void removeHistory() {
-    try (SQLiteDatabase db = helper.getReadableDatabase()) {
-      db.execSQL("DELETE FROM " + name + "_messages");
-    }
+    SQLiteDatabase db = helper.getReadableDatabase();
+    db.execSQL("DELETE FROM " + name + "_messages");
   }
 }

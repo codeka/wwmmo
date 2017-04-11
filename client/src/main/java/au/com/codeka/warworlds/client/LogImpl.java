@@ -20,7 +20,7 @@ public class LogImpl {
   private static class LogImplImpl implements Log.LogImpl {
     @Override
     public boolean isLoggable(String tag, int level) {
-      return android.util.Log.isLoggable("wwmmo", LevelMap[level]);
+      return BuildConfig.DEBUG || android.util.Log.isLoggable("wwmmo", LevelMap[level]);
     }
 
     @Override

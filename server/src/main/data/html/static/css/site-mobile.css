@@ -1,0 +1,16 @@
+
+#header img {
+  top: 9px;
+  left: 9px;
+  margin: 0;
+}
+
+#header h1 {
+  top: 0;
+  left: 60px;
+  margin: 0;
+}
+
+#content {
+  width: 100%;
+}

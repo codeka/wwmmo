@@ -16,18 +16,19 @@ apply plugin: 'application'
 apply plugin: 'org.hidetake.ssh'
 
 dependencies {
-  compile 'au.com.codeka:carrot:2.2.0'
   compile 'joda-time:joda-time:2.3'
-  compile 'com.google.api-client:google-api-client:1.19.1'
-  compile 'com.google.api-client:google-api-client-gson:1.19.1'
+  compile 'com.google.api-client:google-api-client:1.22.0'
+  compile 'com.google.api-client:google-api-client-gson:1.22.0'
   compile 'com.google.code.findbugs:jsr305:3.0.0'
-  compile 'com.google.code.gson:gson:2.7'
+  compile 'com.google.code.gson:gson:2.8.0'
   compile 'com.google.firebase:firebase-admin:4.1.1'
-  compile 'com.google.guava:guava:20.0'
+  compile 'com.google.guava:guava:21.0'
   compile 'com.squareup.wire:wire-gson-support:2.1.2'
+  compile 'org.simplejavamail:simple-java-mail:4.2.1'
   compile 'org.eclipse.jetty:jetty-server:9.4.0.v20161208'
   compile 'org.eclipse.jetty.websocket:websocket-server:9.4.0.v20161208'
   compile 'org.xerial:sqlite-jdbc:3.16.1'
+  compile project(':carrot')
   compile project(':common')
   compile project(':planet-render')
 }

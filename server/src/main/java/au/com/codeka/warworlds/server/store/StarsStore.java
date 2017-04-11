@@ -81,6 +81,24 @@ public class StarsStore extends BaseStore {
     }
   }
 
+  public void delete(long id) {
+    try (Transaction trans = newTransaction()) {
+      newWriter(trans)
+          .stmt("DELETE FROM star_empires WHERE star_id = ?")
+          .param(0, id)
+          .execute();
+
+      newWriter(trans)
+          .stmt("DELETE FROM stars WHERE id = ?")
+          .param(0, id)
+          .execute();
+
+      trans.commit();
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+    }
+  }
+
   @Nullable
   public Star nextStarForSimulate() {
     try (

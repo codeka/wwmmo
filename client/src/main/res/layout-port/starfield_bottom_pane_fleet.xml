@@ -4,89 +4,97 @@
        android:layout_width="wrap_content"
        android:layout_height="wrap_content">
 
-  <ImageView
-      android:id="@+id/fleet_icon"
-      android:layout_width="48dp"
-      android:layout_height="48dp"
-      android:layout_alignParentStart="true"
-      android:layout_alignParentTop="true"
-      tools:src="@drawable/app_icon" />
-
-  <ImageView
-      android:id="@+id/empire_icon"
-      android:layout_width="20dp"
-      android:layout_height="20dp"
-      android:layout_alignBottom="@+id/fleet_icon"
-      android:layout_toEndOf="@+id/fleet_icon"
-      tools:src="@drawable/app_icon" />
-
-  <TextView
-      android:id="@+id/fleet_design"
-      android:layout_width="wrap_content"
-      android:layout_height="20dp"
-      android:layout_alignParentEnd="true"
-      android:layout_alignParentTop="true"
-      android:layout_toEndOf="@+id/fleet_icon"
-      android:gravity="center_vertical"
+  <LinearLayout
+      android:id="@+id/fleet_info"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
       android:orientation="horizontal"
-      tools:text="Design" />
+      android:layout_alignParentTop="true"
+      android:layout_alignParentStart="true">
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content">
 
-  <TextView
-      android:id="@+id/empire_name"
-      android:layout_width="wrap_content"
-      android:layout_height="20dp"
-      android:layout_alignBottom="@+id/empire_icon"
-      android:layout_toEndOf="@+id/empire_icon"
-      android:gravity="center_vertical"
-      tools:text="Empire" />
+      <ImageView
+          android:id="@+id/fleet_icon"
+          android:layout_width="48dp"
+          android:layout_height="48dp"
+          android:layout_alignParentStart="true"
+          android:layout_alignParentTop="true"
+          tools:src="@drawable/app_icon" />
 
-  <View
-      android:id="@+id/separator"
-      android:layout_width="1dp"
-      android:layout_height="1dp"
-      android:layout_centerHorizontal="true" />
+      <ImageView
+          android:id="@+id/empire_icon"
+          android:layout_width="20dp"
+          android:layout_height="20dp"
+          android:layout_alignBottom="@+id/fleet_icon"
+          android:layout_toEndOf="@+id/fleet_icon"
+          tools:src="@drawable/app_icon" />
 
-  <TextView
-      android:id="@+id/fleet_destination"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_alignParentStart="true"
-      android:layout_below="@id/fleet_icon"
-      android:layout_toStartOf="@+id/separator"
-      android:layout_marginTop="8dp"
-      android:layout_marginStart="4dp"
-      android:gravity="center_vertical"
-      android:orientation="horizontal" />
+      <TextView
+          android:id="@+id/fleet_design"
+          android:layout_width="wrap_content"
+          android:layout_height="20dp"
+          android:layout_alignParentEnd="true"
+          android:layout_alignParentTop="true"
+          android:layout_toEndOf="@+id/fleet_icon"
+          android:gravity="center_vertical"
+          android:orientation="horizontal"
+          tools:text="Design" />
 
-  <ProgressBar
-      android:id="@+id/progress_bar"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_below="@+id/fleet_destination"
-      android:layout_alignStart="@+id/fleet_destination"
-      android:layout_toStartOf="@+id/separator"
-      android:layout_margin="4dp" />
+      <TextView
+          android:id="@+id/empire_name"
+          android:layout_width="wrap_content"
+          android:layout_height="20dp"
+          android:layout_alignBottom="@+id/empire_icon"
+          android:layout_toEndOf="@+id/empire_icon"
+          android:gravity="center_vertical"
+          tools:text="Empire" />
 
-  <TextView
-      android:id="@+id/progress_text"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_below="@+id/progress_bar"
-      android:layout_alignStart="@+id/fleet_destination"
-      android:layout_toStartOf="@+id/separator"
-      android:layout_margin="4dp"
-      android:gravity="center_vertical" />
+      <TextView
+          android:id="@+id/fleet_destination"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentStart="true"
+          android:layout_below="@id/fleet_icon"
+          android:layout_toStartOf="@+id/separator"
+          android:layout_marginTop="8dp"
+          android:layout_marginStart="4dp"
+          android:gravity="center_vertical"
+          android:orientation="horizontal" />
 
-  <Button
-      android:id="@+id/boost_btn"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_alignTop="@+id/fleet_destination"
-      android:layout_toEndOf="@+id/separator"
-      android:layout_alignParentEnd="true"
-      android:layout_margin="4dp"
-      android:text="@string/boost" />
+      <ProgressBar
+          android:id="@+id/progress_bar"
+          style="?android:attr/progressBarStyleHorizontal"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_below="@+id/fleet_destination"
+          android:layout_alignStart="@+id/fleet_destination"
+          android:layout_toStartOf="@+id/separator"
+          android:layout_margin="4dp" />
+
+      <TextView
+          android:id="@+id/progress_text"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_below="@+id/progress_bar"
+          android:layout_alignStart="@+id/fleet_destination"
+          android:layout_toStartOf="@+id/separator"
+          android:layout_margin="4dp"
+          android:gravity="center_vertical" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/boost_btn"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/fleet_destination"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="4dp"
+        android:text="@string/boost" />
+  </LinearLayout>
 
 
   <Button
@@ -96,7 +104,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_alignParentEnd="true"
-      android:layout_below="@id/progress_text"
+      android:layout_below="@id/fleet_info"
       android:text="@string/empire" />
 
   <Button
@@ -105,7 +113,7 @@
       android:transitionName="sitrep_btn"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_below="@id/progress_text"
+      android:layout_below="@id/fleet_info"
       android:layout_marginEnd="5dp"
       android:layout_toStartOf="@+id/empire_btn"
       android:text="@string/sitrep" />
@@ -125,7 +133,7 @@
       android:id="@+id/infobar"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_below="@id/progress_text"
+      android:layout_below="@id/fleet_info"
       android:layout_alignParentStart="true"
       android:layout_alignTop="@id/alliance_btn"
       android:layout_toStartOf="@+id/alliance_btn" />

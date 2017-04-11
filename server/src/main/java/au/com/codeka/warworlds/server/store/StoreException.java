@@ -15,4 +15,9 @@ public class StoreException extends Exception {
   public StoreException(String msg) {
     super(msg);
   }
+
+  /** Constructs a new {@link StoreException} with the given exception. */
+  public StoreException(Exception e) {
+    super(e);
+  }
 }

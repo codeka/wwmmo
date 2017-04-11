@@ -14,6 +14,7 @@
   <string name="cancel">Cancel</string>
   <string name="done">Done</string>
   <string name="next">Next</string>
+  <string name="back">Back</string>
   <string name="empire">Empire</string>
   <string name="sitrep">Sit. Rep.</string>
   <string name="view">View</string>
@@ -39,6 +40,8 @@
   <string name="new_group">New Group</string>
   <string name="intel">Intel.</string>
   <string name="locate">Locate</string>
+  <string name="yes">Yes</string>
+  <string name="no">No</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to
@@ -89,5 +92,16 @@
     Thanks for verifying your email address, verification is now complete and you can continue
     playing War Worlds. If you access your account through another device using the same email
     address, the game will be automatically synchronised between the two devices automatically.
+  </string>
+  <string name="signin_error_account_already_exists">
+    This account is already associated with another email address. Do you want to associate it
+    with this new address instead?
+  </string>
+  <string name="signin_error_email_already_associated">
+    This email address is associated with a different account. Do you want to associate with this
+    account instead? You will not be able to access the old account if you do.
+  </string>
+  <string name="signin_error_unknown">
+    Oops, something\'s gone wrong!
   </string>
 </resources>

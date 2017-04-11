@@ -35,6 +35,12 @@ message AccountAssociateResponse {
     // The email address is already associated with a different account, cannot be associated with
     // this new account.
     EMAIL_ALREADY_ASSOCIATED = 3;
+
+    // Some other unexpected error.
+    UNEXPECTED_ERROR = 4;
+
+    // The association hasn't happened yet.
+    NOT_VERIFIED = 5;
   }
   optional AccountAssociateStatus status = 1;
 }
@@ -58,6 +64,9 @@ message Account {
     EMAIL_STATUS_UNKNOWN = 0;
     UNVERIFIED = 1;
     VERIFIED = 2;
+
+    // The address used to be associated with this account, but it was abandoned for another.
+    ABANDONED = 3;
   }
   optional EmailStatus email_status = 4;
 

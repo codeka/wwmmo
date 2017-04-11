@@ -33,6 +33,38 @@
       <div class="star-big star-big-<%= classification.toLowerCase() %>"></div>
       <h1><%= name %></h1>
       <div class="details"><%= id %> [<%= sector_x %>,<%= sector_y %>] (<%= offset_x %>,<%= offset_y %>)</div>
+      <div class="stores">
+        <% for (var i in empire_stores) { %>
+          <div class="store">
+            <img data-empireid="<%= empire_stores[i].empire_id %>" width="16" height="16" />
+            <b><span data-empireid="<%= empire_stores[i].empire_id %>">...</span></b>
+            <span class="store-details">
+              <img src="/admin/img/focus/farming.png" width="16" height="16">
+              <%= Math.round(empire_stores[i].total_goods) %> / <%= Math.round(empire_stores[i].max_goods) %>
+              <span class="delta <% if (empire_stores[i].goods_delta_per_hour < 0) { %>negative<% } else { %>positive<% } %>">
+                <% if (empire_stores[i].goods_delta_per_hour > 0) { %>+<% } %><%= Math.round(empire_stores[i].goods_delta_per_hour) %> / hr
+              </span>
+            </span>
+
+            <span class="store-details">
+              <img src="/admin/img/focus/mining.png" width="16" height="16">
+              <%= Math.round(empire_stores[i].total_minerals) %> / <%= Math.round(empire_stores[i].max_minerals) %>
+              <span class="delta <% if (empire_stores[i].minerals_delta_per_hour < 0) { %>negative<% } else { %>positive<% } %>">
+                <% if (empire_stores[i].minerals_delta_per_hour > 0) { %>+<% } %><%= Math.round(empire_stores[i].minerals_delta_per_hour) %> / hr
+              </span>
+            </span>
+
+            <span class="store-details">
+              <img src="/admin/img/focus/energy.png" width="16" height="16">
+              <%= Math.round(empire_stores[i].total_energy) %> / <%= Math.round(empire_stores[i].max_energy) %>
+              <span class="delta <% if (empire_stores[i].energy_delta_per_hour < 0) { %>negative<% } else { %>positive<% } %>">
+                <% if (empire_stores[i].energy_delta_per_hour > 0) { %>+<% } %><%= Math.round(empire_stores[i].energy_delta_per_hour) %> / hr
+              </span>
+            </span>
+          </div>
+          <% empireStore.getEmpire(empire_stores[i].empire_id); %>
+        <% } %>
+      </div>
       <div class="planets">
         <% for (var i in planets) { %>
           <div class="planet">
@@ -121,7 +153,10 @@
       </div>
       <div class="simulate">
         <a href="javascript:simulate(<%= id %>);">Simulate</a> &bull;
-        <a href="javascript:modify(<%= id %>);">Modify</a>
+        <a href="javascript:modify(<%= id %>);">Modify</a> &bull;
+        <a href="javascript:refreshSector();">Refresh</a> &bull;
+        <a href="javascript:clearNatives(<%= id %>);">Clear natives</a> &bull;
+        <a href="javascript:deleteStar(<%= id %>);">Delete</a>
         <div id="simulate-result"></div>
       </div>
       <div id="modify-popup">
@@ -137,9 +172,9 @@
             <option>SPLIT_FLEET</option>
             <option>MERGE_FLEET</option>
             <option>MOVE_FLEET</option>
+            <option>DELETE_BUILD_REQUEST</option>
           </select>
           <dt>Empire
-          <!-- TODO: use autocomplete -->
           <dd><select name="empire_id">
             <option>TODO: pre-populate</option>
           </select>
@@ -155,8 +190,10 @@
           <dd><select name="fleet_id">
             <option>TODO: pre-populate</option>
           </select>
-          <dt>Focus
-          <dd>TODO?
+          <dt>Build request
+          <dd><select name="build_request_id">
+            <option>TODO: pre-populate</option>
+          </select>
           <dt>Design
           <dd><select name="design_type">
             <option value="">N/A</option>
@@ -176,10 +213,6 @@
           </select>
           <dt>Count
           <dd><input name="count" type="number" />
-          <dt>Target Star
-          <dd>TODO?
-          <dt>Fleet
-          <dd>TODO?
           <dt>Additional fleets
           <dd><input name="additional_fleet_ids" type="text" />
         </dl>

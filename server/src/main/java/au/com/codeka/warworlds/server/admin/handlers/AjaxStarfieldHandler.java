@@ -10,7 +10,7 @@ import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.Simulation;
-import au.com.codeka.warworlds.server.admin.RequestException;
+import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.world.SectorManager;
 import au.com.codeka.warworlds.server.world.StarManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
@@ -46,6 +46,16 @@ public class AjaxStarfieldHandler extends AjaxHandler {
         String modifyJson = getRequest().getParameter("modify");
         handleModifyRequest(starId, modifyJson);
         break;
+      case "delete":
+        starId = Long.parseLong(getRequest().getParameter("id"));
+        handleDeleteRequest(starId);
+        break;
+      case "clearNatives":
+        starId = Long.parseLong(getRequest().getParameter("id"));
+        handleClearNativesRequest(starId);
+        break;
+      default:
+        throw new RequestException(400, "Unknown action: " + getRequest().getParameter("action"));
     }
   }
 
@@ -64,6 +74,16 @@ public class AjaxStarfieldHandler extends AjaxHandler {
     log.debug("modify: " + modifyJson);
     StarModification modification = fromJson(modifyJson, StarModification.class);
     setResponseGson(modifyAndSimulate(starId, modification));
+  }
+
+  private void handleDeleteRequest(long starId) {
+    log.debug("delete star: %d", starId);
+    StarManager.i.deleteStar(starId);
+  }
+
+  private void handleClearNativesRequest(long starId) {
+    log.debug("delete star: %d", starId);
+    StarManager.i.removeNativeColonies(starId);
   }
 
   private SimulateResponse modifyAndSimulate(long starId, @Nullable StarModification modification) {
