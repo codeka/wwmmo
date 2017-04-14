@@ -73,9 +73,14 @@ $(function() {
 
   function showStar(star) {
     currStar = star;
-    var html = $("#star-details-tmpl").applyTemplate(star);
-    $("#star-details").html(html);
-    time.refreshAll();
+    if (star) {
+      var html = $("#star-details-tmpl").applyTemplate(star);
+      $("#star-details").html(html);
+      time.refreshAll();
+    } else {
+      $("#star-details").empty();
+    }
+    updateUrl();
   }
 
   // Called to refresh which fields are visible, based on the modification type you've selected.
@@ -343,11 +348,23 @@ $(function() {
   $("#xy button").on("click", function() {
     currSectorX = $("#xy input[name=x]").val();
     currSectorY = $("#xy input[name=y]").val();
+    currStar = null;
     refreshSector();
+    updateUrl();
   });
 
-  window.refreshSector = function() {
-    var currStarId = currStar == null ? 0 : currStar.id;
+  function updateUrl() {
+    $.QueryString["sector"] = currSectorX + "," + currSectorY;
+    if (currStar == null) {
+      delete $.QueryString["star"];
+    } else {
+      $.QueryString["star"] = currStar.id;
+    }
+    history.replaceState(null, "", "?" + $.param($.QueryString));
+  }
+
+  window.refreshSector = function(currStarId) {
+    currStarId = currStarId ? currStarId : (currStar == null ? 0 : currStar.id);
     $.ajax({
       url: "/admin/ajax/starfield",
       data: {
@@ -357,10 +374,15 @@ $(function() {
       },
       success: function(data) {
         renderSector(data);
+        var shown = false;
         for (var index in data.stars) {
           if (data.stars[index].id == currStarId) {
             showStar(data.stars[index]);
+            shown = true;
           }
+        }
+        if (!shown) {
+          showStar(null);
         }
       }
     });
@@ -382,4 +404,17 @@ $(function() {
     $("#xy input[name=y]").val(parseInt($("#xy input[name=y]").val()) + dy);
     $("#xy button").click();
   });
+
+  if ($.QueryString["sector"]) {
+    var sector = $.QueryString["sector"].split(",");
+    currSectorX = parseInt(sector[0]);
+    currSectorY = parseInt(sector[1]);
+    $("#xy input[name=x]").val(currSectorX);
+    $("#xy input[name=y]").val(currSectorY);
+    var currStarId = null;
+    if ($.QueryString["star"]) {
+      currStarId = parseInt($.QueryString["star"]);
+    }
+    refreshSector(currStarId);
+  }
 });
