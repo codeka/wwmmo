@@ -24,7 +24,7 @@ public class EmpiresHandler extends AdminHandler {
       empires.put(account.empire_id, DataStore.i.empires().get(account.empire_id));
     }
 
-    render("empires/accounts.html", ImmutableMap.<String, Object>builder()
+    render("empires/index.html", ImmutableMap.<String, Object>builder()
         .put("accounts", accounts)
         .put("empires", empires)
         .build());
