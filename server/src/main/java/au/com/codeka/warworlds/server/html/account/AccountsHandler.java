@@ -14,7 +14,7 @@ import au.com.codeka.warworlds.server.world.WatchableObject;
 
 /** Accounts servlet for creating new accounts on the server. */
 public class AccountsHandler extends ProtobufRequestHandler {
-  private final Log log = new Log("AccountsHandler");
+  private final Log log = new Log("EmpiresHandler");
 
   @Override
   public void post() throws RequestException {
