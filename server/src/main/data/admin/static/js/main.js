@@ -17,6 +17,7 @@ $(function() {
   $("#navmenu-toggle").on("click", function() {
     var $navmenu = $("#navmenu");
     var show = ($navmenu.css("display") == "none");
+    localStorage["navmenu.hidden"] = !show;
 
     $navmenu.show();
     $navmenu.animate({
@@ -30,6 +31,11 @@ $(function() {
         "left": (show ? "310" : "0")+"px"
       }, "fast");
   });
+  var isHidden = localStorage["navmenu.hidden"] == "true";
+  if (isHidden) {
+    $("#navmenu").hide();
+    $("#maincontent").css("left", "0px");
+  }
 });
 
 // helper to format a number with comma thousand separators.
