@@ -1,0 +1,12 @@
+package au.com.codeka.warworlds.common.proto;
+
+import "common.proto";
+import "account.proto";
+
+message LoginEvent {
+  optional int64 timestamp = 1;
+  optional int32 day = 2;
+  optional int64 empire_id = 3;
+  optional string email_addr = 4;
+  optional DeviceInfo device_info = 5;
+}

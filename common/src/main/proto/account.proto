@@ -78,6 +78,9 @@ message Account {
 message LoginRequest {
   // Your login cookie. Required.
   optional string cookie = 1;
+
+  // The DeviceInfo of the device you're logging in from.
+  optional DeviceInfo device_info = 2;
 }
 
 // This is sent from the /login endpoing in response to a LoginRequest.
@@ -106,4 +109,25 @@ message LoginResponse {
   // If true, we'll force the ads to be removed. If false, or not specified, we'll check
   // whatever the In-App Purchase API has to say.
   optional bool force_remove_ads = 6;
+}
+
+// Contains details about a device, such as it's ID, model etc. Also contains details about the
+// device's GCM registration (so we can send it GCM messages).
+message DeviceInfo {
+  // The identifier of the device. You can have multiple accounts on one device, this
+  // will then refer to the device itself.
+  optional string device_id = 1;
+
+  // The value of android.os.Build.MODEL for this device
+  optional string device_model = 2;
+
+  // The value of android.os.Build.MANUFACTURER for this device
+  optional string device_manufacturer = 3;
+
+  // The value of android.os.Build.DISPLAY for this device
+  optional string device_build = 4;
+
+  // The value of android.os.Build.VERSION.RELEASE for this device (note that this can
+  // change if you upgrade the OS without re-registering your device!)
+  optional string device_version = 5;
 }
