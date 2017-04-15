@@ -46,9 +46,8 @@
       dataTable.addColumn("number", "7-day actives");
       dataTable.addColumn("number", "New Signups");
       dataTable.addRows([
-      {% for entry in graph_data %}
-        [new Date({{entry.year}}, {{entry.month + 1}}, {{entry.day}}), {{entry.oneda}}, {{entry.sevenda}}, {{entry.signups}}],
-      {% endfor %}
+      {% for entry in graph %}
+        [new Date({{entry.day / 10000}}, {{entry.day / 100 - ((entry.day / 10000) * 100)}} - 1, {{entry.day - (entry.day / 100) * 100}}), {{entry.oneda}}, {{entry.sevenda}}, {{entry.signups}}],{% endfor %}
       ]);
 
       var dataView = new google.visualization.DataView(dataTable);

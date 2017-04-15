@@ -10,3 +10,10 @@ message LoginEvent {
   optional string email_addr = 4;
   optional DeviceInfo device_info = 5;
 }
+
+message DailyStat {
+  optional int32 day = 1;
+  optional int32 oneda = 2;
+  optional int32 sevenda = 3;
+  optional int32 signups = 4;
+}

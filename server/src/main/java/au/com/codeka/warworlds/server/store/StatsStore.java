@@ -3,10 +3,15 @@ package au.com.codeka.warworlds.server.store;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
+import au.com.codeka.warworlds.common.proto.DailyStat;
 import au.com.codeka.warworlds.common.proto.DeviceInfo;
 import au.com.codeka.warworlds.common.proto.LoginEvent;
 import au.com.codeka.warworlds.common.proto.LoginRequest;
@@ -69,12 +74,68 @@ public class StatsStore extends BaseStore {
     return loginEvents;
   }
 
+  /** Get the {@link DailyStat} for the last {@code num} days. */
+  public Map<Integer, DailyStat> getDailyStats(int num) {
+    DateTime dt = DateTime.now().minusDays(num + 7); // 7 more to calculate the 7da correctly
+    int currDay = dateTimeToDay(dt);
+
+    ArrayList<Set<Long>> lastEmpires = new ArrayList<>();
+    lastEmpires.add(new HashSet<>());
+
+    HashMap<Integer, DailyStat> dailyStats = new HashMap<>();
+    try (
+        QueryResult res = newReader()
+            .stmt("SELECT day, empire_id FROM login_events WHERE day >= ? ORDER BY day ASC")
+            .param(0, currDay)
+            .query()
+    ) {
+      while (res.next()) {
+        int day = res.getInt(0);
+        long empireId = res.getLong(1);
+        if (day == currDay) {
+          lastEmpires.get(0).add(empireId);
+        } else {
+          appendStats(dailyStats, currDay, lastEmpires);
+          currDay = day;
+          lastEmpires.add(0, new HashSet<>());
+          lastEmpires.get(0).add(empireId);
+        }
+      }
+      appendStats(dailyStats, currDay, lastEmpires);
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+    }
+    return dailyStats;
+  }
+
+  private void appendStats(
+      Map<Integer, DailyStat> dailyStats,
+      int day,
+      ArrayList<Set<Long>> lastEmpires) {
+    Set<Long> sevenda = new HashSet<>();
+    for (int i = 0; i < 7 && i < lastEmpires.size(); i++) {
+      sevenda.addAll(lastEmpires.get(i));
+    }
+
+    dailyStats.put(day,
+        new DailyStat.Builder()
+            .day(day)
+            .oneda(lastEmpires.get(0).size())
+            .sevenda(sevenda.size())
+            .signups(0) // TODO: populate
+            .build());
+  }
+
   /**
    * Take a stamp in unix-epoch-millis format (i.e. like what you'd get from
    * {@code System.currentTimeMillis()}, and return a "day" integer of the form yyyymmdd.
    */
   private int timestampToDay(long timestamp) {
     DateTime dt = new DateTime(timestamp);
+    return dateTimeToDay(dt);
+  }
+
+  private int dateTimeToDay(DateTime dt) {
     return dt.year().get() * 10000 + dt.monthOfYear().get() * 100 + dt.dayOfMonth().get();
   }
 
