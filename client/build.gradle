@@ -20,7 +20,7 @@ if (signingPropsFile.isFile()) {
 
 android {
   compileSdkVersion 25
-  buildToolsVersion "25.0.2"
+  buildToolsVersion "26.0.0-rc1"
 
   defaultConfig {
     applicationId "au.com.codeka.warworlds2"
@@ -94,11 +94,11 @@ def getVersionCodeFromGit() {
 
 dependencies {
   compile 'com.andkulikov:transitionseverywhere:1.6.3'
-  compile 'com.android.support:appcompat-v7:25.3.0'
-  compile 'com.android.support:preference-v7:25.3.0'
-  compile 'com.google.android.gms:play-services-base:10.2.0'
-  compile 'com.google.firebase:firebase-core:10.2.0'
-  compile 'com.google.firebase:firebase-messaging:10.2.0'
+  compile 'com.android.support:appcompat-v7:25.3.1'
+  compile 'com.android.support:preference-v7:25.3.1'
+  compile 'com.google.android.gms:play-services-base:10.2.1'
+  compile 'com.google.firebase:firebase-core:10.2.1'
+  compile 'com.google.firebase:firebase-messaging:10.2.1'
   compile 'com.google.guava:guava:20.0'
   compile 'com.squareup.picasso:picasso:2.5.2'
   compile project(':common')
