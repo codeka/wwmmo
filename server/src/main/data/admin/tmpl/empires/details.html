@@ -10,7 +10,16 @@
   <h1>{{ empire.display_name }}</h1>
 
   <h2>Stars</h2>
-  {% for star in stars %}
-    <p>star {{star.id}} {{star.name}} (sector={{star.sector_x}}, {{star.sector_y}})</p>
-  {% end %}
+  <table>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+    </tr>
+    {% for star in stars %}
+      <tr>
+        <td>{{ star.id }}</td>
+        <td><a href="/admin/starfield?sector={{ star.sector_x }},{{ star.sector_y }}&star={{ star.id }}">{{ star.name }}</a></td>
+      </tr>
+    {% end %}
+  </table>
 {% end %}

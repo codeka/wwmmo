@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.server.admin.handlers.AccountsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AdminHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AdminLoginHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxAccountsHandler;
@@ -24,8 +23,8 @@ import au.com.codeka.warworlds.server.admin.handlers.AjaxUsersHandler;
 import au.com.codeka.warworlds.server.admin.handlers.ChatHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DashboardHandler;
 import au.com.codeka.warworlds.server.admin.handlers.EmpireDetailsHandler;
-import au.com.codeka.warworlds.server.admin.handlers.EmpiresHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AdminFileHandler;
+import au.com.codeka.warworlds.server.admin.handlers.EmpiresHandler;
 import au.com.codeka.warworlds.server.admin.handlers.SectorsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.StarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.UsersCreateHandler;
@@ -44,7 +43,6 @@ public class AdminServlet extends HandlerServlet {
       new Route("/login", AdminLoginHandler.class),
       new Route("/sectors", SectorsHandler.class),
       new Route("/starfield", StarfieldHandler.class),
-      new Route("/accounts", AccountsHandler.class),
       new Route("/empires", EmpiresHandler.class),
       new Route("/empires/(?<id>[0-9]+)", EmpireDetailsHandler.class),
       new Route("/users", UsersHandler.class),

@@ -6,6 +6,31 @@
 {% block "content" %}
   <h1>Active Empires</h1>
   <div id="graph" style="width: 100%; margin: 0 auto;"></div>
+  <h2>Recent Logins</h2>
+  <table>
+    <tr>
+      <th>Time</th>
+      <th>Empire</th>
+      <th>Email</th>
+      <th>Device ID</th>
+      <th>Model</th>
+      <th>Manufacturer</th>
+      <th>Build</th>
+      <th>Version</th>
+    </tr>
+    {% for loginEvent in loginEvents %}
+      <tr>
+        <td>{{ loginEvent.day }}</td>
+        <td><a href="/admin/empires/{{ loginEvent.empire_id }}">{{ empires[loginEvent.empire_id].display_name }}</a></td>
+        <td>{{ loginEvent.email_addr }}</td>
+        <td>{{ loginEvent.device_info.device_id }}</td>
+        <td>{{ loginEvent.device_info.device_model }}</td>
+        <td>{{ loginEvent.device_info.device_manufacturer }}</td>
+        <td>{{ loginEvent.device_info.device_build }}</td>
+        <td>{{ loginEvent.device_info.device_version }}</td>
+      </tr>
+    {% end %}
+  </table>
   <script type="text/javascript">
     // keep the width/height ratio of the graph nice
     var ratio = 0.4;
@@ -21,9 +46,8 @@
       dataTable.addColumn("number", "7-day actives");
       dataTable.addColumn("number", "New Signups");
       dataTable.addRows([
-      {% for entry in graph_data %}
-        [new Date({{entry.year}}, {{entry.month + 1}}, {{entry.day}}), {{entry.oneda}}, {{entry.sevenda}}, {{entry.signups}}],
-      {% endfor %}
+      {% for entry in graph %}
+        [new Date({{entry.day / 10000}}, {{entry.day / 100 - ((entry.day / 10000) * 100)}} - 1, {{entry.day - (entry.day / 100) * 100}}), {{entry.oneda}}, {{entry.sevenda}}, {{entry.signups}}],{% endfor %}
       ]);
 
       var dataView = new google.visualization.DataView(dataTable);

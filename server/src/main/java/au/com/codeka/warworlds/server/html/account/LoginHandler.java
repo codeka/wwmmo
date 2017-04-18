@@ -45,6 +45,8 @@ public class LoginHandler extends ProtobufRequestHandler {
       return;
     }
 
+    DataStore.i.stats().addLoginEvent(req, account);
+
     LoginResponse.Builder resp = new LoginResponse.Builder()
         .status(LoginResponse.LoginStatus.SUCCESS);
     // Tell the server socket to expect a connection from this client.

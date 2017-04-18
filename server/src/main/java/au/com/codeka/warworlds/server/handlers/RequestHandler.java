@@ -83,10 +83,14 @@ public class RequestHandler {
       }
     } catch (RequestException e) {
       handleException(e);
+    } catch (Exception e) {
+      log.error("Unexpected exception", e);
+      throw e;
     }
   }
 
   protected void handleException(RequestException e) throws RequestException {
+    log.error("Unhandled exception", e);
     throw e;
   }
 
