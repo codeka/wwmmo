@@ -10,6 +10,7 @@ import android.support.v7.preference.PreferenceManager;
 import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.BuildConfig;
@@ -55,6 +56,9 @@ public class GameSettings {
 
     /** If you've associated with an email address, this is it. */
     EMAIL_ADDR(ValueType.STRING, ""),
+
+    /** A unique ID that's gauranteed to not change (as long as the user doesn't clear app data) */
+    INSTANCE_ID(ValueType.STRING, ""),
 
     /** Your current {@link SignInState}. */
     SIGN_IN_STATE(SignInState.ANONYMOUS),
@@ -136,6 +140,10 @@ public class GameSettings {
   private GameSettings() {
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.i);
     sharedPreferences.registerOnSharedPreferenceChangeListener(onPrefChangedListener);
+
+    if (getString(Key.INSTANCE_ID).equals("")) {
+      edit().setString(Key.INSTANCE_ID, UUID.randomUUID().toString()).commit();
+    }
   }
 
   public void addSettingChangedHandler(SettingChangeHandler handler) {

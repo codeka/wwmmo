@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.net;
 
+import android.content.Context;
 import android.os.Build;
 
 import java.io.IOException;
@@ -238,8 +239,8 @@ public class Server {
 
   private static DeviceInfo populateDeviceInfo() {
     return new DeviceInfo.Builder()
-        .device_build(Build.DEVICE)
-        .device_id(Build.ID)
+        .device_build(Build.ID)
+        .device_id(GameSettings.i.getString(GameSettings.Key.INSTANCE_ID))
         .device_manufacturer(Build.MANUFACTURER)
         .device_model(Build.MODEL)
         .device_version(Build.VERSION.RELEASE)
