@@ -79,6 +79,9 @@ public class EmpireManager {
     WatchableObject<Star> star = StarManager.i.getStar(newStarFinder.getStar().id);
     StarManager.i.modifyStar(star, Lists.newArrayList(
         new StarModification.Builder()
+            .type(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
+            .build(),
+        new StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
             .empire_id(id)
             .design_type(Design.DesignType.COLONY_SHIP)

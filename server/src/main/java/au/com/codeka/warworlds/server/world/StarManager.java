@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -68,6 +67,10 @@ public class StarManager {
       star = watchableStar.get();
     } else {
       star = store.get(id);
+      if (star == null) {
+        // If the star's not in the store, it doesn't exist.
+        return;
+      }
     }
     SectorCoord coord = new SectorCoord.Builder().x(star.sector_x).y(star.sector_y).build();
 
@@ -111,43 +114,6 @@ public class StarManager {
             .build());
 
         numColonies--;
-      }
-
-      star.set(starBuilder.build());
-    }
-  }
-
-  /**
-   * Remove the native colonies (and fleets) from the star with the given ID. This is usually what
-   * we do just before putting a new empire on there.
-   */
-  public void removeNativeColonies(long id) {
-    WatchableObject<Star> star = getStar(id);
-    synchronized (star.lock) {
-      log.debug("Removing native colonies from star %d \"%s\"...", star.get().id, star.get().name);
-
-      Star.Builder starBuilder = star.get().newBuilder();
-      for (int i = 0; i < starBuilder.planets.size(); i++) {
-        if (starBuilder.planets.get(i).colony != null
-            && starBuilder.planets.get(i).colony.empire_id == null) {
-          starBuilder.planets.set(i, starBuilder.planets.get(i).newBuilder()
-              .colony(null)
-              .build());
-        }
-      }
-
-      for (int i = 0; i < starBuilder.empire_stores.size(); i++) {
-        if (starBuilder.empire_stores.get(i).empire_id == null) {
-          starBuilder.empire_stores.remove(i);
-          i--;
-        }
-      }
-
-      for (int i = 0; i < starBuilder.fleets.size(); i++) {
-        if (starBuilder.fleets.get(i).empire_id == null) {
-          starBuilder.fleets.remove(i);
-          i--;
-        }
       }
 
       star.set(starBuilder.build());

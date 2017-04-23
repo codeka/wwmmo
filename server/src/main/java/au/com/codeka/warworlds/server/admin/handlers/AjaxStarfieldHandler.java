@@ -83,7 +83,9 @@ public class AjaxStarfieldHandler extends AjaxHandler {
 
   private void handleClearNativesRequest(long starId) {
     log.debug("delete star: %d", starId);
-    StarManager.i.removeNativeColonies(starId);
+    modifyAndSimulate(starId, new StarModification.Builder()
+        .type(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
+        .build());
   }
 
   private SimulateResponse modifyAndSimulate(long starId, @Nullable StarModification modification) {

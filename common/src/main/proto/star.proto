@@ -225,6 +225,11 @@ message StarModification {
     // Delete an in-progress build request.
     // empire_id and build_request_id are required.
     DELETE_BUILD_REQUEST = 9;
+
+    // Remove all native colonies and fleets. Useful when a new player joins. Ignored if send from
+    // the client.
+    // No fields are required.
+    EMPTY_NATIVE = 10;
   }
   optional MODIFICATION_TYPE type = 1;
 

@@ -125,6 +125,9 @@ public class StarModifier {
       case MOVE_FLEET:
         applyMoveFleet(star, auxStars, modification, logHandler);
         return;
+      case EMPTY_NATIVE:
+        applyEmptyNative(star, modification, logHandler);
+        return;
       default:
         logHandler.log("Unknown or unexpected modification type: " + modification.type);
         log.error("Unknown or unexpected modification type: %s", modification.type);
@@ -137,7 +140,7 @@ public class StarModifier {
       Simulation.LogHandler logHandler) {
     Preconditions.checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.COLONIZE));
-    logHandler.log(String.format("- colonizing planet #%d", modification.planet_index));
+    logHandler.log(String.format(Locale.US, "- colonizing planet #%d", modification.planet_index));
 
     // Destroy a colony ship, unless this is a native colony.
     if (modification.empire_id != null) {
@@ -235,7 +238,7 @@ public class StarModifier {
     }
 
     // Now add the fleet itself.
-    logHandler.log(String.format("- creating fleet (%s) numAttacking=%d",
+    logHandler.log(String.format(Locale.US, "- creating fleet (%s) numAttacking=%d",
         attack ? "attacking" : "not attacking",
         numAttacking));
     if (modification.fleet != null) {
@@ -268,7 +271,8 @@ public class StarModifier {
 
     Planet planet = getPlanetWithColony(star, modification.colony_id);
     if (planet != null) {
-      logHandler.log(String.format("- creating building, colony_id=%d", modification.colony_id));
+      logHandler.log(
+          String.format(Locale.US, "- creating building, colony_id=%d", modification.colony_id));
       Colony.Builder colony = planet.colony.newBuilder();
       colony.buildings.add(new Building.Builder()
           .design_type(modification.design_type)
@@ -291,7 +295,7 @@ public class StarModifier {
 
     Planet planet = getPlanetWithColony(star, modification.colony_id);
     if (planet != null) {
-      logHandler.log(String.format("- adjusting focus."));
+      logHandler.log("- adjusting focus.");
       star.planets.set(planet.index, planet.newBuilder()
           .colony(planet.colony.newBuilder()
               .focus(modification.focus)
@@ -513,12 +517,12 @@ public class StarModifier {
 
     EmpireStorage.Builder empireStorageBuilder = star.empire_stores.get(storageIndex).newBuilder();
     if (empireStorageBuilder.total_energy < fuel) {
-      logHandler.log(String.format(
+      logHandler.log(String.format(Locale.US,
           "  not enough energy for move (%.2f < %.2f)", empireStorageBuilder.total_energy, fuel));
       return;
     }
 
-    logHandler.log(String.format("  cost=%.2f", fuel));
+    logHandler.log(String.format(Locale.US, "  cost=%.2f", fuel));
     star.empire_stores.set(storageIndex, empireStorageBuilder
         .total_energy(empireStorageBuilder.total_energy - (float) fuel)
         .build());
@@ -528,6 +532,38 @@ public class StarModifier {
         .state_start_time(System.currentTimeMillis())
         .eta(System.currentTimeMillis() + (long)(timeInHours * HOURS_MS))
         .build());
+  }
+
+  private void applyEmptyNative(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler) {
+    Preconditions.checkArgument(
+        modification.type.equals(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE));
+    logHandler.log("- emptying native colonies");
+
+    for (int i = 0; i < star.planets.size(); i++) {
+      if (star.planets.get(i).colony != null
+          && star.planets.get(i).colony.empire_id == null) {
+        star.planets.set(i, star.planets.get(i).newBuilder()
+            .colony(null)
+            .build());
+      }
+    }
+
+    for (int i = 0; i < star.empire_stores.size(); i++) {
+      if (star.empire_stores.get(i).empire_id == null) {
+        star.empire_stores.remove(i);
+        i--;
+      }
+    }
+
+    for (int i = 0; i < star.fleets.size(); i++) {
+      if (star.fleets.get(i).empire_id == null) {
+        star.fleets.remove(i);
+        i--;
+      }
+    }
   }
 
   @Nullable
