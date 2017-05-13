@@ -41,6 +41,27 @@ task dataFiles {
   outputs.dir data
 }
 
+task buildProto() {
+  def protos = []
+  fileTree(dir: "src/main/proto").matching { include "*.proto" }.visit {
+    FileVisitDetails details ->
+      protos << details.file.name
+  }
+
+  javaexec {
+    main = "-jar"
+    args = [
+        project(':common').projectDir.getAbsolutePath() + "/libs/wire-compiler-2.1.2-jar-with-dependencies.jar",
+        "--proto_path=src/main/proto",
+        "--proto_path=" + project(':common').projectDir.getAbsolutePath() + "/src/main/proto",
+        "--named_files_only",
+        "--java_out=src/main/java",
+    ] + protos
+  }
+}
+
+compileJava.dependsOn buildProto
+
 applicationDistribution.from(dataFiles) {
   into "data"
 }

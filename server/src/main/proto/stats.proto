@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.common.proto;
+package au.com.codeka.warworlds.server.proto;
 
 import "common.proto";
 import "account.proto";
@@ -8,7 +8,7 @@ message LoginEvent {
   optional int32 day = 2;
   optional int64 empire_id = 3;
   optional string email_addr = 4;
-  optional DeviceInfo device_info = 5;
+  optional au.com.codeka.warworlds.common.proto.DeviceInfo device_info = 5;
 }
 
 message DailyStat {

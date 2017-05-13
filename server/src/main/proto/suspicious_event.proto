@@ -1,0 +1,8 @@
+
+package au.com.codeka.warworlds.server.proto;
+
+// A suspicious event is something we record when a client sends us something that we don't expect.
+// It could be an early indication of attempted cheating, or bugs in the client or something else.
+message SuspiciousEvent {
+
+}
