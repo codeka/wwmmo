@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.BackgroundRunner;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -75,6 +76,14 @@ public class ChatController {
     }
 
     public void postMessage(ChatMessage msg) throws RequestException {
+        if (msg.getMessage().length() > 8) {
+            double emojiFraction =
+                (double) countEmojis(msg.getMessage().toCharArray()) / msg.getMessage().length();
+            if (emojiFraction > Configuration.i.getLimits().getMaxEmojiRatio()) {
+                throw new RequestException(400, "Too many emojis (" + emojiFraction + ")");
+            }
+        }
+
         msg.setDatePosted(DateTime.now());
         String msg_native = msg.getMessage();
         String msg_en = new TranslateController().translate(msg_native);
@@ -153,6 +162,25 @@ public class ChatController {
                 }
             }
         }.execute();
+    }
+
+    /** Counts the number of emojis in the given char array. */
+    private int countEmojis(char[] chars) {
+        int count = 0;
+        int index = 0;
+        while (index < chars.length - 1) {
+            if (chars[index] == 0xD83C) {
+                if (chars[index + 1] >= 0xDF00 && chars[index + 1] <= 0xDFFF) {
+                    count ++;
+                }
+            } else if (chars[index] == 0xD83D) {
+                if (chars[index + 1] >= 0xDC00 && chars[index + 1] <= 0xDDFF) {
+                    count ++;
+                }
+            }
+            ++index;
+        }
+        return count;
     }
 
     /**

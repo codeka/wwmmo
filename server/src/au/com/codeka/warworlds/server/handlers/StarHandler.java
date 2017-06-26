@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.handlers;
 import java.util.ArrayList;
 
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
@@ -13,6 +14,7 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.BuildingPosition;
 import au.com.codeka.warworlds.server.model.Star;
+import au.com.codeka.warworlds.server.utils.NameValidator;
 
 /**
  * Handles /realm/.../stars/{id} URL
@@ -55,12 +57,16 @@ public class StarHandler extends RequestHandler {
       throw new RequestException(400);
     }
 
+    String newName = NameValidator.validate(
+        star_rename_request_pb.getNewName(),
+        Configuration.i.getLimits().maxStarNameLength());
+
     if (!star_rename_request_pb.hasPurchaseInfo()) {
       // if there's no purchase info then you must be renaming a wormhole, and it must be
       // one belonging to your alliance.
       Star star = new StarController().getStar(starID);
       if (star.getWormholeExtra() == null) {
-        throw new RequestException(400, "You are you allowed to rename this star.");
+        throw new RequestException(400, "You are not allowed to rename this star.");
       }
 
       Star.WormholeExtra wormhole = star.getWormholeExtra();
@@ -72,7 +78,7 @@ public class StarHandler extends RequestHandler {
 
     String sql = "UPDATE stars SET name = ? WHERE id = ?";
     try (SqlStmt stmt = DB.prepare(sql)) {
-      stmt.setString(1, star_rename_request_pb.getNewName().trim());
+      stmt.setString(1, newName);
       stmt.setInt(2, starID);
       stmt.update();
     } catch (Exception e) {

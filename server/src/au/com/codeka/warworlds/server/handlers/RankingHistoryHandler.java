@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.server.handlers;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import java.math.BigInteger;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
@@ -40,11 +41,11 @@ public class RankingHistoryHandler extends RequestHandler {
                 Messages.EmpireRank.Builder empire_rank_pb = Messages.EmpireRank.newBuilder();
                 empire_rank_pb.setEmpireKey(Integer.toString(res.getInt(1)));
                 empire_rank_pb.setRank(rank);
-                empire_rank_pb.setTotalStars(res.getInt(3));
-                empire_rank_pb.setTotalColonies(res.getInt(4));
-                empire_rank_pb.setTotalBuildings(res.getInt(5));
-                empire_rank_pb.setTotalShips(res.getInt(6));
-                empire_rank_pb.setTotalPopulation(res.getInt(7));
+                empire_rank_pb.setTotalStars(res.getLong(3));
+                empire_rank_pb.setTotalColonies(res.getLong(4));
+                empire_rank_pb.setTotalBuildings(res.getLong(5));
+                empire_rank_pb.setTotalShips(res.getLong(6));
+                empire_rank_pb.setTotalPopulation(res.getLong(7));
                 empire_ranks_pb.addRanks(empire_rank_pb);
             }
 

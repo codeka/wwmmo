@@ -10,6 +10,7 @@ import org.joda.time.DateTime;
 import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.model.BaseAllianceRequest;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -19,6 +20,7 @@ import au.com.codeka.warworlds.server.model.AllianceMember;
 import au.com.codeka.warworlds.server.model.AllianceRequest;
 import au.com.codeka.warworlds.server.model.AllianceRequestVote;
 import au.com.codeka.warworlds.server.model.Empire;
+import au.com.codeka.warworlds.server.utils.NameValidator;
 
 public class AllianceController {
     private DataBase db;
@@ -93,6 +95,13 @@ public class AllianceController {
     }
 
     public int addRequest(AllianceRequest request) throws RequestException {
+        if (request.getRequestType() == BaseAllianceRequest.RequestType.CHANGE_NAME) {
+            String newName = NameValidator.validate(
+                request.getNewName(),
+                Configuration.i.getLimits().maxAllianceNameLength());
+            request.setNewName(newName);
+        }
+
         try {
             // if there's a PNG image attached, make sure it's not too big
             request.ensurePngImageMaxSize(128, 128);
@@ -140,6 +149,11 @@ public class AllianceController {
     }
 
     public void createAlliance(Alliance alliance, Empire ownerEmpire) throws RequestException {
+        String name = NameValidator.validate(
+            alliance.getName(),
+            Configuration.i.getLimits().maxAllianceNameLength());
+        alliance.setName(name);
+
         Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder()
                 .setEmpireId(ownerEmpire.getID())
                 .setAllianceName(alliance.getName());

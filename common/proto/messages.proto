@@ -1,3 +1,4 @@
+syntax = "proto2";
 
 package au.com.codeka.common.protobuf;
 
@@ -91,11 +92,11 @@ message EmpireRank
     optional string empire_key = 1;
     optional int32 rank = 2;
     optional int32 last_rank = 3;
-    optional int32 total_stars = 4;
-    optional int32 total_colonies = 5;
-    optional int32 total_ships = 6;
-    optional int32 total_buildings = 7;
-    optional int32 total_population = 8;
+    optional int64 total_stars = 4;
+    optional int64 total_colonies = 5;
+    optional int64 total_ships = 6;
+    optional int64 total_buildings = 7;
+    optional int64 total_population = 8;
 }
 
 message EmpireRanks

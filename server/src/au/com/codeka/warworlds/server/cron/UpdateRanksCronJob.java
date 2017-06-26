@@ -33,20 +33,7 @@ public class UpdateRanksCronJob extends CronJob {
             SqlResult res = stmt.select();
             while (res.next()) {
                 int empireID = res.getInt(1);
-                int totalShips = res.getInt(2);
-                if (!ranks.containsKey(empireID)) {
-                    continue;
-                }
-                ranks.get(empireID).setTotalShips(totalShips);
-            }
-        }
-
-        sql = "SELECT empire_id, SUM(num_ships) FROM fleets WHERE empire_id IS NOT NULL GROUP BY empire_id";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            SqlResult res = stmt.select();
-            while (res.next()) {
-                int empireID = res.getInt(1);
-                int totalShips = res.getInt(2);
+                long totalShips = res.getLong(2);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -59,7 +46,7 @@ public class UpdateRanksCronJob extends CronJob {
             SqlResult res = stmt.select();
             while (res.next()) {
                 int empireID = res.getInt(1);
-                int totalBuildings = res.getInt(2);
+                long totalBuildings = res.getLong(2);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -72,8 +59,8 @@ public class UpdateRanksCronJob extends CronJob {
             SqlResult res = stmt.select();
             while (res.next()) {
                 int empireID = res.getInt(1);
-                int totalColonies = res.getInt(2);
-                int totalPopulation = res.getInt(3);
+                long totalColonies = res.getLong(2);
+                long totalPopulation = res.getLong(3);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -94,7 +81,7 @@ public class UpdateRanksCronJob extends CronJob {
             SqlResult res = stmt.select();
             while (res.next()) {
                 int empireID = res.getInt(1);
-                int totalStars = res.getInt(2);
+                long totalStars = res.getLong(2);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -106,20 +93,21 @@ public class UpdateRanksCronJob extends CronJob {
         Collections.sort(sortedRanks, new Comparator<EmpireRank>() {
             @Override
             public int compare(EmpireRank left, EmpireRank right) {
-                int diff = right.getTotalPopulation() - left.getTotalPopulation();
+                long diff = right.getTotalPopulation() - left.getTotalPopulation();
+
                 if (diff != 0)
-                    return diff;
+                    return (int) diff;
 
                 diff = right.getTotalColonies() - left.getTotalColonies();
                 if (diff != 0)
-                    return diff;
+                    return (int) diff;
 
                 diff = right.getTotalStars() - left.getTotalStars();
                 if (diff != 0)
-                    return diff;
+                    return (int) diff;
 
                 diff = right.getTotalShips() - left.getTotalShips();
-                return diff;
+                return (int) diff;
             }
         });
 
@@ -140,11 +128,11 @@ public class UpdateRanksCronJob extends CronJob {
                 for (EmpireRank rank : sortedRanks) {
                     stmt.setInt(1, rank.getEmpireID());
                     stmt.setInt(2, rankValue);
-                    stmt.setInt(3, rank.getTotalStars());
-                    stmt.setInt(4, rank.getTotalColonies());
-                    stmt.setInt(5, rank.getTotalBuildings());
-                    stmt.setInt(6, rank.getTotalShips());
-                    stmt.setInt(7, rank.getTotalPopulation());
+                    stmt.setLong(3, rank.getTotalStars());
+                    stmt.setLong(4, rank.getTotalColonies());
+                    stmt.setLong(5, rank.getTotalBuildings());
+                    stmt.setLong(6, rank.getTotalShips());
+                    stmt.setLong(7, rank.getTotalPopulation());
                     stmt.update();
 
                     rankValue ++;

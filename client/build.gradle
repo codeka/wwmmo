@@ -11,11 +11,14 @@ repositories {
 
 dependencies {
   compile fileTree(include: '*.jar', dir: 'libs')
-  compile 'com.google.android.gms:play-services-base:8.4.0'
-  compile 'com.google.android.gms:play-services-ads:8.4.0'
+  compile 'com.google.android.gms:play-services-base:10.2.0'
+  compile 'com.google.android.gms:play-services-ads:10.2.0'
+  compile 'com.google.android.gms:play-services-auth:10.2.0'
   compile 'com.android.support:multidex:1.0.1'
-  compile 'com.android.support:support-v4:23.2.1'
-  compile 'com.android.support:appcompat-v7:23.2.1'
+  compile 'com.android.support:support-v4:25.3.0'
+  compile 'com.android.support:support-vector-drawable:25.3.0'
+  compile 'com.android.support:appcompat-v7:25.3.0'
+  compile 'com.android.support:design:25.3.0'
   compile 'com.squareup.okhttp:okhttp:2.2.0'
   compile project(':common')
   compile project(':control-field')
@@ -23,16 +26,17 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
 
     // TODO: remove the dependency on this.
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         multiDexEnabled true
-        minSdkVersion 9
-        targetSdkVersion 23
+        minSdkVersion 14
+        targetSdkVersion 25
+        vectorDrawables.useSupportLibrary = true
     }
 
     packagingOptions {
@@ -75,56 +79,62 @@ android {
 }
 
 // This is a task which will increment the build # in AndroidManifest.xml
-task('incrementVersionCode') << {
-    def manifestFile = file("src/main/AndroidManifest.xml")
+task('incrementVersionCode') {
+    doLast {
+        def manifestFile = file("src/main/AndroidManifest.xml")
 
-    // First do the versionCode element, increment the new build #
-    def pattern = Pattern.compile("versionCode=\"(\\d+)\"")
-    def manifestText = manifestFile.getText()
-    def matcher = pattern.matcher(manifestText)
-    matcher.find()
+        // First do the versionCode element, increment the new build #
+        def pattern = Pattern.compile("versionCode=\"(\\d+)\"")
+        def manifestText = manifestFile.getText()
+        def matcher = pattern.matcher(manifestText)
+        matcher.find()
 
-    def versionCode = Integer.parseInt(matcher.group(1)) + 1
-    manifestText = matcher.replaceAll("versionCode=\"" + versionCode + "\"")
+        def versionCode = Integer.parseInt(matcher.group(1)) + 1
+        manifestText = matcher.replaceAll("versionCode=\"" + versionCode + "\"")
 
-    // Now do versionName with the same build #.
-    pattern = Pattern.compile("versionName=\"([0-9]+)\\.([0-9]+)\\.[0-9]+\"")
-    matcher = pattern.matcher(manifestText)
-    manifestText = matcher.replaceAll("versionName=\"\$1.\$2." + versionCode + "\"")
+        // Now do versionName with the same build #.
+        pattern = Pattern.compile("versionName=\"([0-9]+)\\.([0-9]+)\\.[0-9]+\"")
+        matcher = pattern.matcher(manifestText)
+        manifestText = matcher.replaceAll("versionName=\"\$1.\$2." + versionCode + "\"")
 
-    manifestFile.write(manifestText)
+        manifestFile.write(manifestText)
+    }
 }
 
 // This is a task which makes sure the warworlds.properties file is sanitized for release builds
-task('resetReleaseWarworldsPropertiesFile') << {
-    def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
-    def content = warworldsPropertiesFile.getText()
+task('resetReleaseWarworldsPropertiesFile') {
+    doLast {
+        def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
+        def content = warworldsPropertiesFile.getText()
 
-    // make sure on_behalf_of is commented out
-    content = content.replaceAll("#?user.on_behalf_of\\s*=.*", "#user.on_behalf_of=nobody")
+        // make sure on_behalf_of is commented out
+        content = content.replaceAll("#?user.on_behalf_of\\s*=.*", "#user.on_behalf_of=nobody")
 
-    // make sure debug is set to 'false'
-    content = content.replaceAll("debug\\s*=.*", "debug=false")
+        // make sure debug is set to 'false'
+        content = content.replaceAll("debug\\s*=.*", "debug=false")
 
-    // change all of the in-app purchase fields to their defaults
-    content = content.replaceAll("iap\\.([^=]+)=.*", "iap.\$1=\$1")
+        // change all of the in-app purchase fields to their defaults
+        content = content.replaceAll("iap\\.([^=]+)=.*", "iap.\$1=\$1")
 
-    // make sure the welcome.rss field is pointing to the live server
-    content = content.replaceAll("welcome.rss=.*\$",
+        // make sure the welcome.rss field is pointing to the live server
+        content = content.replaceAll("welcome.rss=.*\$",
             "welcome.rss=http://www.war-worlds.com/forum/announcements/rss")
 
-    warworldsPropertiesFile.write(content)
+        warworldsPropertiesFile.write(content)
+    }
 }
 
 // This is a task which makes sure the warworlds.properties file is sanitized for debug builds
-task('resetDebugWarworldsPropertiesFile') << {
-    def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
-    def content = warworldsPropertiesFile.getText()
+task('resetDebugWarworldsPropertiesFile') {
+    doLast {
+        def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
+        def content = warworldsPropertiesFile.getText()
 
-    // make sure debug is set to 'true'
-    content = content.replaceAll("debug\\s*=.*", "debug=true")
+        // make sure debug is set to 'true'
+        content = content.replaceAll("debug\\s*=.*", "debug=true")
 
-    warworldsPropertiesFile.write(content)
+        warworldsPropertiesFile.write(content)
+    }
 }
 
 tasks.whenTaskAdded { task ->

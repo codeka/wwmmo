@@ -16,11 +16,11 @@ public class EmpireRank extends BaseEmpireRank {
 
         try {
             mRank = res.getInt("rank");
-            mTotalStars = res.getInt("total_stars");
-            mTotalColonies = res.getInt("total_colonies");
-            mTotalBuildings = res.getInt("total_buildings");
-            mTotalShips = res.getInt("total_ships");
-            mTotalPopulation = res.getInt("total_population");
+            mTotalStars = res.getLong("total_stars");
+            mTotalColonies = res.getLong("total_colonies");
+            mTotalBuildings = res.getLong("total_buildings");
+            mTotalShips = res.getLong("total_ships");
+            mTotalPopulation = res.getLong("total_population");
         } catch (SQLException e) {
             // these may not exist... doesn't matter
         }
@@ -30,19 +30,19 @@ public class EmpireRank extends BaseEmpireRank {
         return mEmpireID;
     }
 
-    public void setTotalShips(int num) {
+    public void setTotalShips(long num) {
         mTotalShips = num;
     }
-    public void setTotalBuildings(int num) {
+    public void setTotalBuildings(long num) {
         mTotalBuildings = num;
     }
-    public void setTotalColonies(int num) {
+    public void setTotalColonies(long num) {
         mTotalColonies = num;
     }
-    public void setTotalStars(int num) {
+    public void setTotalStars(long num) {
         mTotalStars = num;
     }
-    public void setTotalPopulation(int num) {
+    public void setTotalPopulation(long num) {
         mTotalPopulation = num;
     }
 }

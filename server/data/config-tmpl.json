@@ -27,5 +27,22 @@
     "uniqueEmpireVotes": 3, // Number of votes from unique empires before a player is sinbinned
     "voteTimeSeconds": 14400, // Time (in seconds) in which votes much be received (14400 = 4 hours)
     "maxVotesPerDay": 4 // Maximum number of times you can vote to sinbin per day
+  },
+
+  // Various limits you can apply to the game, mostly to combat player griefing, etc.
+  "limits": {
+    // maximum length of an empire name, in unicode characters
+    "maxEmpireNameLength": 40,
+
+    // maximum length an alliance name can be, in unicode characters
+    "maxAllianceNameLength": 80,
+
+    // maximum length a star name can be.
+    "maxStarName": 40,
+
+    // maximum ratio of emojis:text in chat messages, only counted if the message is > 8 characters
+    // long (which would allow you to send an all-emoji message if it consisted of <= 4 emojis).
+    // 20% is the default.
+    "maxEmojiRatio": 0.2,
   }
 }

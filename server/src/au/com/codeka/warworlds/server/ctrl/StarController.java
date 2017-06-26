@@ -540,12 +540,19 @@ public class StarController {
                     }
                 }
 
+                sql = "DELETE FROM buildings WHERE colony_id = ?";
+                try (SqlStmt stmt = prepare(sql)) {
+                    for (BaseColony colony : toRemove) {
+                        stmt.setInt(1, ((Colony) colony).getID());
+                        stmt.update();
+                    }
+                }
+
                 sql = "DELETE FROM colonies WHERE id = ?";
                 try (SqlStmt stmt = prepare(sql)) {
                     for (BaseColony colony : toRemove) {
                         stmt.setInt(1, ((Colony) colony).getID());
                         stmt.update();
-                        toRemove.add(colony);
                     }
                 }
 

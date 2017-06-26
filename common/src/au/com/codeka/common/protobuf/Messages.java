@@ -3389,55 +3389,55 @@ public final class Messages {
      */
     int getLastRank();
 
-    // optional int32 total_stars = 4;
+    // optional int64 total_stars = 4;
     /**
-     * <code>optional int32 total_stars = 4;</code>
+     * <code>optional int64 total_stars = 4;</code>
      */
     boolean hasTotalStars();
     /**
-     * <code>optional int32 total_stars = 4;</code>
+     * <code>optional int64 total_stars = 4;</code>
      */
-    int getTotalStars();
+    long getTotalStars();
 
-    // optional int32 total_colonies = 5;
+    // optional int64 total_colonies = 5;
     /**
-     * <code>optional int32 total_colonies = 5;</code>
+     * <code>optional int64 total_colonies = 5;</code>
      */
     boolean hasTotalColonies();
     /**
-     * <code>optional int32 total_colonies = 5;</code>
+     * <code>optional int64 total_colonies = 5;</code>
      */
-    int getTotalColonies();
+    long getTotalColonies();
 
-    // optional int32 total_ships = 6;
+    // optional int64 total_ships = 6;
     /**
-     * <code>optional int32 total_ships = 6;</code>
+     * <code>optional int64 total_ships = 6;</code>
      */
     boolean hasTotalShips();
     /**
-     * <code>optional int32 total_ships = 6;</code>
+     * <code>optional int64 total_ships = 6;</code>
      */
-    int getTotalShips();
+    long getTotalShips();
 
-    // optional int32 total_buildings = 7;
+    // optional int64 total_buildings = 7;
     /**
-     * <code>optional int32 total_buildings = 7;</code>
+     * <code>optional int64 total_buildings = 7;</code>
      */
     boolean hasTotalBuildings();
     /**
-     * <code>optional int32 total_buildings = 7;</code>
+     * <code>optional int64 total_buildings = 7;</code>
      */
-    int getTotalBuildings();
+    long getTotalBuildings();
 
-    // optional int32 total_population = 8;
+    // optional int64 total_population = 8;
     /**
-     * <code>optional int32 total_population = 8;</code>
+     * <code>optional int64 total_population = 8;</code>
      */
     boolean hasTotalPopulation();
     /**
-     * <code>optional int32 total_population = 8;</code>
+     * <code>optional int64 total_population = 8;</code>
      */
-    int getTotalPopulation();
+    long getTotalPopulation();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.EmpireRank}
@@ -3512,27 +3512,27 @@ public final class Messages {
             }
             case 32: {
               bitField0_ |= 0x00000008;
-              totalStars_ = input.readInt32();
+              totalStars_ = input.readInt64();
               break;
             }
             case 40: {
               bitField0_ |= 0x00000010;
-              totalColonies_ = input.readInt32();
+              totalColonies_ = input.readInt64();
               break;
             }
             case 48: {
               bitField0_ |= 0x00000020;
-              totalShips_ = input.readInt32();
+              totalShips_ = input.readInt64();
               break;
             }
             case 56: {
               bitField0_ |= 0x00000040;
-              totalBuildings_ = input.readInt32();
+              totalBuildings_ = input.readInt64();
               break;
             }
             case 64: {
               bitField0_ |= 0x00000080;
-              totalPopulation_ = input.readInt32();
+              totalPopulation_ = input.readInt64();
               break;
             }
           }
@@ -3650,83 +3650,83 @@ public final class Messages {
       return lastRank_;
     }
 
-    // optional int32 total_stars = 4;
+    // optional int64 total_stars = 4;
     public static final int TOTAL_STARS_FIELD_NUMBER = 4;
-    private int totalStars_;
+    private long totalStars_;
     /**
-     * <code>optional int32 total_stars = 4;</code>
+     * <code>optional int64 total_stars = 4;</code>
      */
     public boolean hasTotalStars() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional int32 total_stars = 4;</code>
+     * <code>optional int64 total_stars = 4;</code>
      */
-    public int getTotalStars() {
+    public long getTotalStars() {
       return totalStars_;
     }
 
-    // optional int32 total_colonies = 5;
+    // optional int64 total_colonies = 5;
     public static final int TOTAL_COLONIES_FIELD_NUMBER = 5;
-    private int totalColonies_;
+    private long totalColonies_;
     /**
-     * <code>optional int32 total_colonies = 5;</code>
+     * <code>optional int64 total_colonies = 5;</code>
      */
     public boolean hasTotalColonies() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional int32 total_colonies = 5;</code>
+     * <code>optional int64 total_colonies = 5;</code>
      */
-    public int getTotalColonies() {
+    public long getTotalColonies() {
       return totalColonies_;
     }
 
-    // optional int32 total_ships = 6;
+    // optional int64 total_ships = 6;
     public static final int TOTAL_SHIPS_FIELD_NUMBER = 6;
-    private int totalShips_;
+    private long totalShips_;
     /**
-     * <code>optional int32 total_ships = 6;</code>
+     * <code>optional int64 total_ships = 6;</code>
      */
     public boolean hasTotalShips() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional int32 total_ships = 6;</code>
+     * <code>optional int64 total_ships = 6;</code>
      */
-    public int getTotalShips() {
+    public long getTotalShips() {
       return totalShips_;
     }
 
-    // optional int32 total_buildings = 7;
+    // optional int64 total_buildings = 7;
     public static final int TOTAL_BUILDINGS_FIELD_NUMBER = 7;
-    private int totalBuildings_;
+    private long totalBuildings_;
     /**
-     * <code>optional int32 total_buildings = 7;</code>
+     * <code>optional int64 total_buildings = 7;</code>
      */
     public boolean hasTotalBuildings() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional int32 total_buildings = 7;</code>
+     * <code>optional int64 total_buildings = 7;</code>
      */
-    public int getTotalBuildings() {
+    public long getTotalBuildings() {
       return totalBuildings_;
     }
 
-    // optional int32 total_population = 8;
+    // optional int64 total_population = 8;
     public static final int TOTAL_POPULATION_FIELD_NUMBER = 8;
-    private int totalPopulation_;
+    private long totalPopulation_;
     /**
-     * <code>optional int32 total_population = 8;</code>
+     * <code>optional int64 total_population = 8;</code>
      */
     public boolean hasTotalPopulation() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional int32 total_population = 8;</code>
+     * <code>optional int64 total_population = 8;</code>
      */
-    public int getTotalPopulation() {
+    public long getTotalPopulation() {
       return totalPopulation_;
     }
 
@@ -3734,11 +3734,11 @@ public final class Messages {
       empireKey_ = "";
       rank_ = 0;
       lastRank_ = 0;
-      totalStars_ = 0;
-      totalColonies_ = 0;
-      totalShips_ = 0;
-      totalBuildings_ = 0;
-      totalPopulation_ = 0;
+      totalStars_ = 0L;
+      totalColonies_ = 0L;
+      totalShips_ = 0L;
+      totalBuildings_ = 0L;
+      totalPopulation_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3762,19 +3762,19 @@ public final class Messages {
         output.writeInt32(3, lastRank_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeInt32(4, totalStars_);
+        output.writeInt64(4, totalStars_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeInt32(5, totalColonies_);
+        output.writeInt64(5, totalColonies_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeInt32(6, totalShips_);
+        output.writeInt64(6, totalShips_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeInt32(7, totalBuildings_);
+        output.writeInt64(7, totalBuildings_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeInt32(8, totalPopulation_);
+        output.writeInt64(8, totalPopulation_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3799,23 +3799,23 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, totalStars_);
+          .computeInt64Size(4, totalStars_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(5, totalColonies_);
+          .computeInt64Size(5, totalColonies_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, totalShips_);
+          .computeInt64Size(6, totalShips_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(7, totalBuildings_);
+          .computeInt64Size(7, totalBuildings_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(8, totalPopulation_);
+          .computeInt64Size(8, totalPopulation_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3944,15 +3944,15 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000002);
         lastRank_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        totalStars_ = 0;
+        totalStars_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
-        totalColonies_ = 0;
+        totalColonies_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000010);
-        totalShips_ = 0;
+        totalShips_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000020);
-        totalBuildings_ = 0;
+        totalBuildings_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000040);
-        totalPopulation_ = 0;
+        totalPopulation_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
@@ -4223,167 +4223,167 @@ public final class Messages {
         return this;
       }
 
-      // optional int32 total_stars = 4;
-      private int totalStars_ ;
+      // optional int64 total_stars = 4;
+      private long totalStars_ ;
       /**
-       * <code>optional int32 total_stars = 4;</code>
+       * <code>optional int64 total_stars = 4;</code>
        */
       public boolean hasTotalStars() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional int32 total_stars = 4;</code>
+       * <code>optional int64 total_stars = 4;</code>
        */
-      public int getTotalStars() {
+      public long getTotalStars() {
         return totalStars_;
       }
       /**
-       * <code>optional int32 total_stars = 4;</code>
+       * <code>optional int64 total_stars = 4;</code>
        */
-      public Builder setTotalStars(int value) {
+      public Builder setTotalStars(long value) {
         bitField0_ |= 0x00000008;
         totalStars_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 total_stars = 4;</code>
+       * <code>optional int64 total_stars = 4;</code>
        */
       public Builder clearTotalStars() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        totalStars_ = 0;
+        totalStars_ = 0L;
         onChanged();
         return this;
       }
 
-      // optional int32 total_colonies = 5;
-      private int totalColonies_ ;
+      // optional int64 total_colonies = 5;
+      private long totalColonies_ ;
       /**
-       * <code>optional int32 total_colonies = 5;</code>
+       * <code>optional int64 total_colonies = 5;</code>
        */
       public boolean hasTotalColonies() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional int32 total_colonies = 5;</code>
+       * <code>optional int64 total_colonies = 5;</code>
        */
-      public int getTotalColonies() {
+      public long getTotalColonies() {
         return totalColonies_;
       }
       /**
-       * <code>optional int32 total_colonies = 5;</code>
+       * <code>optional int64 total_colonies = 5;</code>
        */
-      public Builder setTotalColonies(int value) {
+      public Builder setTotalColonies(long value) {
         bitField0_ |= 0x00000010;
         totalColonies_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 total_colonies = 5;</code>
+       * <code>optional int64 total_colonies = 5;</code>
        */
       public Builder clearTotalColonies() {
         bitField0_ = (bitField0_ & ~0x00000010);
-        totalColonies_ = 0;
+        totalColonies_ = 0L;
         onChanged();
         return this;
       }
 
-      // optional int32 total_ships = 6;
-      private int totalShips_ ;
+      // optional int64 total_ships = 6;
+      private long totalShips_ ;
       /**
-       * <code>optional int32 total_ships = 6;</code>
+       * <code>optional int64 total_ships = 6;</code>
        */
       public boolean hasTotalShips() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional int32 total_ships = 6;</code>
+       * <code>optional int64 total_ships = 6;</code>
        */
-      public int getTotalShips() {
+      public long getTotalShips() {
         return totalShips_;
       }
       /**
-       * <code>optional int32 total_ships = 6;</code>
+       * <code>optional int64 total_ships = 6;</code>
        */
-      public Builder setTotalShips(int value) {
+      public Builder setTotalShips(long value) {
         bitField0_ |= 0x00000020;
         totalShips_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 total_ships = 6;</code>
+       * <code>optional int64 total_ships = 6;</code>
        */
       public Builder clearTotalShips() {
         bitField0_ = (bitField0_ & ~0x00000020);
-        totalShips_ = 0;
+        totalShips_ = 0L;
         onChanged();
         return this;
       }
 
-      // optional int32 total_buildings = 7;
-      private int totalBuildings_ ;
+      // optional int64 total_buildings = 7;
+      private long totalBuildings_ ;
       /**
-       * <code>optional int32 total_buildings = 7;</code>
+       * <code>optional int64 total_buildings = 7;</code>
        */
       public boolean hasTotalBuildings() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional int32 total_buildings = 7;</code>
+       * <code>optional int64 total_buildings = 7;</code>
        */
-      public int getTotalBuildings() {
+      public long getTotalBuildings() {
         return totalBuildings_;
       }
       /**
-       * <code>optional int32 total_buildings = 7;</code>
+       * <code>optional int64 total_buildings = 7;</code>
        */
-      public Builder setTotalBuildings(int value) {
+      public Builder setTotalBuildings(long value) {
         bitField0_ |= 0x00000040;
         totalBuildings_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 total_buildings = 7;</code>
+       * <code>optional int64 total_buildings = 7;</code>
        */
       public Builder clearTotalBuildings() {
         bitField0_ = (bitField0_ & ~0x00000040);
-        totalBuildings_ = 0;
+        totalBuildings_ = 0L;
         onChanged();
         return this;
       }
 
-      // optional int32 total_population = 8;
-      private int totalPopulation_ ;
+      // optional int64 total_population = 8;
+      private long totalPopulation_ ;
       /**
-       * <code>optional int32 total_population = 8;</code>
+       * <code>optional int64 total_population = 8;</code>
        */
       public boolean hasTotalPopulation() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional int32 total_population = 8;</code>
+       * <code>optional int64 total_population = 8;</code>
        */
-      public int getTotalPopulation() {
+      public long getTotalPopulation() {
         return totalPopulation_;
       }
       /**
-       * <code>optional int32 total_population = 8;</code>
+       * <code>optional int64 total_population = 8;</code>
        */
-      public Builder setTotalPopulation(int value) {
+      public Builder setTotalPopulation(long value) {
         bitField0_ |= 0x00000080;
         totalPopulation_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 total_population = 8;</code>
+       * <code>optional int64 total_population = 8;</code>
        */
       public Builder clearTotalPopulation() {
         bitField0_ = (bitField0_ & ~0x00000080);
-        totalPopulation_ = 0;
+        totalPopulation_ = 0L;
         onChanged();
         return this;
       }
@@ -96683,9 +96683,9 @@ public final class Messages {
       "serAssociate\022\022\n\nuser_email\030\001 \001(\t\"\266\001\n\nEmp" +
       "ireRank\022\022\n\nempire_key\030\001 \001(\t\022\014\n\004rank\030\002 \001(" +
       "\005\022\021\n\tlast_rank\030\003 \001(\005\022\023\n\013total_stars\030\004 \001(" +
-      "\005\022\026\n\016total_colonies\030\005 \001(\005\022\023\n\013total_ships" +
-      "\030\006 \001(\005\022\027\n\017total_buildings\030\007 \001(\005\022\030\n\020total" +
-      "_population\030\010 \001(\005\"U\n\013EmpireRanks\0228\n\005rank",
+      "\003\022\026\n\016total_colonies\030\005 \001(\003\022\023\n\013total_ships" +
+      "\030\006 \001(\003\022\027\n\017total_buildings\030\007 \001(\003\022\030\n\020total" +
+      "_population\030\010 \001(\003\"U\n\013EmpireRanks\0228\n\005rank",
       "s\030\001 \003(\0132).au.com.codeka.common.protobuf." +
       "EmpireRank\022\014\n\004date\030\002 \001(\003\"\205\005\n\006Empire\022\013\n\003k" +
       "ey\030\001 \001(\t\022\024\n\014display_name\030\002 \001(\t\022\014\n\004user\030\003" +
