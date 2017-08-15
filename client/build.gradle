@@ -19,16 +19,15 @@ if (signingPropsFile.isFile()) {
 }
 
 android {
-  compileSdkVersion 25
-  buildToolsVersion "26.0.0-rc1"
+  compileSdkVersion 26
+  buildToolsVersion "26.0.0"
 
   defaultConfig {
     applicationId "au.com.codeka.warworlds2"
     minSdkVersion 19
-    targetSdkVersion 25
+    targetSdkVersion 26
     versionCode getVersionCodeFromGit()
     versionName "2.0"
-    multiDexEnabled true
   }
   compileOptions {
     sourceCompatibility 1.8
@@ -94,12 +93,12 @@ def getVersionCodeFromGit() {
 
 dependencies {
   compile 'com.andkulikov:transitionseverywhere:1.6.3'
-  compile 'com.android.support:appcompat-v7:25.3.1'
-  compile 'com.android.support:preference-v7:25.3.1'
-  compile 'com.google.android.gms:play-services-base:10.2.1'
-  compile 'com.google.firebase:firebase-core:10.2.1'
-  compile 'com.google.firebase:firebase-messaging:10.2.1'
-  compile 'com.google.guava:guava:20.0'
+  compile 'com.android.support:appcompat-v7:26.0.1'
+  compile 'com.android.support:preference-v7:26.0.1'
+  compile 'com.google.android.gms:play-services-base:11.2.0'
+  compile 'com.google.firebase:firebase-core:11.2.0'
+  compile 'com.google.firebase:firebase-messaging:11.2.0'
+  compile 'com.google.guava:guava:21.0'
   compile 'com.squareup.picasso:picasso:2.5.2'
   compile project(':common')
 }
