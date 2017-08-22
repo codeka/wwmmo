@@ -11,10 +11,10 @@ import java.util.Set;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
-import au.com.codeka.warworlds.common.proto.DailyStat;
 import au.com.codeka.warworlds.common.proto.DeviceInfo;
-import au.com.codeka.warworlds.common.proto.LoginEvent;
 import au.com.codeka.warworlds.common.proto.LoginRequest;
+import au.com.codeka.warworlds.server.proto.DailyStat;
+import au.com.codeka.warworlds.server.proto.LoginEvent;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
 

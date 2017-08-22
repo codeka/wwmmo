@@ -13,7 +13,9 @@ import java.util.regex.Matcher;
 
 import au.com.codeka.carrot.CarrotEngine;
 import au.com.codeka.carrot.CarrotException;
-import au.com.codeka.carrot.resource.FileResourceLocater;
+import au.com.codeka.carrot.Configuration;
+import au.com.codeka.carrot.bindings.MapBindings;
+import au.com.codeka.carrot.resource.FileResourceLocator;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.AdminRole;
 import au.com.codeka.warworlds.server.handlers.RequestException;
@@ -32,16 +34,13 @@ import javax.servlet.http.HttpServletResponse;
 public class AdminHandler extends RequestHandler {
   private final Log log = new Log("AdminHandler");
 
-  private static final CarrotEngine CARROT_ENGINE = new CarrotEngine();
-  static {
-    CARROT_ENGINE.getConfig().setResourceLocater(
-        new FileResourceLocater(
-            CARROT_ENGINE.getConfig(),
-            new File("data/admin/tmpl").getAbsolutePath()));
-    CARROT_ENGINE.getConfig().setEncoding("utf-8");
-
-    CARROT_ENGINE.getGlobalBindings().put("Session", new SessionHelper());
-  }
+  private static final CarrotEngine CARROT = new CarrotEngine(
+      new Configuration.Builder()
+          .setResourceLocator(
+              new FileResourceLocator.Builder(new File("data/admin/tmpl").getAbsolutePath()))
+          .build(),
+      new MapBindings.Builder()
+          .set("Session", new SessionHelper()));
 
   private Session session;
 
@@ -120,7 +119,7 @@ public class AdminHandler extends RequestHandler {
     getResponse().setContentType("text/html");
     getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
     try {
-      getResponse().getWriter().write(CARROT_ENGINE.process(path, data));
+      getResponse().getWriter().write(CARROT.process(path, new MapBindings(data)));
     } catch (CarrotException | IOException e) {
       log.error("Error rendering template!", e);
       throw new RequestException(e);

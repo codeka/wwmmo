@@ -8,7 +8,9 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.carrot.CarrotEngine;
 import au.com.codeka.carrot.CarrotException;
-import au.com.codeka.carrot.resource.FileResourceLocater;
+import au.com.codeka.carrot.Configuration;
+import au.com.codeka.carrot.bindings.MapBindings;
+import au.com.codeka.carrot.resource.FileResourceLocator;
 import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.handlers.RequestHandler;
 
@@ -16,14 +18,10 @@ import au.com.codeka.warworlds.server.handlers.RequestHandler;
  * Handler for requests out of the html directory.
  */
 public class HtmlRequestHandler extends RequestHandler {
-  private static final CarrotEngine CARROT_ENGINE = new CarrotEngine();
-  static {
-    CARROT_ENGINE.getConfig().setResourceLocater(
-        new FileResourceLocater(
-            CARROT_ENGINE.getConfig(),
-            new File("data/html/tmpl").getAbsolutePath()));
-    CARROT_ENGINE.getConfig().setEncoding("utf-8");
-  }
+  private static final CarrotEngine CARROT = new CarrotEngine(new Configuration.Builder()
+      .setResourceLocator(
+          new FileResourceLocator.Builder(new File("data/html/tmpl").getAbsolutePath()))
+      .build());
 
   protected void render(
       String tmplName,
@@ -31,7 +29,7 @@ public class HtmlRequestHandler extends RequestHandler {
     getResponse().setContentType("text/html");
     getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
     try {
-      getResponse().getWriter().write(CARROT_ENGINE.process(tmplName, data));
+      getResponse().getWriter().write(CARROT.process(tmplName, new MapBindings(data)));
     } catch (CarrotException | IOException e) {
       throw new RequestException(e);
     }

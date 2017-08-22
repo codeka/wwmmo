@@ -13,7 +13,9 @@ import javax.mail.Message;
 
 import au.com.codeka.carrot.CarrotEngine;
 import au.com.codeka.carrot.CarrotException;
-import au.com.codeka.carrot.resource.FileResourceLocater;
+import au.com.codeka.carrot.Configuration;
+import au.com.codeka.carrot.bindings.MapBindings;
+import au.com.codeka.carrot.resource.FileResourceLocator;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
@@ -29,15 +31,12 @@ public class AccountManager {
   private static final Log log = new Log("AccountManager");
 
   private final Map<Long, Pair<String, WatchableObject<Account>>> watchedAccounts;
-  private CarrotEngine carrotEngine = new CarrotEngine();
+  private final CarrotEngine carrotEngine = new CarrotEngine(new Configuration.Builder()
+      .setResourceLocator(new FileResourceLocator.Builder(new File("data/email").getAbsolutePath()))
+      .build());
 
   private AccountManager() {
     watchedAccounts = new HashMap<>();
-    carrotEngine.getConfig().setResourceLocater(
-        new FileResourceLocater(
-            carrotEngine.getConfig(),
-            new File("data/email").getAbsolutePath()));
-    carrotEngine.getConfig().setEncoding("utf-8");
   }
 
   @Nullable
@@ -73,8 +72,8 @@ public class AccountManager {
     email.addRecipient(null, account.email, Message.RecipientType.TO);
     email.setSubject("War Worlds email verification");
     try {
-      email.setText(carrotEngine.process("verification.txt", data));
-      email.setTextHTML(carrotEngine.process("verification.html", data));
+      email.setText(carrotEngine.process("verification.txt", new MapBindings(data)));
+      email.setTextHTML(carrotEngine.process("verification.html", new MapBindings(data)));
     } catch (CarrotException e) {
       log.error("Error sending verification email.", e);
       return;

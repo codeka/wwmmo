@@ -12,10 +12,10 @@ import java.util.TreeMap;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.AdminRole;
-import au.com.codeka.warworlds.common.proto.DailyStat;
 import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.common.proto.LoginEvent;
 import au.com.codeka.warworlds.server.handlers.RequestException;
+import au.com.codeka.warworlds.server.proto.DailyStat;
+import au.com.codeka.warworlds.server.proto.LoginEvent;
 import au.com.codeka.warworlds.server.store.DataStore;
 
 public class DashboardHandler extends AdminHandler {
