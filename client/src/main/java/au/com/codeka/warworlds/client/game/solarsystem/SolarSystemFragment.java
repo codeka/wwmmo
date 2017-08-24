@@ -104,132 +104,99 @@ public class SolarSystemFragment extends BaseFragment {
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    solarSystemView = (SolarSystemView) view.findViewById(R.id.solarsystem_view);
-    final Button buildButton = (Button) view.findViewById(R.id.solarsystem_colony_build);
-    final Button focusButton = (Button) view.findViewById(R.id.solarsystem_colony_focus);
-    final Button sitrepButton = (Button) view.findViewById(R.id.sitrep_btn);
-    final Button planetViewButton = (Button) view.findViewById(R.id.enemy_empire_view);
-    planetName = (TextView) view.findViewById(R.id.planet_name);
-    storedGoods = (TextView) view.findViewById(R.id.stored_goods);
-    totalGoods = (TextView) view.findViewById(R.id.total_goods);
-    deltaGoods = (TextView) view.findViewById(R.id.delta_goods);
+    solarSystemView = view.findViewById(R.id.solarsystem_view);
+    final Button buildButton = view.findViewById(R.id.solarsystem_colony_build);
+    final Button focusButton = view.findViewById(R.id.solarsystem_colony_focus);
+    final Button sitrepButton = view.findViewById(R.id.sitrep_btn);
+    final Button planetViewButton = view.findViewById(R.id.enemy_empire_view);
+    planetName = view.findViewById(R.id.planet_name);
+    storedGoods = view.findViewById(R.id.stored_goods);
+    totalGoods = view.findViewById(R.id.total_goods);
+    deltaGoods = view.findViewById(R.id.delta_goods);
     storedGoodsIcon = view.findViewById(R.id.stored_goods_icon);
-    storedMinerals = (TextView) view.findViewById(R.id.stored_minerals);
-    totalMinerals = (TextView) view.findViewById(R.id.total_minerals);
-    deltaMinerals = (TextView) view.findViewById(R.id.delta_minerals);
+    storedMinerals = view.findViewById(R.id.stored_minerals);
+    totalMinerals = view.findViewById(R.id.total_minerals);
+    deltaMinerals = view.findViewById(R.id.delta_minerals);
     storedMineralsIcon = view.findViewById(R.id.stored_minerals_icon);
-    storedEnergy = (TextView) view.findViewById(R.id.stored_energy);
-    totalEnergy = (TextView) view.findViewById(R.id.total_energy);
-    deltaEnergy = (TextView) view.findViewById(R.id.delta_energy);
+    storedEnergy = view.findViewById(R.id.stored_energy);
+    totalEnergy = view.findViewById(R.id.total_energy);
+    deltaEnergy = view.findViewById(R.id.delta_energy);
     storedEnergyIcon = view.findViewById(R.id.stored_energy_icon);
-    fleetList = (FleetListSimple) view.findViewById(R.id.fleet_list);
+    fleetList = view.findViewById(R.id.fleet_list);
     congenialityContainer = view.findViewById(R.id.congeniality_container);
-    populationCongenialityProgressBar = (ProgressBar) view.findViewById(
-        R.id.solarsystem_population_congeniality);
-    populationCongenialityTextView = (TextView) view.findViewById(
-        R.id.solarsystem_population_congeniality_value);
-    farmingCongenialityProgressBar = (ProgressBar) view.findViewById(
-        R.id.solarsystem_farming_congeniality);
-    farmingCongenialityTextView = (TextView) view.findViewById(
-        R.id.solarsystem_farming_congeniality_value);
-    miningCongenialityProgressBar = (ProgressBar) view.findViewById(
-        R.id.solarsystem_mining_congeniality);
-    miningCongenialityTextView = (TextView) view.findViewById(
-        R.id.solarsystem_mining_congeniality_value);
-    energyCongenialityProgressBar = (ProgressBar) view.findViewById(
-        R.id.solarsystem_energy_congeniality);
-    energyCongenialityTextView = (TextView) view.findViewById(
-        R.id.solarsystem_energy_congeniality_value);
-    bottomLeftPane = (ViewGroup) view.findViewById(R.id.bottom_left_pane);
-    emptyViewButton = (Button) view.findViewById(R.id.empty_view_btn);
+    populationCongenialityProgressBar = view.findViewById(R.id.solarsystem_population_congeniality);
+    populationCongenialityTextView =
+        view.findViewById(R.id.solarsystem_population_congeniality_value);
+    farmingCongenialityProgressBar = view.findViewById(R.id.solarsystem_farming_congeniality);
+    farmingCongenialityTextView = view.findViewById(R.id.solarsystem_farming_congeniality_value);
+    miningCongenialityProgressBar = view.findViewById(R.id.solarsystem_mining_congeniality);
+    miningCongenialityTextView = view.findViewById(R.id.solarsystem_mining_congeniality_value);
+    energyCongenialityProgressBar = view.findViewById(R.id.solarsystem_energy_congeniality);
+    energyCongenialityTextView = view.findViewById(R.id.solarsystem_energy_congeniality_value);
+    bottomLeftPane = view.findViewById(R.id.bottom_left_pane);
+    emptyViewButton = view.findViewById(R.id.empty_view_btn);
     colonyDetailsContainer = view.findViewById(R.id.solarsystem_colony_details);
     enemyColonyDetailsContainer = view.findViewById(R.id.enemy_colony_details);
-    populationCountTextView = (TextView) view.findViewById(R.id.population_count);
-    colonyFocusView = (ColonyFocusView) view.findViewById(R.id.colony_focus_view);
+    populationCountTextView = view.findViewById(R.id.population_count);
+    colonyFocusView = view.findViewById(R.id.colony_focus_view);
 
-    solarSystemView.setPlanetSelectedHandler(new SolarSystemView.PlanetSelectedHandler() {
-        @Override
-        public void onPlanetSelected(Planet planet) {
-          SolarSystemFragment.this.planet = planet;
-          refreshSelectedPlanet();
-        }
-      });
-
-    buildButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (star == null) {
-          return; // can happen before the star loads
-        }
-        if (planet.colony == null) {
-          return; // shouldn't happen, the button should be hidden.
-        }
-
-        getFragmentTransitionManager()
-            .replaceFragment(BuildFragment.class,
-                BuildFragment.createArguments(star.id, planet.index),
-                SharedViewHolder.builder()
-                    .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
-                    .addSharedView(R.id.bottom_pane, "bottom_pane")
-                    .build());
-      }
+    solarSystemView.setPlanetSelectedHandler(planet -> {
+      SolarSystemFragment.this.planet = planet;
+      refreshSelectedPlanet();
     });
 
-    focusButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (star == null || star.planets == null || planet.colony == null) {
-          return;
-        }
-
-        getFragmentTransitionManager().replaceFragment(
-            PlanetDetailsFragment.class,
-            PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
-            SharedViewHolder.builder()
-                .addSharedView(R.id.bottom_pane, "bottom_pane")
-                .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
-                .build());
+    buildButton.setOnClickListener(v -> {
+      if (star == null) {
+        return; // can happen before the star loads
       }
+      if (planet.colony == null) {
+        return; // shouldn't happen, the button should be hidden.
+      }
+
+      getFragmentTransitionManager()
+          .replaceFragment(BuildFragment.class,
+              BuildFragment.createArguments(star.id, planet.index),
+              SharedViewHolder.builder()
+                  .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
+                  .addSharedView(R.id.bottom_pane, "bottom_pane")
+                  .build());
     });
 
-    sitrepButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (star == null) {
-          return; // can happen before the star loads
-        }
+    focusButton.setOnClickListener(v -> {
+      if (star == null || star.planets == null || planet.colony == null) {
+        return;
+      }
 
+      getFragmentTransitionManager().replaceFragment(
+          PlanetDetailsFragment.class,
+          PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
+          SharedViewHolder.builder()
+              .addSharedView(R.id.bottom_pane, "bottom_pane")
+              .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
+              .build());
+    });
+
+    sitrepButton.setOnClickListener(v -> {
+      if (star == null) {
+        return; // can happen before the star loads
+      }
+
+      // TODO
 //        Intent intent = new Intent(getActivity(), SitrepActivity.class);
 //        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
 //        startActivity(intent);
-      }
     });
 
-    planetViewButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onViewColony();
-      }
-    });
+    planetViewButton.setOnClickListener(v -> onViewColony());
 
-    emptyViewButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onViewColony();
-      }
-    });
+    emptyViewButton.setOnClickListener(v -> onViewColony());
 
-    fleetList.setFleetSelectedHandler(new FleetListSimple.FleetSelectedHandler() {
-      @Override
-      public void onFleetSelected(Fleet fleet) {
-        getFragmentTransitionManager().replaceFragment(
-            FleetsFragment.class,
-            FleetsFragment.createArguments(star.id, fleet.id),
-            SharedViewHolder.builder()
-                .addSharedView(R.id.bottom_pane, "bottom_pane")
-                .build());
-      }
-    });
+    fleetList.setFleetSelectedHandler(fleet -> getFragmentTransitionManager().replaceFragment(
+        FleetsFragment.class,
+        FleetsFragment.createArguments(star.id, fleet.id),
+        SharedViewHolder.builder()
+            .addSharedView(R.id.bottom_pane, "bottom_pane")
+            .build()));
   }
 
   @Override
