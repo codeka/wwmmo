@@ -7,7 +7,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 import java.util.Locale;
 
@@ -198,8 +197,7 @@ public class MoveBottomPane extends RelativeLayout {
     StarManager.i.updateStar(star, new StarModification.Builder()
         .type(StarModification.MODIFICATION_TYPE.MOVE_FLEET)
         .fleet_id(fleet.id)
-        .star_id(destStar.id)
-        .build());
+        .star_id(destStar.id));
 
     callback.onClose();
   }

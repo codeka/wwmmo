@@ -127,8 +127,7 @@ public class BuildFragment extends BaseFragment {
             .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
             .colony_id(colony.id)
             .design_type(designType)
-            .count(count)
-            .build());
+            .count(count));
       getFragmentManager().popBackStack();
     }));
   }

@@ -99,8 +99,7 @@ public class MergeBottomPane extends RelativeLayout {
       StarManager.i.updateStar(star, new StarModification.Builder()
           .type(StarModification.MODIFICATION_TYPE.MERGE_FLEET)
           .fleet_id(fleet.id)
-          .additional_fleet_ids(additionalFleetIds)
-          .build());
+          .additional_fleet_ids(additionalFleetIds));
     }
 
     callback.onCancel();

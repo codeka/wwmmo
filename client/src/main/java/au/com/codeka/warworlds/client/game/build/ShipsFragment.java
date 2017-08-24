@@ -262,14 +262,14 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
         tv.setText(entry.heading);
       } else if (entry.fleet != null || entry.buildRequest != null) {
         // existing fleet/upgrading fleet
-        ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        TextView row1 = (TextView) view.findViewById(R.id.design_row1);
-        TextView row2 = (TextView) view.findViewById(R.id.design_row2);
-        TextView row3 = (TextView) view.findViewById(R.id.design_row3);
-        TextView level = (TextView) view.findViewById(R.id.build_level);
-        TextView levelLabel = (TextView) view.findViewById(R.id.build_level_label);
-        ProgressBar progress = (ProgressBar) view.findViewById(R.id.build_progress);
-        TextView notes = (TextView) view.findViewById(R.id.notes);
+        ImageView icon = view.findViewById(R.id.building_icon);
+        TextView row1 = view.findViewById(R.id.design_row1);
+        TextView row2 = view.findViewById(R.id.design_row2);
+        TextView row3 = view.findViewById(R.id.design_row3);
+        TextView level = view.findViewById(R.id.build_level);
+        TextView levelLabel = view.findViewById(R.id.build_level_label);
+        ProgressBar progress = view.findViewById(R.id.build_progress);
+        TextView notes = view.findViewById(R.id.notes);
 
         Fleet fleet = entry.fleet;
         BuildRequest buildRequest = entry.buildRequest;

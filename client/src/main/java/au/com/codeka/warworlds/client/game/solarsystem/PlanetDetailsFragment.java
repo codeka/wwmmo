@@ -84,48 +84,48 @@ public class PlanetDetailsFragment extends BaseFragment {
     long seed = getArguments().getLong(STAR_ID_KEY);
     ViewBackgroundGenerator.setBackground(view.findViewById(R.id.planet_background), null, seed);
 
-    planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
-    empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
+    planetIcon = view.findViewById(R.id.planet_icon);
+    empireIcon = view.findViewById(R.id.empire_icon);
     focusContainer = view.findViewById(R.id.focus_container);
     focusSeekBars = new SeekBar[] {
-        (SeekBar) view.findViewById(R.id.focus_farming),
-        (SeekBar) view.findViewById(R.id.focus_mining),
-        (SeekBar) view.findViewById(R.id.focus_energy),
-        (SeekBar) view.findViewById(R.id.focus_construction)};
+        view.findViewById(R.id.focus_farming),
+        view.findViewById(R.id.focus_mining),
+        view.findViewById(R.id.focus_energy),
+        view.findViewById(R.id.focus_construction)};
     focusTextViews = new TextView[] {
-        (TextView) view.findViewById(R.id.focus_farming_value),
-        (TextView) view.findViewById(R.id.focus_mining_value),
-        (TextView) view.findViewById(R.id.focus_energy_value),
-        (TextView) view.findViewById(R.id.focus_construction_value)};
+        view.findViewById(R.id.focus_farming_value),
+        view.findViewById(R.id.focus_mining_value),
+        view.findViewById(R.id.focus_energy_value),
+        view.findViewById(R.id.focus_construction_value)};
     focusMinusButtons = new Button[] {
-        (Button) view.findViewById(R.id.focus_farming_minus_btn),
-        (Button) view.findViewById(R.id.focus_mining_minus_btn),
-        (Button) view.findViewById(R.id.focus_energy_minus_btn),
-        (Button) view.findViewById(R.id.focus_construction_minus_btn)};
+        view.findViewById(R.id.focus_farming_minus_btn),
+        view.findViewById(R.id.focus_mining_minus_btn),
+        view.findViewById(R.id.focus_energy_minus_btn),
+        view.findViewById(R.id.focus_construction_minus_btn)};
     focusPlusButtons = new Button[] {
-        (Button) view.findViewById(R.id.focus_farming_plus_btn),
-        (Button) view.findViewById(R.id.focus_mining_plus_btn),
-        (Button) view.findViewById(R.id.focus_energy_plus_btn),
-        (Button) view.findViewById(R.id.focus_construction_plus_btn)};
+        view.findViewById(R.id.focus_farming_plus_btn),
+        view.findViewById(R.id.focus_mining_plus_btn),
+        view.findViewById(R.id.focus_energy_plus_btn),
+        view.findViewById(R.id.focus_construction_plus_btn)};
     focusLockButtons = new ImageButton[] {
-        (ImageButton) view.findViewById(R.id.focus_farming_lock),
-        (ImageButton) view.findViewById(R.id.focus_mining_lock),
-        (ImageButton) view.findViewById(R.id.focus_energy_lock),
-        (ImageButton) view.findViewById(R.id.focus_construction_lock)};
-    populationCongenialityValue = (TextView) view.findViewById(R.id.population_congeniality_value);
-    populationCongeniality = (ProgressBar) view.findViewById(R.id.population_congeniality);
-    farmingCongenialityValue = (TextView) view.findViewById(R.id.farming_congeniality_value);
-    farmingCongeniality = (ProgressBar) view.findViewById(R.id.farming_congeniality);
-    miningCongenialityValue = (TextView) view.findViewById(R.id.mining_congeniality_value);
-    miningCongeniality = (ProgressBar) view.findViewById(R.id.mining_congeniality);
-    energyCongenialityValue = (TextView) view.findViewById(R.id.energy_congeniality_value);
-    energyCongeniality = (ProgressBar) view.findViewById(R.id.energy_congeniality);
-    empireName = (TextView) view.findViewById(R.id.empire_name);
+        view.findViewById(R.id.focus_farming_lock),
+        view.findViewById(R.id.focus_mining_lock),
+        view.findViewById(R.id.focus_energy_lock),
+        view.findViewById(R.id.focus_construction_lock)};
+    populationCongenialityValue = view.findViewById(R.id.population_congeniality_value);
+    populationCongeniality = view.findViewById(R.id.population_congeniality);
+    farmingCongenialityValue = view.findViewById(R.id.farming_congeniality_value);
+    farmingCongeniality = view.findViewById(R.id.farming_congeniality);
+    miningCongenialityValue = view.findViewById(R.id.mining_congeniality_value);
+    miningCongeniality = view.findViewById(R.id.mining_congeniality);
+    energyCongenialityValue = view.findViewById(R.id.energy_congeniality_value);
+    energyCongeniality = view.findViewById(R.id.energy_congeniality);
+    empireName = view.findViewById(R.id.empire_name);
 
-    attackBtn = (Button) view.findViewById(R.id.attack_btn);
+    attackBtn = view.findViewById(R.id.attack_btn);
     attackBtn.setOnClickListener(this::onAttackClick);
 
-    colonizeBtn = (Button) view.findViewById(R.id.colonize_btn);
+    colonizeBtn = view.findViewById(R.id.colonize_btn);
     colonizeBtn.setOnClickListener(this::onColonizeClick);
 
     for (int i = 0; i < 4; i++) {
@@ -266,8 +266,7 @@ public class PlanetDetailsFragment extends BaseFragment {
             .mining(mining)
             .energy(energy)
             .construction(construction)
-            .build())
-        .build());
+            .build()));
 
     getFragmentManager().popBackStack();
   }
@@ -319,8 +318,7 @@ public class PlanetDetailsFragment extends BaseFragment {
     StarManager.i.updateStar(star, new StarModification.Builder()
         .type(StarModification.MODIFICATION_TYPE.COLONIZE)
         .empire_id(myEmpire.id)
-        .planet_index(planetIndex)
-        .build());
+        .planet_index(planetIndex));
 
     // TODO: have a nicer API for this.
     getFragmentActivity().getSupportFragmentManager().popBackStack();

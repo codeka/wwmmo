@@ -69,7 +69,12 @@ public class StarManager {
     return stars.getLastSimulationOfOurStar();
   }
 
-  public void updateStar(final Star star, final StarModification modification) {
+  public void updateStar(final Star star, final StarModification.Builder modificationBuilder) {
+    // Be sure to record our empire_id in the request.
+    StarModification modification = modificationBuilder
+        .empire_id(EmpireManager.i.getMyEmpire().id)
+        .build();
+
     App.i.getTaskRunner().runTask(() -> {
       // If there's any auxiliary stars, grab them now, too.
       List<Star> auxiliaryStars = null;

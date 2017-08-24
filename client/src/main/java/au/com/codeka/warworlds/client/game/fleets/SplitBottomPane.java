@@ -117,8 +117,7 @@ public class SplitBottomPane extends RelativeLayout {
     StarManager.i.updateStar(star, new StarModification.Builder()
         .type(StarModification.MODIFICATION_TYPE.SPLIT_FLEET)
         .fleet_id(fleet.id)
-        .count(splitRatio.getMax() - splitRatio.getProgress())
-        .build());
+        .count(splitRatio.getMax() - splitRatio.getProgress()));
 
     callback.onCancel();
   }
