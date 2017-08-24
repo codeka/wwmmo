@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
 import au.com.codeka.warworlds.common.sim.StarModifier;
+import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 
 /**
  * Manages the {@link Star}s we keep cached and stuff.
@@ -79,11 +80,17 @@ public class StarManager {
 
       // Modify the star.
       Star.Builder starBuilder = star.newBuilder();
-      starModifier.modifyStar(
-          starBuilder,
-          auxiliaryStars,
-          Lists.newArrayList(modification),
-          null /* logHandler */);
+      try {
+        starModifier.modifyStar(
+            starBuilder,
+            auxiliaryStars,
+            Lists.newArrayList(modification),
+            null /* logHandler */);
+      } catch (SuspiciousModificationException e) {
+        // Mostly we don't care about these on the client, but it'll be good to log them.
+        log.error("Unexpected suspicious modification.", e);
+        return;
+      }
 
       // Save the now-modified star.
       Star newStar = starBuilder.build();

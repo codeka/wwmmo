@@ -24,6 +24,7 @@ import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
+import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.concurrency.TaskRunner;
 import au.com.codeka.warworlds.server.concurrency.Threads;
 import au.com.codeka.warworlds.server.net.Connection;
@@ -164,7 +165,13 @@ public class Player {
 
   private void onModifyStar(ModifyStarPacket pkt) {
     WatchableObject<Star> star = StarManager.i.getStar(pkt.star_id);
-    StarManager.i.modifyStar(star, pkt.modification, null /* logHandler */);
+    try {
+      StarManager.i.modifyStar(star, pkt.modification, null /* logHandler */);
+    } catch (SuspiciousModificationException e) {
+      // ruh-roh!
+      // TODO: save the suspicious modification
+      log.warning("Suspicious star modification.", e);
+    }
   }
 
   private void onRequestEmpire(RequestEmpirePacket pkt) {

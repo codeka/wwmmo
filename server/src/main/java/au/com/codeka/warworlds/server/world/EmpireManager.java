@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
+import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
@@ -77,40 +78,46 @@ public class EmpireManager {
     long id = DataStore.i.seq().nextIdentifier();
 
     WatchableObject<Star> star = StarManager.i.getStar(newStarFinder.getStar().id);
-    StarManager.i.modifyStar(star, Lists.newArrayList(
-        new StarModification.Builder()
-            .type(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
-            .build(),
-        new StarModification.Builder()
-            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-            .empire_id(id)
-            .design_type(Design.DesignType.COLONY_SHIP)
-            .count(3) // note: one is destroyed by COLONIZE below
-            .build(),
-        new StarModification.Builder()
-            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-            .empire_id(id)
-            .design_type(Design.DesignType.FIGHTER)
-            .count(50)
-            .build(),
-        new StarModification.Builder()
-            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-            .empire_id(id)
-            .design_type(Design.DesignType.TROOP_CARRIER)
-            .count(200)
-            .build(),
-        new StarModification.Builder()
-            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-            .empire_id(id)
-            .design_type(Design.DesignType.SCOUT)
-            .count(10)
-            .build(),
-        new StarModification.Builder()
-            .empire_id(id)
-            .type(StarModification.MODIFICATION_TYPE.COLONIZE)
-            .planet_index(newStarFinder.getPlanetIndex())
-            .build()
-    ), null /* logHandler */);
+    try {
+      StarManager.i.modifyStar(star, Lists.newArrayList(
+          new StarModification.Builder()
+              .type(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
+              .build(),
+          new StarModification.Builder()
+              .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+              .empire_id(id)
+              .design_type(Design.DesignType.COLONY_SHIP)
+              .count(3) // note: one is destroyed by COLONIZE below
+              .build(),
+          new StarModification.Builder()
+              .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+              .empire_id(id)
+              .design_type(Design.DesignType.FIGHTER)
+              .count(50)
+              .build(),
+          new StarModification.Builder()
+              .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+              .empire_id(id)
+              .design_type(Design.DesignType.TROOP_CARRIER)
+              .count(200)
+              .build(),
+          new StarModification.Builder()
+              .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+              .empire_id(id)
+              .design_type(Design.DesignType.SCOUT)
+              .count(10)
+              .build(),
+          new StarModification.Builder()
+              .empire_id(id)
+              .type(StarModification.MODIFICATION_TYPE.COLONIZE)
+              .planet_index(newStarFinder.getPlanetIndex())
+              .build()
+      ), null /* logHandler */);
+    } catch (SuspiciousModificationException e) {
+      // Shouldn't happen, none of these should be suspicious...
+      log.error("Unexpected suspicious modification.", e);
+      return null;
+    }
 
     Empire empire = new Empire.Builder()
         .display_name(name)

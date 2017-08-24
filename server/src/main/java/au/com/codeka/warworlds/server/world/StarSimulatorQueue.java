@@ -5,6 +5,7 @@ import com.google.api.client.util.Lists;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.StarsStore;
 
@@ -87,7 +88,12 @@ public class StarSimulatorQueue {
       if (star != null) {
         long startTime = System.nanoTime();
         WatchableObject<Star> watchableStar = StarManager.i.getStar(star.id);
-        StarManager.i.modifyStar(watchableStar, Lists.newArrayList(), null /* logHandler */);
+        try {
+          StarManager.i.modifyStar(watchableStar, Lists.newArrayList(), null /* logHandler */);
+        } catch (SuspiciousModificationException e) {
+          // Shouldn't ever happen, as we're passing an empty list of modifications.
+          log.warning("Unexpected suspicious modification.", e);
+        }
         long endTime = System.nanoTime();
 
         log.info("Star #%d (%s) simulated in %dms",

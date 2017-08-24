@@ -17,6 +17,7 @@ import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
@@ -25,6 +26,7 @@ import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.StarModifier;
+import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -35,6 +37,8 @@ public class BuildBottomPane extends RelativeLayout {
   public interface Callback {
     void onBuild(Design.DesignType designType, int count);
   }
+
+  private final static Log log = new Log("BuildBottomPane");
 
   private final Star star;
   private final Colony colony;
@@ -83,15 +87,15 @@ public class BuildBottomPane extends RelativeLayout {
 
     inflate(context, R.layout.build_build_bottom_pane, this);
 
-    buildIcon = (ImageView) findViewById(R.id.build_icon);
-    buildName = (TextView) findViewById(R.id.build_name);
-    buildDescription = (TextView) findViewById(R.id.build_description);
-    buildCountContainer = (ViewGroup) findViewById(R.id.build_count_container);
-    buildTime = (TextView) findViewById(R.id.build_timetobuild);
-    buildMinerals = (TextView) findViewById(R.id.build_mineralstobuild);
+    buildIcon = findViewById(R.id.build_icon);
+    buildName = findViewById(R.id.build_name);
+    buildDescription = findViewById(R.id.build_description);
+    buildCountContainer = findViewById(R.id.build_count_container);
+    buildTime = findViewById(R.id.build_timetobuild);
+    buildMinerals = findViewById(R.id.build_mineralstobuild);
 
-    buildCountSeek = (SeekBar) findViewById(R.id.build_count_seek);
-    buildCount = (EditText) findViewById(R.id.build_count_edit);
+    buildCountSeek = findViewById(R.id.build_count_seek);
+    buildCount = findViewById(R.id.build_count_edit);
     buildCountSeek.setMax(1000);
     buildCountSeek.setOnSeekBarChangeListener(buildCountSeekBarChangeListener);
 
@@ -124,14 +128,19 @@ public class BuildBottomPane extends RelativeLayout {
       }
 
       Empire myEmpire = EmpireManager.i.getMyEmpire();
-      new StarModifier(() -> 0).modifyStar(starBuilder,
-          new StarModification.Builder()
-              .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
-              .colony_id(colony.id)
-              .count(count)
-              .design_type(design.type)
-              // TODO: upgrades?
-              .build());
+      try {
+        new StarModifier(() -> 0).modifyStar(starBuilder,
+            new StarModification.Builder()
+                .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
+                .colony_id(colony.id)
+                .count(count)
+                .design_type(design.type)
+                // TODO: upgrades?
+                .build());
+      } catch (SuspiciousModificationException e) {
+        log.error("Suspicious modification?", e);
+        return;
+      }
       // find the build request with ID 0, that's our guy
 
       Star updatedStar = starBuilder.build();

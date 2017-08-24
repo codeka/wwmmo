@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.Simulation;
+import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.world.SectorManager;
 import au.com.codeka.warworlds.server.world.StarManager;
@@ -66,11 +67,11 @@ public class AjaxStarfieldHandler extends AjaxHandler {
     setResponseJson(sector.get());
   }
 
-  private void handleSimulateRequest(long starId) {
+  private void handleSimulateRequest(long starId) throws RequestException {
     setResponseGson(modifyAndSimulate(starId, null));
   }
 
-  private void handleModifyRequest(long starId, String modifyJson) {
+  private void handleModifyRequest(long starId, String modifyJson) throws RequestException {
     log.debug("modify: " + modifyJson);
     StarModification modification = fromJson(modifyJson, StarModification.class);
     setResponseGson(modifyAndSimulate(starId, modification));
@@ -81,14 +82,15 @@ public class AjaxStarfieldHandler extends AjaxHandler {
     StarManager.i.deleteStar(starId);
   }
 
-  private void handleClearNativesRequest(long starId) {
+  private void handleClearNativesRequest(long starId) throws RequestException {
     log.debug("delete star: %d", starId);
     modifyAndSimulate(starId, new StarModification.Builder()
         .type(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
         .build());
   }
 
-  private SimulateResponse modifyAndSimulate(long starId, @Nullable StarModification modification) {
+  private SimulateResponse modifyAndSimulate(long starId, @Nullable StarModification modification)
+      throws RequestException {
     SimulateResponse resp = new SimulateResponse();
     new SimulateResponse();
     long startTime = System.nanoTime();
@@ -101,7 +103,11 @@ public class AjaxStarfieldHandler extends AjaxHandler {
     if (modification != null) {
       modifications.add(modification);
     }
-    StarManager.i.modifyStar(star, modifications, new LogHandler(logMessages));
+    try {
+      StarManager.i.modifyStar(star, modifications, new LogHandler(logMessages));
+    } catch (SuspiciousModificationException e) {
+      throw new RequestException(e);
+    }
     long simulateTime = System.nanoTime();
     resp.simulateTime = (simulateTime - startTime) / 1000000L;
     resp.logMessages = logMessages.toString();

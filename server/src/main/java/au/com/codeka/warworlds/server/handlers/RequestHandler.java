@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.AdminRole;
-import au.com.codeka.warworlds.server.admin.Session;
 
 /**
  * This is the base class for the game's request handlers. It handles some common tasks such as

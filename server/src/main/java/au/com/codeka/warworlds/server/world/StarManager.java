@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.sim.Simulation;
 import au.com.codeka.warworlds.common.sim.StarModifier;
+import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.StarsStore;
 
@@ -92,28 +93,33 @@ public class StarManager {
       // OK, so basically any planet with a population congeniality > 500 will get a colony.
       Star.Builder starBuilder = star.get().newBuilder();
 
-      int numColonies = 0;
-      for (int i = 0; i < starBuilder.planets.size(); i++) {
-        if (starBuilder.planets.get(i).population_congeniality > 500) {
-          starModifier.modifyStar(starBuilder, new StarModification.Builder()
-              .type(StarModification.MODIFICATION_TYPE.COLONIZE)
-              .planet_index(i)
-              .build());
-          numColonies ++;
+      try {
+        int numColonies = 0;
+        for (int i = 0; i < starBuilder.planets.size(); i++) {
+          if (starBuilder.planets.get(i).population_congeniality > 500) {
+            starModifier.modifyStar(starBuilder, new StarModification.Builder()
+                .type(StarModification.MODIFICATION_TYPE.COLONIZE)
+                .planet_index(i)
+                .build());
+            numColonies++;
+          }
         }
-      }
 
-      // Create a fleet of fighters for each colony.
-      NormalRandom rand = new NormalRandom();
-      while (numColonies > 0) {
-        int numShips = 100 + (int) (rand.next() * 40);
-        starModifier.modifyStar(starBuilder, new StarModification.Builder()
-            .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-            .design_type(Design.DesignType.FIGHTER)
-            .count(numShips)
-            .build());
+        // Create a fleet of fighters for each colony.
+        NormalRandom rand = new NormalRandom();
+        while (numColonies > 0) {
+          int numShips = 100 + (int) (rand.next() * 40);
+          starModifier.modifyStar(starBuilder, new StarModification.Builder()
+              .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+              .design_type(Design.DesignType.FIGHTER)
+              .count(numShips)
+              .build());
 
-        numColonies--;
+          numColonies--;
+        }
+      } catch (SuspiciousModificationException e) {
+        // Shouldn't happen, as we're creating the modifications ourselves.
+        log.error("Unexpected suspicious modification.", e);
       }
 
       star.set(starBuilder.build());
@@ -131,7 +137,8 @@ public class StarManager {
   public void modifyStar(
       WatchableObject<Star> star,
       Collection<StarModification> modifications,
-      @Nullable Simulation.LogHandler logHandler) {
+      @Nullable Simulation.LogHandler logHandler)
+      throws SuspiciousModificationException{
     Map<Long, Star> auxStars = null;
     for (StarModification modification : modifications) {
       if (modification.star_id != null) {
@@ -150,7 +157,8 @@ public class StarManager {
       WatchableObject<Star> star,
       @Nullable Collection<Star> auxStars,
       Collection<StarModification> modifications,
-      @Nullable Simulation.LogHandler logHandler) {
+      @Nullable Simulation.LogHandler logHandler)
+      throws SuspiciousModificationException {
     synchronized (star.lock) {
       Star.Builder starBuilder = star.get().newBuilder();
       starModifier.modifyStar(starBuilder, auxStars, modifications, logHandler);
@@ -166,11 +174,13 @@ public class StarManager {
    * @param starBuilder A simulated star that we need to finish up.
    * @param logHandler An optional {@link Simulation.LogHandler} that we'll pass log messages
    *                   through to. If null, we'll just do normal logging.
+   * @throws SuspiciousModificationException if the
    */
   private void completeActions(
       WatchableObject<Star> star,
       Star.Builder starBuilder,
-      @Nullable Simulation.LogHandler logHandler) {
+      @Nullable Simulation.LogHandler logHandler)
+      throws SuspiciousModificationException{
     // For any builds/moves/etc that finish in the future, make sure we schedule a job to
     // re-simulate the star then.
     Long nextSimulateTime = null;
