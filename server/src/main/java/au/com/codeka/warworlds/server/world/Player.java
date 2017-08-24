@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.common.proto.RequestEmpirePacket;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
@@ -165,6 +166,24 @@ public class Player {
 
   private void onModifyStar(ModifyStarPacket pkt) {
     WatchableObject<Star> star = StarManager.i.getStar(pkt.star_id);
+    for (StarModification modification : pkt.modification) {
+      if (modification.empire_id == null || !modification.empire_id.equals(empire.get().id)) {
+        // Update the modification's empire_id to be our own, since that's what'll be recorded
+        // in the database and we don't want this suspicious event to be recorded against the
+        // other person's empire.
+        Long otherEmpireId = modification.empire_id;
+        modification = modification.newBuilder().empire_id(empire.get().id).build();
+
+        SuspiciousEventManager.i.addSuspiciousEvent(new SuspiciousModificationException(
+            pkt.star_id,
+            modification,
+            "Modification empire_id does not equal our own empire. empire_id=%d",
+            otherEmpireId));
+        return;
+      }
+    }
+
+
     try {
       StarManager.i.modifyStar(star, pkt.modification, null /* logHandler */);
     } catch (SuspiciousModificationException e) {
