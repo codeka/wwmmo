@@ -1,6 +1,7 @@
 {% extends "skeleton.html" %}
 {% block "title" %}Starfield{% end %}
 {% block "head" %}
+  <link rel="stylesheet" href="/admin/css/star.css">
   <link rel="stylesheet" href="/admin/css/starfield.css">
   <script type="text/javascript" src="/admin/js/tmpl.js"></script>
   <script type="text/javascript" src="/admin/js/empirestore.js"></script>
@@ -30,7 +31,7 @@
   <div class="right-column">
     <div id="star-details"></div>
     <script id="star-details-tmpl" type="text/html">
-      <div class="star-big star-big-<%= classification.toLowerCase() %>"></div>
+      <div class="star-big star-<%= classification.toLowerCase() %>"></div>
       <h1><%= name %></h1>
       <div class="details"><%= id %> [<%= sector_x %>,<%= sector_y %>] (<%= offset_x %>,<%= offset_y %>)</div>
       <div class="stores">

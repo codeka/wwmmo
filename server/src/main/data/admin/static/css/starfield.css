@@ -79,14 +79,6 @@ table td {
   -webkit-user-select: none;
 }
 
-.star-blackhole { background-position: 0px -128px; }
-.star-blue { background-position: -64px -128px; }
-.star-yellow { background-position: -128px -128px; }
-.star-orange { background-position: 0px -192px; }
-.star-red { background-position: -64px -192px; }
-.star-white { background-position: -128px -192px; }
-.star-neutron { width: 128px; height: 128px; margin: -64px 0 0 -64px; }
-
 #star-details h1 {
   margin-left: 128px;
   margin-bottom: 0px;
@@ -96,22 +88,18 @@ table td {
   margin-left: 128px;
 }
 
+.star-small {
+  position: absolute;
+  cursor: pointer;
+  margin: -32px 0 0 -32px;
+}
+
 .star-big {
-  background: url(../img/stars_big.png);
-  width: 256px;
-  height: 256px;
   margin: -128px 0 0 -128px;
   overflow: hidden;
   position: absolute;
   z-index: -1;
 }
-.star-big-blackhole { background-position: 0px 0px; }
-.star-big-blue { background-position: 0px -256px; }
-.star-big-neutron { background-position: 0px -512px; }
-.star-big-orange { background-position: 0px -768px; }
-.star-big-red { background-position: 0px -1024px; }
-.star-big-white { background-position: 0px -1280px; }
-.star-big-yellow { background-position: 0px -1536px; }
 
 #search {
   width: 492px;

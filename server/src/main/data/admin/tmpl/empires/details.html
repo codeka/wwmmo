@@ -1,10 +1,9 @@
 {% extends "skeleton.html" %}
 {% block "title" %}Empires{% end %}
 {% block "head" %}
+  <link rel="stylesheet" href="/admin/css/star.css">
   <script type="text/javascript" src="/admin/js/tmpl.js"></script>
   <script type="text/javascript" src="/admin/js/time.js"></script>
-  <script>
-  </script>
 {% end %}
 {% block "content" %}
   <h1>{{ empire.display_name }}</h1>
@@ -18,7 +17,7 @@
     {% for star in stars %}
       <tr>
         <td>{{ star.id }}</td>
-        <td><a href="/admin/starfield?sector={{ star.sector_x }},{{ star.sector_y }}&star={{ star.id }}">{{ star.name }}</a></td>
+        <td>{% include "inc/star_name.html" %}</td>
       </tr>
     {% end %}
   </table>

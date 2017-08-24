@@ -42,6 +42,7 @@ public class StarManager {
     starModifier = new StarModifier(() -> DataStore.i.seq().nextIdentifier());
   }
 
+  @Nullable
   public WatchableObject<Star> getStar(long id) {
     WatchableObject<Star> watchableStar;
     synchronized (stars) {

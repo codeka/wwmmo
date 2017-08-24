@@ -1,0 +1,26 @@
+{% extends "skeleton.html" %}
+{% block "title" %}Accounts{% end %}
+{% block "head" %}
+  <link rel="stylesheet" href="/admin/css/star.css">
+  <script type="text/javascript" src="/admin/js/tmpl.js"></script>
+  <script type="text/javascript" src="/admin/js/time.js"></script>
+{% end %}
+{% block "content" %}
+<h1>Suspicious events</h1>
+<table>
+  <tr>
+    <th>Time</th>
+    <th>Empire</th>
+    <th>Star</th>
+    <th>Message</th>
+  </tr>
+  {% for event in events %}
+  <tr>
+    <td>{{ event.timestamp }}</td>
+    <td>{% include "inc/empire_name.html" empire = empires[event.modification.empire_id] %}</td>
+    <td>{% include "inc/star_name.html" star = stars[event.star_id] %}</td>
+    <td>{{ event.message }}</td>
+  </tr>
+  {% end %}
+</table>
+{% end %}

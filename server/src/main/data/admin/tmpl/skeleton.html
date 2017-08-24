@@ -53,6 +53,12 @@
             <li><a href="/admin/sectors">Sectors</a>
           </ul>
         {% endif %}
+        {% if Session.isInRole(session, "ADMINISTRATOR") %}
+          <li><span><span>Debug</span></span>
+            <ul>
+              <li><a href="/admin/debug/suspicious-events">Suspicious events</a>
+            </ul>
+        {% endif %}
       </ul>
     </div></section>
 

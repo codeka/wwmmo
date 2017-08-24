@@ -15,7 +15,7 @@ $(function() {
     for (var index in sector.stars) {
       var star = sector.stars[index];
       var div = $("<div/>");
-      div.addClass("starfield-star");
+      div.addClass("star-small");
       div.addClass("star-" + star.classification.toLowerCase());
       div.css("left", parseInt(star.offset_x * 0.5) + "px");
       div.css("top", parseInt(star.offset_y * 0.5) + "px");

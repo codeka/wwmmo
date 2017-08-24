@@ -1,0 +1,40 @@
+.star-small {
+  background: url(../img/stars_small.png);
+  width: 64px;
+  height: 64px;
+  transform: rotate(45deg) scale(0.5);
+}
+.star-small.star-blackhole { background-position: 0px -128px; }
+.star-small.star-blue { background-position: -64px -128px; }
+.star-small.star-yellow { background-position: -128px -128px; }
+.star-small.star-orange { background-position: 0px -192px; }
+.star-small.star-red { background-position: -64px -192px; }
+.star-small.star-white { background-position: -128px -192px; }
+.star-small.star-neutron { width: 128px; height: 128px; margin: -64px 0 0 -64px; }
+
+.star-big {
+  background: url(../img/stars_big.png);
+  width: 256px;
+  height: 256px;
+  overflow: hidden;
+}
+.star-big.star-blackhole { background-position: 0px 0px; }
+.star-big.star-blue { background-position: 0px -256px; }
+.star-big.star-neutron { background-position: 0px -512px; }
+.star-big.star-orange { background-position: 0px -768px; }
+.star-big.star-red { background-position: 0px -1024px; }
+.star-big.star-white { background-position: 0px -1280px; }
+.star-big.star-yellow { background-position: 0px -1536px; }
+
+.star-small-container {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+}
+.star-small-container .star-small {
+  margin: -18px 0 0 -18px;
+}
+
+.star-small-label {
+  vertical-align: super;
+}
