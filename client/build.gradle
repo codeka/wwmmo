@@ -20,7 +20,7 @@ if (signingPropsFile.isFile()) {
 
 android {
   compileSdkVersion 26
-  buildToolsVersion "26.0.0"
+  buildToolsVersion "26.0.1"
 
   defaultConfig {
     applicationId "au.com.codeka.warworlds2"
@@ -30,8 +30,8 @@ android {
     versionName "2.0"
   }
   compileOptions {
-    sourceCompatibility 1.8
-    targetCompatibility 1.8
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
   }
   signingConfigs {
     release {
@@ -98,7 +98,7 @@ dependencies {
   compile 'com.google.android.gms:play-services-base:11.2.0'
   compile 'com.google.firebase:firebase-core:11.2.0'
   compile 'com.google.firebase:firebase-messaging:11.2.0'
-  compile 'com.google.guava:guava:21.0'
+  compile 'com.google.guava:guava:22.0-android'
   compile 'com.squareup.picasso:picasso:2.5.2'
   compile project(':common')
 }

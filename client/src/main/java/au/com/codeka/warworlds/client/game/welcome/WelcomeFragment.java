@@ -76,15 +76,15 @@ public class WelcomeFragment extends BaseFragment {
     rootView = view;
     ViewBackgroundGenerator.setBackground(view);
 
-    startButton = (Button) checkNotNull(view.findViewById(R.id.start_btn));
-    signInButton = (Button) view.findViewById(R.id.signin_btn);
-    motdView = (TransparentWebView) checkNotNull(view.findViewById(R.id.motd));
-    empireName = (TextView) checkNotNull(view.findViewById(R.id.empire_name));
-    empireIcon = (ImageView) checkNotNull(view.findViewById(R.id.empire_icon));
+    startButton = checkNotNull(view.findViewById(R.id.start_btn));
+    signInButton = view.findViewById(R.id.signin_btn);
+    motdView = checkNotNull(view.findViewById(R.id.motd));
+    empireName = checkNotNull(view.findViewById(R.id.empire_name));
+    empireIcon = checkNotNull(view.findViewById(R.id.empire_icon));
     connectionStatus =
-        (TextView) checkNotNull(view.findViewById(R.id.connection_status));
+        checkNotNull(view.findViewById(R.id.connection_status));
     final Button optionsButton =
-        (Button) checkNotNull(view.findViewById(R.id.options_btn));
+        checkNotNull(view.findViewById(R.id.options_btn));
 
     refreshWelcomeMessage();
 
@@ -94,13 +94,13 @@ public class WelcomeFragment extends BaseFragment {
     startButton.setOnClickListener(v ->
         getFragmentTransitionManager().replaceFragment(StarfieldFragment.class));
 
-    checkNotNull(view.findViewById(R.id.help_btn)).setOnClickListener(v -> {
+    view.findViewById(R.id.help_btn).setOnClickListener(v -> {
           Intent i = new Intent(Intent.ACTION_VIEW);
           i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
           startActivity(i);
         });
 
-    checkNotNull(view.findViewById(R.id.website_btn)).setOnClickListener(v -> {
+    view.findViewById(R.id.website_btn).setOnClickListener(v -> {
           Intent i = new Intent(Intent.ACTION_VIEW);
           i.setData(Uri.parse("http://www.war-worlds.com/"));
           startActivity(i);
