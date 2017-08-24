@@ -87,17 +87,25 @@ public class BuildFragment extends BaseFragment {
   }
 
   @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    Star star = StarManager.i.getStar(getArguments().getLong(STAR_ID_KEY));
+    initialColony = star.planets.get(getArguments().getInt(PLANET_INDEX_KEY)).colony;
+  }
+
+  @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
     colonyPagerAdapter = new ColonyPagerAdapter(this);
-    viewPager = (ViewPager) view.findViewById(R.id.pager);
+    viewPager = view.findViewById(R.id.pager);
     viewPager.setAdapter(colonyPagerAdapter);
-    planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
-    planetName = (TextView) view.findViewById(R.id.planet_name);
-    buildQueueDescription = (TextView) view.findViewById(R.id.build_queue_description);
+    planetIcon = view.findViewById(R.id.planet_icon);
+    planetName = view.findViewById(R.id.planet_name);
+    buildQueueDescription = view.findViewById(R.id.build_queue_description);
 
-    bottomPane = (ViewGroup) view.findViewById(R.id.bottom_pane);
+    bottomPane = view.findViewById(R.id.bottom_pane);
   }
 
   @Override
@@ -128,7 +136,7 @@ public class BuildFragment extends BaseFragment {
             .colony_id(colony.id)
             .design_type(designType)
             .count(count));
-      getFragmentManager().popBackStack();
+        hideBuildSheet();
     }));
   }
 
@@ -156,6 +164,8 @@ public class BuildFragment extends BaseFragment {
   };
 
   private void updateStar(Star s) {
+    log.info("Updating star %d [%s]...", s.id, s.name);
+
     boolean dataSetChanged = (star == null);
 
     star = s;

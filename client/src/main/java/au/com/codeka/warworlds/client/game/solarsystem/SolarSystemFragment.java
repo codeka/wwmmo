@@ -33,7 +33,6 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
-import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.ColonyHelper;
