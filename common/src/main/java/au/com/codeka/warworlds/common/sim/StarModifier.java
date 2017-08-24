@@ -18,6 +18,7 @@ import au.com.codeka.warworlds.common.proto.Building;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Design;
+import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -297,6 +298,14 @@ public class StarModifier {
 
     Planet planet = getPlanetWithColony(star, modification.colony_id);
     if (planet != null) {
+      if (!EmpireHelper.isSameEmpire(planet.colony.empire_id, modification.empire_id)) {
+        throw new SuspiciousModificationException(
+            star.id,
+            modification,
+            "Attempt to create building on planet for different empire. colony.empire_id=%d",
+            planet.colony.empire_id);
+      }
+
       logHandler.log(
           String.format(Locale.US, "- creating building, colony_id=%d", modification.colony_id));
       Colony.Builder colony = planet.colony.newBuilder();
@@ -325,6 +334,13 @@ public class StarModifier {
 
     Planet planet = getPlanetWithColony(star, modification.colony_id);
     if (planet != null) {
+      if (!EmpireHelper.isSameEmpire(planet.colony.empire_id, modification.empire_id)) {
+        throw new SuspiciousModificationException(
+            star.id,
+            modification,
+            "Attempt to adjust focus on planet for different empire. colony.empire_id=%d",
+            planet.colony.empire_id);
+      }
       logHandler.log("- adjusting focus.");
       star.planets.set(planet.index, planet.newBuilder()
           .colony(planet.colony.newBuilder()
@@ -357,6 +373,24 @@ public class StarModifier {
             "Attempt to add build request on colony that does belong to you. colony_id=%d empire_id=%d",
             modification.colony_id,
             colonyBuilder.empire_id);
+      }
+
+      // If the build request is for a ship and this colony doesn't have a shipyard, you can't
+      // build. That's suspicious.
+      Design design = DesignHelper.getDesign(modification.design_type);
+      if (design.design_kind == Design.DesignKind.SHIP) {
+        boolean hasShipyard = false;
+        for (Building building : colonyBuilder.buildings) {
+          if (building.design_type == Design.DesignType.SHIPYARD) {
+            hasShipyard = true;
+          }
+        }
+        if (!hasShipyard) {
+          throw new SuspiciousModificationException(
+              star.id,
+              modification,
+              "Attempt to build ship with no shipyard present.");
+        }
       }
 
       logHandler.log("- adding build request");
@@ -471,7 +505,8 @@ public class StarModifier {
   private void applyMergeFleet(
       Star.Builder star,
       StarModification modification,
-      Simulation.LogHandler logHandler) {
+      Simulation.LogHandler logHandler)
+      throws SuspiciousModificationException {
     checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.MERGE_FLEET));
 
@@ -479,8 +514,17 @@ public class StarModifier {
     if (fleetIndex >= 0) {
       Fleet.Builder fleet = star.fleets.get(fleetIndex).newBuilder();
       if (fleet.state != Fleet.FLEET_STATE.IDLE) {
+        // Can't merge, but this isn't particularly suspicious.
         logHandler.log(String.format(Locale.US,
             "  main fleet %d is %s, cannot merge.", fleet.id, fleet.state));
+      }
+
+      if (!EmpireHelper.isSameEmpire(fleet.empire_id, modification.empire_id)) {
+        throw new SuspiciousModificationException(
+            star.id,
+            modification,
+            "Attempt to merge fleet owned by a different empire. fleet.empire_id=%d",
+            fleet.empire_id);
       }
 
       for (int i = 0; i < star.fleets.size(); i++) {
@@ -490,15 +534,25 @@ public class StarModifier {
         }
         if (modification.additional_fleet_ids.contains(thisFleet.id)) {
           if (!thisFleet.design_type.equals(fleet.design_type)) {
-            // TODO: suspicious! wrong fleet type.
-            logHandler.log(String.format(Locale.US,
-                "  fleet #%d not the same design_type as #%d (%s vs. %s)",
-                thisFleet.id, fleet.id, thisFleet.design_type, fleet.design_type));
-            return;
+            // The client shouldn't allow you to select a fleet of a different type. This would be
+            // suspicious.
+            throw new SuspiciousModificationException(
+                star.id,
+                modification,
+                "Fleet #%d not the same design_type as #%d (%s vs. %s)",
+                thisFleet.id, fleet.id, thisFleet.design_type, fleet.design_type);
+          }
+
+          if (!EmpireHelper.isSameEmpire(thisFleet.empire_id, modification.empire_id)) {
+            throw new SuspiciousModificationException(
+                star.id,
+                modification,
+                "Attempt to merge fleet owned by a different empire. fleet.empire_id=%d",
+                thisFleet.empire_id);
           }
 
           if (thisFleet.state != Fleet.FLEET_STATE.IDLE) {
-            // Suspicious? nah, just skip it.
+            // Again, not particularly suspicious, we'll just skip it.
             logHandler.log(String.format(Locale.US,
                 "  fleet %d is %s, cannot merge.", thisFleet.id, thisFleet.state));
             continue;
@@ -528,7 +582,8 @@ public class StarModifier {
       Star.Builder star,
       Collection<Star> auxStars,
       StarModification modification,
-      Simulation.LogHandler logHandler) {
+      Simulation.LogHandler logHandler)
+      throws SuspiciousModificationException{
     checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.MOVE_FLEET));
     logHandler.log("- moving fleet");
@@ -549,14 +604,24 @@ public class StarModifier {
 
     int fleetIndex = findFleetIndex(star, modification.fleet_id);
     if (fleetIndex < 0) {
-      // TODO: suspicious!
-      logHandler.log("  no fleet with given ID on star.");
-      return;
+      throw new SuspiciousModificationException(
+          star.id,
+          modification,
+          "Attempt to move fleet that does not exist. fleet_id=%d",
+          modification.fleet_id);
     }
     Fleet fleet = star.fleets.get(fleetIndex);
 
+    if (fleet.empire_id != modification.empire_id) {
+      throw new SuspiciousModificationException(
+          star.id,
+          modification,
+          "Attempt to move fleet owned by a different empire. fleet.empire_id=%d",
+          fleet.empire_id);
+    }
+
     if (fleet.state != Fleet.FLEET_STATE.IDLE) {
-      // TODO: suspicious?
+      // Not suspicious, maybe you accidentally pressed twice.
       logHandler.log("  fleet is not idle, can't move.");
       return;
     }
