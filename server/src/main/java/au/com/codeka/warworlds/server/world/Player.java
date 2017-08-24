@@ -168,8 +168,7 @@ public class Player {
     try {
       StarManager.i.modifyStar(star, pkt.modification, null /* logHandler */);
     } catch (SuspiciousModificationException e) {
-      // ruh-roh!
-      // TODO: save the suspicious modification
+      SuspiciousEventManager.i.addSuspiciousEvent(e);
       log.warning("Suspicious star modification.", e);
     }
   }

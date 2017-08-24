@@ -14,6 +14,7 @@ import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.world.SectorManager;
 import au.com.codeka.warworlds.server.world.StarManager;
+import au.com.codeka.warworlds.server.world.SuspiciousEventManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 
 /** Handler for /admin/ajax/starfield requests. */
@@ -106,6 +107,9 @@ public class AjaxStarfieldHandler extends AjaxHandler {
     try {
       StarManager.i.modifyStar(star, modifications, new LogHandler(logMessages));
     } catch (SuspiciousModificationException e) {
+      log.warning("Suspicious modification.", e);
+      // We'll log it as well, even though technically it wasn't the empire who made it.
+      SuspiciousEventManager.i.addSuspiciousEvent(e);
       throw new RequestException(e);
     }
     long simulateTime = System.nanoTime();

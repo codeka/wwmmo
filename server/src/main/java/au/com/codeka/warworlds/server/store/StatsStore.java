@@ -18,6 +18,9 @@ import au.com.codeka.warworlds.server.proto.LoginEvent;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
 
+import static au.com.codeka.warworlds.server.store.StatsHelper.dateTimeToDay;
+import static au.com.codeka.warworlds.server.store.StatsHelper.timestampToDay;
+
 /**
  * Store for various stats that we want to keep track of.
  */
@@ -124,19 +127,6 @@ public class StatsStore extends BaseStore {
             .sevenda(sevenda.size())
             .signups(0) // TODO: populate
             .build());
-  }
-
-  /**
-   * Take a stamp in unix-epoch-millis format (i.e. like what you'd get from
-   * {@code System.currentTimeMillis()}, and return a "day" integer of the form yyyymmdd.
-   */
-  private int timestampToDay(long timestamp) {
-    DateTime dt = new DateTime(timestamp);
-    return dateTimeToDay(dt);
-  }
-
-  private int dateTimeToDay(DateTime dt) {
-    return dt.year().get() * 10000 + dt.monthOfYear().get() * 100 + dt.dayOfMonth().get();
   }
 
   @Override

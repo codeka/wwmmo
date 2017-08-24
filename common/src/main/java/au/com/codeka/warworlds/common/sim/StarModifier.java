@@ -309,6 +309,7 @@ public class StarModifier {
           .build());
     } else {
       throw new SuspiciousModificationException(
+          star.id,
           modification,
           "Attempt to create building on colony that does not exist. colony_id=%d",
           modification.colony_id);
@@ -332,6 +333,7 @@ public class StarModifier {
           .build());
     } else {
       throw new SuspiciousModificationException(
+          star.id,
           modification,
           "Attempt to adjust focus on a colony that does not exist. colony_id=%d",
           modification.colony_id);
@@ -347,8 +349,17 @@ public class StarModifier {
 
     Planet planet = getPlanetWithColony(star, modification.colony_id);
     if (planet != null) {
-      logHandler.log("- adding build request");
       Colony.Builder colonyBuilder = planet.colony.newBuilder();
+      if (!EmpireHelper.isSameEmpire(colonyBuilder.empire_id, modification.empire_id)) {
+        throw new SuspiciousModificationException(
+            star.id,
+            modification,
+            "Attempt to add build request on colony that does belong to you. colony_id=%d empire_id=%d",
+            modification.colony_id,
+            colonyBuilder.empire_id);
+      }
+
+      logHandler.log("- adding build request");
       colonyBuilder.build_requests.add(new BuildRequest.Builder()
           .id(identifierGenerator.nextIdentifier())
           .design_type(modification.design_type)
@@ -361,6 +372,7 @@ public class StarModifier {
           .build());
     } else {
       throw new SuspiciousModificationException(
+          star.id,
           modification,
           "Attempt to add build request on colony that does not exist. colony_id=%d",
           modification.colony_id);
@@ -382,6 +394,7 @@ public class StarModifier {
           if (br.id.equals(modification.build_request_id)) {
             if (!EmpireHelper.isSameEmpire(p.colony.empire_id, modification.empire_id)) {
               throw new SuspiciousModificationException(
+                  star.id,
                   modification,
                   "Attempt to delete build request for different empire. building.empire_id=%d",
                   p.colony.empire_id);
@@ -399,6 +412,7 @@ public class StarModifier {
 
     if (planet == null) {
       throw new SuspiciousModificationException(
+          star.id,
           modification,
           "Attempt to delete build request that does not exist. build_request_id=%d",
           modification.build_request_id);
@@ -427,6 +441,7 @@ public class StarModifier {
       Fleet.Builder fleet = star.fleets.get(fleetIndex).newBuilder();
       if (!EmpireHelper.isSameEmpire(fleet.empire_id, modification.empire_id)) {
         throw new SuspiciousModificationException(
+            star.id,
             modification,
             "Attempt to split fleet of different empire. fleet.empire_id=%d",
             fleet.empire_id);
@@ -446,6 +461,7 @@ public class StarModifier {
           .build());
     } else {
       throw new SuspiciousModificationException(
+          star.id,
           modification,
           "Attempt to split fleet that does not exist. fleet_id=%d",
           modification.fleet_id);
