@@ -17,6 +17,8 @@ import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeFragment;
 import au.com.codeka.warworlds.client.game.welcome.WelcomeFragment;
 import au.com.codeka.warworlds.common.Log;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class MainActivity extends BaseFragmentActivity {
   private static final Log log = new Log("MainActivity");
 
@@ -29,16 +31,15 @@ public class MainActivity extends BaseFragmentActivity {
     setContentView(R.layout.activity_main);
     createFragmentTransitionManager(R.id.fragment_container);
 
-    setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-    Preconditions.checkNotNull(getSupportActionBar()).hide();
+    setSupportActionBar(findViewById(R.id.toolbar));
+    checkNotNull(getSupportActionBar()).hide();
 
-    RenderSurfaceView renderSurfaceView =
-        (RenderSurfaceView) Preconditions.checkNotNull(findViewById(R.id.render_surface));
+    RenderSurfaceView renderSurfaceView = checkNotNull(findViewById(R.id.render_surface));
     renderSurfaceView.setRenderer();
     starfieldManager = new StarfieldManager(renderSurfaceView);
     starfieldManager.create();
 
-    DebugView debugView = (DebugView) Preconditions.checkNotNull(findViewById(R.id.debug_view));
+    DebugView debugView = checkNotNull(findViewById(R.id.debug_view));
     debugView.setFrameCounter(renderSurfaceView.getFrameCounter());
 
     if (savedInstanceState == null) {
@@ -54,7 +55,7 @@ public class MainActivity extends BaseFragmentActivity {
 
   @NonNull
   public StarfieldManager getStarfieldManager() {
-    return Preconditions.checkNotNull(starfieldManager);
+    return checkNotNull(starfieldManager);
   }
 
   @Override

@@ -42,6 +42,8 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
 import au.com.codeka.warworlds.common.sim.StarHelper;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * {@link StarfieldManager} manages the starfield view that we display in the main activity. You can
  * use it to switch between the normal view (that {@link StarfieldFragment} cares about) and the
@@ -232,7 +234,7 @@ public class StarfieldManager {
     initialized = true;
 
     // Shouldn't be null after we're connected to the server.
-    Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
+    Empire myEmpire = checkNotNull(EmpireManager.i.getMyEmpire());
     warpTo(myEmpire.home_star);
   }
 
@@ -262,10 +264,12 @@ public class StarfieldManager {
 
     // Tell the server we want to watch these new sectors, it'll send us back all the stars we
     // don't have yet.
-    App.i.getServer().send(new Packet.Builder()
-        .watch_sectors(new WatchSectorsPacket.Builder()
-            .top(top).left(left).bottom(bottom).right(right).build())
-        .build());
+    App.i.getTaskRunner().runTask(() -> {
+      App.i.getServer().send(new Packet.Builder()
+          .watch_sectors(new WatchSectorsPacket.Builder()
+              .top(top).left(left).bottom(bottom).right(right).build())
+          .build());
+    }, Threads.BACKGROUND);
 
     sectorTop = top;
     sectorLeft = left;
