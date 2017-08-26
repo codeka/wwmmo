@@ -1,18 +1,10 @@
 package au.com.codeka.warworlds.client.game.starfield;
 
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.TypedValue;
+import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.Button;
-import android.widget.RelativeLayout;
-
-import com.transitionseverywhere.AutoTransition;
-import com.transitionseverywhere.Transition;
-import com.transitionseverywhere.TransitionManager;
 
 import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
@@ -21,8 +13,6 @@ import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.ctrl.ChatMiniView;
 import au.com.codeka.warworlds.client.game.chat.ChatFragment;
 import au.com.codeka.warworlds.client.game.empire.EmpireFragment;
-import au.com.codeka.warworlds.client.game.fleets.FleetListSimple;
-import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
 import au.com.codeka.warworlds.client.game.fleets.FleetsFragment;
 import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemContainerFragment;
 import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemFragment;

@@ -1,25 +1,18 @@
 package au.com.codeka.warworlds.client.game.build;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.Html;
+import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TabHost;
 import android.widget.TextView;
 
-import com.google.common.base.Preconditions;
 import com.squareup.picasso.Picasso;
-import com.transitionseverywhere.TransitionManager;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,26 +22,21 @@ import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.TabbedBaseFragment;
-import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.client.opengl.DimensionResolver;
-import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
-import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
+import au.com.codeka.warworlds.client.opengl.DimensionResolver;
+import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
+import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.TimeFormatter;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
-import au.com.codeka.warworlds.common.sim.Simulation;
-import au.com.codeka.warworlds.common.sim.StarModifier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

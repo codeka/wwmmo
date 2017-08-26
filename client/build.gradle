@@ -92,7 +92,6 @@ def getVersionCodeFromGit() {
 }
 
 dependencies {
-  compile 'com.andkulikov:transitionseverywhere:1.6.3'
   compile 'com.android.support:appcompat-v7:26.0.1'
   compile 'com.android.support:preference-v7:26.0.1'
   compile 'com.google.android.gms:play-services-base:11.2.0'
@@ -100,6 +99,7 @@ dependencies {
   compile 'com.google.firebase:firebase-messaging:11.2.0'
   compile 'com.google.guava:guava:22.0-android'
   compile 'com.squareup.picasso:picasso:2.5.2'
+  compile 'com.squareup.flow:flow:1.0.0-alpha3'
   compile project(':common')
 }
 

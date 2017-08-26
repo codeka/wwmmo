@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.client.game.solarsystem;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
+import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -12,7 +13,6 @@ import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
 import com.squareup.wire.Wire;
-import com.transitionseverywhere.TransitionManager;
 
 import java.util.Locale;
 
