@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +17,7 @@ import au.com.codeka.warworlds.client.game.welcome.CreateEmpireFragment;
 import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeFragment;
 import au.com.codeka.warworlds.client.game.welcome.WelcomeFragment;
 import au.com.codeka.warworlds.common.Log;
+import flow.Flow;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,6 +26,12 @@ public class MainActivity extends BaseFragmentActivity {
 
   // Will be non-null between of onCreate/onDestroy.
   @Nullable private StarfieldManager starfieldManager;
+
+  @Override
+  protected void attachBaseContext(Context baseContext) {
+    baseContext = Flow.configure(baseContext, this).install();
+    super.attachBaseContext(baseContext);
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
