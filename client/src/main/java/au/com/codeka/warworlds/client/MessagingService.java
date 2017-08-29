@@ -1,9 +1,8 @@
 package au.com.codeka.warworlds.client;
 
+import au.com.codeka.warworlds.common.Log;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-
-import au.com.codeka.warworlds.common.Log;
 
 /**
  * Implementation of {@link FirebaseMessagingService}.

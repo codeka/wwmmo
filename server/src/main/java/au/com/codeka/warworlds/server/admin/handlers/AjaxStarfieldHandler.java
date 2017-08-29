@@ -1,9 +1,5 @@
 package au.com.codeka.warworlds.server.admin.handlers;
 
-import java.util.ArrayList;
-
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
@@ -16,6 +12,8 @@ import au.com.codeka.warworlds.server.world.SectorManager;
 import au.com.codeka.warworlds.server.world.StarManager;
 import au.com.codeka.warworlds.server.world.SuspiciousEventManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
+import java.util.ArrayList;
+import javax.annotation.Nullable;
 
 /** Handler for /admin/ajax/starfield requests. */
 public class AjaxStarfieldHandler extends AjaxHandler {

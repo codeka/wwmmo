@@ -1,5 +1,10 @@
 package au.com.codeka.warworlds.server.admin.handlers;
 
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.AdminRole;
+import au.com.codeka.warworlds.server.admin.Session;
+import au.com.codeka.warworlds.server.admin.SessionManager;
+import au.com.codeka.warworlds.server.handlers.RequestException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -7,7 +12,6 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -15,14 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.Cookie;
-
-import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.AdminRole;
-import au.com.codeka.warworlds.server.handlers.RequestException;
-import au.com.codeka.warworlds.server.admin.Session;
-import au.com.codeka.warworlds.server.admin.SessionManager;
 
 public class AdminLoginHandler extends AdminHandler {
   private static final Log log = new Log("AdminLoginHandler");

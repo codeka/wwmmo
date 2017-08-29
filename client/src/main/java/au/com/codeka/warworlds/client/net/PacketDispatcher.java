@@ -1,14 +1,12 @@
 package au.com.codeka.warworlds.client.net;
 
-import com.squareup.wire.WireField;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Packet;
+import com.squareup.wire.WireField;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Helper class for dispatching packets to the event bus.

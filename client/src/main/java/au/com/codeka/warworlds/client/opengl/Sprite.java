@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.opengl;
 
-import android.opengl.Matrix;
-
 import com.google.common.base.Preconditions;
 
 /** A {@link Sprite} is basically a quad + texture. */

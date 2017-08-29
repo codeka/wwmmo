@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.client.opengl;
 
 import android.opengl.Matrix;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.animation.DecelerateInterpolator;
 
 /**

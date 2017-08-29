@@ -1,5 +1,17 @@
 package au.com.codeka.warworlds.planetrender.ui;
 
+import au.com.codeka.warworlds.common.Colour;
+import au.com.codeka.warworlds.common.Image;
+import au.com.codeka.warworlds.common.PerlinNoise;
+import au.com.codeka.warworlds.common.PointCloud;
+import au.com.codeka.warworlds.common.Voronoi;
+import au.com.codeka.warworlds.planetrender.PlanetRenderer;
+import au.com.codeka.warworlds.planetrender.Template;
+import au.com.codeka.warworlds.planetrender.TemplateException;
+import au.com.codeka.warworlds.planetrender.TemplatedPerlinNoise;
+import au.com.codeka.warworlds.planetrender.TemplatedPointCloud;
+import au.com.codeka.warworlds.planetrender.TemplatedVoronoi;
+import au.com.codeka.warworlds.planetrender.TextureGenerator;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -14,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -28,19 +39,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
-
-import au.com.codeka.warworlds.common.Colour;
-import au.com.codeka.warworlds.common.Image;
-import au.com.codeka.warworlds.common.PerlinNoise;
-import au.com.codeka.warworlds.common.PointCloud;
-import au.com.codeka.warworlds.common.Voronoi;
-import au.com.codeka.warworlds.planetrender.PlanetRenderer;
-import au.com.codeka.warworlds.planetrender.Template;
-import au.com.codeka.warworlds.planetrender.TemplateException;
-import au.com.codeka.warworlds.planetrender.TemplatedPerlinNoise;
-import au.com.codeka.warworlds.planetrender.TemplatedPointCloud;
-import au.com.codeka.warworlds.planetrender.TemplatedVoronoi;
-import au.com.codeka.warworlds.planetrender.TextureGenerator;
 
 /**
  * This is the shared implemented (between the applet and the Swing application). It's got all of

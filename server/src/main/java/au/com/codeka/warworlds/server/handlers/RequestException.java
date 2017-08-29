@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.server.handlers;
 
 import java.util.Locale;
-
 import javax.servlet.http.HttpServletResponse;
 
 /**

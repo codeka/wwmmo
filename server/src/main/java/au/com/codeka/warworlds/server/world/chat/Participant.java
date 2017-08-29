@@ -1,12 +1,9 @@
 package au.com.codeka.warworlds.server.world.chat;
 
-import com.google.common.collect.Lists;
-
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.common.proto.ChatMessage;
+import com.google.common.collect.Lists;
+import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * A {@link Participant} represents the empire in a chat room. In the case of the global chat room,

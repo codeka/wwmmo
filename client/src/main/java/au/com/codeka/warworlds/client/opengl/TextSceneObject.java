@@ -3,15 +3,12 @@ package au.com.codeka.warworlds.client.opengl;
 import android.graphics.Rect;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-
+import au.com.codeka.warworlds.client.concurrency.Threads;
 import com.google.common.base.Preconditions;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
-
-import au.com.codeka.warworlds.client.concurrency.Threads;
 
 /**
  * A {@link SceneObject} that represents a piece of text.

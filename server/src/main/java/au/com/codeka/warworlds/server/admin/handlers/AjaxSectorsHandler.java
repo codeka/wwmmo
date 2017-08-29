@@ -1,8 +1,5 @@
 package au.com.codeka.warworlds.server.admin.handlers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
@@ -12,6 +9,8 @@ import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.EmpireManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Handler for /admin/ajax/sectors requests. */
 public class AjaxSectorsHandler extends AjaxHandler {

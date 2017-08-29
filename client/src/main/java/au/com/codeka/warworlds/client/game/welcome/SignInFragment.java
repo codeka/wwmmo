@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.client.game.welcome;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,7 +10,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
@@ -22,8 +23,6 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.AccountAssociateRequest;
 import au.com.codeka.warworlds.common.proto.AccountAssociateResponse;
 import au.com.codeka.warworlds.common.proto.Empire;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This fragment is used to associate your cookie with an email address. You'll get a code in your
@@ -51,11 +50,11 @@ public class SignInFragment extends BaseFragment {
     super.onViewCreated(view, savedInstanceState);
     ViewBackgroundGenerator.setBackground(view);
 
-    signInHelp = (TextView) checkNotNull(view.findViewById(R.id.signin_help));
-    signInError = (TextView) checkNotNull(view.findViewById(R.id.signin_error));
-    signInButton = (Button) checkNotNull(view.findViewById(R.id.signin_btn));
-    cancelButton = (Button) checkNotNull(view.findViewById(R.id.cancel_btn));
-    emailText = (EditText) checkNotNull(view.findViewById(R.id.email));
+    signInHelp = checkNotNull(view.findViewById(R.id.signin_help));
+    signInError = checkNotNull(view.findViewById(R.id.signin_error));
+    signInButton = checkNotNull(view.findViewById(R.id.signin_btn));
+    cancelButton = checkNotNull(view.findViewById(R.id.cancel_btn));
+    emailText = checkNotNull(view.findViewById(R.id.email));
     if (GameSettings.i.getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
       signInButton.setText(R.string.next);
     } else {

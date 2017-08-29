@@ -1,19 +1,14 @@
 package au.com.codeka.warworlds.client.util;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.preference.PreferenceManager;
-
-import com.google.common.base.Preconditions;
-
-import java.util.ArrayList;
-import java.util.UUID;
-
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.BuildConfig;
+import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.UUID;
 
 /** Wrapper class around our {@link SharedPreferences} instance. */
 public class GameSettings {

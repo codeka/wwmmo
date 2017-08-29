@@ -1,13 +1,12 @@
 package au.com.codeka.warworlds.server.net;
 
-import java.io.OutputStream;
-import java.net.Socket;
-
 import au.com.codeka.warworlds.common.net.PacketDecoder;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.HelloPacket;
 import au.com.codeka.warworlds.server.world.WatchableObject;
+import java.io.OutputStream;
+import java.net.Socket;
 
 /**
  * Represents a pending connection, which is when you request /login but have not yet connected

@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.client.game.fleets;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,18 +10,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Bottom pane of the fleets view that contains the "split" function.
@@ -50,10 +48,10 @@ public class SplitBottomPane extends RelativeLayout {
 
     inflate(context, R.layout.ctrl_fleet_split_bottom_pane, this);
 
-    fleetDetails = (ViewGroup) findViewById(R.id.fleet);
-    splitLeft = (EditText) findViewById(R.id.split_left);
-    splitRight = (EditText) findViewById(R.id.split_right);
-    splitRatio = (SeekBar) findViewById(R.id.split_ratio);
+    fleetDetails = findViewById(R.id.fleet);
+    splitLeft = findViewById(R.id.split_left);
+    splitRight = findViewById(R.id.split_right);
+    splitRatio = findViewById(R.id.split_ratio);
 
     findViewById(R.id.split_btn).setOnClickListener(this::onSplitClick);
     findViewById(R.id.cancel_btn).setOnClickListener(this::onCancelClick);

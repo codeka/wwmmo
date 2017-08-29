@@ -1,5 +1,11 @@
 package au.com.codeka.warworlds.server.net;
 
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.net.PacketDecoder;
+import au.com.codeka.warworlds.common.proto.Account;
+import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.common.proto.Packet;
+import au.com.codeka.warworlds.server.world.WatchableObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,13 +13,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 import java.util.TreeMap;
-
-import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.net.PacketDecoder;
-import au.com.codeka.warworlds.common.proto.Account;
-import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.common.proto.Packet;
-import au.com.codeka.warworlds.server.world.WatchableObject;
 
 /**
  * Manages the {@link ServerSocket} which is listening for clients to connect.

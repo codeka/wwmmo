@@ -1,8 +1,7 @@
 package au.com.codeka.warworlds.planetrender;
 
-import java.util.Random;
-
 import au.com.codeka.warworlds.common.Voronoi;
+import java.util.Random;
 
 /** A {@link Voronoi} that takes it's parameters from a {@link Template}. */
 public class TemplatedVoronoi extends Voronoi {

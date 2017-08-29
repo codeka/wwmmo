@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Formatter;
 import java.util.Locale;
-
 import javax.annotation.Nullable;
 
 /**

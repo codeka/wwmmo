@@ -1,9 +1,5 @@
 package au.com.codeka.warworlds.client.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Random;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -22,11 +18,12 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
-
-import com.google.common.base.Preconditions;
-
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.common.Log;
+import com.google.common.base.Preconditions;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Random;
 
 /**
  * Generates an image that can be used at the background for the various non-game activities

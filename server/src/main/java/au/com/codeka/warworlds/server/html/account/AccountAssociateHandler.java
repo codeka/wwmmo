@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.html.account;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.AccountAssociateRequest;
@@ -11,8 +13,6 @@ import au.com.codeka.warworlds.server.util.CookieHelper;
 import au.com.codeka.warworlds.server.util.EmailHelper;
 import au.com.codeka.warworlds.server.world.AccountManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This servlet handles /accounts/associate, which is used to associate an account with an email

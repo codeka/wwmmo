@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
-
 import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;

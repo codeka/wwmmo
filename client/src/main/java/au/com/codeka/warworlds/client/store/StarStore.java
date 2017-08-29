@@ -4,16 +4,13 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import java.io.IOException;
-import java.util.Map;
-
-import javax.annotation.Nonnull;
-
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
+import java.io.IOException;
+import java.util.Map;
+import javax.annotation.Nonnull;
 
 /**
  * Specialization of {@link BaseStore} which stores stars. We have a custom class here because

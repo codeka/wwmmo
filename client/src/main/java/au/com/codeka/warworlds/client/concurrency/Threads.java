@@ -1,12 +1,10 @@
 package au.com.codeka.warworlds.client.concurrency;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import com.google.common.base.Preconditions;
-
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * An enumeration of the thread types within War Worlds. Has some helper methods to ensure you run

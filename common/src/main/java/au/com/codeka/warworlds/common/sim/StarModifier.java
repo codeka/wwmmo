@@ -1,15 +1,6 @@
 package au.com.codeka.warworlds.common.sim;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Objects;
-
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkArgument;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
@@ -18,14 +9,17 @@ import au.com.codeka.warworlds.common.proto.Building;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Design;
-import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
-
-import static com.google.common.base.Preconditions.checkArgument;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Class for handling modifications to a star.

@@ -12,14 +12,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
-
 import au.com.codeka.warworlds.client.BuildConfig;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.util.GameSettings;
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 
 public class GameSettingsFragment extends PreferenceFragmentCompat
 implements SharedPreferences.OnSharedPreferenceChangeListener {

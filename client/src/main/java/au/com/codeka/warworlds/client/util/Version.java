@@ -1,10 +1,8 @@
 package au.com.codeka.warworlds.client.util;
 
 import android.os.Build;
-
-import java.util.Locale;
-
 import au.com.codeka.warworlds.client.BuildConfig;
+import java.util.Locale;
 
 /**
  * Some helper functions for display version information.

@@ -1,8 +1,7 @@
 package au.com.codeka.warworlds.client.net;
 
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.common.proto.LoginResponse;
+import javax.annotation.Nullable;
 
 /**
  * This is an event that's posted to the event bus which reports on the state of the {@link Server}.

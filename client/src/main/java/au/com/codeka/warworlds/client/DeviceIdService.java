@@ -1,9 +1,8 @@
 package au.com.codeka.warworlds.client;
 
+import au.com.codeka.warworlds.common.Log;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-
-import au.com.codeka.warworlds.common.Log;
 
 /**
  * Our implementation of {@link FirebaseInstanceIdService}.

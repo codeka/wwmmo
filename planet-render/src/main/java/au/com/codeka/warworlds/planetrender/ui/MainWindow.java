@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.planetrender.ui;
 
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
@@ -10,14 +9,12 @@ public class MainWindow {
 
   /** Launch the application. */
   public static void main(String[] args) {
-    EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        try {
-          MainWindow window = new MainWindow();
-          window.frame.setVisible(true);
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+    EventQueue.invokeLater(() -> {
+      try {
+        MainWindow window = new MainWindow();
+        window.frame.setVisible(true);
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     });
   }

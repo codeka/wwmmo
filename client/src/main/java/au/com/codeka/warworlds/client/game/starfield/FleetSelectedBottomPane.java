@@ -9,13 +9,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
-
-import java.util.Locale;
-
-import javax.annotation.Nonnull;
-
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.build.BuildHelper;
 import au.com.codeka.warworlds.client.game.fleets.FleetListHelper;
@@ -29,6 +22,9 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.sim.StarHelper;
+import com.squareup.picasso.Picasso;
+import java.util.Locale;
+import javax.annotation.Nonnull;
 
 /**
  * Bottom pane for when you have a fleet selected.

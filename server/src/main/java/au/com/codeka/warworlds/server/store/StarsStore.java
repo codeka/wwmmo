@@ -1,12 +1,5 @@
 package au.com.codeka.warworlds.server.store;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -15,6 +8,10 @@ import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
 import au.com.codeka.warworlds.server.store.base.StoreWriter;
 import au.com.codeka.warworlds.server.store.base.Transaction;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * A store for storing stars, including some extra indices for special queries that we can do.

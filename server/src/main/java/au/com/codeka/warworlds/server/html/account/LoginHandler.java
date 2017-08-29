@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.html.account;
 
-import com.google.common.base.Strings;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
@@ -13,6 +11,7 @@ import au.com.codeka.warworlds.server.net.ServerSocketManager;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.EmpireManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
+import com.google.common.base.Strings;
 
 /**
  * This servlet is posted to in order to "log in". You'll get a pointer to the socket to connect

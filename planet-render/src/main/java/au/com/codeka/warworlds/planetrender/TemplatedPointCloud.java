@@ -1,10 +1,9 @@
 package au.com.codeka.warworlds.planetrender;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import au.com.codeka.warworlds.common.PointCloud;
 import au.com.codeka.warworlds.common.Vector2;
+import java.util.ArrayList;
+import java.util.Random;
 
 /** A {@link PointCloud} that takes it's parameters from a {@link Template}. */
 public class TemplatedPointCloud extends PointCloud {

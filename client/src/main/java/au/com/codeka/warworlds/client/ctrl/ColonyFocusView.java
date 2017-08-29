@@ -5,15 +5,11 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.squareup.wire.Wire;
-
-import java.util.Locale;
-
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Star;
+import com.squareup.wire.Wire;
+import java.util.Locale;
 
 public class ColonyFocusView extends FrameLayout {
   public ColonyFocusView(Context context, AttributeSet attrs) {

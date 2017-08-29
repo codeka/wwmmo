@@ -1,25 +1,21 @@
 package au.com.codeka.warworlds.client;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
-
-import com.google.common.base.Preconditions;
-
 import au.com.codeka.warworlds.client.activity.BaseFragmentActivity;
 import au.com.codeka.warworlds.client.ctrl.DebugView;
-import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
-import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.game.welcome.CreateEmpireFragment;
 import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeFragment;
 import au.com.codeka.warworlds.client.game.welcome.WelcomeFragment;
+import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
+import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.common.Log;
 import flow.Flow;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MainActivity extends BaseFragmentActivity {
   private static final Log log = new Log("MainActivity");

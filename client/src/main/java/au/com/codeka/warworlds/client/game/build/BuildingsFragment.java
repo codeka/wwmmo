@@ -8,26 +8,23 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.common.proto.BuildRequest;
+import au.com.codeka.warworlds.common.proto.Building;
+import au.com.codeka.warworlds.common.proto.Colony;
+import au.com.codeka.warworlds.common.proto.Design;
+import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.DesignHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-
-import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.common.proto.BuildRequest;
-import au.com.codeka.warworlds.common.sim.DesignHelper;
-import au.com.codeka.warworlds.common.proto.Building;
-import au.com.codeka.warworlds.common.proto.Colony;
-import au.com.codeka.warworlds.common.proto.Design;
-import au.com.codeka.warworlds.common.proto.Star;
 
 public class BuildingsFragment extends BuildFragment.BaseTabFragment {
   private static final long REFRESH_DELAY_MS = 1000L;

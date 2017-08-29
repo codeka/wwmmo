@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -21,14 +22,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
-import java.util.Locale;
-
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
@@ -41,8 +34,10 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Star;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.squareup.picasso.Picasso;
+import java.util.ArrayList;
+import java.util.Locale;
+import javax.annotation.Nullable;
 
 /**
  * Base fragment for the solar system, which contains the drawer, and lets us switch between stars.

@@ -1,5 +1,9 @@
 package au.com.codeka.warworlds.server.world.generator;
 
+import au.com.codeka.warworlds.common.Log;
+import com.google.common.base.CaseFormat;
+import com.google.common.base.Preconditions;
+import com.google.common.io.Files;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,14 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
-
 import javax.annotation.Nullable;
-
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Preconditions;
-import com.google.common.io.Files;
-
-import au.com.codeka.warworlds.common.Log;
 
 public class NameGenerator {
   private static final Log log = new Log("NameGenerator");

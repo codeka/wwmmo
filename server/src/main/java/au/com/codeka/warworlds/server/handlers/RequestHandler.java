@@ -1,12 +1,12 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import au.com.codeka.warworlds.common.Log;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.wire.Message;
 import com.squareup.wire.WireTypeAdapterFactory;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
@@ -15,12 +15,9 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.regex.Matcher;
-
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import au.com.codeka.warworlds.common.Log;
 
 /**
  * This is the base class for the game's request handlers. It handles some common tasks such as

@@ -1,10 +1,9 @@
 package au.com.codeka.warworlds.planetrender;
 
-import java.util.Random;
-
 import au.com.codeka.warworlds.common.PerlinNoise;
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.Vector3;
+import java.util.Random;
 
 /**
  * This class takes a ray that's going in a certain direction and warps it based on a noise pattern.

@@ -1,13 +1,6 @@
 package au.com.codeka.warworlds.server.world;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.debug.PacketDebug;
@@ -31,8 +24,12 @@ import au.com.codeka.warworlds.server.concurrency.Threads;
 import au.com.codeka.warworlds.server.net.Connection;
 import au.com.codeka.warworlds.server.world.chat.ChatManager;
 import au.com.codeka.warworlds.server.world.chat.Participant;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /** Represents a currently-connected player. */
 public class Player {

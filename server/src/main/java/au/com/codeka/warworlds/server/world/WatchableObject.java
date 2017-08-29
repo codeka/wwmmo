@@ -2,9 +2,7 @@ package au.com.codeka.warworlds.server.world;
 
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.squareup.wire.Message;
-
 import java.util.ArrayList;
-
 import javax.annotation.Nonnull;
 
 /**

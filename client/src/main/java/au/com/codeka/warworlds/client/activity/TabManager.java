@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.activity;
 
-import java.util.TreeMap;
-
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -9,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TabHost;
 import android.widget.TextView;
-
 import au.com.codeka.warworlds.client.R;
+import java.util.TreeMap;
 
 /**
  * An instance of this class can be used to manage tabs (e.g. in {@link TabbedBaseFragment} but

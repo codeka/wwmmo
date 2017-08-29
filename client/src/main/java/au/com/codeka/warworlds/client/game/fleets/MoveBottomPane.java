@@ -1,18 +1,12 @@
 package au.com.codeka.warworlds.client.game.fleets;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.Context;
 import android.text.Html;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.google.common.base.Preconditions;
-
-import java.util.Locale;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
@@ -27,8 +21,10 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.sim.StarHelper;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Preconditions;
+import java.util.Locale;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Bottom pane of the fleets view that contains the "move" function.

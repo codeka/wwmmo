@@ -1,11 +1,8 @@
 package au.com.codeka.warworlds.client.activity;
 
 import android.view.View;
-
 import com.google.common.base.Preconditions;
-
 import java.util.ArrayList;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

@@ -7,10 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.common.base.Preconditions;
-
-import au.com.codeka.warworlds.client.R;
-
 /**
  * Base class for fragments, managed by {@link FragmentTransitionManager} and hosted inside of
  * {@link BaseFragmentActivity}.

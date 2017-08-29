@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.common;
 
 import java.util.List;
 
-
 /**
  * A triangle is simply three vertices from a list of points.
  */

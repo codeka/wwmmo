@@ -5,31 +5,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ctrl.ExpandableStarListAdapter;
-import au.com.codeka.warworlds.client.util.NumberFormatter;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarCollection;
+import au.com.codeka.warworlds.client.util.NumberFormatter;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.squareup.picasso.Picasso;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * Represents an {@link ExpandableStarListAdapter} which shows a list of fleets under each star.

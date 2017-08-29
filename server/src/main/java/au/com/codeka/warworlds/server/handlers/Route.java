@@ -2,13 +2,10 @@ package au.com.codeka.warworlds.server.handlers;
 
 import com.google.common.base.Preconditions;
 import com.google.firebase.database.annotations.Nullable;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 public class Route {
   private Pattern pattern;

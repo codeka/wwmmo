@@ -1,15 +1,13 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import au.com.codeka.warworlds.common.Log;
 import com.google.api.client.util.ByteStreams;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import au.com.codeka.warworlds.common.Log;
 
 /** Simple handler for handling static files (and 'templated' HTML files with no templated data). */
 public class FileHandler extends RequestHandler {

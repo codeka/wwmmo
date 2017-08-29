@@ -1,14 +1,13 @@
 package au.com.codeka.warworlds.planetrender;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import au.com.codeka.warworlds.common.Colour;
 import au.com.codeka.warworlds.common.ColourGradient;
 import au.com.codeka.warworlds.common.PerlinNoise;
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.Vector3;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /** This class will generate an atmosphere around a planet. */
 public class Atmosphere {

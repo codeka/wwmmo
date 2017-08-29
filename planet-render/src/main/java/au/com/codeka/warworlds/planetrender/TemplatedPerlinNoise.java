@@ -1,8 +1,7 @@
 package au.com.codeka.warworlds.planetrender;
 
-import java.util.Random;
-
 import au.com.codeka.warworlds.common.PerlinNoise;
+import java.util.Random;
 
 /** A {@link PerlinNoise} which takes it's parameters from a {@link Template}. */
 public class TemplatedPerlinNoise extends PerlinNoise {

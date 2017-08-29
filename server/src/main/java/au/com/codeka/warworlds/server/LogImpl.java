@@ -1,9 +1,8 @@
 package au.com.codeka.warworlds.server;
 
+import au.com.codeka.warworlds.common.Log;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import au.com.codeka.warworlds.common.Log;
 
 /**
  * This class works with the Log class to provide a concrete implementation we can use in the

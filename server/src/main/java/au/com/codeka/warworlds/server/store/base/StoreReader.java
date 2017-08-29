@@ -1,12 +1,9 @@
 package au.com.codeka.warworlds.server.store.base;
 
-import org.sqlite.javax.SQLiteConnectionPoolDataSource;
-
-import java.sql.SQLException;
-
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.server.store.StoreException;
+import java.sql.SQLException;
+import javax.annotation.Nullable;
+import org.sqlite.javax.SQLiteConnectionPoolDataSource;
 
 /** A helper class for reading from the data store. */
 public class StoreReader extends StatementBuilder<StoreReader> {

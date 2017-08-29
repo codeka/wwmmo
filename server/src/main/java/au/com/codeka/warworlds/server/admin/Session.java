@@ -1,13 +1,9 @@
 package au.com.codeka.warworlds.server.admin;
 
-import org.joda.time.DateTime;
-
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
 import au.com.codeka.warworlds.common.proto.AdminRole;
 import au.com.codeka.warworlds.common.proto.AdminUser;
+import javax.annotation.Nonnull;
+import org.joda.time.DateTime;
 
 /**
  * Represents details about the current session, such as your username, access level and so on.

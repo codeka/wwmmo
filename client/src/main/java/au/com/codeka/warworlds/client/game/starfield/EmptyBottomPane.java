@@ -3,10 +3,8 @@ package au.com.codeka.warworlds.client.game.starfield;
 import android.content.Context;
 import android.view.View;
 import android.widget.FrameLayout;
-
-import javax.annotation.Nonnull;
-
 import au.com.codeka.warworlds.client.R;
+import javax.annotation.Nonnull;
 
 /**
  * The bottom pane when you have nothing selected.

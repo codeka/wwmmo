@@ -1,12 +1,5 @@
 package au.com.codeka.warworlds.server.world;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Queue;
-
-import javax.annotation.concurrent.GuardedBy;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.concurrency.TaskRunner;
@@ -14,6 +7,11 @@ import au.com.codeka.warworlds.server.concurrency.Threads;
 import au.com.codeka.warworlds.server.proto.SuspiciousEvent;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.Pair;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Queue;
+import javax.annotation.concurrent.GuardedBy;
 
 /**
  * A manager for managing the suspicious event store.

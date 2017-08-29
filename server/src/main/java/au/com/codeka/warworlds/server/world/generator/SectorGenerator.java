@@ -1,11 +1,5 @@
 package au.com.codeka.warworlds.server.world.generator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.PointCloud;
 import au.com.codeka.warworlds.common.Vector2;
@@ -16,6 +10,9 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.SectorManager;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * The sector generator is used to expand the universe, and generate bunch of sectors when we run

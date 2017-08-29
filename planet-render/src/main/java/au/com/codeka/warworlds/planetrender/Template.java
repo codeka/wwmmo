@@ -1,19 +1,16 @@
 package au.com.codeka.warworlds.planetrender;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import au.com.codeka.warworlds.common.Colour;
 import au.com.codeka.warworlds.common.ColourGradient;
 import au.com.codeka.warworlds.common.Vector3;
 import au.com.codeka.warworlds.common.XmlIterator;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * A template is used to create an image (usually a complete planet, but it doesn't have to be).

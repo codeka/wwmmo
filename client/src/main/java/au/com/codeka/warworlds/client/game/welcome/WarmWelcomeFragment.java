@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
-
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.SharedViewHolder;
@@ -27,44 +26,35 @@ public class WarmWelcomeFragment extends BaseFragment {
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     ViewBackgroundGenerator.setBackground(view);
 
-    TransparentWebView welcome = (TransparentWebView) view.findViewById(R.id.welcome);
+    TransparentWebView welcome = view.findViewById(R.id.welcome);
     String msg = TransparentWebView.getHtmlFile(getContext(), "html/warm-welcome.html");
     welcome.loadHtml("html/skeleton.html", msg);
 
-    view.findViewById(R.id.next_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        // save the fact that we've finished the warm welcome
-        GameSettings.i.edit()
-            .setBoolean(GameSettings.Key.WARM_WELCOME_SEEN, true)
-            .commit();
+    view.findViewById(R.id.next_btn).setOnClickListener(v -> {
+      // save the fact that we've finished the warm welcome
+      GameSettings.i.edit()
+          .setBoolean(GameSettings.Key.WARM_WELCOME_SEEN, true)
+          .commit();
 
-        getFragmentTransitionManager().replaceFragment(
-            CreateEmpireFragment.class,
-            SharedViewHolder.builder()
-                .addSharedView(R.id.title_icon, "title_icon")
-                .addSharedView(R.id.title, "title")
-                .addSharedView(R.id.next_btn, "done_btn")
-                .build());
-      }
+      getFragmentTransitionManager().replaceFragment(
+          CreateEmpireFragment.class,
+          SharedViewHolder.builder()
+              .addSharedView(R.id.title_icon, "title_icon")
+              .addSharedView(R.id.title, "title")
+              .addSharedView(R.id.next_btn, "done_btn")
+              .build());
     });
 
-    view.findViewById(R.id.help_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
-        startActivity(i);
-      }
+    view.findViewById(R.id.help_btn).setOnClickListener(v -> {
+      Intent i = new Intent(Intent.ACTION_VIEW);
+      i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
+      startActivity(i);
     });
 
-    view.findViewById(R.id.privacy_policy_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse("http://www.war-worlds.com/privacy-policy"));
-        startActivity(i);
-      }
+    view.findViewById(R.id.privacy_policy_btn).setOnClickListener(v -> {
+      Intent i = new Intent(Intent.ACTION_VIEW);
+      i.setData(Uri.parse("http://www.war-worlds.com/privacy-policy"));
+      startActivity(i);
     });
   }
 }

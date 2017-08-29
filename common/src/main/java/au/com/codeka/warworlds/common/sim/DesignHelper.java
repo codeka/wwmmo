@@ -1,15 +1,12 @@
 package au.com.codeka.warworlds.common.sim;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.common.proto.Building;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * Helper class for working with ship and building designs.

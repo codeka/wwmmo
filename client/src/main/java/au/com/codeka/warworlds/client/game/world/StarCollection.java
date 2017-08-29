@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.game.world;
 
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**

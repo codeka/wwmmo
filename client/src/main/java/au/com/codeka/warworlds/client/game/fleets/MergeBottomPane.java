@@ -1,24 +1,20 @@
 package au.com.codeka.warworlds.client.game.fleets;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Iterables.filter;
+
 import android.content.Context;
 import android.view.View;
 import android.widget.RelativeLayout;
-
-import com.google.common.collect.Lists;
-
-import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Iterables.filter;
+import com.google.common.collect.Lists;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Bottom pane of the fleets view that contains the "merge" function.

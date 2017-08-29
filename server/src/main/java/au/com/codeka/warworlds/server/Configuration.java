@@ -1,15 +1,13 @@
 package au.com.codeka.warworlds.server;
 
+import au.com.codeka.warworlds.common.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.annotations.Expose;
 import com.google.gson.stream.JsonReader;
-
 import java.io.FileReader;
 import java.io.IOException;
-
-import au.com.codeka.warworlds.common.Log;
 
 /**
  * The server's configuration parameters are read from a json object on startup and parsed into

@@ -1,15 +1,11 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import au.com.codeka.warworlds.common.Log;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
-
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
-
-import au.com.codeka.warworlds.common.Log;
 
 /**
  * A {@link RequestHandler} with some extra helpers for responding with protobufs.

@@ -6,10 +6,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
-
-import com.google.common.base.Preconditions;
-
 import au.com.codeka.warworlds.common.Log;
+import com.google.common.base.Preconditions;
 
 /**
  * Manages transitions between fragments in a {@link BaseFragmentActivity}.

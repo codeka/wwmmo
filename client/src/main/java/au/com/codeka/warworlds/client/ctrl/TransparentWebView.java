@@ -1,9 +1,5 @@
 package au.com.codeka.warworlds.client.ctrl;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Color;
@@ -11,8 +7,10 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.webkit.WebView;
-
 import com.google.common.io.CharStreams;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 
 /**
  * A {@link WebView} with a transparent background. It's a little tricky and the method for getting

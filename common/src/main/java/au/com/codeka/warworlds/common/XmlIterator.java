@@ -1,8 +1,8 @@
 package au.com.codeka.warworlds.common;
 
 import java.util.Iterator;
-
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * This is an implementation of {@link Iterator} which lets us more easily iterator over

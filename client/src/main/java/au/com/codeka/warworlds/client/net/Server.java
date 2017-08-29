@@ -1,23 +1,14 @@
 package au.com.codeka.warworlds.client.net;
 
-import android.content.Context;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.os.Build;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.ArrayDeque;
-import java.util.Queue;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.world.ChatManager;
+import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.util.GameSettings;
-import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.debug.PacketDebug;
 import au.com.codeka.warworlds.common.net.PacketDecoder;
@@ -27,8 +18,13 @@ import au.com.codeka.warworlds.common.proto.HelloPacket;
 import au.com.codeka.warworlds.common.proto.LoginRequest;
 import au.com.codeka.warworlds.common.proto.LoginResponse;
 import au.com.codeka.warworlds.common.proto.Packet;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /** Represents our connection to the server. */
 public class Server {

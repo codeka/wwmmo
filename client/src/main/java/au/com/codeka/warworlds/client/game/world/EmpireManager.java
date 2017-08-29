@@ -1,16 +1,8 @@
 package au.com.codeka.warworlds.client.game.world;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import android.support.annotation.Nullable;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.concurrency.Threads;
@@ -21,8 +13,11 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket;
 import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.common.proto.RequestEmpirePacket;
-
-import static com.google.common.base.Preconditions.checkState;
+import com.google.common.collect.Lists;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.Nonnull;
 
 /** Manages empires. */
 public class EmpireManager {

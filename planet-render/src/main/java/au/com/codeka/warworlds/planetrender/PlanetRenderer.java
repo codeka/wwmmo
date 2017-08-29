@@ -1,11 +1,10 @@
 package au.com.codeka.warworlds.planetrender;
 
+import au.com.codeka.warworlds.common.Colour;
+import au.com.codeka.warworlds.common.Image;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
-
-import au.com.codeka.warworlds.common.Colour;
-import au.com.codeka.warworlds.common.Image;
 
 /**
  * This is actually a very simple ray-tracing engine. The simplicity comes from the fact that

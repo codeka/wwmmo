@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.client.game.empire;
 
 import android.os.Bundle;
-
 import au.com.codeka.warworlds.client.activity.TabbedBaseFragment;
 import au.com.codeka.warworlds.client.game.fleets.FleetsFragment;
 import au.com.codeka.warworlds.common.Log;

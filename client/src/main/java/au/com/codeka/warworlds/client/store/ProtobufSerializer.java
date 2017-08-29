@@ -1,12 +1,10 @@
 package au.com.codeka.warworlds.client.store;
 
+import au.com.codeka.warworlds.common.Log;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
-
-import au.com.codeka.warworlds.common.Log;
 
 /** Helper for serializing and deserializing protobuf messages in a generic fashion. */
 class ProtobufSerializer<M extends Message<?, ?>> {

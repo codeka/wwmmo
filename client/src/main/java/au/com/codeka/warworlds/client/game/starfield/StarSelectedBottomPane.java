@@ -6,14 +6,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.common.base.Preconditions;
-import com.squareup.picasso.Picasso;
-
-import java.util.Locale;
-
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
@@ -26,6 +18,10 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.StarHelper;
+import com.google.common.base.Preconditions;
+import com.squareup.picasso.Picasso;
+import java.util.Locale;
+import javax.annotation.Nullable;
 
 /**
  * The bottom pane when you have a star selected.
@@ -58,12 +54,12 @@ public class StarSelectedBottomPane extends FrameLayout {
     findViewById(R.id.view_btn).setOnClickListener((v) -> callback.onStarClicked(this.star, null));
 
     this.star = star;
-    planetList = (PlanetListSimple) findViewById(R.id.planet_list);
-    fleetList = (FleetListSimple) findViewById(R.id.fleet_list);
-    starName = (TextView) findViewById(R.id.star_name);
-    starKind = (TextView) findViewById(R.id.star_kind);
-    starIcon = (ImageView) findViewById(R.id.star_icon);
-    renameButton = (Button) findViewById(R.id.rename_btn);
+    planetList = findViewById(R.id.planet_list);
+    fleetList = findViewById(R.id.fleet_list);
+    starName = findViewById(R.id.star_name);
+    starKind = findViewById(R.id.star_kind);
+    starIcon = findViewById(R.id.star_icon);
+    renameButton = findViewById(R.id.rename_btn);
 
     planetList.setPlanetSelectedHandler(planet -> callback.onStarClicked(this.star, planet));
 

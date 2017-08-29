@@ -1,12 +1,10 @@
 package au.com.codeka.warworlds.common.net;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
-import javax.annotation.Nullable;
-
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Packet;
+import java.io.IOException;
+import java.io.OutputStream;
+import javax.annotation.Nullable;
 import okio.BufferedSink;
 import okio.Okio;
 

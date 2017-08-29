@@ -1,17 +1,16 @@
 package au.com.codeka.warworlds.server;
 
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.server.html.HtmlServlet;
 import au.com.codeka.warworlds.server.admin.AdminServlet;
+import au.com.codeka.warworlds.server.html.HtmlServlet;
 import au.com.codeka.warworlds.server.net.ServerSocketManager;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.SmtpHelper;
 import au.com.codeka.warworlds.server.world.StarSimulatorQueue;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 public class Program {
   private static final Log log = new Log("Runner");

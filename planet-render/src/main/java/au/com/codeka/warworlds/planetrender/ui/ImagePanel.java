@@ -1,17 +1,15 @@
 package au.com.codeka.warworlds.planetrender.ui;
 
+import au.com.codeka.warworlds.common.Colour;
+import au.com.codeka.warworlds.common.Image;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.MemoryImageSource;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-
-import au.com.codeka.warworlds.common.Colour;
-import au.com.codeka.warworlds.common.Image;
 
 class ImagePanel extends JPanel {
   private static final long serialVersionUID = 1L;

@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.server.concurrency;
 
 import com.google.common.base.Preconditions;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

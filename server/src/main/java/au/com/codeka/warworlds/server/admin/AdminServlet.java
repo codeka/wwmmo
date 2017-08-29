@@ -1,16 +1,7 @@
 package au.com.codeka.warworlds.server.admin;
 
-import com.google.common.collect.Lists;
-
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-
-import javax.annotation.Nullable;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.server.admin.handlers.AdminFileHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AdminHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AdminLoginHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxAccountsHandler;
@@ -24,7 +15,6 @@ import au.com.codeka.warworlds.server.admin.handlers.ChatHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DashboardHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DebugSuspiciousEventsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.EmpireDetailsHandler;
-import au.com.codeka.warworlds.server.admin.handlers.AdminFileHandler;
 import au.com.codeka.warworlds.server.admin.handlers.EmpiresHandler;
 import au.com.codeka.warworlds.server.admin.handlers.SectorsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.StarfieldHandler;
@@ -33,6 +23,13 @@ import au.com.codeka.warworlds.server.admin.handlers.UsersHandler;
 import au.com.codeka.warworlds.server.handlers.HandlerServlet;
 import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.handlers.Route;
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import javax.annotation.Nullable;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * The {@link AdminServlet} is the root of all requests for the admin backend.
