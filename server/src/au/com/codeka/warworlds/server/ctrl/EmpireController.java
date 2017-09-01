@@ -30,6 +30,7 @@ import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.EmpireStarStats;
 import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.Star;
+import au.com.codeka.warworlds.server.utils.NameValidator;
 
 public class EmpireController {
   private DataBase db;
@@ -128,12 +129,12 @@ public class EmpireController {
   }
 
   public void update(Empire empire) throws RequestException {
-    if (empire.getDisplayName().length() > Configuration.i.getLimits().maxEmpireNameLength()) {
-      throw new RequestException(400, "Empire name is too long.");
-    }
+    String newName = NameValidator.validate(
+        empire.getDisplayName(),
+        Configuration.i.getLimits().maxEmpireNameLength());
 
     try (SqlStmt stmt = db.prepare("UPDATE empires SET name = ? WHERE id = ?")) {
-      stmt.setString(1, empire.getDisplayName());
+      stmt.setString(1, newName);
       stmt.setInt(2, empire.getID());
       stmt.update();
     } catch (Exception e) {
@@ -261,10 +262,9 @@ public class EmpireController {
           "You must give your empire a name.");
     }
 
-    if (empire.getDisplayName().length() > Configuration.i.getLimits().maxEmpireNameLength()) {
-      throw new RequestException(400, Messages.GenericError.ErrorCode.UnknownError,
-          "Empire name is too long.");
-    }
+    String name = NameValidator.validate(
+        empire.getDisplayName(),
+        Configuration.i.getLimits().maxEmpireNameLength());
 
     NewEmpireStarFinder starFinder = new NewEmpireStarFinder();
     if (!starFinder.findStarForNewEmpire()) {
@@ -274,7 +274,7 @@ public class EmpireController {
     empire.setHomeStar(star);
 
     // create the empire
-    db.createEmpire(empire);
+    db.createEmpire(empire, name);
 
     // empty the star of it's current (native) inhabitants
     String sql = "DELETE FROM colonies WHERE star_id = ?";
@@ -459,7 +459,7 @@ public class EmpireController {
       super(trans);
     }
 
-    public void createEmpire(Empire empire) throws RequestException {
+    public void createEmpire(Empire empire, String validatedName) throws RequestException {
       String sql;
       if (empire.getKey() == null || empire.getID() == 0) {
         sql = "INSERT INTO empires (name, cash, home_star_id, user_email, signup_date) VALUES (?, ?, ?, ?, NOW())";
@@ -467,7 +467,7 @@ public class EmpireController {
         sql = "UPDATE empires SET name = ?, cash = ?, home_star_id = ?, user_email = ? WHERE id = ?";
       }
       try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
-        stmt.setString(1, empire.getDisplayName());
+        stmt.setString(1, validatedName);
         stmt.setDouble(2, 2000.0);
         stmt.setInt(3, ((Star) empire.getHomeStar()).getID());
         stmt.setString(4, empire.getEmailAddr());
@@ -491,7 +491,7 @@ public class EmpireController {
               String
                   .format(
                       "The empire name you've chosen, '%s' already exists. Please choose a different name.",
-                      empire.getDisplayName()));
+                      validatedName));
         } else {
           throw new RequestException(e);
         }

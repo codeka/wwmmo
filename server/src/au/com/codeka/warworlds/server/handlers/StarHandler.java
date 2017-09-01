@@ -14,6 +14,7 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.BuildingPosition;
 import au.com.codeka.warworlds.server.model.Star;
+import au.com.codeka.warworlds.server.utils.NameValidator;
 
 /**
  * Handles /realm/.../stars/{id} URL
@@ -56,9 +57,9 @@ public class StarHandler extends RequestHandler {
       throw new RequestException(400);
     }
 
-    if (star_rename_request_pb.getNewName().trim().length() > Configuration.i.getLimits().maxStarNameLength()) {
-      throw new RequestException(400, "Star name too long.");
-    }
+    String newName = NameValidator.validate(
+        star_rename_request_pb.getNewName(),
+        Configuration.i.getLimits().maxStarNameLength());
 
     if (!star_rename_request_pb.hasPurchaseInfo()) {
       // if there's no purchase info then you must be renaming a wormhole, and it must be
@@ -77,7 +78,7 @@ public class StarHandler extends RequestHandler {
 
     String sql = "UPDATE stars SET name = ? WHERE id = ?";
     try (SqlStmt stmt = DB.prepare(sql)) {
-      stmt.setString(1, star_rename_request_pb.getNewName().trim());
+      stmt.setString(1, newName);
       stmt.setInt(2, starID);
       stmt.update();
     } catch (Exception e) {

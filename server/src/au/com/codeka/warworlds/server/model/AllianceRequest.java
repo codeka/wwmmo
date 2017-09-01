@@ -35,6 +35,10 @@ public class AllianceRequest extends BaseAllianceRequest {
         mState = state;
     }
 
+    public void setNewName(String newName) {
+        mNewName = newName;
+    }
+
     public void ensurePngImageMaxSize(int maxWidth, int maxHeight) {
         if (mPngImage != null) {
             mPngImage = ImageSizer.ensureMaxSize(mPngImage, maxWidth, maxHeight);

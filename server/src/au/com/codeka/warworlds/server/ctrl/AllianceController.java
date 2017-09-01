@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.server.model.AllianceMember;
 import au.com.codeka.warworlds.server.model.AllianceRequest;
 import au.com.codeka.warworlds.server.model.AllianceRequestVote;
 import au.com.codeka.warworlds.server.model.Empire;
+import au.com.codeka.warworlds.server.utils.NameValidator;
 
 public class AllianceController {
     private DataBase db;
@@ -94,11 +95,11 @@ public class AllianceController {
     }
 
     public int addRequest(AllianceRequest request) throws RequestException {
-        if (request.getRequestType() == BaseAllianceRequest.RequestType.CHANGE_NAME
-                && request.getNewName().length() >
-                    Configuration.i.getLimits().maxAllianceNameLength()) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.UnknownError,
-                "Alliance name is too long.");
+        if (request.getRequestType() == BaseAllianceRequest.RequestType.CHANGE_NAME) {
+            String newName = NameValidator.validate(
+                request.getNewName(),
+                Configuration.i.getLimits().maxAllianceNameLength());
+            request.setNewName(newName);
         }
 
         try {
@@ -148,10 +149,10 @@ public class AllianceController {
     }
 
     public void createAlliance(Alliance alliance, Empire ownerEmpire) throws RequestException {
-        if (alliance.getName().length() > Configuration.i.getLimits().maxAllianceNameLength()) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.UnknownError,
-                "Alliance name is too long.");
-        }
+        String name = NameValidator.validate(
+            alliance.getName(),
+            Configuration.i.getLimits().maxAllianceNameLength());
+        alliance.setName(name);
 
         Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder()
                 .setEmpireId(ownerEmpire.getID())
