@@ -29,12 +29,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class AdminHandler extends RequestHandler {
-  private final Log log = new Log("AdminHandler");
+  private static final Log log = new Log("AdminHandler");
 
   private static final CarrotEngine CARROT = new CarrotEngine(
       new Configuration.Builder()
           .setResourceLocator(
               new FileResourceLocator.Builder(new File("data/admin/tmpl").getAbsolutePath()))
+          .setLogger((level, msg) -> {
+            msg = msg.replace("%", "%%");
+            if (level == Configuration.Logger.LEVEL_DEBUG) {
+              log.debug("CARROT: %s", msg);
+            } else if (level == Configuration.Logger.LEVEL_INFO) {
+              log.info("CARROT: %s", msg);
+            } else if (level == Configuration.Logger.LEVEL_WARNING) {
+              log.warning("CARROT: %s", msg);
+            } else {
+              log.error("(level: %d): CARROT: %s", level, msg);
+            }
+          })
           .build(),
       new MapBindings.Builder()
           .set("Session", new SessionHelper()));

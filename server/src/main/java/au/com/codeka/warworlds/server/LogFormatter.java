@@ -30,7 +30,11 @@ public class LogFormatter extends Formatter {
     sb.append(record.getLoggerName());
     sb.append(String.format(Locale.US, " [%d] ", record.getThreadID()));
     try {
-      sb.append(String.format(record.getMessage(), record.getParameters()));
+      if (record.getParameters() == null) {
+        sb.append(record.getMessage());
+      } else {
+        sb.append(String.format(record.getMessage(), record.getParameters()));
+      }
     } catch (Exception e) {
       sb.append("ERROR FORMATTING [");
       sb.append(record.getMessage());
