@@ -14,17 +14,11 @@ import javax.annotation.Nullable;
  * navigate the backstack, it might be hidden and then shown again).
  */
 public abstract class Screen {
-
-  /** Called before anything else. */
-  public void onCreate(ScreenStack screenStack) {
-  }
-
   /**
-   * Create the view for this {@link Screen}. This will be called after {@link #onCreate} and
-   * before the first {@link #onShow}. The {@link View} will be reused for subsequent show/hide,
-   * and destroyed before {@link #onDestroy} is called.
-    */
-  public abstract View createView(LayoutInflater inflater, ViewGroup container);
+   * Called before anything else.
+   */
+  public void onCreate(ScreenContext context, LayoutInflater inflater, ViewGroup container) {
+  }
 
   /**
    * Called when the screen is shown. Returns the view we should add to the contain (can be null,

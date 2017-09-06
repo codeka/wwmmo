@@ -86,6 +86,8 @@ public class CreateEmpireFragment extends BaseFragment {
     // Tell the Server we can now connect.
     App.i.getServer().connect();
 
+    //TODO
+/*
     getFragmentTransitionManager().replaceFragment(
         WelcomeFragment.class,
         SharedViewHolder.builder()
@@ -93,5 +95,6 @@ public class CreateEmpireFragment extends BaseFragment {
             .addSharedView(R.id.title, "title")
             .addSharedView(R.id.done_btn, "start_btn")
             .build());
+            */
   }
 }

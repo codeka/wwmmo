@@ -6,29 +6,25 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
-import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
+import au.com.codeka.warworlds.client.ui.FragmentScreen;
+import au.com.codeka.warworlds.client.ui.Screen;
+import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.Version;
-import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
-import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
@@ -43,43 +39,25 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * The "Welcome" activity is what you see when you first start the game, it has a view for showing
+ * The "Welcome" screen is what you see when you first start the game, it has a view for showing
  * news, letting you change your empire and so on.
  */
-public class WelcomeFragment extends BaseFragment {
-  private static final Log log = new Log("WelcomeFragment");
+public class WelcomeScreen extends Screen {
+  private static final Log log = new Log("WelcomeScreen");
 
   /** URL of RSS content to fetch and display in the motd view. */
   private static final String MOTD_RSS = "http://www.war-worlds.com/forum/announcements/rss";
 
-  private View rootView;
-  private Button startButton;
-  private Button signInButton;
-  private TextView connectionStatus;
-  private TextView empireName;
-  private ImageView empireIcon;
-  private TransparentWebView motdView;
+  private ScreenContext context;
+  @Nullable private WelcomeLayout welcomeLayout;
+  @Nullable private String motd;
 
   @Override
-  protected int getViewResourceId() {
-    return R.layout.frag_welcome;
-  }
+  public void onCreate(ScreenContext context, LayoutInflater inflater, ViewGroup container) {
+    this.context = context;
+    welcomeLayout = new WelcomeLayout(inflater.getContext(), layoutCallbacks);
 
-  @Override
-  public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-    rootView = view;
-    ViewBackgroundGenerator.setBackground(view);
-
-    startButton = checkNotNull(view.findViewById(R.id.start_btn));
-    signInButton = view.findViewById(R.id.signin_btn);
-    motdView = checkNotNull(view.findViewById(R.id.motd));
-    empireName = checkNotNull(view.findViewById(R.id.empire_name));
-    empireIcon = checkNotNull(view.findViewById(R.id.empire_icon));
-    connectionStatus =
-        checkNotNull(view.findViewById(R.id.connection_status));
-    final Button optionsButton =
-        checkNotNull(view.findViewById(R.id.options_btn));
+    App.i.getEventBus().register(eventHandler);
 
     refreshWelcomeMessage();
 
@@ -87,39 +65,24 @@ public class WelcomeFragment extends BaseFragment {
     //optionsButton.setOnClickListener(v ->
     //    getFragmentTransitionManager().replaceFragment(GameSettingsFragment.class));
 
-    startButton.setOnClickListener(v ->
-        getFragmentTransitionManager().replaceFragment(StarfieldFragment.class));
-
-    view.findViewById(R.id.help_btn).setOnClickListener(v -> {
-          Intent i = new Intent(Intent.ACTION_VIEW);
-          i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
-          startActivity(i);
-        });
-
-    view.findViewById(R.id.website_btn).setOnClickListener(v -> {
-          Intent i = new Intent(Intent.ACTION_VIEW);
-          i.setData(Uri.parse("http://www.war-worlds.com/"));
-          startActivity(i);
-        });
-
     if (GameSettings.i.getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
-      signInButton.setTag(R.string.signin);
+      welcomeLayout.setSignInText(R.string.signin);
     } else {
-      signInButton.setText(R.string.switch_user);
+      welcomeLayout.setSignInText(R.string.switch_user);
     }
-    signInButton.setOnClickListener(v -> onSignInClick());
   }
 
   @Override
-  public void onResume() {
-    super.onResume();
-
-    startButton.setEnabled(false);
+  public View onShow() {
+    welcomeLayout.setConnectionStatus(false, null);
     updateServerState(App.i.getServer().getCurrState());
-    App.i.getEventBus().register(eventHandler);
 
     if (EmpireManager.i.hasMyEmpire()) {
-      refreshEmpireDetails(EmpireManager.i.getMyEmpire());
+      welcomeLayout.refreshEmpireDetails(EmpireManager.i.getMyEmpire());
+    }
+
+    if (motd != null) {
+      welcomeLayout.updateWelcomeMessage(motd);
     }
 
 /*
@@ -132,22 +95,11 @@ public class WelcomeFragment extends BaseFragment {
 //        }
 //      }
 //    });
-  }
-
-  private void refreshEmpireDetails(Empire empire) {
-    empireName.setText(empire.display_name);
-    Picasso.with(getContext())
-        .load(ImageHelper.getEmpireImageUrl(getContext(), empire, 20, 20))
-        .into(empireIcon);
-  }
-
-  private void onSignInClick() {
-    getFragmentTransitionManager().replaceFragment(SignInFragment.class);
+    return welcomeLayout;
   }
 
   @Override
-  public void onPause() {
-    super.onPause();
+  public void onDestroy() {
     App.i.getEventBus().unregister(eventHandler);
   }
 
@@ -176,10 +128,6 @@ public class WelcomeFragment extends BaseFragment {
           }
         })
         .create().show();*/
-  }
-
-  private void updateWelcomeMessage(String html) {
-    motdView.loadHtml("html/skeleton.html", html);
   }
 
   private void refreshWelcomeMessage() {
@@ -241,29 +189,36 @@ public class WelcomeFragment extends BaseFragment {
         }
       }
 
-      App.i.getTaskRunner().runTask(() -> updateWelcomeMessage(motd.toString()), Threads.UI);
+      App.i.getTaskRunner().runTask(() -> {
+        this.motd = motd.toString();
+        if (welcomeLayout != null) {
+          welcomeLayout.updateWelcomeMessage(motd.toString());
+        }
+      }, Threads.UI);
     }, Threads.BACKGROUND);
   }
 
   private void updateServerState(ServerStateEvent event) {
+    checkNotNull(welcomeLayout);
+
     if (event.getState() == ServerStateEvent.ConnectionState.CONNECTED) {
       long maxMemoryBytes = Runtime.getRuntime().maxMemory();
-      int memoryClass = ((ActivityManager) getFragmentActivity()
-          .getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
+      Context context = App.i.getApplicationContext();
+      ActivityManager activityManager =
+          checkNotNull((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE));
+      int memoryClass = activityManager.getMemoryClass();
 
       DecimalFormat formatter = new DecimalFormat("#,##0");
       String msg = String.format(Locale.ENGLISH,
           "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s", memoryClass,
           formatter.format(maxMemoryBytes), Version.string());
-      connectionStatus.setText(msg);
-      startButton.setEnabled(true);
+      welcomeLayout.setConnectionStatus(true, msg);
     } else {
       if (event.getState() == ServerStateEvent.ConnectionState.ERROR) {
         handleConnectionError(event);
       }
       String msg = String.format("%s - %s", event.getUrl(), event.getState());
-      connectionStatus.setText(msg);
-      startButton.setEnabled(false);
+      welcomeLayout.setConnectionStatus(false, msg);
     }
   }
 
@@ -275,12 +230,36 @@ public class WelcomeFragment extends BaseFragment {
     if (event.getLoginStatus() == null) {
       // Nothing we can do.
       log.debug("Got an error, but login status is null.");
-      return;
     }
-
   }
 
-  private Object eventHandler = new Object() {
+  private final WelcomeLayout.Callbacks layoutCallbacks = new WelcomeLayout.Callbacks() {
+    @Override
+    public void onStartClick() {
+      context.pushScreen(new FragmentScreen(new StarfieldFragment()));
+    }
+
+    @Override
+    public void onHelpClick() {
+      Intent i = new Intent(Intent.ACTION_VIEW);
+      i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
+      context.startActivity(i);
+    }
+
+    @Override
+    public void onWebsiteClick() {
+      Intent i = new Intent(Intent.ACTION_VIEW);
+      i.setData(Uri.parse("http://www.war-worlds.com/"));
+      context.startActivity(i);
+    }
+
+    @Override
+    public void onSignInClick() {
+      //TODO getFragmentTransitionManager().replaceFragment(SignInFragment.class);
+    }
+  };
+
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onServerStateUpdated(ServerStateEvent event) {
       updateServerState(event);
@@ -289,8 +268,8 @@ public class WelcomeFragment extends BaseFragment {
     @EventHandler
     public void onEmpireUpdated(Empire empire) {
       Empire myEmpire = EmpireManager.i.getMyEmpire();
-      if (myEmpire.id.equals(empire.id)) {
-        refreshEmpireDetails(empire);
+      if (myEmpire.id.equals(empire.id) && welcomeLayout != null) {
+        welcomeLayout.refreshEmpireDetails(empire);
       }
     }
   };

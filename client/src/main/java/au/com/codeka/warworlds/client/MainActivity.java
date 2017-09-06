@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,7 +10,7 @@ import au.com.codeka.warworlds.client.ctrl.DebugView;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.game.welcome.CreateEmpireFragment;
 import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeFragment;
-import au.com.codeka.warworlds.client.game.welcome.WelcomeFragment;
+import au.com.codeka.warworlds.client.game.welcome.WelcomeScreen;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.ui.ScreenStack;
 import au.com.codeka.warworlds.client.util.GameSettings;
@@ -53,7 +52,7 @@ public class MainActivity extends BaseFragmentActivity {
     } else if (GameSettings.i.getString(GameSettings.Key.COOKIE).isEmpty()) {
       getFragmentTransitionManager().replaceFragment(CreateEmpireFragment.class);
     } else {
-      getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
+      screenStack.push(new WelcomeScreen());
     }
   }
 

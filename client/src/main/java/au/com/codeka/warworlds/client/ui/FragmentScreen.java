@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 
 /**
- * Helper {@link Screen} to wrap an android {@link Fragment} (until we can migrate all of them
+ * Helper {@link Screen} to wrap an android {@link BaseFragment} (until we can migrate all of them
  * to the new system).
  *
  * Note that we don't honor the full fragment lifecycle, we just call enough methods to make sure
@@ -21,14 +21,9 @@ public class FragmentScreen extends Screen {
   }
 
   @Override
-  public void onCreate(ScreenStack screenStack) {
+  public void onCreate(ScreenContext context, LayoutInflater inflater, ViewGroup container) {
     fragment.onCreate(null);
-  }
-
-  @Override
-  public View createView(LayoutInflater inflater, ViewGroup container) {
     view = fragment.onCreateView(inflater, container, null);
-    return view;
   }
 
   @Override

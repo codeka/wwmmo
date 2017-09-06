@@ -1,17 +1,13 @@
 package au.com.codeka.warworlds.client.ui;
 
+import static au.com.codeka.warworlds.client.concurrency.Threads.checkOnThread;
+
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-
 import au.com.codeka.warworlds.client.concurrency.Threads;
-
-import static au.com.codeka.warworlds.client.concurrency.Threads.checkOnThread;
+import java.util.Stack;
 
 /**
  * {@link ScreenStack} is used to manage a stack of {@link Screen}s. The stack shows it's
@@ -47,8 +43,7 @@ public class ScreenStack {
       }
     } else {
       screens.push(screen);
-      screen.onCreate(this);
-      screen.createView(LayoutInflater.from(container.getContext()), container);
+      screen.onCreate(context, LayoutInflater.from(container.getContext()), container);
     }
 
     View view = screen.onShow();
@@ -93,4 +88,16 @@ public class ScreenStack {
       // Keep going.
     }
   }
+
+  private final ScreenContext context = new ScreenContext() {
+    @Override
+    public void startActivity(Intent intent) {
+      container.getContext().startActivity(intent);
+    }
+
+    @Override
+    public void pushScreen(Screen screen) {
+      push(screen);
+    }
+  };
 }
