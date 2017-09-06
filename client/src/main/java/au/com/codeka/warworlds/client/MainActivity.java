@@ -15,19 +15,12 @@ import au.com.codeka.warworlds.client.game.welcome.WelcomeFragment;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.common.Log;
-import flow.Flow;
 
 public class MainActivity extends BaseFragmentActivity {
   private static final Log log = new Log("MainActivity");
 
   // Will be non-null between of onCreate/onDestroy.
   @Nullable private StarfieldManager starfieldManager;
-
-  @Override
-  protected void attachBaseContext(Context baseContext) {
-    baseContext = Flow.configure(baseContext, this).install();
-    super.attachBaseContext(baseContext);
-  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
