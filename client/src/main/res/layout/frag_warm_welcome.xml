@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="RelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:baselineAligned="false">
@@ -78,4 +80,4 @@
       android:layout_marginLeft="@dimen/tablet_margin"
       android:layout_marginRight="@dimen/tablet_margin"
       android:layout_marginTop="10dp"/>
-</RelativeLayout>
+</merge>
