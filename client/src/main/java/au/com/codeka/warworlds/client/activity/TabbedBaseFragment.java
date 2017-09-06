@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.ui.FragmentScreen;
+import au.com.codeka.warworlds.client.ui.Screen;
+import au.com.codeka.warworlds.client.ui.ScreenStack;
 
 /**
  * A {@link BaseFragment} that is just a container for tabs.
@@ -17,12 +20,17 @@ public abstract class TabbedBaseFragment extends BaseFragment {
   private TabHost tabHost;
   private View rootView;
 
+  // TODO: I don't think screens are the right abstraction for tabs.
+  private ScreenStack screenStack;
+
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     rootView = inflater.inflate(getLayoutID(), container, false);
 
-    tabHost = (TabHost) rootView.findViewById(android.R.id.tabhost);
+    screenStack = new ScreenStack(rootView.findViewById(R.id.real_tabcontent));
+
+    tabHost = rootView.findViewById(android.R.id.tabhost);
     tabManager = new TabManager(tabHost);
 
     createTabs();
@@ -48,13 +56,17 @@ public abstract class TabbedBaseFragment extends BaseFragment {
   }
 
   public static class TabInfo extends TabManager.TabInfo {
-    private Fragment containerFragment;
+    private TabbedBaseFragment containerFragment;
 
     Class<?> fragmentClass;
     Bundle args;
-    Fragment fragment;
+    BaseFragment fragment;
 
-    public TabInfo(Fragment containerFragment, String title, Class<?> fragmentClass, Bundle args) {
+    public TabInfo(
+        TabbedBaseFragment containerFragment,
+        String title,
+        Class<?> fragmentClass,
+        Bundle args) {
       super(title);
       this.containerFragment = containerFragment;
       this.fragmentClass = fragmentClass;
@@ -63,47 +75,36 @@ public abstract class TabbedBaseFragment extends BaseFragment {
 
     @Override
     public View createTabContent(String tag) {
-      View v = new View(containerFragment.getActivity());
+      View v = new View(containerFragment.getContext());
       v.setMinimumHeight(0);
       v.setMinimumWidth(0);
       return v;
     }
 
-    @Override
-    public void switchTo(TabManager.TabInfo lastTabBase) {
-      FragmentTransaction ft = containerFragment.getChildFragmentManager().beginTransaction();
+    private void ensureFragment() {
       if (fragment == null) {
-        fragment =
-            Fragment.instantiate(containerFragment.getActivity(), fragmentClass.getName(), args);
-      }
-      ft.replace(R.id.real_tabcontent, fragment, title);
-
-      try {
-        ft.commit();
-        containerFragment.getChildFragmentManager().executePendingTransactions();
-      } catch (IllegalStateException e) {
-        // we can ignore this since it probably just means the activity is gone.
+        try {
+          fragment = (BaseFragment) fragmentClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
       }
     }
 
     @Override
-    public void recreate() {
-      FragmentTransaction ft = containerFragment.getChildFragmentManager().beginTransaction();
-      if (fragment != null) {
-        ft.detach(fragment);
-        ft.attach(fragment);
-      } else {
-        fragment =
-            Fragment.instantiate(containerFragment.getActivity(), fragmentClass.getName(), args);
-        ft.add(R.id.real_tabcontent, fragment, title);
-      }
+    public void switchTo(TabManager.TabInfo lastTabBase) {
+      ensureFragment();
+      Screen screen = new FragmentScreen(fragment);
+      containerFragment.screenStack.home();
+      containerFragment.screenStack.push(screen);
+    }
 
-      try {
-        ft.commit();
-        containerFragment.getChildFragmentManager().executePendingTransactions();
-      } catch (IllegalStateException e) {
-        // we can ignore this since it probably just means the activity is gone.
-      }
+    @Override
+    public void recreate() {
+      ensureFragment();
+      Screen screen = new FragmentScreen(fragment);
+      containerFragment.screenStack.home();
+      containerFragment.screenStack.push(screen);
     }
 
     @Override

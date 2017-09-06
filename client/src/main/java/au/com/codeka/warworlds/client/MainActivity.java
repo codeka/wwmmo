@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.client.game.welcome.CreateEmpireFragment;
 import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeFragment;
 import au.com.codeka.warworlds.client.game.welcome.WelcomeFragment;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
+import au.com.codeka.warworlds.client.ui.ScreenStack;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.common.Log;
 
@@ -22,11 +23,13 @@ public class MainActivity extends BaseFragmentActivity {
   // Will be non-null between of onCreate/onDestroy.
   @Nullable private StarfieldManager starfieldManager;
 
+  // Will be non-null between onCreate/onDestroy.
+  @Nullable private ScreenStack screenStack;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    createFragmentTransitionManager(R.id.fragment_container);
 
     setSupportActionBar(findViewById(R.id.toolbar));
     checkNotNull(getSupportActionBar()).hide();
@@ -39,14 +42,18 @@ public class MainActivity extends BaseFragmentActivity {
     DebugView debugView = checkNotNull(findViewById(R.id.debug_view));
     debugView.setFrameCounter(renderSurfaceView.getFrameCounter());
 
-    if (savedInstanceState == null) {
-      if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
-        getFragmentTransitionManager().replaceFragment(WarmWelcomeFragment.class);
-      } else if (GameSettings.i.getString(GameSettings.Key.COOKIE).isEmpty()) {
-        getFragmentTransitionManager().replaceFragment(CreateEmpireFragment.class);
-      } else {
-        getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
-      }
+    screenStack = new ScreenStack(findViewById(R.id.fragment_container));
+    createFragmentTransitionManager(screenStack);
+
+    if (savedInstanceState != null) {
+      // TODO: restore the view state?
+    }
+    if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
+      getFragmentTransitionManager().replaceFragment(WarmWelcomeFragment.class);
+    } else if (GameSettings.i.getString(GameSettings.Key.COOKIE).isEmpty()) {
+      getFragmentTransitionManager().replaceFragment(CreateEmpireFragment.class);
+    } else {
+      getFragmentTransitionManager().replaceFragment(WelcomeFragment.class);
     }
   }
 

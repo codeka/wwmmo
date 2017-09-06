@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.client.ui;
 
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -17,22 +19,19 @@ import static au.com.codeka.warworlds.client.concurrency.Threads.checkOnThread;
  */
 public class ScreenStack {
   private final ViewGroup container;
-  private final Stack<Screen> screens;
-  private final Map<Class<Screen>, Screen> createdScreens = new HashMap<>();
+  private final Stack<Screen> screens = new Stack<>();
 
   public ScreenStack(ViewGroup container) {
     this.container = container;
-    this.screens = new Stack<>();
   }
 
   /**
    * Push the given {@link Screen} onto the stack. The currently visible screen (if any) will
    * become hidden (though not destroyed).
    *
-   * @param screenClass The class of the {@link Screen} to push.
-   * @param params The {@link ScreenParameters} to pass to the screen.
+   * @param screen The {@link Screen} to push.
    */
-  public void push(Class<Screen> screenClass, ScreenParameters params) {
+  public void push(Screen screen) {
     checkOnThread(Threads.UI);
 
     if (!screens.isEmpty()) {
@@ -41,17 +40,21 @@ public class ScreenStack {
       container.removeAllViews();
     }
 
-    Screen screen = createdScreens.get(screenClass);
-    if (screen == null) {
-      try {
-        screen = screenClass.newInstance();
-        createdScreens.put(screenClass, screen);
-      } catch (InstantiationException | IllegalAccessException e) {
-        throw new RuntimeException("Could not create Screen.", e);
+    if (screens.contains(screen)) {
+      // If the screen is already on the stack, we'll just remove everything up to that screen
+      while (screens.peek() != screen) {
+        pop();
       }
+    } else {
+      screens.push(screen);
+      screen.onCreate(this);
+      screen.createView(LayoutInflater.from(container.getContext()), container);
     }
 
-
+    View view = screen.onShow();
+    if (view != null) {
+      container.addView(view);
+    }
   }
 
   /**
@@ -61,6 +64,24 @@ public class ScreenStack {
    *     {@link Screen}.
    */
   public boolean pop() {
+    Screen screen = screens.pop();
+    if (screen == null) {
+      return false;
+    }
+
+    screen.onHide();
+    screen.onDestroy();
+    container.removeAllViews();
+
+    if (!screens.isEmpty()) {
+      screen = screens.peek();
+      View view = screen.onShow();
+      if (view != null) {
+        container.addView(view);
+      }
+      return true;
+    }
+
     return false;
   }
 

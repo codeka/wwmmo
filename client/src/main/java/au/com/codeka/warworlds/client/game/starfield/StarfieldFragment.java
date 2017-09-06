@@ -42,10 +42,10 @@ public class StarfieldFragment extends BaseFragment {
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
   //  selectionDetailsView = (SelectionDetailsView) view.findViewById(R.id.selection_details);
-    bottomPane = (ViewGroup) view.findViewById(R.id.bottom_pane);
+    bottomPane = view.findViewById(R.id.bottom_pane);
   //  allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
  //   empireBtn = (Button) view.findViewById(R.id.empire_btn);
-    chatMiniView = (ChatMiniView) view.findViewById(R.id.mini_chat);
+    chatMiniView = view.findViewById(R.id.mini_chat);
 
     chatMiniView.setCallback(roomId -> {
       getFragmentTransitionManager().replaceFragment(
@@ -56,7 +56,7 @@ public class StarfieldFragment extends BaseFragment {
               .build());
     });
 
-    starfieldManager = ((MainActivity) getActivity()).getStarfieldManager();
+    starfieldManager = ((MainActivity) getFragmentActivity()).getStarfieldManager();
     if (starfieldManager.getSelectedStar() != null) {
       showStarSelectedBottomPane(starfieldManager.getSelectedStar());
     } else {

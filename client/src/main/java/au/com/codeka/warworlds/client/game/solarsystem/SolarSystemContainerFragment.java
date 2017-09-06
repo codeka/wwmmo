@@ -53,6 +53,8 @@ public class SolarSystemContainerFragment extends BaseFragment {
   private SearchListAdapter searchListAdapter;
   private boolean waitingForStarToShow;
 
+  private View view;
+
   // We keep the last 5 stars you've visited in an LRU cache so we can display them at the top
   // of the search list (note we actually keep 6 but ignore the most recent one, which is always
   // "this star").
@@ -66,11 +68,13 @@ public class SolarSystemContainerFragment extends BaseFragment {
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
-    drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
+    this.view = view;
+    drawerLayout = view.findViewById(R.id.drawer_layout);
     drawer = view.findViewById(R.id.drawer);
 
-    ListView searchList = (ListView) view.findViewById(R.id.search_result);
-    searchListAdapter = new SearchListAdapter(getLayoutInflater(savedInstanceState));
+    ListView searchList = view.findViewById(R.id.search_result);
+    searchListAdapter = new SearchListAdapter(
+        LayoutInflater.from(getContext()));
     searchList.setAdapter(searchListAdapter);
 
     searchList.setOnItemClickListener((parent, v, position, id) -> {
@@ -101,7 +105,7 @@ public class SolarSystemContainerFragment extends BaseFragment {
         };
     drawerLayout.setDrawerListener(drawerToggle);
 
-    final EditText searchBox = (EditText) view.findViewById(R.id.search_text);
+    final EditText searchBox = view.findViewById(R.id.search_text);
     searchBox.addTextChangedListener(new TextWatcher() {
       @Override
       public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -117,13 +121,12 @@ public class SolarSystemContainerFragment extends BaseFragment {
       }
     });
 
-    ImageButton searchBtn = (ImageButton) view.findViewById(R.id.search_button);
+    ImageButton searchBtn = view.findViewById(R.id.search_button);
     searchBtn.setOnClickListener(v -> performSearch(searchBox.getText().toString()));
   }
 
   @Override
-  public void onActivityCreated(Bundle savedInstanceState) {
-    super.onActivityCreated(savedInstanceState);
+  public void onCreate(Bundle savedInstanceState) {
     drawerToggle.syncState();
 
     Bundle args = getArguments();
@@ -132,13 +135,13 @@ public class SolarSystemContainerFragment extends BaseFragment {
       showStar(star, args);
     }
   }
-
+/*
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
     drawerToggle.onConfigurationChanged(newConfig);
   }
-
+*/
   @Override
   public void onResume() {
     super.onResume();
@@ -151,7 +154,7 @@ public class SolarSystemContainerFragment extends BaseFragment {
     actionBar.setDisplayHomeAsUpEnabled(true);
     actionBar.setHomeButtonEnabled(true);
   }
-
+/*
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     if (drawerToggle.onOptionsItemSelected(item)) {
@@ -160,7 +163,7 @@ public class SolarSystemContainerFragment extends BaseFragment {
 
     return super.onOptionsItemSelected(item);
   }
-
+*/
   @Override
   public void onPause() {
     super.onPause();
@@ -180,7 +183,10 @@ public class SolarSystemContainerFragment extends BaseFragment {
     this.star = star;
     refreshTitle();
 
-    Fragment fragment;
+    // TODO: current fragment? hide!
+    ((ViewGroup) view.findViewById(R.id.content)).removeAllViews();
+
+    BaseFragment fragment;
     //if (star.classification == Star.CLASSIFICATION.WORMHOLE) {
     //  fragment = new WormholeFragment();
     //} else {
@@ -191,7 +197,12 @@ public class SolarSystemContainerFragment extends BaseFragment {
     }
     fragment.setArguments(args);
 
-    getFragmentManager().beginTransaction().replace(R.id.content, fragment).commit();
+    fragment.onCreate(null);
+    View childView =
+        fragment.onCreateView(LayoutInflater.from(getContext()), (ViewGroup) view, null);
+    ((ViewGroup) view.findViewById(R.id.content)).addView(childView);
+    fragment.onStart();
+    fragment.onResume();
 
     drawerLayout.closeDrawer(drawer);
     synchronized (lastStars) {

@@ -379,7 +379,7 @@ public class SolarSystemFragment extends BaseFragment {
       // drawing.
       congenialityContainer.setVisibility(View.GONE);
     } else {
-      float pixelScale = getResources().getDisplayMetrics().density;
+      float pixelScale = getContext().getResources().getDisplayMetrics().density;
       double x = planetCentre.x;
       double y = planetCentre.y;
 
@@ -457,7 +457,7 @@ public class SolarSystemFragment extends BaseFragment {
   }
 
   private void refreshUncolonizedDetails() {
-    populationCountTextView.setText(getString(R.string.uncolonized));
+    populationCountTextView.setText(getContext().getString(R.string.uncolonized));
   }
 
   private void refreshColonyDetails() {

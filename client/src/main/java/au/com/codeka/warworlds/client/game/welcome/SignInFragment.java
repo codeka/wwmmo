@@ -157,7 +157,7 @@ public class SignInFragment extends BaseFragment {
         (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(emailText.getWindowToken(), 0);
 
-    getFragmentManager().popBackStack();
+    //TODO getFragmentManager().popBackStack();
   }
 
   private void onSignInAnonymousState() {

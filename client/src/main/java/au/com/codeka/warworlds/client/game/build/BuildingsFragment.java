@@ -340,12 +340,11 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
   private final Runnable refreshRunnable = new Runnable() {
     @Override
     public void run() {
-      if (!isResumed()) {
-        return;
-      }
+      //if (!isResumed()) {
+      //  return;
+      //}
 
       adapter.notifyDataSetChanged();
-
       handler.postDelayed(refreshRunnable, REFRESH_DELAY_MS);
     }
   };

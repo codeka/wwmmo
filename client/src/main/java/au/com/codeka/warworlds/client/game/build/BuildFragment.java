@@ -49,7 +49,7 @@ public class BuildFragment extends BaseFragment {
   private Star star;
   private List<Colony> colonies;
   private Colony initialColony;
-  private ColonyPagerAdapter colonyPagerAdapter;
+  //private ColonyPagerAdapter colonyPagerAdapter;
 
   private ViewPager viewPager;
   private ImageView planetIcon;
@@ -82,9 +82,9 @@ public class BuildFragment extends BaseFragment {
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    colonyPagerAdapter = new ColonyPagerAdapter(this);
-    viewPager = view.findViewById(R.id.pager);
-    viewPager.setAdapter(colonyPagerAdapter);
+   // colonyPagerAdapter = new ColonyPagerAdapter(this);
+   // viewPager = view.findViewById(R.id.pager);
+   // viewPager.setAdapter(colonyPagerAdapter);
     planetIcon = view.findViewById(R.id.planet_icon);
     planetName = view.findViewById(R.id.planet_name);
     buildQueueDescription = view.findViewById(R.id.build_queue_description);
@@ -176,7 +176,7 @@ public class BuildFragment extends BaseFragment {
     }
 
     if (dataSetChanged) {
-      colonyPagerAdapter.notifyDataSetChanged();
+     // colonyPagerAdapter.notifyDataSetChanged();
     }
   }
 
@@ -208,7 +208,7 @@ public class BuildFragment extends BaseFragment {
           "Build queue: %d", buildQueueLength));
     }
   }
-
+/*
   public class ColonyPagerAdapter extends FragmentStatePagerAdapter {
     private BuildFragment buildFragment;
 
@@ -223,7 +223,7 @@ public class BuildFragment extends BaseFragment {
 
     @Override
     public Fragment getItem(int i) {
-      Fragment fragment = new TabFragment();
+      BaseFragment fragment = new TabFragment();
       int planetIndex = -1;
       for (Planet planet : star.planets) {
         if (planet.colony != null && planet.colony.id.equals(colonies.get(i).id)) {
@@ -257,7 +257,7 @@ public class BuildFragment extends BaseFragment {
       }
     }
   }
-
+*/
   public static class TabFragment extends TabbedBaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -267,9 +267,10 @@ public class BuildFragment extends BaseFragment {
     }
 
     public BuildFragment getBuildFragment() {
-      ViewPager viewPager = (ViewPager) getTabHost().getParent();
-      ColonyPagerAdapter adapter = (ColonyPagerAdapter) viewPager.getAdapter();
-      return adapter.getBuildFragment();
+      //ViewPager viewPager = (ViewPager) getTabHost().getParent();
+      //ColonyPagerAdapter adapter = (ColonyPagerAdapter) viewPager.getAdapter();
+      //return adapter.getBuildFragment();
+      return null;
     }
 
     @Override
@@ -309,8 +310,9 @@ public class BuildFragment extends BaseFragment {
 
     /** Gets a reference to the {@link BuildFragment} we're inside of. */
     protected BuildFragment getBuildFragment() {
-      TabFragment tabFragment = (TabFragment) getParentFragment();
-      return tabFragment.getBuildFragment();
+      //TabFragment tabFragment = (TabFragment) getParentFragment();
+      //return tabFragment.getBuildFragment();
+      return null;
     }
   }
 }

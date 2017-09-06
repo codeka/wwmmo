@@ -20,7 +20,7 @@ import java.util.List;
 
 /** Main fragment for showing the chat system. */
 public class ChatFragment extends BaseFragment {
-  private ChatPagerAdapter chatPagerAdapter;
+ // private ChatPagerAdapter chatPagerAdapter;
   private ViewPager viewPager;
   private FrameLayout bottomPane;
 
@@ -34,11 +34,11 @@ public class ChatFragment extends BaseFragment {
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
-    viewPager = (ViewPager) view.findViewById(R.id.pager);
-    bottomPane = (FrameLayout) view.findViewById(R.id.bottom_pane);
+    viewPager = view.findViewById(R.id.pager);
+    bottomPane = view.findViewById(R.id.bottom_pane);
 
-    chatPagerAdapter = new ChatPagerAdapter(getFragmentManager());
-    viewPager.setAdapter(chatPagerAdapter);
+  ///  chatPagerAdapter = new ChatPagerAdapter(getFragmentManager());
+  //  viewPager.setAdapter(chatPagerAdapter);
 
     showSendPane();
   }
@@ -122,9 +122,9 @@ public class ChatFragment extends BaseFragment {
 
   private void refreshRooms() {
     rooms = ChatManager.i.getRooms();
-    chatPagerAdapter.refresh(rooms);
+  //  chatPagerAdapter.refresh(rooms);
   }
-
+/*
   public class ChatPagerAdapter extends FragmentStatePagerAdapter {
     private final List<ChatRoom> rooms = new ArrayList<>();
 
@@ -176,7 +176,7 @@ public class ChatFragment extends BaseFragment {
       // room.markAllRead()
     }
   }
-
+*/
   private void sendMessage(String msg) {
     ChatRoom room = rooms.get(viewPager.getCurrentItem());
     ChatMessage.Builder chatMessageBuilder = new ChatMessage.Builder()

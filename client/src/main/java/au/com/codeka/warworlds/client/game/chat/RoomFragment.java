@@ -88,8 +88,8 @@ public class RoomFragment extends BaseFragment {
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
-    LayoutInflater inflater = getLayoutInflater(savedInstanceState);
-    FrameLayout header = (FrameLayout) view.findViewById(R.id.header);
+    LayoutInflater inflater = LayoutInflater.from(view.getContext());
+    FrameLayout header = view.findViewById(R.id.header);
     if (room.id == null) {
       headerContent = inflater.inflate(R.layout.chat_header_global, header, false);
       setupGlobalChatHeader(headerContent);
@@ -103,10 +103,10 @@ public class RoomFragment extends BaseFragment {
     header.addView(headerContent);
 
     chatAdapter = new ChatAdapter();
-    chatOutput = (ListView) view.findViewById(R.id.chat_output);
+    chatOutput = view.findViewById(R.id.chat_output);
     chatOutput.setAdapter(chatAdapter);
 
-    unreadCountBtn = (Button) view.findViewById(R.id.unread_btn);
+    unreadCountBtn = view.findViewById(R.id.unread_btn);
     if (unreadCountBtn != null) {
       refreshUnreadCountButton();
       unreadCountBtn.setOnClickListener(v -> {
@@ -341,7 +341,7 @@ public class RoomFragment extends BaseFragment {
 
       View view = convertView;
       if (view == null) {
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
+        LayoutInflater inflater = (LayoutInflater) getFragmentActivity().getSystemService(
             Context.LAYOUT_INFLATER_SERVICE);
 
         if (entry.date == null && entry.message == null) {

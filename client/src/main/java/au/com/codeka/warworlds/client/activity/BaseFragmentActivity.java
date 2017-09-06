@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import au.com.codeka.warworlds.client.ui.ScreenStack;
 
 /**
  * Base class for {@link au.com.codeka.warworlds.client.MainActivity} which manages transitions to
@@ -14,8 +15,8 @@ public class BaseFragmentActivity extends AppCompatActivity {
    * This must be called after you call {@link #setContentView} to create the fragment transition
    * manager.
    */
-  protected void createFragmentTransitionManager(int fragmentContainerId) {
-    transitionManager = new FragmentTransitionManager(this, fragmentContainerId);
+  protected void createFragmentTransitionManager(ScreenStack screenStack) {
+    transitionManager = new FragmentTransitionManager(this, screenStack);
   }
 
   @Override

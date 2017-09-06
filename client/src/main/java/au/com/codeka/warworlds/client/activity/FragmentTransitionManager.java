@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
+import au.com.codeka.warworlds.client.ui.FragmentScreen;
+import au.com.codeka.warworlds.client.ui.ScreenStack;
 import au.com.codeka.warworlds.common.Log;
 import com.google.common.base.Preconditions;
 
@@ -15,42 +17,40 @@ import com.google.common.base.Preconditions;
 public class FragmentTransitionManager {
   private static final Log log = new Log("FragmentTransitionManager");
   private final BaseFragmentActivity activity;
-  private final int fragmentContainerId;
+  private final ScreenStack screenStack;
 
-  private Fragment currFragment;
-
-  public FragmentTransitionManager(BaseFragmentActivity activity, int fragmentContainerId) {
+  public FragmentTransitionManager(BaseFragmentActivity activity, ScreenStack screenStack) {
     this.activity = Preconditions.checkNotNull(activity);
-    this.fragmentContainerId = fragmentContainerId;
+    this.screenStack = screenStack;
   }
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
-  public void replaceFragment(Class<? extends Fragment> fragmentClass) {
+  public void replaceFragment(Class<? extends BaseFragment> fragmentClass) {
     replaceFragment(fragmentClass, null, null);
   }
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
-  public void replaceFragment(Class<? extends Fragment> fragmentClass, @Nullable Bundle args) {
+  public void replaceFragment(Class<? extends BaseFragment> fragmentClass, @Nullable Bundle args) {
     replaceFragment(fragmentClass, args, null);
   }
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
-  public void replaceFragment(Class<? extends Fragment> fragmentClass,
+  public void replaceFragment(Class<? extends BaseFragment> fragmentClass,
       @Nullable SharedViewHolder sharedViews) {
     replaceFragment(fragmentClass, null, sharedViews);
   }
 
   /** Replace the current fragment stack with a new instance of the given fragment class. */
-  public void replaceFragment(Class<? extends Fragment> fragmentClass,
+  public void replaceFragment(Class<? extends BaseFragment> fragmentClass,
       @Nullable Bundle args, @Nullable SharedViewHolder sharedViews) {
-    Fragment fragment = createFragment(fragmentClass, args);
+    BaseFragment fragment = createFragment(fragmentClass, args);
     FragmentTransaction trans = activity.getSupportFragmentManager().beginTransaction();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      fragment.setSharedElementEnterTransition(Transitions.transform());
-      fragment.setSharedElementReturnTransition(Transitions.transform());
-      fragment.setEnterTransition(Transitions.fade());
-      fragment.setExitTransition(Transitions.fade());
+//      fragment.setSharedElementEnterTransition(Transitions.transform());
+//      fragment.setSharedElementReturnTransition(Transitions.transform());
+//      fragment.setEnterTransition(Transitions.fade());
+//      fragment.setExitTransition(Transitions.fade());
     } else {
       trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
       trans.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -71,17 +71,11 @@ public class FragmentTransitionManager {
       }
     }
 
-    if (currFragment != null) {
-      trans.replace(fragmentContainerId, fragment);
-      trans.addToBackStack(null);
-    } else {
-      trans.add(fragmentContainerId, fragment);
-    }
+    screenStack.push(new FragmentScreen(fragment));
     trans.commit();
-    currFragment = fragment;
   }
 
-  private <T extends Fragment> T createFragment(Class<T> fragmentClass, @Nullable Bundle args) {
+  private <T extends BaseFragment> T createFragment(Class<T> fragmentClass, @Nullable Bundle args) {
     try {
       T fragment = fragmentClass.newInstance();
       fragment.setArguments(args);

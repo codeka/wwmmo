@@ -266,7 +266,7 @@ public class PlanetDetailsFragment extends BaseFragment {
             .construction(construction)
             .build()));
 
-    getFragmentManager().popBackStack();
+    // TODO getFragmentManager().popBackStack();
   }
 
   private void onAttackClick(View view) {

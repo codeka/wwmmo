@@ -83,8 +83,9 @@ public class WelcomeFragment extends BaseFragment {
 
     refreshWelcomeMessage();
 
-    optionsButton.setOnClickListener(v ->
-        getFragmentTransitionManager().replaceFragment(GameSettingsFragment.class));
+    // TODO
+    //optionsButton.setOnClickListener(v ->
+    //    getFragmentTransitionManager().replaceFragment(GameSettingsFragment.class));
 
     startButton.setOnClickListener(v ->
         getFragmentTransitionManager().replaceFragment(StarfieldFragment.class));
@@ -247,7 +248,7 @@ public class WelcomeFragment extends BaseFragment {
   private void updateServerState(ServerStateEvent event) {
     if (event.getState() == ServerStateEvent.ConnectionState.CONNECTED) {
       long maxMemoryBytes = Runtime.getRuntime().maxMemory();
-      int memoryClass = ((ActivityManager) getActivity()
+      int memoryClass = ((ActivityManager) getFragmentActivity()
           .getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
 
       DecimalFormat formatter = new DecimalFormat("#,##0");

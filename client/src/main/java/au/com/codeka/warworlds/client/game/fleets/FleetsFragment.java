@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.client.game.fleets;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.transition.TransitionManager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -34,6 +35,7 @@ public class FleetsFragment extends BaseFragment {
   private ExpandableListView listView;
   private FleetExpandableStarListAdapter adapter;
   private FrameLayout bottomPane;
+  private View view;
 
   public static Bundle createArguments(long starId, @Nullable Long selectedFleetId) {
     Bundle args = new Bundle();
@@ -52,6 +54,7 @@ public class FleetsFragment extends BaseFragment {
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+    this.view = view;
 
     bottomPane = view.findViewById(R.id.bottom_pane);
 
@@ -85,7 +88,7 @@ public class FleetsFragment extends BaseFragment {
       starCollection = new MyEmpireStarCollection();
     }
 
-    adapter = new FleetExpandableStarListAdapter(getLayoutInflater(), starCollection);
+    adapter = new FleetExpandableStarListAdapter(LayoutInflater.from(getContext()), starCollection);
     listView.setAdapter(adapter);
     long fleetID = getArguments().getLong(FLEET_ID_KEY, 0);
     if (fleetID != 0 && starID != 0) {
@@ -188,7 +191,6 @@ public class FleetsFragment extends BaseFragment {
   }
 
   private void showStarfield(boolean visible) {
-    View view = getView();
     if (view != null) {
       if (visible) {
         listView.setVisibility(View.GONE);
