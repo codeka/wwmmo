@@ -9,6 +9,9 @@ import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.Random;
+
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.activity.Transitions;
@@ -59,8 +62,16 @@ public abstract class Screen {
           Transition transformTransition = Transitions.transform().clone();
           mainTransition.addTransition(transformTransition);
           for (SharedViews.SharedView sharedView : sharedViews.getSharedViews()) {
-            fadeTransition.excludeTarget(sharedView.getViewId(), true);
-            transformTransition.addTarget(sharedView.getViewId());
+            if (sharedView.getViewId() != 0) {
+              fadeTransition.excludeTarget(sharedView.getViewId(), true);
+              transformTransition.addTarget(sharedView.getViewId());
+            } else if (sharedView.getFromViewId() != 0 && sharedView.getToViewId() != 0) {
+              String name = "shared-" + Long.toString(new Random().nextLong());
+              container.findViewById(sharedView.getFromViewId()).setTransitionName(name);
+              view.findViewById(sharedView.getToViewId()).setTransitionName(name);
+              fadeTransition.excludeTarget(name, true);
+              transformTransition.addTarget(name);
+            }
           }
         }
         TransitionManager.go(scene, mainTransition);

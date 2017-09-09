@@ -75,7 +75,7 @@ public class ScreenStack {
 
     screenHolder.screen.onHide();
     screenHolder.screen.onDestroy();
-    
+
     if (!screens.isEmpty()) {
       screenHolder = screens.peek();
       screenHolder.screen.performShow(screenHolder.sharedViews);

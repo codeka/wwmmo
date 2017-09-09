@@ -24,14 +24,32 @@ public class SharedViews {
   }
 
   public static class SharedView {
-    private int viewId;
+    private final int viewId;
+    private final int fromViewId;
+    private final int toViewId;
 
     public SharedView(int viewId) {
       this.viewId = viewId;
+      this.fromViewId = 0;
+      this.toViewId = 0;
+    }
+
+    public SharedView(int fromViewId, int toViewId) {
+      this.viewId = 0;
+      this.fromViewId = fromViewId;
+      this.toViewId = toViewId;
     }
 
     public int getViewId() {
       return viewId;
+    }
+
+    public int getFromViewId() {
+      return fromViewId;
+    }
+
+    public int getToViewId() {
+      return toViewId;
     }
   }
 
@@ -40,6 +58,11 @@ public class SharedViews {
 
     public Builder addSharedView(int viewId) {
       sharedViews.add(new SharedView(viewId));
+      return this;
+    }
+
+    public Builder addSharedView(int fromViewId, int toViewId) {
+      sharedViews.add(new SharedView(fromViewId, toViewId));
       return this;
     }
 

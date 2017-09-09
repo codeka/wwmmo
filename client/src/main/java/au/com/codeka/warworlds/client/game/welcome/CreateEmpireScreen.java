@@ -16,6 +16,7 @@ import au.com.codeka.warworlds.client.net.HttpRequest;
 import au.com.codeka.warworlds.client.net.ServerUrl;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.SharedViews;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.common.Log;
@@ -89,6 +90,12 @@ public class CreateEmpireScreen extends Screen {
     // Tell the Server we can now connect.
     App.i.getServer().connect();
 
-    context.pushScreen(new WelcomeScreen());
+    context.pushScreen(
+        new WelcomeScreen(),
+        SharedViews.builder()
+            .addSharedView(R.id.next_btn, R.id.start_btn)
+            .addSharedView(R.id.title)
+            .addSharedView(R.id.title_icon)
+            .build());
   }
 }
