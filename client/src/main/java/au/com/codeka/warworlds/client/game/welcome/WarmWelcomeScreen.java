@@ -34,9 +34,9 @@ public class WarmWelcomeScreen extends Screen {
         context.pushScreen(
             new CreateEmpireScreen(),
             SharedViews.builder()
-                .addSharedView(R.id.title_icon, Transitions.transform())
-                .addSharedView(R.id.title, Transitions.transform())
-                .addSharedView(R.id.next_btn, Transitions.transform())
+                .addSharedView(R.id.title_icon)
+                .addSharedView(R.id.title)
+                .addSharedView(R.id.next_btn)
                 .build());
       }
 

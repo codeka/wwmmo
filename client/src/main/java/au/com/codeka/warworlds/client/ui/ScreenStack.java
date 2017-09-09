@@ -4,8 +4,6 @@ import static au.com.codeka.warworlds.client.concurrency.Threads.checkOnThread;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import java.util.Stack;
@@ -19,7 +17,7 @@ import javax.annotation.Nullable;
 public class ScreenStack {
   private final Activity activity;
   private final ViewGroup container;
-  private final Stack<Screen> screens = new Stack<>();
+  private final Stack<ScreenHolder> screens = new Stack<>();
 
   public ScreenStack(Activity activity, ViewGroup container) {
     this.activity = activity;
@@ -46,17 +44,17 @@ public class ScreenStack {
     checkOnThread(Threads.UI);
 
     if (!screens.isEmpty()) {
-      Screen top = screens.peek();
-      top.onHide();
+      ScreenHolder top = screens.peek();
+      top.screen.onHide();
     }
 
     if (screens.contains(screen)) {
       // If the screen is already on the stack, we'll just remove everything up to that screen
-      while (screens.peek() != screen) {
+      while (screens.peek().screen != screen) {
         pop();
       }
     } else {
-      screens.push(screen);
+      screens.push(new ScreenHolder(screen, sharedViews));
       screen.onCreate(context, container);
     }
 
@@ -70,18 +68,17 @@ public class ScreenStack {
    *     {@link Screen}.
    */
   public boolean pop() {
-    Screen screen = screens.pop();
-    if (screen == null) {
+    ScreenHolder screenHolder = screens.pop();
+    if (screenHolder == null) {
       return false;
     }
 
-    screen.onHide();
-    screen.onDestroy();
-    container.removeAllViews();
-
+    screenHolder.screen.onHide();
+    screenHolder.screen.onDestroy();
+    
     if (!screens.isEmpty()) {
-      screen = screens.peek();
-      screen.performShow(null);
+      screenHolder = screens.peek();
+      screenHolder.screen.performShow(screenHolder.sharedViews);
       return true;
     }
 
@@ -94,6 +91,17 @@ public class ScreenStack {
   public void home() {
     while (pop()) {
       // Keep going.
+    }
+  }
+
+  /** Contains info we need about a {@link Screen} while it's on the stack. */
+  private static class ScreenHolder {
+    private final Screen screen;
+    @Nullable private final SharedViews sharedViews;
+
+    public ScreenHolder(Screen screen, @Nullable SharedViews sharedViews) {
+      this.screen = screen;
+      this.sharedViews = sharedViews;
     }
   }
 

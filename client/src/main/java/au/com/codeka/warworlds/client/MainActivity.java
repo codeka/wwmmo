@@ -56,6 +56,13 @@ public class MainActivity extends BaseFragmentActivity {
     }
   }
 
+  @Override
+  public void onBackPressed() {
+    if (!screenStack.pop()) {
+      super.onBackPressed();
+    }
+  }
+
   @NonNull
   public StarfieldManager getStarfieldManager() {
     return checkNotNull(starfieldManager);
