@@ -28,7 +28,8 @@ public abstract class TabbedBaseFragment extends BaseFragment {
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     rootView = inflater.inflate(getLayoutID(), container, false);
 
-    screenStack = new ScreenStack(rootView.findViewById(R.id.real_tabcontent));
+    screenStack =
+        new ScreenStack(getFragmentActivity(), rootView.findViewById(R.id.real_tabcontent));
 
     tabHost = rootView.findViewById(android.R.id.tabhost);
     tabManager = new TabManager(tabHost);

@@ -33,8 +33,10 @@ public class CreateEmpireScreen extends Screen {
   private ScreenContext context;
 
   @Override
-  public void onCreate(ScreenContext context, LayoutInflater inflater, ViewGroup container) {
-    layout = new CreateEmpireLayout(inflater.getContext(), layoutCallbacks);
+  public void onCreate(ScreenContext context, ViewGroup container) {
+    super.onCreate(context, container);
+
+    layout = new CreateEmpireLayout(context.getActivity(), layoutCallbacks);
     this.context = context;
   }
 

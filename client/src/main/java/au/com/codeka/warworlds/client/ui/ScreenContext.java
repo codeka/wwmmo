@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 
 /**
@@ -13,4 +14,7 @@ public interface ScreenContext {
 
   /** Push a new screen onto the current stack. */
   void pushScreen(Screen screen);
+
+  /** Gets the containing {@link Activity}. */
+  Activity getActivity();
 }

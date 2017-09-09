@@ -1,9 +1,15 @@
 package au.com.codeka.warworlds.client.ui;
 
+import android.os.Build;
+import android.support.annotation.CallSuper;
+import android.transition.Scene;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import javax.annotation.Nullable;
+
+import au.com.codeka.warworlds.client.activity.Transitions;
 
 /**
  * A {@link Screen} is similar to a fragment, in that it's a place to keep the business logic
@@ -14,10 +20,41 @@ import javax.annotation.Nullable;
  * navigate the backstack, it might be hidden and then shown again).
  */
 public abstract class Screen {
+  private ViewGroup container;
+
+  /**
+   * The {@link Scene} representing this screen. We use this to transition between this screen
+   * and other screens.
+   */
+  private Scene scene;
+
   /**
    * Called before anything else.
    */
-  public void onCreate(ScreenContext context, LayoutInflater inflater, ViewGroup container) {
+  @CallSuper
+  public void onCreate(ScreenContext context, ViewGroup container) {
+    this.container = container;
+  }
+
+  /**
+   * Performs the "show". Calls {@link #onShow} to get the view, then creates a {@link Scene} (if
+   * needed), and transitions to it.
+   */
+  public void performShow() {
+    View view = onShow();
+    if (view != null) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (scene == null) {
+          scene = new Scene(container, view);
+        }
+        TransitionManager.go(scene, Transitions.transform());
+      } else {
+        container.removeAllViews();
+        container.addView(view);
+      }
+    } else {
+      container.removeAllViews();
+    }
   }
 
   /**

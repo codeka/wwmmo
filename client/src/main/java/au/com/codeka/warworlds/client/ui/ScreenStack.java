@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.ui;
 
 import static au.com.codeka.warworlds.client.concurrency.Threads.checkOnThread;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +15,12 @@ import java.util.Stack;
  * corresponding view in the {@link ViewGroup} that the stack is created with.
  */
 public class ScreenStack {
+  private final Activity activity;
   private final ViewGroup container;
   private final Stack<Screen> screens = new Stack<>();
 
-  public ScreenStack(ViewGroup container) {
+  public ScreenStack(Activity activity, ViewGroup container) {
+    this.activity = activity;
     this.container = container;
   }
 
@@ -33,7 +36,6 @@ public class ScreenStack {
     if (!screens.isEmpty()) {
       Screen top = screens.peek();
       top.onHide();
-      container.removeAllViews();
     }
 
     if (screens.contains(screen)) {
@@ -43,13 +45,10 @@ public class ScreenStack {
       }
     } else {
       screens.push(screen);
-      screen.onCreate(context, LayoutInflater.from(container.getContext()), container);
+      screen.onCreate(context, container);
     }
 
-    View view = screen.onShow();
-    if (view != null) {
-      container.addView(view);
-    }
+    screen.performShow();
   }
 
   /**
@@ -70,10 +69,7 @@ public class ScreenStack {
 
     if (!screens.isEmpty()) {
       screen = screens.peek();
-      View view = screen.onShow();
-      if (view != null) {
-        container.addView(view);
-      }
+      screen.performShow();
       return true;
     }
 
@@ -98,6 +94,11 @@ public class ScreenStack {
     @Override
     public void pushScreen(Screen screen) {
       push(screen);
+    }
+
+    @Override
+    public Activity getActivity() {
+      return activity;
     }
   };
 }

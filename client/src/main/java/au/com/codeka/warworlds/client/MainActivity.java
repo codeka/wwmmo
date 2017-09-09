@@ -41,7 +41,7 @@ public class MainActivity extends BaseFragmentActivity {
     DebugView debugView = checkNotNull(findViewById(R.id.debug_view));
     debugView.setFrameCounter(renderSurfaceView.getFrameCounter());
 
-    screenStack = new ScreenStack(findViewById(R.id.fragment_container));
+    screenStack = new ScreenStack(this, findViewById(R.id.fragment_container));
     createFragmentTransitionManager(screenStack);
 
     if (savedInstanceState != null) {

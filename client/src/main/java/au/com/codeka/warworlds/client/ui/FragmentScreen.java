@@ -21,9 +21,11 @@ public class FragmentScreen extends Screen {
   }
 
   @Override
-  public void onCreate(ScreenContext context, LayoutInflater inflater, ViewGroup container) {
+  public void onCreate(ScreenContext context, ViewGroup container) {
+    super.onCreate(context, container);
+
     fragment.onCreate(null);
-    view = fragment.onCreateView(inflater, container, null);
+    view = fragment.onCreateView(context.getActivity().getLayoutInflater(), container, null);
   }
 
   @Override

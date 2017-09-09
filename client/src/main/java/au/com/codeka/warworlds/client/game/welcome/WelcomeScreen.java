@@ -53,9 +53,11 @@ public class WelcomeScreen extends Screen {
   @Nullable private String motd;
 
   @Override
-  public void onCreate(ScreenContext context, LayoutInflater inflater, ViewGroup container) {
+  public void onCreate(ScreenContext context, ViewGroup container) {
+    super.onCreate(context, container);
+
     this.context = context;
-    welcomeLayout = new WelcomeLayout(inflater.getContext(), layoutCallbacks);
+    welcomeLayout = new WelcomeLayout(context.getActivity(), layoutCallbacks);
 
     App.i.getEventBus().register(eventHandler);
 
