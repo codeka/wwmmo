@@ -20,11 +20,9 @@ public class Transitions {
 
     private void init() {
       setOrdering(ORDERING_TOGETHER);
-      this.addTransition(new Fade(Fade.OUT))
-          .addTransition(new ChangeBounds())
+      this.addTransition(new ChangeBounds())
           .addTransition(new ChangeTransform())
-          .addTransition(new ChangeImageTransform())
-          .addTransition(new Fade(Fade.IN));
+          .addTransition(new ChangeImageTransform());
     }
   }
 

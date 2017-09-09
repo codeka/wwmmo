@@ -15,6 +15,9 @@ public interface ScreenContext {
   /** Push a new screen onto the current stack. */
   void pushScreen(Screen screen);
 
+  /** Push a new screen onto the current stack. */
+  void pushScreen(Screen screen, SharedViews sharedViews);
+
   /** Gets the containing {@link Activity}. */
   Activity getActivity();
 }

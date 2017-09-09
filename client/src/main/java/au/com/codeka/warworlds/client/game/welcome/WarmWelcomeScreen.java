@@ -4,8 +4,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
+
+import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.activity.Transitions;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.SharedViews;
 import au.com.codeka.warworlds.client.util.GameSettings;
 
 /**
@@ -27,14 +31,13 @@ public class WarmWelcomeScreen extends Screen {
             .setBoolean(GameSettings.Key.WARM_WELCOME_SEEN, true)
             .commit();
 
-        context.pushScreen(new CreateEmpireScreen());
-//        context.pushScreen(
-//            new CreateEmpireScreen(),
-//            SharedViewHolder.builder()
-//                .addSharedView(R.id.title_icon, "title_icon")
-//                .addSharedView(R.id.title, "title")
-//                .addSharedView(R.id.next_btn, "done_btn")
-//                .build());
+        context.pushScreen(
+            new CreateEmpireScreen(),
+            SharedViews.builder()
+                .addSharedView(R.id.title_icon, Transitions.transform())
+                .addSharedView(R.id.title, Transitions.transform())
+                .addSharedView(R.id.next_btn, Transitions.transform())
+                .build());
       }
 
       @Override

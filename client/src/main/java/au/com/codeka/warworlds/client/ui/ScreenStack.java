@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import java.util.Stack;
 
+import javax.annotation.Nullable;
+
 /**
  * {@link ScreenStack} is used to manage a stack of {@link Screen}s. The stack shows it's
  * corresponding view in the {@link ViewGroup} that the stack is created with.
@@ -31,6 +33,16 @@ public class ScreenStack {
    * @param screen The {@link Screen} to push.
    */
   public void push(Screen screen) {
+    push(screen, null);
+  }
+
+  /**
+   * Push the given {@link Screen} onto the stack. The currently visible screen (if any) will
+   * become hidden (though not destroyed).
+   *
+   * @param screen The {@link Screen} to push.
+   */
+  public void push(Screen screen, @Nullable SharedViews sharedViews) {
     checkOnThread(Threads.UI);
 
     if (!screens.isEmpty()) {
@@ -48,7 +60,7 @@ public class ScreenStack {
       screen.onCreate(context, container);
     }
 
-    screen.performShow();
+    screen.performShow(sharedViews);
   }
 
   /**
@@ -69,7 +81,7 @@ public class ScreenStack {
 
     if (!screens.isEmpty()) {
       screen = screens.peek();
-      screen.performShow();
+      screen.performShow(null);
       return true;
     }
 
@@ -93,7 +105,12 @@ public class ScreenStack {
 
     @Override
     public void pushScreen(Screen screen) {
-      push(screen);
+      push(screen, null);
+    }
+
+    @Override
+    public void pushScreen(Screen screen, SharedViews sharedViews) {
+      push(screen, sharedViews);
     }
 
     @Override

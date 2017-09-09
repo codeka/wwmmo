@@ -81,7 +81,7 @@
       android:text="@string/create_empire_switch_account_btn"/>
 
   <Button
-      android:id="@+id/done_btn"
+      android:id="@+id/next_btn"
       android:transitionName="done_btn"
       android:layout_width="match_parent"
       android:layout_height="40dp"

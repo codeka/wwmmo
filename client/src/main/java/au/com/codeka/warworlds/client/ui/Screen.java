@@ -3,7 +3,9 @@ package au.com.codeka.warworlds.client.ui;
 import android.os.Build;
 import android.support.annotation.CallSuper;
 import android.transition.Scene;
+import android.transition.Transition;
 import android.transition.TransitionManager;
+import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,8 @@ public abstract class Screen {
    */
   private Scene scene;
 
+  private SharedViews sharedViews;
+
   /**
    * Called before anything else.
    */
@@ -40,14 +44,26 @@ public abstract class Screen {
    * Performs the "show". Calls {@link #onShow} to get the view, then creates a {@link Scene} (if
    * needed), and transitions to it.
    */
-  public void performShow() {
+  public void performShow(@Nullable SharedViews sharedViews) {
     View view = onShow();
     if (view != null) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         if (scene == null) {
           scene = new Scene(container, view);
         }
-        TransitionManager.go(scene, Transitions.transform());
+        TransitionSet mainTransition = new TransitionSet();
+        Transition fadeTransition = Transitions.fade().clone();
+        mainTransition.addTransition(fadeTransition);
+
+        if (sharedViews != null) {
+          Transition transformTransition = Transitions.transform().clone();
+          mainTransition.addTransition(transformTransition);
+          for (SharedViews.SharedView sharedView : sharedViews.getSharedViews()) {
+            fadeTransition.excludeTarget(sharedView.getViewId(), true);
+            transformTransition.addTarget(sharedView.getViewId());
+          }
+        }
+        TransitionManager.go(scene, mainTransition);
       } else {
         container.removeAllViews();
         container.addView(view);
