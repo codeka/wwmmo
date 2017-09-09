@@ -2,7 +2,9 @@ package au.com.codeka.warworlds.client.game.welcome;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import au.com.codeka.warworlds.client.App;
@@ -12,6 +14,8 @@ import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.net.HttpRequest;
 import au.com.codeka.warworlds.client.net.ServerUrl;
+import au.com.codeka.warworlds.client.ui.Screen;
+import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.common.Log;
@@ -19,30 +23,36 @@ import au.com.codeka.warworlds.common.proto.NewAccountRequest;
 import au.com.codeka.warworlds.common.proto.NewAccountResponse;
 
 /**
- * This fragment is shown when you don't have a cookie saved. We'll want to either let you create
+ * This screen is shown when you don't have a cookie saved. We'll want to either let you create
  * a new empire, or sign in with an existing account (if you have one).
  */
-public class CreateEmpireFragment extends BaseFragment {
-  private static final Log log = new Log("CreateEmpireFragment");
+public class CreateEmpireScreen extends Screen {
+  private static final Log log = new Log("CreateEmpireScreen");
+
+  private CreateEmpireLayout layout;
+  private ScreenContext context;
 
   @Override
-  protected int getViewResourceId() {
-    return R.layout.frag_create_empire;
+  public void onCreate(ScreenContext context, LayoutInflater inflater, ViewGroup container) {
+    layout = new CreateEmpireLayout(inflater.getContext(), layoutCallbacks);
+    this.context = context;
   }
 
   @Override
-  public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
-    ViewBackgroundGenerator.setBackground(view);
-    view.findViewById(R.id.done_btn).setOnClickListener(v -> registerEmpire(view));
+  public View onShow() {
+    return layout;
   }
 
-  private void registerEmpire(final View rootView) {
-    // Hide the edit field and account switch button, show the progress bar
-    rootView.findViewById(R.id.empire_name).setVisibility(View.GONE);
-    rootView.findViewById(R.id.switch_account_btn).setVisibility(View.GONE);
-    rootView.findViewById(R.id.progress).setVisibility(View.VISIBLE);
+  private final CreateEmpireLayout.Callbacks layoutCallbacks = new CreateEmpireLayout.Callbacks() {
+    @Override
+    public void onDoneClick(String empireName) {
+      registerEmpire(empireName);
+    }
+  };
 
-    final String empireName = ((EditText) rootView.findViewById(R.id.empire_name)).getText().toString();
+  private void registerEmpire(String empireName) {
+    layout.showSpinner();
+
     App.i.getTaskRunner().runTask(() -> {
       HttpRequest request = new HttpRequest.Builder()
           .url(ServerUrl.getUrl() + "accounts")
@@ -54,12 +64,10 @@ public class CreateEmpireFragment extends BaseFragment {
           .build();
       NewAccountResponse resp = request.getBody(NewAccountResponse.class);
       if (resp == null) {
-        // TODO: report the error
+        // TODO: report the error to the server?
         log.error("Didn't get NewAccountResponse, as expected.", request.getException());
-        App.i.getTaskRunner().runTask(() ->
-            onRegisterError(rootView, "An unknown error occurred."), Threads.UI);
       } else if (resp.cookie == null) {
-        App.i.getTaskRunner().runTask(() -> onRegisterError(rootView, resp.message), Threads.UI);
+        App.i.getTaskRunner().runTask(() -> layout.showError(resp.message), Threads.UI);
       } else {
         log.info(
             "New account response, cookie: %s, message: %s",
@@ -68,13 +76,6 @@ public class CreateEmpireFragment extends BaseFragment {
         App.i.getTaskRunner().runTask(() -> onRegisterSuccess(resp), Threads.UI);
       }
     }, Threads.BACKGROUND);
-  }
-
-  private void onRegisterError(View rootView, String errorMsg) {
-    rootView.findViewById(R.id.empire_name).setVisibility(View.VISIBLE);
-    rootView.findViewById(R.id.switch_account_btn).setVisibility(View.VISIBLE);
-    rootView.findViewById(R.id.progress).setVisibility(View.GONE);
-    ((TextView) rootView.findViewById(R.id.setup_name)).setText(errorMsg);
   }
 
   private void onRegisterSuccess(NewAccountResponse resp) {
@@ -86,15 +87,6 @@ public class CreateEmpireFragment extends BaseFragment {
     // Tell the Server we can now connect.
     App.i.getServer().connect();
 
-    //TODO
-/*
-    getFragmentTransitionManager().replaceFragment(
-        WelcomeFragment.class,
-        SharedViewHolder.builder()
-            .addSharedView(R.id.title_icon, "title_icon")
-            .addSharedView(R.id.title, "title")
-            .addSharedView(R.id.done_btn, "start_btn")
-            .build());
-            */
+    context.pushScreen(new WelcomeScreen());
   }
 }

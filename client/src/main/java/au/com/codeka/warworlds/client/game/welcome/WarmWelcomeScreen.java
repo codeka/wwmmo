@@ -33,15 +33,7 @@ public class WarmWelcomeScreen extends Screen {
             .setBoolean(GameSettings.Key.WARM_WELCOME_SEEN, true)
             .commit();
 
-        context.pushScreen(new WelcomeScreen());
-        // TODO: should be CreateEmpireScreen().
-//        getFragmentTransitionManager().replaceFragment(
-//            CreateEmpireFragment.class,
-//            SharedViewHolder.builder()
-//                .addSharedView(R.id.title_icon, "title_icon")
-//                .addSharedView(R.id.title, "title")
-//                .addSharedView(R.id.next_btn, "done_btn")
-//                .build());
+        context.pushScreen(new CreateEmpireScreen());
       }
 
       @Override

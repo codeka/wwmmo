@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import au.com.codeka.warworlds.client.activity.BaseFragmentActivity;
 import au.com.codeka.warworlds.client.ctrl.DebugView;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
-import au.com.codeka.warworlds.client.game.welcome.CreateEmpireFragment;
+import au.com.codeka.warworlds.client.game.welcome.CreateEmpireScreen;
 import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeScreen;
 import au.com.codeka.warworlds.client.game.welcome.WelcomeScreen;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
@@ -50,7 +50,7 @@ public class MainActivity extends BaseFragmentActivity {
     if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
       screenStack.push(new WarmWelcomeScreen());
     } else if (GameSettings.i.getString(GameSettings.Key.COOKIE).isEmpty()) {
-      getFragmentTransitionManager().replaceFragment(CreateEmpireFragment.class);
+      screenStack.push(new CreateEmpireScreen());
     } else {
       screenStack.push(new WelcomeScreen());
     }
