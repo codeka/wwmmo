@@ -23,7 +23,7 @@ public class CreateEmpireLayout extends RelativeLayout {
   public CreateEmpireLayout(Context context, Callbacks callbacks) {
     super(context);
     this.callbacks = callbacks;
-    inflate(context, R.layout.frag_create_empire, this);
+    inflate(context, R.layout.create_empire, this);
 
     empireName = findViewById(R.id.empire_name);
 

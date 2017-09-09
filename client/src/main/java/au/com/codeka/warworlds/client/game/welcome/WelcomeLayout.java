@@ -3,9 +3,6 @@ package au.com.codeka.warworlds.client.game.welcome;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.util.AttributeSet;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -41,7 +38,7 @@ public class WelcomeLayout extends RelativeLayout {
   public WelcomeLayout(Context context, @Nonnull Callbacks callbacks) {
     super(context, null);
     this.callbacks = callbacks;
-    inflate(context, R.layout.frag_welcome, this);
+    inflate(context, R.layout.welcome, this);
     ViewBackgroundGenerator.setBackground(this);
 
     startButton = checkNotNull(findViewById(R.id.start_btn));

@@ -21,7 +21,7 @@ public class WarmWelcomeLayout extends RelativeLayout {
 
   public WarmWelcomeLayout(Context context, @Nonnull Callbacks callbacks) {
     super(context);
-    inflate(context, R.layout.frag_warm_welcome, this);
+    inflate(context, R.layout.warm_welcome, this);
     this.callbacks = callbacks;
 
     ViewBackgroundGenerator.setBackground(this);
