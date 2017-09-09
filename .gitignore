@@ -21,7 +21,10 @@ client/*.apk
 
 # Android Studio/gradle files and directories
 .gradle
-.idea/
+.idea/*
+
+!.idea/codeStyleSettings.xml
+!.idea/dictionaries/
 local.properties
 captures/
 *.iml
