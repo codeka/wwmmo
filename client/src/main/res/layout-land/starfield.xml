@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="RelativeLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/stuff">
+    android:layout_height="match_parent">
 
     <View
         android:id="@+id/ad"
@@ -29,7 +31,6 @@
 
     <RelativeLayout
         android:id="@+id/bottom_pane"
-        android:transitionName="bottom_pane"
         style="@style/RightPane"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

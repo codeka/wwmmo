@@ -9,7 +9,6 @@
 
     <ImageView
         android:id="@+id/title_icon"
-        android:transitionName="title_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_margin="5dp"
@@ -17,7 +16,6 @@
 
     <TextView
         android:id="@+id/title"
-        android:transitionName="title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -28,7 +26,6 @@
 
     <Button
         android:id="@+id/website_btn"
-        android:transitionName="website_btn"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -41,7 +38,6 @@
 
     <Button
         android:id="@+id/help_btn"
-        android:transitionName="help_btn"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -96,7 +92,6 @@
 
     <Button
         android:id="@+id/start_btn"
-        android:transitionName="start_btn"
         android:layout_width="330dp"
         android:layout_height="40dp"
         android:layout_marginTop="5dp"

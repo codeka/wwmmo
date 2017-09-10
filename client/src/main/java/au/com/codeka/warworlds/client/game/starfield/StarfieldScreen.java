@@ -1,20 +1,19 @@
 package au.com.codeka.warworlds.client.game.starfield;
 
-import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.BaseFragment;
-import au.com.codeka.warworlds.client.activity.SharedViewHolder;
-import au.com.codeka.warworlds.client.ctrl.ChatMiniView;
 import au.com.codeka.warworlds.client.game.chat.ChatFragment;
 import au.com.codeka.warworlds.client.game.empire.EmpireFragment;
 import au.com.codeka.warworlds.client.game.fleets.FleetsFragment;
 import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemContainerFragment;
 import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemFragment;
+import au.com.codeka.warworlds.client.ui.FragmentScreen;
+import au.com.codeka.warworlds.client.ui.Screen;
+import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.SharedViews;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -24,62 +23,41 @@ import au.com.codeka.warworlds.common.proto.Star;
  * This is the main fragment that shows the starfield, lets you navigate around, select stars
  * and fleets and so on.
  */
-public class StarfieldFragment extends BaseFragment {
-  private final Log log = new Log("StarfieldFragment");
+public class StarfieldScreen extends Screen {
+  private final Log log = new Log("StarfieldScreen");
 
   private StarfieldManager starfieldManager;
 
-  private ViewGroup stuff;
-  private ViewGroup bottomPane;
-  private ChatMiniView chatMiniView;
+  private ScreenContext context;
+  private StarfieldLayout layout;
 
   @Override
-  protected int getViewResourceId() {
-    return R.layout.frag_starfield;
-  }
+  public void onCreate(ScreenContext context, ViewGroup container) {
+    super.onCreate(context, container);
+    this.context = context;
+    layout = new StarfieldLayout(context.getActivity(), layoutCallbacks);
 
-  @Override
-  public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-  //  selectionDetailsView = (SelectionDetailsView) view.findViewById(R.id.selection_details);
-    bottomPane = view.findViewById(R.id.bottom_pane);
-  //  allianceBtn = (Button) view.findViewById(R.id.alliance_btn);
- //   empireBtn = (Button) view.findViewById(R.id.empire_btn);
-    chatMiniView = view.findViewById(R.id.mini_chat);
-
-    chatMiniView.setCallback(roomId -> {
-      getFragmentTransitionManager().replaceFragment(
-          ChatFragment.class,
-          new Bundle() /* TODO: args */,
-          SharedViewHolder.builder()
-              .addSharedView(R.id.bottom_pane, "bottom_pane")
-              .build());
-    });
-
-    starfieldManager = ((MainActivity) getFragmentActivity()).getStarfieldManager();
+    starfieldManager = ((MainActivity) context.getActivity()).getStarfieldManager();
     if (starfieldManager.getSelectedStar() != null) {
       showStarSelectedBottomPane(starfieldManager.getSelectedStar());
     } else {
       showEmptyBottomPane(true);
     }
-
-    stuff = (ViewGroup) view.findViewById(R.id.stuff);
   }
 
   @Override
-  public void onStart() {
-    super.onStart();
+  public View onShow() {
     starfieldManager.addTapListener(tapListener);
+    return layout;
   }
 
   @Override
-  public void onStop() {
-    super.onStop();
+  public void onHide() {
     starfieldManager.removeTapListener(tapListener);
   }
 
   private void showEmptyBottomPane(boolean instant) {
-    EmptyBottomPane emptyBottomPane = new EmptyBottomPane(getContext(),
+    EmptyBottomPane emptyBottomPane = new EmptyBottomPane(context.getActivity(),
         new EmptyBottomPane.Callback() {
       @Override
       public void onEmpireClicked(View view) {
@@ -96,17 +74,12 @@ public class StarfieldFragment extends BaseFragment {
         onAllianceClick();
       }
     });
-
-    if (!instant) {
-      TransitionManager.beginDelayedTransition(stuff);
-    }
-    bottomPane.removeAllViews();
-    bottomPane.addView(emptyBottomPane);
+    layout.showBottomPane(emptyBottomPane, instant);
   }
 
   private void showStarSelectedBottomPane(Star star) {
     StarSelectedBottomPane starSelectedBottomPane = new StarSelectedBottomPane(
-        getContext(), star, new StarSelectedBottomPane.Callback() {
+        context.getActivity(), star, new StarSelectedBottomPane.Callback() {
       @Override
       public void onEmpireClicked(View view) {
         onEmpireClick();
@@ -122,34 +95,25 @@ public class StarfieldFragment extends BaseFragment {
 
       @Override
       public void onStarClicked(Star star, @Nullable Planet planet) {
-        getFragmentTransitionManager().replaceFragment(
-            SolarSystemContainerFragment.class,
-            SolarSystemFragment.createArguments(star.id),
-            SharedViewHolder.builder()
-                .addSharedView(R.id.bottom_pane, "bottom_pane")
-                //.addSharedView(R.id.top_pane, "top_pane")
-                .build());
+        SolarSystemContainerFragment fragment = new SolarSystemContainerFragment();
+        fragment.setArguments(SolarSystemFragment.createArguments(star.id));
+        context.pushScreen(new FragmentScreen(fragment), createSharedViews());
       }
 
       @Override
       public void onFleetClicked(Star star, Fleet fleet) {
-        getFragmentTransitionManager().replaceFragment(
-            FleetsFragment.class,
-            FleetsFragment.createArguments(star.id, fleet.id),
-            SharedViewHolder.builder()
-                .addSharedView(R.id.bottom_pane, "bottom_pane")
-                .build());
+        FleetsFragment fragment = new FleetsFragment();
+        fragment.setArguments(FleetsFragment.createArguments(star.id, fleet.id));
+        context.pushScreen(new FragmentScreen(fragment), createSharedViews());
       }
     });
 
-    TransitionManager.beginDelayedTransition(stuff);
-    bottomPane.removeAllViews();
-    bottomPane.addView(starSelectedBottomPane);
+    layout.showBottomPane(starSelectedBottomPane, false /* instant */);
   }
 
   private void showFleetSelectedBottomPane(Star star, Fleet fleet) {
     FleetSelectedBottomPane fleetSelectedBottomPane = new FleetSelectedBottomPane(
-        getContext(), star, fleet, new FleetSelectedBottomPane.Callback() {
+        context.getActivity(), star, fleet, new FleetSelectedBottomPane.Callback() {
       @Override
       public void onEmpireClicked(View view) {
         onEmpireClick();
@@ -164,24 +128,26 @@ public class StarfieldFragment extends BaseFragment {
       }
     });
 
-    TransitionManager.beginDelayedTransition(stuff);
-    bottomPane.removeAllViews();
-    bottomPane.addView(fleetSelectedBottomPane);
+    layout.showBottomPane(fleetSelectedBottomPane, false /* instant */);
   }
 
   private void onEmpireClick() {
-    getFragmentTransitionManager().replaceFragment(
-        EmpireFragment.class,
-        EmpireFragment.createArguments(),
-        SharedViewHolder.builder()
-            .addSharedView(R.id.bottom_pane, "bottom_pane")
-            .build());
+    EmpireFragment fragment = new EmpireFragment();
+    fragment.setArguments(EmpireFragment.createArguments());
+    context.pushScreen(new FragmentScreen(fragment), createSharedViews());
   }
 
   private void onSitrepClick() {
   }
 
   private void onAllianceClick() {
+  }
+
+  private SharedViews createSharedViews() {
+    return SharedViews.builder()
+        .addSharedView(R.id.bottom_pane)
+        .addSharedView(R.id.top_pane)
+        .build();
   }
 
   private final StarfieldManager.TapListener tapListener = new StarfieldManager.TapListener() {
@@ -202,6 +168,17 @@ public class StarfieldFragment extends BaseFragment {
       } else {
         showFleetSelectedBottomPane(star, fleet);
       }
+    }
+  };
+
+  private final StarfieldLayout.Callbacks layoutCallbacks = new StarfieldLayout.Callbacks() {
+    @Override
+    public void onChatClick(@Nullable Long roomId) {
+      context.pushScreen(
+          new FragmentScreen(new ChatFragment()),
+          SharedViews.builder()
+              .addSharedView(R.id.bottom_pane)
+              .build());
     }
   };
 }

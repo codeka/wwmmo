@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
 
 /**
  * {@link StarfieldManager} manages the starfield view that we display in the main activity. You can
- * use it to switch between the normal view (that {@link StarfieldFragment} cares about) and the
+ * use it to switch between the normal view (that {@link StarfieldScreen} cares about) and the
  * move-fleet view, etc.
  */
 public class StarfieldManager {
