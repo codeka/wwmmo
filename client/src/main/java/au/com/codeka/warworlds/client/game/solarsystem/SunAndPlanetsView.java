@@ -26,14 +26,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The view which displays the big star and planets.
+ * The view which displays the big star and planets, and allows you to click planets to "select"
+ * them. You can only select one planet at a time.
  */
-public class SolarSystemView extends RelativeLayout {
+public class SunAndPlanetsView extends RelativeLayout {
   public interface PlanetSelectedHandler {
     void onPlanetSelected(Planet planet);
   }
 
-  private static final Log log = new Log("SolarSystemView");
+  private static final Log log = new Log("SunAndPlanetsView");
   private final Paint orbitPaint;
   private Star star;
   private PlanetInfo[] planetInfos;
@@ -41,7 +42,7 @@ public class SolarSystemView extends RelativeLayout {
   @Nullable private Planet selectedPlanet;
   @Nullable private PlanetSelectedHandler planetSelectedHandler;
 
-  public SolarSystemView(Context context, AttributeSet attrs) {
+  public SunAndPlanetsView(Context context, AttributeSet attrs) {
     super(context, attrs);
     orbitPaint = new Paint();
     orbitPaint.setARGB(255, 255, 255, 255);

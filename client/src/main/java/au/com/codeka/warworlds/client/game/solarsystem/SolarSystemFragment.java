@@ -47,7 +47,7 @@ public class SolarSystemFragment extends BaseFragment {
   private Planet planet;
   private long starID;
 
-  private SolarSystemView solarSystemView;
+  private SunAndPlanetsView sunAndPlanetsView;
   private TextView planetName;
   private TextView storedGoods;
   private TextView totalGoods;
@@ -100,7 +100,7 @@ public class SolarSystemFragment extends BaseFragment {
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    solarSystemView = view.findViewById(R.id.solarsystem_view);
+    sunAndPlanetsView = view.findViewById(R.id.solarsystem_view);
     final Button buildButton = view.findViewById(R.id.solarsystem_colony_build);
     final Button focusButton = view.findViewById(R.id.solarsystem_colony_focus);
     final Button sitrepButton = view.findViewById(R.id.sitrep_btn);
@@ -136,7 +136,7 @@ public class SolarSystemFragment extends BaseFragment {
     populationCountTextView = view.findViewById(R.id.population_count);
     colonyFocusView = view.findViewById(R.id.colony_focus_view);
 
-    solarSystemView.setPlanetSelectedHandler(planet -> {
+    sunAndPlanetsView.setPlanetSelectedHandler(planet -> {
       SolarSystemFragment.this.planet = planet;
       refreshSelectedPlanet();
     });
@@ -153,7 +153,7 @@ public class SolarSystemFragment extends BaseFragment {
           .replaceFragment(BuildFragment.class,
               BuildFragment.createArguments(star.id, planet.index),
               SharedViewHolder.builder()
-                  .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
+                  .addSharedView(sunAndPlanetsView.getPlanetView(planet), "planet_icon")
                   .addSharedView(R.id.bottom_pane, "bottom_pane")
                   .build());
     });
@@ -168,7 +168,7 @@ public class SolarSystemFragment extends BaseFragment {
           PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
           SharedViewHolder.builder()
               .addSharedView(R.id.bottom_pane, "bottom_pane")
-              .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
+              .addSharedView(sunAndPlanetsView.getPlanetView(planet), "planet_icon")
               .build());
     });
 
@@ -230,13 +230,13 @@ public class SolarSystemFragment extends BaseFragment {
     if (isFirstRefresh) {
       selectedPlanetIndex = getArguments().getInt(PLANET_INDEX_KEY, -1);
     } else {
-      selectedPlanetIndex = solarSystemView.getSelectedPlanetIndex();
+      selectedPlanetIndex = sunAndPlanetsView.getSelectedPlanetIndex();
     }
 
-    solarSystemView.setStar(star);
+    sunAndPlanetsView.setStar(star);
     if (selectedPlanetIndex >= 0) {
       log.debug("Selecting planet #%d", selectedPlanetIndex);
-      solarSystemView.selectPlanet(selectedPlanetIndex);
+      sunAndPlanetsView.selectPlanet(selectedPlanetIndex);
     } else {
       log.debug("No planet selected");
     }
@@ -359,7 +359,7 @@ public class SolarSystemFragment extends BaseFragment {
         PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
         SharedViewHolder.builder()
             .addSharedView(R.id.bottom_pane, "bottom_pane")
-            .addSharedView(solarSystemView.getPlanetView(planet), "planet_icon")
+            .addSharedView(sunAndPlanetsView.getPlanetView(planet), "planet_icon")
             .build());
   }
 
@@ -368,7 +368,7 @@ public class SolarSystemFragment extends BaseFragment {
       return;
     }
 
-    Vector2 planetCentre = solarSystemView.getPlanetCentre(planet);
+    Vector2 planetCentre = sunAndPlanetsView.getPlanetCentre(planet);
 
     String name = star.name + " " + RomanNumeralFormatter.format(star.planets.indexOf(planet) + 1);
     planetName.setText(name);
