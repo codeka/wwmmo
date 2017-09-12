@@ -12,6 +12,11 @@ pushd $ROOTPATH > /dev/null
 ./gradlew --daemon :server:installDist
 popd > /dev/null
 
+# This is so the app running on the phone will be able to connect to us. 8080 for the normal
+# HTTP stuff, 8081 is our custom port for the long-lived connection.
+adb reverse tcp:8080 tcp:8080
+adb reverse tcp:8081 tcp:8081
+
 pushd $RUNPATH > /dev/null
 SERVER_OPTS=""
 SERVER_OPTS="$SERVER_OPTS -DConfigFile=$RUNPATH/data/config-debug.json"
