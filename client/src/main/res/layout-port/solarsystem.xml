@@ -28,7 +28,6 @@
 
     <RelativeLayout
         android:id="@+id/bottom_pane"
-        android:transitionName="bottom_pane"
         style="@style/BottomPane"
         android:layout_width="match_parent"
         android:layout_height="180dp"
@@ -117,7 +116,13 @@
       </LinearLayout>
     </RelativeLayout>
 
-    <include layout="@layout/solarsystem_congeniality" />
+    <au.com.codeka.warworlds.client.game.solarsystem.CongenialityView
+        android:id="@+id/congeniality"
+        android:layout_width="85dp"
+        android:layout_height="64dp"
+        android:layout_alignParentTop="true"
+        android:visibility="gone" />
+
     <include layout="@layout/solarsystem_store" />
     <RelativeLayout
         android:id="@+id/top_pane"

@@ -8,7 +8,6 @@ import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import au.com.codeka.warworlds.client.R;
@@ -47,7 +46,8 @@ public class SolarSystemLayout extends DrawerLayout {
 
   private final Callbacks callbacks;
 
-  private final SunAndPlanetsView sunAndPlanetsView;
+  private final SunAndPlanetsView sunAndPlanets;
+  private final CongenialityView congeniality;
   private final TextView planetName;
   private final TextView storedGoods;
   private final TextView totalGoods;
@@ -62,15 +62,6 @@ public class SolarSystemLayout extends DrawerLayout {
   private final TextView deltaEnergy;
   private final View storedEnergyIcon;
   private final FleetListSimple fleetList;
-  private final View congenialityContainer;
-  private final ProgressBar populationCongenialityProgressBar;
-  private final TextView populationCongenialityTextView;
-  private final ProgressBar farmingCongenialityProgressBar;
-  private final TextView farmingCongenialityTextView;
-  private final ProgressBar miningCongenialityProgressBar;
-  private final TextView miningCongenialityTextView;
-  private final ProgressBar energyCongenialityProgressBar;
-  private final TextView energyCongenialityTextView;
   private final ViewGroup bottomLeftPane;
   private final Button emptyViewButton;
   private final View colonyDetailsContainer;
@@ -96,7 +87,8 @@ public class SolarSystemLayout extends DrawerLayout {
     this.star = star;
     this.planetIndex = planetIndex;
 
-    sunAndPlanetsView = findViewById(R.id.solarsystem_view);
+    sunAndPlanets = findViewById(R.id.solarsystem_view);
+    congeniality = findViewById(R.id.congeniality);
     final Button buildButton = findViewById(R.id.solarsystem_colony_build);
     final Button focusButton = findViewById(R.id.solarsystem_colony_focus);
     final Button sitrepButton = findViewById(R.id.sitrep_btn);
@@ -115,15 +107,6 @@ public class SolarSystemLayout extends DrawerLayout {
     deltaEnergy = findViewById(R.id.delta_energy);
     storedEnergyIcon = findViewById(R.id.stored_energy_icon);
     fleetList = findViewById(R.id.fleet_list);
-    congenialityContainer = findViewById(R.id.congeniality_container);
-    populationCongenialityProgressBar = findViewById(R.id.solarsystem_population_congeniality);
-    populationCongenialityTextView = findViewById(R.id.solarsystem_population_congeniality_value);
-    farmingCongenialityProgressBar = findViewById(R.id.solarsystem_farming_congeniality);
-    farmingCongenialityTextView = findViewById(R.id.solarsystem_farming_congeniality_value);
-    miningCongenialityProgressBar = findViewById(R.id.solarsystem_mining_congeniality);
-    miningCongenialityTextView = findViewById(R.id.solarsystem_mining_congeniality_value);
-    energyCongenialityProgressBar = findViewById(R.id.solarsystem_energy_congeniality);
-    energyCongenialityTextView = findViewById(R.id.solarsystem_energy_congeniality_value);
     bottomLeftPane = findViewById(R.id.bottom_left_pane);
     emptyViewButton = findViewById(R.id.empty_view_btn);
     colonyDetailsContainer = findViewById(R.id.solarsystem_colony_details);
@@ -131,7 +114,7 @@ public class SolarSystemLayout extends DrawerLayout {
     populationCountTextView = findViewById(R.id.population_count);
     colonyFocusView = findViewById(R.id.colony_focus_view);
 
-    sunAndPlanetsView.setPlanetSelectedHandler(planet -> {
+    sunAndPlanets.setPlanetSelectedHandler(planet -> {
       if (planet == null) {
         SolarSystemLayout.this.planetIndex = -1;
       } else {
@@ -152,7 +135,7 @@ public class SolarSystemLayout extends DrawerLayout {
 
   public void refreshStar(Star star) {
     fleetList.setStar(star);
-    sunAndPlanetsView.setStar(star);
+    sunAndPlanets.setStar(star);
 
     Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
     EmpireStorage storage = null;
@@ -234,7 +217,7 @@ public class SolarSystemLayout extends DrawerLayout {
 
     if (planetIndex >= 0) {
       log.debug("Selecting planet #%d", planetIndex);
-      sunAndPlanetsView.selectPlanet(planetIndex);
+      sunAndPlanets.selectPlanet(planetIndex);
     } else {
       log.debug("No planet selected");
     }
@@ -247,7 +230,7 @@ public class SolarSystemLayout extends DrawerLayout {
     }
     Planet planet = star.planets.get(planetIndex);
 
-    Vector2 planetCentre = sunAndPlanetsView.getPlanetCentre(planet);
+    Vector2 planetCentre = sunAndPlanets.getPlanetCentre(planet);
 
     String name = star.name + " " + RomanNumeralFormatter.format(star.planets.indexOf(planet) + 1);
     planetName.setText(name);
@@ -256,7 +239,7 @@ public class SolarSystemLayout extends DrawerLayout {
       // this is probably because the SolarSystemView probably hasn't rendered yet. We'll
       // just ignore this then cause it'll fire an onPlanetSelected when it finishes
       // drawing.
-      congenialityContainer.setVisibility(View.GONE);
+      congeniality.setVisibility(View.GONE);
     } else {
       float pixelScale = getContext().getResources().getDisplayMetrics().density;
       double x = planetCentre.x;
@@ -274,33 +257,17 @@ public class SolarSystemLayout extends DrawerLayout {
       }
 
       RelativeLayout.LayoutParams params =
-          (RelativeLayout.LayoutParams) congenialityContainer.getLayoutParams();
+          (RelativeLayout.LayoutParams) congeniality.getLayoutParams();
       params.leftMargin = (int) (x - offsetX);
       params.topMargin = (int) (y - offsetY);
       if (params.topMargin < (40 * pixelScale)) {
         params.topMargin = (int)(40 * pixelScale);
       }
 
-      congenialityContainer.setLayoutParams(params);
-      congenialityContainer.setVisibility(View.VISIBLE);
+      congeniality.setLayoutParams(params);
+      congeniality.setVisibility(View.VISIBLE);
     }
-
-    populationCongenialityTextView.setText(NumberFormatter.format(planet.population_congeniality));
-    populationCongenialityProgressBar.setProgress(
-        (int) (populationCongenialityProgressBar.getMax()
-            * (planet.population_congeniality / 1000.0)));
-
-    farmingCongenialityTextView.setText(NumberFormatter.format(planet.farming_congeniality));
-    farmingCongenialityProgressBar.setProgress(
-        (int)(farmingCongenialityProgressBar.getMax() * (planet.farming_congeniality / 100.0)));
-
-    miningCongenialityTextView.setText(NumberFormatter.format(planet.mining_congeniality));
-    miningCongenialityProgressBar.setProgress(
-        (int)(miningCongenialityProgressBar.getMax() * (planet.mining_congeniality / 100.0)));
-
-    energyCongenialityTextView.setText(NumberFormatter.format(planet.energy_congeniality));
-    energyCongenialityProgressBar.setProgress(
-        (int)(miningCongenialityProgressBar.getMax() * (planet.energy_congeniality / 100.0)));
+    congeniality.setPlanet(planet);
 
     TransitionManager.beginDelayedTransition(bottomLeftPane);
     if (planet.colony == null) {

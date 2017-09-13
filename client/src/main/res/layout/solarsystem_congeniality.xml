@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/congeniality_container"
-    android:layout_width="85dp"
-    android:layout_height="64dp"
-    android:layout_alignParentTop="true"
-    android:visibility="gone">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.support.v4.widget.DrawerLayout">
 
   <ImageView
-      android:id="@+id/solarsystem_population_icon"
+      android:id="@+id/population_icon"
       android:layout_width="16dp"
       android:layout_height="16dp"
       android:layout_alignParentStart="true"
@@ -15,28 +12,28 @@
       android:src="@drawable/population" />
 
   <ImageView
-      android:id="@+id/solarsystem_farming_icon"
-      android:layout_below="@id/solarsystem_population_icon"
+      android:id="@+id/farming_icon"
+      android:layout_below="@id/population_icon"
       android:layout_width="16dp"
       android:layout_height="16dp"
       android:src="@drawable/farming" />
 
   <ImageView
-      android:id="@+id/solarsystem_mining_icon"
-      android:layout_below="@id/solarsystem_farming_icon"
+      android:id="@+id/mining_icon"
+      android:layout_below="@id/farming_icon"
       android:layout_width="16dp"
       android:layout_height="16dp"
       android:src="@drawable/mining" />
 
   <ImageView
-      android:id="@+id/solarsystem_energy_icon"
-      android:layout_below="@id/solarsystem_mining_icon"
+      android:id="@+id/energy_icon"
+      android:layout_below="@id/mining_icon"
       android:layout_width="16dp"
       android:layout_height="16dp"
       android:src="@drawable/energy" />
 
   <ProgressBar
-      android:id="@+id/solarsystem_population_congeniality"
+      android:id="@+id/population_congeniality"
       style="?android:attr/progressBarStyleHorizontal"
       android:layout_width="match_parent"
       android:layout_height="10dp"
@@ -45,48 +42,48 @@
       android:layout_marginBottom="3dp"
       android:layout_marginStart="2dp"
       android:layout_marginEnd="25dp"
-      android:layout_toEndOf="@+id/solarsystem_population_icon" />
+      android:layout_toEndOf="@+id/population_icon" />
 
   <ProgressBar
-      android:id="@+id/solarsystem_farming_congeniality"
+      android:id="@+id/farming_congeniality"
       style="?android:attr/progressBarStyleHorizontal"
       android:layout_width="match_parent"
       android:layout_height="10dp"
-      android:layout_below="@id/solarsystem_population_congeniality"
+      android:layout_below="@id/population_congeniality"
       android:layout_marginTop="3dp"
       android:layout_marginBottom="3dp"
       android:layout_marginStart="2dp"
       android:layout_marginEnd="25dp"
-      android:layout_toEndOf="@+id/solarsystem_population_icon" />
+      android:layout_toEndOf="@+id/population_icon" />
 
   <ProgressBar
-      android:id="@+id/solarsystem_mining_congeniality"
+      android:id="@+id/mining_congeniality"
       style="?android:attr/progressBarStyleHorizontal"
       android:layout_width="match_parent"
       android:layout_height="10dp"
-      android:layout_below="@id/solarsystem_farming_congeniality"
+      android:layout_below="@id/farming_congeniality"
       android:layout_marginTop="3dp"
       android:layout_marginBottom="3dp"
       android:layout_marginStart="2dp"
       android:layout_marginEnd="25dp"
-      android:layout_toEndOf="@id/solarsystem_population_icon"
+      android:layout_toEndOf="@id/population_icon"
       android:paddingBottom="2dp" />
 
   <ProgressBar
-      android:id="@+id/solarsystem_energy_congeniality"
+      android:id="@+id/energy_congeniality"
       style="?android:attr/progressBarStyleHorizontal"
       android:layout_width="match_parent"
       android:layout_height="10dp"
-      android:layout_below="@id/solarsystem_mining_congeniality"
+      android:layout_below="@id/mining_congeniality"
       android:layout_marginTop="3dp"
       android:layout_marginBottom="3dp"
       android:layout_marginStart="2dp"
       android:layout_marginEnd="25dp"
-      android:layout_toEndOf="@id/solarsystem_population_icon"
+      android:layout_toEndOf="@id/population_icon"
       android:paddingBottom="2dp" />
 
   <TextView
-      android:id="@+id/solarsystem_population_congeniality_value"
+      android:id="@+id/population_congeniality_value"
       android:layout_width="25dp"
       android:layout_height="16dp"
       android:layout_alignParentEnd="true"
@@ -95,29 +92,29 @@
       android:textSize="12sp" />
 
   <TextView
-      android:id="@+id/solarsystem_farming_congeniality_value"
+      android:id="@+id/farming_congeniality_value"
       android:layout_width="25dp"
       android:layout_height="16dp"
       android:layout_alignParentEnd="true"
-      android:layout_below="@id/solarsystem_population_congeniality_value"
+      android:layout_below="@id/population_congeniality_value"
       android:gravity="center"
       android:textSize="12sp" />
 
   <TextView
-      android:id="@+id/solarsystem_mining_congeniality_value"
+      android:id="@+id/mining_congeniality_value"
       android:layout_width="25dp"
       android:layout_height="16dp"
       android:layout_alignParentEnd="true"
-      android:layout_below="@id/solarsystem_farming_congeniality_value"
+      android:layout_below="@id/farming_congeniality_value"
       android:gravity="center"
       android:textSize="12sp" />
 
   <TextView
-      android:id="@+id/solarsystem_energy_congeniality_value"
+      android:id="@+id/energy_congeniality_value"
       android:layout_width="25dp"
       android:layout_height="16dp"
       android:layout_alignParentEnd="true"
-      android:layout_below="@id/solarsystem_mining_congeniality_value"
+      android:layout_below="@id/mining_congeniality_value"
       android:gravity="center"
       android:textSize="12sp" />
-</RelativeLayout>
+</merge>
