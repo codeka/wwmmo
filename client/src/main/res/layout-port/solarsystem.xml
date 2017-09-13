@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.support.v4.widget.DrawerLayout"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+
+    <au.com.codeka.warworlds.client.game.solarsystem.SunAndPlanetsView
+        android:id="@+id/solarsystem_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/bottom_pane"
+        android:layout_marginBottom="-8px" />
+
+    <au.com.codeka.warworlds.client.ctrl.ChatMiniView
+        android:id="@+id/mini_chat"
+        android:layout_height="50dp"
+        android:layout_width="fill_parent"
+        android:layout_above="@+id/bottom_pane"
+        android:layout_marginBottom="-4px" />
+
+    <RelativeLayout
+        android:id="@+id/bottom_pane"
+        android:transitionName="bottom_pane"
+        style="@style/BottomPane"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_alignParentBottom="true" >
+
+      <au.com.codeka.warworlds.client.ctrl.InfobarView
+          android:id="@+id/infobar"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_alignParentBottom="true" />
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_alignParentTop="true"
+          android:layout_above="@id/infobar"
+          android:baselineAligned="false"
+          android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/bottom_left_pane"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+
+          <TextView
+              android:id="@+id/planet_name"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center_horizontal"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              tools:text="Planet name" />
+
+          <TextView
+              android:id="@+id/population_count"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_below="@id/planet_name"
+              android:layout_marginStart="6dp"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              tools:text="123" />
+
+          <FrameLayout
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_below="@id/population_count">
+            <include layout="@layout/solarsystem_planet_details" />
+          </FrameLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/bottom_right_pane"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+
+          <View android:id="@+id/btn_spacer"
+              android:layout_width="1dp"
+              android:layout_height="10dp"
+              android:layout_marginTop="10dp"
+              android:layout_centerHorizontal="true" />
+
+          <Button
+              android:id="@+id/sitrep_btn"
+              style="@style/Button"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_alignParentEnd="true"
+              android:layout_toEndOf="@+id/btn_spacer"
+              android:layout_marginStart="2dp"
+              android:layout_marginEnd="5dp"
+              android:layout_marginTop="10dp"
+              android:text="@string/sitrep" />
+
+          <ScrollView
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_below="@+id/sitrep_btn">
+            <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
+                android:id="@+id/fleet_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+          </ScrollView>
+        </RelativeLayout>
+      </LinearLayout>
+    </RelativeLayout>
+
+    <include layout="@layout/solarsystem_congeniality" />
+    <include layout="@layout/solarsystem_store" />
+    <RelativeLayout
+        android:id="@+id/top_pane"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        style="@style/TopPane">
+    </RelativeLayout>
+
+  </RelativeLayout>
+
+  <RelativeLayout
+      android:id="@+id/drawer"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_marginEnd="40dp"
+      android:layout_gravity="start"
+      android:background="@drawable/left_pane_bg">
+
+    <EditText
+        android:id="@+id/search_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?android:attr/actionBarSize"
+        android:layout_toStartOf="@+id/search_button"
+        android:inputType="text"
+        android:imeOptions="actionSearch" />
+
+    <ImageButton
+        android:id="@+id/search_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?android:attr/actionBarSize"
+        android:layout_alignParentEnd="true"
+        android:src="@android:drawable/ic_menu_search" />
+
+    <ListView
+        android:id="@+id/search_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/search_button" />
+  </RelativeLayout>
+</merge>

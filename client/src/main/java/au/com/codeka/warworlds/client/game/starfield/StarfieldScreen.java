@@ -8,8 +8,7 @@ import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.chat.ChatFragment;
 import au.com.codeka.warworlds.client.game.empire.EmpireFragment;
 import au.com.codeka.warworlds.client.game.fleets.FleetsFragment;
-import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemContainerFragment;
-import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemFragment;
+import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemScreen;
 import au.com.codeka.warworlds.client.ui.FragmentScreen;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
@@ -95,9 +94,7 @@ public class StarfieldScreen extends Screen {
 
       @Override
       public void onStarClicked(Star star, @Nullable Planet planet) {
-        SolarSystemContainerFragment fragment = new SolarSystemContainerFragment();
-        fragment.setArguments(SolarSystemFragment.createArguments(star.id));
-        context.pushScreen(new FragmentScreen(fragment), createSharedViews());
+        context.pushScreen(new SolarSystemScreen(star, -1 /* planetIndex */));
       }
 
       @Override

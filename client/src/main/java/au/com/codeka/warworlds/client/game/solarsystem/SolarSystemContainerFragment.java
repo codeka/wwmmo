@@ -2,17 +2,14 @@ package au.com.codeka.warworlds.client.game.solarsystem;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -63,7 +60,7 @@ public class SolarSystemContainerFragment extends BaseFragment {
 
   @Override
   protected int getViewResourceId() {
-    return R.layout.frag_solarsystem_container;
+    return R.layout.solarsystem;
   }
 
   @Override
@@ -129,11 +126,11 @@ public class SolarSystemContainerFragment extends BaseFragment {
   public void onCreate(Bundle savedInstanceState) {
     drawerToggle.syncState();
 
-    Bundle args = getArguments();
-    if (args.getLong(SolarSystemFragment.STAR_ID_KEY) != 0) {
-      Star star = StarManager.i.getStar(args.getLong(SolarSystemFragment.STAR_ID_KEY));
-      showStar(star, args);
-    }
+//    Bundle args = getArguments();
+//    if (args.getLong(SolarSystemFragment.STAR_ID_KEY) != 0) {
+//      Star star = StarManager.i.getStar(args.getLong(SolarSystemFragment.STAR_ID_KEY));
+//      showStar(star, args);
+//    }
   }
 /*
   @Override
@@ -184,7 +181,7 @@ public class SolarSystemContainerFragment extends BaseFragment {
     refreshTitle();
 
     // TODO: current fragment? hide!
-    ((ViewGroup) view.findViewById(R.id.content)).removeAllViews();
+//    ((ViewGroup) view.findViewById(R.id.content)).removeAllViews();
 
     BaseFragment fragment;
     //if (star.classification == Star.CLASSIFICATION.WORMHOLE) {
@@ -192,15 +189,15 @@ public class SolarSystemContainerFragment extends BaseFragment {
     //} else {
       fragment = new SolarSystemFragment();
     //}
-    if (args == null) {
-      args = SolarSystemFragment.createArguments(star.id);
-    }
+//    if (args == null) {
+//      args = SolarSystemFragment.createArguments(star.id);
+//    }
     fragment.setArguments(args);
 
     fragment.onCreate(null);
     View childView =
         fragment.onCreateView(LayoutInflater.from(getContext()), (ViewGroup) view, null);
-    ((ViewGroup) view.findViewById(R.id.content)).addView(childView);
+//    ((ViewGroup) view.findViewById(R.id.content)).addView(childView);
     fragment.onStart();
     fragment.onResume();
 
