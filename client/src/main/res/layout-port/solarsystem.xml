@@ -15,8 +15,9 @@
         android:id="@+id/solarsystem_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
         android:layout_above="@+id/bottom_pane"
+        android:layout_below="@+id/top_pane"
+        android:layout_marginTop="-8px"
         android:layout_marginBottom="-8px" />
 
     <au.com.codeka.warworlds.client.ctrl.ChatMiniView
@@ -123,14 +124,20 @@
         android:layout_alignParentTop="true"
         android:visibility="gone" />
 
-    <include layout="@layout/solarsystem_store" />
+    <au.com.codeka.warworlds.client.game.solarsystem.StoreView
+        android:id="@+id/store"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/top_pane"
+        android:layout_marginEnd="5dp" />
+
     <RelativeLayout
         android:id="@+id/top_pane"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         style="@style/TopPane">
     </RelativeLayout>
-
   </RelativeLayout>
 
   <RelativeLayout

@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
 import android.transition.TransitionManager;
@@ -14,16 +13,13 @@ import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.client.game.fleets.FleetListSimple;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
-import au.com.codeka.warworlds.client.util.NumberFormatter;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.ColonyHelper;
-import com.google.common.base.Preconditions;
 import com.squareup.wire.Wire;
 import java.util.Locale;
 import javax.annotation.Nonnull;
@@ -43,24 +39,12 @@ public class SolarSystemLayout extends DrawerLayout {
 
   private static final Log log = new Log("SolarSystemLayout");
 
-
   private final Callbacks callbacks;
 
   private final SunAndPlanetsView sunAndPlanets;
   private final CongenialityView congeniality;
+  private final StoreView store;
   private final TextView planetName;
-  private final TextView storedGoods;
-  private final TextView totalGoods;
-  private final TextView deltaGoods;
-  private final View storedGoodsIcon;
-  private final TextView storedMinerals;
-  private final TextView totalMinerals;
-  private final TextView deltaMinerals;
-  private final View storedMineralsIcon;
-  private final TextView storedEnergy;
-  private final TextView totalEnergy;
-  private final TextView deltaEnergy;
-  private final View storedEnergyIcon;
   private final FleetListSimple fleetList;
   private final ViewGroup bottomLeftPane;
   private final Button emptyViewButton;
@@ -89,23 +73,12 @@ public class SolarSystemLayout extends DrawerLayout {
 
     sunAndPlanets = findViewById(R.id.solarsystem_view);
     congeniality = findViewById(R.id.congeniality);
+    store = findViewById(R.id.store);
     final Button buildButton = findViewById(R.id.solarsystem_colony_build);
     final Button focusButton = findViewById(R.id.solarsystem_colony_focus);
     final Button sitrepButton = findViewById(R.id.sitrep_btn);
     final Button planetViewButton = findViewById(R.id.enemy_empire_view);
     planetName = findViewById(R.id.planet_name);
-    storedGoods = findViewById(R.id.stored_goods);
-    totalGoods = findViewById(R.id.total_goods);
-    deltaGoods = findViewById(R.id.delta_goods);
-    storedGoodsIcon = findViewById(R.id.stored_goods_icon);
-    storedMinerals = findViewById(R.id.stored_minerals);
-    totalMinerals = findViewById(R.id.total_minerals);
-    deltaMinerals = findViewById(R.id.delta_minerals);
-    storedMineralsIcon = findViewById(R.id.stored_minerals_icon);
-    storedEnergy = findViewById(R.id.stored_energy);
-    totalEnergy = findViewById(R.id.total_energy);
-    deltaEnergy = findViewById(R.id.delta_energy);
-    storedEnergyIcon = findViewById(R.id.stored_energy_icon);
     fleetList = findViewById(R.id.fleet_list);
     bottomLeftPane = findViewById(R.id.bottom_left_pane);
     emptyViewButton = findViewById(R.id.empty_view_btn);
@@ -136,80 +109,7 @@ public class SolarSystemLayout extends DrawerLayout {
   public void refreshStar(Star star) {
     fleetList.setStar(star);
     sunAndPlanets.setStar(star);
-
-    Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
-    EmpireStorage storage = null;
-    for (EmpireStorage s : star.empire_stores) {
-      if (s.empire_id != null && s.empire_id.equals(myEmpire.id)) {
-        storage = s;
-        break;
-      }
-    }
-    if (storage == null) {
-      storedGoods.setVisibility(View.GONE);
-      deltaGoods.setVisibility(View.GONE);
-      totalGoods.setVisibility(View.GONE);
-      storedGoodsIcon.setVisibility(View.GONE);
-      storedMinerals.setVisibility(View.GONE);
-      deltaMinerals.setVisibility(View.GONE);
-      totalMinerals.setVisibility(View.GONE);
-      storedMineralsIcon.setVisibility(View.GONE);
-      storedEnergy.setVisibility(View.GONE);
-      deltaEnergy.setVisibility(View.GONE);
-      totalEnergy.setVisibility(View.GONE);
-      storedEnergyIcon.setVisibility(View.GONE);
-    } else {
-      storedGoods.setVisibility(View.VISIBLE);
-      deltaGoods.setVisibility(View.VISIBLE);
-      totalGoods.setVisibility(View.VISIBLE);
-      storedGoodsIcon.setVisibility(View.VISIBLE);
-      storedMinerals.setVisibility(View.VISIBLE);
-      deltaMinerals.setVisibility(View.VISIBLE);
-      totalMinerals.setVisibility(View.VISIBLE);
-      storedMineralsIcon.setVisibility(View.VISIBLE);
-      storedEnergy.setVisibility(View.VISIBLE);
-      deltaEnergy.setVisibility(View.VISIBLE);
-      totalEnergy.setVisibility(View.VISIBLE);
-      storedEnergyIcon.setVisibility(View.VISIBLE);
-
-      storedGoods.setText(NumberFormatter.format(Math.round(storage.total_goods)));
-      totalGoods.setText(String.format(Locale.ENGLISH, "/ %s",
-          NumberFormatter.format(Math.round(storage.max_goods))));
-      storedMinerals.setText(NumberFormatter.format(Math.round(storage.total_minerals)));
-      totalMinerals.setText(String.format(Locale.ENGLISH, "/ %s",
-          NumberFormatter.format(Math.round(storage.max_minerals))));
-      storedEnergy.setText(NumberFormatter.format(Math.round(storage.total_energy)));
-      totalEnergy.setText(String.format(Locale.ENGLISH, "/ %s",
-          NumberFormatter.format(Math.round(storage.max_energy))));
-
-      if (Wire.get(storage.goods_delta_per_hour, 0.0f) >= 0) {
-        deltaGoods.setTextColor(Color.GREEN);
-        deltaGoods.setText(String.format(Locale.ENGLISH, "+%d/hr",
-            Math.round(Wire.get(storage.goods_delta_per_hour, 0.0f))));
-      } else {
-        deltaGoods.setTextColor(Color.RED);
-        deltaGoods.setText(String.format(Locale.ENGLISH, "%d/hr",
-            Math.round(Wire.get(storage.goods_delta_per_hour, 0.0f))));
-      }
-      if (Wire.get(storage.minerals_delta_per_hour, 0.0f) >= 0) {
-        deltaMinerals.setTextColor(Color.GREEN);
-        deltaMinerals.setText(String.format(Locale.ENGLISH, "+%d/hr",
-            Math.round(Wire.get(storage.minerals_delta_per_hour, 0.0f))));
-      } else {
-        deltaMinerals.setTextColor(Color.RED);
-        deltaMinerals.setText(String.format(Locale.ENGLISH, "%d/hr",
-            Math.round(Wire.get(storage.minerals_delta_per_hour, 0.0f))));
-      }
-      if (Wire.get(storage.energy_delta_per_hour, 0.0f) >= 0) {
-        deltaEnergy.setTextColor(Color.GREEN);
-        deltaEnergy.setText(String.format(Locale.ENGLISH, "+%d/hr",
-            Math.round(Wire.get(storage.energy_delta_per_hour, 0.0f))));
-      } else {
-        deltaEnergy.setTextColor(Color.RED);
-        deltaEnergy.setText(String.format(Locale.ENGLISH, "%d/hr",
-            Math.round(Wire.get(storage.energy_delta_per_hour, 0.0f))));
-      }
-    }
+    store.setStar(star);
 
     if (planetIndex >= 0) {
       planetName.setText(this.star.name);
@@ -221,7 +121,6 @@ public class SolarSystemLayout extends DrawerLayout {
     } else {
       log.debug("No planet selected");
     }
-
   }
 
   private void refreshSelectedPlanet() {
