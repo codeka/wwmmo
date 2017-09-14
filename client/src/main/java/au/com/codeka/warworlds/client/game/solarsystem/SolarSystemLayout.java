@@ -1,18 +1,26 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import android.content.Context;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.text.Html;
 import android.transition.TransitionManager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.client.game.fleets.FleetListSimple;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
+import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector2;
@@ -41,6 +49,8 @@ public class SolarSystemLayout extends DrawerLayout {
 
   private final Callbacks callbacks;
 
+  private final View drawer;
+  private final ActionBarDrawerToggle drawerToggle;
   private final SunAndPlanetsView sunAndPlanets;
   private final CongenialityView congeniality;
   private final StoreView store;
@@ -52,6 +62,8 @@ public class SolarSystemLayout extends DrawerLayout {
   private final View enemyColonyDetailsContainer;
   private final TextView populationCountTextView;
   private final ColonyFocusView colonyFocusView;
+
+  private final StarSearchListAdapter searchListAdapter;
 
   @Nonnull private Star star;
   private int planetIndex;
@@ -71,13 +83,10 @@ public class SolarSystemLayout extends DrawerLayout {
     this.star = star;
     this.planetIndex = planetIndex;
 
+    drawer = findViewById(R.id.drawer);
     sunAndPlanets = findViewById(R.id.solarsystem_view);
     congeniality = findViewById(R.id.congeniality);
     store = findViewById(R.id.store);
-    final Button buildButton = findViewById(R.id.solarsystem_colony_build);
-    final Button focusButton = findViewById(R.id.solarsystem_colony_focus);
-    final Button sitrepButton = findViewById(R.id.sitrep_btn);
-    final Button planetViewButton = findViewById(R.id.enemy_empire_view);
     planetName = findViewById(R.id.planet_name);
     fleetList = findViewById(R.id.fleet_list);
     bottomLeftPane = findViewById(R.id.bottom_left_pane);
@@ -96,6 +105,10 @@ public class SolarSystemLayout extends DrawerLayout {
       refreshSelectedPlanet();
     });
 
+    final Button buildButton = findViewById(R.id.solarsystem_colony_build);
+    final Button focusButton = findViewById(R.id.solarsystem_colony_focus);
+    final Button sitrepButton = findViewById(R.id.sitrep_btn);
+    final Button planetViewButton = findViewById(R.id.enemy_empire_view);
     buildButton.setOnClickListener(v -> callbacks.onBuildClick(planetIndex));
     focusButton.setOnClickListener(v -> callbacks.onFocusClick(planetIndex));
     sitrepButton.setOnClickListener(v -> callbacks.onSitrepClick());
@@ -103,8 +116,54 @@ public class SolarSystemLayout extends DrawerLayout {
     emptyViewButton.setOnClickListener(v -> callbacks.onViewColonyClick(planetIndex));
     fleetList.setFleetSelectedHandler(fleet -> callbacks.onFleetClick(fleet.id));
 
+
+    ListView searchList = findViewById(R.id.search_result);
+    searchListAdapter = new StarSearchListAdapter(
+        LayoutInflater.from(getContext()));
+    searchList.setAdapter(searchListAdapter);
+
+    searchList.setOnItemClickListener((parent, v, position, id) -> {
+      Star s = (Star) searchListAdapter.getItem(position);
+      if (s != null) {
+        refreshStar(s);
+      }
+    });
+
+    drawerToggle =
+        new ActionBarDrawerToggle(
+            (MainActivity) context,
+            this,
+            R.string.drawer_open,
+            R.string.drawer_close) {
+          @Override
+          public void onDrawerClosed(View view) {
+            super.onDrawerClosed(view);
+            refreshTitle();
+          }
+
+          @Override
+          public void onDrawerOpened(View drawerView) {
+            super.onDrawerOpened(drawerView);
+            refreshTitle();
+            searchListAdapter.setCursor(StarManager.i.getMyStars());
+          }
+        };
+    setDrawerListener(drawerToggle);
+
     refreshStar(star);
   }
+
+  @Override
+  public void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    drawerToggle.syncState();
+
+    ActionBar actionBar = checkNotNull(getMainActivity().getSupportActionBar());
+    actionBar.show();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+    actionBar.setHomeButtonEnabled(true);
+  }
+
 
   public void refreshStar(Star star) {
     fleetList.setStar(star);
@@ -120,6 +179,25 @@ public class SolarSystemLayout extends DrawerLayout {
       sunAndPlanets.selectPlanet(planetIndex);
     } else {
       log.debug("No planet selected");
+    }
+  }
+
+  // TODO: this is pretty hacky...
+  private MainActivity getMainActivity() {
+    return (MainActivity) getContext();
+  }
+
+  private void refreshTitle() {
+    ActionBar actionBar = checkNotNull(getMainActivity().getSupportActionBar());
+    log.debug("Refreshing title. isDrawerOpen=%s star=%s actionBar.isShowing=%s",
+        isDrawerOpen(drawer) ? "true" : "false",
+        star.name,
+        actionBar.isShowing() ? "true" : "false");
+
+    if (isDrawerOpen(drawer)) {
+      actionBar.setTitle("Star Search");
+    } else {
+      actionBar.setTitle(star.name);
     }
   }
 
@@ -243,4 +321,5 @@ public class SolarSystemLayout extends DrawerLayout {
     populationCountTextView.setText(Html.fromHtml(pop));
     colonyFocusView.setVisibility(View.GONE);
   }
+
 }
