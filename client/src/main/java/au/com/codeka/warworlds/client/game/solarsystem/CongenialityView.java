@@ -8,7 +8,6 @@ import android.widget.TextView;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.util.NumberFormatter;
 import au.com.codeka.warworlds.common.proto.Planet;
-import au.com.codeka.warworlds.common.proto.Star;
 
 /**
  * View that displays the "congeniality" of a planet.

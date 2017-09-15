@@ -47,21 +47,14 @@ public class SolarSystemLayout extends DrawerLayout {
 
   private static final Log log = new Log("SolarSystemLayout");
 
-  private final Callbacks callbacks;
-
   private final View drawer;
   private final ActionBarDrawerToggle drawerToggle;
   private final SunAndPlanetsView sunAndPlanets;
   private final CongenialityView congeniality;
+  private final PlanetSummaryView planetSummary;
   private final StoreView store;
   private final TextView planetName;
   private final FleetListSimple fleetList;
-  private final ViewGroup bottomLeftPane;
-  private final Button emptyViewButton;
-  private final View colonyDetailsContainer;
-  private final View enemyColonyDetailsContainer;
-  private final TextView populationCountTextView;
-  private final ColonyFocusView colonyFocusView;
 
   private final StarSearchListAdapter searchListAdapter;
 
@@ -79,7 +72,6 @@ public class SolarSystemLayout extends DrawerLayout {
     super(context);
     inflate(context, R.layout.solarsystem, this);
 
-    this.callbacks = callbacks;
     this.star = star;
     this.planetIndex = planetIndex;
 
@@ -87,14 +79,9 @@ public class SolarSystemLayout extends DrawerLayout {
     sunAndPlanets = findViewById(R.id.solarsystem_view);
     congeniality = findViewById(R.id.congeniality);
     store = findViewById(R.id.store);
+    planetSummary = findViewById(R.id.planet_summary);
     planetName = findViewById(R.id.planet_name);
     fleetList = findViewById(R.id.fleet_list);
-    bottomLeftPane = findViewById(R.id.bottom_left_pane);
-    emptyViewButton = findViewById(R.id.empty_view_btn);
-    colonyDetailsContainer = findViewById(R.id.solarsystem_colony_details);
-    enemyColonyDetailsContainer = findViewById(R.id.enemy_colony_details);
-    populationCountTextView = findViewById(R.id.population_count);
-    colonyFocusView = findViewById(R.id.colony_focus_view);
 
     sunAndPlanets.setPlanetSelectedHandler(planet -> {
       if (planet == null) {
@@ -105,6 +92,8 @@ public class SolarSystemLayout extends DrawerLayout {
       refreshSelectedPlanet();
     });
 
+    planetSummary.setCallbacks(() -> callbacks.onViewColonyClick(planetIndex));
+
     final Button buildButton = findViewById(R.id.solarsystem_colony_build);
     final Button focusButton = findViewById(R.id.solarsystem_colony_focus);
     final Button sitrepButton = findViewById(R.id.sitrep_btn);
@@ -113,9 +102,7 @@ public class SolarSystemLayout extends DrawerLayout {
     focusButton.setOnClickListener(v -> callbacks.onFocusClick(planetIndex));
     sitrepButton.setOnClickListener(v -> callbacks.onSitrepClick());
     planetViewButton.setOnClickListener(v -> callbacks.onViewColonyClick(planetIndex));
-    emptyViewButton.setOnClickListener(v -> callbacks.onViewColonyClick(planetIndex));
     fleetList.setFleetSelectedHandler(fleet -> callbacks.onFleetClick(fleet.id));
-
 
     ListView searchList = findViewById(R.id.search_result);
     searchListAdapter = new StarSearchListAdapter(
@@ -163,7 +150,6 @@ public class SolarSystemLayout extends DrawerLayout {
     actionBar.setDisplayHomeAsUpEnabled(true);
     actionBar.setHomeButtonEnabled(true);
   }
-
 
   public void refreshStar(Star star) {
     fleetList.setStar(star);
@@ -246,80 +232,6 @@ public class SolarSystemLayout extends DrawerLayout {
     }
     congeniality.setPlanet(planet);
 
-    TransitionManager.beginDelayedTransition(bottomLeftPane);
-    if (planet.colony == null) {
-      emptyViewButton.setVisibility(View.VISIBLE);
-      colonyDetailsContainer.setVisibility(View.GONE);
-      enemyColonyDetailsContainer.setVisibility(View.GONE);
-
-      refreshUncolonizedDetails();
-    } else {
-      emptyViewButton.setVisibility(View.GONE);
-      colonyDetailsContainer.setVisibility(View.GONE);
-      enemyColonyDetailsContainer.setVisibility(View.GONE);
-
-      if (planet.colony.empire_id == null) {
-        enemyColonyDetailsContainer.setVisibility(View.VISIBLE);
-        refreshNativeColonyDetails(planet);
-      } else {
-        Empire colonyEmpire = EmpireManager.i.getEmpire(planet.colony.empire_id);
-        if (colonyEmpire != null) {
-          Empire myEmpire = EmpireManager.i.getMyEmpire();
-          if (myEmpire.id.equals(colonyEmpire.id)) {
-            colonyDetailsContainer.setVisibility(View.VISIBLE);
-            refreshColonyDetails(planet);
-          } else {
-            enemyColonyDetailsContainer.setVisibility(View.VISIBLE);
-            refreshEnemyColonyDetails(colonyEmpire, planet);
-          }
-        } else {
-          // TODO: wait for the empire to come in.
-        }
-      }
-    }
+    planetSummary.setPlanet(star, planet);
   }
-
-  private void refreshUncolonizedDetails() {
-    populationCountTextView.setText(getContext().getString(R.string.uncolonized));
-  }
-
-  private void refreshColonyDetails(Planet planet) {
-    String pop = "Pop: "
-        + Math.round(planet.colony.population)
-        + " <small>"
-        + String.format(Locale.US, "(%s%d / hr)",
-        Wire.get(planet.colony.delta_population, 0.0f) < 0 ? "-" : "+",
-        Math.abs(Math.round(Wire.get(planet.colony.delta_population, 0.0f))))
-        + "</small> / "
-        + ColonyHelper.getMaxPopulation(planet);
-    populationCountTextView.setText(Html.fromHtml(pop));
-
-    colonyFocusView.setVisibility(View.VISIBLE);
-    colonyFocusView.refresh(star, planet.colony);
-  }
-
-  private void refreshEnemyColonyDetails(Empire empire, Planet planet) {
-    populationCountTextView.setText(String.format(Locale.US, "Population: %d",
-        Math.round(planet.colony.population)));
-
-/*    ImageView enemyIcon = (ImageView) mView.findViewById(R.id.enemy_empire_icon);
-    TextView enemyName = (TextView) mView.findViewById(R.id.enemy_empire_name);
-    TextView enemyDefence = (TextView) mView.findViewById(R.id.enemy_empire_defence);
-
-    int defence = (int) (0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
-    if (defence < 1) {
-      defence = 1;
-    }
-    enemyIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
-    enemyName.setText(empire.getDisplayName());
-    enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d", defence));
-  */}
-
-  private void refreshNativeColonyDetails(Planet planet) {
-    String pop = "Pop: "
-        + Math.round(planet.colony.population);
-    populationCountTextView.setText(Html.fromHtml(pop));
-    colonyFocusView.setVisibility(View.GONE);
-  }
-
 }

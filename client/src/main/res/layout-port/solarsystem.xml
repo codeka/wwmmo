@@ -61,21 +61,11 @@
               android:textAppearance="?android:attr/textAppearanceSmall"
               tools:text="Planet name" />
 
-          <TextView
-              android:id="@+id/population_count"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_below="@id/planet_name"
-              android:layout_marginStart="6dp"
-              android:textAppearance="?android:attr/textAppearanceSmall"
-              tools:text="123" />
-
-          <FrameLayout
+          <au.com.codeka.warworlds.client.game.solarsystem.PlanetSummaryView
+              android:id="@+id/planet_summary"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:layout_below="@id/population_count">
-            <include layout="@layout/solarsystem_planet_details" />
-          </FrameLayout>
+              android:layout_below="@id/planet_name" />
         </RelativeLayout>
 
         <RelativeLayout
