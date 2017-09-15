@@ -94,7 +94,12 @@ public class StarfieldScreen extends Screen {
 
       @Override
       public void onStarClicked(Star star, @Nullable Planet planet) {
-        context.pushScreen(new SolarSystemScreen(star, -1 /* planetIndex */));
+        context.pushScreen(
+            new SolarSystemScreen(star, -1 /* planetIndex */),
+            new SharedViews.Builder()
+                .addSharedView(R.id.top_pane)
+                .addSharedView(R.id.bottom_pane)
+                .build());
       }
 
       @Override
