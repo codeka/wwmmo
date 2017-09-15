@@ -148,7 +148,7 @@ public class SolarSystemLayout extends DrawerLayout {
             searchListAdapter.setCursor(StarManager.i.getMyStars());
           }
         };
-    setDrawerListener(drawerToggle);
+    addDrawerListener(drawerToggle);
 
     refreshStar(star);
   }
