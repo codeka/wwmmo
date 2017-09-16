@@ -42,6 +42,8 @@
   <string name="locate">Locate</string>
   <string name="yes">Yes</string>
   <string name="no">No</string>
+  <string name="plus">+</string>
+  <string name="minus">-</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to

@@ -3,9 +3,12 @@ package au.com.codeka.warworlds.client.game.solarsystem;
 import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.SharedViews;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -13,6 +16,9 @@ import au.com.codeka.warworlds.common.proto.Star;
  * for managing builds, planet focus, launching fleets and so on.
  */
 public class SolarSystemScreen extends Screen {
+  private static final Log log = new Log("SolarSystemScreen");
+
+  private ScreenContext context;
   private SolarSystemLayout layout;
   private Star star;
   private int planetIndex;
@@ -25,6 +31,7 @@ public class SolarSystemScreen extends Screen {
   @Override
   public void onCreate(ScreenContext context, ViewGroup container) {
     super.onCreate(context, container);
+    this.context = context;
 
     layout = new SolarSystemLayout(context.getActivity(), layoutCallbacks, star, planetIndex);
 
@@ -63,7 +70,13 @@ public class SolarSystemScreen extends Screen {
 
     @Override
     public void onFocusClick(int planetIndex) {
-
+      log.info("focus click: %d", planetIndex);
+      context.pushScreen(
+          new PlanetDetailsScreen(star, star.planets.get(planetIndex)),
+          new SharedViews.Builder()
+              .addSharedView(R.id.top_pane)
+              .addSharedView(R.id.bottom_pane)
+              .build());
     }
 
     @Override
@@ -73,9 +86,15 @@ public class SolarSystemScreen extends Screen {
 
     @Override
     public void onViewColonyClick(int planetIndex) {
+      context.pushScreen(
+          new PlanetDetailsScreen(star, star.planets.get(planetIndex)),
+          new SharedViews.Builder()
+              .addSharedView(R.id.top_pane)
+              .addSharedView(R.id.bottom_pane)
+              .build());
 //      getFragmentTransitionManager().replaceFragment(
-//          PlanetDetailsFragment.class,
-//          PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
+//          PlanetDetailsScreen.class,
+//          PlanetDetailsScreen.createArguments(star.id, star.planets.indexOf(planet)),
 //          SharedViewHolder.builder()
 //              .addSharedView(R.id.bottom_pane, "bottom_pane")
 //              .addSharedView(sunAndPlanetsView.getPlanetView(planet), "planet_icon")

@@ -32,21 +32,21 @@ class StarSearchListAdapter extends BaseAdapter {
   private static final ArrayList<Star> lastStars = new ArrayList<>();
   private static final int LAST_STARS_MAX_SIZE = 6;
 
-  private final int VIEW_TYPE_STAR = 0;
-  private final int VIEW_TYPE_SEPARATOR = 1;
-  private final int NUM_VIEW_TYPES = 2;
+  private static final int VIEW_TYPE_STAR = 0;
+  private static final int VIEW_TYPE_SEPARATOR = 1;
+  private static final int NUM_VIEW_TYPES = 2;
 
-  public StarSearchListAdapter(LayoutInflater inflater) {
+  StarSearchListAdapter(LayoutInflater inflater) {
     this.inflater = inflater;
   }
 
   /** Sets the {@link StarCursor} that we'll use to display stars. */
-  public void setCursor(StarCursor cursor) {
+  void setCursor(StarCursor cursor) {
     this.cursor = checkNotNull(cursor);
     notifyDataSetChanged();
   }
 
-  public void addToLastStars(Star star) {
+  void addToLastStars(Star star) {
     synchronized (lastStars) {
       for (int i = 0; i < lastStars.size(); i++) {
         if (lastStars.get(i).id.equals(star.id)) {
