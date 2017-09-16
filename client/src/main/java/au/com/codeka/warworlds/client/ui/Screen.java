@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.ui;
 
 import android.os.Build;
 import android.support.annotation.CallSuper;
+import android.support.v4.view.ViewCompat;
 import android.transition.Scene;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import au.com.codeka.warworlds.common.Log;
 import java.util.Random;
 
 import javax.annotation.Nullable;
@@ -25,6 +27,9 @@ import au.com.codeka.warworlds.client.activity.Transitions;
  * navigate the backstack, it might be hidden and then shown again).
  */
 public abstract class Screen {
+  private static final Random RANDOM = new Random();
+  private static final Log log = new Log("Screen");
+
   private ViewGroup container;
 
   /**
@@ -65,10 +70,17 @@ public abstract class Screen {
             if (sharedView.getViewId() != 0) {
               fadeTransition.excludeTarget(sharedView.getViewId(), true);
               transformTransition.addTarget(sharedView.getViewId());
-            } else if (sharedView.getFromViewId() != 0 && sharedView.getToViewId() != 0) {
-              String name = "shared-" + Long.toString(new Random().nextLong());
-              container.findViewById(sharedView.getFromViewId()).setTransitionName(name);
-              view.findViewById(sharedView.getToViewId()).setTransitionName(name);
+            } else {
+              String name = "shared-" + Long.toString(RANDOM.nextLong());
+              if (sharedView.getFromViewId() != 0 && sharedView.getToViewId() != 0) {
+                container.findViewById(sharedView.getFromViewId()).setTransitionName(name);
+                view.findViewById(sharedView.getToViewId()).setTransitionName(name);
+              } else if (sharedView.getFromView() != null && sharedView.getToViewId() != 0) {
+                sharedView.getFromView().setTransitionName(name);
+                view.findViewById(sharedView.getToViewId()).setTransitionName(name);
+              } else {
+                log.error("Unexpected SharedView configuration.");
+              }
               fadeTransition.excludeTarget(name, true);
               transformTransition.addTarget(name);
             }

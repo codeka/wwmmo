@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -57,7 +58,7 @@ public class SolarSystemLayout extends DrawerLayout {
    *
    * @param context The {@link Context}.
    * @param star The {@link Star} to display initially.
-   * @param planetIndex The index of the planet to have initially select (or -1 for no planet).
+   * @param startPlanetIndex The index of the planet to have initially select (or -1 for no planet).
    */
   public SolarSystemLayout(
       Context context, Callbacks callbacks, @Nonnull Star star, int startPlanetIndex) {
@@ -141,6 +142,16 @@ public class SolarSystemLayout extends DrawerLayout {
     actionBar.show();
     actionBar.setDisplayHomeAsUpEnabled(true);
     actionBar.setHomeButtonEnabled(true);
+  }
+
+  /**
+   * Gets the {@link View} that's showing the planet with the given index.
+   *
+   * @param planetIndex The index of the planet whose {@link View} you want.
+   * @return The {@link View} (actually, {@link ImageView} that the planet is being displayed in.
+   */
+  public View getPlanetView(int planetIndex) {
+    return sunAndPlanets.getPlanetView(planetIndex);
   }
 
   public void refreshStar(Star star) {

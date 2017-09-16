@@ -74,7 +74,7 @@ public class SolarSystemScreen extends Screen {
       context.pushScreen(
           new PlanetDetailsScreen(star, star.planets.get(planetIndex)),
           new SharedViews.Builder()
-              .addSharedView(R.id.top_pane)
+              .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
               .addSharedView(R.id.bottom_pane)
               .build());
     }
@@ -89,7 +89,7 @@ public class SolarSystemScreen extends Screen {
       context.pushScreen(
           new PlanetDetailsScreen(star, star.planets.get(planetIndex)),
           new SharedViews.Builder()
-              .addSharedView(R.id.top_pane)
+              .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
               .addSharedView(R.id.bottom_pane)
               .build());
 //      getFragmentTransitionManager().replaceFragment(
