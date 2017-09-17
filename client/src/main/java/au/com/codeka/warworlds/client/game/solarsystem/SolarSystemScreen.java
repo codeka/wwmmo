@@ -1,5 +1,9 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.App;
@@ -40,7 +44,18 @@ public class SolarSystemScreen extends Screen {
 
   @Override
   public View onShow() {
+    ActionBar actionBar = checkNotNull(context.getActivity().getSupportActionBar());
+    actionBar.show();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+    actionBar.setHomeButtonEnabled(true);
+
     return layout;
+  }
+
+  @Override
+  public void onHide() {
+    ActionBar actionBar = checkNotNull(context.getActivity().getSupportActionBar());
+    actionBar.hide();
   }
 
   @Override
@@ -92,13 +107,6 @@ public class SolarSystemScreen extends Screen {
               .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
               .addSharedView(R.id.bottom_pane)
               .build());
-//      getFragmentTransitionManager().replaceFragment(
-//          PlanetDetailsScreen.class,
-//          PlanetDetailsScreen.createArguments(star.id, star.planets.indexOf(planet)),
-//          SharedViewHolder.builder()
-//              .addSharedView(R.id.bottom_pane, "bottom_pane")
-//              .addSharedView(sunAndPlanetsView.getPlanetView(planet), "planet_icon")
-//              .build());
     }
 
     @Override

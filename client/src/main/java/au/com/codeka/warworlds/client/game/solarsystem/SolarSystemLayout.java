@@ -137,11 +137,6 @@ public class SolarSystemLayout extends DrawerLayout {
   public void onAttachedToWindow() {
     super.onAttachedToWindow();
     drawerToggle.syncState();
-
-    ActionBar actionBar = checkNotNull(getMainActivity().getSupportActionBar());
-    actionBar.show();
-    actionBar.setDisplayHomeAsUpEnabled(true);
-    actionBar.setHomeButtonEnabled(true);
   }
 
   /**
