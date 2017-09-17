@@ -155,6 +155,8 @@ public class SolarSystemLayout extends DrawerLayout {
   }
 
   public void refreshStar(Star star) {
+    this.star = star;
+
     searchListAdapter.addToLastStars(star);
     fleetList.setStar(star);
     sunAndPlanets.setStar(star);
@@ -170,6 +172,7 @@ public class SolarSystemLayout extends DrawerLayout {
     } else {
       log.debug("No planet selected");
     }
+    refreshSelectedPlanet();
   }
 
   // TODO: this is pretty hacky...

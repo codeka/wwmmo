@@ -122,6 +122,11 @@ public class ScreenStack {
     }
 
     @Override
+    public void popScreen() {
+      pop();
+    }
+
+    @Override
     public Activity getActivity() {
       return activity;
     }

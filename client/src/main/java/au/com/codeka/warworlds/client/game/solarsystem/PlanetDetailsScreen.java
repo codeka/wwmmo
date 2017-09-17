@@ -59,7 +59,7 @@ public class PlanetDetailsScreen extends Screen {
               .construction(constructionFocus)
               .build()));
 
-      // TODO popBackStack(); ?
+      context.popScreen();
     }
 
     @Override
