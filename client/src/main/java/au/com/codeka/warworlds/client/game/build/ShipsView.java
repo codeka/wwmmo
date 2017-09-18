@@ -33,7 +33,7 @@ public class ShipsView extends ListView {
 
   private ShipListAdapter shipListAdapter;
 
-  public ShipsView(Context context, Star star, Colony colony) {
+  public ShipsView(Context context, Star star, Colony colony, BuildLayout buildLayout) {
     super(context);
     this.context = context;
     this.star = star;
@@ -47,10 +47,10 @@ public class ShipsView extends ListView {
       ItemEntry entry = (ItemEntry) shipListAdapter.getItem(position);
       if (entry.fleet == null && entry.buildRequest == null) {
         // It's a new fleet
-//          getBuildFragment().showBuildSheet(entry.design);
+        buildLayout.showBuildSheet(entry.design);
       } else if (entry.fleet != null && entry.buildRequest == null) {
         // TODO: upgrade
-//          getBuildFragment().showProgressSheet(entry.fleet, entry.buildRequest);
+        buildLayout.showBuildSheet(entry.design);
       }
     });
 

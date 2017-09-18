@@ -62,14 +62,15 @@ public class BuildLayout extends RelativeLayout {
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
     bottomPane.removeAllViews();
-    bottomPane.addView(new BuildBottomPane(getContext(), star, colony, design, (designType, count) -> {
-      StarManager.i.updateStar(star, new StarModification.Builder()
-          .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
-          .colony_id(colony.id)
-          .design_type(designType)
-          .count(count));
-      hideBuildSheet();
-    }));
+    bottomPane.addView(
+        new BuildBottomPane(getContext(), star, colony, design, (designType, count) -> {
+            StarManager.i.updateStar(star, new StarModification.Builder()
+                .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
+                .colony_id(colony.id)
+                .design_type(designType)
+                .count(count));
+            hideBottomSheet();
+          }));
   }
 
   /**
@@ -80,9 +81,10 @@ public class BuildLayout extends RelativeLayout {
     // TODO
   }
 
-  public void hideBuildSheet() {
+  public void hideBottomSheet() {
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.getLayoutParams().height = (int) new DimensionResolver(getContext()).dp2px(30);
+    bottomPane.removeAllViews();
   }
 
   public void refreshColonyDetails(Colony colony) {

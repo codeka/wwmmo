@@ -69,11 +69,12 @@ public class ColonyView extends FrameLayout {
     public void onTabSelected(TabLayout.Tab tab) {
       TransitionManager.beginDelayedTransition(tabContent);
 
+      buildLayout.hideBottomSheet();
       tabContent.removeAllViews();
       if (tab.getPosition() == 0) {
         tabContent.addView(new BuildingsView(context, star, colony, buildLayout));
       } else if (tab.getPosition() == 1) {
-        tabContent.addView(new ShipsView(context, star, colony));
+        tabContent.addView(new ShipsView(context, star, colony, buildLayout));
       } else if (tab.getPosition() == 2) {
         tabContent.addView(new QueueView(context, star, colony));
       }
