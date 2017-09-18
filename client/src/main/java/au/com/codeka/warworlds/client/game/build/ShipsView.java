@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ShipsView extends ListView implements BuildTabContentView {
+public class ShipsView extends ListView implements TabContentView {
   private final Context context;
   private final Star star;
   private final Colony colony;

@@ -6,6 +6,6 @@ import au.com.codeka.warworlds.common.proto.Star;
 /**
  * Interface implemented by the build tabs ({@link BuildingsView}, {@link ShipsView}) etc.
  */
-public interface BuildTabContentView {
+public interface TabContentView {
   void refresh(Star star, Colony colony);
 }

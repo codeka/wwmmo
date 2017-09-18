@@ -1,18 +1,11 @@
 package au.com.codeka.warworlds.client.game.build;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
-import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.BaseFragment;
-import au.com.codeka.warworlds.client.activity.TabManager;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Star;
 
-public class QueueView extends ListView implements BuildTabContentView {
+public class QueueView extends ListView implements TabContentView {
   private final Context context;
   private final Star star;
   private final Colony colony;

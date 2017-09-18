@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.common.proto.Colony;
-import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -25,7 +24,7 @@ public class ColonyView extends FrameLayout {
 
   private Star star;
   private Colony colony;
-  private BuildTabContentView contentView;
+  private TabContentView contentView;
 
   public ColonyView(@NonNull Context context, Star star, Colony colony, BuildLayout buildLayout) {
     super(context);
