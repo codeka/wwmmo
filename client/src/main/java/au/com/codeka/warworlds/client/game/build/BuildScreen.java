@@ -41,7 +41,7 @@ public class BuildScreen extends Screen {
   public void onCreate(ScreenContext context, ViewGroup parent) {
     super.onCreate(context, parent);
 
-    layout = new BuildLayout(context.getActivity(), star, colonies);
+    layout = new BuildLayout(context.getActivity(), star, colonies, colonies.indexOf(currColony));
     layout.refreshColonyDetails(currColony);
     App.i.getEventBus().register(eventHandler);
   }

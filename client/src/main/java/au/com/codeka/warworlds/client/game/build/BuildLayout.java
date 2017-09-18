@@ -40,7 +40,7 @@ public class BuildLayout extends RelativeLayout {
   private Star star;
   private List<Colony> colonies;
 
-  public BuildLayout(Context context, Star star, List<Colony> colonies) {
+  public BuildLayout(Context context, Star star, List<Colony> colonies, int initialIndex) {
     super(context);
     this.star = star;
     this.colonies = colonies;
@@ -49,10 +49,12 @@ public class BuildLayout extends RelativeLayout {
     colonyPagerAdapter = new ColonyPagerAdapter(context, star, colonies, this);
     viewPager = findViewById(R.id.pager);
     viewPager.setAdapter(colonyPagerAdapter);
+    viewPager.setCurrentItem(initialIndex);
     planetIcon = findViewById(R.id.planet_icon);
     planetName = findViewById(R.id.planet_name);
     buildQueueDescription = findViewById(R.id.build_queue_description);
     bottomPane = findViewById(R.id.bottom_pane);
+    viewPager.addOnPageChangeListener(pageChangeListener);
   }
 
   /** Called when the star is updated. We'll need to refresh our current view. */
@@ -117,4 +119,20 @@ public class BuildLayout extends RelativeLayout {
           "Build queue: %d", buildQueueLength));
     }
   }
+
+  private final ViewPager.OnPageChangeListener pageChangeListener =
+      new ViewPager.OnPageChangeListener() {
+          @Override
+          public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+          }
+
+          @Override
+          public void onPageSelected(int position) {
+            refreshColonyDetails(colonies.get(position));
+          }
+
+          @Override
+          public void onPageScrollStateChanged(int state) {
+          }
+        };
 }

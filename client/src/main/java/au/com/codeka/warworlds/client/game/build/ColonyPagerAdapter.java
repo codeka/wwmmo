@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.client.game.build;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
