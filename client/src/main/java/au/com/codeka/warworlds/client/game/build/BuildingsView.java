@@ -2,8 +2,6 @@ package au.com.codeka.warworlds.client.game.build;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.os.Bundle;
-import android.os.Handler;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +20,6 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,7 +31,7 @@ public class BuildingsView extends ListView {
 
   private BuildingListAdapter adapter;
 
-  public BuildingsView(Context context, Star star, Colony colony) {
+  public BuildingsView(Context context, Star star, Colony colony, BuildLayout buildLayout) {
     super(context);
     this.star = star;
     this.colony = colony;
@@ -45,10 +42,10 @@ public class BuildingsView extends ListView {
     setOnItemClickListener((parent, v, position, id) -> {
       ItemEntry entry = (ItemEntry) adapter.getItem(position);
       if (entry.building == null && entry.buildRequest == null) {
- //       getBuildFragment().showBuildSheet(entry.design);
+        buildLayout.showBuildSheet(entry.design);
       } else if (entry.building != null && entry.buildRequest == null) {
         // TODO: upgrade
- //       getBuildFragment().showBuildSheet(entry.design);
+        buildLayout.showBuildSheet(entry.design);
       }
     });
   }
@@ -105,15 +102,12 @@ public class BuildingsView extends ListView {
         }
       }
 
-      Collections.sort(existingBuildingEntries, new Comparator<ItemEntry>() {
-        @Override
-        public int compare(ItemEntry lhs, ItemEntry rhs) {
-          Design.DesignType a = (lhs.building != null
-              ? lhs.building.design_type : lhs.buildRequest.design_type);
-          Design.DesignType b = (rhs.building != null
-              ? rhs.building.design_type : rhs.buildRequest.design_type);
-          return a.compareTo(b);
-        }
+      Collections.sort(existingBuildingEntries, (lhs, rhs) -> {
+        Design.DesignType a = (lhs.building != null
+            ? lhs.building.design_type : lhs.buildRequest.design_type);
+        Design.DesignType b = (rhs.building != null
+            ? rhs.building.design_type : rhs.buildRequest.design_type);
+        return a.compareTo(b);
       });
 
       ItemEntry title = new ItemEntry();

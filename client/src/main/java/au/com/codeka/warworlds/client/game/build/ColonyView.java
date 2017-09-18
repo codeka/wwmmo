@@ -71,7 +71,7 @@ public class ColonyView extends FrameLayout {
 
       tabContent.removeAllViews();
       if (tab.getPosition() == 0) {
-        tabContent.addView(new BuildingsView(context, star, colony));
+        tabContent.addView(new BuildingsView(context, star, colony, buildLayout));
       } else if (tab.getPosition() == 1) {
         tabContent.addView(new ShipsView(context, star, colony));
       } else if (tab.getPosition() == 2) {
