@@ -40,7 +40,7 @@ public class ShipsView extends ListView implements BuildTabContentView {
     this.colony = colony;
 
     shipListAdapter = new ShipListAdapter();
-    updateStar(star, colony);
+    refresh(star, colony);
 
     setAdapter(shipListAdapter);
     setOnItemClickListener((parent, view, position, id) -> {
@@ -84,10 +84,6 @@ public class ShipsView extends ListView implements BuildTabContentView {
 
   @Override
   public void refresh(Star star, Colony colony) {
-    // TODO
-  }
-
-  private void updateStar(Star star, Colony colony) {
     Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
     ArrayList<Fleet> fleets = new ArrayList<>();
     for (Fleet fleet : star.fleets) {
@@ -104,7 +100,7 @@ public class ShipsView extends ListView implements BuildTabContentView {
       }
     }
 
-    shipListAdapter.setShips(fleets, buildRequests);
+    shipListAdapter.refresh(fleets, buildRequests);
   }
 
   /** This adapter is used to populate the list of ship designs in our view. */
@@ -115,7 +111,7 @@ public class ShipsView extends ListView implements BuildTabContentView {
     private static final int EXISTING_SHIP_TYPE = 1;
     private static final int NEW_SHIP_TYPE = 2;
 
-    public void setShips(ArrayList<Fleet> fleets, ArrayList<BuildRequest> buildRequests) {
+    public void refresh(ArrayList<Fleet> fleets, ArrayList<BuildRequest> buildRequests) {
       entries = new ArrayList<>();
 
       entries.add(new ItemEntry("New Ships"));
