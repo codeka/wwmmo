@@ -119,7 +119,7 @@ header#page-header nav.userinfo a {
 
 header#page-header div.donate-btn {
   position: absolute;
-  top: -10px;
+  top: 0px;
   left: auto;
   right: 16px;
   width: 100px;

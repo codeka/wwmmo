@@ -62,8 +62,8 @@ public class SunAndPlanetsView extends RelativeLayout {
   }
 
   /** Gets the {@link ImageView} that displays the given planet's icon. */
-  public ImageView getPlanetView(Planet planet) {
-    return planetInfos[planet.index].imageView;
+  public ImageView getPlanetView(int planetIndex) {
+    return planetInfos[planetIndex].imageView;
   }
 
   public void setStar(Star star) {

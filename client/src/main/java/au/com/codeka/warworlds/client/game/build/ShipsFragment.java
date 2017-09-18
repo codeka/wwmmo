@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.game.fleets.FleetListHelper;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ShipsFragment extends BuildFragment.BaseTabFragment {
+public class ShipsFragment extends BaseFragment {
   private ShipListAdapter shipListAdapter;
 
   @Override
@@ -37,7 +38,7 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
     View v = inflater.inflate(R.layout.frag_build_ships, container, false);
 
     shipListAdapter = new ShipListAdapter();
-    updateStar(getStar(), getColony());
+//    updateStar(getStar(), getColony());
 
     final ListView shipList = (ListView) v.findViewById(R.id.ship_list);
     shipList.setAdapter(shipListAdapter);
@@ -47,13 +48,10 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
         ItemEntry entry = (ItemEntry) shipListAdapter.getItem(position);
         if (entry.fleet == null && entry.buildRequest == null) {
           // It's a new fleet
-          getBuildFragment().showBuildSheet(entry.design);
+//          getBuildFragment().showBuildSheet(entry.design);
         } else if (entry.fleet != null && entry.buildRequest == null) {
           // TODO: upgrade
-          getBuildFragment().showBuildSheet(entry.design);
-        } else {
-          // It's an in-progress fleet
-          getBuildFragment().showProgressSheet(entry.fleet, entry.buildRequest);
+//          getBuildFragment().showProgressSheet(entry.fleet, entry.buildRequest);
         }
       }
     });
@@ -318,9 +316,9 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
             row2.setText(String.format(Locale.US, "Upgrades: %s", upgrades));
           }
 
-          String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
-          row3.setVisibility(View.VISIBLE);
-          row3.setText(Html.fromHtml(requiredHtml));
+//          String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
+//          row3.setVisibility(View.VISIBLE);
+//          row3.setText(Html.fromHtml(requiredHtml));
         }
 
         if (fleet != null && fleet.notes != null) {
@@ -349,8 +347,8 @@ public class ShipsFragment extends BuildFragment.BaseTabFragment {
         BuildHelper.setDesignIcon(design, icon);
 
         row1.setText(FleetListHelper.getFleetName((Fleet) null, design));
-        String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
-        row2.setText(Html.fromHtml(requiredHtml));
+//        String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
+//        row2.setText(Html.fromHtml(requiredHtml));
 
         row3.setVisibility(View.GONE);
       }

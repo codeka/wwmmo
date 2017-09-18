@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.ui;
 
+import android.view.View;
 import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
@@ -25,23 +26,37 @@ public class SharedViews {
 
   public static class SharedView {
     private final int viewId;
+    private final View fromView;
     private final int fromViewId;
     private final int toViewId;
 
     public SharedView(int viewId) {
       this.viewId = viewId;
+      this.fromView = null;
       this.fromViewId = 0;
       this.toViewId = 0;
     }
 
     public SharedView(int fromViewId, int toViewId) {
       this.viewId = 0;
+      this.fromView = null;
       this.fromViewId = fromViewId;
+      this.toViewId = toViewId;
+    }
+
+    public SharedView(View fromView, int toViewId) {
+      this.viewId = 0;
+      this.fromView = fromView;
+      this.fromViewId = 0;
       this.toViewId = toViewId;
     }
 
     public int getViewId() {
       return viewId;
+    }
+
+    public View getFromView() {
+      return fromView;
     }
 
     public int getFromViewId() {
@@ -63,6 +78,11 @@ public class SharedViews {
 
     public Builder addSharedView(int fromViewId, int toViewId) {
       sharedViews.add(new SharedView(fromViewId, toViewId));
+      return this;
+    }
+
+    public Builder addSharedView(View fromView, int toViewId) {
+      sharedViews.add(new SharedView(fromView, toViewId));
       return this;
     }
 

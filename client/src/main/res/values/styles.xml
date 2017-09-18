@@ -51,6 +51,22 @@
     <item name="android:shadowRadius">1.0</item>
   </style>
 
+  <style name="TabLayout" parent="Widget.Design.TabLayout">
+    <item name="tabMaxWidth">200dp</item>
+    <item name="tabIndicatorColor">?attr/colorAccent</item>
+    <item name="tabIndicatorHeight">2dp</item>
+    <item name="tabPaddingStart">12dp</item>
+    <item name="tabPaddingEnd">12dp</item>
+    <item name="tabBackground">?attr/selectableItemBackground</item>
+    <item name="tabTextAppearance">@style/TabTextAppearance</item>
+    <item name="tabSelectedTextColor">?android:textColorPrimary</item>
+  </style>
+  <style name="TabTextAppearance" parent="TextAppearance.Design.Tab">
+    <item name="android:textSize">14sp</item>
+    <item name="android:textColor">?android:textColorSecondary</item>
+    <item name="textAllCaps">true</item>
+  </style>
+
   <style name="WarWorlds.PreferenceThemeOverlay" parent="@style/PreferenceThemeOverlay">
     <item name="android:background">@color/default_background</item>
   </style>

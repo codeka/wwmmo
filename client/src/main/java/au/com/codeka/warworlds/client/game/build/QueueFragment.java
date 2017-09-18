@@ -5,9 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.TabManager;
 
-public class QueueFragment extends BuildFragment.BaseTabFragment implements TabManager.Reloadable {
+public class QueueFragment extends BaseFragment implements TabManager.Reloadable {
  // private BuildQueueList buildQueueList;
 
   @Override

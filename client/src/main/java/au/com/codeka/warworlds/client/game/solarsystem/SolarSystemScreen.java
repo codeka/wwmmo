@@ -1,11 +1,19 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.game.build.BuildScreen;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.SharedViews;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -13,6 +21,9 @@ import au.com.codeka.warworlds.common.proto.Star;
  * for managing builds, planet focus, launching fleets and so on.
  */
 public class SolarSystemScreen extends Screen {
+  private static final Log log = new Log("SolarSystemScreen");
+
+  private ScreenContext context;
   private SolarSystemLayout layout;
   private Star star;
   private int planetIndex;
@@ -25,6 +36,7 @@ public class SolarSystemScreen extends Screen {
   @Override
   public void onCreate(ScreenContext context, ViewGroup container) {
     super.onCreate(context, container);
+    this.context = context;
 
     layout = new SolarSystemLayout(context.getActivity(), layoutCallbacks, star, planetIndex);
 
@@ -33,7 +45,18 @@ public class SolarSystemScreen extends Screen {
 
   @Override
   public View onShow() {
+    ActionBar actionBar = checkNotNull(context.getActivity().getSupportActionBar());
+    actionBar.show();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+    actionBar.setHomeButtonEnabled(true);
+
     return layout;
+  }
+
+  @Override
+  public void onHide() {
+    ActionBar actionBar = checkNotNull(context.getActivity().getSupportActionBar());
+    actionBar.hide();
   }
 
   @Override
@@ -58,12 +81,23 @@ public class SolarSystemScreen extends Screen {
   private final SolarSystemLayout.Callbacks layoutCallbacks = new SolarSystemLayout.Callbacks() {
     @Override
     public void onBuildClick(int planetIndex) {
-
+      context.pushScreen(
+          new BuildScreen(star, planetIndex),
+          new SharedViews.Builder()
+              .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
+              .addSharedView(R.id.bottom_pane)
+              .build());
     }
 
     @Override
     public void onFocusClick(int planetIndex) {
-
+      log.info("focus click: %d", planetIndex);
+      context.pushScreen(
+          new PlanetDetailsScreen(star, star.planets.get(planetIndex)),
+          new SharedViews.Builder()
+              .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
+              .addSharedView(R.id.bottom_pane)
+              .build());
     }
 
     @Override
@@ -73,13 +107,12 @@ public class SolarSystemScreen extends Screen {
 
     @Override
     public void onViewColonyClick(int planetIndex) {
-//      getFragmentTransitionManager().replaceFragment(
-//          PlanetDetailsFragment.class,
-//          PlanetDetailsFragment.createArguments(star.id, star.planets.indexOf(planet)),
-//          SharedViewHolder.builder()
-//              .addSharedView(R.id.bottom_pane, "bottom_pane")
-//              .addSharedView(sunAndPlanetsView.getPlanetView(planet), "planet_icon")
-//              .build());
+      context.pushScreen(
+          new PlanetDetailsScreen(star, star.planets.get(planetIndex)),
+          new SharedViews.Builder()
+              .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
+              .addSharedView(R.id.bottom_pane)
+              .build());
     }
 
     @Override

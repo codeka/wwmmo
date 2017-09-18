@@ -26,46 +26,44 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-public class BuildingsFragment extends BuildFragment.BaseTabFragment {
+public class BuildingsView extends ListView {
   private static final long REFRESH_DELAY_MS = 1000L;
 
-  private final Handler handler = new Handler();
+  private Star star;
+  private Colony colony;
+
   private BuildingListAdapter adapter;
 
-  @Override
-  protected int getViewResourceId() {
-    return R.layout.frag_build_buildings;
-  }
 
-  @Override
-  public void onViewCreated(View view, Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
+  public BuildingsView(Context context, Star star, Colony colony) {
+    super(context);
+    this.star = star;
+    this.colony = colony;
 
     adapter = new BuildingListAdapter();
-    adapter.setColony(getStar(), getColony());
-    ListView buildingsList = (ListView) view.findViewById(R.id.building_list);
-    buildingsList.setAdapter(adapter);
-    buildingsList.setOnItemClickListener((parent, v, position, id) -> {
+    adapter.setColony(star, colony);
+    setAdapter(adapter);
+    setOnItemClickListener((parent, v, position, id) -> {
       ItemEntry entry = (ItemEntry) adapter.getItem(position);
       if (entry.building == null && entry.buildRequest == null) {
-        getBuildFragment().showBuildSheet(entry.design);
+ //       getBuildFragment().showBuildSheet(entry.design);
       } else if (entry.building != null && entry.buildRequest == null) {
         // TODO: upgrade
-        getBuildFragment().showBuildSheet(entry.design);
+ //       getBuildFragment().showBuildSheet(entry.design);
       }
     });
   }
 
   @Override
-  public void onResume() {
-    super.onResume();
-    handler.postDelayed(refreshRunnable, REFRESH_DELAY_MS);
+  public void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    postDelayed(refreshRunnable, REFRESH_DELAY_MS);
   }
 
   @Override
-  public void onPause() {
-    super.onPause();
-    handler.removeCallbacks(refreshRunnable);
+  public void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+    removeCallbacks(refreshRunnable);
   }
 
   /** This adapter is used to populate a list of buildings in a list view. */
@@ -248,14 +246,14 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         tv.setText(entry.title);
       } else if (entry.building != null || entry.buildRequest != null) {
         // existing building/upgrading building
-        ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        TextView row1 = (TextView) view.findViewById(R.id.design_row1);
-        TextView row2 = (TextView) view.findViewById(R.id.design_row2);
-        TextView row3 = (TextView) view.findViewById(R.id.design_row3);
-        TextView level = (TextView) view.findViewById(R.id.build_level);
-        TextView levelLabel = (TextView) view.findViewById(R.id.build_level_label);
-        ProgressBar progress = (ProgressBar) view.findViewById(R.id.build_progress);
-        TextView notes = (TextView) view.findViewById(R.id.notes);
+        ImageView icon = view.findViewById(R.id.building_icon);
+        TextView row1 = view.findViewById(R.id.design_row1);
+        TextView row2 = view.findViewById(R.id.design_row2);
+        TextView row3 = view.findViewById(R.id.design_row3);
+        TextView level = view.findViewById(R.id.build_level);
+        TextView levelLabel = view.findViewById(R.id.build_level_label);
+        ProgressBar progress = view.findViewById(R.id.build_progress);
+        TextView notes = view.findViewById(R.id.notes);
 
         Building building = entry.building;
         BuildRequest buildRequest = entry.buildRequest;
@@ -294,7 +292,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
             progress.setVisibility(View.GONE);
 
             String requiredHtml =
-                DesignHelper.getDependenciesHtml(getColony(), design, building.level + 1);
+                DesignHelper.getDependenciesHtml(colony, design, building.level + 1);
             row2.setText(Html.fromHtml(requiredHtml));
 
             row3.setVisibility(View.GONE);
@@ -313,10 +311,10 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         }
       } else {
         // new building
-        ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        TextView row1 = (TextView) view.findViewById(R.id.design_row1);
-        TextView row2 = (TextView) view.findViewById(R.id.design_row2);
-        TextView row3 = (TextView) view.findViewById(R.id.design_row3);
+        ImageView icon = view.findViewById(R.id.building_icon);
+        TextView row1 = view.findViewById(R.id.design_row1);
+        TextView row2 = view.findViewById(R.id.design_row2);
+        TextView row3 = view.findViewById(R.id.design_row3);
 
         view.findViewById(R.id.build_progress).setVisibility(View.GONE);
         view.findViewById(R.id.build_level).setVisibility(View.GONE);
@@ -327,7 +325,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
         BuildHelper.setDesignIcon(design, icon);
 
         row1.setText(design.display_name);
-        String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
+        String requiredHtml = DesignHelper.getDependenciesHtml(colony, design);
         row2.setText(Html.fromHtml(requiredHtml));
 
         row3.setVisibility(View.GONE);
@@ -345,7 +343,7 @@ public class BuildingsFragment extends BuildFragment.BaseTabFragment {
       //}
 
       adapter.notifyDataSetChanged();
-      handler.postDelayed(refreshRunnable, REFRESH_DELAY_MS);
+      postDelayed(refreshRunnable, REFRESH_DELAY_MS);
     }
   };
 

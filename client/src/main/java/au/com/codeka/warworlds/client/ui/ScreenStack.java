@@ -4,6 +4,7 @@ import static au.com.codeka.warworlds.client.concurrency.Threads.checkOnThread;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import java.util.Stack;
@@ -15,11 +16,11 @@ import javax.annotation.Nullable;
  * corresponding view in the {@link ViewGroup} that the stack is created with.
  */
 public class ScreenStack {
-  private final Activity activity;
+  private final AppCompatActivity activity;
   private final ViewGroup container;
   private final Stack<ScreenHolder> screens = new Stack<>();
 
-  public ScreenStack(Activity activity, ViewGroup container) {
+  public ScreenStack(AppCompatActivity activity, ViewGroup container) {
     this.activity = activity;
     this.container = container;
   }
@@ -122,7 +123,12 @@ public class ScreenStack {
     }
 
     @Override
-    public Activity getActivity() {
+    public void popScreen() {
+      pop();
+    }
+
+    @Override
+    public AppCompatActivity getActivity() {
       return activity;
     }
   };

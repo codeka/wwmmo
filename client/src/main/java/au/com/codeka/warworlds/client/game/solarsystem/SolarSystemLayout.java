@@ -6,30 +6,22 @@ import android.content.Context;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.text.Html;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.client.game.fleets.FleetListSimple;
-import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector2;
-import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
-import au.com.codeka.warworlds.common.sim.ColonyHelper;
-import com.squareup.wire.Wire;
-import java.util.Locale;
 import javax.annotation.Nonnull;
 
 /**
@@ -66,14 +58,15 @@ public class SolarSystemLayout extends DrawerLayout {
    *
    * @param context The {@link Context}.
    * @param star The {@link Star} to display initially.
-   * @param planetIndex The index of the planet to have initially select (or -1 for no planet).
+   * @param startPlanetIndex The index of the planet to have initially select (or -1 for no planet).
    */
-  public SolarSystemLayout(Context context, Callbacks callbacks, @Nonnull Star star, int planetIndex) {
+  public SolarSystemLayout(
+      Context context, Callbacks callbacks, @Nonnull Star star, int startPlanetIndex) {
     super(context);
     inflate(context, R.layout.solarsystem, this);
 
     this.star = star;
-    this.planetIndex = planetIndex;
+    this.planetIndex = startPlanetIndex;
 
     drawer = findViewById(R.id.drawer);
     sunAndPlanets = findViewById(R.id.solarsystem_view);
@@ -144,14 +137,22 @@ public class SolarSystemLayout extends DrawerLayout {
   public void onAttachedToWindow() {
     super.onAttachedToWindow();
     drawerToggle.syncState();
+  }
 
-    ActionBar actionBar = checkNotNull(getMainActivity().getSupportActionBar());
-    actionBar.show();
-    actionBar.setDisplayHomeAsUpEnabled(true);
-    actionBar.setHomeButtonEnabled(true);
+  /**
+   * Gets the {@link View} that's showing the planet with the given index.
+   *
+   * @param planetIndex The index of the planet whose {@link View} you want.
+   * @return The {@link View} (actually, {@link ImageView} that the planet is being displayed in.
+   */
+  public View getPlanetView(int planetIndex) {
+    return sunAndPlanets.getPlanetView(planetIndex);
   }
 
   public void refreshStar(Star star) {
+    this.star = star;
+
+    searchListAdapter.addToLastStars(star);
     fleetList.setStar(star);
     sunAndPlanets.setStar(star);
     store.setStar(star);
@@ -166,6 +167,7 @@ public class SolarSystemLayout extends DrawerLayout {
     } else {
       log.debug("No planet selected");
     }
+    refreshSelectedPlanet();
   }
 
   // TODO: this is pretty hacky...
