@@ -46,7 +46,7 @@ public class BuildLayout extends RelativeLayout {
     this.colonies = colonies;
     inflate(context, R.layout.build, this);
 
-    colonyPagerAdapter = new ColonyPagerAdapter(context, star, colonies);
+    colonyPagerAdapter = new ColonyPagerAdapter(context, star, colonies, this);
     viewPager = findViewById(R.id.pager);
     viewPager.setAdapter(colonyPagerAdapter);
     planetIcon = findViewById(R.id.planet_icon);

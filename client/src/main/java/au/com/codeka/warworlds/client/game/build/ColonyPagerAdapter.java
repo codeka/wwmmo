@@ -1,7 +1,9 @@
 package au.com.codeka.warworlds.client.game.build;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
@@ -18,12 +20,18 @@ import java.util.List;
 public class ColonyPagerAdapter extends PagerAdapter {
   private static final Log log = new Log("ColonyPagerAdapter");
   private final Context context;
+  private final BuildLayout buildLayout;
 
   private Star star;
   private List<Colony> colonies;
 
-  public ColonyPagerAdapter(Context context, Star star, List<Colony> colonies) {
+  public ColonyPagerAdapter(
+      Context context,
+      Star star,
+      List<Colony> colonies,
+      BuildLayout buildLayout) {
     this.context = context;
+    this.buildLayout = buildLayout;
     this.star = star;
     this.colonies = colonies;
   }
@@ -32,7 +40,8 @@ public class ColonyPagerAdapter extends PagerAdapter {
   public Object instantiateItem(ViewGroup parent, int position) {
     log.info("instantiating item %d", position);
     Colony colony = colonies.get(position);
-    ColonyView view = new ColonyView(context, star, colony);
+    ColonyView view = new ColonyView(context, star, colony, buildLayout);
+    view.setLayoutParams(new ViewPager.LayoutParams());
     parent.addView(view);
     return view;
   }

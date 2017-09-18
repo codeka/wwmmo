@@ -34,7 +34,6 @@ public class BuildingsView extends ListView {
 
   private BuildingListAdapter adapter;
 
-
   public BuildingsView(Context context, Star star, Colony colony) {
     super(context);
     this.star = star;

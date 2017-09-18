@@ -1,40 +1,19 @@
 package au.com.codeka.warworlds.client.game.build;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 import au.com.codeka.warworlds.client.App;
-import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.BaseFragment;
-import au.com.codeka.warworlds.client.activity.TabbedBaseFragment;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
-import au.com.codeka.warworlds.client.game.world.ImageHelper;
-import au.com.codeka.warworlds.client.game.world.StarManager;
-import au.com.codeka.warworlds.client.opengl.DimensionResolver;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
-import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
-import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
-import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
-import au.com.codeka.warworlds.common.proto.StarModification;
-import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import javax.annotation.Nullable;
 
 /**
  * Shows buildings and ships on a planet. You can swipe left/right to switch between your colonies
@@ -51,18 +30,7 @@ public class BuildScreen extends Screen {
 
   public BuildScreen(Star star, int planetIndex) {
     this.star = star;
-    colonies = new ArrayList<>();
-    Empire myEmpire = EmpireManager.i.getMyEmpire();
-    for (Planet planet : star.planets) {
-      if (planet.colony != null
-          && planet.colony.empire_id != null
-          && planet.colony.empire_id.equals(myEmpire.id)) {
-        colonies.add(planet.colony);
-        if (planet.index.equals(planetIndex)) {
-          currColony = planet.colony;
-        }
-      }
-    }
+    extractColonies(star, planetIndex);
     if (currColony == null) {
       // Shouldn't happen, but maybe we were given a bad planetIndex?
       currColony = colonies.get(0);
@@ -100,22 +68,33 @@ public class BuildScreen extends Screen {
   private void updateStar(Star s) {
     log.info("Updating star %d [%s]...", s.id, s.name);
 
-    boolean dataSetChanged = (star == null);
-
+    Colony oldColony = currColony;
     star = s;
-    colonies = new ArrayList<>();
-    Empire myEmpire = EmpireManager.i.getMyEmpire();
-    for (Planet planet : star.planets) {
-      if (planet.colony != null && planet.colony.empire_id != null
-          && planet.colony.empire_id.equals(myEmpire.id)) {
-        colonies.add(planet.colony);
+    extractColonies(star, -1);
+    if (oldColony != null) {
+      for (Colony colony : colonies) {
+        if (colony.id.equals(oldColony.id)) {
+          currColony = colony;
+        }
       }
     }
-/*
-    if (dataSetChanged) {
-      colonyPagerAdapter.notifyDataSetChanged();
-    }
-*/
+
+    // TODO: refresh the layout
   }
 
+  private void extractColonies(Star star, int planetIndex) {
+    Empire myEmpire = EmpireManager.i.getMyEmpire();
+    colonies = new ArrayList<>();
+    currColony = null;
+    for (Planet planet : star.planets) {
+      if (planet.colony != null
+          && planet.colony.empire_id != null
+          && planet.colony.empire_id.equals(myEmpire.id)) {
+        colonies.add(planet.colony);
+        if (planet.index == planetIndex) {
+          currColony = planet.colony;
+        }
+      }
+    }
+  }
 }

@@ -1,21 +1,29 @@
 package au.com.codeka.warworlds.client.game.build;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.activity.TabManager;
+import au.com.codeka.warworlds.common.proto.Colony;
+import au.com.codeka.warworlds.common.proto.Star;
 
-public class QueueFragment extends BaseFragment implements TabManager.Reloadable {
- // private BuildQueueList buildQueueList;
+public class QueueView extends ListView {
+  private final Context context;
+  private final Star star;
+  private final Colony colony;
 
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-      Bundle savedInstanceState) {
-    View v = inflater.inflate(R.layout.frag_build_queue, container, false);
-/*
+  public QueueView(Context context, Star star, Colony colony) {
+    super(context);
+    this.context = context;
+    this.star = star;
+    this.colony = colony;
+
+    /*
     final Star star = getStar();
     final Colony colony = getColony();
     if (star == null)
@@ -41,13 +49,5 @@ public class QueueFragment extends BaseFragment implements TabManager.Reloadable
       }
     });
 */
-    return v;
-  }
-
-  @Override
-  public void reloadTab() {
-    //if (buildQueueList != null) {
-   //   buildQueueList.refreshSelection();
-   // }
   }
 }

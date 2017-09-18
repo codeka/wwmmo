@@ -2,19 +2,16 @@ package au.com.codeka.warworlds.client.game.build;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.game.fleets.FleetListHelper;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
@@ -29,103 +26,62 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ShipsFragment extends BaseFragment {
+public class ShipsView extends ListView {
+  private final Context context;
+  private final Star star;
+  private final Colony colony;
+
   private ShipListAdapter shipListAdapter;
 
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-      Bundle savedInstanceState) {
-    View v = inflater.inflate(R.layout.frag_build_ships, container, false);
+  public ShipsView(Context context, Star star, Colony colony) {
+    super(context);
+    this.context = context;
+    this.star = star;
+    this.colony = colony;
 
     shipListAdapter = new ShipListAdapter();
-//    updateStar(getStar(), getColony());
+    updateStar(star, colony);
 
-    final ListView shipList = (ListView) v.findViewById(R.id.ship_list);
-    shipList.setAdapter(shipListAdapter);
-    shipList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ItemEntry entry = (ItemEntry) shipListAdapter.getItem(position);
-        if (entry.fleet == null && entry.buildRequest == null) {
-          // It's a new fleet
+    setAdapter(shipListAdapter);
+    setOnItemClickListener((parent, view, position, id) -> {
+      ItemEntry entry = (ItemEntry) shipListAdapter.getItem(position);
+      if (entry.fleet == null && entry.buildRequest == null) {
+        // It's a new fleet
 //          getBuildFragment().showBuildSheet(entry.design);
-        } else if (entry.fleet != null && entry.buildRequest == null) {
-          // TODO: upgrade
+      } else if (entry.fleet != null && entry.buildRequest == null) {
+        // TODO: upgrade
 //          getBuildFragment().showProgressSheet(entry.fleet, entry.buildRequest);
-        }
       }
     });
 
-    shipList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-      @Override
-      public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-        final ItemEntry entry = (ItemEntry) shipListAdapter.getItem(position);
+    setOnItemLongClickListener((adapterView, view, position, id) -> {
+      final ItemEntry entry = (ItemEntry) shipListAdapter.getItem(position);
 
-        //NotesDialog dialog = new NotesDialog();
-        //dialog.setup(entry.fleet == null ? entry.buildRequest.getNotes() : entry.fleet.getNotes(),
-        //    new NotesDialog.NotesChangedHandler() {
-        //      @Override
-        //      public void onNotesChanged(String notes) {
-        //        if (entry.fleet != null) {
-        //          entry.fleet.setNotes(notes);
-        //        } else if (entry.buildRequest != null) {
-        //          entry.buildRequest.setNotes(notes);
-        //        }
-        //        shipListAdapter.notifyDataSetChanged();
+      //NotesDialog dialog = new NotesDialog();
+      //dialog.setup(entry.fleet == null ? entry.buildRequest.getNotes() : entry.fleet.getNotes(),
+      //    new NotesDialog.NotesChangedHandler() {
+      //      @Override
+      //      public void onNotesChanged(String notes) {
+      //        if (entry.fleet != null) {
+      //          entry.fleet.setNotes(notes);
+      //        } else if (entry.buildRequest != null) {
+      //          entry.buildRequest.setNotes(notes);
+      //        }
+      //        shipListAdapter.notifyDataSetChanged();
 
-        //        if (entry.fleet != null) {
-        //          FleetManager.i.updateNotes(entry.fleet);
-        //        } else {
-        //          BuildManager.i.updateNotes(entry.buildRequest.getKey(), notes);
-        //        }
-        //      }
-        //    });
+      //        if (entry.fleet != null) {
+      //          FleetManager.i.updateNotes(entry.fleet);
+      //        } else {
+      //          BuildManager.i.updateNotes(entry.buildRequest.getKey(), notes);
+      //        }
+      //      }
+      //    });
 
-        //dialog.show(getActivity().getSupportFragmentManager(), "");
-        return true;
-      }
+      //dialog.show(getActivity().getSupportFragmentManager(), "");
+      return true;
     });
-
-    return v;
   }
 
-  @Override
-  public void onStart() {
-    super.onStart();
-    //StarManager.eventBus.register(eventHandler);
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    //StarManager.eventBus.unregister(eventHandler);
-  }
-/*
-  private final Object eventHandler = new Object() {
-    @EventHandler
-    public void onStarUpdated(Star s) {
-      if (!getStar().getKey().equals(s.getKey())) {
-        return;
-      }
-
-      // We can't guarantee that getColony() has been updated yet, but we only need the key
-      // and can update from that.
-      String colonyKey = getColony().getKey();
-      Colony colony = null;
-      for (BaseColony baseColony : s.getColonies()) {
-        if (baseColony.getKey().equals(colonyKey)) {
-          colony = (Colony) baseColony;
-          break;
-        }
-      }
-      if (colony == null) {
-        return;
-      }
-
-      updateStar(s, colony);
-    }
-  };
-*/
   private void updateStar(Star star, Colony colony) {
     Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
     ArrayList<Fleet> fleets = new ArrayList<>();
@@ -316,9 +272,9 @@ public class ShipsFragment extends BaseFragment {
             row2.setText(String.format(Locale.US, "Upgrades: %s", upgrades));
           }
 
-//          String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
-//          row3.setVisibility(View.VISIBLE);
-//          row3.setText(Html.fromHtml(requiredHtml));
+          String requiredHtml = DesignHelper.getDependenciesHtml(colony, design);
+          row3.setVisibility(View.VISIBLE);
+          row3.setText(Html.fromHtml(requiredHtml));
         }
 
         if (fleet != null && fleet.notes != null) {
@@ -333,10 +289,10 @@ public class ShipsFragment extends BaseFragment {
         }
       } else {
         // new fleet
-        ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        TextView row1 = (TextView) view.findViewById(R.id.design_row1);
-        TextView row2 = (TextView) view.findViewById(R.id.design_row2);
-        TextView row3 = (TextView) view.findViewById(R.id.design_row3);
+        ImageView icon = view.findViewById(R.id.building_icon);
+        TextView row1 = view.findViewById(R.id.design_row1);
+        TextView row2 = view.findViewById(R.id.design_row2);
+        TextView row3 = view.findViewById(R.id.design_row3);
 
         view.findViewById(R.id.build_progress).setVisibility(View.GONE);
         view.findViewById(R.id.build_level).setVisibility(View.GONE);
@@ -347,8 +303,8 @@ public class ShipsFragment extends BaseFragment {
         BuildHelper.setDesignIcon(design, icon);
 
         row1.setText(FleetListHelper.getFleetName((Fleet) null, design));
-//        String requiredHtml = DesignHelper.getDependenciesHtml(getColony(), design);
-//        row2.setText(Html.fromHtml(requiredHtml));
+        String requiredHtml = DesignHelper.getDependenciesHtml(colony, design);
+        row2.setText(Html.fromHtml(requiredHtml));
 
         row3.setVisibility(View.GONE);
       }
