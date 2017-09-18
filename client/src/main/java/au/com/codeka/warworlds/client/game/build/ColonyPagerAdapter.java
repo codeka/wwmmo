@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
@@ -22,6 +23,8 @@ public class ColonyPagerAdapter extends PagerAdapter {
   private final Context context;
   private final BuildLayout buildLayout;
 
+  private final SparseArray<ColonyView> views = new SparseArray<>();
+
   private Star star;
   private List<Colony> colonies;
 
@@ -36,6 +39,20 @@ public class ColonyPagerAdapter extends PagerAdapter {
     this.colonies = colonies;
   }
 
+  public void refresh(Star star, List<Colony> colonies) {
+    this.star = star;
+
+    // TODO: what if the current list of colonies has changed?
+    this.colonies = colonies;
+    notifyDataSetChanged();
+
+    for (int i = 0; i < views.size(); i++) {
+      int position = views.keyAt(i);
+      ColonyView view = views.valueAt(i);
+      view.refresh(star, colonies.get(position));
+    }
+  }
+
   @Override
   public Object instantiateItem(ViewGroup parent, int position) {
     log.info("instantiating item %d", position);
@@ -43,11 +60,13 @@ public class ColonyPagerAdapter extends PagerAdapter {
     ColonyView view = new ColonyView(context, star, colony, buildLayout);
     view.setLayoutParams(new ViewPager.LayoutParams());
     parent.addView(view);
+    views.put(position, view);
     return view;
   }
 
   @Override
   public void destroyItem(ViewGroup collection, int position, Object view) {
+    views.remove(position);
     collection.removeView((View) view);
   }
 

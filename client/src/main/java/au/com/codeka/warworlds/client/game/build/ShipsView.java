@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ShipsView extends ListView {
+public class ShipsView extends ListView implements BuildTabContentView {
   private final Context context;
   private final Star star;
   private final Colony colony;
@@ -80,6 +80,11 @@ public class ShipsView extends ListView {
       //dialog.show(getActivity().getSupportFragmentManager(), "");
       return true;
     });
+  }
+
+  @Override
+  public void refresh(Star star, Colony colony) {
+    // TODO
   }
 
   private void updateStar(Star star, Colony colony) {

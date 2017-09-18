@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class BuildingsView extends ListView {
+public class BuildingsView extends ListView implements BuildTabContentView {
   private static final long REFRESH_DELAY_MS = 1000L;
 
   private Star star;
@@ -37,7 +37,7 @@ public class BuildingsView extends ListView {
     this.colony = colony;
 
     adapter = new BuildingListAdapter();
-    adapter.setColony(star, colony);
+    adapter.refresh(star, colony);
     setAdapter(adapter);
     setOnItemClickListener((parent, v, position, id) -> {
       ItemEntry entry = (ItemEntry) adapter.getItem(position);
@@ -48,6 +48,13 @@ public class BuildingsView extends ListView {
         buildLayout.showBuildSheet(entry.design);
       }
     });
+  }
+
+  @Override
+  public void refresh(Star star, Colony colony) {
+    this.star = star;
+    this.colony = colony;
+    adapter.refresh(star, colony);
   }
 
   @Override
@@ -70,7 +77,7 @@ public class BuildingsView extends ListView {
     private static final int EXISTING_BUILDING_TYPE = 1;
     private static final int NEW_BUILDING_TYPE = 2;
 
-    public void setColony(Star star, Colony colony) {
+    public void refresh(Star star, Colony colony) {
       entries = new ArrayList<>();
 
       List<Building> buildings = colony.buildings;

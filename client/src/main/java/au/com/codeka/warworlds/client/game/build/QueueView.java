@@ -12,7 +12,7 @@ import au.com.codeka.warworlds.client.activity.TabManager;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Star;
 
-public class QueueView extends ListView {
+public class QueueView extends ListView implements BuildTabContentView {
   private final Context context;
   private final Star star;
   private final Colony colony;
@@ -50,4 +50,10 @@ public class QueueView extends ListView {
     });
 */
   }
+
+  @Override
+  public void refresh(Star star, Colony colony) {
+    // TODO
+  }
+
 }

@@ -19,11 +19,13 @@ import au.com.codeka.warworlds.common.proto.Star;
 public class ColonyView extends FrameLayout {
   private final Context context;
   private final BuildLayout buildLayout;
-  private final Star star;
-  private final Colony colony;
 
   private final TabLayout tabLayout;
   private final FrameLayout tabContent;
+
+  private Star star;
+  private Colony colony;
+  private BuildTabContentView contentView;
 
   public ColonyView(@NonNull Context context, Star star, Colony colony, BuildLayout buildLayout) {
     super(context);
@@ -63,6 +65,14 @@ public class ColonyView extends FrameLayout {
     tabLayout.addOnTabSelectedListener(tabSelectedListener);
   }
 
+  public void refresh(Star star, Colony colony) {
+    this.star = star;
+    this.colony = colony;
+    if (contentView != null) {
+      contentView.refresh(star, colony);
+    }
+  }
+
   private final TabLayout.OnTabSelectedListener tabSelectedListener =
       new TabLayout.OnTabSelectedListener() {
     @Override
@@ -72,12 +82,13 @@ public class ColonyView extends FrameLayout {
       buildLayout.hideBottomSheet();
       tabContent.removeAllViews();
       if (tab.getPosition() == 0) {
-        tabContent.addView(new BuildingsView(context, star, colony, buildLayout));
+        contentView = new BuildingsView(context, star, colony, buildLayout);
       } else if (tab.getPosition() == 1) {
-        tabContent.addView(new ShipsView(context, star, colony, buildLayout));
+        contentView = new ShipsView(context, star, colony, buildLayout);
       } else if (tab.getPosition() == 2) {
-        tabContent.addView(new QueueView(context, star, colony));
+        contentView = new QueueView(context, star, colony);
       }
+      tabContent.addView((View) contentView);
     }
 
     @Override

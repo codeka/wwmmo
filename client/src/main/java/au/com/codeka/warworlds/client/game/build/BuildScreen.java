@@ -79,7 +79,7 @@ public class BuildScreen extends Screen {
       }
     }
 
-    // TODO: refresh the layout
+    layout.refresh(star, colonies);
   }
 
   private void extractColonies(Star star, int planetIndex) {

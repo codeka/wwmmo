@@ -55,6 +55,13 @@ public class BuildLayout extends RelativeLayout {
     bottomPane = findViewById(R.id.bottom_pane);
   }
 
+  /** Called when the star is updated. We'll need to refresh our current view. */
+  public void refresh(Star star, List<Colony> colonies) {
+    this.star = star;
+    this.colonies = colonies;
+    colonyPagerAdapter.refresh(star, colonies);
+  }
+
   /** Show the "build" popup sheet for the given {@link Design}. */
   public void showBuildSheet(Design design) {
     final Colony colony = checkNotNull(colonies.get(viewPager.getCurrentItem()));
