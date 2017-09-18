@@ -6,7 +6,6 @@
          android:layout_height="match_parent">
 
     <ImageView android:id="@+id/planet_icon"
-               android:transitionName="planet_icon"
                android:layout_width="48dp"
                android:layout_height="48dp"
                android:layout_alignParentStart="true"
@@ -35,7 +34,6 @@
 
     <FrameLayout android:id="@+id/bottom_pane"
                     style="@style/BottomPane"
-                    android:transitionName="bottom_pane"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_alignParentBottom="true">

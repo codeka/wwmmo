@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.game.build.BuildScreen;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;
@@ -80,7 +81,12 @@ public class SolarSystemScreen extends Screen {
   private final SolarSystemLayout.Callbacks layoutCallbacks = new SolarSystemLayout.Callbacks() {
     @Override
     public void onBuildClick(int planetIndex) {
-
+      context.pushScreen(
+          new BuildScreen(star, planetIndex),
+          new SharedViews.Builder()
+              .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
+              .addSharedView(R.id.bottom_pane)
+              .build());
     }
 
     @Override
