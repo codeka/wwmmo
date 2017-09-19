@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.chat.ChatFragment;
-import au.com.codeka.warworlds.client.game.empire.EmpireFragment;
+import au.com.codeka.warworlds.client.game.empire.EmpireScreen;
 import au.com.codeka.warworlds.client.game.fleets.FleetsFragment;
 import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemScreen;
 import au.com.codeka.warworlds.client.ui.FragmentScreen;
@@ -134,9 +134,7 @@ public class StarfieldScreen extends Screen {
   }
 
   private void onEmpireClick() {
-    EmpireFragment fragment = new EmpireFragment();
-    fragment.setArguments(EmpireFragment.createArguments());
-    context.pushScreen(new FragmentScreen(fragment), createSharedViews());
+    context.pushScreen(new EmpireScreen());
   }
 
   private void onSitrepClick() {
