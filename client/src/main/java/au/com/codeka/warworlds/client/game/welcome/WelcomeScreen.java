@@ -256,7 +256,7 @@ public class WelcomeScreen extends Screen {
 
     @Override
     public void onSignInClick() {
-      //TODO getFragmentTransitionManager().replaceFragment(SignInFragment.class);
+      context.pushScreen(new SignInScreen());
     }
   };
 
