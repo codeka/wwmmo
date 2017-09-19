@@ -493,30 +493,21 @@ public class StarfieldManager {
 
   /** Detach any non-moving fleets that may have been moving previously. */
   private void detachNonMovingFleets(@Nullable Star oldStar, Star star) {
-    log.debug("detachNonMovingFleets()");
-
     // Remove any fleets that are no longer moving.
     for (Fleet fleet : star.fleets) {
       if (fleet.state != Fleet.FLEET_STATE.MOVING) {
-        log.debug("%d Fleet %d (%s) is %s.", star.id, fleet.id, fleet.design_type, fleet.state);
         SceneObject sceneObject = sceneObjects.get(fleet.id);
         if (sceneObject != null) {
-          log.debug("%d ... and it has a SceneObject.", star.id);
           detachNonMovingFleet(fleet, sceneObject);
-        } else {
-          log.debug("%d ... but it doesn't have a SceneObject.", star.id);
         }
       }
     }
 
     // Make sure to also do the same for fleets that are no longer on the star.
     if (oldStar != null) {
-      log.debug("%d The oldStar is not null.", star.id);
       for (Fleet oldFleet : oldStar.fleets) {
         SceneObject sceneObject = sceneObjects.get(oldFleet.id);
         if (sceneObject == null) {
-          log.debug("%d Fleet %d (%s) doesn't have a SceneObject.",
-              star.id, oldFleet.id, oldFleet.design_type);
           // no need to see if we need to remove it if it doesn't exist...
           continue;
         }
@@ -528,14 +519,9 @@ public class StarfieldManager {
           }
         }
         if (removed) {
-          log.debug("%d The old fleet doesn't exist in the new fleet.", star.id);
           detachNonMovingFleet(oldFleet, sceneObject);
-        } else {
-          log.debug("%d The old fleet exists in the new fleet.", star.id);
         }
       }
-    } else {
-      log.debug("%d The oldStar is null.", star.id);
     }
   }
 

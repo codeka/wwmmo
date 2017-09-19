@@ -606,7 +606,7 @@ public class StarModifier {
     }
     Fleet fleet = star.fleets.get(fleetIndex);
 
-    if (fleet.empire_id != modification.empire_id) {
+    if (!fleet.empire_id.equals(modification.empire_id)) {
       throw new SuspiciousModificationException(
           star.id,
           modification,

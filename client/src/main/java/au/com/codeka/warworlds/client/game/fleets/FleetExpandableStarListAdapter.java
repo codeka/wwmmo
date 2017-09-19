@@ -111,8 +111,9 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
     }
   }
 
-  public void setSelectedFleetId(@Nullable Long starId, @Nullable Long fleetId) {
+  public void setSelectedFleetId(@Nullable Star star, @Nullable Long fleetId) {
     selectedFleetId = fleetId;
+    selectedStar = star;
 
     if (multiSelect) {
       if (!selectedFleetIds.contains(fleetId)) {

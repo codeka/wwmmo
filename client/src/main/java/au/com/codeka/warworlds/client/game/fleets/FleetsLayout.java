@@ -11,7 +11,6 @@ import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.game.world.StarCollection;
-import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -56,7 +55,7 @@ public class FleetsLayout extends RelativeLayout {
     for (int groupPosition = 0; groupPosition < starCollection.size(); groupPosition++) {
       Star star = starCollection.get(groupPosition);
       listView.expandGroup(groupPosition);
-      adapter.setSelectedFleetId(star.id, fleetId);
+      adapter.setSelectedFleetId(star, fleetId);
       break;
     }
   }
@@ -76,18 +75,8 @@ public class FleetsLayout extends RelativeLayout {
     bottomPane.addView(new ActionBottomPane(getContext(), actionBottomPaneCallback));
   }
 
-  public void showMovePane() {
-    if (adapter.getSelectedFleetId() == null) {
-      return;
-    }
+  public void showMovePane(Star star, long fleetId) {
     showStarfield(true /* visible */);
-
-    Star star = adapter.getSelectedStar();
-    if (star == null) {
-      return;
-    }
-
-    long fleetId = adapter.getSelectedFleetId();
 
     // TODO: the cast seems... not great.
     StarfieldManager starfieldManager = ((MainActivity) getContext()).getStarfieldManager();
@@ -101,19 +90,8 @@ public class FleetsLayout extends RelativeLayout {
     bottomPane.addView(moveBottomPane);
   }
 
-  public void showSplitPane() {
-    if (adapter.getSelectedFleetId() == null) {
-      // No fleet selected, can't split.
-      return;
-    }
+  public void showSplitPane(Star star, long fleetId) {
     showStarfield(false /* visible */);
-
-    Star star = adapter.getSelectedStar();
-    if (star == null) {
-      return;
-    }
-
-    long fleetId = adapter.getSelectedFleetId();
 
     SplitBottomPane splitBottomPane = new SplitBottomPane(getContext(), this::showActionsPane);
     splitBottomPane.setFleet(star, fleetId);
@@ -123,19 +101,8 @@ public class FleetsLayout extends RelativeLayout {
     bottomPane.addView(splitBottomPane);
   }
 
-  public void showMergePane() {
-    if (adapter.getSelectedFleetId() == null) {
-      // No fleet selected, can't split.
-      return;
-    }
+  public void showMergePane(Star star, long fleetId) {
     showStarfield(false /* visible */);
-
-    Star star = adapter.getSelectedStar();
-    if (star == null) {
-      return;
-    }
-
-    long fleetId = adapter.getSelectedFleetId();
 
     MergeBottomPane mergeBottomPane =
         new MergeBottomPane(getContext(), adapter, this::showActionsPane);
@@ -160,17 +127,44 @@ public class FleetsLayout extends RelativeLayout {
       new ActionBottomPane.Callback() {
         @Override
         public void onMoveClick() {
-          showMovePane();
+          Long fleetId = adapter.getSelectedFleetId();
+          if (fleetId == null) {
+            return;
+          }
+          Star star = adapter.getSelectedStar();
+          if (star == null) {
+            return;
+          }
+
+          showMovePane(star, fleetId);
         }
 
         @Override
         public void onSplitClick() {
-          showSplitPane();
+          Long fleetId = adapter.getSelectedFleetId();
+          if (fleetId == null) {
+            return;
+          }
+          Star star = adapter.getSelectedStar();
+          if (star == null) {
+            return;
+          }
+
+          showSplitPane(star, fleetId);
         }
 
         @Override
         public void onMergeClick() {
-          showMergePane();
+          Long fleetId = adapter.getSelectedFleetId();
+          if (fleetId == null) {
+            return;
+          }
+          Star star = adapter.getSelectedStar();
+          if (star == null) {
+            return;
+          }
+
+          showMergePane(star, fleetId);
         }
       };
 }
