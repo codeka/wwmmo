@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.activity;
+package au.com.codeka.warworlds.client.ui;
 
 import android.annotation.TargetApi;
 import android.os.Build;

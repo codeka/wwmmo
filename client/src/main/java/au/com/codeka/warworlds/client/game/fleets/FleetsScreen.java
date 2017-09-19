@@ -1,22 +1,11 @@
 package au.com.codeka.warworlds.client.game.fleets;
 
-import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.transition.TransitionManager;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.FrameLayout;
-import au.com.codeka.warworlds.client.MainActivity;
-import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.BaseFragment;
-import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.game.world.ArrayListStarCollection;
 import au.com.codeka.warworlds.client.game.world.MyEmpireStarCollection;
 import au.com.codeka.warworlds.client.game.world.StarCollection;
-import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.common.Log;

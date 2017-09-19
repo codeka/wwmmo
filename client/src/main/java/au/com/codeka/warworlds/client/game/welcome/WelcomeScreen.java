@@ -15,7 +15,6 @@ import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldScreen;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
-import au.com.codeka.warworlds.client.ui.FragmentScreen;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.util.GameSettings;

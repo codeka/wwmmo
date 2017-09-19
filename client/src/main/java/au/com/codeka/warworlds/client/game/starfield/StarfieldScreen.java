@@ -9,7 +9,6 @@ import au.com.codeka.warworlds.client.game.chat.ChatScreen;
 import au.com.codeka.warworlds.client.game.fleets.FleetsScreen;
 import au.com.codeka.warworlds.client.game.empire.EmpireScreen;
 import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemScreen;
-import au.com.codeka.warworlds.client.ui.FragmentScreen;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;

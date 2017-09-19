@@ -5,7 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import au.com.codeka.warworlds.client.activity.BaseFragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import au.com.codeka.warworlds.client.ctrl.DebugView;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.game.welcome.CreateEmpireScreen;
@@ -16,7 +16,7 @@ import au.com.codeka.warworlds.client.ui.ScreenStack;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.common.Log;
 
-public class MainActivity extends BaseFragmentActivity {
+public class MainActivity extends AppCompatActivity {
   private static final Log log = new Log("MainActivity");
 
   // Will be non-null between of onCreate/onDestroy.
@@ -42,7 +42,6 @@ public class MainActivity extends BaseFragmentActivity {
     debugView.setFrameCounter(renderSurfaceView.getFrameCounter());
 
     screenStack = new ScreenStack(this, findViewById(R.id.fragment_container));
-    createFragmentTransitionManager(screenStack);
 
     if (savedInstanceState != null) {
       // TODO: restore the view state?

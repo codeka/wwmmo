@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.Transitions;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;

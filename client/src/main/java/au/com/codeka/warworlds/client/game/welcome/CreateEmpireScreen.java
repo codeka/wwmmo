@@ -1,16 +1,9 @@
 package au.com.codeka.warworlds.client.game.welcome;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.BaseFragment;
-import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.net.HttpRequest;
 import au.com.codeka.warworlds.client.net.ServerUrl;
@@ -18,7 +11,6 @@ import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;
 import au.com.codeka.warworlds.client.util.GameSettings;
-import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.NewAccountRequest;
 import au.com.codeka.warworlds.common.proto.NewAccountResponse;
