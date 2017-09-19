@@ -2,7 +2,7 @@ package au.com.codeka.warworlds.client.game.empire;
 
 import android.os.Bundle;
 import au.com.codeka.warworlds.client.activity.TabbedBaseFragment;
-import au.com.codeka.warworlds.client.game.fleets.FleetsFragment;
+import au.com.codeka.warworlds.client.game.fleets.FleetsScreen;
 import au.com.codeka.warworlds.common.Log;
 
 /**
@@ -26,7 +26,7 @@ public class EmpireFragment extends TabbedBaseFragment {
     getTabManager().addTab(getContext(),
         new TabInfo(this, "Build", BuildQueueFragment.class, new Bundle()));
     getTabManager().addTab(getContext(),
-        new TabInfo(this, "Fleets", FleetsFragment.class, new Bundle()));
+        new TabInfo(this, "Fleets", FleetsScreen.class, new Bundle()));
   }
 
   @Override

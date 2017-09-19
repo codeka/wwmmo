@@ -13,6 +13,14 @@ public class ArrayListStarCollection implements StarCollection {
     stars = new ArrayList<>();
   }
 
+  public static ArrayListStarCollection of(Star... stars) {
+    ArrayListStarCollection starCollection = new ArrayListStarCollection();
+    for (Star star : stars) {
+      starCollection.getStars().add(star);
+    }
+    return starCollection;
+  }
+
   @Override
   public int size() {
     return stars.size();

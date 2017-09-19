@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/default_background">
-
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.RelativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
   <ExpandableListView
       android:id="@+id/fleet_list"
       android:layout_width="match_parent"
@@ -11,11 +11,14 @@
       android:layout_alignParentTop="true"
       android:layout_above="@+id/bottom_pane"
       android:layout_marginBottom="-4px"
+      android:background="@color/default_background"
       android:listSelector="@drawable/list_selector" />
 
-  <au.com.codeka.warworlds.ctrl.FleetSelectionPanel
+  <FrameLayout
       android:id="@+id/bottom_pane"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_alignParentBottom="true" />
-</RelativeLayout>
+      android:layout_alignParentBottom="true"
+      style="@style/BottomPane">
+  </FrameLayout>
+</merge>
