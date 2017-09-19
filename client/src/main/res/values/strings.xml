@@ -47,6 +47,9 @@
   <string name="buildings">Buildings</string>
   <string name="ships">Ships</string>
   <string name="queue">Queue</string>
+  <string name="overview">Overview</string>
+  <string name="colonies">Colonies</string>
+  <string name="fleets">Fleets</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to
