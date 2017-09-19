@@ -139,7 +139,7 @@ public class PlanetDetailsLayout extends RelativeLayout {
     if (empire != null) {
       empireName.setText(empire.display_name);
     } else {
-      empireName.setText("");
+      empireName.setText(R.string.uncolonized);
     }
     congeniality.setPlanet(planet);
 

@@ -114,8 +114,7 @@ public class PlanetDetailsScreen extends Screen {
           .empire_id(myEmpire.id)
           .planet_index(planet.index));
 
-      // TODO: have a nicer API for this.
-      //context.popScreen();
+      context.popScreen();
     }
   };
 }
