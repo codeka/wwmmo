@@ -46,6 +46,8 @@ public class BuildingsView extends ListView implements TabContentView {
       } else if (entry.building != null && entry.buildRequest == null) {
         // TODO: upgrade
         buildLayout.showBuildSheet(entry.design);
+      } else {
+        buildLayout.showProgressSheet(null, entry.buildRequest);
       }
     });
   }

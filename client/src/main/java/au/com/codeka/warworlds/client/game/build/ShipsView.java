@@ -51,6 +51,8 @@ public class ShipsView extends ListView implements TabContentView {
       } else if (entry.fleet != null && entry.buildRequest == null) {
         // TODO: upgrade
         buildLayout.showBuildSheet(entry.design);
+      } else {
+        buildLayout.showProgressSheet(null, entry.buildRequest);
       }
     });
 

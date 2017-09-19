@@ -87,7 +87,15 @@ public class BuildLayout extends RelativeLayout {
    * if we're upgrading.
    */
   public void showProgressSheet(@Nullable Fleet fleet, BuildRequest buildRequest) {
-    // TODO
+    final Colony colony = checkNotNull(colonies.get(viewPager.getCurrentItem()));
+
+    TransitionManager.beginDelayedTransition(bottomPane);
+    bottomPane.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+    bottomPane.removeAllViews();
+    bottomPane.addView(
+        new ProgressBottomPane(getContext(), star, colony, buildRequest, () -> {
+          // TODO
+        }));
   }
 
   public void hideBottomSheet() {

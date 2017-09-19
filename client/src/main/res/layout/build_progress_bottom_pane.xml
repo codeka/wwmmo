@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.RelativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+  <ImageView
+      android:id="@+id/build_icon"
+      android:layout_width="48dp"
+      android:layout_height="48dp"
+      android:layout_alignParentStart="true"
+      android:layout_alignParentTop="true"
+      android:layout_marginTop="20dp"
+      android:layout_marginBottom="20dp" />
+
+  <TextView
+      android:id="@+id/build_name"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"
+      android:layout_toEndOf="@+id/build_icon"
+      android:layout_marginTop="20dp"
+      android:textAppearance="?android:attr/textAppearanceMedium" />
+
+  <TextView
+      android:id="@+id/build_time_remaining"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignStart="@+id/build_name"
+      android:layout_below="@+id/build_name"
+      android:textAppearance="?android:attr/textAppearanceSmall" />
+
+  <ProgressBar
+      android:id="@+id/build_progress"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="wrap_content"
+      android:layout_height="10dp"
+      android:layout_marginEnd="10dp"
+      android:layout_marginBottom="20dp"
+      android:layout_alignStart="@+id/build_name"
+      android:layout_toStartOf="@+id/cancel"
+      android:layout_below="@+id/build_time_remaining" />
+
+  <Button
+      android:id="@+id/cancel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentEnd="true"
+      android:layout_centerVertical="true"
+      android:layout_marginEnd="10dp"
+      android:text="@string/cancel" />
+</merge>

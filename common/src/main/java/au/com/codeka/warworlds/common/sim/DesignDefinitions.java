@@ -333,6 +333,7 @@ public class DesignDefinitions {
                       .build())
                   .build()
           ))
+          .show_in_solar_system(false)
           .max_per_colony(1)
           .build(),
 
@@ -489,6 +490,7 @@ public class DesignDefinitions {
                   ))
                   .build()
           ))
+          .show_in_solar_system(false)
           .build(),
 
       new Design.Builder()
@@ -507,6 +509,7 @@ public class DesignDefinitions {
               .build())
           .image_url("hq.png")
           .max_per_empire(1)
+          .show_in_solar_system(true)
           .build(),
 
       new Design.Builder()
@@ -593,6 +596,7 @@ public class DesignDefinitions {
                           .build()))
                   .build()
           ))
+          .show_in_solar_system(true)
           .build(),
 
       new Design.Builder()
@@ -692,6 +696,7 @@ public class DesignDefinitions {
                           .build()))
                   .build()
           ))
+          .show_in_solar_system(true)
           .build()
   )).build();
 }
