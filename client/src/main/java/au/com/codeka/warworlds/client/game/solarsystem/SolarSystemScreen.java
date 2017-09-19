@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.build.BuildScreen;
+import au.com.codeka.warworlds.client.game.fleets.FleetsScreen;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;
@@ -117,7 +118,11 @@ public class SolarSystemScreen extends Screen {
 
     @Override
     public void onFleetClick(long fleetId) {
-
+      context.pushScreen(
+          new FleetsScreen(star, fleetId),
+          new SharedViews.Builder()
+              .addSharedView(R.id.bottom_pane)
+              .build());
     }
   };
 }

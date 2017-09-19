@@ -103,7 +103,7 @@ public class StarfieldScreen extends Screen {
 
       @Override
       public void onFleetClicked(Star star, Fleet fleet) {
-        context.pushScreen(new FleetsScreen(star), createSharedViews());
+        context.pushScreen(new FleetsScreen(star, fleet.id), createSharedViews());
       }
     });
 

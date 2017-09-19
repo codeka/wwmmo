@@ -11,6 +11,7 @@ import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.game.world.StarCollection;
+import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -33,6 +34,11 @@ public class FleetsLayout extends RelativeLayout {
     adapter = new FleetExpandableStarListAdapter(LayoutInflater.from(getContext()), starCollection);
     listView.setAdapter(adapter);
 
+    if (starCollection.size() == 1) {
+      // if it's just one star, just expand it now.
+      listView.expandGroup(0);
+    }
+
     listView.setOnChildClickListener((lv, v, groupPosition, childPosition, id) -> {
       adapter.onItemClick(groupPosition, childPosition);
       return false;
@@ -40,6 +46,19 @@ public class FleetsLayout extends RelativeLayout {
 
     // Actions pane by default.
     bottomPane.addView(new ActionBottomPane(getContext(), actionBottomPaneCallback));
+  }
+
+  /**
+   * Select the given fleet. This is expensive and should be avoided except when there's only
+   * one (or a small, finite number of) star.
+   */
+  public void selectFleet(long fleetId) {
+    for (int groupPosition = 0; groupPosition < starCollection.size(); groupPosition++) {
+      Star star = starCollection.get(groupPosition);
+      listView.expandGroup(groupPosition);
+      adapter.setSelectedFleetId(star.id, fleetId);
+      break;
+    }
   }
 
   @Override

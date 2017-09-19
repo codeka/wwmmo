@@ -122,6 +122,8 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
       selectedFleetIds.clear();
       selectedFleetIds.add(fleetId);
     }
+
+    notifyDataSetChanged();
   }
 
   public void onItemClick(int groupPosition, int childPosition) {

@@ -20,18 +20,22 @@ public class FleetsScreen extends Screen {
 
   private final StarCollection starCollection;
   private FleetsLayout layout;
+  private Long initialFleetId;
 
   /**
    * Construct a new {@link FleetsScreen}.
    *
    * @param star The {@link Star} to display fleets of. If null, the fleets of all stars will
    *             be displayed.
+   * @param fleetId If non-null, the ID of the fleet to have initially selected. Only possible when
+   *                star is also non-null.
    */
-  public FleetsScreen(@Nullable Star star) {
+  public FleetsScreen(@Nullable Star star, @Nullable Long fleetId) {
     if (star == null) {
       starCollection = new MyEmpireStarCollection();
     } else {
       starCollection = ArrayListStarCollection.of(star);
+      initialFleetId = fleetId;
     }
   }
 
@@ -40,6 +44,9 @@ public class FleetsScreen extends Screen {
     super.onCreate(context, parent);
 
     layout = new FleetsLayout(context.getActivity(), starCollection);
+    if (initialFleetId != null) {
+      layout.selectFleet(initialFleetId);
+    }
   }
 
   @Override
