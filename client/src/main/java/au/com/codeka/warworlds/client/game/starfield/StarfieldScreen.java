@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.game.chat.ChatFragment;
+import au.com.codeka.warworlds.client.game.chat.ChatScreen;
 import au.com.codeka.warworlds.client.game.fleets.FleetsScreen;
 import au.com.codeka.warworlds.client.game.empire.EmpireScreen;
 import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemScreen;
@@ -173,7 +173,7 @@ public class StarfieldScreen extends Screen {
     @Override
     public void onChatClick(@Nullable Long roomId) {
       context.pushScreen(
-          new FragmentScreen(new ChatFragment()),
+          new ChatScreen(),
           SharedViews.builder()
               .addSharedView(R.id.bottom_pane)
               .build());

@@ -4,8 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.os.Handler;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
@@ -18,10 +16,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.game.world.ChatManager;
 import au.com.codeka.warworlds.client.game.world.ChatMessagesUpdatedEvent;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
@@ -30,7 +28,6 @@ import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 import au.com.codeka.warworlds.common.proto.Empire;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,9 +37,7 @@ import java.util.Locale;
 /**
  * Fragment for showing the chats within a single {@link ChatRoom}.
  */
-public class RoomFragment extends BaseFragment {
-  private static final String CHAT_ROOM_KEY = "ChatRoom";
-
+public class RoomView extends RelativeLayout {
   private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("h:mm a", Locale.US);
   private static final SimpleDateFormat DATE_FORMAT =
       new SimpleDateFormat("EE, dd MMM yyyy", Locale.US);
@@ -50,9 +45,9 @@ public class RoomFragment extends BaseFragment {
   /** Number of messages to fetch in a batch. */
   private static final int BATCH_SIZE = 10;
 
-  private ChatRoom room;
+  private final ChatRoom room;
+
   private ChatAdapter chatAdapter;
-  private Handler handler;
   private boolean autoTranslate;
   private ListView chatOutput;
   private boolean noMoreChats;
@@ -61,35 +56,15 @@ public class RoomFragment extends BaseFragment {
 
   private long newestMessageTime;
 
-  public static Bundle createArguments(ChatRoom room) {
-    Bundle bundle = new Bundle();
-    bundle.putByteArray(CHAT_ROOM_KEY, room.encode());
-    return bundle;
-  }
+  public RoomView(Context context, ChatRoom room) {
+    super(context);
+    this.room = room;
+    inflate(context, R.layout.chat_room, this);
 
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    Bundle args = getArguments();
-    try {
-      room = ChatRoom.ADAPTER.decode(checkNotNull(args.getByteArray(CHAT_ROOM_KEY)));
-    } catch (IOException e) {
-      throw new RuntimeException("Unexpected IOException.", e);
-    }
-    handler = new Handler();
     autoTranslate = false; //new GlobalOptions().autoTranslateChatMessages();
-  }
 
-  @Override
-  protected int getViewResourceId() {
-    return R.layout.frag_chat_room;
-  }
-
-  @Override
-  public void onViewCreated(View view, Bundle savedInstanceState) {
-    LayoutInflater inflater = LayoutInflater.from(view.getContext());
-    FrameLayout header = view.findViewById(R.id.header);
+    LayoutInflater inflater = LayoutInflater.from(context);
+    FrameLayout header = findViewById(R.id.header);
     if (room.id == null) {
       headerContent = inflater.inflate(R.layout.chat_header_global, header, false);
       setupGlobalChatHeader(headerContent);
@@ -103,10 +78,10 @@ public class RoomFragment extends BaseFragment {
     header.addView(headerContent);
 
     chatAdapter = new ChatAdapter();
-    chatOutput = view.findViewById(R.id.chat_output);
+    chatOutput = findViewById(R.id.chat_output);
     chatOutput.setAdapter(chatAdapter);
 
-    unreadCountBtn = view.findViewById(R.id.unread_btn);
+    unreadCountBtn = findViewById(R.id.unread_btn);
     if (unreadCountBtn != null) {
       refreshUnreadCountButton();
       unreadCountBtn.setOnClickListener(v -> {
@@ -137,15 +112,15 @@ public class RoomFragment extends BaseFragment {
   }
 
   @Override
-  public void onStart() {
-    super.onStart();
+  public void onAttachedToWindow() {
+    super.onAttachedToWindow();
     App.i.getEventBus().register(eventHandler);
     refreshMessages();
   }
 
   @Override
-  public void onStop() {
-    super.onStop();
+  public void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
     App.i.getEventBus().unregister(eventHandler);
   }
 
@@ -341,8 +316,8 @@ public class RoomFragment extends BaseFragment {
 
       View view = convertView;
       if (view == null) {
-        LayoutInflater inflater = (LayoutInflater) getFragmentActivity().getSystemService(
-            Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = checkNotNull((LayoutInflater) getContext().getSystemService(
+            Context.LAYOUT_INFLATER_SERVICE));
 
         if (entry.date == null && entry.message == null) {
           view = inflater.inflate(R.layout.chat_row_loading, parent, false);
@@ -355,14 +330,14 @@ public class RoomFragment extends BaseFragment {
 
       if (entry.date == null && entry.message == null) {
         // this implies we're at the end of the list, fetch the next bunch
-        handler.post(RoomFragment.this::fetchChatItems);
+        post(RoomView.this::fetchChatItems);
       } else if (entry.date != null) {
-        TextView message = (TextView) view.findViewById(R.id.message);
+        TextView message = view.findViewById(R.id.message);
         message.setTextColor(Color.LTGRAY);
         message.setGravity(Gravity.END);
         message.setText(DATE_FORMAT.format(new Date(entry.date)));
       } else if (action != ChatMessage.MessageAction.Normal) {
-        TextView message = (TextView) view.findViewById(R.id.message);
+        TextView message = view.findViewById(R.id.message);
         message.setTextColor(Color.LTGRAY);
         message.setGravity(Gravity.START);
         Empire empire = null;
@@ -389,10 +364,10 @@ public class RoomFragment extends BaseFragment {
           }
         }
       } else if (entry.message.empire_id == null) {
-        ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
-        TextView empireName = (TextView) view.findViewById(R.id.empire_name);
-        TextView msgTime = (TextView) view.findViewById(R.id.msg_time);
-        TextView message = (TextView) view.findViewById(R.id.message);
+        ImageView empireIcon = view.findViewById(R.id.empire_icon);
+        TextView empireName = view.findViewById(R.id.empire_name);
+        TextView msgTime = view.findViewById(R.id.msg_time);
+        TextView message = view.findViewById(R.id.message);
 
         empireName.setText("");
         empireIcon.setImageBitmap(null);
@@ -405,10 +380,10 @@ public class RoomFragment extends BaseFragment {
           message.setMovementMethod(LinkMovementMethod.getInstance());
         }
       } else {
-        ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
-        TextView empireName = (TextView) view.findViewById(R.id.empire_name);
-        TextView msgTime = (TextView) view.findViewById(R.id.msg_time);
-        TextView message = (TextView) view.findViewById(R.id.message);
+        ImageView empireIcon = view.findViewById(R.id.empire_icon);
+        TextView empireName = view.findViewById(R.id.empire_name);
+        TextView msgTime = view.findViewById(R.id.msg_time);
+        TextView message = view.findViewById(R.id.message);
 
         Empire empire = EmpireManager.i.getEmpire(entry.message.empire_id);
         if (empire != null) {
@@ -448,13 +423,13 @@ public class RoomFragment extends BaseFragment {
   }
 
   private void setupGlobalChatHeader(View v) {
-    ImageButton settingsBtn = (ImageButton) v.findViewById(R.id.settings_btn);
+    ImageButton settingsBtn = v.findViewById(R.id.settings_btn);
     settingsBtn.setOnClickListener(v1 -> {
 //        ChatGlobalSettingsDialog dialog = new ChatGlobalSettingsDialog();
 //        dialog.show(getActivity().getSupportFragmentManager(), "");
     });
 
-    Button newGroupBtn = (Button) v.findViewById(R.id.new_group_btn);
+    Button newGroupBtn = v.findViewById(R.id.new_group_btn);
     newGroupBtn.setOnClickListener(v12 -> {
 //        ChatManager.i.startConversation(null);
     });

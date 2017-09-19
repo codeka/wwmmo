@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.client.game.starfield;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.transition.TransitionManager;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -9,9 +8,7 @@ import android.widget.RelativeLayout;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.SharedViewHolder;
 import au.com.codeka.warworlds.client.ctrl.ChatMiniView;
-import au.com.codeka.warworlds.client.game.chat.ChatFragment;
 
 /**
  * Layout for {@link StarfieldScreen}.

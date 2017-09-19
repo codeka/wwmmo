@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:background="@color/default_background">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.RelativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
   <android.support.v4.view.ViewPager
       android:id="@+id/pager"
@@ -16,10 +17,8 @@
   <FrameLayout
       android:id="@+id/bottom_pane"
       style="@style/BottomPane"
-      android:transitionName="bottom_pane"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_alignParentBottom="true">
   </FrameLayout>
-
-</RelativeLayout>
+</merge>

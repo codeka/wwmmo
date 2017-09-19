@@ -1,53 +1,34 @@
 package au.com.codeka.warworlds.client.game.chat;
 
-import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.activity.BaseFragment;
 import au.com.codeka.warworlds.client.game.world.ChatManager;
+import au.com.codeka.warworlds.client.ui.Screen;
+import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
-import java.util.ArrayList;
 import java.util.List;
 
 /** Main fragment for showing the chat system. */
-public class ChatFragment extends BaseFragment {
+public class ChatScreen extends Screen {
  // private ChatPagerAdapter chatPagerAdapter;
-  private ViewPager viewPager;
-  private FrameLayout bottomPane;
+
+  private ChatLayout layout;
 
   private List<ChatRoom> rooms;
   private Handler handler;
 
   @Override
-  protected int getViewResourceId() {
-    return R.layout.frag_chat;
+  public void onCreate(ScreenContext context, ViewGroup container) {
+    super.onCreate(context, container);
+    layout = new ChatLayout(context.getActivity(), layoutCallbacks);
   }
 
   @Override
-  public void onViewCreated(View view, Bundle savedInstanceState) {
-    viewPager = view.findViewById(R.id.pager);
-    bottomPane = view.findViewById(R.id.bottom_pane);
-
-  ///  chatPagerAdapter = new ChatPagerAdapter(getFragmentManager());
-  //  viewPager.setAdapter(chatPagerAdapter);
-
-    showSendPane();
-  }
-
-  @Override
-  public void onResume() {
-    super.onResume();
-
+  public View onShow() {
     refreshRooms();
+    return layout;
 /*
     Bundle extras = getIntent().getExtras();
     if (extras != null) {
@@ -80,18 +61,6 @@ public class ChatFragment extends BaseFragment {
         });
       }
     }*/
-  }
-
-  @Override
-  public void onStart() {
-    super.onStart();
-  //  ChatManager.eventBus.register(mEventHandler);
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-//    ChatManager.eventBus.unregister(mEventHandler);
   }
 
   public void moveToFirstUnreadConversation() {
@@ -140,8 +109,8 @@ public class ChatFragment extends BaseFragment {
 
     @Override
     public Fragment getItem(int index) {
-      Fragment fragment = new RoomFragment();
-      fragment.setArguments(RoomFragment.createArguments(rooms.get(index)));
+      Fragment fragment = new RoomView();
+      fragment.setArguments(RoomView.createArguments(rooms.get(index)));
       return fragment;
     }
 
@@ -177,27 +146,6 @@ public class ChatFragment extends BaseFragment {
     }
   }
 */
-  private void sendMessage(String msg) {
-    ChatRoom room = rooms.get(viewPager.getCurrentItem());
-    ChatMessage.Builder chatMessageBuilder = new ChatMessage.Builder()
-        .message(msg)
-        .room_id(room.id);
-
-    // if this is our first chat after the update ...
-//    if (!Util.getSharedPreferences().getBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
-//      // ... and this message is all in English ...
-//      if (isEnglish(message)) {
-//        // ... and they haven't already set the 'auto-translate' setting ...
-//        if (!new GlobalOptions().autoTranslateChatMessages()) {
-//          // ... then ask whether they want to enable auto-translate
-//          showConfirmAutoTranslateDialog();
-//        }
-//      }
-//    }
-
-    ChatManager.i.sendMessage(chatMessageBuilder.build());
-  }
-
   private void showConfirmAutoTranslateDialog() {
 //    Util.getSharedPreferences().edit()
 //        .putBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", true)
@@ -226,13 +174,27 @@ public class ChatFragment extends BaseFragment {
     return true;
   }
 
-  /** Show the default, send, pane. */
-  private void showSendPane() {
-    SendBottomPane sendBottomPane = new SendBottomPane(getContext(), this::sendMessage);
+  private final ChatLayout.Callbacks layoutCallbacks = new ChatLayout.Callbacks() {
+    @Override
+    public void onSend(String msg) {
+      ChatRoom room = rooms.get(0 /* TODO */);
+      ChatMessage.Builder chatMessageBuilder = new ChatMessage.Builder()
+          .message(msg)
+          .room_id(room.id);
 
-    TransitionManager.beginDelayedTransition(bottomPane);
-    bottomPane.removeAllViews();
-    bottomPane.addView(sendBottomPane);
-  }
+      // if this is our first chat after the update ...
+//    if (!Util.getSharedPreferences().getBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
+//      // ... and this message is all in English ...
+//      if (isEnglish(message)) {
+//        // ... and they haven't already set the 'auto-translate' setting ...
+//        if (!new GlobalOptions().autoTranslateChatMessages()) {
+//          // ... then ask whether they want to enable auto-translate
+//          showConfirmAutoTranslateDialog();
+//        }
+//      }
+//    }
 
+      ChatManager.i.sendMessage(chatMessageBuilder.build());
+    }
+  };
 }
