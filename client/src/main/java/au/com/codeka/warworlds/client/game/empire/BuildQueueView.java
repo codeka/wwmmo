@@ -1,13 +1,18 @@
 package au.com.codeka.warworlds.client.game.empire;
 
-import au.com.codeka.warworlds.client.activity.BaseFragment;
+import android.content.Context;
+import android.widget.FrameLayout;
 
-public class BuildQueueFragment extends BaseFragment {/*
+public class BuildQueueView extends FrameLayout {
+  public BuildQueueView(Context context) {
+    super(context);
+  }
+/*
     private BuildQueueStarsListAdapter adapter;
     private EmpireStarsFetcher fetcher;
     private BuildSelectionPanel buildSelectionPanel;
 
-    public BuildQueueFragment() {
+    public BuildQueueView() {
         fetcher = new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Building, null);
         fetcher.getStars(0, 20);
     }

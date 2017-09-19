@@ -33,16 +33,14 @@ public class EmpireLayout extends TabPlusContentView {
     tabContent.removeAllViews();
     View contentView = null;
     if (index == 0) {
-      // TODO: overview
+      contentView = new OverviewView(getContext());
     } else if (index == 1) {
-      // TODO: colonies
+      contentView = new ColoniesView(getContext());
     } else if (index == 2) {
-      // TODO: build
+      contentView = new BuildQueueView(getContext());
     } else if (index == 3) {
       contentView = new FleetsLayout(getContext(), new MyEmpireStarCollection());
     }
-    if (contentView != null) { // TODO: remove if once all paths are implemented
-      tabContent.addView(contentView);
-    }
+    tabContent.addView(contentView);
   }
 }

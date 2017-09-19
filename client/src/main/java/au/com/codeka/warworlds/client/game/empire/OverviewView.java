@@ -1,9 +1,15 @@
 package au.com.codeka.warworlds.client.game.empire;
 
-import au.com.codeka.warworlds.client.activity.BaseFragment;
+import android.content.Context;
+import android.widget.FrameLayout;
 
-public class OverviewFragment extends BaseFragment {/*
-    private static final Log log = new Log("OverviewFragment");
+public class OverviewView extends FrameLayout {
+  public OverviewView(Context context) {
+    super(context);
+  }
+
+  /*
+    private static final Log log = new Log("OverviewView");
     private View mView;
     private EmpireRankList mEmpireList;
 

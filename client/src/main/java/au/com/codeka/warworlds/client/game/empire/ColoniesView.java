@@ -1,16 +1,21 @@
 package au.com.codeka.warworlds.client.game.empire;
 
-import au.com.codeka.warworlds.client.activity.BaseFragment;
+import android.content.Context;
+import android.widget.FrameLayout;
 
 /**
- * ColoniesFragment shows a list of stars, which you can expand to see colonies that
+ * ColoniesView shows a list of stars, which you can expand to see colonies that
  * belong to those stars.
  */
-public class ColoniesFragment extends BaseFragment {/*
+public class ColoniesView extends FrameLayout {
+  public ColoniesView(Context context) {
+    super(context);
+  }
+/*
     private StarsListAdapter adapter;
     private EmpireStarsFetcher fetcher;
 
-    public ColoniesFragment() {
+    public ColoniesView() {
         fetcher = new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Colonies, null);
         // fetch the first few stars
         fetcher.getStars(0, 20);
