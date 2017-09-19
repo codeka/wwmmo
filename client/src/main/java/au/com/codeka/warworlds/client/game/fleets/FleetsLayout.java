@@ -37,6 +37,9 @@ public class FleetsLayout extends RelativeLayout {
       adapter.onItemClick(groupPosition, childPosition);
       return false;
     });
+
+    // Actions pane by default.
+    bottomPane.addView(new ActionBottomPane(getContext(), actionBottomPaneCallback));
   }
 
   @Override
@@ -51,22 +54,7 @@ public class FleetsLayout extends RelativeLayout {
 
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.removeAllViews();
-    bottomPane.addView(new ActionBottomPane(getContext(), new ActionBottomPane.Callback() {
-      @Override
-      public void onMoveClick() {
-        showMovePane();
-      }
-
-      @Override
-      public void onSplitClick() {
-        showSplitPane();
-      }
-
-      @Override
-      public void onMergeClick() {
-        showMergePane();
-      }
-    }));
+    bottomPane.addView(new ActionBottomPane(getContext(), actionBottomPaneCallback));
   }
 
   public void showMovePane() {
@@ -148,4 +136,22 @@ public class FleetsLayout extends RelativeLayout {
       setBackgroundResource(R.color.default_background);
     }
   }
+
+  private final ActionBottomPane.Callback actionBottomPaneCallback =
+      new ActionBottomPane.Callback() {
+        @Override
+        public void onMoveClick() {
+          showMovePane();
+        }
+
+        @Override
+        public void onSplitClick() {
+          showSplitPane();
+        }
+
+        @Override
+        public void onMergeClick() {
+          showMergePane();
+        }
+      };
 }

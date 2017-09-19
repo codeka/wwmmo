@@ -51,7 +51,6 @@ public class FleetsScreen extends Screen {
     super.onCreate(context, parent);
 
     layout = new FleetsLayout(context.getActivity(), starCollection);
-    //showActionsPane();
   }
 
   @Override
