@@ -344,6 +344,8 @@ public class Simulation {
           float totalMineralsRequired = buildCost.minerals * (1.0f - br.progress) * br.count;
           log("     Required: [population=%.2f] [minerals=%.2f]",
               totalWorkersRequired, totalMineralsRequired);
+          log("     Available: [population=%.2f] [minerals=%.2f]",
+              workersPerBuildRequest, mineralsPerBuildRequest);
 
           // The amount of work we can do this turn is the minimum of whatever resources we have
           // available allows.
@@ -389,6 +391,7 @@ public class Simulation {
           float mineralsUsedThisTurn = totalMineralsRequired - remainingMineralsRequired;
           storage.total_minerals(Math.max(0, storage.total_minerals - mineralsUsedThisTurn));
           mineralsDeltaPerHour -= mineralsUsedThisTurn;
+          colony.delta_minerals(mineralsDeltaPerHour);
           log("     Used: [minerals=%.4f]", mineralsUsedThisTurn);
 
           float timeForMineralsHours =
