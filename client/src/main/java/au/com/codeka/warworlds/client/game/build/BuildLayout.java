@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.transition.TransitionManager;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -36,6 +37,7 @@ public class BuildLayout extends RelativeLayout {
   private final TextView planetName;
   private final TextView buildQueueDescription;
   private final ViewGroup bottomPane;
+  @Nullable private BottomPaneContentView bottomPaneContentView;
 
   private Star star;
   private List<Colony> colonies;
@@ -62,24 +64,29 @@ public class BuildLayout extends RelativeLayout {
     this.star = star;
     this.colonies = colonies;
     colonyPagerAdapter.refresh(star, colonies);
+    if (bottomPaneContentView != null) {
+      bottomPaneContentView.refresh(star);
+    }
   }
 
   /** Show the "build" popup sheet for the given {@link Design}. */
   public void showBuildSheet(Design design) {
     final Colony colony = checkNotNull(colonies.get(viewPager.getCurrentItem()));
 
-    TransitionManager.beginDelayedTransition(bottomPane);
-    bottomPane.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
-    bottomPane.removeAllViews();
-    bottomPane.addView(
-        new BuildBottomPane(getContext(), star, colony, design, (designType, count) -> {
+    bottomPaneContentView = new BuildBottomPane(
+        getContext(), star, colony, design, (designType, count) -> {
             StarManager.i.updateStar(star, new StarModification.Builder()
                 .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
                 .colony_id(colony.id)
                 .design_type(designType)
                 .count(count));
             hideBottomSheet();
-          }));
+          });
+
+    TransitionManager.beginDelayedTransition(bottomPane);
+    bottomPane.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+    bottomPane.removeAllViews();
+    bottomPane.addView((View) bottomPaneContentView);
   }
 
   /**
@@ -89,16 +96,20 @@ public class BuildLayout extends RelativeLayout {
   public void showProgressSheet(@Nullable Fleet fleet, BuildRequest buildRequest) {
     final Colony colony = checkNotNull(colonies.get(viewPager.getCurrentItem()));
 
+    bottomPaneContentView =
+        new ProgressBottomPane(getContext(), star, colony, buildRequest, () -> {
+          // TODO
+        });
+
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
     bottomPane.removeAllViews();
-    bottomPane.addView(
-        new ProgressBottomPane(getContext(), star, colony, buildRequest, () -> {
-          // TODO
-        }));
+    bottomPane.addView((View) bottomPaneContentView);
   }
 
   public void hideBottomSheet() {
+    bottomPaneContentView = null;
+
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.getLayoutParams().height = (int) new DimensionResolver(getContext()).dp2px(30);
     bottomPane.removeAllViews();

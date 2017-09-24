@@ -154,9 +154,7 @@ public class BuildingsView extends ListView implements TabContentView {
       title.title = "Existing Buildings";
       entries.add(title);
 
-      for (ItemEntry entry : existingBuildingEntries) {
-        entries.add(entry);
-      }
+      entries.addAll(existingBuildingEntries);
 
       notifyDataSetChanged();
     }

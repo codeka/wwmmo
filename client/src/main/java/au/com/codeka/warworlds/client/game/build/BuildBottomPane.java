@@ -31,7 +31,7 @@ import java.util.Locale;
 /**
  * Bottom pane of the build fragment for when we're building something new.
  */
-public class BuildBottomPane extends RelativeLayout {
+public class BuildBottomPane extends RelativeLayout implements BottomPaneContentView {
   public interface Callback {
     void onBuild(Design.DesignType designType, int count);
   }
@@ -112,6 +112,11 @@ public class BuildBottomPane extends RelativeLayout {
     } else {
       buildCountContainer.setVisibility(View.GONE);
     }
+  }
+
+  @Override
+  public void refresh(Star star) {
+    // TODO
   }
 
   private void updateBuildTime() {
