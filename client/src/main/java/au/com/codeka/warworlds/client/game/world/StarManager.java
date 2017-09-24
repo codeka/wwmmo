@@ -12,6 +12,7 @@ import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
+import au.com.codeka.warworlds.common.sim.Simulation;
 import au.com.codeka.warworlds.common.sim.StarModifier;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import com.google.common.collect.Lists;
@@ -64,6 +65,22 @@ public class StarManager {
    */
   public Long getLastSimulationOfOurStar() {
     return stars.getLastSimulationOfOurStar();
+  }
+
+  /**
+   * Queue up the given {@link Star} to be simulated. The star will be simulated in the background
+   * and will be posted to the event bus when complete.
+   */
+  public void queueSimulateStar(Star star) {
+    // Something more scalable that just queuing them all to the background threadpool...
+    App.i.getTaskRunner().runTask(() -> {
+      Star.Builder starBuilder = star.newBuilder();
+      new Simulation().simulate(starBuilder);
+
+      // No need to save the star, it's just a simulation, but publish it to the event bus so
+      // clients can see it.
+      App.i.getEventBus().publish(starBuilder.build());
+    }, Threads.BACKGROUND);
   }
 
   public void updateStar(final Star star, final StarModification.Builder modificationBuilder) {

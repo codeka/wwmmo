@@ -4,6 +4,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
+import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
@@ -21,6 +22,9 @@ import java.util.List;
  */
 public class BuildScreen extends Screen {
   private static final Log log = new Log("BuildScreen");
+
+  /** We'll let the layout know to refresh progress and so on at this frequency. */
+  private static final long REFRESH_DELAY_MS = 1000L;
 
   private Star star;
   private List<Colony> colonies;
@@ -48,7 +52,14 @@ public class BuildScreen extends Screen {
 
   @Override
   public View onShow() {
+    // Refresh immediately on show
+    layout.post(refreshRunnable);
     return layout;
+  }
+
+  @Override
+  public void onHide() {
+    layout.removeCallbacks(refreshRunnable);
   }
 
   @Override
@@ -97,4 +108,21 @@ public class BuildScreen extends Screen {
       }
     }
   }
+
+  private final Runnable refreshRunnable = new Runnable() {
+    private int refreshCount = 0;
+
+    @Override
+    public void run() {
+      refreshCount++;
+      if (refreshCount % 10 == 0) {
+        // Every tenth refresh, we'll re-simulate the star
+        StarManager.i.queueSimulateStar(star);
+      } else {
+        layout.refresh(star, colonies);
+      }
+
+      layout.postDelayed(refreshRunnable, REFRESH_DELAY_MS);
+    }
+  };
 }

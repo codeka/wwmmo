@@ -12,6 +12,7 @@ import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * A {@link PagerAdapter} used by the {@link BuildLayout} to allow you to quickly swipe between your
@@ -50,6 +51,15 @@ public class ColonyPagerAdapter extends PagerAdapter {
       ColonyView view = views.valueAt(i);
       view.refresh(star, colonies.get(position));
     }
+  }
+
+  /**
+   * Gets the {@link ColonyView} at the specified position (or null if it hasn't been created
+   * yet).
+   */
+  @Nullable
+  public ColonyView getView(int position) {
+    return views.get(position);
   }
 
   @Override

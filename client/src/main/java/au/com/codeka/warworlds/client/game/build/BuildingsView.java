@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class BuildingsView extends ListView implements TabContentView {
-  private static final long REFRESH_DELAY_MS = 1000L;
-
   private Star star;
   private Colony colony;
 
@@ -62,13 +60,11 @@ public class BuildingsView extends ListView implements TabContentView {
   @Override
   public void onAttachedToWindow() {
     super.onAttachedToWindow();
-    postDelayed(refreshRunnable, REFRESH_DELAY_MS);
   }
 
   @Override
   public void onDetachedFromWindow() {
     super.onDetachedFromWindow();
-    removeCallbacks(refreshRunnable);
   }
 
   /** This adapter is used to populate a list of buildings in a list view. */
@@ -336,18 +332,6 @@ public class BuildingsView extends ListView implements TabContentView {
       return view;
     }
   }
-
-  private final Runnable refreshRunnable = new Runnable() {
-    @Override
-    public void run() {
-      //if (!isResumed()) {
-      //  return;
-      //}
-
-      adapter.notifyDataSetChanged();
-      postDelayed(refreshRunnable, REFRESH_DELAY_MS);
-    }
-  };
 
   static class ItemEntry {
     String title;
