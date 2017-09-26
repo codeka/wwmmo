@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
+import com.google.common.annotations.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +28,8 @@ public class Simulation {
   private static final boolean sDebug = false;
 
   /** Step time is 10 minutes. */
-  private static final long STEP_TIME = 10 * Time.MINUTE;
+  @VisibleForTesting
+  static final long STEP_TIME = 10 * Time.MINUTE;
 
   public Simulation() {
     this(System.currentTimeMillis(), true, sDebug ? new BasicLogHandler() : null);
@@ -162,7 +164,7 @@ public class Simulation {
 
     // if there's only native colonies, don't bother simulating from more than
     // 24 hours ago. The native colonies will generally be in a steady state
-    long oneDayAgo = System.currentTimeMillis() - Time.DAY;
+    long oneDayAgo = timeOverride - Time.DAY;
     if (lastSimulation != null && lastSimulation < oneDayAgo) {
       log("Last simulation more than on day ago, checking whether there are any non-native "
           + "colonies.");
@@ -185,7 +187,7 @@ public class Simulation {
 
     if (lastSimulation == null) {
       log("Star has never been simulated, simulating for 1 step only");
-      lastSimulation = System.currentTimeMillis() - STEP_TIME;
+      lastSimulation = timeOverride - STEP_TIME;
     }
     return trimTimeToStep(lastSimulation);
   }
