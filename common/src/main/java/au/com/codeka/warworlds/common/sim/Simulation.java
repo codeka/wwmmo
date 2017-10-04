@@ -258,13 +258,13 @@ public class Simulation {
           storage.total_minerals, minerals, minerals * dt);
 
       // calculate the output from energy this turn and add it to the star global
-      float enegry =
+      float energy =
           colony.population * colony.focus.energy * (planet.energy_congeniality / 100.0f);
-      colony.delta_energy(enegry);
-      storage.total_energy(Math.max(0, storage.total_energy + enegry * dt));
-      energyDeltaPerHour += enegry;
+      colony.delta_energy(energy);
+      storage.total_energy(Math.max(0, storage.total_energy + energy * dt));
+      energyDeltaPerHour += energy;
       log("    Energy: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
-          storage.total_energy, enegry, enegry * dt);
+          storage.total_energy, energy, energy * dt);
 
       totalPopulation += colony.population;
 
@@ -390,7 +390,7 @@ public class Simulation {
           float remainingMineralsRequired =
               buildCost.minerals * (1.0f - br.progress - progressThisTurn) * br.count;
 
-          float mineralsUsedThisTurn = totalMineralsRequired - remainingMineralsRequired;
+          float mineralsUsedThisTurn = mineralsPerBuildRequest - remainingMineralsRequired;
           storage.total_minerals(Math.max(0, storage.total_minerals - mineralsUsedThisTurn));
           mineralsDeltaPerHour -= mineralsUsedThisTurn;
           colony.delta_minerals(mineralsDeltaPerHour);

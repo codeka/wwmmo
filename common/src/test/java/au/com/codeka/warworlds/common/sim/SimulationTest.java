@@ -4,12 +4,15 @@ import static au.com.codeka.warworlds.common.testing.Matchers.closeTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import com.google.common.collect.Lists;
+import javax.print.DocFlavor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -217,4 +220,167 @@ public class SimulationTest {
     assertThat(starBuilder.empire_stores.get(0).total_minerals, closeTo(112.50f, 2));
     assertThat(starBuilder.empire_stores.get(0).total_energy, closeTo(104.17f, 2));
   }
+
+  @Test
+  public void testBuildColonyShipEnoughEverything() {
+    Star.Builder starBuilder = new Star.Builder()
+        .id(1L)
+        .planets(Lists.newArrayList(
+            new Planet.Builder()
+                .index(0)
+                .energy_congeniality(100)
+                .farming_congeniality(200)
+                .mining_congeniality(300)
+                .population_congeniality(1200)
+                .planet_type(Planet.PLANET_TYPE.TERRAN)
+                .colony(
+                    new Colony.Builder()
+                        .empire_id(1L)
+                        .focus(
+                            new ColonyFocus.Builder()
+                                .energy(0.0f)
+                                .farming(0.0f)
+                                .mining(0.0f)
+                                .construction(1.0f)
+                                .build())
+                        .population(1200f)
+                        .build_requests(Lists.newArrayList(
+                            new BuildRequest.Builder()
+                                .count(1)
+                                .design_type(Design.DesignType.COLONY_SHIP)
+                                .id(1L)
+                                .progress(0.0f)
+                                .start_time(NOW_TIME)
+                                .build()
+                        ))
+                        .build())
+                .build()
+        ))
+        .empire_stores(Lists.newArrayList(
+            new EmpireStorage.Builder()
+                .empire_id(1L)
+                .max_energy(1000f)
+                .max_goods(1000f)
+                .max_minerals(1000f)
+                .total_energy(100f)
+                .total_goods(100f)
+                .total_minerals(120f)
+                .build()
+        ))
+        .name("Stardust");
+
+    new Simulation(NOW_TIME, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(NOW_TIME));
+    // We're 120% over quota so we should finish in 1/1.2 of a time step.
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
+        is(NOW_TIME + (long)((1 / 1.2) * Simulation.STEP_TIME)));
+
+    starBuilder = new Star.Builder()
+        .id(1L)
+        .planets(Lists.newArrayList(
+            new Planet.Builder()
+                .index(0)
+                .energy_congeniality(100)
+                .farming_congeniality(200)
+                .mining_congeniality(300)
+                .population_congeniality(1200)
+                .planet_type(Planet.PLANET_TYPE.TERRAN)
+                .colony(
+                    new Colony.Builder()
+                        .empire_id(1L)
+                        .focus(
+                            new ColonyFocus.Builder()
+                                .energy(0.0f)
+                                .farming(0.0f)
+                                .mining(0.0f)
+                                .construction(1.0f)
+                                .build())
+                        .population(1000f)
+                        .build_requests(Lists.newArrayList(
+                            new BuildRequest.Builder()
+                                .count(1)
+                                .design_type(Design.DesignType.COLONY_SHIP)
+                                .id(1L)
+                                .progress(0.0f)
+                                .start_time(NOW_TIME)
+                                .build()
+                        ))
+                        .build())
+                .build()
+        ))
+        .empire_stores(Lists.newArrayList(
+            new EmpireStorage.Builder()
+                .empire_id(1L)
+                .max_energy(1000f)
+                .max_goods(1000f)
+                .max_minerals(1000f)
+                .total_energy(100f)
+                .total_goods(100f)
+                .total_minerals(120f)
+                .build()
+        ))
+        .name("Stardust");
+
+    new Simulation(NOW_TIME, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(NOW_TIME));
+    // We're 100% over quota on population so we should finish exactly at the end of the step.
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
+        is(NOW_TIME + Simulation.STEP_TIME));
+
+    starBuilder = new Star.Builder()
+        .id(1L)
+        .planets(Lists.newArrayList(
+            new Planet.Builder()
+                .index(0)
+                .energy_congeniality(100)
+                .farming_congeniality(200)
+                .mining_congeniality(300)
+                .population_congeniality(1200)
+                .planet_type(Planet.PLANET_TYPE.TERRAN)
+                .colony(
+                    new Colony.Builder()
+                        .empire_id(1L)
+                        .focus(
+                            new ColonyFocus.Builder()
+                                .energy(0.0f)
+                                .farming(0.0f)
+                                .mining(0.0f)
+                                .construction(1.0f)
+                                .build())
+                        .population(1200f)
+                        .build_requests(Lists.newArrayList(
+                            new BuildRequest.Builder()
+                                .count(1)
+                                .design_type(Design.DesignType.COLONY_SHIP)
+                                .id(1L)
+                                .progress(0.0f)
+                                .start_time(NOW_TIME)
+                                .build()
+                        ))
+                        .build())
+                .build()
+        ))
+        .empire_stores(Lists.newArrayList(
+            new EmpireStorage.Builder()
+                .empire_id(1L)
+                .max_energy(1000f)
+                .max_goods(1000f)
+                .max_minerals(1000f)
+                .total_energy(100f)
+                .total_goods(100f)
+                .total_minerals(100f)
+                .build()
+        ))
+        .name("Stardust");
+
+    new Simulation(NOW_TIME, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(NOW_TIME));
+    // We're 100% over quota on minerals so we should finish exactly at the end of the step.
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
+        is(NOW_TIME + Simulation.STEP_TIME));
+  }
+
 }
