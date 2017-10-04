@@ -416,10 +416,7 @@ public class Simulation {
 
     // Finally, update the population. The first thing we need to do is evenly distribute goods
     // between all of the colonies.
-    float totalGoodsPerHour = totalPopulation / 10.0f;
-    if (totalPopulation > 0.0001f && totalGoodsPerHour < 10.0f) {
-      totalGoodsPerHour = 10.0f;
-    }
+    float totalGoodsPerHour = Math.min(10.0f, totalPopulation / 10.0f);
     float totalGoodsRequired = totalGoodsPerHour * dt;
     goodsDeltaPerHour -= totalGoodsPerHour;
 

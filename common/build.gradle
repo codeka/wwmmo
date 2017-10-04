@@ -28,9 +28,16 @@ task buildProto() {
 
 compileJava.dependsOn buildProto
 
+test {
+  testLogging {
+    // Show that tests are run in the command-line output
+    events 'passed'
+  }
+}
+
 dependencies {
   compile 'com.squareup.wire:wire-runtime:2.1.2'
   compile 'com.google.code.findbugs:jsr305:3.0.1'
   compile 'com.google.guava:guava:22.0-android'
-  compile 'junit:junit:4.12'
+  testCompile 'junit:junit:4.12'
 }
