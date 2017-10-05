@@ -3,6 +3,7 @@
 *~
 *.class
 *.pyc
+.DS_Store
 
 # Make sure keystore.jks never gets added to source control, it's SEKRET!
 keystore.jks

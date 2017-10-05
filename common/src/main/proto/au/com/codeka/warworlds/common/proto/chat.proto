@@ -1,0 +1,45 @@
+package au.com.codeka.warworlds.common.proto;
+
+import "au/com/codeka/warworlds/common/proto/common.proto";
+
+// A chat message, who it's from, the kind of message and whatnot.
+message ChatMessage {
+  optional int64 id = 7;
+  optional string message = 1;
+  optional int64 empire_id = 2;
+  optional int64 date_posted = 3;
+  optional int64 alliance_id = 4;
+
+  // If the message was auto-translated to english, this will be the english translation.
+  optional string message_en = 5;
+
+  // If the message was intended for a specific room, this will be the ID of the room.
+  optional int64 room_id = 6;
+
+  // "profanity" level, 0 == not profane, 1 == somewhat profane, 2 == very profane. Used in
+  // conjunction with client-side filtering of chat messages.
+  optional int64 profanity_level = 9;
+
+  // The "action" of this message, allows us to notify participants of a conversation
+  // via special messages with a custom action.
+  enum MessageAction
+  {
+    Normal = 0; // a "normal" chat message, the default
+    ParticipantAdded = 1; // a new participant was added
+    ParticipantLeft = 2; // someone left the conversation
+  }
+  optional MessageAction action = 8;
+}
+
+// A room is a private chat between two or more participants.
+message ChatRoom {
+  optional int64 id = 1;
+  optional string name = 2;
+  repeated ChatParticipant participants = 3;
+}
+
+// Refers to a participant of a chat room.
+message ChatParticipant {
+  optional int64 empire_id = 1;
+  optional bool is_muted = 2;
+}

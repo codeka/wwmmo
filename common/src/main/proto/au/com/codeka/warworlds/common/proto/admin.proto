@@ -1,0 +1,27 @@
+package au.com.codeka.warworlds.common.proto;
+
+import "au/com/codeka/warworlds/common/proto/common.proto";
+
+// The role an AdminUser has in the backend.
+enum AdminRole {
+  // The administrator role allows you to modify the security settings of the backend.
+  ADMINISTRATOR = 1;
+
+  // A role which allows you to modify/view the starfield.
+  STARFIELD = 2;
+
+  // A role which allows you to modify empires.
+  EMPIRE = 3;
+
+  // A role which allows you to monitor chat and sinbin users, etc.
+  CHAT = 4;
+}
+
+// An admin user is used by the backend to do authentication and authorization.
+message AdminUser {
+  // The email address of the user. We authenticate using google login.
+  optional string email_addr = 1;
+
+  // A list of the roles this user is in.
+  repeated AdminRole roles = 2;
+}

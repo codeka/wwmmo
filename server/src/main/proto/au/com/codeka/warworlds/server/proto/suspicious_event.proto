@@ -1,0 +1,21 @@
+
+package au.com.codeka.warworlds.server.proto;
+
+import "au/com/codeka/warworlds/common/proto/common.proto";
+import "au/com/codeka/warworlds/common/proto/star.proto";
+
+// A suspicious event is something we record when a client sends us something that we don't expect.
+// It could be an early indication of attempted cheating, or bugs in the client or something else.
+message SuspiciousEvent {
+  // The time this event happened.
+  optional int64 timestamp = 1;
+
+  // The ID of the star that was being attempted to modify.
+  optional int64 star_id = 2;
+
+  // The modification that we deemed to be suspicious.
+  optional au.com.codeka.warworlds.common.proto.StarModification modification = 3;
+
+  // A message describining what we thought was supicious.
+  optional string message = 4;
+}
