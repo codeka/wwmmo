@@ -139,7 +139,8 @@ public class Simulation {
 
   /**
    * After simulating the first step in the prediction star, copy the mineral, goods and energy
-   * deltas across to the main star.
+   * deltas across to the main star. Also copy the build request efficiencies, since they're also
+   * the ones we'll care about (i.e. the efficient for the *next* step).
    */
   private void copyDeltas(Star.Builder star, Star.Builder predictionStar) {
     ArrayList<EmpireStorage> stores = new ArrayList<>();
@@ -151,6 +152,23 @@ public class Simulation {
           .build());
     }
     star.empire_stores(stores);
+
+    for (int i = 0; i < star.planets.size(); i++) {
+      Planet.Builder planetBuilder = star.planets.get(i).newBuilder();
+      if (planetBuilder.colony != null) {
+        Colony.Builder colonyBuilder = planetBuilder.colony.newBuilder();
+        for (int j = 0; j < planetBuilder.colony.build_requests.size(); j++) {
+          BuildRequest.Builder brBuilder = colonyBuilder.build_requests.get(j).newBuilder();
+          brBuilder.minerals_efficiency(
+              predictionStar.planets.get(i).colony.build_requests.get(j).minerals_efficiency);
+          brBuilder.population_efficiency(
+              predictionStar.planets.get(i).colony.build_requests.get(j).population_efficiency);
+          colonyBuilder.build_requests.set(j, brBuilder.build());
+        }
+        planetBuilder.colony(colonyBuilder.build());
+      }
+      star.planets.set(i, planetBuilder.build());
+    }
   }
 
   /**

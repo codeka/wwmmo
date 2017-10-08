@@ -438,52 +438,114 @@ public class SimulationTest {
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.92f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.08f, 2));
 
     // And it should continue taking 10 steps as we continue simulating.
     new Simulation(NOW_TIME + Simulation.STEP_TIME, false, logHandler).simulate(starBuilder);
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.92f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.08f, 2));
 
+    // Note as we progress, the efficiency of the population improves as we need less and less
+    // population relative to when we started.
     new Simulation(NOW_TIME + (2 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.90f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.10f, 2));
 
     new Simulation(NOW_TIME + (3 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.90f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.10f, 2));
 
     new Simulation(NOW_TIME + (4 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.86f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.14f, 2));
 
     new Simulation(NOW_TIME + (5 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.86f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.14f, 2));
 
     new Simulation(NOW_TIME + (6 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.80f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.20f, 2));
 
     new Simulation(NOW_TIME + (7 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.80f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.20f, 2));
 
     new Simulation(NOW_TIME + (8 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.67f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.33f, 2));
 
     new Simulation(NOW_TIME + (9 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.67f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.33f, 2));
 
     new Simulation(NOW_TIME + (10 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
     assertThat(
@@ -491,6 +553,12 @@ public class SimulationTest {
         is(NOW_TIME + (10 * Simulation.STEP_TIME)));
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).progress, closeTo(1.0f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.67f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.33f, 2));
   }
 
 }
