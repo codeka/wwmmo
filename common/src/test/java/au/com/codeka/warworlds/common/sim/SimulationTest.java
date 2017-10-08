@@ -383,7 +383,6 @@ public class SimulationTest {
         is(NOW_TIME + Simulation.STEP_TIME));
   }
 
-
   @Test
   public void testBuildColonyShipInsufficientPopulation() {
     Star.Builder starBuilder = new Star.Builder()
@@ -561,4 +560,94 @@ public class SimulationTest {
         closeTo(0.33f, 2));
   }
 
+
+  @Test
+  public void testBuildColonyShipInsufficientMinerals() {
+    Star.Builder starBuilder = new Star.Builder()
+        .id(1L)
+        .planets(Lists.newArrayList(
+            new Planet.Builder()
+                .index(0)
+                .energy_congeniality(100)
+                .farming_congeniality(200)
+                .mining_congeniality(300)
+                .population_congeniality(1000)
+                .planet_type(Planet.PLANET_TYPE.TERRAN)
+                .colony(
+                    new Colony.Builder()
+                        .empire_id(1L)
+                        .focus(
+                            new ColonyFocus.Builder()
+                                .energy(0.0f)
+                                .farming(0.0f)
+                                .mining(0.01f)
+                                .construction(0.99f)
+                                .build())
+                        .population(1000f)
+                        .build_requests(Lists.newArrayList(
+                            new BuildRequest.Builder()
+                                .count(1)
+                                .design_type(Design.DesignType.COLONY_SHIP)
+                                .id(1L)
+                                .progress(0.0f)
+                                .start_time(NOW_TIME)
+                                .build()
+                        ))
+                        .build())
+                .build()
+        ))
+        .empire_stores(Lists.newArrayList(
+            new EmpireStorage.Builder()
+                .empire_id(1L)
+                .max_energy(1000f)
+                .max_goods(1000f)
+                .max_minerals(1000f)
+                .total_energy(100f)
+                .total_goods(100f)
+                .total_minerals(10f)
+                .build()
+        ))
+        .name("Stardust");
+
+    new Simulation(NOW_TIME, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(NOW_TIME));
+    // We only have 25% of the required minerals, so it should take 4 steps to complete.
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
+        is(NOW_TIME + (4 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.20f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.80f, 2));
+
+    new Simulation(NOW_TIME + Simulation.STEP_TIME, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(NOW_TIME));
+    // We only have 25% of the required minerals, so it should take 4 steps to complete.
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
+        is(NOW_TIME + (4 * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.20f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.80f, 2));
+
+    new Simulation(NOW_TIME + (2 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(NOW_TIME + (2 * Simulation.STEP_TIME)));
+    // However, after the first step, we'll have created enough minerals to finish the build.
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
+        is(NOW_TIME + Math.round(1.9375f * Simulation.STEP_TIME)));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).progress, closeTo(1.00f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
+        closeTo(0.20f, 2));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
+        closeTo(0.80f, 2));
+  }
 }
