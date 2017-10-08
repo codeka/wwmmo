@@ -76,4 +76,9 @@ message BuildRequest {
   // The "progress" of the build, from 0 (just started) to 1.0 (complete). It's not always going to
   // relate to start_time/end_time (due to lack of resources, changing focus etc).
   optional float progress = 6;
+
+  // The "efficiency" of the minerals/populations. These values will together add up to 1, and will
+  // describe the relative efficiency of the minerals/population you have. That is,
+  optional float minerals_efficiency = 7;
+  optional float population_efficiency = 8;
 }

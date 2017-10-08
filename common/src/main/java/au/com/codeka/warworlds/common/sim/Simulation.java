@@ -63,7 +63,7 @@ public class Simulation {
     if (logHandler != null) {
       logHandler.setStarName(star.name);
     }
-    log(String.format("Begin simulation for '%s'", star.name));
+    log("Begin simulation for '%s' @ %d", star.name, timeOverride);
 
     // figure out the start time, which is the oldest last_simulation time
     long startTime = getSimulateStartTime(star);
@@ -88,7 +88,7 @@ public class Simulation {
     Star.Builder predictionStar = null;
     long now = startTime;
     while (true) {
-      if (now < endTime) {
+      if (now <= endTime) {
         simulateStepForAllEmpires(now, star, empireIds);
       } else if (predictionStar == null) {
         // This is also the time to simulate combat. The star has been simulated up to "now", combat
@@ -102,7 +102,7 @@ public class Simulation {
         log("Begin prediction");
         simulateStepForAllEmpires(now, predictionStar, empireIds);
         copyDeltas(star, predictionStar);
-      } else if (predict && now < predictionTime) {
+      } else if (predict && now <= predictionTime) {
         simulateStepForAllEmpires(now, predictionStar, empireIds);
       } else {
         break;
@@ -187,9 +187,10 @@ public class Simulation {
 
     if (lastSimulation == null) {
       log("Star has never been simulated, simulating for 1 step only");
-      lastSimulation = timeOverride - STEP_TIME;
+      return timeOverride - STEP_TIME;
     }
-    return trimTimeToStep(lastSimulation);
+
+    return trimTimeToStep(lastSimulation) + STEP_TIME;
   }
 
   /** Trims a time to the step time. */
@@ -198,7 +199,7 @@ public class Simulation {
   }
 
   private void simulateStepForAllEmpires(long now, Star.Builder star, Set<Long> empireIds) {
-    log("- Step [now=%s]", Time.format(now));
+    log("- Step [now=%d]", now);
     for (Long empireId : empireIds) {
       log(String.format("-- Empire [%s]", empireId == null ? "Native" : empireId));
       simulateStep(now, star, empireId);
@@ -289,7 +290,7 @@ public class Simulation {
       // based on the number of ACTUAL build requests they'll be working on this turn
       int numValidBuildRequests = 0;
       for (BuildRequest br : colony.build_requests) {
-        if (br.start_time > now + STEP_TIME) {
+        if (br.start_time >= now) {
           continue;
         }
         if (br.progress >= 1.0f) {
@@ -320,7 +321,7 @@ public class Simulation {
           Design design = DesignHelper.getDesign(br.design_type);
 
           long startTime = br.start_time;
-          if (startTime > now + STEP_TIME || br.progress >= 1.0f) {
+          if (startTime > now || br.progress >= 1.0f) {
             completeBuildRequests.add(br.build());
             continue;
           }
@@ -334,16 +335,16 @@ public class Simulation {
           //  buildCost = upgrade.getBuildCost();
           //}
 
-          log("---- Building [design=%s %s] [count=%d] cost [workers=%d] [minerals=%d] [start-time=%s]",
+          log("---- Building [design=%s %s] [count=%d] cost [workers=%d] [minerals=%d] [start-time=%d]",
               design.design_kind, design.type, br.count, buildCost.population, buildCost.minerals,
-              Time.format(br.start_time));
+              br.start_time);
 
           // The total amount of time to build something is based on the number of workers it
           // requires, if you have the right number of workers and the right amount of minerals,
-          // you can finish the build in one turn. We require whatever fraction of progress is left
-          // of both minerals and workers.
-          float totalWorkersRequired = buildCost.population * (1.0f - br.progress) * br.count;
-          float totalMineralsRequired = buildCost.minerals * (1.0f - br.progress) * br.count;
+          // you can finish the build in one turn. However, if you only have a fraction of them
+          // available, then that fraction of progress will be made.
+          float totalWorkersRequired = buildCost.population * br.count;
+          float totalMineralsRequired = buildCost.minerals * br.count;
           log("     Required: [population=%.2f] [minerals=%.2f]",
               totalWorkersRequired, totalMineralsRequired);
           log("     Available: [population=%.2f] [minerals=%.2f]",
@@ -361,7 +362,7 @@ public class Simulation {
           if (br.start_time > now) {
             float fraction = ((float) startTime - now) / STEP_TIME;
             progressThisTurn *= fraction;
-            log("    - reduced progress: %.2f (fraction=%.2f)", progressThisTurn, fraction);
+            log("     Reduced progress: %.2f (fraction=%.2f)", progressThisTurn, fraction);
           }
 
           // what is the current amount of time we have now as a percentage of the total build
@@ -370,14 +371,14 @@ public class Simulation {
             // OK, we've finished! Work out how far into the step we completed.
             float unusedProgress = progressThisTurn + br.progress - 1.0f;
             float fractionProgress = (progressThisTurn - unusedProgress) / progressThisTurn;
-            long endTime = now;
-            if (br.start_time > now) {
+            long endTime = now - STEP_TIME;
+            if (br.start_time > endTime) {
               endTime = br.start_time;
             }
             endTime += (long)(STEP_TIME * fractionProgress);
 
-            log("     FINISHED! fraction-progress = %.2f, end-time=%s",
-                fractionProgress, Time.format(endTime));
+            log("     FINISHED! fraction-progress = %.2f, end-time=%d",
+                fractionProgress, endTime);
             br.progress(1.0f);
             br.end_time(endTime);
             completeBuildRequests.add(br.build());
@@ -390,21 +391,39 @@ public class Simulation {
           float remainingMineralsRequired =
               buildCost.minerals * (1.0f - br.progress - progressThisTurn) * br.count;
 
-          float mineralsUsedThisTurn = mineralsPerBuildRequest - remainingMineralsRequired;
+          float mineralsUsedThisTurn =
+              Math.min(totalMineralsRequired, mineralsPerBuildRequest) - remainingMineralsRequired;
           storage.total_minerals(Math.max(0, storage.total_minerals - mineralsUsedThisTurn));
           mineralsDeltaPerHour -= mineralsUsedThisTurn;
           colony.delta_minerals(mineralsDeltaPerHour);
           log("     Used: [minerals=%.4f]", mineralsUsedThisTurn);
 
-          float timeForMineralsHours =
-              remainingMineralsRequired / mineralsUsedThisTurn / (Time.HOUR / STEP_TIME);
-          float timeForPopulationHours =
-              remainingWorkersRequired / workersPerBuildRequest / (Time.HOUR / STEP_TIME);
-          log("     Remaining: [minerals=%.2f hrs] [population=%.2f hrs]",
-              timeForMineralsHours, timeForPopulationHours);
+          float timeForMineralsSteps =
+              (remainingMineralsRequired / mineralsPerBuildRequest);
+          float timeForPopulationSteps =
+              (remainingWorkersRequired / workersPerBuildRequest);
+          float timeForMineralsHours = timeForMineralsSteps * STEP_TIME / Time.HOUR;
+          float timeForPopulationHours = timeForPopulationSteps * STEP_TIME / Time.HOUR;
+          log("     Remaining: [minerals=%.2f hrs %.2f steps] [population=%.2f hrs %.2f steps]",
+              timeForMineralsHours,
+              timeForMineralsSteps,
+              timeForPopulationHours,
+              timeForPopulationSteps);
           br.end_time(now +
-              Math.round(Math.max(timeForMineralsHours, timeForPopulationHours)) * Time.HOUR);
+              Math.round(Math.max(timeForMineralsHours, timeForPopulationHours) * Time.HOUR));
+          log("     Finish time: %d (now=%d)",
+              now + Math.round(Math.max(timeForMineralsHours, timeForPopulationHours) * Time.HOUR),
+              now);
           br.progress(br.progress + progressThisTurn);
+
+          // Calculate the efficiency of the minerals vs. population
+          float sumTimeInHours = timeForMineralsHours + timeForPopulationHours;
+          float mineralsEfficiency = 1 - (timeForMineralsHours / sumTimeInHours);
+          float populationEfficiency = 1 - (timeForPopulationHours / sumTimeInHours);
+          br.minerals_efficiency(mineralsEfficiency);
+          br.population_efficiency(populationEfficiency);
+          log("     Efficiency: [minerals=%.3f] [population=%.3f]",
+              mineralsEfficiency, populationEfficiency);
 
           completeBuildRequests.add(br.build());
         }
