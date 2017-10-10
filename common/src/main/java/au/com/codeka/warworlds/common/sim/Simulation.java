@@ -67,10 +67,6 @@ public class Simulation {
 
     // figure out the start time, which is the oldest last_simulation time
     long startTime = getSimulateStartTime(star);
-    if (startTime >= trimTimeToStep(timeOverride) && !predict) {
-      log("Simulation already up-to-date, not simulating.");
-      return;
-    }
     long endTime = trimTimeToStep(timeOverride);
 
     HashSet<Long> empireIds = new HashSet<>();
@@ -205,7 +201,7 @@ public class Simulation {
 
     if (lastSimulation == null) {
       log("Star has never been simulated, simulating for 1 step only");
-      return timeOverride - STEP_TIME;
+      return trimTimeToStep(timeOverride);
     }
 
     return trimTimeToStep(lastSimulation) + STEP_TIME;
@@ -370,11 +366,14 @@ public class Simulation {
 
           // The amount of work we can do this turn is the minimum of whatever resources we have
           // available allows.
-          float progressThisTurn = Math.min(
-              workersPerBuildRequest / totalWorkersRequired,
-              mineralsPerBuildRequest / totalMineralsRequired);
-          log("     Progress: [this turn=%.4f] [total=%.4f]",
-              progressThisTurn, br.progress + progressThisTurn);
+          float populationProgressThisTurn = workersPerBuildRequest / totalWorkersRequired;
+          float mineralsProgressThisTurn = mineralsPerBuildRequest / totalMineralsRequired;
+          float progressThisTurn = Math.min(populationProgressThisTurn, mineralsProgressThisTurn);
+          log("     Progress: [this turn=%.4f (minerals=%.4f pop=%.4f] [total=%.4f]",
+              progressThisTurn,
+              mineralsProgressThisTurn,
+              populationProgressThisTurn,
+              br.progress + progressThisTurn);
 
           // If it started half way through this step, the progress is lessened.
           if (br.start_time > now) {
@@ -382,6 +381,17 @@ public class Simulation {
             progressThisTurn *= fraction;
             log("     Reduced progress: %.2f (fraction=%.2f)", progressThisTurn, fraction);
           }
+
+          float mineralsUsedThisTurn = Math.min(totalMineralsRequired, mineralsPerBuildRequest);
+          if (populationProgressThisTurn < mineralsProgressThisTurn) {
+            // If we're limited by population, then we won't have used all of the minerals that
+            // were available to us.
+            mineralsUsedThisTurn *= populationProgressThisTurn;
+          }
+          storage.total_minerals(Math.max(0, storage.total_minerals - mineralsUsedThisTurn));
+          mineralsDeltaPerHour -= mineralsUsedThisTurn;
+          colony.delta_minerals(mineralsDeltaPerHour);
+          log("     Used: [minerals=%.4f]", mineralsUsedThisTurn);
 
           // what is the current amount of time we have now as a percentage of the total build
           // time?
@@ -395,8 +405,7 @@ public class Simulation {
             }
             endTime += (long)(STEP_TIME * fractionProgress);
 
-            log("     FINISHED! fraction-progress = %.2f, end-time=%d",
-                fractionProgress, endTime);
+            log("     FINISHED! fraction-progress = %.2f, end-time=%d", fractionProgress, endTime);
             br.progress(1.0f);
             br.end_time(endTime);
             completeBuildRequests.add(br.build());
@@ -408,13 +417,6 @@ public class Simulation {
               buildCost.population * (1.0f - br.progress - progressThisTurn) * br.count;
           float remainingMineralsRequired =
               buildCost.minerals * (1.0f - br.progress - progressThisTurn) * br.count;
-
-          float mineralsUsedThisTurn =
-              Math.min(totalMineralsRequired, mineralsPerBuildRequest) - remainingMineralsRequired;
-          storage.total_minerals(Math.max(0, storage.total_minerals - mineralsUsedThisTurn));
-          mineralsDeltaPerHour -= mineralsUsedThisTurn;
-          colony.delta_minerals(mineralsDeltaPerHour);
-          log("     Used: [minerals=%.4f]", mineralsUsedThisTurn);
 
           float timeForMineralsSteps =
               (remainingMineralsRequired / mineralsPerBuildRequest);
