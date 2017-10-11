@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.common.sim;
 
+import static au.com.codeka.warworlds.common.sim.Simulation.STEP_TIME;
+import static au.com.codeka.warworlds.common.sim.SimulationHelper.trimTimeToStep;
+
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
@@ -35,6 +38,22 @@ public class BuildHelper {
     } else {
       return String.format(Locale.US, "%d hrs", Math.round(hours));
     }
+  }
+
+  /** Get the exact fraction that the given build has completed based on the time "now". */
+  public static float getBuildProgress(BuildRequest buildRequest, long now) {
+    // Update the progress percentages for partial steps while we're here.
+    long brStartTime = trimTimeToStep(now);
+    long brEndTime = brStartTime + STEP_TIME;
+    if (buildRequest.start_time > brStartTime) {
+      brStartTime = buildRequest.start_time;
+    }
+    if (now > brStartTime && now <= brEndTime) {
+      float stepFraction = (float)(now - brStartTime) / ((float) STEP_TIME);
+      return Math.min(1.0f, buildRequest.progress + stepFraction * buildRequest.progress_per_step);
+    }
+
+    return buildRequest.progress;
   }
 
   @Nullable

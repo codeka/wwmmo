@@ -650,14 +650,15 @@ public class SimulationTest {
         starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
         closeTo(0.95f, 2));
 
-    new Simulation(NOW_TIME + (19 * Simulation.STEP_TIME), false, logHandler).simulate(starBuilder);
-    assertThat(starBuilder.last_simulation, is(NOW_TIME + (19 * Simulation.STEP_TIME)));
+    long now = NOW_TIME + (19 * Simulation.STEP_TIME);
+    new Simulation(now, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(now));
     // Should be finished now. (note, we round it because there's going to be some rounding errors)
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time / 100000.0f,
         closeTo((NOW_TIME + (19 * Simulation.STEP_TIME)) / 100000.0f, 3));
     assertThat(
-        starBuilder.planets.get(0).colony.build_requests.get(0).progress,
+        BuildHelper.getBuildProgress(starBuilder.planets.get(0).colony.build_requests.get(0), now),
         closeTo(1.0f, 2));
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).minerals_efficiency,
@@ -728,25 +729,24 @@ public class SimulationTest {
         starBuilder.planets.get(0).colony.build_requests.get(0).progress,
         closeTo(0.0f, 2));
 
-    new Simulation(
-        NOW_TIME + (Simulation.STEP_TIME / 4L) + (Simulation.STEP_TIME / 100L),
-        false,
-        logHandler).simulate(starBuilder);
+    long now = NOW_TIME + (Simulation.STEP_TIME / 4L) + (Simulation.STEP_TIME / 100L);
+    new Simulation(now, false, logHandler).simulate(starBuilder);
     // Now we're half-way through
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 50)));
     assertThat(
-        starBuilder.planets.get(0).colony.build_requests.get(0).progress,
-        closeTo(0.0f, 2));
+        BuildHelper.getBuildProgress(starBuilder.planets.get(0).colony.build_requests.get(0), now),
+        closeTo(0.5f, 2));
 
-    new Simulation(
-        NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 50),
-        false,
-        logHandler).simulate(starBuilder);
+    now = NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 50);
+    new Simulation(now, false, logHandler).simulate(starBuilder);
     // NOW we should be finished.
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
         is(NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 50)));
+    assertThat(
+        BuildHelper.getBuildProgress(starBuilder.planets.get(0).colony.build_requests.get(0), now),
+        closeTo(1.0f, 2));
   }
 }

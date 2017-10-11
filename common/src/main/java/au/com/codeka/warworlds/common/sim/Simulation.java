@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.common.sim;
 
+import static au.com.codeka.warworlds.common.sim.SimulationHelper.trimTimeToStep;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
@@ -209,11 +211,6 @@ public class Simulation {
     }
 
     return trimTimeToStep(lastSimulation) + STEP_TIME;
-  }
-
-  /** Trims a time to the step time. */
-  private static long trimTimeToStep(long time) {
-    return (time / STEP_TIME) * STEP_TIME;
   }
 
   private void simulateStepForAllEmpires(long now, Star.Builder star, Set<Long> empireIds) {
