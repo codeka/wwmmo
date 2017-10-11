@@ -81,4 +81,7 @@ message BuildRequest {
   // describe the relative efficiency of the minerals/population you have. That is,
   optional float minerals_efficiency = 7;
   optional float population_efficiency = 8;
+
+  // The amount of progress we're making per step, so we can update counters and stuff in real-time.
+  optional float progress_per_step = 9;
 }

@@ -106,7 +106,8 @@ public class Simulation {
       now += STEP_TIME;
     }
 
-    // copy the end times for builds from the prediction star
+    // Copy the end times for builds from the prediction star.
+    long stepStartTime = trimTimeToStep(timeOverride);
     for (int i = 0; i < star.planets.size(); i++) {
       Planet predictionPlanet = predictionStar.planets.get(i);
       Planet.Builder planet = star.planets.get(i).newBuilder();
@@ -120,16 +121,17 @@ public class Simulation {
       for (BuildRequest predictionBuildRequest : predictionPlanet.colony.build_requests) {
         for (int j = 0; j < planet.colony.build_requests.size(); j++) {
           BuildRequest.Builder br = planet.colony.build_requests.get(j).newBuilder();
+
           if (predictionBuildRequest.id.equals(br.id)) {
-            buildRequests.add(br
-                .end_time(predictionBuildRequest.end_time)
-                .build());
+            br.end_time(predictionBuildRequest.end_time);
+            buildRequests.add(br.build());
           }
         }
       }
       planet.colony(planet.colony.newBuilder().build_requests(buildRequests).build());
       star.planets.set(i, planet.build());
     }
+
     star.last_simulation = endTime;
   }
 
@@ -159,6 +161,8 @@ public class Simulation {
               predictionStar.planets.get(i).colony.build_requests.get(j).minerals_efficiency);
           brBuilder.population_efficiency(
               predictionStar.planets.get(i).colony.build_requests.get(j).population_efficiency);
+          brBuilder.progress_per_step(
+              predictionStar.planets.get(i).colony.build_requests.get(j).progress_per_step);
           colonyBuilder.build_requests.set(j, brBuilder.build());
         }
         planetBuilder.colony(colonyBuilder.build());
@@ -405,8 +409,10 @@ public class Simulation {
             }
             endTime += (long)(STEP_TIME * fractionProgress);
 
-            log("     FINISHED! fraction-progress = %.2f, end-time=%d", fractionProgress, endTime);
+            log("     FINISHED! progress-this-turn: %.2f fraction-progress = %.2f, end-time=%d",
+                progressThisTurn, fractionProgress, endTime);
             br.progress(1.0f);
+            br.progress_per_step(progressThisTurn);
             br.end_time(endTime);
             completeBuildRequests.add(br.build());
             continue;
@@ -435,6 +441,7 @@ public class Simulation {
               now + Math.round(Math.max(timeForMineralsHours, timeForPopulationHours) * Time.HOUR),
               now);
           br.progress(br.progress + progressThisTurn);
+          br.progress_per_step(progressThisTurn);
 
           // Calculate the efficiency of the minerals vs. population
           float sumTimeInHours = timeForMineralsHours + timeForPopulationHours;

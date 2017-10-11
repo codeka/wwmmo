@@ -43,6 +43,8 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
 
   public static final Float DEFAULT_POPULATION_EFFICIENCY = 0.0f;
 
+  public static final Float DEFAULT_PROGRESS_PER_STEP = 0.0f;
+
   @WireField(
       tag = 1,
       adapter = "com.squareup.wire.ProtoAdapter#INT64"
@@ -108,11 +110,20 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
   )
   public final Float population_efficiency;
 
-  public BuildRequest(Long id, Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress, Float minerals_efficiency, Float population_efficiency) {
-    this(id, design_type, count, start_time, end_time, progress, minerals_efficiency, population_efficiency, ByteString.EMPTY);
+  /**
+   * The amount of progress we're making per step, so we can update counters and stuff in real-time.
+   */
+  @WireField(
+      tag = 9,
+      adapter = "com.squareup.wire.ProtoAdapter#FLOAT"
+  )
+  public final Float progress_per_step;
+
+  public BuildRequest(Long id, Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress, Float minerals_efficiency, Float population_efficiency, Float progress_per_step) {
+    this(id, design_type, count, start_time, end_time, progress, minerals_efficiency, population_efficiency, progress_per_step, ByteString.EMPTY);
   }
 
-  public BuildRequest(Long id, Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress, Float minerals_efficiency, Float population_efficiency, ByteString unknownFields) {
+  public BuildRequest(Long id, Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress, Float minerals_efficiency, Float population_efficiency, Float progress_per_step, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
     this.id = id;
     this.design_type = design_type;
@@ -122,6 +133,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     this.progress = progress;
     this.minerals_efficiency = minerals_efficiency;
     this.population_efficiency = population_efficiency;
+    this.progress_per_step = progress_per_step;
   }
 
   @Override
@@ -135,6 +147,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     builder.progress = progress;
     builder.minerals_efficiency = minerals_efficiency;
     builder.population_efficiency = population_efficiency;
+    builder.progress_per_step = progress_per_step;
     builder.addUnknownFields(unknownFields());
     return builder;
   }
@@ -152,7 +165,8 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
         && Internal.equals(end_time, o.end_time)
         && Internal.equals(progress, o.progress)
         && Internal.equals(minerals_efficiency, o.minerals_efficiency)
-        && Internal.equals(population_efficiency, o.population_efficiency);
+        && Internal.equals(population_efficiency, o.population_efficiency)
+        && Internal.equals(progress_per_step, o.progress_per_step);
   }
 
   @Override
@@ -168,6 +182,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
       result = result * 37 + (progress != null ? progress.hashCode() : 0);
       result = result * 37 + (minerals_efficiency != null ? minerals_efficiency.hashCode() : 0);
       result = result * 37 + (population_efficiency != null ? population_efficiency.hashCode() : 0);
+      result = result * 37 + (progress_per_step != null ? progress_per_step.hashCode() : 0);
       super.hashCode = result;
     }
     return result;
@@ -184,6 +199,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     if (progress != null) builder.append(", progress=").append(progress);
     if (minerals_efficiency != null) builder.append(", minerals_efficiency=").append(minerals_efficiency);
     if (population_efficiency != null) builder.append(", population_efficiency=").append(population_efficiency);
+    if (progress_per_step != null) builder.append(", progress_per_step=").append(progress_per_step);
     return builder.replace(0, 2, "BuildRequest{").append('}').toString();
   }
 
@@ -203,6 +219,8 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     public Float minerals_efficiency;
 
     public Float population_efficiency;
+
+    public Float progress_per_step;
 
     public Builder() {
     }
@@ -264,9 +282,17 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
       return this;
     }
 
+    /**
+     * The amount of progress we're making per step, so we can update counters and stuff in real-time.
+     */
+    public Builder progress_per_step(Float progress_per_step) {
+      this.progress_per_step = progress_per_step;
+      return this;
+    }
+
     @Override
     public BuildRequest build() {
-      return new BuildRequest(id, design_type, count, start_time, end_time, progress, minerals_efficiency, population_efficiency, buildUnknownFields());
+      return new BuildRequest(id, design_type, count, start_time, end_time, progress, minerals_efficiency, population_efficiency, progress_per_step, buildUnknownFields());
     }
   }
 
@@ -285,6 +311,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
           + (value.progress != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(6, value.progress) : 0)
           + (value.minerals_efficiency != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(7, value.minerals_efficiency) : 0)
           + (value.population_efficiency != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(8, value.population_efficiency) : 0)
+          + (value.progress_per_step != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(9, value.progress_per_step) : 0)
           + value.unknownFields().size();
     }
 
@@ -298,6 +325,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
       if (value.progress != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 6, value.progress);
       if (value.minerals_efficiency != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 7, value.minerals_efficiency);
       if (value.population_efficiency != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 8, value.population_efficiency);
+      if (value.progress_per_step != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 9, value.progress_per_step);
       writer.writeBytes(value.unknownFields());
     }
 
@@ -322,6 +350,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
           case 6: builder.progress(ProtoAdapter.FLOAT.decode(reader)); break;
           case 7: builder.minerals_efficiency(ProtoAdapter.FLOAT.decode(reader)); break;
           case 8: builder.population_efficiency(ProtoAdapter.FLOAT.decode(reader)); break;
+          case 9: builder.progress_per_step(ProtoAdapter.FLOAT.decode(reader)); break;
           default: {
             FieldEncoding fieldEncoding = reader.peekFieldEncoding();
             Object value = fieldEncoding.rawProtoAdapter().decode(reader);
