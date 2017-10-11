@@ -34,6 +34,8 @@ public class ProgressBottomPane extends RelativeLayout implements BottomPaneCont
   private final TextView buildName;
   private final TextView timeRemaining;
   private final ProgressBar buildProgress;
+  private final ProgressBar populationEfficiency;
+  private final ProgressBar miningEfficiency;
 
   public ProgressBottomPane(
       Context context,
@@ -53,6 +55,8 @@ public class ProgressBottomPane extends RelativeLayout implements BottomPaneCont
     buildName = findViewById(R.id.build_name);
     timeRemaining = findViewById(R.id.build_time_remaining);
     buildProgress = findViewById(R.id.build_progress);
+    populationEfficiency = findViewById(R.id.population_efficiency);
+    miningEfficiency = findViewById(R.id.mining_efficiency);
 
     Design design = DesignHelper.getDesign(buildRequest.design_type);
     BuildViewHelper.setDesignIcon(design, buildIcon);
@@ -84,6 +88,8 @@ public class ProgressBottomPane extends RelativeLayout implements BottomPaneCont
   private void update() {
     int progress = Math.round(BuildHelper.getBuildProgress(buildRequest, System.currentTimeMillis()) * 100);
     buildProgress.setProgress(progress);
+    populationEfficiency.setProgress(Math.round(buildRequest.population_efficiency * 100));
+    miningEfficiency.setProgress(Math.round(buildRequest.minerals_efficiency * 100));
 
     String verb = "Building"; // (buildRequest.build_request_id == null ? "Building" : "Upgrading");
     timeRemaining.setText(Html.fromHtml(String.format(Locale.ENGLISH,

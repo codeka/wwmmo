@@ -43,6 +43,56 @@
       android:layout_toStartOf="@+id/cancel"
       android:layout_below="@+id/build_time_remaining" />
 
+  <TextView
+      android:id="@+id/efficiency_label"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignStart="@+id/build_name"
+      android:layout_alignTop="@+id/population_efficiency_icon"
+      android:layout_alignBottom="@+id/mining_efficiency_icon"
+      android:text="@string/efficiency"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:gravity="center_vertical" />
+
+  <ImageView
+      android:id="@+id/population_efficiency_icon"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toEndOf="@id/efficiency_label"
+      android:layout_below="@id/build_progress"
+      android:layout_marginStart="10dp"
+      android:src="@drawable/population" />
+
+  <ImageView
+      android:id="@+id/mining_efficiency_icon"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toEndOf="@id/efficiency_label"
+      android:layout_below="@id/population_efficiency_icon"
+      android:layout_marginStart="10dp"
+      android:layout_marginTop="4dp"
+      android:src="@drawable/mining" />
+
+  <ProgressBar
+      android:id="@+id/population_efficiency"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="100dp"
+      android:layout_height="10dp"
+      android:layout_marginStart="10dp"
+      android:layout_toEndOf="@+id/population_efficiency_icon"
+      android:layout_alignTop="@+id/population_efficiency_icon"
+      android:layout_alignBottom="@+id/population_efficiency_icon" />
+
+  <ProgressBar
+      android:id="@+id/mining_efficiency"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="100dp"
+      android:layout_height="10dp"
+      android:layout_marginStart="10dp"
+      android:layout_toEndOf="@+id/mining_efficiency_icon"
+      android:layout_alignTop="@+id/mining_efficiency_icon"
+      android:layout_alignBottom="@+id/mining_efficiency_icon" />
+
   <Button
       android:id="@+id/cancel"
       android:layout_width="wrap_content"
