@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.BuildHelper;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
@@ -229,7 +230,7 @@ public class ShipsView extends ListView implements TabContentView {
         BuildRequest buildRequest = entry.buildRequest;
         Design design = DesignHelper.getDesign(
             fleet != null ? fleet.design_type : buildRequest.design_type);
-        BuildHelper.setDesignIcon(design, icon);
+        BuildViewHelper.setDesignIcon(design, icon);
 
         int numUpgrades = design.upgrades.size();
         if (numUpgrades == 0 || fleet == null) {
@@ -303,7 +304,7 @@ public class ShipsView extends ListView implements TabContentView {
         view.findViewById(R.id.notes).setVisibility(View.GONE);
 
         Design design = entry.design;
-        BuildHelper.setDesignIcon(design, icon);
+        BuildViewHelper.setDesignIcon(design, icon);
 
         row1.setText(FleetListHelper.getFleetName((Fleet) null, design));
         String requiredHtml = DesignHelper.getDependenciesHtml(colony, design);

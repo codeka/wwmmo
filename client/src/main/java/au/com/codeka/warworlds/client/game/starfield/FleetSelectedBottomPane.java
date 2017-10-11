@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.game.build.BuildHelper;
+import au.com.codeka.warworlds.client.game.build.BuildViewHelper;
 import au.com.codeka.warworlds.client.game.fleets.FleetListHelper;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
@@ -79,7 +79,7 @@ public class FleetSelectedBottomPane extends FrameLayout {
 
     fleetDesign.setText(FleetListHelper.getFleetName(fleet, design/*, 18.0f*/));
     fleetDestination.setText(FleetListHelper.getFleetDestination(star, fleet, false));
-    BuildHelper.setDesignIcon(design, fleetIcon);
+    BuildViewHelper.setDesignIcon(design, fleetIcon);
 
     //FleetUpgrade.BoostFleetUpgrade fleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");
     //if (fleetUpgrade != null && !fleetUpgrade.isBoosting()) {

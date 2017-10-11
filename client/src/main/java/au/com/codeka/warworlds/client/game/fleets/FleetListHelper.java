@@ -3,10 +3,9 @@ package au.com.codeka.warworlds.client.game.fleets;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.game.build.BuildHelper;
+import au.com.codeka.warworlds.client.game.build.BuildViewHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Design;
@@ -19,7 +18,7 @@ import javax.annotation.Nullable;
 
 public class FleetListHelper {
   public static void populateFleetRow(ViewGroup row, Star star, Fleet fleet, Design design) {
-    BuildHelper.setDesignIcon(design, row.findViewById(R.id.fleet_icon));
+    BuildViewHelper.setDesignIcon(design, row.findViewById(R.id.fleet_icon));
     ((TextView) row.findViewById(R.id.fleet_row1)).setText(getFleetName(fleet, design));
     ((TextView) row.findViewById(R.id.fleet_row2)).setText(getFleetStance(fleet));
     ((TextView) row.findViewById(R.id.fleet_row3)).setText(getFleetDestination(star, fleet, true));

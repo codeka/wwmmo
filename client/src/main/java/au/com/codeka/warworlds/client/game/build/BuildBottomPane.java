@@ -24,6 +24,7 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
+import au.com.codeka.warworlds.common.sim.BuildHelper;
 import au.com.codeka.warworlds.common.sim.StarModifier;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import java.util.Locale;
@@ -102,7 +103,7 @@ public class BuildBottomPane extends RelativeLayout implements BottomPaneContent
     buildCount.setText("1");
     buildCountSeek.setProgress(1);
 
-    BuildHelper.setDesignIcon(design, buildIcon);
+    BuildViewHelper.setDesignIcon(design, buildIcon);
     buildName.setText(design.display_name);
     buildDescription.setText(Html.fromHtml(design.description));
 

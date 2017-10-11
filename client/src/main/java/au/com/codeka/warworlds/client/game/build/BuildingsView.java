@@ -17,6 +17,7 @@ import au.com.codeka.warworlds.common.proto.Building;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.BuildHelper;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -256,7 +257,7 @@ public class BuildingsView extends ListView implements TabContentView {
         Design design = DesignHelper.getDesign(
             (building != null ? building.design_type : buildRequest.design_type));
 
-        BuildHelper.setDesignIcon(design, icon);
+        BuildViewHelper.setDesignIcon(design, icon);
         int numUpgrades = design.upgrades.size();
 
         if (numUpgrades == 0 || building == null) {
@@ -318,7 +319,7 @@ public class BuildingsView extends ListView implements TabContentView {
         view.findViewById(R.id.notes).setVisibility(View.GONE);
 
         Design design = entries.get(position).design;
-        BuildHelper.setDesignIcon(design, icon);
+        BuildViewHelper.setDesignIcon(design, icon);
 
         row1.setText(design.display_name);
         String requiredHtml = DesignHelper.getDependenciesHtml(colony, design);

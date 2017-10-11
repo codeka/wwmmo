@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.game.build.BuildHelper;
+import au.com.codeka.warworlds.client.game.build.BuildViewHelper;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -81,7 +81,7 @@ public class FleetListSimple extends LinearLayout {
     TextView row1 = view.findViewById(R.id.fleet_row1);
     TextView row2 = view.findViewById(R.id.fleet_row2);
 
-    BuildHelper.setDesignIcon(design, icon);
+    BuildViewHelper.setDesignIcon(design, icon);
 
     row1.setText(FleetListHelper.getFleetName(fleet, design));
     row2.setText(FleetListHelper.getFleetStance(fleet));

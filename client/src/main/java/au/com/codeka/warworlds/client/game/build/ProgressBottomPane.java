@@ -12,6 +12,7 @@ import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.BuildHelper;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import java.util.Locale;
 
@@ -54,7 +55,7 @@ public class ProgressBottomPane extends RelativeLayout implements BottomPaneCont
     buildProgress = findViewById(R.id.build_progress);
 
     Design design = DesignHelper.getDesign(buildRequest.design_type);
-    BuildHelper.setDesignIcon(design, buildIcon);
+    BuildViewHelper.setDesignIcon(design, buildIcon);
     buildName.setText(DesignHelper.getDesignName(design, false));
 
     update();
