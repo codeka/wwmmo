@@ -12,7 +12,6 @@ import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import com.google.common.collect.Lists;
-import javax.print.DocFlavor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -667,7 +666,6 @@ public class SimulationTest {
         starBuilder.planets.get(0).colony.build_requests.get(0).population_efficiency,
         closeTo(0.95f, 2));
   }
-
 
   @Test
   public void testBuildScoutPartialStep() {
