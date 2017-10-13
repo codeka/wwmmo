@@ -159,12 +159,12 @@ public class Simulation {
         Colony.Builder colonyBuilder = planetBuilder.colony.newBuilder();
         for (int j = 0; j < planetBuilder.colony.build_requests.size(); j++) {
           BuildRequest.Builder brBuilder = colonyBuilder.build_requests.get(j).newBuilder();
-          brBuilder.minerals_efficiency(
-              predictionStar.planets.get(i).colony.build_requests.get(j).minerals_efficiency);
-          brBuilder.population_efficiency(
-              predictionStar.planets.get(i).colony.build_requests.get(j).population_efficiency);
-          brBuilder.progress_per_step(
-              predictionStar.planets.get(i).colony.build_requests.get(j).progress_per_step);
+          BuildRequest predictionBuildRequest =
+              predictionStar.planets.get(i).colony.build_requests.get(j);
+          brBuilder.minerals_efficiency(predictionBuildRequest.minerals_efficiency);
+          brBuilder.population_efficiency(predictionBuildRequest.population_efficiency);
+          brBuilder.progress_per_step(predictionBuildRequest.progress_per_step);
+          brBuilder.delta_minerals_per_hour(predictionBuildRequest.delta_minerals_per_hour);
           colonyBuilder.build_requests.set(j, brBuilder.build());
         }
         planetBuilder.colony(colonyBuilder.build());
@@ -265,13 +265,13 @@ public class Simulation {
           storage.total_goods, goods, goods * dt);
 
       // calculate the output from mining this turn and add it to the star global
-      float minerals =
+      float mineralsPerHour =
           colony.population * colony.focus.mining * (planet.mining_congeniality / 100.0f);
-      colony.delta_minerals(minerals);
-      storage.total_minerals(Math.max(0, storage.total_minerals + minerals * dt));
-      mineralsDeltaPerHour += minerals;
+      colony.delta_minerals(mineralsPerHour);
+      storage.total_minerals(Math.max(0, storage.total_minerals + mineralsPerHour * dt));
+      mineralsDeltaPerHour += mineralsPerHour;
       log("    Minerals: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
-          storage.total_minerals, minerals, minerals * dt);
+          storage.total_minerals, mineralsPerHour, mineralsPerHour * dt);
 
       // calculate the output from energy this turn and add it to the star global
       float energy =
@@ -365,11 +365,14 @@ public class Simulation {
           log("     Available: [population=%.2f] [minerals=%.2f]",
               workersPerBuildRequest, mineralsPerBuildRequest);
 
-          // The amount of work we can do this turn is the minimum of whatever resources we have
-          // available allows.
+          // The amount of work we can do this turn is based on how much population we have (if
+          // we have enough minerals) or based the min of population/minerals if we don't.
           float populationProgressThisTurn = workersPerBuildRequest / totalWorkersRequired;
           float mineralsProgressThisTurn = mineralsPerBuildRequest / totalMineralsRequired;
-          float progressThisTurn = Math.min(populationProgressThisTurn, mineralsProgressThisTurn);
+          float progressThisTurn =
+              mineralsProgressThisTurn >= 1.0
+                  ? populationProgressThisTurn
+                  : Math.min(populationProgressThisTurn, mineralsProgressThisTurn);
           log("     Progress: [this turn=%.4f (minerals=%.4f pop=%.4f] [total=%.4f]",
               progressThisTurn,
               mineralsProgressThisTurn,
@@ -390,8 +393,7 @@ public class Simulation {
             mineralsUsedThisTurn *= populationProgressThisTurn;
           }
           storage.total_minerals(Math.max(0, storage.total_minerals - mineralsUsedThisTurn));
-          mineralsDeltaPerHour -= mineralsUsedThisTurn;
-          colony.delta_minerals(mineralsDeltaPerHour);
+          br.delta_minerals_per_hour(-mineralsUsedThisTurn * STEP_TIME / Time.HOUR);
           log("     Used: [minerals=%.4f]", mineralsUsedThisTurn);
 
           // what is the current amount of time we have now as a percentage of the total build

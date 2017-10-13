@@ -84,4 +84,7 @@ message BuildRequest {
 
   // The amount of progress we're making per step, so we can update counters and stuff in real-time.
   optional float progress_per_step = 9;
+
+  // The delta of goods per hour this build request is CURRENTLY using.
+  optional float delta_minerals_per_hour = 10;
 }

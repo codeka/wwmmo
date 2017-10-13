@@ -1,7 +1,9 @@
 package au.com.codeka.warworlds.common.sim;
 
 import au.com.codeka.warworlds.common.Vector2;
+import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
+import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import java.util.Locale;
 import javax.annotation.Nullable;
@@ -21,6 +23,27 @@ public class StarHelper {
       }
     }
     return null;
+  }
+
+  /** Gets the delta minerals per hour *at this time* for the given empty. */
+  public static float getDeltaMineralsPerHour(Star star, long empireId, long now) {
+    float delta = 0.0f;
+    EmpireStorage storage = getStorage(star, empireId);
+    if (storage != null) {
+      delta += storage.minerals_delta_per_hour;
+    }
+    for (Planet planet : star.planets) {
+      if (planet.colony != null
+          && planet.colony.empire_id != null
+          && planet.colony.empire_id.equals(empireId)) {
+        for (BuildRequest br : planet.colony.build_requests) {
+          if (br.start_time < now && br.end_time > now) {
+            delta += br.delta_minerals_per_hour;
+          }
+        }
+      }
+    }
+    return delta;
   }
 
   /**

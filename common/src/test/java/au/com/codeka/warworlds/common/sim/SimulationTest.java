@@ -336,7 +336,7 @@ public class SimulationTest {
                 .energy_congeniality(100)
                 .farming_congeniality(200)
                 .mining_congeniality(300)
-                .population_congeniality(1200)
+                .population_congeniality(1000)
                 .planet_type(Planet.PLANET_TYPE.TERRAN)
                 .colony(
                     new Colony.Builder()
@@ -348,7 +348,7 @@ public class SimulationTest {
                                 .mining(0.0f)
                                 .construction(1.0f)
                                 .build())
-                        .population(1200f)
+                        .population(1000f)
                         .build_requests(Lists.newArrayList(
                             new BuildRequest.Builder()
                                 .count(1)
@@ -717,34 +717,186 @@ public class SimulationTest {
 
     new Simulation(NOW_TIME, false, logHandler).simulate(starBuilder);
     assertThat(starBuilder.last_simulation, is(NOW_TIME));
-    // We started 1/4 of the way through the step, and we should finish after 1/50th of a step
-    // (because we have 50x more minerals than needed)
+    // We started 1/4 of the way through the step, and we should finish after 1/200th of a step
+    // (because we have enough minerals and 200x more population than needed)
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
-        is(NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 50)));
+        is(NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 200)));
     // But we're not ACTUALLY finished yet, because actually we've only just started...
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).progress,
         closeTo(0.0f, 2));
 
-    long now = NOW_TIME + (Simulation.STEP_TIME / 4L) + (Simulation.STEP_TIME / 100L);
+    long now = NOW_TIME + (Simulation.STEP_TIME / 4L) + (Simulation.STEP_TIME / 400L);
     new Simulation(now, false, logHandler).simulate(starBuilder);
     // Now we're half-way through
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
-        is(NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 50)));
+        is(NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 200)));
     assertThat(
         BuildHelper.getBuildProgress(starBuilder.planets.get(0).colony.build_requests.get(0), now),
         closeTo(0.5f, 2));
 
-    now = NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 50);
+    now = NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 200);
     new Simulation(now, false, logHandler).simulate(starBuilder);
     // NOW we should be finished.
     assertThat(
         starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
-        is(NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 50)));
+        is(NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 200)));
     assertThat(
         BuildHelper.getBuildProgress(starBuilder.planets.get(0).colony.build_requests.get(0), now),
         closeTo(1.0f, 2));
+  }
+
+  /** If you have more minerals than you need, you can't build faster. Unlike population. */
+  @Test
+  public void testExtraMineralsDoesntAffectBuildTime() {
+    Star.Builder starBuilder = new Star.Builder()
+        .id(1L)
+        .planets(Lists.newArrayList(
+            new Planet.Builder()
+                .index(0)
+                .energy_congeniality(100)
+                .farming_congeniality(200)
+                .mining_congeniality(300)
+                .population_congeniality(2000)
+                .planet_type(Planet.PLANET_TYPE.TERRAN)
+                .colony(
+                    new Colony.Builder()
+                        .empire_id(1L)
+                        .focus(
+                            new ColonyFocus.Builder()
+                                .energy(0.0f)
+                                .farming(0.0f)
+                                .mining(0.0f)
+                                .construction(1.0f)
+                                .build())
+                        .population(2000f)
+                        .build_requests(Lists.newArrayList(
+                            new BuildRequest.Builder()
+                                .count(1)
+                                .design_type(Design.DesignType.COLONY_SHIP)
+                                .id(1L)
+                                .progress(0.0f)
+                                .start_time(NOW_TIME)
+                                .build()
+                        ))
+                        .build())
+                .build()
+        ))
+        .empire_stores(Lists.newArrayList(
+            new EmpireStorage.Builder()
+                .empire_id(1L)
+                .max_energy(1000f)
+                .max_goods(1000f)
+                .max_minerals(2000f)
+                .total_energy(100f)
+                .total_goods(100f)
+                .total_minerals(100f)
+                .build()
+        ))
+        .name("Stardust");
+
+    long now = NOW_TIME;
+    new Simulation(now, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(now));
+    // Because we haven't started building yet, minerals should not be being used.
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
+        is(NOW_TIME + (Simulation.STEP_TIME / 2)));
+
+    // Doubling the mineral count won't affect the end time.
+    starBuilder.empire_stores.set(
+        0, starBuilder.empire_stores.get(0).newBuilder().total_minerals(200f).build());
+    new Simulation(now, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(now));
+    assertThat(
+        starBuilder.planets.get(0).colony.build_requests.get(0).end_time,
+        is(NOW_TIME + (Simulation.STEP_TIME / 2)));
+  }
+
+  @Test
+  public void testMineralUsage() {
+    Star.Builder starBuilder = new Star.Builder()
+        .id(1L)
+        .planets(Lists.newArrayList(
+            new Planet.Builder()
+                .index(0)
+                .energy_congeniality(100)
+                .farming_congeniality(200)
+                .mining_congeniality(300)
+                .population_congeniality(1000)
+                .planet_type(Planet.PLANET_TYPE.TERRAN)
+                .colony(
+                    new Colony.Builder()
+                        .empire_id(1L)
+                        .focus(
+                            new ColonyFocus.Builder()
+                                .energy(0.0f)
+                                .farming(0.8f)
+                                .mining(0.1f)
+                                .construction(0.1f)
+                                .build())
+                        .population(1000f)
+                        .build_requests(Lists.newArrayList(
+                            new BuildRequest.Builder()
+                                .count(1)
+                                .design_type(Design.DesignType.SCOUT)
+                                .id(1L)
+                                .progress(0.0f)
+                                .start_time(NOW_TIME + (Simulation.STEP_TIME/4))
+                                .build()
+                        ))
+                        .build())
+                .build()
+        ))
+        .empire_stores(Lists.newArrayList(
+            new EmpireStorage.Builder()
+                .empire_id(1L)
+                .max_energy(1000f)
+                .max_goods(1000f)
+                .max_minerals(1000f)
+                .total_energy(100f)
+                .total_goods(100f)
+                .total_minerals(100f)
+                .build()
+        ))
+        .name("Stardust");
+
+    long now = NOW_TIME;
+    new Simulation(now, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(now));
+    // Because we haven't started building yet, minerals should not be being used.
+    assertThat(starBuilder.empire_stores.get(0).total_minerals, closeTo(150f, 2));
+    assertThat(
+        StarHelper.getDeltaMineralsPerHour(starBuilder.build(), 1L, now),
+        closeTo(300.0f, 2));
+    assertThat(
+        ColonyHelper.getDeltaMineralsPerHour(starBuilder.planets.get(0).colony, now),
+        closeTo(300.0f, 2));
+
+    now = NOW_TIME + (Simulation.STEP_TIME / 4L) + (Simulation.STEP_TIME / 40L);
+    new Simulation(now, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(NOW_TIME));
+    // We're half-way through, so we should be using those minerals.
+    assertThat(starBuilder.empire_stores.get(0).total_minerals, closeTo(150f, 2));
+    assertThat(
+        StarHelper.getDeltaMineralsPerHour(starBuilder.build(), 1L, now),
+        closeTo(293.33f, 2));
+    assertThat(
+        ColonyHelper.getDeltaMineralsPerHour(starBuilder.planets.get(0).colony, now),
+        closeTo(293.33f, 2));
+
+    now = NOW_TIME + (Simulation.STEP_TIME / 4) + (Simulation.STEP_TIME / 20);
+    new Simulation(now, false, logHandler).simulate(starBuilder);
+    assertThat(starBuilder.last_simulation, is(NOW_TIME));
+    // Now we're done, we're no longer using the minerals.
+    assertThat(starBuilder.empire_stores.get(0).total_minerals, closeTo(150f, 2));
+    assertThat(
+        StarHelper.getDeltaMineralsPerHour(starBuilder.build(), 1L, now),
+        closeTo(300.0f, 2));
+    assertThat(
+        ColonyHelper.getDeltaMineralsPerHour(starBuilder.planets.get(0).colony, now),
+        closeTo(300.0f, 2));
   }
 }

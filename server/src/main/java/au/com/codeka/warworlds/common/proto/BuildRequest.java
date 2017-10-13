@@ -45,6 +45,8 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
 
   public static final Float DEFAULT_PROGRESS_PER_STEP = 0.0f;
 
+  public static final Float DEFAULT_DELTA_MINERALS_PER_HOUR = 0.0f;
+
   @WireField(
       tag = 1,
       adapter = "com.squareup.wire.ProtoAdapter#INT64"
@@ -119,11 +121,20 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
   )
   public final Float progress_per_step;
 
-  public BuildRequest(Long id, Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress, Float minerals_efficiency, Float population_efficiency, Float progress_per_step) {
-    this(id, design_type, count, start_time, end_time, progress, minerals_efficiency, population_efficiency, progress_per_step, ByteString.EMPTY);
+  /**
+   * The delta of goods per hour this build request is CURRENTLY using.
+   */
+  @WireField(
+      tag = 10,
+      adapter = "com.squareup.wire.ProtoAdapter#FLOAT"
+  )
+  public final Float delta_minerals_per_hour;
+
+  public BuildRequest(Long id, Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress, Float minerals_efficiency, Float population_efficiency, Float progress_per_step, Float delta_minerals_per_hour) {
+    this(id, design_type, count, start_time, end_time, progress, minerals_efficiency, population_efficiency, progress_per_step, delta_minerals_per_hour, ByteString.EMPTY);
   }
 
-  public BuildRequest(Long id, Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress, Float minerals_efficiency, Float population_efficiency, Float progress_per_step, ByteString unknownFields) {
+  public BuildRequest(Long id, Design.DesignType design_type, Integer count, Long start_time, Long end_time, Float progress, Float minerals_efficiency, Float population_efficiency, Float progress_per_step, Float delta_minerals_per_hour, ByteString unknownFields) {
     super(ADAPTER, unknownFields);
     this.id = id;
     this.design_type = design_type;
@@ -134,6 +145,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     this.minerals_efficiency = minerals_efficiency;
     this.population_efficiency = population_efficiency;
     this.progress_per_step = progress_per_step;
+    this.delta_minerals_per_hour = delta_minerals_per_hour;
   }
 
   @Override
@@ -148,6 +160,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     builder.minerals_efficiency = minerals_efficiency;
     builder.population_efficiency = population_efficiency;
     builder.progress_per_step = progress_per_step;
+    builder.delta_minerals_per_hour = delta_minerals_per_hour;
     builder.addUnknownFields(unknownFields());
     return builder;
   }
@@ -166,7 +179,8 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
         && Internal.equals(progress, o.progress)
         && Internal.equals(minerals_efficiency, o.minerals_efficiency)
         && Internal.equals(population_efficiency, o.population_efficiency)
-        && Internal.equals(progress_per_step, o.progress_per_step);
+        && Internal.equals(progress_per_step, o.progress_per_step)
+        && Internal.equals(delta_minerals_per_hour, o.delta_minerals_per_hour);
   }
 
   @Override
@@ -183,6 +197,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
       result = result * 37 + (minerals_efficiency != null ? minerals_efficiency.hashCode() : 0);
       result = result * 37 + (population_efficiency != null ? population_efficiency.hashCode() : 0);
       result = result * 37 + (progress_per_step != null ? progress_per_step.hashCode() : 0);
+      result = result * 37 + (delta_minerals_per_hour != null ? delta_minerals_per_hour.hashCode() : 0);
       super.hashCode = result;
     }
     return result;
@@ -200,6 +215,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     if (minerals_efficiency != null) builder.append(", minerals_efficiency=").append(minerals_efficiency);
     if (population_efficiency != null) builder.append(", population_efficiency=").append(population_efficiency);
     if (progress_per_step != null) builder.append(", progress_per_step=").append(progress_per_step);
+    if (delta_minerals_per_hour != null) builder.append(", delta_minerals_per_hour=").append(delta_minerals_per_hour);
     return builder.replace(0, 2, "BuildRequest{").append('}').toString();
   }
 
@@ -221,6 +237,8 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
     public Float population_efficiency;
 
     public Float progress_per_step;
+
+    public Float delta_minerals_per_hour;
 
     public Builder() {
     }
@@ -290,9 +308,17 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
       return this;
     }
 
+    /**
+     * The delta of goods per hour this build request is CURRENTLY using.
+     */
+    public Builder delta_minerals_per_hour(Float delta_minerals_per_hour) {
+      this.delta_minerals_per_hour = delta_minerals_per_hour;
+      return this;
+    }
+
     @Override
     public BuildRequest build() {
-      return new BuildRequest(id, design_type, count, start_time, end_time, progress, minerals_efficiency, population_efficiency, progress_per_step, buildUnknownFields());
+      return new BuildRequest(id, design_type, count, start_time, end_time, progress, minerals_efficiency, population_efficiency, progress_per_step, delta_minerals_per_hour, buildUnknownFields());
     }
   }
 
@@ -312,6 +338,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
           + (value.minerals_efficiency != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(7, value.minerals_efficiency) : 0)
           + (value.population_efficiency != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(8, value.population_efficiency) : 0)
           + (value.progress_per_step != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(9, value.progress_per_step) : 0)
+          + (value.delta_minerals_per_hour != null ? ProtoAdapter.FLOAT.encodedSizeWithTag(10, value.delta_minerals_per_hour) : 0)
           + value.unknownFields().size();
     }
 
@@ -326,6 +353,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
       if (value.minerals_efficiency != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 7, value.minerals_efficiency);
       if (value.population_efficiency != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 8, value.population_efficiency);
       if (value.progress_per_step != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 9, value.progress_per_step);
+      if (value.delta_minerals_per_hour != null) ProtoAdapter.FLOAT.encodeWithTag(writer, 10, value.delta_minerals_per_hour);
       writer.writeBytes(value.unknownFields());
     }
 
@@ -351,6 +379,7 @@ public final class BuildRequest extends Message<BuildRequest, BuildRequest.Build
           case 7: builder.minerals_efficiency(ProtoAdapter.FLOAT.decode(reader)); break;
           case 8: builder.population_efficiency(ProtoAdapter.FLOAT.decode(reader)); break;
           case 9: builder.progress_per_step(ProtoAdapter.FLOAT.decode(reader)); break;
+          case 10: builder.delta_minerals_per_hour(ProtoAdapter.FLOAT.decode(reader)); break;
           default: {
             FieldEncoding fieldEncoding = reader.peekFieldEncoding();
             Object value = fieldEncoding.rawProtoAdapter().decode(reader);
