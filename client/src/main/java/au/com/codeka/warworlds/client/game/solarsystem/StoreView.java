@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.StarHelper;
 import com.google.common.base.Preconditions;
 import com.squareup.wire.Wire;
 import java.util.Locale;
@@ -88,7 +89,9 @@ public class StoreView extends RelativeLayout {
       if (Wire.get(storage.minerals_delta_per_hour, 0.0f) >= 0) {
         deltaMinerals.setTextColor(Color.GREEN);
         deltaMinerals.setText(String.format(Locale.ENGLISH, "+%d/hr",
-            Math.round(Wire.get(storage.minerals_delta_per_hour, 0.0f))));
+            Math.round(
+                StarHelper.getDeltaMineralsPerHour(
+                    star, myEmpire.id, System.currentTimeMillis()))));
       } else {
         deltaMinerals.setTextColor(Color.RED);
         deltaMinerals.setText(String.format(Locale.ENGLISH, "%d/hr",
