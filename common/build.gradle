@@ -1,3 +1,5 @@
+import groovy.io.FileType
+
 apply plugin: 'java'
 
 repositories {
@@ -9,11 +11,10 @@ tasks.withType(JavaCompile) {
   targetCompatibility = "1.8"
 }
 
-task buildProto() {
+task buildProto() << {
   def protos = []
-  fileTree(dir: "src/main/proto").matching { include "*.proto" }.visit {
-    FileVisitDetails details ->
-      protos << details.file.name
+  new File(projectDir.path + "/src/main/proto").eachFileRecurse(FileType.FILES) { file ->
+    protos << file.absolutePath
   }
 
   javaexec {
