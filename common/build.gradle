@@ -14,7 +14,7 @@ tasks.withType(JavaCompile) {
 task buildProto() << {
   def protos = []
   new File(projectDir.path + "/src/main/proto").eachFileRecurse(FileType.FILES) { file ->
-    protos << file.absolutePath
+    protos << file.absolutePath - (projectDir.path + "/src/main/proto/")
   }
 
   javaexec {
@@ -22,6 +22,7 @@ task buildProto() << {
     args = [
         "libs/wire-compiler-2.1.2-jar-with-dependencies.jar",
         "--proto_path=src/main/proto",
+        "--named_files_only",
         "--java_out=src/main/java",
     ] + protos
   }

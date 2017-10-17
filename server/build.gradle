@@ -47,7 +47,7 @@ task dataFiles {
 task buildProto() << {
   def protos = []
   new File(projectDir.path + "/src/main/proto").eachFileRecurse(FileType.FILES) { file ->
-    protos << file.absolutePath
+    protos << file.absolutePath - (projectDir.path + "/src/main/proto/")
   }
 
   javaexec {
