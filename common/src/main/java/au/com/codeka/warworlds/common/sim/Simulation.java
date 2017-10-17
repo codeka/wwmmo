@@ -134,7 +134,7 @@ public class Simulation {
       star.planets.set(i, planet.build());
     }
 
-    star.last_simulation = endTime;
+    star.last_simulation = timeOverride;
   }
 
   /**
