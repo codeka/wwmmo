@@ -85,10 +85,12 @@ public class StarfieldScreen extends Screen {
 
       @Override
       public void onSitrepClicked(View view) {
+        onSitrepClick();
       }
 
       @Override
       public void onAllianceClicked(View view) {
+        onAllianceClick();
       }
 
       @Override
@@ -120,10 +122,12 @@ public class StarfieldScreen extends Screen {
 
       @Override
       public void onSitrepClicked(View view) {
+        onSitrepClick();
       }
 
       @Override
       public void onAllianceClicked(View view) {
+        onAllianceClick();
       }
     });
 
@@ -154,7 +158,6 @@ public class StarfieldScreen extends Screen {
         showEmptyBottomPane(false);
       } else {
         showStarSelectedBottomPane(star);
-//        selectionDetailsView.showStar(star);
       }
     }
 

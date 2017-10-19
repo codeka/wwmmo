@@ -133,6 +133,11 @@ public class StarfieldManager {
   /** Gets the selected star (or null if no star is selected). */
   @Nullable
   public Star getSelectedStar() {
+    if (selectedFleet != null) {
+      // If we have a fleet selected, the selectedStar will be the star for that fleet but from
+      // the user's point of view, there's no actual star selected...
+      return null;
+    }
     return selectedStar;
   }
 
@@ -161,6 +166,7 @@ public class StarfieldManager {
       selectionIndicatorSceneObject.getParent().removeChild(selectionIndicatorSceneObject);
     }
 
+    selectedFleet = null;
     selectedStar = star;
     for (TapListener tapListener : tapListeners) {
       tapListener.onStarTapped(star);
@@ -194,6 +200,7 @@ public class StarfieldManager {
       selectionIndicatorSceneObject.getParent().removeChild(selectionIndicatorSceneObject);
     }
 
+    selectedStar = star;
     selectedFleet = fleet;
     for (TapListener tapListener : tapListeners) {
       tapListener.onFleetTapped(star, fleet);
@@ -329,7 +336,6 @@ public class StarfieldManager {
       container = new SceneObject(scene.getDimensionResolver());
       container.setClipRadius(80.0f);
       container.setTapTargetRadius(80.0f);
-      container.setTag(new SceneObjectInfo(star));
       addSectorSceneObject(Pair.create(star.sector_x, star.sector_y), container);
 
       float x = (star.sector_x - centerSectorX) * 1024.0f + (star.offset_x - 512.0f);
@@ -344,6 +350,9 @@ public class StarfieldManager {
       }
       container.removeAllChildren();
     }
+
+    // Be sure to update the container's tag with the new star info.
+    container.setTag(new SceneObjectInfo(star));
 
     Sprite sprite = createStarSprite(star);
     container.addChild(sprite);
@@ -728,6 +737,26 @@ public class StarfieldManager {
       }
 
       updateStar(star);
+
+      if (selectedFleet != null && selectedStar != null && selectedStar.id.equals(star.id)) {
+        // We have a fleet selected and it's one on this star. Make sure we update the selected
+        // fleet as well.
+        boolean found = false;
+        for (Fleet fleet : star.fleets) {
+          if (fleet.id.equals(selectedFleet.id)) {
+            selectedFleet = fleet;
+            selectedStar = star;
+            found = true;
+          }
+        }
+        if (!found) {
+          // The fleet's been removed from star, it's no longer selected!
+          setSelectedFleet(null, null);
+        }
+      } else if (selectedStar != null && selectedStar.id.equals(star.id)) {
+        // The star that we have selected has been updated.
+        selectedStar = star;
+      }
     }
   };
 
