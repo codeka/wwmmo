@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.server.world;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.NormalRandom;
+import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -11,6 +12,7 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 import au.com.codeka.warworlds.common.sim.Simulation;
+import au.com.codeka.warworlds.common.sim.StarHelper;
 import au.com.codeka.warworlds.common.sim.StarModifier;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.store.DataStore;
@@ -197,6 +199,7 @@ public class StarManager {
       ArrayList<BuildRequest> remainingBuildRequests = new ArrayList<>();
       for (BuildRequest br : planet.colony.build_requests) {
         if (br.end_time <= now) {
+          // It's finished. Add the actual thing it built.
           Design design = DesignHelper.getDesign(br.design_type);
           if (design.design_kind == Design.DesignKind.BUILDING) {
             starModifier.modifyStar(
@@ -221,6 +224,20 @@ public class StarManager {
                     .build()),
                 logHandler);
           }
+
+          // Subtract the minerals it used last turn (since that won't have happening in the
+          // simulation)
+          int storageIndex = StarHelper.getStorageIndex(starBuilder, planet.colony.empire_id);
+          float minerals = starBuilder.empire_stores.get(storageIndex).total_minerals;
+          minerals -= br.delta_minerals_per_hour * Time.HOUR / Simulation.STEP_TIME * br.progress_per_step;
+          if (minerals < 0) {
+            minerals = 0;
+          }
+          starBuilder.empire_stores.set(storageIndex,
+              starBuilder.empire_stores.get(storageIndex).newBuilder()
+                  .total_minerals(minerals)
+                  .build());
+
           // TODO: add a sitrep as well
         } else {
           if (nextSimulateTime == null || nextSimulateTime > br.end_time) {

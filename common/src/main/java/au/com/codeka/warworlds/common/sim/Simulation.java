@@ -30,8 +30,7 @@ public class Simulation {
   private static final boolean sDebug = false;
 
   /** Step time is 10 minutes. */
-  @VisibleForTesting
-  static final long STEP_TIME = 10 * Time.MINUTE;
+  public static final long STEP_TIME = 10 * Time.MINUTE;
 
   public Simulation() {
     this(System.currentTimeMillis(), true, sDebug ? new BasicLogHandler() : null);
