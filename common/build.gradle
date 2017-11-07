@@ -11,20 +11,27 @@ tasks.withType(JavaCompile) {
   targetCompatibility = "1.8"
 }
 
-task buildProto() << {
-  def protos = []
-  new File(projectDir.path + "/src/main/proto").eachFileRecurse(FileType.FILES) { file ->
-    protos << file.absolutePath - (projectDir.path + "/src/main/proto/")
-  }
+def fixProtoPath(str) {
+  def prefix = projectDir.path + "/src/main/proto/".replace("/", File.separator)
+  return (str - prefix).replace(File.separator, "/")
+}
 
-  javaexec {
-    main = "-jar"
-    args = [
-        "libs/wire-compiler-2.1.2-jar-with-dependencies.jar",
-        "--proto_path=src/main/proto",
-        "--named_files_only",
-        "--java_out=src/main/java",
-    ] + protos
+task buildProto() {
+  doLast {
+    def protos = []
+    new File(projectDir.path + "/src/main/proto").eachFileRecurse(FileType.FILES) { file ->
+      protos << fixProtoPath(file.absolutePath)
+    }
+
+    javaexec {
+      main = "-jar"
+      args = [
+         "libs/wire-compiler-2.1.2-jar-with-dependencies.jar",
+         "--proto_path=src/main/proto",
+         "--named_files_only",
+         "--java_out=src/main/java",
+      ] + protos
+    }
   }
 }
 

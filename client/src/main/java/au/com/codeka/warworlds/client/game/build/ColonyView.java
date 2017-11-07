@@ -6,7 +6,6 @@ import android.support.design.widget.TabLayout;
 import android.support.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ui.views.TabPlusContentView;
 import au.com.codeka.warworlds.common.proto.Colony;
