@@ -72,7 +72,7 @@ public class FleetSelectedBottomPane extends FrameLayout {
     Empire empire = EmpireManager.i.getEmpire(fleet.empire_id);
     if (empire != null) {
       empireName.setText(empire.display_name);
-      Picasso.with(getContext())
+      Picasso.get()
           .load(ImageHelper.getEmpireImageUrl(getContext(), empire, 20, 20))
           .into(empireIcon);
     }

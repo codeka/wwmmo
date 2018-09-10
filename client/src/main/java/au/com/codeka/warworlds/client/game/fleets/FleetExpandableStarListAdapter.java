@@ -204,7 +204,7 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
       fightersTotal.setText("...");
       nonFightersTotal.setText("...");
     } else {
-      Picasso.with(view.getContext())
+      Picasso.get()
           .load(ImageHelper.getStarImageUrl(view.getContext(), star, 16, 16))
           .into(starIcon);
 

@@ -70,7 +70,7 @@ public class ImageHelper {
    * Bind an image with the given URL to the given {@link ImageView}.
    */
   public static void bindImage(ImageView view, String imageUrl) {
-    Picasso.with(view.getContext())
+    Picasso.get()
         .load(imageUrl)
         .into(view);
   }

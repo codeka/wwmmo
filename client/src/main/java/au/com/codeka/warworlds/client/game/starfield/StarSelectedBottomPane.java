@@ -127,7 +127,7 @@ public class StarSelectedBottomPane extends FrameLayout {
     starName.setText(star.name);
     starKind.setText(String.format(Locale.ENGLISH, "%s %s", star.classification,
         StarHelper.getCoordinateString(star)));
-    Picasso.with(getContext())
+    Picasso.get()
         .load(ImageHelper.getStarImageUrl(getContext(), star, 40, 40))
         .into(starIcon);
   }

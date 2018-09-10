@@ -119,7 +119,7 @@ public class PlanetListSimple extends LinearLayout {
     View view = inflater.inflate(R.layout.ctrl_planet_list_simple_row, this, false);
 
     final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
-    Picasso.with(getContext())
+    Picasso.get()
         .load(ImageHelper.getPlanetImageUrl(getContext(), star, planetIndex, 32, 32))
         .into(icon);
 
@@ -157,7 +157,7 @@ public class PlanetListSimple extends LinearLayout {
 
     Empire empire = EmpireManager.i.getEmpire(empireID);
     if (empire != null) {
-      Picasso.with(getContext())
+      Picasso.get()
           .load(ImageHelper.getEmpireImageUrl(getContext(), empire, 32, 32))
           .into(icon);
 

@@ -95,7 +95,7 @@ public class SunAndPlanetsView extends RelativeLayout {
     lp.leftMargin = -lp.width / 2;
     sunImageView.setLayoutParams(lp);
     addView(sunImageView);
-    Picasso.with(getContext())
+    Picasso.get()
         .load(ImageHelper.getStarImageUrl(getContext(), star, 256, 256))
         .into(sunImageView);
 
@@ -168,7 +168,7 @@ public class SunAndPlanetsView extends RelativeLayout {
       ViewCompat.setTransitionName(planetInfo.imageView, "planet_icon_" + i);
       addView(planetInfo.imageView);
 
-      Picasso.with(getContext())
+      Picasso.get()
           .load(ImageHelper.getPlanetImageUrl(getContext(), star, i, 64, 64))
           .into(planetInfo.imageView);
 

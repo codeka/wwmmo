@@ -142,7 +142,7 @@ class StarSearchListAdapter extends BaseAdapter {
       starMineralsDelta.setText("");
       starMineralsTotal.setText("???");
     } else {
-      Picasso.with(view.getContext())
+      Picasso.get()
           .load(ImageHelper.getStarImageUrl(inflater.getContext(), star, 36, 36))
           .into(starIcon);
       starName.setText(star.name);

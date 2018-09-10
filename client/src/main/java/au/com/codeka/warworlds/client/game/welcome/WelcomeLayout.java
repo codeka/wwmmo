@@ -57,7 +57,7 @@ public class WelcomeLayout extends RelativeLayout {
 
   public void refreshEmpireDetails(Empire empire) {
     empireName.setText(empire.display_name);
-    Picasso.with(getContext())
+    Picasso.get()
         .load(ImageHelper.getEmpireImageUrl(getContext(), empire, 20, 20))
         .into(empireIcon);
   }

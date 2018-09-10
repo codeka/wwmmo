@@ -124,7 +124,7 @@ public class BuildLayout extends RelativeLayout {
     }
     checkNotNull(planet);
 
-    Picasso.with(getContext())
+    Picasso.get()
         .load(ImageHelper.getPlanetImageUrl(getContext(), star, planet.index, 64, 64))
         .into(planetIcon);
     planetName.setText(String.format(Locale.US, "%s %s", star.name,

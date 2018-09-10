@@ -83,7 +83,7 @@ public class BitmapTexture extends Texture {
         App.i.getTaskRunner().runTask(new Runnable() {
           @Override
           public void run() {
-            Picasso.with(context)
+            Picasso.get()
                 .load(url)
                 .into(picassoTarget);
           }
@@ -119,8 +119,8 @@ public class BitmapTexture extends Texture {
       }
 
       @Override
-      public void onBitmapFailed(Drawable errorDrawable) {
-        log.warning("Error loading bitmap: %s", url);
+      public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+        log.warning("Error loading bitmap: %s", url, e);
       }
 
       @Override

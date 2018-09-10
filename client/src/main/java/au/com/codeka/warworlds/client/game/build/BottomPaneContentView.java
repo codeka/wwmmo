@@ -8,3 +8,4 @@ import au.com.codeka.warworlds.common.proto.Star;
 public interface BottomPaneContentView {
   void refresh(Star star);
 }
+

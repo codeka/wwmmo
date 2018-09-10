@@ -9,7 +9,7 @@ import com.squareup.picasso.Picasso;
  */
 public class BuildViewHelper {
   public static void setDesignIcon(Design design, ImageView imageView) {
-    Picasso.with(imageView.getContext())
+    Picasso.get()
         .load("file:///android_asset/sprites/" + design.image_url)
         .into(imageView);
   }
