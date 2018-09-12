@@ -388,6 +388,10 @@ $(function() {
     });
   }
 
+  window.showRaw = function() {
+    $("#simulate-result").html("<pre><code>" + JSON.stringify(currStar, null, 2) + "</code></pre>");
+  }
+
   $("#starfield-container a").on("click", function() {
     var dx = 0;
     var dy = 0;
