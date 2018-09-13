@@ -13,7 +13,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Building;
 import au.com.codeka.warworlds.common.proto.Colony;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class BuildingsView extends ListView implements TabContentView {
-  private static final Log log = new Log("BuildingsView");
   private Star star;
   private Colony colony;
 
@@ -56,7 +54,6 @@ public class BuildingsView extends ListView implements TabContentView {
 
   @Override
   public void refresh(Star star, Colony colony) {
-    log.debug("BuildingsView.refresh()");
     this.star = star;
     this.colony = colony;
     adapter.refresh(star, colony);
@@ -72,7 +69,6 @@ public class BuildingsView extends ListView implements TabContentView {
 
     public void refresh(Star star, Colony colony) {
       Threads.checkOnThread(Threads.UI);
-      log.debug("refreshing...");
       entries = new ArrayList<>();
 
       List<Building> buildings = colony.buildings;
@@ -152,7 +148,6 @@ public class BuildingsView extends ListView implements TabContentView {
       entries.add(title);
 
       entries.addAll(existingBuildingEntries);
-      log.debug("refreshed %d entries.", entries.size());
 
       notifyDataSetChanged();
     }
@@ -171,7 +166,6 @@ public class BuildingsView extends ListView implements TabContentView {
       if (entries == null)
         return 0;
 
-      log.debug("getItemViewType() entries.size = %d index = %d", entries.size(), position);
       if (entries.get(position).title != null)
         return HEADING_TYPE;
       if (entries.get(position).design != null)
@@ -207,7 +201,6 @@ public class BuildingsView extends ListView implements TabContentView {
       if (entries == null)
         return 0;
 
-      log.debug("getCount() == %d", entries.size());
       return entries.size();
     }
 
