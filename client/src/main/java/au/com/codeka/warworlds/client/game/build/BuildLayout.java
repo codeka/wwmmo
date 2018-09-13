@@ -97,8 +97,12 @@ public class BuildLayout extends RelativeLayout {
     final Colony colony = checkNotNull(colonies.get(viewPager.getCurrentItem()));
 
     bottomPaneContentView =
-        new ProgressBottomPane(getContext(), star, colony, buildRequest, () -> {
-          // TODO
+        new ProgressBottomPane(getContext(), buildRequest, () -> {
+          // "Cancel" has been clicked.
+          StarManager.i.updateStar(star, new StarModification.Builder()
+              .type(StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST)
+              .build_request_id(buildRequest.id));
+          hideBottomSheet();
         });
 
     TransitionManager.beginDelayedTransition(bottomPane);

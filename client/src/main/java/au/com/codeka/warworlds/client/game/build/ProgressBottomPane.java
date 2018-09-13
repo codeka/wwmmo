@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.game.build;
 
 import android.content.Context;
 import android.text.Html;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -25,13 +26,8 @@ public class ProgressBottomPane extends RelativeLayout implements BottomPaneCont
     void onCancelBuild();
   }
 
-  private Star star;
-  private Colony colony;
   private BuildRequest buildRequest;
-  private final Callback callback;
 
-  private final ImageView buildIcon;
-  private final TextView buildName;
   private final TextView timeRemaining;
   private final ProgressBar buildProgress;
   private final ProgressBar populationEfficiency;
@@ -39,24 +35,20 @@ public class ProgressBottomPane extends RelativeLayout implements BottomPaneCont
 
   public ProgressBottomPane(
       Context context,
-      Star star,
-      Colony colony,
       BuildRequest buildRequest,
       Callback callback) {
     super(context);
     inflate(context, R.layout.build_progress_bottom_pane, this);
 
-    this.star = star;
-    this.colony = colony;
     this.buildRequest = buildRequest;
-    this.callback = callback;
 
-    buildIcon = findViewById(R.id.build_icon);
-    buildName = findViewById(R.id.build_name);
+    ImageView buildIcon = findViewById(R.id.build_icon);
+    TextView buildName = findViewById(R.id.build_name);
     timeRemaining = findViewById(R.id.build_time_remaining);
     buildProgress = findViewById(R.id.build_progress);
     populationEfficiency = findViewById(R.id.population_efficiency);
     miningEfficiency = findViewById(R.id.mining_efficiency);
+    findViewById(R.id.cancel).setOnClickListener((View view) -> callback.onCancelBuild());
 
     Design design = DesignHelper.getDesign(buildRequest.design_type);
     BuildViewHelper.setDesignIcon(design, buildIcon);
@@ -74,9 +66,7 @@ public class ProgressBottomPane extends RelativeLayout implements BottomPaneCont
       }
       for (BuildRequest br : planet.colony.build_requests) {
         if (br.id.equals(buildRequest.id)) {
-          this.star = star;
-          this.colony = planet.colony;
-          this.buildRequest = br;
+          buildRequest = br;
           break;
         }
       }
@@ -86,10 +76,17 @@ public class ProgressBottomPane extends RelativeLayout implements BottomPaneCont
   }
 
   private void update() {
-    int progress = Math.round(BuildHelper.getBuildProgress(buildRequest, System.currentTimeMillis()) * 100);
+    int progress =
+        Math.round(BuildHelper.getBuildProgress(buildRequest, System.currentTimeMillis()) * 100);
     buildProgress.setProgress(progress);
-    populationEfficiency.setProgress(Math.round(buildRequest.population_efficiency * 100));
-    miningEfficiency.setProgress(Math.round(buildRequest.minerals_efficiency * 100));
+
+    // These could be null if the star hasn't been simulated recently.
+    if (buildRequest.population_efficiency != null) {
+      populationEfficiency.setProgress(Math.round(buildRequest.population_efficiency * 100));
+    }
+    if (buildRequest.minerals_efficiency != null) {
+      miningEfficiency.setProgress(Math.round(buildRequest.minerals_efficiency * 100));
+    }
 
     String verb = "Building"; // (buildRequest.build_request_id == null ? "Building" : "Upgrading");
     timeRemaining.setText(Html.fromHtml(String.format(Locale.ENGLISH,
