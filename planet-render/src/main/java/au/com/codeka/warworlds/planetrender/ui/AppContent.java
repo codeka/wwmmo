@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.planetrender.ui;
 
+import org.omg.CORBA.Environment;
+
 import au.com.codeka.warworlds.common.Colour;
 import au.com.codeka.warworlds.common.Image;
 import au.com.codeka.warworlds.common.PerlinNoise;
@@ -21,9 +23,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import javax.swing.DefaultComboBoxModel;
@@ -245,21 +249,13 @@ public class AppContent extends JPanel {
   }
 
   private String[] getTemplateNames() {
-    ArrayList<String> fileNames = new ArrayList<>();
     File[] files = getSamplesDirectory().listFiles();
     if (files == null) {
       return new String[] {};
     }
 
-    for (File file : files) {
-      String name = file.getName();
-      if (!name.endsWith(".xml")) {
-        continue;
-      }
-      name = name.substring(0, name.length() - 4);
-      name = name.replace('-', ' ');
-      fileNames.add(name);
-    }
+    ArrayList<String> fileNames = new ArrayList<>();
+    getTemplateNames(getSamplesDirectory(), "", fileNames);
 
     String[] array = new String[fileNames.size()];
     fileNames.toArray(array);
@@ -267,9 +263,30 @@ public class AppContent extends JPanel {
     return array;
   }
 
+  private void getTemplateNames(File rootDir, String prefix, List<String> fileNames) {
+    File[] files = rootDir.listFiles();
+    if (files == null) {
+      return;
+    }
+
+    for (File file : files) {
+      if (file.isDirectory() && !file.getName().startsWith(".")) {
+        getTemplateNames(file, prefix + file.getName() + File.separator, fileNames);
+        continue;
+      }
+
+      String name = file.getName();
+      if (!name.endsWith(".xml")) {
+        continue;
+      }
+
+      fileNames.add(prefix + name);
+    }
+  }
+
   private String loadTemplate(String name) {
     File dir = getSamplesDirectory();
-    File templateFile = new File(dir, name.replace(' ', '-') + ".xml");
+    File templateFile = new File(dir, name);
     try {
       return new String(Files.readAllBytes(Paths.get(templateFile.toString())),
           Charset.forName("utf-8"));
@@ -279,6 +296,6 @@ public class AppContent extends JPanel {
   }
 
   private File getSamplesDirectory() {
-    return new File("xml");
+    return new File("renderer");
   }
 }
