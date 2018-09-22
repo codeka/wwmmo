@@ -44,6 +44,7 @@ public class LoginHandler extends ProtobufRequestHandler {
       return;
     }
 
+    DataStore.i.empires().saveDevice(empire.get(), req.device_info);
     DataStore.i.stats().addLoginEvent(req, account);
 
     LoginResponse.Builder resp = new LoginResponse.Builder()

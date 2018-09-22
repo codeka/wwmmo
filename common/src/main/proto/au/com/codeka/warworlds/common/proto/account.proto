@@ -130,4 +130,13 @@ message DeviceInfo {
   // The value of android.os.Build.VERSION.RELEASE for this device (note that this can
   // change if you upgrade the OS without re-registering your device!)
   optional string device_version = 5;
+
+  // The Firebase Cloud Messaging info about the device.
+  optional FcmDeviceInfo fcm_device_info = 6;
+}
+
+// Contains details about the Firebase Cloud Messaging device.
+message FcmDeviceInfo {
+  // A token needed to message this device.
+  optional string token = 1;
 }

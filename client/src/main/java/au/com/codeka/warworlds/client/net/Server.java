@@ -3,6 +3,10 @@ package au.com.codeka.warworlds.client.net;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import android.os.Build;
+
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.world.ChatManager;
@@ -14,6 +18,7 @@ import au.com.codeka.warworlds.common.debug.PacketDebug;
 import au.com.codeka.warworlds.common.net.PacketDecoder;
 import au.com.codeka.warworlds.common.net.PacketEncoder;
 import au.com.codeka.warworlds.common.proto.DeviceInfo;
+import au.com.codeka.warworlds.common.proto.FcmDeviceInfo;
 import au.com.codeka.warworlds.common.proto.HelloPacket;
 import au.com.codeka.warworlds.common.proto.LoginRequest;
 import au.com.codeka.warworlds.common.proto.LoginResponse;
@@ -234,12 +239,23 @@ public class Server {
   }
 
   private static DeviceInfo populateDeviceInfo() {
+    String fcmToken = "";
+    try {
+      fcmToken = FirebaseInstanceId.getInstance().getToken("wwmmo", "FCM");
+    } catch (IOException e) {
+      log.error("Error getting FCM token.", e);
+      // We won't be able to message this device, I guess.
+    }
+//FirebaseInstanceId.getInstance().getInstanceId()
     return new DeviceInfo.Builder()
         .device_build(Build.ID)
         .device_id(GameSettings.i.getString(GameSettings.Key.INSTANCE_ID))
         .device_manufacturer(Build.MANUFACTURER)
         .device_model(Build.MODEL)
         .device_version(Build.VERSION.RELEASE)
+        .fcm_device_info(new FcmDeviceInfo.Builder()
+            .token(fcmToken)
+            .build())
         .build();
   }
 }

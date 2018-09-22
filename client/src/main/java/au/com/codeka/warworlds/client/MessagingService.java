@@ -19,4 +19,10 @@ public class MessagingService extends FirebaseMessagingService {
     log.info("From: " + remoteMessage.getFrom());
     log.info("Notification Message Body: " + remoteMessage.getNotification().getBody());
   }
+
+  @Override
+  public void onNewToken(String token) {
+    log.info("Firebase new token: %s", token);
+    // TODO: update the server.
+  }
 }
