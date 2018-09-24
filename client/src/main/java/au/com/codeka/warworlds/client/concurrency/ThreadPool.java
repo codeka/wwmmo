@@ -45,7 +45,7 @@ public class ThreadPool {
         minThreads, maxThreads, keepAliveMs, TimeUnit.MILLISECONDS, workQueue, threadFactory);
   }
 
-  public void runTask(Runnable runnable) {
+  public void run(Runnable runnable) {
     executor.execute(runnable);
   }
 

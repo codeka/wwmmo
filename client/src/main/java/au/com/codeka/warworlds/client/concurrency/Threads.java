@@ -42,14 +42,14 @@ public enum Threads {
 
   private boolean isInitialized;
   @Nullable private Handler handler;
-  @Nullable private TaskQueue taskQueue;
+  @Nullable private RunnableQueue runnableQueue;
   @Nullable private Thread thread;
   @Nullable private ThreadPool threadPool;
 
-  public void setThread(@NonNull Thread thread, @NonNull TaskQueue taskQueue) {
-    checkState(!isInitialized || this.taskQueue == taskQueue);
+  public void setThread(@NonNull Thread thread, @NonNull RunnableQueue runnableQueue) {
+    checkState(!isInitialized || this.runnableQueue == runnableQueue);
     this.thread = thread;
-    this.taskQueue = taskQueue;
+    this.runnableQueue = runnableQueue;
     this.isInitialized = true;
   }
 
@@ -64,7 +64,7 @@ public enum Threads {
   public void resetThread() {
     thread = null;
     handler = null;
-    taskQueue = null;
+    runnableQueue = null;
     isInitialized = false;
   }
 
@@ -86,13 +86,18 @@ public enum Threads {
     }
   }
 
-  public void runTask(Runnable runnable) {
+  /**
+   * Run the given {@link Runnable} on this thread.
+   *
+   * @param runnable The {@link Runnable} to run.
+   */
+  public void run(Runnable runnable) {
     if (handler != null) {
       handler.post(runnable);
     } else if (threadPool != null) {
-      threadPool.runTask(runnable);
-    } else if (taskQueue != null) {
-      taskQueue.postTask(runnable);
+      threadPool.run(runnable);
+    } else if (runnableQueue != null) {
+      runnableQueue.post(runnable);
     } else {
       throw new IllegalStateException("Cannot run task, no handler, taskQueue or threadPool!");
     }

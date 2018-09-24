@@ -69,7 +69,7 @@ class EventHandlerInfo {
     if (callOnThread.isCurrentThread() && callOnThread != Threads.BACKGROUND) {
       runnable.run();
     } else {
-      callOnThread.runTask(runnable);
+      callOnThread.run(runnable);
     }
   }
 }

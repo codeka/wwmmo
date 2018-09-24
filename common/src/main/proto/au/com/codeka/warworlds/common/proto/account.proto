@@ -139,4 +139,7 @@ message DeviceInfo {
 message FcmDeviceInfo {
   // A token needed to message this device.
   optional string token = 1;
+
+  // The device ID that firebase reports.
+  optional string device_id = 2;
 }

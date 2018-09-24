@@ -5,7 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import android.os.Build;
 
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.iid.InstanceIdResult;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
@@ -84,39 +84,40 @@ public class Server {
   }
 
   private void login(@Nonnull String cookie) {
-    App.i.getTaskRunner().runTask(() -> {
-      log.info("Logging in: %s", ServerUrl.getUrl("/login"));
-      HttpRequest request = new HttpRequest.Builder()
-          .url(ServerUrl.getUrl("/login"))
-          .method(HttpRequest.Method.POST)
-          .body(new LoginRequest.Builder()
-              .cookie(cookie)
-              .device_info(populateDeviceInfo())
-              .build().encode())
-          .build();
-      if (request.getResponseCode() != 200) {
-        if (request.getResponseCode() >= 401 && request.getResponseCode() < 500) {
-          // Our cookie must not be valid, we'll clear it before trying again.
-          GameSettings.i.edit()
-              .setString(GameSettings.Key.COOKIE, "")
-              .commit();
-        }
-        log.error(
-            "Error logging in, will try again: %d",
-            request.getResponseCode(),
-            request.getException());
-        disconnect();
-      } else {
-        LoginResponse loginResponse = checkNotNull(request.getBody(LoginResponse.class));
-        if (loginResponse.status != LoginResponse.LoginStatus.SUCCESS) {
-          updateState(ServerStateEvent.ConnectionState.ERROR, loginResponse.status);
-          log.error("Error logging in, got login status: %s", loginResponse.status);
+    App.i.getTaskRunner().runTask(FirebaseInstanceId.getInstance().getInstanceId())
+      .then((InstanceIdResult instanceIdResult) -> {
+        log.info("Logging in: %s", ServerUrl.getUrl("/login"));
+        HttpRequest request = new HttpRequest.Builder()
+            .url(ServerUrl.getUrl("/login"))
+            .method(HttpRequest.Method.POST)
+            .body(new LoginRequest.Builder()
+                .cookie(cookie)
+                .device_info(populateDeviceInfo(instanceIdResult))
+                .build().encode())
+            .build();
+        if (request.getResponseCode() != 200) {
+          if (request.getResponseCode() >= 401 && request.getResponseCode() < 500) {
+            // Our cookie must not be valid, we'll clear it before trying again.
+            GameSettings.i.edit()
+                .setString(GameSettings.Key.COOKIE, "")
+                .commit();
+          }
+          log.error(
+              "Error logging in, will try again: %d",
+              request.getResponseCode(),
+              request.getException());
           disconnect();
         } else {
-          connectGameSocket(loginResponse);
+          LoginResponse loginResponse = checkNotNull(request.getBody(LoginResponse.class));
+          if (loginResponse.status != LoginResponse.LoginStatus.SUCCESS) {
+            updateState(ServerStateEvent.ConnectionState.ERROR, loginResponse.status);
+            log.error("Error logging in, got login status: %s", loginResponse.status);
+            disconnect();
+          } else {
+            connectGameSocket(loginResponse);
+          }
         }
-      }
-    }, Threads.BACKGROUND);
+      }, Threads.BACKGROUND);
   }
 
   private void connectGameSocket(LoginResponse loginResponse) {
@@ -238,15 +239,7 @@ public class Server {
     App.i.getEventBus().publish(currState);
   }
 
-  private static DeviceInfo populateDeviceInfo() {
-    String fcmToken = "";
-    try {
-      fcmToken = FirebaseInstanceId.getInstance().getToken("wwmmo", "FCM");
-    } catch (IOException e) {
-      log.error("Error getting FCM token.", e);
-      // We won't be able to message this device, I guess.
-    }
-//FirebaseInstanceId.getInstance().getInstanceId()
+  private static DeviceInfo populateDeviceInfo(InstanceIdResult instanceIdResult) {
     return new DeviceInfo.Builder()
         .device_build(Build.ID)
         .device_id(GameSettings.i.getString(GameSettings.Key.INSTANCE_ID))
@@ -254,7 +247,8 @@ public class Server {
         .device_model(Build.MODEL)
         .device_version(Build.VERSION.RELEASE)
         .fcm_device_info(new FcmDeviceInfo.Builder()
-            .token(fcmToken)
+            .token(instanceIdResult.getToken())
+            .device_id(instanceIdResult.getId())
             .build())
         .build();
   }
