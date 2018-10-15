@@ -1,0 +1,17 @@
+package au.com.codeka.warworlds.common.proto;
+
+import "au/com/codeka/warworlds/common/proto/common.proto";
+
+// A Notification is sent from the server to a particular device for a specific empire. It usually
+// contains a simple message from the server, a build complete notification, a move complete
+// notification, things of that sort. All notifications are also stored on the server, for auditing.
+message Notification {
+  // A unique identifier for this notification.
+  optional int64 id = 1;
+
+  // The empire ID this notification is for.
+  optional int64 empire_id = 2;
+
+  // A string message to send to the empire. This is mostly used for debugging.
+  optional string debug_message = 3;
+}

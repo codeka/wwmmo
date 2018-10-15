@@ -65,16 +65,21 @@ public class RequestHandler {
         return;
       }
 
-      if (request.getMethod().equals("GET")) {
-        get();
-      } else if (request.getMethod().equals("POST")) {
-        post();
-      } else if (request.getMethod().equals("PUT")) {
-        put();
-      } else if (request.getMethod().equals("DELETE")) {
-        delete();
-      } else {
-        throw new RequestException(501);
+      switch (request.getMethod()) {
+        case "GET":
+          get();
+          break;
+        case "POST":
+          post();
+          break;
+        case "PUT":
+          put();
+          break;
+        case "DELETE":
+          delete();
+          break;
+        default:
+          throw new RequestException(501);
       }
     } catch (RequestException e) {
       handleException(e);

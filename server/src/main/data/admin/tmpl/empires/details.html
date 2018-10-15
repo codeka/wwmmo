@@ -25,11 +25,18 @@
       <td>{{ device.device_manufacturer }}</td>
       <td>{{ device.device_build }}</td>
       <td>{{ device.device_version }}</td>
-      <td>{{ device.fcm_device_info.token }}</td>
+      <td>{{ String.trunc(device.fcm_device_info.token, 15) }}</td>
     </tr>
     {% end %}
   </table>
-
+  <form method="post">
+    <p>Send message to {{ empire.display_name}}:</p>
+    <input type="text" name="msg">
+    <input type="submit" value="Send">
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% end %}
+  </form>
   <h2>Stars</h2>
   <table>
     <tr>

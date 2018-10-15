@@ -5,6 +5,12 @@ public class GmsTask<R> extends Task<Void, R> {
   public GmsTask(TaskRunner taskRunner, com.google.android.gms.tasks.Task<R> gmsTask) {
     super(taskRunner);
     gmsTask.addOnFailureListener(this::onError);
-    gmsTask.addOnCompleteListener(task -> this.onComplete(task.getResult()));
+    gmsTask.addOnCompleteListener(task -> {
+      try {
+        this.onComplete(task.getResult());
+      } catch (Exception e) {
+        onError(e);
+      }
+    });
   }
 }

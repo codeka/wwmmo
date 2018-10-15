@@ -87,9 +87,6 @@ public class AdminServlet extends HandlerServlet {
           return SessionManager.i.getSession(sessionCookieValue);
         }
       }
-      if (sessionCookieValue.equals("")) {
-        log.warning("No session cookie found.");
-      }
     }
 
     return null;

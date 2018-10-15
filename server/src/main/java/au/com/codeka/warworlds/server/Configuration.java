@@ -1,13 +1,23 @@
 package au.com.codeka.warworlds.server;
 
 import au.com.codeka.warworlds.common.Log;
+
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.Expose;
 import com.google.gson.stream.JsonReader;
+
+import java.io.ByteArrayInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
+
+import javax.annotation.Nullable;
 
 /**
  * The server's configuration parameters are read from a json object on startup and parsed into
@@ -17,8 +27,16 @@ public class Configuration {
   public static final Configuration i = new Configuration();
   private static final Log log = new Log("Configuration");
 
+  private static final Collection<String> FIREBASE_SCOPES =
+      Lists.newArrayList("https://www.googleapis.com/auth/firebase.messaging");
+
+
   @Expose private int listenPort;
   @Expose private SmtpConfig smtp;
+  @Expose private JsonElement firebase;
+
+  @Nullable
+  private GoogleCredentials firebaseCredentials;
 
   private Configuration() {
     smtp = new SmtpConfig();
@@ -47,6 +65,25 @@ public class Configuration {
 
   public SmtpConfig getSmtp() {
     return smtp;
+  }
+
+  public GoogleCredentials getFirebaseCredentials() {
+    try {
+      if (firebaseCredentials == null) {
+        try {
+          firebaseCredentials = GoogleCredentials.fromStream(
+              new ByteArrayInputStream(firebase.toString().getBytes("utf-8")))
+              .createScoped(FIREBASE_SCOPES);
+        } catch (UnsupportedEncodingException e) {
+          // Should never happen.
+        }
+      }
+
+      firebaseCredentials.refreshIfExpired();
+    } catch (IOException e) {
+      throw new RuntimeException("Should never happen.", e);
+    }
+    return firebaseCredentials;
   }
 
   public static class SmtpConfig {
@@ -81,5 +118,9 @@ public class Configuration {
     public String getSenderAddr() {
       return senderAddr;
     }
+  }
+
+  public static class FcmConfig {
+    @Expose private String projectID;
   }
 }

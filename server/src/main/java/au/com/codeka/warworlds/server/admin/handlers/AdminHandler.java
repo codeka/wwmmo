@@ -49,7 +49,8 @@ public class AdminHandler extends RequestHandler {
           })
           .build(),
       new MapBindings.Builder()
-          .set("Session", new SessionHelper()));
+          .set("Session", new SessionHelper())
+          .set("String", new StringHelper()));
 
   private Session session;
 
@@ -194,6 +195,16 @@ public class AdminHandler extends RequestHandler {
     public boolean isInRole(Session session, String roleName) throws CarrotException {
       AdminRole role = AdminRole.valueOf(roleName);
       return session.isInRole(role);
+    }
+  }
+
+  private static class StringHelper {
+    @SuppressWarnings("unused") // Used by template engine.
+    public String trunc(String s, int maxLength) {
+      if (s.length() > maxLength - 3) {
+        return s.substring(0, maxLength - 3) + "...";
+      }
+      return s;
     }
   }
 }

@@ -19,11 +19,7 @@ public class LogFormatter extends Formatter {
   public String format(LogRecord record) {
     StringBuilder sb = new StringBuilder();
 
-    try {
-      DATE_TIME_FORMATTER.printTo(sb, record.getMillis());
-    } catch (IOException e) {
-      // ignore
-    }
+    DATE_TIME_FORMATTER.printTo(sb, record.getMillis());
     sb.append(" ");
     sb.append(record.getLevel().toString());
     sb.append(" ");

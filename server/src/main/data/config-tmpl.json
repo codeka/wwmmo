@@ -10,5 +10,8 @@
     "username": null,
     "password": null,
     "senderAddr": "noreply@war-worlds.com"
-  }
+  },
+
+  // Firebase config stuff. Cut'n'paste from firebase console.
+  "firebase": {}
 }

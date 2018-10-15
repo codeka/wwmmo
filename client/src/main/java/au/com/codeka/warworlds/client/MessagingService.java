@@ -1,8 +1,17 @@
 package au.com.codeka.warworlds.client;
 
+import android.util.Base64;
+import android.widget.Toast;
+
+import au.com.codeka.warworlds.client.concurrency.TaskRunner;
+import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Notification;
+
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.io.IOException;
 
 /**
  * Implementation of {@link FirebaseMessagingService}.
@@ -17,7 +26,26 @@ public class MessagingService extends FirebaseMessagingService {
     // Also if you intend on generating your own notifications as a result of a received FCM
     // message, here is where that should be initiated. See sendNotification method below.
     log.info("From: " + remoteMessage.getFrom());
-    log.info("Notification Message Body: " + remoteMessage.getNotification().getBody());
+    String notificationBase64 = remoteMessage.getData().get("notification");
+    if (notificationBase64 == null) {
+      log.info("Notification is null, ignoring.");
+      return;
+    }
+
+    Notification notification;
+    try {
+      notification = Notification.ADAPTER.decode(Base64.decode(notificationBase64, 0));
+    } catch (IOException e) {
+      log.warning("Error decoding notification, dropping.", e);
+      return;
+    }
+
+    if (notification.debug_message != null) {
+      App.i.getTaskRunner().runTask(() ->
+          Toast.makeText(App.i, notification.debug_message, Toast.LENGTH_LONG).show(), Threads.UI);
+    }
+
+    // TODO: handle other kinds of toasts.
   }
 
   @Override

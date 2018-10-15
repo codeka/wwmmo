@@ -24,8 +24,7 @@ public class HandlerServlet extends GenericServlet {
   }
 
   @Override
-  public void service(ServletRequest request, ServletResponse response)
-      throws IOException, ServletException {
+  public void service(ServletRequest request, ServletResponse response) {
     for (Route route : routes) {
       Matcher matcher = route.matches((HttpServletRequest) request);
       if (matcher != null) {
