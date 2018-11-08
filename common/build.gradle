@@ -46,7 +46,7 @@ test {
 
 dependencies {
   implementation 'com.squareup.wire:wire-runtime:2.1.2'
-  implementation 'com.google.code.findbugs:jsr305:3.0.1'
-  implementation 'com.google.guava:guava:22.0-android'
+  implementation 'com.google.code.findbugs:jsr305:3.0.2'
+  implementation 'com.google.guava:guava:24.1-android'
   testCompile 'junit:junit:4.12'
 }

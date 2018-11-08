@@ -19,13 +19,13 @@ if (signingPropsFile.isFile()) {
 }
 
 android {
-  compileSdkVersion 27
+  compileSdkVersion 28
   buildToolsVersion '28.0.3'
 
   defaultConfig {
     applicationId "au.com.codeka.warworlds2"
     minSdkVersion 19
-    targetSdkVersion 27
+    targetSdkVersion 28
     versionCode getVersionCodeFromGit()
     versionName "2.0"
   }
@@ -85,7 +85,7 @@ android.applicationVariants.all { variant ->
   }
 }
 
-def getVersionCodeFromGit() {
+static def getVersionCodeFromGit() {
   // Same as running:
   // git rev-list <checked out branch name> | wc -l
   return Grgit.open().log().size()
@@ -95,10 +95,10 @@ dependencies {
   implementation 'com.android.support:appcompat-v7:27.1.0'
   implementation 'com.android.support:design:27.1.0'
   implementation 'com.android.support:preference-v7:27.1.0'
-  implementation 'com.google.android.gms:play-services-base:15.0.1'
-  implementation 'com.google.firebase:firebase-core:16.0.3'
-  implementation 'com.google.firebase:firebase-messaging:17.3.1'
-  implementation 'com.google.guava:guava:22.0-android'
+  implementation 'com.google.android.gms:play-services-base:16.0.1'
+  implementation 'com.google.firebase:firebase-core:16.0.5'
+  implementation 'com.google.firebase:firebase-messaging:17.3.4'
+  implementation 'com.google.guava:guava:24.1-android'
   implementation 'com.squareup.picasso:picasso:2.71828'
   implementation 'com.squareup.wire:wire-runtime:2.1.2'
   implementation project(':common')

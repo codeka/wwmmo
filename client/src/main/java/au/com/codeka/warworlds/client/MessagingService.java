@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.client;
 import android.util.Base64;
 import android.widget.Toast;
 
-import au.com.codeka.warworlds.client.concurrency.TaskRunner;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Notification;
