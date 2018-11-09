@@ -80,7 +80,7 @@ public class EmpireSetupActivity extends BaseActivity {
     }
 
     final ProgressDialog pleaseWaitDialog =
-        ProgressDialog.show(context, null, "Please wait...", true);
+        ProgressDialog.show(context, null, "Please wait, " + empireName, true);
 
     Messages.Empire empire = Messages.Empire.newBuilder()
         .setDisplayName(empireName)

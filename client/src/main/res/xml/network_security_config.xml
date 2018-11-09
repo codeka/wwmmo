@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Allow cleartext traffic to 127.0.0.1, which we use for development. -->
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <!-- Allow cleartext traffic to www.war-worlds.com, which is where we get the MOTD. -->
+        <domain includeSubdomains="true">www.war-worlds.com</domain>
+    </domain-config>
+</network-security-config>
