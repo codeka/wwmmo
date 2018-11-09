@@ -1,10 +1,10 @@
 package au.com.codeka.warworlds.api;
 
-import com.squareup.okhttp.Response;
 
 import java.net.SocketException;
 
 import au.com.codeka.common.protobuf.Messages;
+import okhttp3.Response;
 
 public class ApiException extends Exception {
     private static final long serialVersionUID = 1L;

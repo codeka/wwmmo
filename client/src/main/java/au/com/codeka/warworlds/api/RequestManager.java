@@ -2,28 +2,28 @@ package au.com.codeka.warworlds.api;
 
 import android.content.Context;
 
-import com.google.common.collect.Lists;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.CertificatePinner;
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Protocol;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.eventbus.EventBus;
+
+import okhttp3.Cache;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Connection;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * Provides the low-level interface for making requests to the API.
@@ -35,10 +35,10 @@ public class RequestManager {
   private static final Log log = new Log("RequestManager");
   private static final boolean DBG = true;
 
-  private static final int MAX_INFLIGHT_REQUESTS = 8;
+  private static final int MAX_INFLIGHT_REQUESTS = 32;
   private static final int MAX_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
 
-  private final OkHttpClient httpClient;
+  private OkHttpClient httpClient;
   private final Set<ApiRequest> inFlightRequests = new HashSet<>();
 
   // We use a stack because the most recent request is likely the most important (since it's usually
@@ -48,35 +48,19 @@ public class RequestManager {
   private final Object lock = new Object();
 
   private RequestManager() {
-    httpClient = new OkHttpClient();
-
-    CertificatePinner certificatePinner = new CertificatePinner.Builder()
-        // LetsEncrypt's root certificate:
-        .add("game.war-worlds.com", "sha1/2ptSqHcRadMTGKVn4dybH0S1s1w=")
-        // RapidSSL's certificate:
-        .add("game.war-worlds.com", "sha1/V0Ls7aMrGMfL5lxi8ZjorxqPOro=")
-        // The below is obsolete as of June, 2017:
-        .add("game.war-worlds.com", "sha1/7pk8GWNOfZdQYlUboW2S4aXDNls=")
-        .build();
-    httpClient.setCertificatePinner(certificatePinner);
-
-    httpClient.getDispatcher().setMaxRequests(MAX_INFLIGHT_REQUESTS);
-    httpClient.getDispatcher().setMaxRequestsPerHost(MAX_INFLIGHT_REQUESTS);
   }
 
   /** Sets up the request manager, once we've got a context. Initializes the cache and so on. */
   public void setup(Context context) {
-    if (httpClient.getCache() == null) {
-      try {
-        File cacheDir = new File(context.getCacheDir(), "api");
-        if (!cacheDir.mkdirs()) {
-          // Ignore, directory (probably) already exists
-        }
-        httpClient.setCache(new Cache(cacheDir, MAX_CACHE_SIZE));
-      } catch (IOException e) {
-        log.error("Error setting up HTTP cache.", e);
-      }
+    File cacheDir = new File(context.getCacheDir(), "api");
+    if (!cacheDir.mkdirs()) {
+      // Ignore, directory (probably) already exists
     }
+    httpClient = new OkHttpClient.Builder()
+        .addInterceptor(new LoggingInterceptor())
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .cache(new Cache(cacheDir, MAX_CACHE_SIZE))
+        .build();
   }
 
   public RequestManagerState getCurrentState() {
@@ -92,6 +76,7 @@ public class RequestManager {
       if (inFlightRequests.size() < MAX_INFLIGHT_REQUESTS) {
         enqueueRequest(apiRequest);
       } else {
+        log.info("Too many in-flight requests, waiting.");
         waitingRequests.push(apiRequest);
       }
       updateState();
@@ -103,20 +88,13 @@ public class RequestManager {
     apiRequest.getTiming().onRequestSent();
     try {
       Response resp = httpClient.newCall(apiRequest.buildOkRequest()).execute();
+      if (DBG) log.info("<< %s", resp);
       apiRequest.handleResponse(resp);
       return true;
     } catch (IOException e) {
       log.error("Error in sendRequestSync.", e);
       return false;
     }
-  }
-
-  public void addInterceptor(Interceptor interceptor) {
-    httpClient.interceptors().add(interceptor);
-  }
-
-  public void removeInterceptor(Interceptor interceptor) {
-    httpClient.interceptors().remove(interceptor);
   }
 
   private void handleResponse(ApiRequest request, Response response) {
@@ -166,7 +144,6 @@ public class RequestManager {
 
   void enqueueRequest(ApiRequest apiRequest) {
     inFlightRequests.add(apiRequest);
-    if (DBG) log.info(">> %s", apiRequest);
     apiRequest.getTiming().onRequestSent();
     httpClient.newCall(apiRequest.buildOkRequest()).enqueue(responseCallback);
     updateState();
@@ -174,13 +151,13 @@ public class RequestManager {
 
   private Callback responseCallback = new Callback() {
     @Override
-    public void onFailure(Request request, IOException e) {
-      handleFailure((ApiRequest) request.tag(), null, e);
+    public void onFailure(Call call, IOException e) {
+      handleFailure((ApiRequest) call.request().tag(), null, e);
     }
 
     @Override
-    public void onResponse(Response response) throws IOException {
-      ApiRequest request = (ApiRequest) response.request().tag();
+    public void onResponse(Call call, Response response) throws IOException {
+      ApiRequest request = (ApiRequest) call.request().tag();
       handleResponse(request, response);
     }
   };
@@ -202,5 +179,45 @@ public class RequestManager {
     }
 
     return new RequestManagerState(numInflightRequests);
+  }
+
+  private static class LoggingInterceptor implements Interceptor {
+
+    @Override
+    public Response intercept(Chain chain) throws IOException {
+      log.info("chain!!");
+      Request request = chain.request();
+      if (!DBG) {
+        return chain.proceed(request);
+      }
+
+      RequestBody requestBody = request.body();
+      Connection connection = chain.connection();
+      log.info("--> %s %s %s (%d bytes)",
+          request.method(),
+          request.url(),
+          (connection != null ? connection.protocol() : ""),
+          (requestBody != null ? requestBody.contentLength() : 0));
+
+      long startNs = System.nanoTime();
+      Response response;
+      try {
+        response = chain.proceed(request);
+      } catch (Exception e) {
+        log.error("<-- HTTP FAILED: " + e);
+        throw e;
+      }
+      long tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs);
+
+      ResponseBody responseBody = response.body();
+      long contentLength = responseBody.contentLength();
+      log.info("<-- %d %s %s (%d ms, %d bytes)",
+          response.code(),
+          (response.message().isEmpty() ? "" : ' ' + response.message()),
+          response.request().url(),
+          tookMs,
+          contentLength != -1 ? contentLength : 0);
+      return response;
+    }
   }
 }

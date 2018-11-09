@@ -8,16 +8,11 @@ import android.os.Looper;
 import android.os.SystemClock;
 
 import com.google.protobuf.Message;
-import com.squareup.okhttp.CacheControl;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 import javax.annotation.Nullable;
 
@@ -26,6 +21,12 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.Realm;
+import okhttp3.CacheControl;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /** Encapsulates a request to the server. */
 public class ApiRequest {
@@ -321,7 +322,7 @@ public class ApiRequest {
 
     @Override
     public String toString() {
-      return String.format("[queue-time: %dms, server-time: %dms]",
+      return String.format(Locale.US, "[queue-time: %dms, server-time: %dms]",
           requestSentTime - startTime, responseReceivedTime - requestSentTime);
     }
   }

@@ -15,10 +15,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -27,6 +23,9 @@ import javax.annotation.Nullable;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.RequestManager;
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * This is a view that's displayed over all activities and shows up a little bit of debugging
@@ -65,7 +64,7 @@ public class DebugView extends FrameLayout {
 
       if (!interceptorAdded) {
         interceptorAdded = true;
-        RequestManager.i.addInterceptor(requestInterceptor);
+      //  RequestManager.i.addInterceptor(requestInterceptor);
       }
       isAttached = true;
 
@@ -97,10 +96,10 @@ public class DebugView extends FrameLayout {
   }
 
   public void refresh() {
-    ImageView memoryGraph = (ImageView) view.findViewById(R.id.memory_graph);
+    ImageView memoryGraph = view.findViewById(R.id.memory_graph);
     memoryGraph.setImageBitmap(createMemoryGraph(memoryGraph.getWidth(), memoryGraph.getHeight()));
 
-    LinearLayout messagesContainer = (LinearLayout) view.findViewById(R.id.messages);
+    LinearLayout messagesContainer = view.findViewById(R.id.messages);
     for (int i = 0; i < messagesContainer.getChildCount(); i++) {
       TextView tv = (TextView) messagesContainer.getChildAt(i);
       if (messages.size() > i) {
@@ -222,13 +221,13 @@ public class DebugView extends FrameLayout {
     public String toString() {
       StringBuilder sb = new StringBuilder();
       if (request != null) {
-        String url = request.url().getPath();
-        String realmUrl = RealmContext.i.getCurrentRealm().getBaseUrl().getPath().toString();
+        String url = request.url().encodedPath();
+        String realmUrl = RealmContext.i.getCurrentRealm().getBaseUrl().getPath();
         if (url.startsWith(realmUrl)) {
           url = url.substring(realmUrl.length());
         }
-        if (request.url().getQuery() != null) {
-          url += "?" + request.url().getQuery();
+        if (request.url().query() != null) {
+          url += "?" + request.url().query();
         }
 
         if (millis == 0) {
