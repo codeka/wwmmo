@@ -13,8 +13,7 @@ public class CronJobRegistry {
     static {
         sCronJobs = new TreeMap<>();
         sCronJobs.put("update-ranks", UpdateRanksCronJob.class);
-        sCronJobs.put("purge-combat-reports", PurgeCombatReportsCronJob.class);
-        sCronJobs.put("purge-sessions", PurgeSessionsCronJob.class);
+        sCronJobs.put("prune-database", PruneDatabaseCronJob.class);
         sCronJobs.put("find-abandoned-empires", FindAbandonedEmpiresCronJob.class);
         sCronJobs.put("find-alts", FindAltAccountsCronJob.class);
         sCronJobs.put("update-dashboard", UpdateDashboardCronJob.class);

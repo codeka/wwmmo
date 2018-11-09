@@ -6,13 +6,12 @@ buildscript {
         maven {
             url 'https://maven.google.com'
         }
-        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
-		classpath 'com.google.gms:google-services:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.0.0-beta3'
     }
 }
+
 allprojects {
     repositories {
         mavenCentral()
