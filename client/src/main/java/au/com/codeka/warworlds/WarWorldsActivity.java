@@ -96,7 +96,7 @@ public class WarWorldsActivity extends BaseActivity {
       @Override
       public void onClick(View v) {
         Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
+        i.setData(Uri.parse("https://war-worlds.wikia.com/wiki/War_Worlds_Wiki"));
         startActivity(i);
       }
     });
