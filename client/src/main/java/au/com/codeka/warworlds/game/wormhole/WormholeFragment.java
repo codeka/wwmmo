@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.game.wormhole;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -16,7 +15,6 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentManager;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,11 +23,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.fragment.app.FragmentManager;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
-import au.com.codeka.common.model.BaseBuilding;
-import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseGlFragment;
@@ -46,17 +43,14 @@ import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
-import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.designeffects.WormholeDisruptorBuildingEffect;
 
 /**
  * This fragment is used in place of SolarSystemFragment in the SolarSystemActivity for

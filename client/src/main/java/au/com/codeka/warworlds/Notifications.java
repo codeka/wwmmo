@@ -21,11 +21,11 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
 import android.util.Base64;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.TaskStackBuilder;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;

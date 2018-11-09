@@ -2,8 +2,8 @@ package au.com.codeka.warworlds.game.alliance;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.view.Window;
+
+import androidx.fragment.app.FragmentTransaction;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 

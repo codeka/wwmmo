@@ -12,8 +12,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,9 +24,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -37,6 +36,7 @@ import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.AllianceRequest;
@@ -597,7 +597,8 @@ public class AllianceActivity extends TabFragmentActivity {
 
       public class ItemEntry {
         // May be null if we have to refresh the empire.
-        @Nullable public Empire empire;
+        @Nullable
+        public Empire empire;
         public AllianceRequest request;
 
         public ItemEntry(@Nullable Empire empire, AllianceRequest request) {

@@ -9,10 +9,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.WindowManager;
+
+import androidx.appcompat.app.AppCompatActivity;
 import au.com.codeka.warworlds.ctrl.DebugView;
 import au.com.codeka.warworlds.model.PurchaseManager;
 
@@ -20,7 +21,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 @SuppressLint("Registered") // it's a base class
-public class BaseActivity extends ActionBarActivity {
+public class BaseActivity extends AppCompatActivity {
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private DebugView mDebugView;

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.model;
 
-import android.support.v4.util.LruCache;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
@@ -8,6 +7,7 @@ import java.util.Collection;
 
 import javax.annotation.Nullable;
 
+import androidx.collection.LruCache;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiRequest;

@@ -1,6 +1,6 @@
 package au.com.codeka.warworlds;
 
-import android.support.multidex.MultiDexApplication;
+import androidx.multidex.MultiDexApplication;
 
 public class App extends MultiDexApplication {
   public static App i;

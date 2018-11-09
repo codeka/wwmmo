@@ -13,7 +13,6 @@ import org.joda.time.Duration;
 
 import android.content.Context;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
@@ -29,6 +28,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.fragment.app.FragmentActivity;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseBuildRequest;

@@ -2,11 +2,11 @@ package au.com.codeka.warworlds;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.View;
-import android.view.Window;
 import android.widget.TabHost;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 /**
  * This is our base \c FragmentActivity class for a tabbed activity. We'll define the code

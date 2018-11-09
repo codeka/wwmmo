@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="873"
-    android:versionName="0.8.873"
+    android:versionCode="881"
+    android:versionName="0.8.881"
     android:installLocation="auto"
     android:largeHeap="@bool/largeHeap">
 
@@ -47,6 +47,11 @@
 
         <meta-data android:name="com.google.android.gms.version"
            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-0091628662952708~3570955779"/>
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
 
         <!-- Main activity -->
         <activity

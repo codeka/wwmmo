@@ -1,8 +1,9 @@
 package au.com.codeka.warworlds.game.empire;
 
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import androidx.fragment.app.Fragment;
 import au.com.codeka.warworlds.R;
 
 public class BaseFragment extends Fragment {

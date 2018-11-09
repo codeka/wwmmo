@@ -5,10 +5,10 @@ import java.util.TreeMap;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.view.View;
-import android.view.Window;
 import android.widget.FrameLayout;
+
+import androidx.fragment.app.FragmentManager;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;

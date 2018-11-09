@@ -3,10 +3,11 @@ package au.com.codeka.warworlds.game.chat;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
+
+import androidx.fragment.app.DialogFragment;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;

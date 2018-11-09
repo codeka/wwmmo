@@ -3,9 +3,9 @@ package au.com.codeka.warworlds.game.build;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.text.Html;
 
+import androidx.fragment.app.DialogFragment;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;

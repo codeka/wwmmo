@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.model;
 
-import android.support.v4.util.LruCache;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +9,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import androidx.collection.LruCache;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;

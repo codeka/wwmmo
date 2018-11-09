@@ -4,6 +4,11 @@ apply plugin: 'application'
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile fileTree(dir: '../jetty/lib', include: '*.jar')
+    compile 'com.google.code.gson:gson:2.8.2'
+    compile 'joda-time:joda-time:2.9.9'
+    implementation 'com.google.protobuf:protobuf-java:3.6.0'
+    compile 'com.google.guava:guava:24.1-jre'
+    compile 'com.google.code.findbugs:jsr305:3.0.2'
     compile project(':common')
 }
 

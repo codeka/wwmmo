@@ -3,7 +3,6 @@ package au.com.codeka.warworlds;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.*;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
@@ -14,8 +13,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,6 +21,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
@@ -50,8 +49,8 @@ public class AccountsActivity extends BaseActivity {
     Util.loadProperties();
     setContentView(R.layout.accounts);
 
-    final ListView listView = (ListView) findViewById(R.id.select_account);
-    final Button logInButton = (Button) findViewById(R.id.log_in_btn);
+    final ListView listView = findViewById(R.id.select_account);
+    final Button logInButton = findViewById(R.id.log_in_btn);
     logInButton.setOnClickListener(new OnClickListener() {
       public void onClick(View v) {
         // Get account name

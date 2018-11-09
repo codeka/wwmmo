@@ -20,8 +20,8 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.support.v4.util.LruCache;
 
+import androidx.collection.LruCache;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;

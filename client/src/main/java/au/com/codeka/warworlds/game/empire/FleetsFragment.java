@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +14,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.fragment.app.FragmentManager;
 import au.com.codeka.NumberFormatter;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet;

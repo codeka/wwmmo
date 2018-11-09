@@ -5,29 +5,30 @@ apply plugin: 'com.android.application'
 Properties props = new Properties()
 props.load(new FileInputStream(file('signing.properties')))
 
-repositories {
-  mavenCentral()
-}
-
 dependencies {
-  compile fileTree(include: '*.jar', dir: 'libs')
-  compile 'com.google.android.gms:play-services-base:10.2.0'
-  compile 'com.google.android.gms:play-services-ads:10.2.0'
-  compile 'com.google.android.gms:play-services-auth:10.2.0'
-  compile 'com.android.support:multidex:1.0.1'
-  compile 'com.android.support:support-v4:25.3.0'
-  compile 'com.android.support:support-vector-drawable:25.3.0'
-  compile 'com.android.support:appcompat-v7:25.3.0'
-  compile 'com.android.support:design:25.3.0'
-  compile 'com.squareup.okhttp:okhttp:2.2.0'
-  compile project(':common')
-  compile project(':control-field')
-  compile project(':planet-render')
+  implementation fileTree(include: '*.jar', dir: 'libs')
+  implementation 'com.google.android.gms:play-services-base:16.0.1'
+  implementation 'com.google.android.gms:play-services-ads:17.1.0'
+  implementation 'com.google.android.gms:play-services-auth:16.0.1'
+  implementation 'com.google.guava:guava:24.1-android'
+  implementation 'com.google.code.gson:gson:2.8.2'
+  implementation 'joda-time:joda-time:2.9.9'
+  implementation 'com.google.protobuf:protobuf-java:3.6.0'
+  implementation 'com.google.code.findbugs:jsr305:3.0.2'
+  implementation 'com.android.support:multidex:1.0.3'
+  implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+  implementation 'androidx.vectordrawable:vectordrawable:1.0.1'
+  implementation 'androidx.appcompat:appcompat:1.0.2'
+  implementation 'com.google.android.material:material:1.1.0-alpha01'
+  implementation 'com.squareup.okhttp:okhttp:2.2.0'
+  implementation project(':common')
+  implementation project(':control-field')
+  implementation project(':planet-render')
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     // TODO: remove the dependency on this.
     useLibrary 'org.apache.http.legacy'
@@ -35,7 +36,7 @@ android {
     defaultConfig {
         multiDexEnabled true
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 28
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -44,12 +45,6 @@ android {
         // confuse the build process.
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/LICENSE.txt'
-    }
-
-    // Make sure we're using Java 1.7 source compatibility
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
     }
 
     dexOptions {

@@ -18,10 +18,7 @@ public class LogFormatter extends Formatter {
     public String format(LogRecord record) {
         StringBuilder sb = new StringBuilder();
 
-        try {
-            mDateTimeFormatter.printTo(sb, record.getMillis());
-        } catch (IOException e) {
-        }
+        mDateTimeFormatter.printTo(sb, record.getMillis());
         sb.append(" ");
         sb.append(record.getLevel().toString());
         sb.append(" ");

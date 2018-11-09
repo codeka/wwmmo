@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +16,7 @@ import android.widget.ListView;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
+import androidx.fragment.app.Fragment;
 import au.com.codeka.warworlds.R;
 
 /**
