@@ -151,6 +151,9 @@ message Empire
     // rate of change of cash, based on taxed income)
     optional float cash = 9;
 
+    // We can't change cash to 64-bit without breaking compatibility, so we'll add a second field.
+    optional double cash64 = 17;
+
     // if specified, contains the details of the empire's rank
     optional EmpireRank rank = 11;
 

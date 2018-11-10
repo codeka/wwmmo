@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -160,7 +161,7 @@ public class AllianceDetailsFragment extends Fragment
     }
 
     private void fullRefresh() {
-        Button depositBtn = (Button) mView.findViewById(R.id.bank_deposit);
+        Button depositBtn = mView.findViewById(R.id.bank_deposit);
         if (depositBtn != null) depositBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,7 +171,7 @@ public class AllianceDetailsFragment extends Fragment
             }
         });
 
-        Button withdrawBtn = (Button) mView.findViewById(R.id.bank_withdraw);
+        Button withdrawBtn = mView.findViewById(R.id.bank_withdraw);
         if (withdrawBtn != null) withdrawBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -180,7 +181,7 @@ public class AllianceDetailsFragment extends Fragment
             }
         });
 
-        Button changeBtn = (Button) mView.findViewById(R.id.change_details_btn);
+        Button changeBtn = mView.findViewById(R.id.change_details_btn);
         if (changeBtn != null) changeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -188,7 +189,7 @@ public class AllianceDetailsFragment extends Fragment
             }
         });
 
-        Button joinBtn = (Button) mView.findViewById(R.id.join_btn);
+        Button joinBtn = mView.findViewById(R.id.join_btn);
         if (joinBtn != null) joinBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -198,7 +199,7 @@ public class AllianceDetailsFragment extends Fragment
             }
         });
 
-        Button leaveBtn = (Button) mView.findViewById(R.id.leave_btn);
+        Button leaveBtn = mView.findViewById(R.id.leave_btn);
         if (leaveBtn != null) leaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -218,23 +219,23 @@ public class AllianceDetailsFragment extends Fragment
         }
         mRefreshPosted = false;
 
-        TextView allianceName = (TextView) mView.findViewById(R.id.alliance_name);
+        TextView allianceName = mView.findViewById(R.id.alliance_name);
         allianceName.setText(mAlliance.getName());
 
-        TextView bankBalance = (TextView) mView.findViewById(R.id.bank_balance);
+        TextView bankBalance = mView.findViewById(R.id.bank_balance);
         if (bankBalance != null) {
-            bankBalance.setText(Cash.format((float) mAlliance.getBankBalance()));
+            bankBalance.setText(Cash.format(mAlliance.getBankBalance()));
         }
 
-        TextView allianceMembers = (TextView) mView.findViewById(R.id.alliance_num_members);
-        allianceMembers.setText(String.format("Members: %d", mAlliance.getNumMembers()));
+        TextView allianceMembers = mView.findViewById(R.id.alliance_num_members);
+        allianceMembers.setText(String.format(Locale.US, "Members: %d", mAlliance.getNumMembers()));
 
-        ImageView allianceIcon = (ImageView) mView.findViewById(R.id.alliance_icon);
+        ImageView allianceIcon = mView.findViewById(R.id.alliance_icon);
         allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(mActivity, mAlliance));
 
         if (mAlliance.getMembers() != null) {
-            ArrayList<Empire> members = new ArrayList<Empire>();
-            ArrayList<Integer> missingMembers = new ArrayList<Integer>();
+            ArrayList<Empire> members = new ArrayList<>();
+            ArrayList<Integer> missingMembers = new ArrayList<>();
             for (BaseAllianceMember am : mAlliance.getMembers()) {
                 Empire member = EmpireManager.i.getEmpire(am.getEmpireID());
                 if (member == null) {
@@ -243,7 +244,7 @@ public class AllianceDetailsFragment extends Fragment
                     members.add(member);
                 }
             }
-            LinearLayout membersList = (LinearLayout) mView.findViewById(R.id.members);
+            LinearLayout membersList = mView.findViewById(R.id.members);
             membersList.removeAllViews();
             populateEmpireList(membersList, members);
 
@@ -281,13 +282,13 @@ public class AllianceDetailsFragment extends Fragment
             View view = mLayoutInflater.inflate(R.layout.alliance_empire_row, null);
             view.setTag(empire);
 
-            ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
-            TextView empireName = (TextView) view.findViewById(R.id.empire_name);
-            TextView lastSeen = (TextView) view.findViewById(R.id.last_seen);
-            TextView totalStars = (TextView) view.findViewById(R.id.total_stars);
-            TextView totalColonies = (TextView) view.findViewById(R.id.total_colonies);
-            TextView totalShips = (TextView) view.findViewById(R.id.total_ships);
-            TextView totalBuildings = (TextView) view.findViewById(R.id.total_buildings);
+            ImageView empireIcon = view.findViewById(R.id.empire_icon);
+            TextView empireName = view.findViewById(R.id.empire_name);
+            TextView lastSeen = view.findViewById(R.id.last_seen);
+            TextView totalStars = view.findViewById(R.id.total_stars);
+            TextView totalColonies = view.findViewById(R.id.total_colonies);
+            TextView totalShips = view.findViewById(R.id.total_ships);
+            TextView totalBuildings = view.findViewById(R.id.total_buildings);
             view.findViewById(R.id.rank).setVisibility(View.INVISIBLE);
 
             DecimalFormat formatter = new DecimalFormat("#,##0");

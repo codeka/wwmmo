@@ -3,6 +3,7 @@
     <domain-config cleartextTrafficPermitted="true">
         <!-- Allow cleartext traffic to 127.0.0.1, which we use for development. -->
         <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.0.15</domain>
         <!-- Allow cleartext traffic to www.war-worlds.com, which is where we get the MOTD. -->
         <domain includeSubdomains="true">www.war-worlds.com</domain>
     </domain-config>

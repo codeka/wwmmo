@@ -24,7 +24,7 @@ public class Empire extends BaseEmpire {
         mID = res.getInt("id");
         mKey = Integer.toString(mID);
         mDisplayName = res.getString("name");
-        mCash = res.getFloat("cash");
+        mCash = res.getDouble("cash");
         mEmailAddr = res.getString("user_email");
         mHomeStarID = res.getInt("home_star_id");
         mAllianceID = res.getInt("alliance_id");

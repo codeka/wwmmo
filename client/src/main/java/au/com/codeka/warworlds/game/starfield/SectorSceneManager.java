@@ -197,7 +197,7 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
     HUD hud = new HUD();
     refreshHud(hud);
 
-    return new Tuple(scene, hud);
+    return new Tuple<>(scene, hud);
   }
 
   @Nullable

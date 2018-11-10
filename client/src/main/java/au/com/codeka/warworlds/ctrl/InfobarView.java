@@ -27,8 +27,8 @@ public class InfobarView extends FrameLayout {
   // The cash value we're currently displaying, so we can animate to the "real"
   // value as it's
   // updated.
-  private static float sCurrCash;
-  private static float sRealCash;
+  private static double sCurrCash;
+  private static double sRealCash;
   private static int sEmpireID; // if this changes, we update the cash instantly
 
   public InfobarView(Context context, AttributeSet attrs) {
@@ -46,11 +46,11 @@ public class InfobarView extends FrameLayout {
     @Override
     public void run() {
       boolean increasing = sRealCash > sCurrCash;
-      float newCash = sCurrCash + (increasing ? 125f : -125f);
+      double newCash = sCurrCash + (increasing ? 125f : -125f);
       if ((increasing && newCash > sRealCash) || (!increasing && newCash < sRealCash)) {
         newCash = sRealCash;
       }
-      TextView cash = (TextView) view.findViewById(R.id.cash);
+      TextView cash = view.findViewById(R.id.cash);
       cash.setText(Cash.format(newCash));
       sCurrCash = newCash;
 
@@ -66,7 +66,7 @@ public class InfobarView extends FrameLayout {
       return;
     }
 
-    ProgressBar working = (ProgressBar) view.findViewById(R.id.working);
+    ProgressBar working = view.findViewById(R.id.working);
     if (requestManagerState.numInflightRequests > 0) {
       working.setVisibility(View.VISIBLE);
     } else {
@@ -109,10 +109,10 @@ public class InfobarView extends FrameLayout {
       } else if (sRealCash != sCurrCash) {
         handler.post(updateCashRunnable);
       }
-      TextView cash = (TextView) view.findViewById(R.id.cash);
+      TextView cash = view.findViewById(R.id.cash);
       cash.setText(Cash.format(sCurrCash));
 
-      TextView empireName = (TextView) view.findViewById(R.id.empire_name);
+      TextView empireName = view.findViewById(R.id.empire_name);
       empireName.setText(empire.getDisplayName());
     }
 
@@ -126,7 +126,7 @@ public class InfobarView extends FrameLayout {
       refreshEmpire(empire);
     }
 
-    @EventHandler(thread = EventHandler.UI_THREAD)
+    @EventHandler()
     public void onRequestManagerStateChanged(RequestManagerState requestManagerState) {
       refresh(requestManagerState);
     }

@@ -126,7 +126,7 @@ public class AllianceManager {
     request(pb);
   }
 
-  public void requestDeposit(final int allianceID, final String message, int amount) {
+  public void requestDeposit(final int allianceID, final String message, long amount) {
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
     Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
         .setRequestType(Messages.AllianceRequest.RequestType.DEPOSIT_CASH).setAmount(amount)
@@ -135,7 +135,7 @@ public class AllianceManager {
     request(pb);
   }
 
-  public void requestWithdraw(final int allianceID, final String message, int amount) {
+  public void requestWithdraw(final int allianceID, final String message, long amount) {
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
     Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
         .setRequestType(Messages.AllianceRequest.RequestType.WITHDRAW_CASH).setAmount(amount)

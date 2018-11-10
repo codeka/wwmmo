@@ -15,7 +15,9 @@ public class AllianceDetailsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.alliance_details);
-        mAllianceDetailsFragment = (AllianceDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.alliance_details);
+        mAllianceDetailsFragment =
+            (AllianceDetailsFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.alliance_details);
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();

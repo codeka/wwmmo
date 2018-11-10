@@ -27,7 +27,7 @@ public class DepositRequestDialog extends DialogFragment {
         LayoutInflater inflater = activity.getLayoutInflater();
         mView = inflater.inflate(R.layout.alliance_request_dlg, null);
 
-        TextView instructions = (TextView) mView.findViewById(R.id.instructions);
+        TextView instructions = mView.findViewById(R.id.instructions);
         instructions.setText("Enter the amount to deposit, and a brief description of why you're depositing (optional), then click \"Deposit\".");
 
         return new StyledDialog.Builder(getActivity())
@@ -44,10 +44,17 @@ public class DepositRequestDialog extends DialogFragment {
     }
 
     private void onDeposit() {
-        TextView message = (TextView) mView.findViewById(R.id.message);
-        TextView amount = (TextView) mView.findViewById(R.id.amount);
-        AllianceManager.i.requestDeposit(mAllianceID, message.getText().toString(),
-                            Integer.parseInt(amount.getText().toString()));
+        TextView message = mView.findViewById(R.id.message);
+        TextView amountView = mView.findViewById(R.id.amount);
+        long amount = 0;
+        try {
+            amount = Long.parseLong(amountView.getText().toString());
+        } catch (NumberFormatException e) {
+            TextView instructions = mView.findViewById(R.id.instructions);
+            instructions.setText("Make sure you enter a valid amount of cash to deposit.");
+            return;
+        }
+        AllianceManager.i.requestDeposit(mAllianceID, message.getText().toString(), amount);
 
         dismiss();
     }
