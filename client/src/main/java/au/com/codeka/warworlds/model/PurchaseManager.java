@@ -30,7 +30,7 @@ public class PurchaseManager {
             "dlAKtgymQkRGgspbmj5UW4B72drUt2kWPdRNw3RBfZBthTjm/6fUkPIxFpV8Ec/5Ty/z6Vn+VglTyE8xYaxPd"+
             "q+5JjWgA8oiiBFItNppBYl3ojNS9kBsYYmHJM4UlkwRSrc8f3HIIiZFYva4OR/ms2fWJ/kDzQIDAQAB";
 
-    private static int REQUEST_CODE = 67468732; // random big number that hopefully won't conflict
+    private static int REQUEST_CODE = 6732; // random big number that hopefully won't conflict
 
     private static ArrayList<String> sAllSkus;
     {
