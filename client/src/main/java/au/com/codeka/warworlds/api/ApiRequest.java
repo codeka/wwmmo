@@ -27,12 +27,14 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.internal.http.HttpMethod;
 
 /** Encapsulates a request to the server. */
 public class ApiRequest {
   private static final Log log = new Log("ApiRequest");
 
   private static final MediaType PROTOBUF = MediaType.parse("application/x-protobuf");
+  private static final MediaType BYTES = MediaType.parse("application/octet-stream");
 
   private final Timing timing;
   private final String url;
@@ -222,7 +224,12 @@ public class ApiRequest {
 
   private RequestBody convertRequestBody() {
     if (requestBody == null) {
-      return null;
+      if (HttpMethod.requiresRequestBody(method)) {
+        // A POST request must have a body, so we'll just give it an empty one.
+        return RequestBody.create(BYTES, new byte[0]);
+      } else {
+        return null;
+      }
     }
     return RequestBody.create(PROTOBUF, requestBody.toByteArray());
   }
