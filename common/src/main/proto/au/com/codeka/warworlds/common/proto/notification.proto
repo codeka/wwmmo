@@ -12,6 +12,20 @@ message Notification {
   // The empire ID this notification is for.
   optional int64 empire_id = 2;
 
+  // The type of this notification.
+  enum Type {
+    UNKNOWN = 0;
+    // A debug message, mostly just used for debugging notifications.
+    DEBUG_MESSAGE = 1;
+
+    // A build has completed.
+    BUILD_COMPLETE = 2;
+  }
+  optional Type type = 3;
+
   // A string message to send to the empire. This is mostly used for debugging.
-  optional string debug_message = 3;
+  optional string debug_message = 4;
+
+  // The ID of the star that this notification is referring to.
+  optional int64 star_id = 5;
 }
