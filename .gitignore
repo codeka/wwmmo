@@ -23,6 +23,8 @@ client/signing.properties
 .idea/
 local.properties
 *.iml
+client/release
+server/release
 
 # Ignore build directory in top-level folder and the first child. This is where
 # build artifacts go.
