@@ -13,7 +13,7 @@ import org.ajoberstar.grgit.Grgit
 apply plugin: 'com.android.application'
 
 Properties signingProps = new Properties()
-File signingPropsFile = new File("signing.properties")
+File signingPropsFile = new File("client/signing.properties")
 if (signingPropsFile.isFile()) {
   signingProps.load(new FileInputStream(signingPropsFile))
 }
