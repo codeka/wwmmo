@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Html;
@@ -37,6 +38,7 @@ public class AccountsActivity extends BaseActivity {
   private Context context = this;
 
   private final int GET_ACCOUNTS_PERMISSION = 1;
+  private final int SELECT_ACCOUNT_REQUEST_CODE = 3522;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -103,10 +105,13 @@ public class AccountsActivity extends BaseActivity {
 
     List<String> accounts = getGoogleAccounts();
     if (accounts.size() == 0) {
-      // If we don't have GET_ACCOUNTS permission, we'll want to request that and try again.
+      // If we don't have GET_ACCOUNTS permission, we'll want to request that and try again. On
+      // Android > O, this permission is no longer required, and we just go straight into the
+      // newChooseAccountIntent.
       int permissionCheck = ContextCompat.checkSelfPermission(
           AccountsActivity.this, android.Manifest.permission.GET_ACCOUNTS);
-      if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+      if (permissionCheck != PackageManager.PERMISSION_GRANTED
+          && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
         // Show a dialog and invoke the "Add Account" activity if requested
         StyledDialog.Builder builder = new StyledDialog.Builder(context);
         builder.setMessage("In order to fetch accounts on your phone, we need to ask for 'Contacts'"
@@ -123,21 +128,10 @@ public class AccountsActivity extends BaseActivity {
         builder.setTitle("Permissions");
         builder.create().show();
       } else {
-        // Show a dialog and invoke the "Add Account" activity if requested
-        StyledDialog.Builder builder = new StyledDialog.Builder(context);
-        builder.setMessage("You need a Google Account in order to be able to play War Worlds.");
-        builder.setPositiveButton("Add Account", new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int which) {
-            startActivity(new Intent(Settings.ACTION_ADD_ACCOUNT));
-          }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int which) {
-            finish();
-          }
-        });
-        builder.setTitle("No Google Account");
-        builder.create().show();
+        // Prompt the user to choose an account that we'll then be able to see.
+        Intent intent = AccountManager.newChooseAccountIntent(
+            null, null, new String[]{"com.google"}, false, null, null, null, null);
+        startActivityForResult(intent, SELECT_ACCOUNT_REQUEST_CODE);
       }
     } else {
       if (accountName != null) {
@@ -149,7 +143,7 @@ public class AccountsActivity extends BaseActivity {
         }
       }
 
-      ListView listView = (ListView) findViewById(R.id.select_account);
+      ListView listView = findViewById(R.id.select_account);
       listView.setAdapter(new ArrayAdapter<>(context, R.layout.account, accounts));
       listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
       listView.setItemChecked(accountSelectedPosition, true);
@@ -226,6 +220,7 @@ public class AccountsActivity extends BaseActivity {
   private List<String> getGoogleAccounts() {
     ArrayList<String> result = new ArrayList<>();
     Account[] accounts = AccountManager.get(context).getAccounts();
+
     for (Account account : accounts) {
       if (account.type.equals("com.google")) {
         result.add(account.name);

@@ -156,7 +156,7 @@ public class RequestManager {
     }
 
     @Override
-    public void onResponse(Call call, Response response) throws IOException {
+    public void onResponse(Call call, Response response) {
       ApiRequest request = (ApiRequest) call.request().tag();
       handleResponse(request, response);
     }

@@ -173,7 +173,7 @@ public class WarWorldsActivity extends BaseActivity {
 
           String currAccountName = prefs.getString("AccountName", null);
           if (currAccountName != null && currAccountName.endsWith("@anon.war-worlds.com")) {
-            Button reauthButton = (Button) findViewById(R.id.reauth_btn);
+            Button reauthButton = findViewById(R.id.reauth_btn);
             reauthButton.setText("Sign in");
           }
           maybeShowSignInPrompt();

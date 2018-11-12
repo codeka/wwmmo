@@ -71,10 +71,13 @@ public class Authenticator {
     } else {
       try {
         final String scope = "oauth2:email";
+        log.info("Getting token for \"%s\" & scope \"%s\"...", accountName, scope);
         String authToken = GoogleAuthUtil.getToken(context, accountName, scope);
         if (authToken == null) {
+          log.error("Failed to get auth token.");
           throw new ApiException("Error getting auth token.");
         }
+        log.info("Got token: %s", authToken);
         cookie = getCookie(authToken, realm);
         log.info("Authentication successful.");
       } catch (UserRecoverableAuthException e) {
@@ -98,7 +101,7 @@ public class Authenticator {
   /**
    * Makes a request to the server to get a cookie which we can send with each subsequent request.
    */
-  public String getCookie(String authToken, Realm realm) throws ApiException {
+  public String getCookie(String authToken, Realm realm) {
     String url = realm.getBaseUrl().resolve("login?authToken=" + authToken).toString();
 
     String impersonate = Util.getProperties().getProperty("user.on_behalf_of", null);
@@ -110,7 +113,8 @@ public class Authenticator {
         .errorCallback(new ApiRequest.ErrorCallback() {
           @Override
           public void onRequestError(ApiRequest request, Messages.GenericError error) {
-
+            log.error("Got error from login request: %d %s",
+                error.getErrorCode(), error.getErrorMessage());
           }
         }).build();
     RequestManager.i.sendRequestSync(request);
