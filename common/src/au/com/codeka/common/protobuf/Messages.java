@@ -93976,6 +93976,66 @@ public final class Messages {
      * <code>optional int32 num_pending_requests = 9;</code>
      */
     int getNumPendingRequests();
+
+    /**
+     * <pre>
+     * The total stars this alliance controls.
+     * </pre>
+     *
+     * <code>optional int64 total_stars = 10;</code>
+     */
+    boolean hasTotalStars();
+    /**
+     * <pre>
+     * The total stars this alliance controls.
+     * </pre>
+     *
+     * <code>optional int64 total_stars = 10;</code>
+     */
+    long getTotalStars();
+
+    /**
+     * <pre>
+     * True if this alliance is still 'active'.
+     * </pre>
+     *
+     * <code>optional bool is_active = 11;</code>
+     */
+    boolean hasIsActive();
+    /**
+     * <pre>
+     * True if this alliance is still 'active'.
+     * </pre>
+     *
+     * <code>optional bool is_active = 11;</code>
+     */
+    boolean getIsActive();
+
+    /**
+     * <pre>
+     * A user-defined description for this alliance.
+     * </pre>
+     *
+     * <code>optional string description = 12;</code>
+     */
+    boolean hasDescription();
+    /**
+     * <pre>
+     * A user-defined description for this alliance.
+     * </pre>
+     *
+     * <code>optional string description = 12;</code>
+     */
+    java.lang.String getDescription();
+    /**
+     * <pre>
+     * A user-defined description for this alliance.
+     * </pre>
+     *
+     * <code>optional string description = 12;</code>
+     */
+    com.google.protobuf.ByteString
+        getDescriptionBytes();
   }
   /**
    * <pre>
@@ -94002,6 +94062,9 @@ public final class Messages {
       members_ = java.util.Collections.emptyList();
       dateImageUpdated_ = 0L;
       numPendingRequests_ = 0;
+      totalStars_ = 0L;
+      isActive_ = false;
+      description_ = "";
     }
 
     @java.lang.Override
@@ -94082,6 +94145,22 @@ public final class Messages {
             case 72: {
               bitField0_ |= 0x00000080;
               numPendingRequests_ = input.readInt32();
+              break;
+            }
+            case 80: {
+              bitField0_ |= 0x00000100;
+              totalStars_ = input.readInt64();
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000200;
+              isActive_ = input.readBool();
+              break;
+            }
+            case 98: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000400;
+              description_ = bs;
               break;
             }
           }
@@ -94436,6 +94515,106 @@ public final class Messages {
       return numPendingRequests_;
     }
 
+    public static final int TOTAL_STARS_FIELD_NUMBER = 10;
+    private long totalStars_;
+    /**
+     * <pre>
+     * The total stars this alliance controls.
+     * </pre>
+     *
+     * <code>optional int64 total_stars = 10;</code>
+     */
+    public boolean hasTotalStars() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <pre>
+     * The total stars this alliance controls.
+     * </pre>
+     *
+     * <code>optional int64 total_stars = 10;</code>
+     */
+    public long getTotalStars() {
+      return totalStars_;
+    }
+
+    public static final int IS_ACTIVE_FIELD_NUMBER = 11;
+    private boolean isActive_;
+    /**
+     * <pre>
+     * True if this alliance is still 'active'.
+     * </pre>
+     *
+     * <code>optional bool is_active = 11;</code>
+     */
+    public boolean hasIsActive() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <pre>
+     * True if this alliance is still 'active'.
+     * </pre>
+     *
+     * <code>optional bool is_active = 11;</code>
+     */
+    public boolean getIsActive() {
+      return isActive_;
+    }
+
+    public static final int DESCRIPTION_FIELD_NUMBER = 12;
+    private volatile java.lang.Object description_;
+    /**
+     * <pre>
+     * A user-defined description for this alliance.
+     * </pre>
+     *
+     * <code>optional string description = 12;</code>
+     */
+    public boolean hasDescription() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <pre>
+     * A user-defined description for this alliance.
+     * </pre>
+     *
+     * <code>optional string description = 12;</code>
+     */
+    public java.lang.String getDescription() {
+      java.lang.Object ref = description_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          description_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * A user-defined description for this alliance.
+     * </pre>
+     *
+     * <code>optional string description = 12;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDescriptionBytes() {
+      java.lang.Object ref = description_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        description_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -94474,6 +94653,15 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeInt32(9, numPendingRequests_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeInt64(10, totalStars_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeBool(11, isActive_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 12, description_);
       }
       unknownFields.writeTo(output);
     }
@@ -94515,6 +94703,17 @@ public final class Messages {
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(9, numPendingRequests_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(10, totalStars_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(11, isActive_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(12, description_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -94577,6 +94776,21 @@ public final class Messages {
         result = result && (getNumPendingRequests()
             == other.getNumPendingRequests());
       }
+      result = result && (hasTotalStars() == other.hasTotalStars());
+      if (hasTotalStars()) {
+        result = result && (getTotalStars()
+            == other.getTotalStars());
+      }
+      result = result && (hasIsActive() == other.hasIsActive());
+      if (hasIsActive()) {
+        result = result && (getIsActive()
+            == other.getIsActive());
+      }
+      result = result && (hasDescription() == other.hasDescription());
+      if (hasDescription()) {
+        result = result && getDescription()
+            .equals(other.getDescription());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -94626,6 +94840,20 @@ public final class Messages {
       if (hasNumPendingRequests()) {
         hash = (37 * hash) + NUM_PENDING_REQUESTS_FIELD_NUMBER;
         hash = (53 * hash) + getNumPendingRequests();
+      }
+      if (hasTotalStars()) {
+        hash = (37 * hash) + TOTAL_STARS_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getTotalStars());
+      }
+      if (hasIsActive()) {
+        hash = (37 * hash) + IS_ACTIVE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getIsActive());
+      }
+      if (hasDescription()) {
+        hash = (37 * hash) + DESCRIPTION_FIELD_NUMBER;
+        hash = (53 * hash) + getDescription().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -94783,6 +95011,12 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000080);
         numPendingRequests_ = 0;
         bitField0_ = (bitField0_ & ~0x00000100);
+        totalStars_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000200);
+        isActive_ = false;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        description_ = "";
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -94848,6 +95082,18 @@ public final class Messages {
           to_bitField0_ |= 0x00000080;
         }
         result.numPendingRequests_ = numPendingRequests_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.totalStars_ = totalStars_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.isActive_ = isActive_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.description_ = description_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -94945,6 +95191,17 @@ public final class Messages {
         }
         if (other.hasNumPendingRequests()) {
           setNumPendingRequests(other.getNumPendingRequests());
+        }
+        if (other.hasTotalStars()) {
+          setTotalStars(other.getTotalStars());
+        }
+        if (other.hasIsActive()) {
+          setIsActive(other.getIsActive());
+        }
+        if (other.hasDescription()) {
+          bitField0_ |= 0x00000800;
+          description_ = other.description_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -95806,6 +96063,202 @@ public final class Messages {
       public Builder clearNumPendingRequests() {
         bitField0_ = (bitField0_ & ~0x00000100);
         numPendingRequests_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private long totalStars_ ;
+      /**
+       * <pre>
+       * The total stars this alliance controls.
+       * </pre>
+       *
+       * <code>optional int64 total_stars = 10;</code>
+       */
+      public boolean hasTotalStars() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <pre>
+       * The total stars this alliance controls.
+       * </pre>
+       *
+       * <code>optional int64 total_stars = 10;</code>
+       */
+      public long getTotalStars() {
+        return totalStars_;
+      }
+      /**
+       * <pre>
+       * The total stars this alliance controls.
+       * </pre>
+       *
+       * <code>optional int64 total_stars = 10;</code>
+       */
+      public Builder setTotalStars(long value) {
+        bitField0_ |= 0x00000200;
+        totalStars_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The total stars this alliance controls.
+       * </pre>
+       *
+       * <code>optional int64 total_stars = 10;</code>
+       */
+      public Builder clearTotalStars() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        totalStars_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private boolean isActive_ ;
+      /**
+       * <pre>
+       * True if this alliance is still 'active'.
+       * </pre>
+       *
+       * <code>optional bool is_active = 11;</code>
+       */
+      public boolean hasIsActive() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <pre>
+       * True if this alliance is still 'active'.
+       * </pre>
+       *
+       * <code>optional bool is_active = 11;</code>
+       */
+      public boolean getIsActive() {
+        return isActive_;
+      }
+      /**
+       * <pre>
+       * True if this alliance is still 'active'.
+       * </pre>
+       *
+       * <code>optional bool is_active = 11;</code>
+       */
+      public Builder setIsActive(boolean value) {
+        bitField0_ |= 0x00000400;
+        isActive_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * True if this alliance is still 'active'.
+       * </pre>
+       *
+       * <code>optional bool is_active = 11;</code>
+       */
+      public Builder clearIsActive() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        isActive_ = false;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object description_ = "";
+      /**
+       * <pre>
+       * A user-defined description for this alliance.
+       * </pre>
+       *
+       * <code>optional string description = 12;</code>
+       */
+      public boolean hasDescription() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <pre>
+       * A user-defined description for this alliance.
+       * </pre>
+       *
+       * <code>optional string description = 12;</code>
+       */
+      public java.lang.String getDescription() {
+        java.lang.Object ref = description_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            description_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A user-defined description for this alliance.
+       * </pre>
+       *
+       * <code>optional string description = 12;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDescriptionBytes() {
+        java.lang.Object ref = description_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          description_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A user-defined description for this alliance.
+       * </pre>
+       *
+       * <code>optional string description = 12;</code>
+       */
+      public Builder setDescription(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        description_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A user-defined description for this alliance.
+       * </pre>
+       *
+       * <code>optional string description = 12;</code>
+       */
+      public Builder clearDescription() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        description_ = getDefaultInstance().getDescription();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A user-defined description for this alliance.
+       * </pre>
+       *
+       * <code>optional string description = 12;</code>
+       */
+      public Builder setDescriptionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        description_ = value;
         onChanged();
         return this;
       }
@@ -106463,60 +106916,61 @@ public final class Messages {
       "anceDeposit\020\004\022\024\n\020AllianceWithdraw\020\005\"S\n\020C" +
       "ashAuditRecords\022?\n\007records\030\001 \003(\0132..au.co" +
       "m.codeka.common.protobuf.CashAuditRecord" +
-      "\"\374\001\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002 \001(\t" +
+      "\"\271\002\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002 \001(\t" +
       "\022\024\n\014time_created\030\003 \001(\003\022\032\n\022creator_empire" +
       "_key\030\004 \001(\t\022\024\n\014bank_balance\030\007 \001(\001\022\023\n\013num_" +
       "members\030\005 \001(\005\022>\n\007members\030\006 \003(\0132-.au.com.",
       "codeka.common.protobuf.AllianceMember\022\032\n" +
       "\022date_image_updated\030\010 \001(\003\022\034\n\024num_pending" +
-      "_requests\030\t \001(\005\"G\n\tAlliances\022:\n\talliance" +
-      "s\030\001 \003(\0132\'.au.com.codeka.common.protobuf." +
-      "Alliance\"\317\001\n\016AllianceMember\022\013\n\003key\030\001 \001(\t" +
-      "\022\022\n\nempire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001" +
-      "(\t\022\023\n\013time_joined\030\004 \001(\003\022@\n\004rank\030\005 \001(\01622." +
-      "au.com.codeka.common.protobuf.AllianceMe" +
-      "mber.Rank\"/\n\004Rank\022\013\n\007CAPTAIN\020\000\022\016\n\nLIEUTE" +
-      "NANT\020\001\022\n\n\006MEMBER\020\002\"\364\004\n\017AllianceRequest\022\n",
-      "\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\031\n\021reque" +
-      "st_empire_id\030\003 \001(\005\022\024\n\014request_date\030\004 \001(\003" +
-      "\022P\n\014request_type\030\005 \001(\0162:.au.com.codeka.c" +
-      "ommon.protobuf.AllianceRequest.RequestTy" +
-      "pe\022\017\n\007message\030\006 \001(\t\022J\n\005state\030\007 \001(\0162;.au." +
-      "com.codeka.common.protobuf.AllianceReque" +
-      "st.RequestState\022\021\n\tnum_votes\030\010 \001(\005\022\030\n\020ta" +
-      "rget_empire_id\030\t \001(\005\022\016\n\006amount\030\n \001(\002\022\021\n\t" +
-      "png_image\030\013 \001(\014\022\020\n\010new_name\030\014 \001(\t\022@\n\004vot" +
-      "e\030\r \003(\01322.au.com.codeka.common.protobuf.",
-      "AllianceRequestVote\"t\n\013RequestType\022\010\n\004JO" +
-      "IN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014DEPOSIT_CAS" +
-      "H\020\003\022\021\n\rWITHDRAW_CASH\020\004\022\020\n\014CHANGE_IMAGE\020\005" +
-      "\022\017\n\013CHANGE_NAME\020\006\"F\n\014RequestState\022\013\n\007PEN" +
-      "DING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002\022\r\n\tWI" +
-      "THDRAWN\020\003\"d\n\020AllianceRequests\022@\n\010request" +
-      "s\030\001 \003(\0132..au.com.codeka.common.protobuf." +
-      "AllianceRequest\022\016\n\006cursor\030\002 \001(\t\"\203\001\n\023Alli" +
-      "anceRequestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_" +
-      "id\030\002 \001(\005\022\033\n\023alliance_request_id\030\003 \001(\005\022\021\n",
-      "\tempire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030" +
-      "\006 \001(\003\"\243\003\n\013ErrorReport\022\027\n\017android_version" +
-      "\030\001 \001(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014package_n" +
-      "ame\030\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013stack_" +
-      "trace\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013report_t" +
-      "ime\030\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007context\030" +
-      "\t \001(\t\022\027\n\017exception_class\030\n \001(\t\022\021\n\theap_s" +
-      "ize\030\013 \001(\003\022\026\n\016heap_allocated\030\014 \001(\003\022\021\n\thea" +
-      "p_free\030\r \001(\003\022\026\n\016total_run_time\030\016 \001(\003\022\033\n\023" +
-      "foreground_run_time\030\017 \001(\003\022\022\n\nlog_output\030",
-      "\020 \001(\t\022\031\n\021server_request_qs\030\021 \001(\t\022!\n\031serv" +
-      "er_request_user_agent\030\022 \001(\t\"K\n\014ErrorRepo" +
-      "rts\022;\n\007reports\030\001 \003(\0132*.au.com.codeka.com" +
-      "mon.protobuf.ErrorReport*\344\001\n\025SituationRe" +
-      "portFilter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020" +
-      "\001\022\024\n\020BuildCompleteAny\020\002\022\021\n\rFleetAttacked" +
-      "\020\003\022\022\n\016FleetDestroyed\020\004\022\023\n\017FleetVictoriou" +
-      "s\020\005\022\022\n\016ColonyAttacked\020\006\022\023\n\017ColonyDestroy" +
-      "ed\020\007\022\026\n\022BuildCompleteShips\020\010\022\031\n\025BuildCom" +
-      "pleteBuilding\020\t"
+      "_requests\030\t \001(\005\022\023\n\013total_stars\030\n \001(\003\022\021\n\t" +
+      "is_active\030\013 \001(\010\022\023\n\013description\030\014 \001(\t\"G\n\t" +
+      "Alliances\022:\n\talliances\030\001 \003(\0132\'.au.com.co" +
+      "deka.common.protobuf.Alliance\"\317\001\n\016Allian" +
+      "ceMember\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(" +
+      "\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n\013time_joined\030\004" +
+      " \001(\003\022@\n\004rank\030\005 \001(\01622.au.com.codeka.commo" +
+      "n.protobuf.AllianceMember.Rank\"/\n\004Rank\022\013",
+      "\n\007CAPTAIN\020\000\022\016\n\nLIEUTENANT\020\001\022\n\n\006MEMBER\020\002\"" +
+      "\364\004\n\017AllianceRequest\022\n\n\002id\030\001 \001(\005\022\023\n\013allia" +
+      "nce_id\030\002 \001(\005\022\031\n\021request_empire_id\030\003 \001(\005\022" +
+      "\024\n\014request_date\030\004 \001(\003\022P\n\014request_type\030\005 " +
+      "\001(\0162:.au.com.codeka.common.protobuf.Alli" +
+      "anceRequest.RequestType\022\017\n\007message\030\006 \001(\t" +
+      "\022J\n\005state\030\007 \001(\0162;.au.com.codeka.common.p" +
+      "rotobuf.AllianceRequest.RequestState\022\021\n\t" +
+      "num_votes\030\010 \001(\005\022\030\n\020target_empire_id\030\t \001(" +
+      "\005\022\016\n\006amount\030\n \001(\002\022\021\n\tpng_image\030\013 \001(\014\022\020\n\010",
+      "new_name\030\014 \001(\t\022@\n\004vote\030\r \003(\01322.au.com.co" +
+      "deka.common.protobuf.AllianceRequestVote" +
+      "\"t\n\013RequestType\022\010\n\004JOIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004" +
+      "KICK\020\002\022\020\n\014DEPOSIT_CASH\020\003\022\021\n\rWITHDRAW_CAS" +
+      "H\020\004\022\020\n\014CHANGE_IMAGE\020\005\022\017\n\013CHANGE_NAME\020\006\"F" +
+      "\n\014RequestState\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020" +
+      "\001\022\014\n\010REJECTED\020\002\022\r\n\tWITHDRAWN\020\003\"d\n\020Allian" +
+      "ceRequests\022@\n\010requests\030\001 \003(\0132..au.com.co" +
+      "deka.common.protobuf.AllianceRequest\022\016\n\006" +
+      "cursor\030\002 \001(\t\"\203\001\n\023AllianceRequestVote\022\n\n\002",
+      "id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\033\n\023allianc" +
+      "e_request_id\030\003 \001(\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n" +
+      "\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003\"\243\003\n\013ErrorRepo" +
+      "rt\022\027\n\017android_version\030\001 \001(\t\022\023\n\013phone_mod" +
+      "el\030\002 \001(\t\022\024\n\014package_name\030\003 \001(\t\022\023\n\013app_ve" +
+      "rsion\030\004 \001(\t\022\023\n\013stack_trace\030\005 \001(\t\022\017\n\007mess" +
+      "age\030\006 \001(\t\022\023\n\013report_time\030\007 \001(\003\022\021\n\tempire" +
+      "_id\030\010 \001(\005\022\017\n\007context\030\t \001(\t\022\027\n\017exception_" +
+      "class\030\n \001(\t\022\021\n\theap_size\030\013 \001(\003\022\026\n\016heap_a" +
+      "llocated\030\014 \001(\003\022\021\n\theap_free\030\r \001(\003\022\026\n\016tot",
+      "al_run_time\030\016 \001(\003\022\033\n\023foreground_run_time" +
+      "\030\017 \001(\003\022\022\n\nlog_output\030\020 \001(\t\022\031\n\021server_req" +
+      "uest_qs\030\021 \001(\t\022!\n\031server_request_user_age" +
+      "nt\030\022 \001(\t\"K\n\014ErrorReports\022;\n\007reports\030\001 \003(" +
+      "\0132*.au.com.codeka.common.protobuf.ErrorR" +
+      "eport*\344\001\n\025SituationReportFilter\022\013\n\007ShowA" +
+      "ll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020BuildCompleteA" +
+      "ny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016FleetDestroye" +
+      "d\020\004\022\023\n\017FleetVictorious\020\005\022\022\n\016ColonyAttack" +
+      "ed\020\006\022\023\n\017ColonyDestroyed\020\007\022\026\n\022BuildComple",
+      "teShips\020\010\022\031\n\025BuildCompleteBuilding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -106997,7 +107451,7 @@ public final class Messages {
     internal_static_au_com_codeka_common_protobuf_Alliance_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_au_com_codeka_common_protobuf_Alliance_descriptor,
-        new java.lang.String[] { "Key", "Name", "TimeCreated", "CreatorEmpireKey", "BankBalance", "NumMembers", "Members", "DateImageUpdated", "NumPendingRequests", });
+        new java.lang.String[] { "Key", "Name", "TimeCreated", "CreatorEmpireKey", "BankBalance", "NumMembers", "Members", "DateImageUpdated", "NumPendingRequests", "TotalStars", "IsActive", "Description", });
     internal_static_au_com_codeka_common_protobuf_Alliances_descriptor =
       getDescriptor().getMessageTypes().get(61);
     internal_static_au_com_codeka_common_protobuf_Alliances_fieldAccessorTable = new

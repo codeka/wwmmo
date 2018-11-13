@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,8 +27,10 @@ public class AllianceManager {
   /**
    * Fetches all alliances from the server.
    */
-  public void fetchAlliances(@Nonnull final FetchAlliancesCompleteHandler handler) {
-    RequestManager.i.sendRequest(new ApiRequest.Builder("alliances", "GET")
+  public void fetchAlliances(
+      boolean hideDead, @Nonnull final FetchAlliancesCompleteHandler handler) {
+    RequestManager.i.sendRequest(new ApiRequest.Builder(
+            String.format(Locale.US, "alliances?hide_dead=%d", hideDead ? 1 : 0), "GET")
         .completeCallback(new ApiRequest.CompleteCallback() {
           @Override
           public void onRequestComplete(ApiRequest request) {

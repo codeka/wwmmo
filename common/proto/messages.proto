@@ -1352,6 +1352,15 @@ message Alliance
     // Only for our own alliance, this'll be the number of pending requests
     // we have waiting for us.
     optional int32 num_pending_requests = 9;
+
+    // The total stars this alliance controls.
+    optional int64 total_stars = 10;
+
+    // True if this alliance is still 'active'.
+    optional bool is_active = 11;
+
+    // A user-defined description for this alliance.
+    optional string description = 12;
 }
 
 

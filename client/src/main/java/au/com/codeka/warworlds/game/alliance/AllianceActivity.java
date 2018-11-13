@@ -24,6 +24,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import javax.annotation.Nonnegative;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import au.com.codeka.common.Log;
@@ -116,11 +119,11 @@ public class AllianceActivity extends TabFragmentActivity {
 
     @Override
     public View onCreateView(
-        LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
-      view = inflator.inflate(R.layout.alliance_overview_tab, container, false);
+        @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+      view = inflater.inflate(R.layout.alliance_overview_tab, container, false);
       rankListAdapter = new RankListAdapter();
 
-      final Button createBtn = (Button) view.findViewById(R.id.create_alliance_btn);
+      final Button createBtn = view.findViewById(R.id.create_alliance_btn);
       createBtn.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -128,7 +131,7 @@ public class AllianceActivity extends TabFragmentActivity {
         }
       });
 
-      ListView alliancesList = (ListView) view.findViewById(R.id.alliances);
+      ListView alliancesList = view.findViewById(R.id.alliances);
       alliancesList.setAdapter(rankListAdapter);
       alliancesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         @Override
@@ -184,12 +187,14 @@ public class AllianceActivity extends TabFragmentActivity {
     }
 
     private void refresh() {
-      final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.loading);
-      final ListView alliancesList = (ListView) view.findViewById(R.id.alliances);
+      final ProgressBar progressBar = view.findViewById(R.id.loading);
+      final ListView alliancesList = view.findViewById(R.id.alliances);
       alliancesList.setVisibility(View.GONE);
       progressBar.setVisibility(View.VISIBLE);
 
-      AllianceManager.i.fetchAlliances(new AllianceManager.FetchAlliancesCompleteHandler() {
+      boolean hideDead = false;
+      AllianceManager.i.fetchAlliances(hideDead,
+          new AllianceManager.FetchAlliancesCompleteHandler() {
         @Override
         public void onAlliancesFetched(List<Alliance> alliances) {
           rankListAdapter.setAlliances(alliances);
