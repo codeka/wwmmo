@@ -29,9 +29,9 @@ public class Alliance extends BaseAlliance {
       mName = res.getString("name");
     }
     try {
-      mDescription = res.getString("description");
-    } catch (Exception e) {
       mDescription = res.getString("alliance_description");
+    } catch (Exception e) {
+      mDescription = res.getString("description");
     }
     mCreatorEmpireID = res.getInt("creator_empire_id");
     mCreatorEmpireKey = Integer.toString(mCreatorEmpireID);
@@ -42,7 +42,11 @@ public class Alliance extends BaseAlliance {
     mDateImageUpdated = res.getDateTime("image_updated_date");
     mNumPendingRequests = res.getInt("num_pending_requests");
     mIsActive = res.getInt("is_active") != 0;
-    mTotalStars = res.getLong("total_stars");
+    try {
+      mTotalStars = res.getLong("alliance_total_stars");
+    } catch (Exception e) {
+      mTotalStars = res.getLong("total_stars");
+    }
   }
 
   public void setID(int id) {

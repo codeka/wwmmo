@@ -605,6 +605,7 @@ public class EmpireController {
       String sql = "SELECT empires.*, empire_ranks.*, alliances.id AS alliance_id, alliances.name as alliance_name,"
           + " alliances.description as alliance_description, alliances.creator_empire_id,"
           + " alliances.created_date, alliances.bank_balance, alliances.image_updated_date,"
+          + " alliances.is_active, alliances.total_stars AS alliance_total_stars,"
           + " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires,"
           + " (SELECT MAX(create_date) FROM empire_shields WHERE empire_shields.empire_id = empires.id AND rejected = 0) AS shield_last_update,"
           + " (SELECT COUNT(*) FROM alliance_requests WHERE alliance_id = alliances.id AND state = "
