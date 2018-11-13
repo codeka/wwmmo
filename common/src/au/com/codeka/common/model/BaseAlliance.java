@@ -136,8 +136,12 @@ public abstract class BaseAlliance {
     if (mNumPendingRequests != null) {
       pb.setNumPendingRequests(mNumPendingRequests);
     }
-    pb.setTotalStars(mTotalStars);
-    pb.setIsActive(mIsActive);
+    if (mTotalStars != null) {
+      pb.setTotalStars(mTotalStars);
+    }
+    if (mIsActive != null) {
+      pb.setIsActive(mIsActive);
+    }
 
     if (mMembers != null) {
       for (BaseAllianceMember member : mMembers) {

@@ -603,6 +603,7 @@ public class EmpireController {
 
     private String getSelectEmpire(String whereClause, boolean includeBanned, Integer limit) {
       String sql = "SELECT empires.*, empire_ranks.*, alliances.id AS alliance_id, alliances.name as alliance_name,"
+          + " alliances.description as alliance_description,"
           + " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires,"
           + " (SELECT MAX(create_date) FROM empire_shields WHERE empire_shields.empire_id = empires.id AND rejected = 0) AS shield_last_update,"
           + " (SELECT COUNT(*) FROM alliance_requests WHERE alliance_id = alliances.id AND state = "

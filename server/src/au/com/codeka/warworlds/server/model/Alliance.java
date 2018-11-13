@@ -28,7 +28,11 @@ public class Alliance extends BaseAlliance {
     } catch (Exception e) {
       mName = res.getString("name");
     }
-    mDescription = res.getString("description");
+    try {
+      mDescription = res.getString("description");
+    } catch (Exception e) {
+      mDescription = res.getString("alliance_description");
+    }
     mCreatorEmpireID = res.getInt("creator_empire_id");
     mCreatorEmpireKey = Integer.toString(mCreatorEmpireID);
     mTimeCreated = res.getDateTime("created_date");
