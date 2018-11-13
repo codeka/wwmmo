@@ -17,7 +17,7 @@ import au.com.codeka.warworlds.server.model.EmpireRank;
 public class UpdateRanksCronJob extends CronJob {
     @Override
     public void run(String extra) throws Exception {
-        TreeMap<Integer, EmpireRank> ranks = new TreeMap<Integer, EmpireRank>();
+        TreeMap<Integer, EmpireRank> ranks = new TreeMap<>();
 
         String sql = "SELECT id AS empire_id FROM empires WHERE state <> 2";
         try (SqlStmt stmt = DB.prepare(sql)) {
@@ -28,7 +28,8 @@ public class UpdateRanksCronJob extends CronJob {
             }
         }
 
-        sql = "SELECT empire_id, SUM(num_ships) FROM fleets WHERE empire_id IS NOT NULL GROUP BY empire_id";
+        sql = "SELECT empire_id, SUM(num_ships) " +
+              "FROM fleets WHERE empire_id IS NOT NULL GROUP BY empire_id";
         try (SqlStmt stmt = DB.prepare(sql)) {
             SqlResult res = stmt.select();
             while (res.next()) {
@@ -54,7 +55,8 @@ public class UpdateRanksCronJob extends CronJob {
             }
         }
 
-        sql = "SELECT empire_id, COUNT(*), SUM(population) FROM colonies WHERE empire_id IS NOT NULL GROUP BY empire_id";
+        sql = "SELECT empire_id, COUNT(*), SUM(population) " +
+              "FROM colonies WHERE empire_id IS NOT NULL GROUP BY empire_id";
         try (SqlStmt stmt = DB.prepare(sql)) {
             SqlResult res = stmt.select();
             while (res.next()) {
@@ -89,26 +91,23 @@ public class UpdateRanksCronJob extends CronJob {
             }
         }
 
-        ArrayList<EmpireRank> sortedRanks = new ArrayList<EmpireRank>(ranks.values());
-        Collections.sort(sortedRanks, new Comparator<EmpireRank>() {
-            @Override
-            public int compare(EmpireRank left, EmpireRank right) {
-                long diff = right.getTotalPopulation() - left.getTotalPopulation();
+        ArrayList<EmpireRank> sortedRanks = new ArrayList<>(ranks.values());
+        sortedRanks.sort((left, right) -> {
+            long diff = right.getTotalPopulation() - left.getTotalPopulation();
 
-                if (diff != 0)
-                    return (int) diff;
-
-                diff = right.getTotalColonies() - left.getTotalColonies();
-                if (diff != 0)
-                    return (int) diff;
-
-                diff = right.getTotalStars() - left.getTotalStars();
-                if (diff != 0)
-                    return (int) diff;
-
-                diff = right.getTotalShips() - left.getTotalShips();
+            if (diff != 0)
                 return (int) diff;
-            }
+
+            diff = right.getTotalColonies() - left.getTotalColonies();
+            if (diff != 0)
+                return (int) diff;
+
+            diff = right.getTotalStars() - left.getTotalStars();
+            if (diff != 0)
+                return (int) diff;
+
+            diff = right.getTotalShips() - left.getTotalShips();
+            return (int) diff;
         });
 
         try (Transaction t = DB.beginTransaction()) {
@@ -140,6 +139,25 @@ public class UpdateRanksCronJob extends CronJob {
             }
 
             t.commit();
+        }
+
+        // Also update the alliance's "total_stars" field while we're here.
+        sql = " UPDATE beta.alliances" +
+              " SET" +
+              "   total_stars=sub.total_stars" +
+              " FROM (" +
+              "   SELECT" +
+              "     alliances.id," +
+              "     empire_ranks.total_stars" +
+              "   FROM beta.alliances" +
+              "   INNER JOIN beta.empires" +
+              "     ON alliances.id = empires.alliance_id" +
+              "   INNER JOIN beta.empire_ranks" +
+              "     ON empires.id = empire_ranks.empire_id" +
+              " ) AS sub" +
+              " WHERE alliances.id = sub.id";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.update();
         }
     }
 }
