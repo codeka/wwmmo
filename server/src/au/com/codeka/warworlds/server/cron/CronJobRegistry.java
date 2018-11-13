@@ -18,6 +18,7 @@ public class CronJobRegistry {
         sCronJobs.put("find-alts", FindAltAccountsCronJob.class);
         sCronJobs.put("update-dashboard", UpdateDashboardCronJob.class);
         sCronJobs.put("fix-names", FixNamesCronJob.class);
+        sCronJobs.put("update-active-alliances", UpdateActiveAlliancesCronJob.class);
     }
 
     public static CronJob getJob(String name) {
