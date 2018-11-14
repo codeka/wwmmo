@@ -3,5 +3,6 @@
     <!-- Allow cleartext traffic to 127.0.0.1, which we use for development. -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">codeka.com.au</domain>
     </domain-config>
 </network-security-config>
