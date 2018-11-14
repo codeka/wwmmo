@@ -41,7 +41,9 @@ public class Alliance extends BaseAlliance {
     mMembers = new ArrayList<>();
     mDateImageUpdated = res.getDateTime("image_updated_date");
     mNumPendingRequests = res.getInt("num_pending_requests");
-    mIsActive = res.getInt("is_active") != 0;
+    if (res.getInt("is_active") != null) {
+      mIsActive = res.getInt("is_active") != 0;
+    }
     try {
       mTotalStars = res.getLong("alliance_total_stars");
     } catch (Exception e) {

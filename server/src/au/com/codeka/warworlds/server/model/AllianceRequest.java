@@ -25,6 +25,7 @@ public class AllianceRequest extends BaseAllianceRequest {
         mAmount = res.getFloat("amount");
         mPngImage = res.getBytes("png_image");
         mNewName = res.getString("new_name");
+        mNewDescription = res.getString("new_description");
     }
 
     public void setID(int id){
@@ -37,6 +38,10 @@ public class AllianceRequest extends BaseAllianceRequest {
 
     public void setNewName(String newName) {
         mNewName = newName;
+    }
+
+    public void setNewDescription(String newDescription) {
+        mNewDescription = newDescription;
     }
 
     public void ensurePngImageMaxSize(int maxWidth, int maxHeight) {

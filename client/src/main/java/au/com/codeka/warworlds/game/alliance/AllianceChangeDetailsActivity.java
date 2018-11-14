@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game.alliance;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Locale;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,6 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
@@ -29,155 +32,168 @@ import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
 public class AllianceChangeDetailsActivity extends BaseActivity {
-    private ImagePickerHelper mImagePickerHelper = new ImagePickerHelper(this);
+  private ImagePickerHelper mImagePickerHelper = new ImagePickerHelper(this);
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.alliance_change_details);
+    setContentView(R.layout.alliance_change_details);
 
-        final Button changeNameBtn = (Button) findViewById(R.id.change_name_btn);
-        changeNameBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onChangeNameClick();
-            }
-        });
+    final Button changeNameBtn = findViewById(R.id.change_name_btn);
+    changeNameBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        onChangeNameClick();
+      }
+    });
 
-        final Button chooseImageBtn = (Button) findViewById(R.id.choose_image_btn);
-        chooseImageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onChooseImageClick();
-            }
-        });
+    final Button chooseImageBtn = findViewById(R.id.choose_image_btn);
+    chooseImageBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        onChooseImageClick();
+      }
+    });
 
-        final Button changeImageBtn = (Button) findViewById(R.id.change_image_btn);
-        changeImageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onChangeImageClick();
-            }
-        });
-    }
+    final Button changeImageBtn = findViewById(R.id.change_image_btn);
+    changeImageBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        onChangeImageClick();
+      }
+    });
+  }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mImagePickerHelper.onActivityResult(requestCode, resultCode, data);
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    mImagePickerHelper.onActivityResult(requestCode, resultCode, data);
 
-        super.onActivityResult(requestCode, resultCode, data);
-    }
+    super.onActivityResult(requestCode, resultCode, data);
+  }
 
-    @Override
-    public void onResumeFragments() {
-        super.onResumeFragments();
+  @Override
+  public void onResumeFragments() {
+    super.onResumeFragments();
 
-        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-            @Override
-            public void onHelloComplete(boolean success, ServerGreeting greeting) {
-                if (!success) {
-                    startActivity(new Intent(AllianceChangeDetailsActivity.this, WarWorldsActivity.class));
-                } else {
-                    fullRefresh();
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        ShieldManager.eventBus.register(mEventHandler);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        ShieldManager.eventBus.unregister(mEventHandler);
-    }
-
-    private void fullRefresh() {
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        Alliance myAlliance = (Alliance) myEmpire.getAlliance();
-
-        TextView allianceName = (TextView) findViewById(R.id.alliance_name);
-        allianceName.setText(myAlliance.getName());
-
-        TextView allianceMembers = (TextView) findViewById(R.id.alliance_num_members);
-        allianceMembers.setText(String.format("Members: %d", myAlliance.getNumMembers()));
-
-        final EditText newNameEdit = (EditText) findViewById(R.id.new_name);
-        newNameEdit.setText(myAlliance.getName());
-
-        TextView txt = (TextView) findViewById(R.id.change_image_info);
-        txt.setText(Html.fromHtml(txt.getText().toString()));
-
-        Bitmap shield = AllianceShieldManager.i.getShield(this, myAlliance);
-        ImageView currentShield = (ImageView) findViewById(R.id.current_image);
-        currentShield.setImageBitmap(shield);
-        ImageView currentShieldSmall = (ImageView) findViewById(R.id.current_image_small);
-        currentShieldSmall.setImageBitmap(shield);
-        ImageView allianceIcon = (ImageView) findViewById(R.id.alliance_icon);
-        allianceIcon.setImageBitmap(shield);
-
-        loadImage();
-    }
-
-    private void onChangeNameClick() {
-        final EditText newNameEdit = (EditText) findViewById(R.id.new_name);
-
-        final String newName = newNameEdit.getText().toString().trim();
-        if (newName.equals(EmpireManager.i.getEmpire().getAlliance().getName())) {
-            new StyledDialog.Builder(this)
-                .setMessage("Please enter the new name you want before clicking 'Change'.")
-                .setTitle("Rename Alliance")
-                .setPositiveButton("OK", null)
-                .create().show();
-            return;
+    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+      @Override
+      public void onHelloComplete(boolean success, ServerGreeting greeting) {
+        if (!success) {
+          startActivity(new Intent(AllianceChangeDetailsActivity.this, WarWorldsActivity.class));
+        } else {
+          fullRefresh();
         }
+      }
+    });
+  }
 
-        int allianceID = ((Alliance) EmpireManager.i.getEmpire().getAlliance()).getID();
-        AllianceManager.i.requestChangeName(allianceID, "", newName);
+  @Override
+  public void onStart() {
+    super.onStart();
+    ShieldManager.eventBus.register(mEventHandler);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    ShieldManager.eventBus.unregister(mEventHandler);
+  }
+
+  private void fullRefresh() {
+    MyEmpire myEmpire = EmpireManager.i.getEmpire();
+    Alliance myAlliance = (Alliance) myEmpire.getAlliance();
+
+    TextView allianceName = findViewById(R.id.alliance_name);
+    allianceName.setText(myAlliance.getName());
+
+    TextView allianceMembers = findViewById(R.id.alliance_num_members);
+    allianceMembers.setText(String.format(Locale.US, "Members: %d • Stars: %d",
+        myAlliance.getNumMembers(), myAlliance.getTotalStars()));
+
+    final EditText newNameEdit = findViewById(R.id.new_name);
+    newNameEdit.setText(myAlliance.getName());
+
+    final EditText newDescriptionEdit = findViewById(R.id.new_description);
+    newDescriptionEdit.setText(
+        myAlliance.getDescription() == null ? "" : myAlliance.getDescription());
+
+    TextView txt = findViewById(R.id.change_image_info);
+    txt.setText(Html.fromHtml(txt.getText().toString()));
+
+    Bitmap shield = AllianceShieldManager.i.getShield(this, myAlliance);
+    ImageView currentShield = findViewById(R.id.current_image);
+    currentShield.setImageBitmap(shield);
+    ImageView currentShieldSmall = findViewById(R.id.current_image_small);
+    currentShieldSmall.setImageBitmap(shield);
+    ImageView allianceIcon = findViewById(R.id.alliance_icon);
+    allianceIcon.setImageBitmap(shield);
+
+    loadImage();
+  }
+
+  private void onChangeNameClick() {
+    final EditText newNameEdit = findViewById(R.id.new_name);
+    final EditText newDescriptionEdit = findViewById(R.id.new_description);
+
+    final String newName = newNameEdit.getText().toString().trim();
+    final String newDescription = newDescriptionEdit.getText().toString().trim();
+    final Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
+    if (newName.equals(myAlliance.getName())
+        && newDescription.equals(myAlliance.getDescription())) {
+      new StyledDialog.Builder(this)
+          .setMessage("Please enter the new name and/or description you want before clicking 'Change'.")
+          .setTitle("Rename Alliance")
+          .setPositiveButton("OK", null)
+          .create().show();
+      return;
     }
 
-    private void onChooseImageClick() {
-        mImagePickerHelper.chooseImage();
+    if (!newName.equals(myAlliance.getName())) {
+      AllianceManager.i.requestChangeName(myAlliance.getID(), "", newName);
     }
 
-    private void onChangeImageClick() {
-        Bitmap bmp = mImagePickerHelper.getImage();
-        if (bmp == null) {
-            return;
-        }
+    if (!newDescription.equals(myAlliance.getDescription())) {
+      AllianceManager.i.requestChangeDescription(myAlliance.getID(), "", newDescription);
+    }
+  }
+  private void onChooseImageClick() {
+    mImagePickerHelper.chooseImage();
+  }
 
-        int allianceID = ((Alliance) EmpireManager.i.getEmpire().getAlliance()).getID();
-
-        ByteArrayOutputStream outs = new ByteArrayOutputStream();
-        bmp.compress(CompressFormat.PNG, 90, outs);
-
-        AllianceManager.i.requestChangeImage(allianceID, "", outs.toByteArray());
+  private void onChangeImageClick() {
+    Bitmap bmp = mImagePickerHelper.getImage();
+    if (bmp == null) {
+      return;
     }
 
-    private void loadImage() {
-        Bitmap bmp = mImagePickerHelper.getImage();
-        if (bmp == null) {
-            return;
-        }
+    int allianceID = ((Alliance) EmpireManager.i.getEmpire().getAlliance()).getID();
 
-        ImageView currentImage = (ImageView) findViewById(R.id.current_image);
-        currentImage.setImageBitmap(bmp);
-        ImageView currentImageSmall = (ImageView) findViewById(R.id.current_image_small);
-        currentImageSmall.setImageBitmap(bmp);
+    ByteArrayOutputStream outs = new ByteArrayOutputStream();
+    bmp.compress(CompressFormat.PNG, 90, outs);
 
-        // and now we can enable the 'Change' button
-        ((Button) findViewById(R.id.change_image_btn)).setEnabled(true);;        
+    AllianceManager.i.requestChangeImage(allianceID, "", outs.toByteArray());
+  }
+
+  private void loadImage() {
+    Bitmap bmp = mImagePickerHelper.getImage();
+    if (bmp == null) {
+      return;
     }
 
-    private Object mEventHandler = new Object() {
-        @EventHandler
-        public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
-            fullRefresh();
-        }
-    };
+    ImageView currentImage = findViewById(R.id.current_image);
+    currentImage.setImageBitmap(bmp);
+    ImageView currentImageSmall = findViewById(R.id.current_image_small);
+    currentImageSmall.setImageBitmap(bmp);
+
+    // and now we can enable the 'Change' button
+    (findViewById(R.id.change_image_btn)).setEnabled(true);
+  }
+
+  private Object mEventHandler = new Object() {
+    @EventHandler
+    public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+      fullRefresh();
+    }
+  };
 }

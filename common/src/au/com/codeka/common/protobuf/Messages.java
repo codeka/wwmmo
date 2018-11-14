@@ -98435,6 +98435,32 @@ public final class Messages {
      */
     au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder getVoteOrBuilder(
         int index);
+
+    /**
+     * <pre>
+     * for CHANGE_DESCRIPTION, the new description you want
+     * </pre>
+     *
+     * <code>optional string new_description = 14;</code>
+     */
+    boolean hasNewDescription();
+    /**
+     * <pre>
+     * for CHANGE_DESCRIPTION, the new description you want
+     * </pre>
+     *
+     * <code>optional string new_description = 14;</code>
+     */
+    java.lang.String getNewDescription();
+    /**
+     * <pre>
+     * for CHANGE_DESCRIPTION, the new description you want
+     * </pre>
+     *
+     * <code>optional string new_description = 14;</code>
+     */
+    com.google.protobuf.ByteString
+        getNewDescriptionBytes();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.AllianceRequest}
@@ -98461,6 +98487,7 @@ public final class Messages {
       pngImage_ = com.google.protobuf.ByteString.EMPTY;
       newName_ = "";
       vote_ = java.util.Collections.emptyList();
+      newDescription_ = "";
     }
 
     @java.lang.Override
@@ -98574,6 +98601,12 @@ public final class Messages {
                   input.readMessage(au.com.codeka.common.protobuf.Messages.AllianceRequestVote.PARSER, extensionRegistry));
               break;
             }
+            case 114: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00001000;
+              newDescription_ = bs;
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -98634,6 +98667,10 @@ public final class Messages {
        * <code>CHANGE_NAME = 6;</code>
        */
       CHANGE_NAME(6),
+      /**
+       * <code>CHANGE_DESCRIPTION = 7;</code>
+       */
+      CHANGE_DESCRIPTION(7),
       ;
 
       /**
@@ -98664,6 +98701,10 @@ public final class Messages {
        * <code>CHANGE_NAME = 6;</code>
        */
       public static final int CHANGE_NAME_VALUE = 6;
+      /**
+       * <code>CHANGE_DESCRIPTION = 7;</code>
+       */
+      public static final int CHANGE_DESCRIPTION_VALUE = 7;
 
 
       public final int getNumber() {
@@ -98687,6 +98728,7 @@ public final class Messages {
           case 4: return WITHDRAW_CASH;
           case 5: return CHANGE_IMAGE;
           case 6: return CHANGE_NAME;
+          case 7: return CHANGE_DESCRIPTION;
           default: return null;
         }
       }
@@ -99172,6 +99214,60 @@ public final class Messages {
       return vote_.get(index);
     }
 
+    public static final int NEW_DESCRIPTION_FIELD_NUMBER = 14;
+    private volatile java.lang.Object newDescription_;
+    /**
+     * <pre>
+     * for CHANGE_DESCRIPTION, the new description you want
+     * </pre>
+     *
+     * <code>optional string new_description = 14;</code>
+     */
+    public boolean hasNewDescription() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    /**
+     * <pre>
+     * for CHANGE_DESCRIPTION, the new description you want
+     * </pre>
+     *
+     * <code>optional string new_description = 14;</code>
+     */
+    public java.lang.String getNewDescription() {
+      java.lang.Object ref = newDescription_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          newDescription_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * for CHANGE_DESCRIPTION, the new description you want
+     * </pre>
+     *
+     * <code>optional string new_description = 14;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNewDescriptionBytes() {
+      java.lang.Object ref = newDescription_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        newDescription_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -99222,6 +99318,9 @@ public final class Messages {
       }
       for (int i = 0; i < vote_.size(); i++) {
         output.writeMessage(13, vote_.get(i));
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 14, newDescription_);
       }
       unknownFields.writeTo(output);
     }
@@ -99280,6 +99379,9 @@ public final class Messages {
       for (int i = 0; i < vote_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(13, vote_.get(i));
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(14, newDescription_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -99360,6 +99462,11 @@ public final class Messages {
       }
       result = result && getVoteList()
           .equals(other.getVoteList());
+      result = result && (hasNewDescription() == other.hasNewDescription());
+      if (hasNewDescription()) {
+        result = result && getNewDescription()
+            .equals(other.getNewDescription());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -99424,6 +99531,10 @@ public final class Messages {
       if (getVoteCount() > 0) {
         hash = (37 * hash) + VOTE_FIELD_NUMBER;
         hash = (53 * hash) + getVoteList().hashCode();
+      }
+      if (hasNewDescription()) {
+        hash = (37 * hash) + NEW_DESCRIPTION_FIELD_NUMBER;
+        hash = (53 * hash) + getNewDescription().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -99585,6 +99696,8 @@ public final class Messages {
         } else {
           voteBuilder_.clear();
         }
+        newDescription_ = "";
+        bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
 
@@ -99666,6 +99779,10 @@ public final class Messages {
         } else {
           result.vote_ = voteBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.newDescription_ = newDescription_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -99773,6 +99890,11 @@ public final class Messages {
               voteBuilder_.addAllMessages(other.vote_);
             }
           }
+        }
+        if (other.hasNewDescription()) {
+          bitField0_ |= 0x00002000;
+          newDescription_ = other.newDescription_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -100667,6 +100789,106 @@ public final class Messages {
           vote_ = null;
         }
         return voteBuilder_;
+      }
+
+      private java.lang.Object newDescription_ = "";
+      /**
+       * <pre>
+       * for CHANGE_DESCRIPTION, the new description you want
+       * </pre>
+       *
+       * <code>optional string new_description = 14;</code>
+       */
+      public boolean hasNewDescription() {
+        return ((bitField0_ & 0x00002000) == 0x00002000);
+      }
+      /**
+       * <pre>
+       * for CHANGE_DESCRIPTION, the new description you want
+       * </pre>
+       *
+       * <code>optional string new_description = 14;</code>
+       */
+      public java.lang.String getNewDescription() {
+        java.lang.Object ref = newDescription_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            newDescription_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * for CHANGE_DESCRIPTION, the new description you want
+       * </pre>
+       *
+       * <code>optional string new_description = 14;</code>
+       */
+      public com.google.protobuf.ByteString
+          getNewDescriptionBytes() {
+        java.lang.Object ref = newDescription_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          newDescription_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * for CHANGE_DESCRIPTION, the new description you want
+       * </pre>
+       *
+       * <code>optional string new_description = 14;</code>
+       */
+      public Builder setNewDescription(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00002000;
+        newDescription_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * for CHANGE_DESCRIPTION, the new description you want
+       * </pre>
+       *
+       * <code>optional string new_description = 14;</code>
+       */
+      public Builder clearNewDescription() {
+        bitField0_ = (bitField0_ & ~0x00002000);
+        newDescription_ = getDefaultInstance().getNewDescription();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * for CHANGE_DESCRIPTION, the new description you want
+       * </pre>
+       *
+       * <code>optional string new_description = 14;</code>
+       */
+      public Builder setNewDescriptionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00002000;
+        newDescription_ = value;
+        onChanged();
+        return this;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -106931,7 +107153,7 @@ public final class Messages {
       " \001(\003\022@\n\004rank\030\005 \001(\01622.au.com.codeka.commo" +
       "n.protobuf.AllianceMember.Rank\"/\n\004Rank\022\013",
       "\n\007CAPTAIN\020\000\022\016\n\nLIEUTENANT\020\001\022\n\n\006MEMBER\020\002\"" +
-      "\364\004\n\017AllianceRequest\022\n\n\002id\030\001 \001(\005\022\023\n\013allia" +
+      "\246\005\n\017AllianceRequest\022\n\n\002id\030\001 \001(\005\022\023\n\013allia" +
       "nce_id\030\002 \001(\005\022\031\n\021request_empire_id\030\003 \001(\005\022" +
       "\024\n\014request_date\030\004 \001(\003\022P\n\014request_type\030\005 " +
       "\001(\0162:.au.com.codeka.common.protobuf.Alli" +
@@ -106942,35 +107164,37 @@ public final class Messages {
       "\005\022\016\n\006amount\030\n \001(\002\022\021\n\tpng_image\030\013 \001(\014\022\020\n\010",
       "new_name\030\014 \001(\t\022@\n\004vote\030\r \003(\01322.au.com.co" +
       "deka.common.protobuf.AllianceRequestVote" +
-      "\"t\n\013RequestType\022\010\n\004JOIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004" +
-      "KICK\020\002\022\020\n\014DEPOSIT_CASH\020\003\022\021\n\rWITHDRAW_CAS" +
-      "H\020\004\022\020\n\014CHANGE_IMAGE\020\005\022\017\n\013CHANGE_NAME\020\006\"F" +
-      "\n\014RequestState\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020" +
-      "\001\022\014\n\010REJECTED\020\002\022\r\n\tWITHDRAWN\020\003\"d\n\020Allian" +
-      "ceRequests\022@\n\010requests\030\001 \003(\0132..au.com.co" +
-      "deka.common.protobuf.AllianceRequest\022\016\n\006" +
-      "cursor\030\002 \001(\t\"\203\001\n\023AllianceRequestVote\022\n\n\002",
-      "id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\033\n\023allianc" +
-      "e_request_id\030\003 \001(\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n" +
-      "\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003\"\243\003\n\013ErrorRepo" +
-      "rt\022\027\n\017android_version\030\001 \001(\t\022\023\n\013phone_mod" +
-      "el\030\002 \001(\t\022\024\n\014package_name\030\003 \001(\t\022\023\n\013app_ve" +
-      "rsion\030\004 \001(\t\022\023\n\013stack_trace\030\005 \001(\t\022\017\n\007mess" +
-      "age\030\006 \001(\t\022\023\n\013report_time\030\007 \001(\003\022\021\n\tempire" +
-      "_id\030\010 \001(\005\022\017\n\007context\030\t \001(\t\022\027\n\017exception_" +
-      "class\030\n \001(\t\022\021\n\theap_size\030\013 \001(\003\022\026\n\016heap_a" +
-      "llocated\030\014 \001(\003\022\021\n\theap_free\030\r \001(\003\022\026\n\016tot",
-      "al_run_time\030\016 \001(\003\022\033\n\023foreground_run_time" +
-      "\030\017 \001(\003\022\022\n\nlog_output\030\020 \001(\t\022\031\n\021server_req" +
-      "uest_qs\030\021 \001(\t\022!\n\031server_request_user_age" +
-      "nt\030\022 \001(\t\"K\n\014ErrorReports\022;\n\007reports\030\001 \003(" +
-      "\0132*.au.com.codeka.common.protobuf.ErrorR" +
-      "eport*\344\001\n\025SituationReportFilter\022\013\n\007ShowA" +
-      "ll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020BuildCompleteA" +
-      "ny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016FleetDestroye" +
-      "d\020\004\022\023\n\017FleetVictorious\020\005\022\022\n\016ColonyAttack" +
-      "ed\020\006\022\023\n\017ColonyDestroyed\020\007\022\026\n\022BuildComple",
-      "teShips\020\010\022\031\n\025BuildCompleteBuilding\020\t"
+      "\022\027\n\017new_description\030\016 \001(\t\"\214\001\n\013RequestTyp" +
+      "e\022\010\n\004JOIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014DEPO" +
+      "SIT_CASH\020\003\022\021\n\rWITHDRAW_CASH\020\004\022\020\n\014CHANGE_" +
+      "IMAGE\020\005\022\017\n\013CHANGE_NAME\020\006\022\026\n\022CHANGE_DESCR" +
+      "IPTION\020\007\"F\n\014RequestState\022\013\n\007PENDING\020\000\022\014\n" +
+      "\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002\022\r\n\tWITHDRAWN\020\003" +
+      "\"d\n\020AllianceRequests\022@\n\010requests\030\001 \003(\0132." +
+      ".au.com.codeka.common.protobuf.AllianceR",
+      "equest\022\016\n\006cursor\030\002 \001(\t\"\203\001\n\023AllianceReque" +
+      "stVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022" +
+      "\033\n\023alliance_request_id\030\003 \001(\005\022\021\n\tempire_i" +
+      "d\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003\"\243\003\n" +
+      "\013ErrorReport\022\027\n\017android_version\030\001 \001(\t\022\023\n" +
+      "\013phone_model\030\002 \001(\t\022\024\n\014package_name\030\003 \001(\t" +
+      "\022\023\n\013app_version\030\004 \001(\t\022\023\n\013stack_trace\030\005 \001" +
+      "(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013report_time\030\007 \001(\003" +
+      "\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007context\030\t \001(\t\022\027\n\017" +
+      "exception_class\030\n \001(\t\022\021\n\theap_size\030\013 \001(\003",
+      "\022\026\n\016heap_allocated\030\014 \001(\003\022\021\n\theap_free\030\r " +
+      "\001(\003\022\026\n\016total_run_time\030\016 \001(\003\022\033\n\023foregroun" +
+      "d_run_time\030\017 \001(\003\022\022\n\nlog_output\030\020 \001(\t\022\031\n\021" +
+      "server_request_qs\030\021 \001(\t\022!\n\031server_reques" +
+      "t_user_agent\030\022 \001(\t\"K\n\014ErrorReports\022;\n\007re" +
+      "ports\030\001 \003(\0132*.au.com.codeka.common.proto" +
+      "buf.ErrorReport*\344\001\n\025SituationReportFilte" +
+      "r\022\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020Buil" +
+      "dCompleteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016Fle" +
+      "etDestroyed\020\004\022\023\n\017FleetVictorious\020\005\022\022\n\016Co",
+      "lonyAttacked\020\006\022\023\n\017ColonyDestroyed\020\007\022\026\n\022B" +
+      "uildCompleteShips\020\010\022\031\n\025BuildCompleteBuil" +
+      "ding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -107469,7 +107693,7 @@ public final class Messages {
     internal_static_au_com_codeka_common_protobuf_AllianceRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor,
-        new java.lang.String[] { "Id", "AllianceId", "RequestEmpireId", "RequestDate", "RequestType", "Message", "State", "NumVotes", "TargetEmpireId", "Amount", "PngImage", "NewName", "Vote", });
+        new java.lang.String[] { "Id", "AllianceId", "RequestEmpireId", "RequestDate", "RequestType", "Message", "State", "NumVotes", "TargetEmpireId", "Amount", "PngImage", "NewName", "Vote", "NewDescription", });
     internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor =
       getDescriptor().getMessageTypes().get(64);
     internal_static_au_com_codeka_common_protobuf_AllianceRequests_fieldAccessorTable = new

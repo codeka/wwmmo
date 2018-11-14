@@ -222,6 +222,14 @@ public class AllianceDetailsFragment extends Fragment
         TextView allianceName = mView.findViewById(R.id.alliance_name);
         allianceName.setText(mAlliance.getName());
 
+        TextView allianceDescription = mView.findViewById(R.id.description);
+        if (mAlliance.getDescription() != null && !mAlliance.getDescription().trim().isEmpty()) {
+            allianceDescription.setText(mAlliance.getDescription());
+            allianceDescription.setVisibility(View.VISIBLE);
+        } else {
+            allianceDescription.setVisibility(View.GONE);
+        }
+
         TextView bankBalance = mView.findViewById(R.id.bank_balance);
         if (bankBalance != null) {
             bankBalance.setText(Cash.format(mAlliance.getBankBalance()));

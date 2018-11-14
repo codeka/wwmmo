@@ -1402,6 +1402,7 @@ message AllianceRequest
         WITHDRAW_CASH = 4;
         CHANGE_IMAGE = 5;
         CHANGE_NAME = 6;
+        CHANGE_DESCRIPTION = 7;
     }
     optional RequestType request_type = 5;
     optional string message = 6;
@@ -1431,6 +1432,9 @@ message AllianceRequest
 
     // the votes we've received for this request so far.
     repeated AllianceRequestVote vote = 13;
+
+    // for CHANGE_DESCRIPTION, the new description you want
+    optional string new_description = 14;
 }
 
 

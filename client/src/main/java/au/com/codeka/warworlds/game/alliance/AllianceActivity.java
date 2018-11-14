@@ -309,14 +309,15 @@ public class AllianceActivity extends TabFragmentActivity {
         }
 
         if (entry.alliance != null) {
-          TextView allianceName = (TextView) view.findViewById(R.id.alliance_name);
+          TextView allianceName = view.findViewById(R.id.alliance_name);
           allianceName.setText(entry.alliance.getName());
 
-          TextView allianceMembers = (TextView) view.findViewById(R.id.alliance_num_members);
+          TextView allianceMembers = view.findViewById(R.id.alliance_num_members);
           allianceMembers.setText(
-              String.format(Locale.US, "Members: %d", entry.alliance.getNumMembers()));
+              String.format(Locale.US, "Members: %d • Stars: %d",
+                  entry.alliance.getNumMembers(), entry.alliance.getTotalStars()));
 
-          ImageView allianceIcon = (ImageView) view.findViewById(R.id.alliance_icon);
+          ImageView allianceIcon = view.findViewById(R.id.alliance_icon);
           allianceIcon.setImageBitmap(
               AllianceShieldManager.i.getShield(getActivity(), entry.alliance));
         }
@@ -364,7 +365,7 @@ public class AllianceActivity extends TabFragmentActivity {
       mView = inflator.inflate(R.layout.alliance_requests_tab, container, false);
       mRequestListAdapter = new RequestListAdapter();
 
-      ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
+      ListView joinRequestsList = mView.findViewById(R.id.join_requests);
       joinRequestsList.setAdapter(mRequestListAdapter);
 
       joinRequestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -554,13 +555,13 @@ public class AllianceActivity extends TabFragmentActivity {
           return view;
         }
 
-        TextView empireName = (TextView) view.findViewById(R.id.empire_name);
-        ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
-        TextView requestDescription = (TextView) view.findViewById(R.id.request_description);
-        ImageView requestStatus = (ImageView) view.findViewById(R.id.request_status);
-        TextView requestVotes = (TextView) view.findViewById(R.id.request_votes);
-        TextView message = (TextView) view.findViewById(R.id.message);
-        ImageView pngImage = (ImageView) view.findViewById(R.id.png_image);
+        TextView empireName = view.findViewById(R.id.empire_name);
+        ImageView empireIcon = view.findViewById(R.id.empire_icon);
+        TextView requestDescription = view.findViewById(R.id.request_description);
+        ImageView requestStatus = view.findViewById(R.id.request_status);
+        TextView requestVotes = view.findViewById(R.id.request_votes);
+        TextView message = view.findViewById(R.id.message);
+        ImageView pngImage = view.findViewById(R.id.png_image);
 
         if (entry.empire == null) {
           empireName.setText("...");

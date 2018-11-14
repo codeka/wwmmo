@@ -165,11 +165,30 @@ public class AllianceManager {
     request(pb);
   }
 
-  public void requestChangeName(final int allianceID, final String message, final String newName) {
+  public void requestChangeName(
+      final int allianceID,
+      final String message,
+      final String newName) {
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
     Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
-        .setRequestType(Messages.AllianceRequest.RequestType.CHANGE_NAME).setNewName(newName)
-        .setAllianceId(allianceID).setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
+        .setRequestType(Messages.AllianceRequest.RequestType.CHANGE_NAME)
+        .setNewName(newName)
+        .setAllianceId(allianceID)
+        .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
+        .setMessage(message).build();
+    request(pb);
+  }
+
+  public void requestChangeDescription(
+      final int allianceID,
+      final String message,
+      final String newDescription) {
+    final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+    Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
+        .setRequestType(Messages.AllianceRequest.RequestType.CHANGE_DESCRIPTION)
+        .setNewDescription(newDescription)
+        .setAllianceId(allianceID)
+        .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
         .setMessage(message).build();
     request(pb);
   }
