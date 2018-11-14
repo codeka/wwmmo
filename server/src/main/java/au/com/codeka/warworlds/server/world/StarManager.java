@@ -293,9 +293,15 @@ public class StarManager {
     }
 
     // Make sure we simulate at least when the next fleet arrives
-    for (Fleet fleet : starBuilder.fleets) {
+    for (int i = 0; i < starBuilder.fleets.size(); i++) {
+      Fleet fleet = starBuilder.fleets.get(i);
       if (fleet.eta != null && (nextSimulateTime == null || nextSimulateTime > fleet.eta)) {
-        nextSimulateTime = fleet.eta;
+        if (fleet.state != Fleet.FLEET_STATE.MOVING) {
+          log.warning("Fleet has non-MOVING but non-null eta, resetting to null.");
+          starBuilder.fleets.set(i, fleet.newBuilder().eta(null).build());
+        } else {
+          nextSimulateTime = fleet.eta;
+        }
       }
     }
 

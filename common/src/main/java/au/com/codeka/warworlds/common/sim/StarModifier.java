@@ -268,6 +268,7 @@ public class StarModifier {
           .state(attack ? Fleet.FLEET_STATE.ATTACKING : Fleet.FLEET_STATE.IDLE)
           .state_start_time(System.currentTimeMillis())
           .destination_star_id(null)
+          .eta(null)
           .build());
     } else {
       star.fleets.add(new Fleet.Builder()
