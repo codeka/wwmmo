@@ -19,6 +19,8 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -131,6 +133,14 @@ public class AllianceActivity extends TabFragmentActivity {
         }
       });
 
+      final CheckBox showInactiveChk = view.findViewById(R.id.show_inactive);
+      showInactiveChk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+          refresh();
+        }
+      });
+
       ListView alliancesList = view.findViewById(R.id.alliances);
       alliancesList.setAdapter(rankListAdapter);
       alliancesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -192,7 +202,7 @@ public class AllianceActivity extends TabFragmentActivity {
       alliancesList.setVisibility(View.GONE);
       progressBar.setVisibility(View.VISIBLE);
 
-      boolean hideDead = false;
+      boolean hideDead = !((CheckBox) view.findViewById(R.id.show_inactive)).isChecked();
       AllianceManager.i.fetchAlliances(hideDead,
           new AllianceManager.FetchAlliancesCompleteHandler() {
         @Override

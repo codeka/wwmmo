@@ -89,6 +89,7 @@ public class Authenticator {
         activity.startActivityForResult(intent, BaseActivity.AUTH_RECOVERY_REQUEST);
         log.warning("Got UserRecoverableAuthException, TODO");
       } catch (GoogleAuthException | IOException e) {
+        log.warning("Exception: ", e);
         throw new ApiException(e);
       } finally {
         authenticating = false;
