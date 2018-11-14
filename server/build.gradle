@@ -85,7 +85,5 @@ remotes {
 
 task deploy(type: Exec, dependsOn: 'installDist') {
   workingDir "${buildDir}/install/server"
-  commandLine "sh", "-c", "rsync -a -e" +
-      " 'ssh -o UserKnownHostsFile=${projectDir}/../../known_hosts -i ${projectDir}/../../wwmmo2.id_rsa'" +
-      " . wwmmo@wwmmo.codeka.com.au:/home/wwmmo/staging"
+  commandLine "rsync -crlD --chmod=ugo=rwX . wwmmo@wwmmo.codeka.com.au:/home/wwmmo/staging"
 }
