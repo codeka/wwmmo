@@ -251,7 +251,7 @@ public class AllianceController {
           " (SELECT COUNT(*) FROM empires WHERE empires.alliance_id = alliances.id) AS num_empires," +
           " (SELECT COUNT(*) FROM alliance_requests WHERE alliance_id = alliances.id AND state = " + AllianceRequest.RequestState.PENDING.getNumber() + ") AS num_pending_requests" +
           " FROM alliances" +
-          (hideDead ? " WHERE is_active=1" : "") +
+          (hideDead ? " WHERE is_active=1 AND num_empires > 0" : "") +
           " ORDER BY name ASC";
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
