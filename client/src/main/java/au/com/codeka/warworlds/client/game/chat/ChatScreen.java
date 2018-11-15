@@ -93,61 +93,9 @@ public class ChatScreen extends Screen {
 
   private void refreshRooms() {
     rooms = ChatManager.i.getRooms();
-  //  chatPagerAdapter.refresh(rooms);
+    layout.refresh(rooms);
   }
-/*
-  public class ChatPagerAdapter extends FragmentStatePagerAdapter {
-    private final List<ChatRoom> rooms = new ArrayList<>();
 
-    ChatPagerAdapter(FragmentManager fm) {
-      super(fm);
-    }
-
-    public void refresh(List<ChatRoom> rooms) {
-      this.rooms.clear();
-      this.rooms.addAll(rooms);
-      notifyDataSetChanged();
-    }
-
-    @Override
-    public Fragment getItem(int index) {
-      Fragment fragment = new RoomView();
-      fragment.setArguments(RoomView.createArguments(rooms.get(index)));
-      return fragment;
-    }
-
-    @Override
-    public int getItemPosition(Object item) {
-      if (item instanceof ChatRoom) {
-        ChatRoom room = (ChatRoom) item;
-        for (int i = 0; i < rooms.size(); i++) {
-          if (rooms.get(i).id.equals(room.id)) {
-            return i;
-          }
-        }
-      }
-      return POSITION_NONE;
-    }
-
-    @Override
-    public int getCount() {
-      return rooms.size();
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) {
-      return rooms.get(position).name;
-    }
-
-    @Override
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
-      super.setPrimaryItem(container, position, object);
-
-      ChatRoom room = rooms.get(position);
-      // room.markAllRead()
-    }
-  }
-*/
   private void showConfirmAutoTranslateDialog() {
 //    Util.getSharedPreferences().edit()
 //        .putBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", true)
