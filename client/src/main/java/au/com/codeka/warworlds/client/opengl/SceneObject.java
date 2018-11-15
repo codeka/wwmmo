@@ -1,10 +1,14 @@
 package au.com.codeka.warworlds.client.opengl;
 
 import android.opengl.Matrix;
-import au.com.codeka.warworlds.common.Log;
+
 import com.google.common.base.Preconditions;
+
 import java.util.ArrayList;
+
 import javax.annotation.Nullable;
+
+import au.com.codeka.warworlds.common.Log;
 
 /** Base class for any "object" within a {@link Scene}. */
 public class SceneObject {

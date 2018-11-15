@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server;
 
-import au.com.codeka.warworlds.common.Log;
-
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -18,6 +16,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 
 import javax.annotation.Nullable;
+
+import au.com.codeka.warworlds.common.Log;
 
 /**
  * The server's configuration parameters are read from a json object on startup and parsed into

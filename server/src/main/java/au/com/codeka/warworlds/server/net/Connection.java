@@ -1,5 +1,9 @@
 package au.com.codeka.warworlds.server.net;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.debug.PacketDebug;
 import au.com.codeka.warworlds.common.net.PacketDecoder;
@@ -12,9 +16,6 @@ import au.com.codeka.warworlds.server.concurrency.TaskRunner;
 import au.com.codeka.warworlds.server.concurrency.Threads;
 import au.com.codeka.warworlds.server.world.Player;
 import au.com.codeka.warworlds.server.world.WatchableObject;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
 
 /**
  * Represents an established connection to a client.

@@ -1,9 +1,12 @@
 package au.com.codeka.warworlds.server;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.common.collect.Lists;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.admin.AdminServlet;
@@ -13,19 +16,6 @@ import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.SmtpHelper;
 import au.com.codeka.warworlds.server.world.NotificationManager;
 import au.com.codeka.warworlds.server.world.StarSimulatorQueue;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringBufferInputStream;
-import java.io.StringReader;
-import java.util.Collection;
 
 public class Program {
   private static final Log log = new Log("Runner");

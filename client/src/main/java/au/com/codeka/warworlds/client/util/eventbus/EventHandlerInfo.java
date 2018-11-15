@@ -1,10 +1,12 @@
 package au.com.codeka.warworlds.client.util.eventbus;
 
-import android.support.annotation.Nullable;
-import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.common.Log;
+import androidx.annotation.Nullable;
+
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+
+import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.common.Log;
 
 /**
  * Holds all the details about a single event handler.

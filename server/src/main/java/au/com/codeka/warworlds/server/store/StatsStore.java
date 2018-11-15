@@ -1,7 +1,13 @@
 package au.com.codeka.warworlds.server.store;
 
-import static au.com.codeka.warworlds.server.store.StatsHelper.dateTimeToDay;
-import static au.com.codeka.warworlds.server.store.StatsHelper.timestampToDay;
+import org.joda.time.DateTime;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
@@ -11,13 +17,9 @@ import au.com.codeka.warworlds.server.proto.DailyStat;
 import au.com.codeka.warworlds.server.proto.LoginEvent;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.joda.time.DateTime;
+
+import static au.com.codeka.warworlds.server.store.StatsHelper.dateTimeToDay;
+import static au.com.codeka.warworlds.server.store.StatsHelper.timestampToDay;
 
 /**
  * Store for various stats that we want to keep track of.

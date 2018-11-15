@@ -7,7 +7,9 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.webkit.WebView;
+
 import com.google.common.io.CharStreams;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;

@@ -1,5 +1,16 @@
 package au.com.codeka.warworlds.server.world;
 
+import com.google.common.collect.ImmutableMap;
+
+import org.simplejavamail.email.Email;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+import javax.mail.Message;
+
 import au.com.codeka.carrot.CarrotEngine;
 import au.com.codeka.carrot.CarrotException;
 import au.com.codeka.carrot.Configuration;
@@ -11,13 +22,6 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.Pair;
 import au.com.codeka.warworlds.server.util.SmtpHelper;
-import com.google.common.collect.ImmutableMap;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import javax.annotation.Nullable;
-import javax.mail.Message;
-import org.simplejavamail.email.Email;
 
 /**
  * Manages {@link Account}s.

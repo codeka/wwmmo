@@ -1,13 +1,15 @@
 package au.com.codeka.warworlds.client.game.chat;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import au.com.codeka.warworlds.client.R;
+
 import javax.annotation.Nonnull;
+
+import au.com.codeka.warworlds.client.R;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Bottom pane that contains the "send" text box and button.

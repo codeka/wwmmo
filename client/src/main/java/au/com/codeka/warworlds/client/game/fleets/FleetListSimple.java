@@ -7,14 +7,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.build.BuildViewHelper;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents a simple list of fleets, shown inside a {@link LinearLayout}.

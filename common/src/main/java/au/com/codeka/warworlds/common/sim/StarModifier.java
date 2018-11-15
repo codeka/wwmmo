@@ -1,6 +1,13 @@
 package au.com.codeka.warworlds.common.sim;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
@@ -14,12 +21,8 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Objects;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Class for handling modifications to a star.

@@ -1,7 +1,8 @@
 package au.com.codeka.warworlds.server.store;
 
-import au.com.codeka.warworlds.common.Log;
 import java.io.File;
+
+import au.com.codeka.warworlds.common.Log;
 
 /** Wraps our references to the various data store objects. */
 public class DataStore {

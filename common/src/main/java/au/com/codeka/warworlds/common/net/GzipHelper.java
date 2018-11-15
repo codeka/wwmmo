@@ -1,12 +1,14 @@
 package au.com.codeka.warworlds.common.net;
 
-import au.com.codeka.warworlds.common.Log;
 import com.google.common.io.ByteStreams;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import au.com.codeka.warworlds.common.Log;
 
 /**
  * Helper for working with Gzip compression.

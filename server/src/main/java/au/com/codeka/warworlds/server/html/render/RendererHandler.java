@@ -1,12 +1,8 @@
 package au.com.codeka.warworlds.server.html.render;
 
-import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.Vector3;
-import au.com.codeka.warworlds.planetrender.PlanetRenderer;
-import au.com.codeka.warworlds.planetrender.Template;
-import au.com.codeka.warworlds.server.handlers.RequestHandler;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,8 +10,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Random;
+
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
+
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.Vector3;
+import au.com.codeka.warworlds.planetrender.PlanetRenderer;
+import au.com.codeka.warworlds.planetrender.Template;
+import au.com.codeka.warworlds.server.handlers.RequestHandler;
 
 /**
  * Base class for the handlers that render images.

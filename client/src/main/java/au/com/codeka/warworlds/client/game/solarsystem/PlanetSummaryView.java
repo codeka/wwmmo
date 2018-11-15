@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.Html;
 import android.transition.TransitionManager;
 import android.util.AttributeSet;
@@ -10,6 +8,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.squareup.wire.Wire;
+
+import java.util.Locale;
+
+import javax.annotation.Nonnull;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
@@ -17,9 +25,6 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.ColonyHelper;
-import com.squareup.wire.Wire;
-import java.util.Locale;
-import javax.annotation.Nonnull;
 
 /**
  * The summary view of a planet that shows up in the bottom-left of the solarsystem screen.

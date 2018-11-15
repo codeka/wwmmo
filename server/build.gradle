@@ -85,5 +85,5 @@ remotes {
 
 task deploy(type: Exec, dependsOn: 'installDist') {
   workingDir "${buildDir}/install/server"
-  commandLine "rsync -crlD --chmod=ugo=rwX . wwmmo@wwmmo.codeka.com.au:/home/wwmmo/staging"
+  commandLine "rsync", "-crlD", "--chmod=ugo=rwX", ".", "wwmmo@wwmmo.codeka.com.au:/home/wwmmo/staging"
 }

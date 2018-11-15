@@ -1,5 +1,9 @@
 package au.com.codeka.warworlds.server.html;
 
+import com.google.common.collect.Lists;
+
+import java.util.ArrayList;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.handlers.HandlerServlet;
 import au.com.codeka.warworlds.server.handlers.RequestHandler;
@@ -11,8 +15,6 @@ import au.com.codeka.warworlds.server.html.account.LoginHandler;
 import au.com.codeka.warworlds.server.html.render.EmpireRendererHandler;
 import au.com.codeka.warworlds.server.html.render.PlanetRendererHandler;
 import au.com.codeka.warworlds.server.html.render.StarRendererHandler;
-import com.google.common.collect.Lists;
-import java.util.ArrayList;
 
 /**
  * Servlet for working with top-level {@link RequestHandler}s.

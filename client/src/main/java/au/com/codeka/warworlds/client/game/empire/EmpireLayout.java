@@ -1,11 +1,13 @@
 package au.com.codeka.warworlds.client.game.empire;
 
 import android.content.Context;
-import android.support.design.widget.TabLayout;
-import android.support.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+
+import androidx.transition.TransitionManager;
+
+import com.google.android.material.tabs.TabLayout;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.fleets.FleetsLayout;
 import au.com.codeka.warworlds.client.game.world.MyEmpireStarCollection;

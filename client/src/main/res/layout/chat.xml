@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-  <android.support.v4.view.ViewPager
+  <androidx.viewpager.widget.ViewPager
       android:id="@+id/pager"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_alignParentTop="true"
       android:layout_above="@+id/bottom_pane"
       android:layout_marginBottom="4dp">
-  </android.support.v4.view.ViewPager>
+  </androidx.viewpager.widget.ViewPager>
 
   <FrameLayout
       android:id="@+id/bottom_pane"

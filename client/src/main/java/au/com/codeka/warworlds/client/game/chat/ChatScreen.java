@@ -3,12 +3,14 @@ package au.com.codeka.warworlds.client.game.chat;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.List;
+
 import au.com.codeka.warworlds.client.game.world.ChatManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
-import java.util.List;
 
 /** Main fragment for showing the chat system. */
 public class ChatScreen extends Screen {

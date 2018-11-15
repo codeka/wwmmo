@@ -1,8 +1,9 @@
 package au.com.codeka.warworlds.common.sim;
 
+import com.google.common.collect.Lists;
+
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Designs;
-import com.google.common.collect.Lists;
 
 /** Holder class that just holds all the design definitions. */
 public class DesignDefinitions {

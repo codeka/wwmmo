@@ -4,13 +4,15 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.ChatMessage;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.ChatMessage;
 
 /**
  * Store for storing chats, etc.

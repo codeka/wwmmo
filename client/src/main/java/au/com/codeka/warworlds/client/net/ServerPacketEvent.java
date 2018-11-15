@@ -1,7 +1,8 @@
 package au.com.codeka.warworlds.client.net;
 
-import au.com.codeka.warworlds.common.proto.Packet;
 import com.google.common.base.Preconditions;
+
+import au.com.codeka.warworlds.common.proto.Packet;
 
 /**
  * An event that is fired every time a packet is sent or received.

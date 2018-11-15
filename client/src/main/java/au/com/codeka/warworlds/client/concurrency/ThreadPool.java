@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.client.concurrency;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;

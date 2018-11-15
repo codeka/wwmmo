@@ -2,6 +2,10 @@ package au.com.codeka.warworlds.client.game.build;
 
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
@@ -13,8 +17,6 @@ import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Shows buildings and ships on a planet. You can swipe left/right to switch between your colonies

@@ -1,11 +1,14 @@
 package au.com.codeka.warworlds.client.game.build;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.transition.TransitionManager;
+
+import com.google.android.material.tabs.TabLayout;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ui.views.TabPlusContentView;
 import au.com.codeka.warworlds.common.proto.Colony;

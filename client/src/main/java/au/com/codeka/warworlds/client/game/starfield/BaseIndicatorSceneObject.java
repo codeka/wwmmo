@@ -2,16 +2,18 @@ package au.com.codeka.warworlds.client.game.starfield;
 
 import android.opengl.GLES20;
 import android.text.TextUtils;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
+
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.opengl.DimensionResolver;
 import au.com.codeka.warworlds.client.opengl.SceneObject;
 import au.com.codeka.warworlds.client.opengl.Shader;
 import au.com.codeka.warworlds.common.Colour;
 import au.com.codeka.warworlds.common.Log;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 
 /**
  * Base class for {@link SceneObject}s that we want to use to "indicate" something (radar radius,

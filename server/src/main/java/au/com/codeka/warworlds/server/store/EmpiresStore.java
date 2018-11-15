@@ -1,13 +1,15 @@
 package au.com.codeka.warworlds.server.store;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.DeviceInfo;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nullable;
 
 /** Storage for empires. */
 public class EmpiresStore extends BaseStore {

@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.html.render;
 
-import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.server.handlers.RequestException;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
@@ -12,7 +10,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Random;
+
 import javax.imageio.ImageIO;
+
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.server.handlers.RequestException;
 
 /**
  * {@link RendererHandler} for rendering empire shields.

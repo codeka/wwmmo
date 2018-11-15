@@ -1,12 +1,13 @@
 package au.com.codeka.warworlds.server;
 
 import com.google.common.base.Throwables;
-import java.io.IOException;
+
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.Locale;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  * SimpleFormatter is supposed to take a format string, but I couldn't get it work. Doing our

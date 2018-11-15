@@ -1,10 +1,12 @@
 package au.com.codeka.warworlds.server.store.base;
 
-import au.com.codeka.warworlds.server.store.StoreException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import javax.annotation.Nullable;
+
+import au.com.codeka.warworlds.server.store.StoreException;
 
 public class QueryResult implements AutoCloseable {
   @Nullable private final Connection conn;

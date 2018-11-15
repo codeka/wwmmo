@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.util.NumberFormatter;
 import au.com.codeka.warworlds.common.proto.Planet;

@@ -2,6 +2,9 @@ package au.com.codeka.warworlds.client.game.solarsystem;
 
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.common.base.Preconditions;
+
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.ui.Screen;
@@ -12,7 +15,6 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
-import com.google.common.base.Preconditions;
 
 /**
  * Activity for interacting with enemy planets (note it's not necessarily an enemy, per se, it

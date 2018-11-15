@@ -1,11 +1,12 @@
 package au.com.codeka.warworlds.common.testing;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.util.Collections;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.Collections;
 
 /**
  * Some custom matchers.

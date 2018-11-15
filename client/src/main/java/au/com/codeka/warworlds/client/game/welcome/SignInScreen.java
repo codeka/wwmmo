@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.client.game.welcome;
 
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.concurrency.Threads;

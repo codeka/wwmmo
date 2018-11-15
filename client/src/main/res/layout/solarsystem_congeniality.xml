@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="android.support.v4.widget.DrawerLayout">
+    tools:parentTag="androidx.drawerlayout.widget.DrawerLayout">
 
   <ImageView
       android:id="@+id/population_icon"

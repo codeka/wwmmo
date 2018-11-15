@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.game.build;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Html;
@@ -12,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import java.util.Locale;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.concurrency.Threads;
@@ -27,7 +28,8 @@ import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.BuildHelper;
 import au.com.codeka.warworlds.common.sim.StarModifier;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
-import java.util.Locale;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Bottom pane of the build fragment for when we're building something new.

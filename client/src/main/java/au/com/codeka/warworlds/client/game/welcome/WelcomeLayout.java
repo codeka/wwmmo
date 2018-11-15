@@ -1,20 +1,23 @@
 package au.com.codeka.warworlds.client.game.welcome;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Context;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.common.proto.Empire;
-import com.squareup.picasso.Picasso;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Layout for the {@link WelcomeScreen}.

@@ -6,16 +6,20 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import au.com.codeka.warworlds.client.App;
-import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.common.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
 import java.io.IOException;
 import java.io.InputStream;
+
+import au.com.codeka.warworlds.client.App;
+import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.common.Log;
 
 /** Represents a texture image. */
 public class BitmapTexture extends Texture {

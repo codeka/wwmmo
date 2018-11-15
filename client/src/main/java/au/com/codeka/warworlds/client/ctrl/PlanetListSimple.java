@@ -7,6 +7,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
@@ -15,10 +22,6 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
-import com.squareup.picasso.Picasso;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * The planet list that shows up on the starfield view. It also includes details about empires

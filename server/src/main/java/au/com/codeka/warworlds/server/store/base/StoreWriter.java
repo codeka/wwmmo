@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.server.store.base;
 
-import au.com.codeka.warworlds.server.store.StoreException;
-import javax.annotation.Nullable;
 import org.sqlite.javax.SQLiteConnectionPoolDataSource;
+
+import javax.annotation.Nullable;
+
+import au.com.codeka.warworlds.server.store.StoreException;
 
 /** A helper class for writing to the data store. */
 public class StoreWriter extends StatementBuilder<StoreWriter> {

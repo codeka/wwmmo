@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.game.welcome;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Context;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -9,9 +7,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Layout for {@link SignInScreen}.

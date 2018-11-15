@@ -1,6 +1,13 @@
 package au.com.codeka.warworlds.common.sim;
 
-import static au.com.codeka.warworlds.common.sim.SimulationHelper.trimTimeToStep;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
@@ -12,14 +19,8 @@ import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
-import com.google.common.annotations.VisibleForTesting;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nullable;
+
+import static au.com.codeka.warworlds.common.sim.SimulationHelper.trimTimeToStep;
 
 /** This class is used to simulate a {@link Star}. */
 public class Simulation {

@@ -1,10 +1,20 @@
 package au.com.codeka.warworlds.client.game.starfield;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Context;
-import android.support.v4.util.LongSparseArray;
-import android.support.v4.util.Pair;
+
+import androidx.collection.LongSparseArray;
+import androidx.core.util.Pair;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
@@ -30,14 +40,8 @@ import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
 import au.com.codeka.warworlds.common.sim.StarHelper;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link StarfieldManager} manages the starfield view that we display in the main activity. You can

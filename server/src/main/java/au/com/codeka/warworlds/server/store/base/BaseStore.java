@@ -1,17 +1,20 @@
 package au.com.codeka.warworlds.server.store.base;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.sqlite.SQLiteConfig;
+import org.sqlite.javax.SQLiteConnectionPoolDataSource;
 
-import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.server.store.StoreException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Locale;
+
 import javax.annotation.Nullable;
 import javax.sql.PooledConnection;
-import org.sqlite.SQLiteConfig;
-import org.sqlite.javax.SQLiteConnectionPoolDataSource;
+
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.server.store.StoreException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Base storage object for interfacing with the data store.

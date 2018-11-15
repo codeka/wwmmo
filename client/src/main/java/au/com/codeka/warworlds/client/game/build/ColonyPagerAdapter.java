@@ -1,18 +1,22 @@
 package au.com.codeka.warworlds.client.game.build;
 
 import android.content.Context;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
-import java.util.List;
-import javax.annotation.Nullable;
 
 /**
  * A {@link PagerAdapter} used by the {@link BuildLayout} to allow you to quickly swipe between your

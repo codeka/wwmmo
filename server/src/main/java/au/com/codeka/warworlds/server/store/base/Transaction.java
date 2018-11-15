@@ -1,11 +1,13 @@
 package au.com.codeka.warworlds.server.store.base;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.sqlite.javax.SQLiteConnectionPoolDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import javax.sql.PooledConnection;
-import org.sqlite.javax.SQLiteConnectionPoolDataSource;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helper class for wrapping up a transaction.

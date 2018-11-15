@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.common.sim;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Planet;
-import au.com.codeka.warworlds.common.proto.Star;
 
 /**
  * Helper for accessing information about a {@link Colony}.

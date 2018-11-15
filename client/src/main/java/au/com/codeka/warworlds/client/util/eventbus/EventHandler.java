@@ -1,10 +1,11 @@
 package au.com.codeka.warworlds.client.util.eventbus;
 
-import au.com.codeka.warworlds.client.concurrency.Threads;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import au.com.codeka.warworlds.client.concurrency.Threads;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

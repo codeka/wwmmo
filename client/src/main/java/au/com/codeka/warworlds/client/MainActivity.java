@@ -1,11 +1,11 @@
 package au.com.codeka.warworlds.client;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import au.com.codeka.warworlds.client.ctrl.DebugView;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.game.welcome.CreateEmpireScreen;
@@ -15,6 +15,8 @@ import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.ui.ScreenStack;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.common.Log;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MainActivity extends AppCompatActivity {
   private static final Log log = new Log("MainActivity");

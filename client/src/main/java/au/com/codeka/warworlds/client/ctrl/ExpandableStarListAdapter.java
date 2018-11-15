@@ -4,12 +4,14 @@ package au.com.codeka.warworlds.client.ctrl;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+
+import javax.annotation.Nonnull;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.world.StarCollection;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.proto.Star;
-import javax.annotation.Nonnull;
 
 /**
  * Base adapter class for adapter which show an expandable list of stars which you can expand and

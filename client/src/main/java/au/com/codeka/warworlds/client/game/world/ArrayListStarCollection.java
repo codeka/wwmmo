@@ -1,7 +1,8 @@
 package au.com.codeka.warworlds.client.game.world;
 
-import au.com.codeka.warworlds.common.proto.Star;
 import java.util.ArrayList;
+
+import au.com.codeka.warworlds.common.proto.Star;
 
 /**
  * A {@link StarCollection} that's backed by a simple {@link ArrayList} of stars.

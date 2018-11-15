@@ -1,15 +1,22 @@
 package au.com.codeka.warworlds.client.game.build;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Context;
-import android.support.v4.view.ViewPager;
 import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.viewpager.widget.ViewPager;
+
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+import java.util.Locale;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
@@ -22,10 +29,8 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
-import com.squareup.picasso.Picasso;
-import java.util.List;
-import java.util.Locale;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Layout for {@link BuildScreen}.

@@ -1,12 +1,13 @@
 package au.com.codeka.warworlds.server.world;
 
+import com.google.api.client.util.Lists;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.StarsStore;
-import com.google.api.client.util.Lists;
 
 /**
  * This class manages the star simulation queue, and schedules stars to be simulated at the

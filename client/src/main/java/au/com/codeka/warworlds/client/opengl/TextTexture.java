@@ -6,9 +6,11 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
-import au.com.codeka.warworlds.common.Log;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import au.com.codeka.warworlds.common.Log;
 
 /**
  * This is a {@link Texture} which is used to back an image for drawing arbitrary strings.

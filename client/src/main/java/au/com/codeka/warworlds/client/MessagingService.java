@@ -3,14 +3,14 @@ package au.com.codeka.warworlds.client;
 import android.util.Base64;
 import android.widget.Toast;
 
-import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.Notification;
-
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.io.IOException;
+
+import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Notification;
 
 /**
  * Implementation of {@link FirebaseMessagingService}.

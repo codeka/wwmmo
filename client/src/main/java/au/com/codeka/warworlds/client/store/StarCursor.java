@@ -1,10 +1,13 @@
 package au.com.codeka.warworlds.client.store;
 
 import android.database.Cursor;
-import au.com.codeka.warworlds.common.proto.Star;
+
 import java.io.IOException;
 import java.util.Iterator;
+
 import javax.annotation.Nullable;
+
+import au.com.codeka.warworlds.common.proto.Star;
 
 /**
  * A "cursor" that's used to scroll through the results of querying stars.

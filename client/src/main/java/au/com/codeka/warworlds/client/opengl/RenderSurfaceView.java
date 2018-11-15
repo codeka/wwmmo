@@ -3,14 +3,18 @@ package au.com.codeka.warworlds.client.opengl;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+
+import androidx.annotation.Nullable;
+
+import com.google.common.base.Preconditions;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
 import au.com.codeka.warworlds.client.concurrency.RunnableQueue;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.common.Log;
-import com.google.common.base.Preconditions;
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 /** GLSurfaceView upon which we do all of our rendering. */
 public class RenderSurfaceView extends GLSurfaceView {

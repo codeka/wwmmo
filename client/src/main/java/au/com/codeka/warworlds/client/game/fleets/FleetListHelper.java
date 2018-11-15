@@ -4,6 +4,13 @@ import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.common.base.CaseFormat;
+
+import java.util.Locale;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.build.BuildViewHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
@@ -12,9 +19,6 @@ import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
-import com.google.common.base.CaseFormat;
-import java.util.Locale;
-import javax.annotation.Nullable;
 
 public class FleetListHelper {
   public static void populateFleetRow(ViewGroup row, Star star, Fleet fleet, Design design) {

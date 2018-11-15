@@ -2,10 +2,12 @@ package au.com.codeka.warworlds.client.game.welcome;
 
 import android.content.Context;
 import android.widget.RelativeLayout;
+
+import javax.annotation.Nonnull;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
-import javax.annotation.Nonnull;
 
 /**
  * Layout for {@link WarmWelcomeScreen}.

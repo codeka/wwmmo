@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.client.game.fleets;
 
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.game.world.ArrayListStarCollection;
 import au.com.codeka.warworlds.client.game.world.MyEmpireStarCollection;
 import au.com.codeka.warworlds.client.game.world.StarCollection;

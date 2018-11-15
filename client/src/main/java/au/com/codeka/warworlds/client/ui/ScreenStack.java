@@ -1,15 +1,17 @@
 package au.com.codeka.warworlds.client.ui;
 
-import static au.com.codeka.warworlds.client.concurrency.Threads.checkOnThread;
-
-import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
-import au.com.codeka.warworlds.client.concurrency.Threads;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.Stack;
 
 import javax.annotation.Nullable;
+
+import au.com.codeka.warworlds.client.concurrency.Threads;
+
+import static au.com.codeka.warworlds.client.concurrency.Threads.checkOnThread;
 
 /**
  * {@link ScreenStack} is used to manage a stack of {@link Screen}s. The stack shows it's

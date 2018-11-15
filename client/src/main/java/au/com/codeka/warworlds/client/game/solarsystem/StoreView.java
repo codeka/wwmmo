@@ -6,6 +6,12 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.common.base.Preconditions;
+import com.squareup.wire.Wire;
+
+import java.util.Locale;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.util.NumberFormatter;
@@ -14,10 +20,6 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.StarHelper;
-import com.google.common.base.Preconditions;
-import com.squareup.wire.Wire;
-import java.util.Locale;
-import javax.annotation.Nullable;
 
 /**
  * {@link StoreView} displays the current contents of your store.

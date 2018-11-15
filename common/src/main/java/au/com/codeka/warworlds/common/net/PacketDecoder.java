@@ -1,9 +1,10 @@
 package au.com.codeka.warworlds.common.net;
 
-import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.common.proto.Packet;
 import java.io.IOException;
 import java.io.InputStream;
+
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Packet;
 import okio.BufferedSource;
 import okio.Okio;
 

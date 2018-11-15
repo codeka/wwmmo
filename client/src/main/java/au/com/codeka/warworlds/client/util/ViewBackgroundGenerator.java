@@ -13,17 +13,21 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
-import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.common.Log;
+
+import androidx.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
+
+import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.common.Log;
 
 /**
  * Generates an image that can be used at the background for the various non-game activities

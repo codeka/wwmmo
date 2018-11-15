@@ -1,10 +1,12 @@
 package au.com.codeka.warworlds.client.game.chat;
 
 import android.content.Context;
-import android.support.v4.view.ViewPager;
 import android.transition.TransitionManager;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import androidx.viewpager.widget.ViewPager;
+
 import au.com.codeka.warworlds.client.R;
 
 /**

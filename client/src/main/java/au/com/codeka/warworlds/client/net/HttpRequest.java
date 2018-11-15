@@ -1,16 +1,19 @@
 package au.com.codeka.warworlds.client.net;
 
-import au.com.codeka.warworlds.common.Log;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+
 import javax.annotation.Nullable;
+
+import au.com.codeka.warworlds.common.Log;
 
 /**
  * Simple wrapper around {@link HttpURLConnection} that lets us make HTTP requests more easily.

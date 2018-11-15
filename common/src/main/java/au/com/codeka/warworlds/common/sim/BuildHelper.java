@@ -1,17 +1,19 @@
 package au.com.codeka.warworlds.common.sim;
 
-import static au.com.codeka.warworlds.common.sim.Simulation.STEP_TIME;
-import static au.com.codeka.warworlds.common.sim.SimulationHelper.trimTimeToStep;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import javax.annotation.Nullable;
+
+import static au.com.codeka.warworlds.common.sim.Simulation.STEP_TIME;
+import static au.com.codeka.warworlds.common.sim.SimulationHelper.trimTimeToStep;
 
 public class BuildHelper {
 

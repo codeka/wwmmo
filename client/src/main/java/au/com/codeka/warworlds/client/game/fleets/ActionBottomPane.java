@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.game.fleets;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
@@ -14,10 +12,15 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+
+import com.google.common.base.CaseFormat;
+
+import javax.annotation.Nonnull;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.common.proto.Fleet;
-import com.google.common.base.CaseFormat;
-import javax.annotation.Nonnull;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Bottom pane of the fleets view that contains the main action buttons (split, move, etc).

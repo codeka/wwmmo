@@ -1,10 +1,11 @@
 package au.com.codeka.warworlds.server.admin.handlers;
 
+import java.util.List;
+
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatMessagesPacket;
 import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.world.chat.ChatManager;
-import java.util.List;
 
 /**
  * Handler for /admin/ajax/chat which lets us send messages from the special 'server' user.

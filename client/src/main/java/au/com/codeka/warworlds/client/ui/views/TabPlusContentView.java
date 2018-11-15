@@ -1,10 +1,13 @@
 package au.com.codeka.warworlds.client.ui.views;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.material.tabs.TabLayout;
+
 import au.com.codeka.warworlds.client.R;
 
 /**

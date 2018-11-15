@@ -1,5 +1,12 @@
 package au.com.codeka.warworlds.server.world;
 
+import com.google.common.collect.Lists;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
@@ -10,10 +17,6 @@ import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
-import com.google.common.collect.Lists;
-import java.util.HashMap;
-import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * Manages empires, keeps them loaded and ensure they get saved to the data store at the right time.

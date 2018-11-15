@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.game.chat;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Html;
@@ -18,6 +16,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.world.ChatManager;
@@ -28,14 +33,11 @@ import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 import au.com.codeka.warworlds.common.proto.Empire;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Fragment for showing the chats within a single {@link ChatRoom}.
+ * View for showing the chats within a single {@link ChatRoom}.
  */
 public class RoomView extends RelativeLayout {
   private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("h:mm a", Locale.US);

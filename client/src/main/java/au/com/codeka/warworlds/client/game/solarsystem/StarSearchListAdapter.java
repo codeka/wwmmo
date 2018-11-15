@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +9,12 @@ import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.Locale;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
@@ -18,9 +22,8 @@ import au.com.codeka.warworlds.client.store.StarCursor;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Star;
-import com.squareup.picasso.Picasso;
-import java.util.ArrayList;
-import java.util.Locale;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 class StarSearchListAdapter extends BaseAdapter {
   private LayoutInflater inflater;

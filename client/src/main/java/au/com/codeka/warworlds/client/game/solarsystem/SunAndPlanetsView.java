@@ -3,12 +3,20 @@ package au.com.codeka.warworlds.client.game.solarsystem;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
@@ -20,10 +28,6 @@ import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
-import com.squareup.picasso.Picasso;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * The view which displays the big star and planets, and allows you to click planets to "select"

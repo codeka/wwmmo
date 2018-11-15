@@ -1,5 +1,11 @@
 package au.com.codeka.warworlds.server.world;
 
+import com.google.common.base.Preconditions;
+
+import java.util.HashMap;
+
+import javax.annotation.Nonnull;
+
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Sector;
@@ -7,9 +13,6 @@ import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.generator.SectorGenerator;
-import com.google.common.base.Preconditions;
-import java.util.HashMap;
-import javax.annotation.Nonnull;
 
 /**
  * Manages the sectors we have loaded.

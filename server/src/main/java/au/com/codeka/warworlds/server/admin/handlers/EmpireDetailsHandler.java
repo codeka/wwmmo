@@ -1,5 +1,10 @@
 package au.com.codeka.warworlds.server.admin.handlers;
 
+import com.google.common.collect.ImmutableMap;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import au.com.codeka.warworlds.common.proto.DeviceInfo;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Notification;
@@ -8,9 +13,6 @@ import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.NotificationManager;
 import au.com.codeka.warworlds.server.world.StarManager;
-import com.google.common.collect.ImmutableMap;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Handler for /admin/empires/xxx which shows details about the empire with id xxx.

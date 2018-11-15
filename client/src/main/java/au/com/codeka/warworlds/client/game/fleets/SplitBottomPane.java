@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.game.fleets;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,14 +8,18 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Bottom pane of the fleets view that contains the "split" function.

@@ -1,5 +1,11 @@
 package au.com.codeka.warworlds.server.store;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
@@ -7,10 +13,6 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
 import au.com.codeka.warworlds.server.store.base.Transaction;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * Sectors store is a special store for storing the details of the sectors.

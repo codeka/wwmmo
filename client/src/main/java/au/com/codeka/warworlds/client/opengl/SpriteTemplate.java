@@ -1,12 +1,14 @@
 package au.com.codeka.warworlds.client.opengl;
 
 import android.opengl.GLES20;
-import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.common.Vector2;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+
+import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.common.Vector2;
 
 /**
  * A {@link SpriteTemplate} describes a sprite's characteristics (texture, bounds within the texture

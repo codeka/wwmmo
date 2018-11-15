@@ -1,13 +1,14 @@
 package au.com.codeka.warworlds.server.store;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
 import au.com.codeka.warworlds.server.store.base.StoreReader;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A store that holds all the chat messages.

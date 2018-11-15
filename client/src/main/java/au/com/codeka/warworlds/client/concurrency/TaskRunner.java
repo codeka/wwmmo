@@ -1,10 +1,5 @@
 package au.com.codeka.warworlds.client.concurrency;
 
-import android.support.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-
 import java.util.Timer;
 import java.util.TimerTask;
 

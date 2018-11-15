@@ -7,15 +7,16 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.Locale;
+
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
-import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.BuildHelper;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
-import java.util.Locale;
 
 /**
  * Bottom pane for an existing build. Shows the current progress, what we're blocked on (e.g. need

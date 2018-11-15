@@ -4,8 +4,11 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import com.squareup.wire.Message;
+
 import java.util.Map;
+
 import javax.annotation.Nonnull;
 
 /** Class for storing protos in a sqlite key-value store, keyed by a long id. */

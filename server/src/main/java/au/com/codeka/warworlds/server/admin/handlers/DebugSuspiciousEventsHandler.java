@@ -1,5 +1,10 @@
 package au.com.codeka.warworlds.server.admin.handlers;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.TreeMap;
+
 import au.com.codeka.warworlds.common.proto.AdminRole;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -9,10 +14,6 @@ import au.com.codeka.warworlds.server.world.EmpireManager;
 import au.com.codeka.warworlds.server.world.StarManager;
 import au.com.codeka.warworlds.server.world.SuspiciousEventManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
 
 /**
  * Handler for /debug/suspicious-events.

@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.common.debug;
 
-import au.com.codeka.warworlds.common.proto.Packet;
 import com.squareup.wire.WireField;
+
 import java.lang.reflect.Field;
+
+import au.com.codeka.warworlds.common.proto.Packet;
 
 /**
  * Helper class that contains some nice debugging details about our packets.

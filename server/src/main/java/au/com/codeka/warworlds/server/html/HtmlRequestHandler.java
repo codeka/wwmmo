@@ -1,5 +1,11 @@
 package au.com.codeka.warworlds.server.html;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.carrot.CarrotEngine;
 import au.com.codeka.carrot.CarrotException;
 import au.com.codeka.carrot.Configuration;
@@ -7,10 +13,6 @@ import au.com.codeka.carrot.bindings.MapBindings;
 import au.com.codeka.carrot.resource.FileResourceLocator;
 import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.handlers.RequestHandler;
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * Handler for requests out of the html directory.

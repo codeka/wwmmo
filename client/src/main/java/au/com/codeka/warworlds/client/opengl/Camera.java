@@ -1,8 +1,9 @@
 package au.com.codeka.warworlds.client.opengl;
 
 import android.opengl.Matrix;
-import android.support.annotation.Nullable;
 import android.view.animation.DecelerateInterpolator;
+
+import androidx.annotation.Nullable;
 
 /**
  * The {@link Camera} can be used to draw a {@link Scene}, scroll and zoom around.

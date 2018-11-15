@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.html.account;
 
+import com.google.common.base.Strings;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.server.handlers.RequestException;
@@ -7,7 +9,6 @@ import au.com.codeka.warworlds.server.html.HtmlRequestHandler;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.util.Pair;
 import au.com.codeka.warworlds.server.world.AccountManager;
-import com.google.common.base.Strings;
 
 /**
  * This servlet handles /accounts/verify, which is used to verify an email address.

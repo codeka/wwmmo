@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.client.ctrl;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Html;
@@ -12,17 +10,22 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import java.util.Locale;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
-import au.com.codeka.warworlds.client.game.chat.ChatScreen;
 import au.com.codeka.warworlds.client.game.chat.ChatHelper;
+import au.com.codeka.warworlds.client.game.chat.ChatScreen;
 import au.com.codeka.warworlds.client.game.world.ChatManager;
 import au.com.codeka.warworlds.client.game.world.ChatMessagesUpdatedEvent;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.Empire;
-import java.util.Locale;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A view that contains the last couple of chat messages, and expands to the full

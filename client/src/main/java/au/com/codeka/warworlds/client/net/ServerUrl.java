@@ -1,10 +1,11 @@
 package au.com.codeka.warworlds.client.net;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import au.com.codeka.warworlds.client.BuildConfig;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.Version;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Helper class for getting the current server URL.

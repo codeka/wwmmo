@@ -1,12 +1,14 @@
 package au.com.codeka.warworlds.common.sim;
 
+import java.util.Locale;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
-import java.util.Locale;
-import javax.annotation.Nullable;
 
 /**
  * A helper for working with {@link Star}s.

@@ -1,7 +1,7 @@
 package au.com.codeka.warworlds.common;
 
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * An edge is a two points from a list of points.

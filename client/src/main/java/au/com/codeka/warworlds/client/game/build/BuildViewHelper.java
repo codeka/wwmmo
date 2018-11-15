@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.client.game.build;
 
 import android.widget.ImageView;
-import au.com.codeka.warworlds.common.proto.Design;
+
 import com.squareup.picasso.Picasso;
+
+import au.com.codeka.warworlds.common.proto.Design;
 
 /**
  * Helper class for working with build views and stuff.

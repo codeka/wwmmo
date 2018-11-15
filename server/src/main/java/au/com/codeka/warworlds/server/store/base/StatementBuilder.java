@@ -1,16 +1,19 @@
 package au.com.codeka.warworlds.server.store.base;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.sqlite.javax.SQLiteConnectionPoolDataSource;
 
-import au.com.codeka.warworlds.common.Log;
-import au.com.codeka.warworlds.server.store.StoreException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+
 import javax.annotation.Nullable;
-import org.sqlite.javax.SQLiteConnectionPoolDataSource;
+
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.server.store.StoreException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Base class for {@link StoreReader} and {@link StoreWriter} that handling building the query.

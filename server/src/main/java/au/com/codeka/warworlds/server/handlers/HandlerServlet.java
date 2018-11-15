@@ -1,15 +1,15 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import au.com.codeka.warworlds.common.Log;
-import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
+
 import javax.servlet.GenericServlet;
-import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import au.com.codeka.warworlds.common.Log;
 
 /**
  * Base {@link javax.servlet.Servlet} for working with handlers.

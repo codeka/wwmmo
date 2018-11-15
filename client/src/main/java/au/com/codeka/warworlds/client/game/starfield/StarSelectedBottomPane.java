@@ -6,6 +6,14 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.common.base.Preconditions;
+import com.squareup.picasso.Picasso;
+
+import java.util.Locale;
+
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ctrl.PlanetListSimple;
@@ -18,10 +26,6 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.StarHelper;
-import com.google.common.base.Preconditions;
-import com.squareup.picasso.Picasso;
-import java.util.Locale;
-import javax.annotation.Nullable;
 
 /**
  * The bottom pane when you have a star selected.

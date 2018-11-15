@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.client.ui;
 
 import android.os.Build;
-import android.support.annotation.CallSuper;
 import android.transition.Scene;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -9,10 +8,13 @@ import android.transition.TransitionSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import au.com.codeka.warworlds.common.Log;
+import androidx.annotation.CallSuper;
+
 import java.util.Random;
 
 import javax.annotation.Nullable;
+
+import au.com.codeka.warworlds.common.Log;
 
 /**
  * A {@link Screen} is similar to a fragment, in that it's a place to keep the business logic

@@ -1,5 +1,9 @@
 package au.com.codeka.warworlds.client.game.world;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
@@ -8,8 +12,6 @@ import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatMessagesPacket;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 import au.com.codeka.warworlds.common.proto.Packet;
-import com.google.common.collect.Lists;
-import java.util.List;
 
 /**
  * Manages the chat rooms we're in and so on.

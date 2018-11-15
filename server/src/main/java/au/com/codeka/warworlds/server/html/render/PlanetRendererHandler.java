@@ -1,5 +1,9 @@
 package au.com.codeka.warworlds.server.html.render;
 
+import java.io.File;
+import java.util.Locale;
+import java.util.Random;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector3;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -7,9 +11,6 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.handlers.RequestException;
 import au.com.codeka.warworlds.server.world.StarManager;
 import au.com.codeka.warworlds.server.world.WatchableObject;
-import java.io.File;
-import java.util.Locale;
-import java.util.Random;
 
 /**
  * {@link RendererHandler} for rendering planets.

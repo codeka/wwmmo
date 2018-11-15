@@ -1,13 +1,14 @@
 package au.com.codeka.warworlds.client.game.chat;
 
-import au.com.codeka.warworlds.client.game.world.EmpireManager;
-import au.com.codeka.warworlds.common.proto.ChatMessage;
-import au.com.codeka.warworlds.common.proto.Empire;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import au.com.codeka.warworlds.client.game.world.EmpireManager;
+import au.com.codeka.warworlds.common.proto.ChatMessage;
+import au.com.codeka.warworlds.common.proto.Empire;
 
 /**
  * Some helper methods for working with chat messages.

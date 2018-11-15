@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.game.empire;
 
 import android.view.View;
 import android.view.ViewGroup;
+
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.common.Log;

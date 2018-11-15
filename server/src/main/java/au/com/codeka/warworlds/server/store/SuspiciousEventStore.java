@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.store;
 
-import static au.com.codeka.warworlds.server.store.StatsHelper.timestampToDay;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.server.proto.SuspiciousEvent;
@@ -8,8 +9,8 @@ import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
 import au.com.codeka.warworlds.server.store.base.StoreWriter;
 import au.com.codeka.warworlds.server.store.base.Transaction;
-import java.util.ArrayList;
-import java.util.Collection;
+
+import static au.com.codeka.warworlds.server.store.StatsHelper.timestampToDay;
 
 /**
  * Store for keep track of suspicious events.

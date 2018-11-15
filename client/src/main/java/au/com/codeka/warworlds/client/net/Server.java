@@ -1,11 +1,18 @@
 package au.com.codeka.warworlds.client.net;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import android.os.Build;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.concurrency.Threads;
@@ -23,13 +30,8 @@ import au.com.codeka.warworlds.common.proto.HelloPacket;
 import au.com.codeka.warworlds.common.proto.LoginRequest;
 import au.com.codeka.warworlds.common.proto.LoginResponse;
 import au.com.codeka.warworlds.common.proto.Packet;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.ArrayDeque;
-import java.util.Queue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /** Represents our connection to the server. */
 public class Server {
