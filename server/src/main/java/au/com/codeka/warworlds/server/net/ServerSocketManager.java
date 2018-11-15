@@ -21,12 +21,6 @@ public class ServerSocketManager {
   private static final Log log = new Log("ServerSocketManager");
   public static final ServerSocketManager i = new ServerSocketManager();
 
-  /**
-   * When we get notified of a pending connection, wait this amount of time for the connection to
-   * come through.
-   */
-  private static final int CONNECTION_TIMEOUT_MS = 10000;
-
   private ServerSocket serverSocket;
   private Thread acceptThread;
 
@@ -56,7 +50,8 @@ public class ServerSocketManager {
    */
   public void addPendingConnection(
       Account account, WatchableObject<Empire> empire, byte[] encryptionKey) {
-    pendingConnections.put(empire.get().id, new PendingConnection(account, empire, encryptionKey));
+    pendingConnections.put(
+        empire.get().id, new PendingConnection(this, account, empire, encryptionKey));
   }
 
   public void stop() {
@@ -75,6 +70,11 @@ public class ServerSocketManager {
       // ignore
     }
     acceptThread = null;
+  }
+
+  /** Called by the {@link Connection} when it disconnects. */
+  void onDisconnect(Long empireId, Connection conn) {
+    connections.remove(empireId);
   }
 
   /** Called when we get a new connection from a client. */

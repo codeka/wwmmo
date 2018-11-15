@@ -42,10 +42,10 @@ public class Player {
   private final WatchableObject<Empire> empire;
 
   /** The list of {@link Sector}s this player is currently watching. */
-  private final ArrayList<WatchableObject<Sector>> sectors = new ArrayList<>();
+  private final ArrayList<WatchableObject<Sector>> watchedSectors = new ArrayList<>();
 
   /** The {@link Star}s that we are currently watching. */
-  private final Map<Long, WatchableObject<Star>> stars = new HashMap<>();
+  private final Map<Long, WatchableObject<Star>> watchedStars = new HashMap<>();
 
   /** The {@link WatchableObject.Watcher} which we'll be watching stars with. */
   private final WatchableObject.Watcher<Star> starWatcher;
@@ -57,13 +57,11 @@ public class Player {
     this.connection = checkNotNull(connection);
     this.empire = checkNotNull(empire);
 
-    starWatcher = star -> {
-      connection.send(new Packet.Builder()
-          .star_updated(new StarUpdatedPacket.Builder()
-              .stars(Lists.newArrayList(star.get()))
-              .build())
-          .build());
-    };
+    starWatcher = star -> connection.send(new Packet.Builder()
+        .star_updated(new StarUpdatedPacket.Builder()
+            .stars(Lists.newArrayList(star.get()))
+            .build())
+        .build());
 
     TaskRunner.i.runTask(this::onPostConnect, Threads.BACKGROUND);
   }
@@ -122,27 +120,30 @@ public class Player {
    */
   public void onDisconnect() {
     ChatManager.i.disconnectPlayer(empire.get().id);
+
+    clearWatchedStars();
+    synchronized (watchedSectors) {
+      watchedSectors.clear();
+    }
   }
 
   private void onWatchSectorsPacket(WatchSectorsPacket pkt) {
     // TODO: if we're already watching some of these sectors, we can just keep watching those,
 
     // Remove all our current watched stars
-    synchronized (stars) {
-      for (WatchableObject<Star> star : stars.values()) {
-        star.removeWatcher(starWatcher);
-      }
-    }
+    clearWatchedStars();
 
-    sectors.clear();
     List<Star> stars = new ArrayList<>();
-    for (long sectorY = pkt.top; sectorY <= pkt.bottom; sectorY ++) {
-      for (long sectorX = pkt.left; sectorX <= pkt.right; sectorX ++) {
-        WatchableObject<Sector> sector =
-            SectorManager.i.getSector(new SectorCoord.Builder().x(sectorX).y(sectorY).build());
-        SectorManager.i.verifyNativeColonies(sector);
-        sectors.add(sector);
-        stars.addAll(sector.get().stars);
+    synchronized (watchedSectors) {
+      watchedSectors.clear();
+      for (long sectorY = pkt.top; sectorY <= pkt.bottom; sectorY++) {
+        for (long sectorX = pkt.left; sectorX <= pkt.right; sectorX++) {
+          WatchableObject<Sector> sector =
+              SectorManager.i.getSector(new SectorCoord.Builder().x(sectorX).y(sectorY).build());
+          SectorManager.i.verifyNativeColonies(sector);
+          watchedSectors.add(sector);
+          stars.addAll(sector.get().stars);
+        }
       }
     }
 
@@ -152,11 +153,16 @@ public class Player {
             .build())
         .build());
 
-    synchronized (this.stars) {
+    synchronized (watchedStars) {
       for (Star star : stars) {
         WatchableObject<Star> watchableStar = StarManager.i.getStar(star.id);
+        if (watchableStar == null) {
+          // Huh?
+          log.warning("Got unexpected null star: %d", star.id);
+          continue;
+        }
         watchableStar.addWatcher(starWatcher);
-        this.stars.put(star.id, watchableStar);
+        watchedStars.put(star.id, watchableStar);
       }
     }
   }
@@ -229,4 +235,13 @@ public class Player {
           .build());
     }
   };
+
+  private void clearWatchedStars() {
+    synchronized (watchedStars) {
+      for (WatchableObject<Star> star : watchedStars.values()) {
+        star.removeWatcher(starWatcher);
+      }
+      watchedStars.clear();
+    }
+  }
 }
