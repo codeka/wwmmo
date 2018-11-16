@@ -68,6 +68,9 @@ public class AccountsActivity extends BaseActivity {
         // Get account name
         accountSelectedPosition = listView.getCheckedItemPosition();
         TextView account = (TextView) listView.getChildAt(accountSelectedPosition);
+        if (account == null) {
+          return;
+        }
 
         SharedPreferences prefs = Util.getSharedPreferences();
         String accountName = prefs.getString("AccountName", null);

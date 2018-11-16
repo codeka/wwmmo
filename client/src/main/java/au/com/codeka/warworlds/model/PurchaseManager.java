@@ -34,7 +34,7 @@ public class PurchaseManager {
 
     private static ArrayList<String> sAllSkus;
     {
-        sAllSkus = new ArrayList<String>();
+        sAllSkus = new ArrayList<>();
         sAllSkus.add("star_rename");
         sAllSkus.add("remove_ads");
         sAllSkus.add("rename_empire");
