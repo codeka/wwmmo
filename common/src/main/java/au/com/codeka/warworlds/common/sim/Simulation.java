@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.common.sim;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,7 @@ import javax.annotation.Nullable;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Time;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
+import au.com.codeka.warworlds.common.proto.Building;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.CombatReport;
 import au.com.codeka.warworlds.common.proto.Design;
@@ -73,7 +75,7 @@ public class Simulation {
 
     HashSet<Long> empireIds = new HashSet<>();
     for (Planet planet : star.planets) {
-      if (planet.colony != null && !empireIds.contains(planet.colony.empire_id)) {
+      if (planet.colony != null) {
         empireIds.add(planet.colony.empire_id);
       }
     }
@@ -145,11 +147,7 @@ public class Simulation {
   private void copyDeltas(Star.Builder star, Star.Builder predictionStar) {
     ArrayList<EmpireStorage> stores = new ArrayList<>();
     for (int i = 0; i < star.empire_stores.size(); i++) {
-      stores.add(star.empire_stores.get(i).newBuilder()
-          .minerals_delta_per_hour(predictionStar.empire_stores.get(i).minerals_delta_per_hour)
-          .goods_delta_per_hour(predictionStar.empire_stores.get(i).goods_delta_per_hour)
-          .energy_delta_per_hour(predictionStar.empire_stores.get(i).energy_delta_per_hour)
-          .build());
+      stores.add(predictionStar.empire_stores.get(i).newBuilder().build());
     }
     star.empire_stores(stores);
 
@@ -238,6 +236,10 @@ public class Simulation {
       return;
     }
 
+    storage.max_goods = 1000.0f;
+    storage.max_energy = 1000.0f;
+    storage.max_minerals = 1000.0f;
+
     float dt = Time.toHours(STEP_TIME);
     float goodsDeltaPerHour = 0.0f;
     float mineralsDeltaPerHour = 0.0f;
@@ -251,6 +253,23 @@ public class Simulation {
       Colony.Builder colony = planet.colony.newBuilder();
       if (!equalEmpire(colony.empire_id, empireId)) {
         continue;
+      }
+
+      // Apply storage bonuses this round (note: this could change from step to step, if a building
+      // finishes being built, for example).
+      for (Building building : colony.buildings) {
+        Design design = DesignHelper.getDesign(building.design_type);
+        List<Design.Effect> effects = design.effect;
+        if (building.level != null && building.level > 1) {
+          effects = design.upgrades.get(building.level).effects;
+        }
+        for (Design.Effect effect : effects) {
+          if (effect.type == Design.EffectType.STORAGE) {
+            storage.max_goods += effect.goods;
+            storage.max_minerals += effect.minerals;
+            storage.max_energy += effect.energy;
+          }
+        }
       }
 
       log("--- Colony [planetIndex=%d] [population=%.2f]", i, colony.population);
@@ -544,11 +563,7 @@ public class Simulation {
     storage.goods_delta_per_hour(goodsDeltaPerHour);
     storage.minerals_delta_per_hour(mineralsDeltaPerHour);
     storage.energy_delta_per_hour(energyDeltaPerHour);
-    if (storageIndex >= 0) {
-      star.empire_stores.set(storageIndex, storage.build());
-    } else {
-      star.empire_stores.add(storage.build());
-    }
+    star.empire_stores.set(storageIndex, storage.build());
   }
 
   /**
