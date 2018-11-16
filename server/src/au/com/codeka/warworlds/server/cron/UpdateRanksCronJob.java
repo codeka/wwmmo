@@ -148,12 +148,13 @@ public class UpdateRanksCronJob extends CronJob {
         " FROM (" +
         "   SELECT" +
         "     alliances.id," +
-        "     empire_ranks.total_stars" +
+        "     SUM(empire_ranks.total_stars) AS total_stars" +
         "   FROM beta.alliances" +
         "   INNER JOIN beta.empires" +
         "     ON alliances.id = empires.alliance_id" +
         "   INNER JOIN beta.empire_ranks" +
         "     ON empires.id = empire_ranks.empire_id" +
+        "   GROUP BY alliances.id" +
         " ) AS sub" +
         " WHERE alliances.id = sub.id";
     try (SqlStmt stmt = DB.prepare(sql)) {
