@@ -115,6 +115,7 @@ public class BuildBottomPane extends RelativeLayout implements BottomPaneContent
     } else {
       buildCountContainer.setVisibility(View.GONE);
     }
+    updateBuildTime();
   }
 
   @Override

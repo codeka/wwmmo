@@ -27,72 +27,48 @@
       android:layout_alignStart="@id/build_name"
       android:layout_below="@id/build_name"/>
 
-  <FrameLayout android:id="@+id/upgrade_vs_new_container"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:layout_below="@id/build_description"
-               android:layout_toEndOf="@id/build_icon">
-    <RelativeLayout
-        android:id="@+id/build_count_container"
+  <RelativeLayout
+      android:id="@+id/build_count_container"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/build_description"
+      android:layout_toEndOf="@id/build_icon"
+      android:visibility="visible">
+
+    <TextView
+        android:id="@+id/build_count_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible">
+        android:layout_alignParentTop="true"
+        android:text="@string/num_to_build"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textStyle="bold" />
 
-      <TextView
-          android:id="@+id/build_count_label"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_alignParentTop="true"
-          android:text="@string/num_to_build"
-          android:textAppearance="?android:attr/textAppearanceSmall"
-          android:textStyle="bold" />
+    <SeekBar
+        android:id="@+id/build_count_seek"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/build_count_label"
+        android:layout_toStartOf="@+id/build_count_edit"
+        android:layout_marginEnd="10dp"
+        android:layout_alignParentStart="true" />
 
-      <SeekBar
-          android:id="@+id/build_count_seek"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_below="@id/build_count_label"
-          android:layout_toStartOf="@+id/build_count_edit"
-          android:layout_marginEnd="10dp"
-          android:layout_alignParentStart="true" />
-
-      <EditText
-          android:id="@+id/build_count_edit"
-          android:layout_width="100dp"
-          android:layout_height="wrap_content"
-          android:layout_alignParentEnd="true"
-          android:layout_alignParentTop="true"
-          android:inputType="number" >
-        <requestFocus />
-      </EditText>
-    </RelativeLayout>
-
-    <RelativeLayout android:id="@+id/upgrade_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone">
-      <TextView android:id="@+id/upgrade_current_level_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:text="@string/current_level"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold" />
-      <TextView android:id="@+id/upgrade_current_level"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/upgrade_current_level_label"
-                android:layout_toEndOf="@+id/upgrade_current_level_label"
-                android:layout_marginStart="10dp" />
-
-    </RelativeLayout>
-  </FrameLayout>
+    <EditText
+        android:id="@+id/build_count_edit"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:inputType="number" >
+      <requestFocus />
+    </EditText>
+  </RelativeLayout>
 
   <TextView
       android:id="@+id/build_timetobuild_label"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_below="@id/upgrade_vs_new_container"
+      android:layout_below="@id/build_count_container"
       android:text="@string/time_to_build"
       android:textAppearance="?android:attr/textAppearanceSmall"
       android:textStyle="bold" />

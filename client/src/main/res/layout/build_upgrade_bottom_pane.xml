@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  tools:parentTag="RelativeLayout"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <ImageView
+    android:id="@+id/build_icon"
+    android:layout_width="64dp"
+    android:layout_height="64dp"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentTop="true" />
+
+  <TextView
+    android:id="@+id/build_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:layout_toEndOf="@id/build_icon"
+    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+  <TextView
+    android:id="@+id/build_description"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignStart="@id/build_name"
+    android:layout_below="@id/build_name"/>
+
+  <RelativeLayout android:id="@+id/upgrade_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/build_description"
+    android:layout_toEndOf="@id/build_icon">
+    <TextView android:id="@+id/upgrade_current_level_label"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"
+      android:text="@string/current_level"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:textStyle="bold" />
+    <TextView android:id="@+id/upgrade_current_level"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBaseline="@+id/upgrade_current_level_label"
+      android:layout_toEndOf="@+id/upgrade_current_level_label"
+      android:layout_marginStart="10dp"/>
+  </RelativeLayout>
+
+  <TextView
+    android:id="@+id/build_timetobuild_label"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/upgrade_container"
+    android:text="@string/time_to_upgrade"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:textStyle="bold" />
+
+  <TextView
+    android:id="@+id/build_timetobuild"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignBaseline="@id/build_timetobuild_label"
+    android:layout_toEndOf="@id/build_timetobuild_label"
+    android:layout_marginStart="10dp"
+    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+  <ImageView
+    android:id="@+id/build_mineralstobuild_label"
+    android:layout_width="16dp"
+    android:layout_height="16dp"
+    android:layout_below="@+id/build_timetobuild_label"
+    android:layout_alignEnd="@+id/build_timetobuild_label"
+    android:src="@drawable/mining" />
+
+  <TextView
+    android:id="@+id/build_mineralstobuild"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/build_timetobuild_label"
+    android:layout_toEndOf="@id/build_timetobuild_label"
+    android:layout_marginStart="10dp"
+    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+  <Button
+    android:id="@+id/build_button"
+    android:layout_width="100dp"
+    android:layout_height="30dp"
+    android:layout_below="@id/build_mineralstobuild"
+    android:layout_alignParentEnd="true"
+    android:layout_marginBottom="10dp"
+    android:layout_marginEnd="10dp"
+    android:text="@string/upgrade" />
+</merge>

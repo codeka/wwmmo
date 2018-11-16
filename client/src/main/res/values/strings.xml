@@ -51,6 +51,7 @@
   <string name="colonies">Colonies</string>
   <string name="fleets">Fleets</string>
   <string name="efficiency">Efficiency</string>
+  <string name="upgrade">Upgrade</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to
@@ -69,6 +70,7 @@
   <string name="num_to_build">Number to build:</string>
   <string name="current_level">Current level:</string>
   <string name="time_to_build">Time to build:</string>
+  <string name="time_to_upgrade">Time to upgrade:</string>
 
   <string name="pref_category_chat">Chat</string>
   <string name="pref_chat_profanity_filter">Filter profanity</string>

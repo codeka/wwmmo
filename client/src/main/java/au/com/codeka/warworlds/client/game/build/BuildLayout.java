@@ -23,12 +23,14 @@ import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.opengl.DimensionResolver;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
+import au.com.codeka.warworlds.common.proto.Building;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
+import au.com.codeka.warworlds.common.sim.DesignHelper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -87,6 +89,33 @@ public class BuildLayout extends RelativeLayout {
                 .count(count));
             hideBottomSheet();
           });
+
+    TransitionManager.beginDelayedTransition(bottomPane);
+    bottomPane.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+    bottomPane.removeAllViews();
+    bottomPane.addView((View) bottomPaneContentView);
+  }
+
+  /**
+   * Show the "upgrade" sheet for upgrading the given {@link Building}. If the building is already
+   * at max level, then nothing will happen.
+   */
+  public void showUpgradeSheet(Building building) {
+    final Colony colony = checkNotNull(colonies.get(viewPager.getCurrentItem()));
+    final Design design = DesignHelper.getDesign(building.design_type);
+
+    bottomPaneContentView = new UpgradeBottomPane(
+        getContext(), star, colony, design, building, (bldg) -> {
+/* TODO: upgrade the building
+      StarManager.i.updateStar(star, new StarModification.Builder()
+          .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
+          .colony_id(colony.id)
+          .
+          .design_type(designType)
+          .count(count));
+*/
+      hideBottomSheet();
+    });
 
     TransitionManager.beginDelayedTransition(bottomPane);
     bottomPane.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
