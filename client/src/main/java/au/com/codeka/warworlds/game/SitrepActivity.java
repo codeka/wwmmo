@@ -604,5 +604,4 @@ public class SitrepActivity extends BaseActivity {
       return view;
     }
   }
-
 }

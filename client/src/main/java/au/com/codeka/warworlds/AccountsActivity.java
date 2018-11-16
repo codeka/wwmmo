@@ -10,18 +10,28 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Html;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import au.com.codeka.common.protobuf.Messages;
@@ -71,6 +81,18 @@ public class AccountsActivity extends BaseActivity {
 
         // Otherwise, just save the new account name and we're done.
         saveAccountName(account.getText().toString());
+      }
+    });
+
+    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+        if (position >= getGoogleAccounts().size()) {
+          // Prompt the user to choose an account that we'll then be able to see.
+          Intent intent = AccountManager.newChooseAccountIntent(
+              null, null, new String[]{"com.google"}, false, null, null, null, null);
+          startActivityForResult(intent, SELECT_ACCOUNT_REQUEST_CODE);
+        }
       }
     });
 
@@ -144,7 +166,7 @@ public class AccountsActivity extends BaseActivity {
       }
 
       ListView listView = findViewById(R.id.select_account);
-      listView.setAdapter(new ArrayAdapter<>(context, R.layout.account, accounts));
+      listView.setAdapter(new AccountListAdapter(context, accounts));
       listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
       listView.setItemChecked(accountSelectedPosition, true);
     }
@@ -152,14 +174,12 @@ public class AccountsActivity extends BaseActivity {
 
   @Override
   public void onRequestPermissionsResult(
-      int requestCode, String permissions[], int[] grantResults) {
+      int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
     switch (requestCode) {
       case GET_ACCOUNTS_PERMISSION: {
         // If request is cancelled, the result arrays are empty.
-        if (grantResults.length > 0
-            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-          // TODO: granted, do we need to do anything else?
-        } else {
+        if (grantResults.length == 0
+            || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
           finish();
         }
       }
@@ -228,5 +248,54 @@ public class AccountsActivity extends BaseActivity {
     }
 
     return result;
+  }
+
+  /**
+   * A list adapter to display the list of accounts. We have one extra row on the bottom for
+   * "+ Add Account", which lets you choose additional accounts.
+   */
+  public class AccountListAdapter extends BaseAdapter {
+    private final Context context;
+    private final List<String> accounts;
+
+    public AccountListAdapter(Context context, List<String> accounts) {
+      this.context = context;
+      this.accounts = accounts;
+    }
+
+    @Override
+    public int getCount() {
+      return accounts.size() + 1;
+    }
+
+    @Override
+    public Object getItem(int position) {
+      if (position < accounts.size()) {
+        return accounts.get(position);
+      }
+      return null;
+    }
+
+    @Override
+    public long getItemId(int position) {
+      return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      View view = convertView;
+      if (view == null) {
+        if (position < accounts.size()) {
+          view = LayoutInflater.from(context).inflate(R.layout.account, parent, false);
+        } else {
+          view = LayoutInflater.from(context).inflate(R.layout.account_add, parent, false);
+        }
+      }
+      if (position < accounts.size()) {
+        ((TextView) view).setText(accounts.get(position));
+      }
+
+      return view;
+    }
   }
 }
