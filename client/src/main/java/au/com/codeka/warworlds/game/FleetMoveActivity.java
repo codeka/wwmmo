@@ -297,7 +297,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
         if (minDistance > 0) {
           float distanceToClosestStar = findClosestStar(markerStar);
           if (distanceToClosestStar < minDistance) {
-            if (tooCloseIndicatorEntity == null) {
+            if (tooCloseIndicatorEntity == null || tooCloseIndicatorEntity.isDisposed()) {
               tooCloseIndicatorEntity = new RadiusIndicatorEntity(this);
               tooCloseIndicatorEntity.setScale(minDistance * Sector.PIXELS_PER_PARSEC * 2.0f);
             }
