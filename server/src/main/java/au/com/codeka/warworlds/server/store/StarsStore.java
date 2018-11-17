@@ -7,6 +7,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.Building;
+import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -30,7 +32,7 @@ public class StarsStore extends BaseStore {
     try (QueryResult res =
              newReader().stmt("SELECT star FROM stars WHERE id = ?").param(0, id).query()) {
       if (res.next()) {
-        return Star.ADAPTER.decode(res.getBytes(0));
+        return processStar(Star.ADAPTER.decode(res.getBytes(0)));
       }
     } catch (Exception e) {
       log.error("Unexpected.", e);
@@ -105,7 +107,7 @@ public class StarsStore extends BaseStore {
             .stmt("SELECT star FROM stars WHERE next_simulation IS NOT NULL ORDER BY next_simulation ASC")
             .query()) {
       if (res.next()) {
-        return Star.ADAPTER.decode(res.getBytes(0));
+        return processStar(Star.ADAPTER.decode(res.getBytes(0)));
       }
     } catch (Exception e) {
       log.error("Unexpected.", e);
@@ -121,13 +123,33 @@ public class StarsStore extends BaseStore {
         .query()) {
       ArrayList<Star> stars = new ArrayList<>();
       while (res.next()) {
-        stars.add(Star.ADAPTER.decode(res.getBytes(0)));
+        stars.add(processStar(Star.ADAPTER.decode(res.getBytes(0))));
       }
       return stars;
     } catch (Exception e) {
       log.error("Unexpected.", e);
       return null;
     }
+  }
+
+  /** Do some pre-processing on the star. */
+  private Star processStar(Star s) {
+    // TODO: after we've loaded all the stars at least once, remove this logic.
+    Star.Builder sb = s.newBuilder();
+    for (int i = 0 ; i < sb.planets.size(); i++) {
+      if (sb.planets.get(i).colony != null) {
+        Colony.Builder cb = sb.planets.get(i).colony.newBuilder();
+        for (int j = 0; j < cb.buildings.size(); j++) {
+          Building.Builder bb = cb.buildings.get(j).newBuilder();
+          if (bb.id == null || bb.id == 0) {
+            bb.id(DataStore.i.seq().nextIdentifier());
+            cb.buildings.set(j, bb.build());
+          }
+        }
+        sb.planets.set(i, sb.planets.get(i).newBuilder().colony(cb.build()).build());
+      }
+    }
+    return sb.build();
   }
 
   public ArrayList<Long> getStarsForEmpire(long empireId) {

@@ -201,6 +201,7 @@ message StarModification {
     // Add a build request, start building it.
     // empire_id, colony_id, design_type are required.
     // count is required for ship builds.
+    // building_id is required to upgrade a building (rather than build a new one).
     ADD_BUILD_REQUEST = 4;
 
     // Create a new building, ignored if sent from client.
@@ -238,6 +239,7 @@ message StarModification {
   optional int64 colony_id = 4;
   optional int64 fleet_id = 5;
   optional int64 build_request_id = 12;
+  optional int64 building_id = 13;
 
   optional ColonyFocus focus = 6;
   optional Design.DesignType design_type = 7;

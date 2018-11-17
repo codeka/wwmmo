@@ -49,6 +49,9 @@ message ColonyFocus {
 
 // Represents a completed building in a colony.
 message Building {
+  // A unique ID for this building.
+  optional int64 id = 4;
+
   // The type of the design of this building
   optional Design.DesignType design_type = 1;
 

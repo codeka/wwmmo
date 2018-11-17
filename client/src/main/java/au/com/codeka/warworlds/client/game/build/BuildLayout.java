@@ -106,14 +106,12 @@ public class BuildLayout extends RelativeLayout {
 
     bottomPaneContentView = new UpgradeBottomPane(
         getContext(), star, colony, design, building, (bldg) -> {
-/* TODO: upgrade the building
       StarManager.i.updateStar(star, new StarModification.Builder()
           .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
           .colony_id(colony.id)
-          .
+          .building_id(building.)
           .design_type(designType)
           .count(count));
-*/
       hideBottomSheet();
     });
 
