@@ -34,22 +34,18 @@ public class BitmapTexture extends Texture {
 
   @Override
   public void bind() {
-    if (loader != null) {
-      if (loader.isLoaded()) {
-        setTextureId(loader.createGlTexture());
-        loader = null;
-      }
+    if (loader != null && loader.isLoaded()) {
+      setTextureId(loader.createGlTexture());
+      loader = null;
     }
 
     super.bind();
   }
 
-  @Nullable
   public static BitmapTexture load(Context context, String fileName) {
     return new BitmapTexture(new Loader(context, fileName, null /* url */));
   }
 
-  @Nullable
   public static BitmapTexture loadUrl(Context context, String url) {
     return new BitmapTexture(new Loader(context, null /* fileName */, url));
   }
@@ -63,7 +59,7 @@ public class BitmapTexture extends Texture {
     private String url;
     private Bitmap bitmap;
 
-    public Loader(Context context, @Nullable String fileName, @Nullable String url) {
+    Loader(Context context, @Nullable String fileName, @Nullable String url) {
       this.context = Preconditions.checkNotNull(context);
       Preconditions.checkState(fileName != null || url != null);
       this.fileName = fileName;
@@ -72,26 +68,19 @@ public class BitmapTexture extends Texture {
 
     public void load() {
       if (fileName != null) {
-        App.i.getTaskRunner().runTask(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              InputStream ins = context.getAssets().open(fileName);
-              bitmap = BitmapFactory.decodeStream(ins);
-            } catch (IOException e) {
-              log.warning("Error loading texture '%s'", fileName, e);
-            }
+        App.i.getTaskRunner().runTask(() -> {
+          try {
+            log.info("Loading resource: %s", fileName);
+            InputStream ins = context.getAssets().open(fileName);
+            bitmap = BitmapFactory.decodeStream(ins);
+          } catch (IOException e) {
+            log.error("Error loading texture '%s'", fileName, e);
           }
         }, Threads.BACKGROUND);
       } else {
-        App.i.getTaskRunner().runTask(new Runnable() {
-          @Override
-          public void run() {
-            Picasso.get()
-                .load(url)
-                .into(picassoTarget);
-          }
-        }, Threads.UI);
+        App.i.getTaskRunner().runTask(
+            () -> Picasso.get().load(url).into(picassoTarget),
+            Threads.UI);
       }
     }
 
@@ -99,7 +88,7 @@ public class BitmapTexture extends Texture {
       return bitmap != null;
     }
 
-    public int createGlTexture() {
+    int createGlTexture() {
       Preconditions.checkState(bitmap != null);
 
       final int[] textureHandleBuffer = new int[1];
@@ -108,6 +97,7 @@ public class BitmapTexture extends Texture {
       GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
       GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
       GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+
       return textureHandleBuffer[0];
     }
 

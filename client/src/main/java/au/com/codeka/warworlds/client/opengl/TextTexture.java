@@ -66,8 +66,10 @@ public class TextTexture extends Texture {
         id = textureHandleBuffer[0];
         setTextureId(id);
       }
+      super.bind();
       GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
       dirty = false;
+      return;
     }
 
     super.bind();
