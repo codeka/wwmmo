@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -363,6 +364,14 @@ public class Simulation {
           // the build cost is defined by the original design, or possibly by the upgrade if that
           // is what it is.
           Design.BuildCost buildCost = design.build_cost;
+          if (br.building_id != null) {
+            for (Building building : colony.buildings) {
+              if (Objects.equals(building.id, br.building_id)) {
+                buildCost = design.upgrades.get(building.level - 1).build_cost;
+                break;
+              }
+            }
+          }
           //if (br.mExistingFleetID != null) {
           //  ShipDesign shipDesign = (ShipDesign) design;
           //  ShipDesign.Upgrade upgrade = shipDesign.getUpgrade(br.getUpgradeID());

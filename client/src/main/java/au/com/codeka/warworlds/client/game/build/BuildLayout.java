@@ -109,9 +109,8 @@ public class BuildLayout extends RelativeLayout {
       StarManager.i.updateStar(star, new StarModification.Builder()
           .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
           .colony_id(colony.id)
-          .building_id(building.)
-          .design_type(designType)
-          .count(count));
+          .building_id(building.id)
+          .design_type(building.design_type));
       hideBottomSheet();
     });
 

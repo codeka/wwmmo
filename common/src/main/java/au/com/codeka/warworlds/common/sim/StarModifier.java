@@ -154,6 +154,9 @@ public class StarModifier {
       case EMPTY_NATIVE:
         applyEmptyNative(star, modification, logHandler);
         return;
+      case UPGRADE_BUILDING:
+        applyUpgradeBuilding(star, modification, logHandler);
+        return;
       default:
         logHandler.log("Unknown or unexpected modification type: " + modification.type);
         log.error("Unknown or unexpected modification type: %s", modification.type);
@@ -391,12 +394,42 @@ public class StarModifier {
         }
       }
 
+      // If this is not a building, then building_id must be null.
+      if (design.design_kind != Design.DesignKind.BUILDING && modification.building_id != null) {
+        throw new SuspiciousModificationException(
+            star.id,
+            modification,
+            "Cannot upgrade something that is not a building.");
+      }
+
+      // If the build request has a building_id, then that building should be on this colony.
+      if (modification.building_id != null) {
+        boolean found = false;
+        for (Building bldg : colonyBuilder.buildings) {
+          if (Objects.equals(bldg.id, modification.building_id)) {
+            found = true;
+          }
+        }
+        if (!found) {
+          throw new SuspiciousModificationException(
+              star.id,
+              modification,
+              "Cannot upgrade a building that doesn't exist: #%d", modification.building_id);
+        }
+      }
+
+      int count = 1;
+      if (design.design_kind == Design.DesignKind.SHIP) {
+        count = modification.count;
+      }
+
       logHandler.log("- adding build request");
       colonyBuilder.build_requests.add(new BuildRequest.Builder()
           .id(identifierGenerator.nextIdentifier())
           .design_type(modification.design_type)
+          .building_id(modification.building_id)
           .start_time(System.currentTimeMillis())
-          .count(modification.count)
+          .count(count)
           .progress(0.0f)
           .build());
       star.planets.set(planet.index, planet.newBuilder()
@@ -683,6 +716,48 @@ public class StarModifier {
       if (star.fleets.get(i).empire_id == null) {
         star.fleets.remove(i);
         i--;
+      }
+    }
+  }
+
+  private void applyUpgradeBuilding(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler)
+      throws SuspiciousModificationException {
+    checkArgument(
+        modification.type.equals(StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING));
+    logHandler.log("- upgrading building");
+    for (int i = 0; i < star.planets.size(); i++) {
+      if (star.planets.get(i).colony != null
+          && star.planets.get(i).colony.id.equals(modification.colony_id)) {
+        Colony.Builder colony = star.planets.get(i).colony.newBuilder();
+        if (!colony.empire_id.equals(modification.empire_id)) {
+          throw new SuspiciousModificationException(
+              star.id,
+              modification,
+              "trying to upgrade building belonging to different empire (%d)", colony.empire_id);
+        }
+
+        boolean found = false;
+        for (int j = 0; j < colony.buildings.size(); j++) {
+          if (colony.buildings.get(j).id.equals(modification.building_id)) {
+            found = true;
+            Building.Builder building = colony.buildings.get(j).newBuilder();
+            // TODO: check if it's at max level?
+            building.level(building.level + 1);
+            colony.buildings.set(j, building.build());
+          }
+        }
+
+        if (!found) {
+          throw new SuspiciousModificationException(
+              star.id,
+              modification,
+              "trying to upgrade building that doesn't exist (%d)", modification.building_id);
+        }
+
+        star.planets.set(i, star.planets.get(i).newBuilder().colony(colony.build()).build());
       }
     }
   }

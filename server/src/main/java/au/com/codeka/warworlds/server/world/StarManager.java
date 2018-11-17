@@ -205,16 +205,30 @@ public class StarManager {
           // It's finished. Add the actual thing it built.
           Design design = DesignHelper.getDesign(br.design_type);
           if (design.design_kind == Design.DesignKind.BUILDING) {
-            starModifier.modifyStar(
-                starBuilder,
-                null,
-                Lists.newArrayList(new StarModification.Builder()
-                    .type(StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
-                    .colony_id(planet.colony.id)
-                    .empire_id(planet.colony.empire_id)
-                    .design_type(br.design_type)
-                    .build()),
-                logHandler);
+            if (br.building_id != null) {
+              // It's an existing building that we're upgrading.
+              starModifier.modifyStar(starBuilder,
+                  null,
+                  Lists.newArrayList(new StarModification.Builder()
+                      .type(StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING)
+                      .colony_id(planet.colony.id)
+                      .empire_id(planet.colony.empire_id)
+                      .building_id(br.building_id)
+                      .build()),
+                  logHandler);
+            } else {
+              // It's a new building that we're creating.
+              starModifier.modifyStar(
+                  starBuilder,
+                  null,
+                  Lists.newArrayList(new StarModification.Builder()
+                      .type(StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
+                      .colony_id(planet.colony.id)
+                      .empire_id(planet.colony.empire_id)
+                      .design_type(br.design_type)
+                      .build()),
+                  logHandler);
+            }
           } else {
             starModifier.modifyStar(
                 starBuilder,

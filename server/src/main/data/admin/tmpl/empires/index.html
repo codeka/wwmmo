@@ -19,7 +19,7 @@
     {% for account in accounts %}
     <tr>
       <td>{{ account.empire_id }}</td>
-      <td>{% include "inc/empire_name.html" empire = empires[account.empire_id] %}</a></td>
+      <td>{% include "inc/empire_name.html" empire = empires[account.empire_id] %}</td>
       <td><span title="Canonical: {{ account.email_canonical }}">{{ account.email }}</span></td>
       <td><span title="{{ account.email_verification_code }}">{{ account.email_status }}</span></td>
       <td>{% if account.email_status != null && account.email_status.toString() == "UNVERIFIED" %}

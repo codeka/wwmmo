@@ -84,17 +84,16 @@ public class BuildingsView extends ListView implements TabContentView {
         // if the building is being upgraded (i.e. if there's a build request that
         // references this building) then add the build request as well
         for (BuildRequest br : BuildHelper.getBuildRequests(star)) {
-//          if (br.existing_building_id != null && br.existing_building_id.equals(b.id)) {
-//            entry.buildRequest = (BuildRequest) br;
-//          }
+          if (br.building_id != null && br.building_id.equals(b.id)) {
+            entry.buildRequest = br;
+          }
         }
         existingBuildingEntries.add(entry);
       }
 
       for (BuildRequest br : colony.build_requests) {
         Design design = DesignHelper.getDesign(br.design_type);
-        if (design.design_kind == Design.DesignKind.BUILDING
-          /*&& br.existing_building_id == null*/) {
+        if (design.design_kind == Design.DesignKind.BUILDING && br.building_id == null) {
           ItemEntry entry = new ItemEntry();
           entry.buildRequest = br;
           existingBuildingEntries.add(entry);
@@ -277,7 +276,7 @@ public class BuildingsView extends ListView implements TabContentView {
           row3.setVisibility(View.GONE);
           progress.setVisibility(View.VISIBLE);
           progress.setProgress(Math.round(buildRequest.progress * 100.0f));
-        } else if (building != null) {
+        } else /*if (building != null)*/ {
           if (numUpgrades < building.level) {
             row2.setText(getContext().getString(R.string.no_more_upgrades));
             row3.setVisibility(View.GONE);

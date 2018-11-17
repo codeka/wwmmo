@@ -69,6 +69,9 @@ message BuildRequest {
   // The type of the design being created.
   optional Design.DesignType design_type = 2;
 
+  // If we're upgrading a building, the building we're upgrading.
+  optional int64 building_id = 11;
+
   // The number of things being created. Required when building ships, otherwise ignored.
   optional int32 count = 3;
 

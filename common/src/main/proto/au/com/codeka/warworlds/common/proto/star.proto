@@ -231,6 +231,10 @@ message StarModification {
     // the client.
     // No fields are required.
     EMPTY_NATIVE = 10;
+
+    // Upgrades an existing building.
+    // empire_id, colony_id and buiding_id are required.
+    UPGRADE_BUILDING = 11;
   }
   optional MODIFICATION_TYPE type = 1;
 

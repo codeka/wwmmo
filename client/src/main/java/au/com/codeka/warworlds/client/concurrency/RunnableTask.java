@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.client.concurrency;
 
+import au.com.codeka.warworlds.common.Log;
+
 /**
  * A {@link Task} that encapsulates a {@link Runnable}, {@link RunnableP}, {@link RunnableR} or
  * {@link RunnablePR} that you want to run on a particular thread.
@@ -10,6 +12,8 @@ package au.com.codeka.warworlds.client.concurrency;
  *           not be ignored.
  */
 public class RunnableTask<P, R> extends Task<P, R> {
+  private static final Log log = new Log("RunnableTask");
+
   /** A runnable that takes a parameter. */
   public interface RunnableP<P> {
     void run(P param);
@@ -83,6 +87,7 @@ public class RunnableTask<P, R> extends Task<P, R> {
         }
         onComplete(result);
       } catch (Exception e) {
+        log.error("Unexpected.", e);
         onError(e);
       }
     });
