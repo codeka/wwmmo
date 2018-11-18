@@ -90,7 +90,7 @@ public class SceneObject {
   }
 
   public void removeChild(SceneObject child) {
-    Preconditions.checkState(child.parent == this);
+    Preconditions.checkState(child.parent == this, "%s != %s", child.parent, this);
     if (children != null) {
       children.remove(child);
       child.scene = null;

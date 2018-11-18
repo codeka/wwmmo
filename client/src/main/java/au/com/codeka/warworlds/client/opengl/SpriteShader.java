@@ -14,6 +14,7 @@ public class SpriteShader extends Shader {
   private int posHandle;
   private int texCoordHandle;
   private int texSamplerHandle;
+  private int alphaHandle;
 
   public SpriteShader() {
   }
@@ -24,6 +25,10 @@ public class SpriteShader extends Shader {
 
   public int getTexCoordHandle() {
     return texCoordHandle;
+  }
+
+  public int getAlphaHandle() {
+    return alphaHandle;
   }
 
   @Override
@@ -45,9 +50,12 @@ public class SpriteShader extends Shader {
     return TextUtils.join("\n", new String[]{
         "precision mediump float;",
         "uniform sampler2D uTexture;",
+        "uniform float uAlpha;",
         "varying vec2 vTexCoord;",
         "void main() {",
-        "  gl_FragColor = texture2D(uTexture, vTexCoord);",
+        "  vec4 color = texture2D(uTexture, vTexCoord);",
+        "  color.a = color.a * uAlpha;",
+        "  gl_FragColor = color;",
         "}",
     });
   }
@@ -57,6 +65,7 @@ public class SpriteShader extends Shader {
     posHandle = getAttributeLocation("aPosition");
     texCoordHandle = getAttributeLocation("aTexCoord");
     texSamplerHandle = getUniformLocation("uTexture");
+    alphaHandle = getUniformLocation("uAlpha");
   }
 
   @Override
