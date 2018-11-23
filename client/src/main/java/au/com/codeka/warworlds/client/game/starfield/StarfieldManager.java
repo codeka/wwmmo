@@ -88,6 +88,9 @@ public class StarfieldManager {
   /** A mapping of sector x,y coordinates to the list of {@link SceneObject}s for that sector. */
   private final Map<Pair<Long,Long>, ArrayList<SceneObject>> sectorSceneObjects = new HashMap<>();
 
+  /** A mapping of sector x,y coordinates to the {@link BackgroundSceneObject}s for that sector. */
+  private final Map<Pair<Long,Long>, BackgroundSceneObject> backgroundSceneObjects = new HashMap<>();
+
   /**
    * The "selection indicator" which is added to a star or fleet scene object to indicate the
    * current selection. It's never null, but it might not be attached to anything.
@@ -350,7 +353,9 @@ public class StarfieldManager {
 
       // Temporarily remove the container, and clear out it's children. We'll re-add them all.
       synchronized (scene.lock) {
-        scene.getRootObject().removeChild(container);
+        if (container.getParent() != null) {
+          scene.getRootObject().removeChild(container);
+        }
       }
       container.removeAllChildren();
     }
@@ -580,34 +585,20 @@ public class StarfieldManager {
   }
 
   private void createSectorBackground(long sectorX, long sectorY) {
-    SceneObject container = new SceneObject(scene.getDimensionResolver());
-    Sprite sprite = scene.createSprite(new SpriteTemplate.Builder()
-        .shader(scene.getSpriteShader())
-        .texture(scene.getTextureManager().loadTexture("stars/starfield.png"))
-        .build());
-    sprite.setSize(1024.0f, 1024.0f);
-    container.addChild(sprite);
+    BackgroundSceneObject backgroundSceneObject =
+        new BackgroundSceneObject(scene, sectorX, sectorY);
+    backgroundSceneObject.setZoomAmount(camera.getZoomAmount());
+    backgroundSceneObject.translate(
+        -(centerSectorX - sectorX) * 1024.0f,
+        (centerSectorY - sectorY) * 1024.0f);
 
-    Random rand = new Random(sectorX ^ sectorY * 41378L + 728247L);
-    for (int i = 0; i < 20; i++) {
-      int x = rand.nextInt(4);
-      int y = rand.nextInt(4);
-      sprite = scene.createSprite(new SpriteTemplate.Builder()
-          .shader(scene.getSpriteShader())
-          .texture(scene.getTextureManager().loadTexture("stars/gas.png"))
-          .uvTopLeft(new Vector2(0.25f * x, 0.25f * y))
-          .uvBottomRight(new Vector2(0.25f * x + 0.25f, 0.25f * y + 0.25f))
-          .build());
-      sprite.translate((rand.nextFloat() - 0.5f) * 1024.0f, (rand.nextFloat() - 0.5f) * 1024.0f);
-      float size = 300.0f + rand.nextFloat() * 200.0f;
-      sprite.setSize(size, size);
-      container.addChild(sprite);
+    Pair<Long, Long> xy = Pair.create(sectorX, sectorY);
+    addSectorSceneObject(xy, backgroundSceneObject);
+    synchronized (backgroundSceneObjects) {
+      backgroundSceneObjects.put(xy, backgroundSceneObject);
     }
-
-    container.translate(-(centerSectorX - sectorX) * 1024.0f, (centerSectorY - sectorY) * 1024.0f);
-    addSectorSceneObject(Pair.create(sectorX, sectorY), container);
     synchronized (scene.lock) {
-      scene.getRootObject().addChild(container);
+      scene.getRootObject().addChild(backgroundSceneObject);
     }
   }
 
@@ -678,6 +669,10 @@ public class StarfieldManager {
         }
         scene.getRootObject().removeChild(obj);
       }
+    }
+
+    synchronized (backgroundSceneObjects) {
+      backgroundSceneObjects.remove(sectorCoord);
     }
   }
 
@@ -779,6 +774,11 @@ public class StarfieldManager {
     @Override
     public void onScale(float factor) {
       camera.zoom(factor);
+      synchronized (backgroundSceneObjects) {
+        for (BackgroundSceneObject backgroundSceneObject : backgroundSceneObjects.values()) {
+          backgroundSceneObject.setZoomAmount(camera.getZoomAmount());
+        }
+      }
     }
 
     @Override
@@ -786,7 +786,7 @@ public class StarfieldManager {
       SceneObjectInfo selected = null;
 
       // Work out which object (if any) you tapped on.
-      synchronized (scene) {
+      synchronized (scene.lock) {
         SceneObject selectedSceneObject = null;
         float[] outVec = new float[4];
         Vector3 pos = new Vector3();

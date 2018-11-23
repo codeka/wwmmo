@@ -63,6 +63,10 @@ public class Camera {
     return screenHeight;
   }
 
+  public float getZoomAmount() {
+    return zoomAmount;
+  }
+
   public void onDraw() {
     if (flinging) {
       float dt = 0.016f;
@@ -126,5 +130,11 @@ public class Camera {
 
   public void zoom(float factor) {
     zoomAmount *= factor;
+    if (zoomAmount > 5.0f) {
+      zoomAmount = 5.0f;
+    }
+    if (zoomAmount < 0.25f) {
+      zoomAmount = 0.25f;
+    }
   }
 }
