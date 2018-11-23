@@ -30,7 +30,7 @@ public class Configuration {
   private static final Collection<String> FIREBASE_SCOPES =
       Lists.newArrayList("https://www.googleapis.com/auth/firebase.messaging");
 
-
+  @Expose private String baseUrl;
   @Expose private int listenPort;
   @Expose private SmtpConfig smtp;
   @Expose private JsonElement firebase;
@@ -84,6 +84,10 @@ public class Configuration {
       throw new RuntimeException("Should never happen.", e);
     }
     return firebaseCredentials;
+  }
+
+  public String getBaseUrl() {
+    return baseUrl;
   }
 
   public static class SmtpConfig {

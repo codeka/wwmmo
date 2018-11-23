@@ -61,10 +61,12 @@ public class AccountManager {
           "No empire associated with account: " + account.email_canonical);
     }
 
+    String verifyUrl =
+        au.com.codeka.warworlds.server.Configuration.i.getBaseUrl() + "/accounts/verify";
     Map<String, Object> data = ImmutableMap.of(
         "account", account,
         "empire", empire.get(),
-        "verification_url", "http://localhost:8080/accounts/verify");
+        "verification_url", verifyUrl);
 
     log.info("Sending verification email to '%s' for '%s' code: %s",
         account.email, empire.get().display_name, account.email_verification_code);
