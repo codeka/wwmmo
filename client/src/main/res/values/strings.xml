@@ -52,6 +52,7 @@
   <string name="fleets">Fleets</string>
   <string name="efficiency">Efficiency</string>
   <string name="upgrade">Upgrade</string>
+  <string name="settings">Settings</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to
@@ -114,5 +115,32 @@
   </string>
   <string name="signin_error_unknown">
     Oops, something\'s gone wrong!
+  </string>
+
+  <string name="empire_settings_patreon">Patreon</string>
+  <string name="empire_settings_patreon_desc">
+    Connect your empire to your Patreon account in order to collect your benefits!\n\n
+    <a href="https://www.patreon.com/codeka">And of course, click here to support me if you\'re not already!</a>
+  </string>
+  <string name="empire_settings_patreon_connect">Connect to Patreon</string>
+  <string name="empire_settings_rename">Rename Empire</string>
+  <string name="empire_settings_rename_desc">
+    You can purchase the ability to rename your empire for %1s below. Enter a new name and click
+    &quot;Rename&quot;.
+  </string>
+  <string name="empire_settings_shield">Upload Custom Shield</string>
+  <string name="empire_settings_shield_desc">
+    You can upload a custom shield image for %1s. Note: shield images will be reviewed and
+    inappropriate images will be removed.\n\n
+    <a href='http://www.war-worlds.com/doc/empire-settings/shield'>Click here for more
+    information.</a>
+  </string>
+  <string name="empire_settings_shield_choose">Choose Shield</string>
+  <string name="empire_settings_reset">Reset Empire</string>
+  <string name="empire_settings_reset_desc">
+    Resetting your empire will destroy your current empire and allow you to restart the game from a
+    fresh star. The cost of this purchase increases as the size of your empire increase: to reset
+    an empire with four stars or less is free, resetting an empire with up to 10 stars is %1s and
+    resetting an empire with &gt; 10 stars is %2s.
   </string>
 </resources>

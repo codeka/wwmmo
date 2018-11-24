@@ -25,6 +25,7 @@ public class EmpireLayout extends TabPlusContentView {
     addTab(R.string.colonies);
     addTab(R.string.build);
     addTab(R.string.fleets);
+    addTab(R.string.settings);
   }
 
   @Override
@@ -42,6 +43,8 @@ public class EmpireLayout extends TabPlusContentView {
       contentView = new BuildQueueView(getContext());
     } else if (index == 3) {
       contentView = new FleetsLayout(getContext(), new MyEmpireStarCollection());
+    } else if (index == 4) {
+      contentView = new SettingsView(getContext());
     }
     tabContent.addView(contentView);
   }

@@ -28,6 +28,7 @@ android {
     targetSdkVersion 28
     versionCode getVersionCodeFromGit()
     versionName "2.0"
+    multiDexEnabled true
   }
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
@@ -101,6 +102,8 @@ dependencies {
   implementation 'com.google.guava:guava:24.1-android'
   implementation 'com.squareup.picasso:picasso:2.71828'
   implementation 'com.squareup.wire:wire-runtime:2.1.2'
+  implementation 'com.android.support:multidex:1.0.3'
+  implementation 'com.patreon:patreon:0.4.2'
   implementation project(':common')
 }
 

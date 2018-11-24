@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       tools:parentTag="android.widget.ScrollView">
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+
+    <au.com.codeka.warworlds.client.ctrl.HorizontalSeparator
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/empire_settings_patreon"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:text="@string/empire_settings_patreon_desc"/>
+
+    <Button
+        android:id="@+id/patreon_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center"
+        android:text="@string/empire_settings_patreon_connect"/>
+
+    <au.com.codeka.warworlds.client.ctrl.HorizontalSeparator
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/empire_settings_rename"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:orientation="horizontal">
+      <EditText
+          android:id="@+id/rename"
+          android:layout_width="0dp"
+          android:layout_weight="1"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="10dp"
+          android:inputType="text"
+          android:ems="10"/>
+
+      <Button
+          android:id="@+id/rename_btn"
+          android:layout_width="100dp"
+          android:layout_height="30dp"
+          android:text="@string/rename"/>
+    </LinearLayout>
+
+    <au.com.codeka.warworlds.client.ctrl.HorizontalSeparator
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/empire_settings_shield"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:text="@string/empire_settings_shield_desc"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+      <ImageView
+          android:id="@+id/current_shield"
+          android:layout_width="60dp"
+          android:layout_height="60dp"
+          android:src="@drawable/app_icon"/>
+
+      <ImageView
+          android:id="@+id/current_shield_small"
+          android:layout_width="20dp"
+          android:layout_height="20dp"
+          android:layout_marginStart="-10dp"
+          android:layout_gravity="bottom"
+          android:src="@drawable/app_icon"/>
+
+      <Button
+          android:id="@+id/shield_change_btn"
+          android:layout_width="wrap_content"
+          android:layout_height="30dp"
+          android:layout_marginTop="15dp"
+          android:layout_marginStart="20dp"
+          android:text="@string/empire_settings_shield_choose"/>
+
+      <Button
+          android:id="@+id/save_btn"
+          android:layout_width="100dp"
+          android:layout_height="30dp"
+          android:layout_marginTop="15dp"
+          android:layout_marginStart="10dp"
+          android:enabled="false"
+          android:text="@string/save"/>
+    </LinearLayout>
+
+    <au.com.codeka.warworlds.client.ctrl.HorizontalSeparator
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/empire_settings_reset"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:text="@string/empire_settings_reset_desc"/>
+
+    <Button
+        android:id="@+id/reset_empire_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center"
+        android:text="@string/empire_settings_reset"/>
+
+  </LinearLayout>
+</merge>

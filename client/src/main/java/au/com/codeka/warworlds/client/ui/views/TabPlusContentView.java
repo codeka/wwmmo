@@ -25,7 +25,7 @@ public abstract class TabPlusContentView extends FrameLayout {
         new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT));
-    tabLayout.setTabMode(TabLayout.MODE_FIXED);
+    tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
     addView(tabLayout);
 
     tabContent = new FrameLayout(context);
