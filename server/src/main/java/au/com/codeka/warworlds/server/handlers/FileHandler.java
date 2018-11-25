@@ -59,6 +59,11 @@ public class FileHandler extends RequestHandler {
 
   @Override
   public void post() throws RequestException {
-    throw new RequestException(404);
+    String path = getExtraOption();
+    if (path == null) {
+      path = "";
+    }
+    path += getUrlParameter("path");
+    throw new RequestException(405, path);
   }
 }

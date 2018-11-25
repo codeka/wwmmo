@@ -16,5 +16,12 @@
   },
 
   // Firebase config stuff. Cut'n'paste from firebase console.
-  "firebase": {}
+  "firebase": {},
+
+  // Patreon config. Populate from https://www.patreon.com/portal/registration/register-clients
+  "patreon": {
+    "clientId": null,
+    "clientSecret": null,
+    "redirectUri": null
+  }
 }

@@ -19,7 +19,7 @@ apply plugin: 'org.hidetake.ssh'
 
 dependencies {
   implementation 'au.com.codeka:carrot:2.4.1'
-  implementation 'joda-time:joda-time:2.9.2'
+  implementation 'joda-time:joda-time:2.9.9'
   implementation 'com.google.api-client:google-api-client:1.25.0'
   implementation 'com.google.api-client:google-api-client-gson:1.25.0'
   implementation 'com.google.code.findbugs:jsr305:3.0.2'
@@ -31,7 +31,7 @@ dependencies {
   implementation 'org.eclipse.jetty:jetty-server:9.4.0.v20161208'
   implementation 'org.eclipse.jetty.websocket:websocket-server:9.4.0.v20161208'
   implementation 'org.xerial:sqlite-jdbc:3.16.1'
-  //compile project(':carrot')
+  implementation 'com.patreon:patreon:0.4.2'
   implementation project(':common')
   implementation project(':planet-render')
 }
@@ -80,6 +80,13 @@ remotes {
     host = 'wwmmo.codeka.com.au'
     user = 'wwmmo'
     identity = file('../../wwmmo2.id_rsa')
+  }
+}
+
+startScripts {
+  doLast {
+    // Remove too-long-classpath and use wildcard ( works for java 6 and above only)
+    windowsScript.text = windowsScript.text.replaceAll('set CLASSPATH=.*', 'set CLASSPATH=.;%APP_HOME%/lib/*')
   }
 }
 

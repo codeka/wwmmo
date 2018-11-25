@@ -31,6 +31,16 @@
         android:layout_gravity="center"
         android:text="@string/empire_settings_patreon_connect"/>
 
+    <TextView
+      android:id="@+id/patreon_complete"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:layout_margin="20dp"
+      android:visibility="gone"
+      tools:text="Connected to Patreon!"
+      tools:visibility="visible" />
+
     <au.com.codeka.warworlds.client.ctrl.HorizontalSeparator
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

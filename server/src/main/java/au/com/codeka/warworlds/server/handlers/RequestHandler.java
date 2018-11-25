@@ -141,7 +141,7 @@ public class RequestHandler {
         String.format(Locale.US, "private, max-age=%d", (int)(hours * 3600)));
     if (etag != null) {
       etag = BaseEncoding.base64().encode(
-          Hashing.sha1().hashString(etag, Charset.defaultCharset()).asBytes());
+          Hashing.sha256().hashString(etag, Charset.defaultCharset()).asBytes());
       response.setHeader("ETag", String.format("\"%s\"", etag));
     }
   }

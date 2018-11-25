@@ -12,6 +12,7 @@ import au.com.codeka.warworlds.server.html.account.AccountAssociateHandler;
 import au.com.codeka.warworlds.server.html.account.AccountVerifyHandler;
 import au.com.codeka.warworlds.server.html.account.AccountsHandler;
 import au.com.codeka.warworlds.server.html.account.LoginHandler;
+import au.com.codeka.warworlds.server.html.account.PatreonBeginHandler;
 import au.com.codeka.warworlds.server.html.render.EmpireRendererHandler;
 import au.com.codeka.warworlds.server.html.render.PlanetRendererHandler;
 import au.com.codeka.warworlds.server.html.render.StarRendererHandler;
@@ -25,6 +26,7 @@ public class HtmlServlet extends HandlerServlet {
       new Route("/accounts", AccountsHandler.class),
       new Route("/accounts/associate", AccountAssociateHandler.class),
       new Route("/accounts/verify", AccountVerifyHandler.class),
+      new Route("/accounts/patreon-begin", PatreonBeginHandler.class),
       new Route("/login", LoginHandler.class),
       new Route(
           "/render/star/(?<star>[0-9]+)/(?<width>[0-9]+)x(?<height>[0-9]+)/(?<bucket>[a-z]+dpi)\\.png$",

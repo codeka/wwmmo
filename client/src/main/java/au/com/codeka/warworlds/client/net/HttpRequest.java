@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.common.Log;
 
 /**
@@ -42,6 +43,10 @@ public class HttpRequest {
       URL url = new URL(builder.url);
       conn = (HttpURLConnection) url.openConnection();
       conn.setRequestMethod(builder.method.toString());
+      if (builder.authenticated) {
+        String cookie = GameSettings.i.getString(GameSettings.Key.COOKIE);
+        conn.setRequestProperty("COOKIE", cookie);
+      }
       for (String key : builder.headers.keySet()) {
         conn.setRequestProperty(key, builder.headers.get(key));
       }
@@ -104,7 +109,7 @@ public class HttpRequest {
     try {
       Field adapterField = protoType.getField("ADAPTER");
       ProtoAdapter<T> adapter = (ProtoAdapter<T>) adapterField.get(null);
-      return (T) adapter.decode(bytes);
+      return adapter.decode(bytes);
     } catch (IOException e) {
       exception = e;
       log.warning("Error fetching '%s'", url, e);
@@ -120,6 +125,7 @@ public class HttpRequest {
     private Method method;
     private HashMap<String, String> headers;
     private byte[] body;
+    private boolean authenticated;
 
     public Builder() {
       method = Method.GET;
@@ -138,6 +144,11 @@ public class HttpRequest {
 
     public Builder header(String name, String value) {
       headers.put(name, value);
+      return this;
+    }
+
+    public Builder authenticated() {
+      this.authenticated = true;
       return this;
     }
 

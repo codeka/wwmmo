@@ -34,6 +34,7 @@ public class Configuration {
   @Expose private int listenPort;
   @Expose private SmtpConfig smtp;
   @Expose private JsonElement firebase;
+  @Expose private PatreonConfig patreon;
 
   @Nullable
   private GoogleCredentials firebaseCredentials;
@@ -65,6 +66,10 @@ public class Configuration {
 
   public SmtpConfig getSmtp() {
     return smtp;
+  }
+
+  public PatreonConfig getPatreon() {
+    return patreon;
   }
 
   public GoogleCredentials getFirebaseCredentials() {
@@ -124,7 +129,21 @@ public class Configuration {
     }
   }
 
-  public static class FcmConfig {
-    @Expose private String projectID;
+  public static class PatreonConfig {
+    @Expose private String clientId;
+    @Expose private String clientSecret;
+    @Expose private String redirectUri;
+
+    public String getClientId() {
+      return clientId;
+    }
+
+    public String getClientSecret() {
+      return clientSecret;
+    }
+
+    public String getRedirectUri() {
+      return redirectUri;
+    }
   }
 }

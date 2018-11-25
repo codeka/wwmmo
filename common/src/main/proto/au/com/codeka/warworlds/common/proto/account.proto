@@ -143,3 +143,22 @@ message FcmDeviceInfo {
   // The device ID that firebase reports.
   optional string device_id = 2;
 }
+
+// Contains the request parameters for /account/patreon-begin.
+message PatreonBeginRequest {
+  // The EmpireID of the requesting empire. Must match who you're authenticated as.
+  optional int64 empire_id = 1;
+}
+
+// Contains the response to a /account/patreon-begin request, that is, all the stuff needed to start
+// the Patreon OAuth handshake.
+message PatreonBeginResponse {
+  // Client ID. Required.
+  optional string client_id = 1;
+
+  // Redirect URI. Required.
+  optional string redirect_uri = 2;
+
+  // The state that we pass to Patreon, that'll get passed back to our Redirect URI.
+  optional string state = 3;
+}
