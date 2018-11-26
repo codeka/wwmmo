@@ -1,8 +1,12 @@
 package au.com.codeka.warworlds.server.world;
 
+import au.com.codeka.warworlds.server.handlers.RequestException;
+import com.github.jasminb.jsonapi.JSONAPIDocument;
 import com.google.common.collect.Lists;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -17,6 +21,10 @@ import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
+import com.patreon.PatreonAPI;
+import com.patreon.PatreonOAuth;
+import com.patreon.resources.Pledge;
+import com.patreon.resources.User;
 
 /**
  * Manages empires, keeps them loaded and ensure they get saved to the data store at the right time.
@@ -131,6 +139,36 @@ public class EmpireManager {
         SectorsStore.SectorState.NonEmpty);
 
     return watchEmpire(empire);
+  }
+
+  /**
+   * Refreshes the Patreon pledge data for the given {@link Empire}, by making a request to
+   * Patreon's server with the given access token.
+   */
+  public void refreshPatreonPledges(
+      WatchableObject<Empire> empire,
+      PatreonOAuth.TokensResponse tokens) throws IOException {
+    log.info("Refreshing Patreon pledges for %d (%s)...", empire.get().id, empire.get().display_name);
+
+    String accessToken = tokens.getAccessToken();
+    PatreonAPI apiClient = new PatreonAPI(accessToken);
+    JSONAPIDocument<User> userJson = apiClient.fetchUser();
+    User user = userJson.get();
+
+    log.info("  full name: %s", user.getFullName());
+    log.info("  about: %s", user.getAbout());
+    log.info("  discord: %s", user.getDiscordId());
+    user.
+    int maxPledge = 0;
+    if (user.getPledges() != null) {
+      for (Pledge pledge : user.getPledges()) {
+        if (!pledge.getPaused() && pledge.getAmountCents() > maxPledge) {
+          maxPledge = pledge.getAmountCents();
+        }
+      }
+    }
+    log.info("  max pledge: %d", maxPledge);
+
   }
 
   private WatchableObject<Empire> watchEmpire(Empire empire) {

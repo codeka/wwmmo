@@ -55,4 +55,18 @@ message Empire {
 
   // the time we last saw this empire.
   optional int64 last_seen = 8;
+
+  // The Patreon tier this empire is at. We'll use this to decide whether they get a decoration on
+  // their shield, whether IAPs are made free, etc.
+  enum PatreonTier {
+    // The empire is not a Patron.
+    NONE = 0;
+    // The empire is at the 'fan' tier, $1.
+    FAN = 1;
+    // The empire is at the 'patron' tier, $5.
+    PATRON = 2;
+    // The empire is at the 'empire' tier, $10.
+    EMPIRE = 3;
+  }
+  optional PatreonTier patreon_tier = 9;
 }

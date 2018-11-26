@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.common.proto.DeviceInfo;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
+import com.patreon.PatreonOAuth;
 
 /** Storage for empires. */
 public class EmpiresStore extends BaseStore {
@@ -98,6 +99,24 @@ public class EmpiresStore extends BaseStore {
     return devices;
   }
 
+  public void savePatreonInfo(long empireID, PatreonOAuth.TokensResponse tokens, ) {
+    try {
+      newWriter()
+          .stmt("INSERT OR REPLACE INTO patreon_tokens (" +
+              "empire_id, access_token, refresh_token, token_type, scope, expiry" +
+              ") VALUES (?, ?, ?, ?, ?, ?)")
+          .param(0, empireID)
+          .param(1, tokens.getAccessToken())
+          .param(2, tokens.getRefreshToken())
+          .param(3, tokens.getTokenType())
+          .param(4, tokens.getScope())
+          .param(5, tokens.getExpiresIn()) // TODO: we assume this is # of seconds?
+          .execute();
+    } catch (StoreException e) {
+      log.error("Unexpected.", e);
+    }
+  }
+
   @Override
   protected int onOpen(int diskVersion) throws StoreException {
     if (diskVersion == 0) {
@@ -119,6 +138,19 @@ public class EmpiresStore extends BaseStore {
           .execute();
       newWriter()
           .stmt("CREATE UNIQUE INDEX IX_devices_empire_device ON devices (empire_id, device_id)")
+          .execute();
+      diskVersion++;
+    }
+    if (diskVersion == 2) {
+      newWriter()
+          .stmt(
+              "CREATE TABLE patreon_tokens (" +
+                  "  empire_id INTEGER PRIMARY KEY," +
+                  "  access_token STRING," +
+                  "  refresh_token STRING," +
+                  "  token_type STRING," +
+                  "  scope STRING," +
+                  "  expiry INTEGER)")
           .execute();
       diskVersion++;
     }

@@ -1,0 +1,40 @@
+package au.com.codeka.warworlds.server.proto;
+
+// Details about a user's patreon account.
+message PatreonInfo {
+    // The empire_id that they associated with.
+    optional int64 empire_id = 1;
+
+    // OAuth access token.
+    optional string access_token = 2;
+
+    // OAuth refresh token.
+    optional string refresh_token = 3;
+
+    // OAuth token type.
+    optional string token_type = 4;
+
+    // OAuth token_scope.
+    optional string token_scope = 5;
+
+    // OAuth token expiry.
+    optional int64 token_expiry_time = 6;
+
+    // Full name on Patreon.
+    optional string full_name = 7;
+
+    // Discord ID that they've associated with Patreon.
+    optional string discord_id = 8;
+
+    // The user's 'about' string.
+    optional string about = 9;
+
+    // The user's image.
+    optional string image_url = 10;
+
+    // The user's email address (if they have one).
+    optional string email = 11;
+
+    // The maximum current pledge amount the user has pledged to us (in cents).
+    optional int32 max_pledge = 12;
+}
