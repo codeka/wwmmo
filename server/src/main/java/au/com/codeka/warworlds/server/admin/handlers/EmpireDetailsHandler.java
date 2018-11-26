@@ -10,9 +10,11 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Notification;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.handlers.RequestException;
+import au.com.codeka.warworlds.server.proto.PatreonInfo;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.world.NotificationManager;
 import au.com.codeka.warworlds.server.world.StarManager;
+import au.com.codeka.warworlds.server.world.WatchableObject;
 
 /**
  * Handler for /admin/empires/xxx which shows details about the empire with id xxx.
@@ -25,7 +27,6 @@ public class EmpireDetailsHandler extends AdminHandler {
     if (empire == null) {
       throw new RequestException(404);
     }
-
 
     complete(empire, ImmutableMap.builder());
   }
@@ -55,16 +56,24 @@ public class EmpireDetailsHandler extends AdminHandler {
 
   private void complete(Empire empire, ImmutableMap.Builder<String, Object> mapBuilder)
       throws RequestException {
+    mapBuilder.put("empire", empire);
+
     ArrayList<Star> stars = new ArrayList<>();
     for (Long starId : DataStore.i.stars().getStarsForEmpire(empire.id)) {
-      stars.add(StarManager.i.getStar(starId).get());
+      WatchableObject<Star> star = StarManager.i.getStar(starId);
+      if (star != null) {
+        stars.add(star.get());
+      }
+    }
+    mapBuilder.put("stars", stars);
+
+    mapBuilder.put("devices", DataStore.i.empires().getDevicesForEmpire(empire.id));
+
+    PatreonInfo patreonInfo = DataStore.i.empires().getPatreonInfo(empire.id);
+    if (patreonInfo != null) {
+      mapBuilder.put("patreon", patreonInfo);
     }
 
-    List<DeviceInfo> devices = DataStore.i.empires().getDevicesForEmpire(empire.id);
-    render("empires/details.html", mapBuilder
-        .put("empire", empire)
-        .put("stars", stars)
-        .put("devices", devices)
-        .build());
+    render("empires/details.html", mapBuilder.build());
   }
 }

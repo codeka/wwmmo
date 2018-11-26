@@ -29,14 +29,20 @@
     </tr>
     {% end %}
   </table>
+  <h2>Send message</h2>
   <form method="post">
-    <p>Send message to {{ empire.display_name}}:</p>
     <input type="text" name="msg">
     <input type="submit" value="Send">
     {% if error %}
       <p class="error">{{ error }}</p>
     {% end %}
   </form>
+  {% if patreon %}
+    <h2>Patreon</h2>
+    <textarea>
+      {{ Gson.encode(patreon) }}
+    </textarea>
+  {% end %}
   <h2>Stars</h2>
   <table>
     <tr>

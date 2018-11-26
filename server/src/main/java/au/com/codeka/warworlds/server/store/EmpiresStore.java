@@ -114,6 +114,24 @@ public class EmpiresStore extends BaseStore {
     }
   }
 
+  /** Gets the {@link PatreonInfo} for the given empire. */
+  @Nullable
+  public PatreonInfo getPatreonInfo(long empireId) {
+    try {
+      QueryResult res = newReader()
+          .stmt("SELECT patreon_info FROM patreon_info WHERE empire_id=?")
+          .param(0, empireId)
+          .query();
+      if (res.next()) {
+        return PatreonInfo.ADAPTER.decode(res.getBytes(0));
+      }
+      return null;
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+      return null;
+    }
+  }
+
   @Override
   protected int onOpen(int diskVersion) throws StoreException {
     if (diskVersion == 0) {

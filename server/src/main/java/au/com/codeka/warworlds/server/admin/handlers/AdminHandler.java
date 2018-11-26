@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.admin.handlers;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +54,8 @@ public class AdminHandler extends RequestHandler {
           .build(),
       new MapBindings.Builder()
           .set("Session", new SessionHelper())
-          .set("String", new StringHelper()));
+          .set("String", new StringHelper())
+          .set("Gson", new GsonHelper()));
 
   private Session session;
 
@@ -150,7 +152,7 @@ public class AdminHandler extends RequestHandler {
   }
 
   protected void authenticate() {
-    URI requestUrl = null;
+    URI requestUrl;
     try {
       requestUrl = new URI(getRequestUrl());
     } catch (URISyntaxException e) {
@@ -167,7 +169,6 @@ public class AdminHandler extends RequestHandler {
 
     redirect(redirectUrl);
   }
-
 
   protected Session getSession() throws RequestException {
     if (session == null) {
@@ -208,6 +209,13 @@ public class AdminHandler extends RequestHandler {
         return s.substring(0, maxLength - 3) + "...";
       }
       return s;
+    }
+  }
+
+  private static class GsonHelper {
+    @SuppressWarnings("unused") // Used by template engine.
+    public String encode(Object obj) {
+      return new Gson().toJson(obj);
     }
   }
 }
