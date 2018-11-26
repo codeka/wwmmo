@@ -6,6 +6,7 @@ import au.com.codeka.warworlds.common.proto.PatreonBeginRequest;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.handlers.ProtobufRequestHandler;
 import au.com.codeka.warworlds.server.handlers.RequestException;
+import au.com.codeka.warworlds.server.proto.PatreonInfo;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.EmpiresStore;
 import au.com.codeka.warworlds.server.world.EmpireManager;
@@ -32,15 +33,29 @@ public class ConnectToPatreonHandler extends ProtobufRequestHandler {
     String state = getRequest().getParameter("state");
 
     Configuration.PatreonConfig patreonConfig = Configuration.i.getPatreon();
-    PatreonOAuth oauthClient = new PatreonOAuth(
-        patreonConfig.getClientId(), patreonConfig.getClientSecret(), patreonConfig.getRedirectUri());
+    PatreonOAuth oauthClient =
+        new PatreonOAuth(
+            patreonConfig.getClientId(),
+            patreonConfig.getClientSecret(),
+            patreonConfig.getRedirectUri());
     try {
       PatreonOAuth.TokensResponse tokens = oauthClient.getTokens(code);
-      PatreonBeginRequest req = PatreonBeginRequest.ADAPTER.decode(BaseEncoding.base64().decode(state));
-      DataStore.i.empires().savePatreonToken(req.empire_id, tokens);
+      PatreonBeginRequest req =
+          PatreonBeginRequest.ADAPTER.decode(BaseEncoding.base64().decode(state));
+
+      // Set up an empty PatreonInfo, that we'll then populate.
+      PatreonInfo patreonInfo = new PatreonInfo.Builder()
+          .empire_id(req.empire_id)
+          .access_token(tokens.getAccessToken())
+          .refresh_token(tokens.getRefreshToken())
+          .token_expiry_time((long) tokens.getExpiresIn())
+          .token_type(tokens.getTokenType())
+          .token_scope(tokens.getScope())
+          .build();
+      DataStore.i.empires().savePatreonInfo(req.empire_id, patreonInfo);
 
       WatchableObject<Empire> empire = EmpireManager.i.getEmpire(req.empire_id);
-      EmpireManager.i.refreshPatreonPledges(empire, tokens);
+      EmpireManager.i.refreshPatreonInfo(empire, patreonInfo);
     } catch (IOException e) {
       throw new RequestException(e);
     }

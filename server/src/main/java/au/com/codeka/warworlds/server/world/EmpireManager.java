@@ -18,6 +18,7 @@ import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
+import au.com.codeka.warworlds.server.proto.PatreonInfo;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
@@ -142,23 +143,18 @@ public class EmpireManager {
   }
 
   /**
-   * Refreshes the Patreon pledge data for the given {@link Empire}, by making a request to
-   * Patreon's server with the given access token.
+   * Refreshes the Patreon data for the given {@link Empire}, by making a request to Patreon's
+   * server.
    */
-  public void refreshPatreonPledges(
-      WatchableObject<Empire> empire,
-      PatreonOAuth.TokensResponse tokens) throws IOException {
-    log.info("Refreshing Patreon pledges for %d (%s)...", empire.get().id, empire.get().display_name);
+  public void refreshPatreonInfo(
+      WatchableObject<Empire> empire, PatreonInfo patreonInfo) throws IOException {
+    log.info("Refreshing Patreon pledges for %d (%s).",
+        empire.get().id, empire.get().display_name);
 
-    String accessToken = tokens.getAccessToken();
-    PatreonAPI apiClient = new PatreonAPI(accessToken);
+    PatreonAPI apiClient = new PatreonAPI(patreonInfo.access_token);
     JSONAPIDocument<User> userJson = apiClient.fetchUser();
     User user = userJson.get();
 
-    log.info("  full name: %s", user.getFullName());
-    log.info("  about: %s", user.getAbout());
-    log.info("  discord: %s", user.getDiscordId());
-    user.
     int maxPledge = 0;
     if (user.getPledges() != null) {
       for (Pledge pledge : user.getPledges()) {
@@ -167,8 +163,17 @@ public class EmpireManager {
         }
       }
     }
-    log.info("  max pledge: %d", maxPledge);
 
+    patreonInfo = patreonInfo.newBuilder()
+        .full_name(user.getFullName())
+        .about(user.getAbout())
+        .discord_id(user.getDiscordId())
+        .patreon_url(user.getUrl())
+        .email(user.getEmail())
+        .image_url(user.getImageUrl())
+        .max_pledge(maxPledge)
+        .build();
+    DataStore.i.empires().savePatreonInfo(empire.get().id, patreonInfo);
   }
 
   private WatchableObject<Empire> watchEmpire(Empire empire) {

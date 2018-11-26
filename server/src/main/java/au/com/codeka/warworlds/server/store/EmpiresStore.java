@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.DeviceInfo;
 import au.com.codeka.warworlds.common.proto.Empire;
+import au.com.codeka.warworlds.server.proto.PatreonInfo;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
 import com.patreon.PatreonOAuth;
@@ -99,18 +100,14 @@ public class EmpiresStore extends BaseStore {
     return devices;
   }
 
-  public void savePatreonInfo(long empireID, PatreonOAuth.TokensResponse tokens, ) {
+  public void savePatreonInfo(long empireID, PatreonInfo patreonInfo) {
     try {
       newWriter()
-          .stmt("INSERT OR REPLACE INTO patreon_tokens (" +
-              "empire_id, access_token, refresh_token, token_type, scope, expiry" +
-              ") VALUES (?, ?, ?, ?, ?, ?)")
+          .stmt("INSERT OR REPLACE INTO patreon_info (" +
+              "empire_id, token_expiry_time, patreon_info) VALUES (?, ?, ?)")
           .param(0, empireID)
-          .param(1, tokens.getAccessToken())
-          .param(2, tokens.getRefreshToken())
-          .param(3, tokens.getTokenType())
-          .param(4, tokens.getScope())
-          .param(5, tokens.getExpiresIn()) // TODO: we assume this is # of seconds?
+          .param(1, patreonInfo.token_expiry_time)
+          .param(2, patreonInfo.encode())
           .execute();
     } catch (StoreException e) {
       log.error("Unexpected.", e);
@@ -144,13 +141,10 @@ public class EmpiresStore extends BaseStore {
     if (diskVersion == 2) {
       newWriter()
           .stmt(
-              "CREATE TABLE patreon_tokens (" +
+              "CREATE TABLE patreon_info (" +
                   "  empire_id INTEGER PRIMARY KEY," +
-                  "  access_token STRING," +
-                  "  refresh_token STRING," +
-                  "  token_type STRING," +
-                  "  scope STRING," +
-                  "  expiry INTEGER)")
+                  "  token_expiry_time INTEGER," +
+                  "  patreon_info BLOB)")
           .execute();
       diskVersion++;
     }
