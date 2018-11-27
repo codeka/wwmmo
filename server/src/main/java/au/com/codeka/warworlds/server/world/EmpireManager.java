@@ -158,7 +158,7 @@ public class EmpireManager {
     int maxPledge = 0;
     if (user.getPledges() != null) {
       for (Pledge pledge : user.getPledges()) {
-        if (!pledge.getPaused() && pledge.getAmountCents() > maxPledge) {
+        if (pledge.getAmountCents() > maxPledge) {
           maxPledge = pledge.getAmountCents();
         }
       }
