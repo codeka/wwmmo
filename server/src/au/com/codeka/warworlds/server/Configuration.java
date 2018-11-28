@@ -37,6 +37,7 @@ public class Configuration {
   @Expose private DatabaseConfiguration database;
   @Expose private SinbinConfiguration sinbin;
   @Expose private LimitsConfiguration limits;
+  @Expose private PatreonConfig patreon;
 
   public Configuration() {
     limits = new LimitsConfiguration();
@@ -71,6 +72,10 @@ public class Configuration {
 
   public LimitsConfiguration getLimits() {
     return limits;
+  }
+
+  public PatreonConfig getPatreon() {
+    return patreon;
   }
 
   public static class DatabaseConfiguration {
@@ -156,6 +161,24 @@ public class Configuration {
 
     public double getMaxEmojiRatio() {
       return maxEmojiRatio;
+    }
+  }
+
+  public static class PatreonConfig {
+    @Expose private String clientId;
+    @Expose private String clientSecret;
+    @Expose private String redirectUri;
+
+    public String getClientId() {
+      return clientId;
+    }
+
+    public String getClientSecret() {
+      return clientSecret;
+    }
+
+    public String getRedirectUri() {
+      return redirectUri;
     }
   }
 }

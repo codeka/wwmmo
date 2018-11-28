@@ -44,5 +44,12 @@
     // long (which would allow you to send an all-emoji message if it consisted of <= 4 emojis).
     // 20% is the default.
     "maxEmojiRatio": 0.2,
+  },
+
+  // Patreon config. Populate from https://www.patreon.com/portal/registration/register-clients
+  "patreon": {
+    "clientId": "",
+    "clientSecret": "",
+    "redirectUri": ""
   }
 }

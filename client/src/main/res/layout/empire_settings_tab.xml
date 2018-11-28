@@ -1,138 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
 
-        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-            android:id="@+id/horz_sep_1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="Empire Rename" />
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/rename_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/horz_sep_1"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="@dimen/tablet_margin_5dp"
-            android:layout_marginRight="@dimen/tablet_margin_5dp"
-            android:text="You can purchase the ability to rename your empire for %1s below. Enter a new name and click &quot;Rename&quot;." />
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+      android:id="@+id/horz_sep_4"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentTop="true"
+      android:text="Patreon" />
 
-       <EditText
-            android:id="@+id/rename"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/rename_desc"
-            android:layout_toLeftOf="@+id/rename_btn"
-            android:layout_marginRight="10dp"
-            android:layout_below="@+id/rename_desc"
-            android:inputType="text"
-            android:ems="10" />
+    <TextView
+      android:id="@+id/patreon_desc"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginTop="5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp"
+      android:layout_marginBottom="5dp"
+      android:layout_below="@+id/horz_sep_4"
+      android:text="Connect your empire to your Patreon account in order to collect your benefits!&lt;br/&gt;&lt;br/&gt;&lt;a href='https://www.patreon.com/codeka'&gt;And of course, click here to support me if you're not already!&lt;/a&gt;" />
 
-        <Button
-            android:id="@+id/rename_btn"
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:layout_alignRight="@+id/rename_desc"
-            android:layout_alignTop="@+id/rename"
-            android:text="Rename" />
+    <Button
+      android:id="@+id/patreon_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="30dp"
+      android:layout_centerHorizontal="true"
+      android:layout_marginTop="15dp"
+      android:layout_below="@+id/patreon_desc"
+      android:text="Connect to Patreon" />
 
-        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-            android:id="@+id/horz_sep_2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/rename"
-            android:layout_marginTop="10dp"
-            android:text="Upload Custom Shield" />
+    <TextView
+      android:id="@+id/patreon_complete"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerHorizontal="true"
+      android:layout_below="@+id/patreon_btn"
+      android:layout_margin="20dp"
+      android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/custom_shield_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/horz_sep_2"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="@dimen/tablet_margin_5dp"
-            android:layout_marginRight="@dimen/tablet_margin_5dp"
-            android:text="You can upload a custom shield image for %1s. Note: shield images will be reviewed and inappropriate images will be removed.&lt;br/&gt;&lt;br/&gt;&lt;a href='http://www.war-worlds.com/doc/empire-settings/shield'&gt;Click here for more information.&lt;/a&gt;" />
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+      android:id="@+id/horz_sep_1"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/patreon_complete"
+      android:layout_alignParentLeft="true"
+      android:text="Empire Rename" />
 
-        <ImageView
-            android:id="@+id/current_shield"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_alignLeft="@+id/custom_shield_desc"
-            android:layout_below="@+id/custom_shield_desc"
-            android:layout_marginTop="10dp"
-            android:src="@drawable/app_icon" />
+    <TextView
+      android:id="@+id/rename_desc"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/horz_sep_1"
+      android:layout_alignParentLeft="true"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginTop="5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp"
+      android:layout_marginBottom="5dp"
+      android:text="You can purchase the ability to rename your empire for %1s below. Enter a new name and click &quot;Rename&quot;." />
 
-        <ImageView
-            android:id="@+id/current_shield_small"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_toRightOf="@+id/current_shield"
-            android:layout_alignBottom="@+id/current_shield"
-            android:layout_marginLeft="-10dp"
-            android:src="@drawable/app_icon" />
+    <EditText
+      android:id="@+id/rename"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/rename_desc"
+      android:layout_alignLeft="@+id/rename_desc"
+      android:layout_marginRight="10dp"
+      android:layout_toLeftOf="@+id/rename_btn"
+      android:ems="10"
+      android:inputType="text" />
 
-        <Button
-            android:id="@+id/shield_change_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_alignTop="@+id/current_shield"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/current_shield_small"
-            android:text="Choose Shield" />
+    <Button
+      android:id="@+id/rename_btn"
+      android:layout_width="100dp"
+      android:layout_height="30dp"
+      android:layout_alignTop="@+id/rename"
+      android:layout_alignRight="@+id/rename_desc"
+      android:text="Rename" />
 
-        <Button
-            android:id="@+id/save_btn"
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:layout_alignTop="@+id/current_shield"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/shield_change_btn"
-            android:enabled="false"
-            android:text="Save" />
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+      android:id="@+id/horz_sep_2"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/rename"
+      android:layout_alignParentLeft="true"
+      android:layout_marginTop="10dp"
+      android:text="Upload Custom Shield" />
 
-        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-            android:id="@+id/horz_sep_3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/current_shield"
-            android:layout_marginTop="10dp"
-            android:text="Reset Empire" />
+    <TextView
+      android:id="@+id/custom_shield_desc"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/horz_sep_2"
+      android:layout_alignParentLeft="true"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginTop="5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp"
+      android:layout_marginBottom="5dp"
+      android:text="You can upload a custom shield image for %1s. Note: shield images will be reviewed and inappropriate images will be removed.&lt;br/&gt;&lt;br/&gt;&lt;a href='http://www.war-worlds.com/doc/empire-settings/shield'&gt;Click here for more information.&lt;/a&gt;" />
 
-        <TextView
-            android:id="@+id/reset_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/horz_sep_3"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="@dimen/tablet_margin_5dp"
-            android:layout_marginRight="@dimen/tablet_margin_5dp"
-            android:text="Resetting your empire will destroy your current empire and allow you to restart the game from a fresh star. The cost of this purchase increases as the size of your empire increase: to reset an empire with four stars or less is free, resetting an empire with up to 10 stars is %1s and resetting an empire with &gt; 10 stars is %2s." />
+    <ImageView
+      android:id="@+id/current_shield"
+      android:layout_width="60dp"
+      android:layout_height="60dp"
+      android:layout_below="@+id/custom_shield_desc"
+      android:layout_alignLeft="@+id/custom_shield_desc"
+      android:layout_marginTop="10dp"
+      android:src="@drawable/app_icon" />
 
-        <Button
-            android:id="@+id/reset_empire_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_below="@id/reset_desc"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="15dp"
-            android:text="Reset Empire" />
+    <ImageView
+      android:id="@+id/current_shield_small"
+      android:layout_width="20dp"
+      android:layout_height="20dp"
+      android:layout_alignBottom="@+id/current_shield"
+      android:layout_marginLeft="-10dp"
+      android:layout_toRightOf="@+id/current_shield"
+      android:src="@drawable/app_icon" />
 
-    </RelativeLayout>
+    <Button
+      android:id="@+id/shield_change_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="30dp"
+      android:layout_alignTop="@+id/current_shield"
+      android:layout_marginLeft="10dp"
+      android:layout_marginTop="15dp"
+      android:layout_toRightOf="@+id/current_shield_small"
+      android:text="Choose Shield" />
+
+    <Button
+      android:id="@+id/save_btn"
+      android:layout_width="100dp"
+      android:layout_height="30dp"
+      android:layout_alignTop="@+id/current_shield"
+      android:layout_marginLeft="10dp"
+      android:layout_marginTop="15dp"
+      android:layout_toRightOf="@+id/shield_change_btn"
+      android:enabled="false"
+      android:text="Save" />
+
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+      android:id="@+id/horz_sep_3"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/current_shield"
+      android:layout_alignParentLeft="true"
+      android:layout_marginTop="10dp"
+      android:text="Reset Empire" />
+
+    <TextView
+      android:id="@+id/reset_desc"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/horz_sep_3"
+      android:layout_alignParentLeft="true"
+      android:layout_marginLeft="@dimen/tablet_margin_5dp"
+      android:layout_marginTop="5dp"
+      android:layout_marginRight="@dimen/tablet_margin_5dp"
+      android:layout_marginBottom="5dp"
+      android:text="Resetting your empire will destroy your current empire and allow you to restart the game from a fresh star. The cost of this purchase increases as the size of your empire increase: to reset an empire with four stars or less is free, resetting an empire with up to 10 stars is %1s and resetting an empire with &gt; 10 stars is %2s." />
+
+    <Button
+      android:id="@+id/reset_empire_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="30dp"
+      android:layout_below="@id/reset_desc"
+      android:layout_centerHorizontal="true"
+      android:layout_marginTop="15dp"
+      android:text="Reset Empire" />
+
+  </RelativeLayout>
 </ScrollView>
