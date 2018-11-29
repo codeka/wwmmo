@@ -37,7 +37,7 @@ public class EmpiresPatreonHandler extends RequestHandler {
           .empireId(empireId)
           .accessToken(tokens.getAccessToken())
           .refreshToken(tokens.getRefreshToken())
-          .tokenExpiryTime(new DateTime((long) tokens.getExpiresIn()))
+          .tokenExpiryTime(DateTime.now().plusSeconds(tokens.getExpiresIn()))
           .tokenType(tokens.getTokenType())
           .tokenScope(tokens.getScope())
           .build();

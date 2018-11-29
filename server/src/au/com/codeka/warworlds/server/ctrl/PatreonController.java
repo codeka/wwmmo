@@ -27,11 +27,7 @@ public class PatreonController {
   }
 
   public void savePatreonInfo(PatreonInfo patreonInfo) throws RequestException {
-    try {
-      db.savePatreonInfo(patreonInfo);
-    } catch (Exception e) {
-      throw new RequestException(e);
-    }
+    db.savePatreonInfo(patreonInfo);
   }
 
   public void updatePatreonInfo(PatreonInfo patreonInfo) throws RequestException {
@@ -76,7 +72,7 @@ public class PatreonController {
       super(trans);
     }
 
-    public void savePatreonInfo(PatreonInfo patreonInfo) throws RequestException {
+    void savePatreonInfo(PatreonInfo patreonInfo) throws RequestException {
       String sql;
       if (patreonInfo.getId() == 0) {
         sql = "INSERT INTO patreon (empire_id, access_token, refresh_token, token_type," +
@@ -116,6 +112,7 @@ public class PatreonController {
         if (patreonInfo.getId() != 0) {
           stmt.setLong(14, patreonInfo.getId());
         }
+        stmt.update();
       } catch (Exception e) {
         throw new RequestException(e);
       }
