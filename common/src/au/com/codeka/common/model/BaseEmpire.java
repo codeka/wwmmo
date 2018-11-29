@@ -17,6 +17,7 @@ public abstract class BaseEmpire {
   protected State mState;
   protected Double mTaxCollectedPerHour;
   protected DateTime mLastSeen;
+  protected PatreonLevel mPatreonLevel;
 
   protected abstract BaseEmpireRank createEmpireRank(Messages.EmpireRank pb);
 
@@ -72,6 +73,10 @@ public abstract class BaseEmpire {
     return mLastSeen;
   }
 
+  public PatreonLevel getPatreonLevel() {
+    return mPatreonLevel;
+  }
+
   public void updateAlliance(BaseAlliance alliance) {
     mAlliance = alliance;
   }
@@ -111,6 +116,10 @@ public abstract class BaseEmpire {
     if (pb.hasTaxesCollectedPerHour()) {
       mTaxCollectedPerHour = pb.getTaxesCollectedPerHour();
     }
+
+    if (pb.hasPatreonLevel()) {
+      mPatreonLevel = PatreonLevel.fromNumber(pb.getPatreonLevel().getNumber());
+    }
   }
 
   public void toProtocolBuffer(Messages.Empire.Builder pb, boolean isTrusted) {
@@ -124,9 +133,9 @@ public abstract class BaseEmpire {
       pb.setEmail("");
     }
     if (mState == State.ABANDONED) {
-      pb.setState(Messages.Empire.EmpireState.valueOf(State.ACTIVE.getValue()));
+      pb.setState(Messages.Empire.EmpireState.forNumber(State.ACTIVE.getValue()));
     } else {
-      pb.setState(Messages.Empire.EmpireState.valueOf(mState.getValue()));
+      pb.setState(Messages.Empire.EmpireState.forNumber(mState.getValue()));
     }
     if (mLastSeen != null) {
       pb.setLastSeen(mLastSeen.getMillis() / 1000);
@@ -157,6 +166,8 @@ public abstract class BaseEmpire {
     if (mTaxCollectedPerHour != null) {
       pb.setTaxesCollectedPerHour(mTaxCollectedPerHour);
     }
+
+    pb.setPatreonLevel(Messages.Empire.PatreonLevel.forNumber(mPatreonLevel.getValue()));
   }
 
   public enum State {
@@ -185,4 +196,43 @@ public abstract class BaseEmpire {
     }
   }
 
+  public enum PatreonLevel {
+    NONE(0),
+    FAN(1),
+    PATRON(2),
+    EMPIRE(3);
+
+    private int value;
+
+    PatreonLevel(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
+
+    public static PatreonLevel fromNumber(int value) {
+      for (PatreonLevel level : PatreonLevel.values()) {
+        if (level.getValue() == value) {
+          return level;
+        }
+      }
+
+      return PatreonLevel.NONE;
+    }
+
+    public static PatreonLevel fromPledge(int pledgeCents) {
+      if (pledgeCents < 100) {
+        return PatreonLevel.NONE;
+      }
+      if (pledgeCents < 500) {
+        return PatreonLevel.FAN;
+      }
+      if (pledgeCents < 1000) {
+        return PatreonLevel.PATRON;
+      }
+      return PatreonLevel.EMPIRE;
+    }
+  }
 }

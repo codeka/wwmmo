@@ -2,1182 +2,1087 @@ syntax = "proto2";
 
 package au.com.codeka.common.protobuf;
 
-
 // Unused.
-message MessageOfTheDay
-{
-    optional string message = 1;
-    optional string last_update = 2;
+message MessageOfTheDay {
+  optional string message = 1;
+  optional string last_update = 2;
 }
-
 
 //
 // Some methods will return this in the case of an error, so we can display a meaningful error
 // to the user.
 //
-message GenericError
-{
-    optional int32 error_code = 1;
-    optional string error_message = 2;
+message GenericError {
+  optional int32 error_code = 1;
+  optional string error_message = 2;
 
-    enum ErrorCode
-    {
-        UnknownError = 15;
-        InsufficientCash = 1;
-        CannotAttackOwnColony = 2;
-        CannotAttackColonyGone = 7;
-        CannotBuildDependencyNotMet = 3;
-        CannotBuildMaxPerColonyReached = 4;
-        CannotBuildMaxPerEmpireReached = 8;
-        CannotBuildMaxLevelReached = 5;
-        RenameStarOldNameIncorrect = 6;
-        CannotCreateEmpireDuplicateName = 9;
-        CannotCreateEmpireBlankName = 10;
-        CannotSplitFleetUnequalSizes = 11;
-        CannotOrderFleetNotIdle = 12;
-        CannotMergeFleetDifferentDesign = 13;
-        CannotCollectTaxesAlreadyInProgress = 14;
-        CannotColonizePlanetAlreadyHasColony = 16;
-        CannotColonizePlanetNoColonyShips = 17;
-        InvalidImage = 18;
-        ShieldImageTooBig = 19;
-        EmpireNameExists = 20;
-        InvalidConversation = 21;
-        EmpireAlreadyInConversation = 22;
-        EmpireBanned = 23;
-        FleetBoostNoUpgrade = 24;
-        FleetBoostAlreadyBoosting = 25;
-        FleetBoostNotMoving = 26;
-        FleetMoveCannotMoveToEmptySpace = 27;
-        FleetMoveCannotMoveToStar = 28;
-        FleetNotOnWormhole = 29;
-        WormholeNotTuned = 30;
-        WormholeTooClose = 31;
-        FleetMoveTooCloseToStar = 32;
-        CannotVoteOnNonPendingRequest = 33;
-        NoWormholeDisruptorInRange = 34;
-        NetworkError = 35;
-        AuthenticationError = 36;
-        NotAnonymous = 37;
-    }
+  enum ErrorCode {
+    UnknownError = 15;
+    InsufficientCash = 1;
+    CannotAttackOwnColony = 2;
+    CannotAttackColonyGone = 7;
+    CannotBuildDependencyNotMet = 3;
+    CannotBuildMaxPerColonyReached = 4;
+    CannotBuildMaxPerEmpireReached = 8;
+    CannotBuildMaxLevelReached = 5;
+    RenameStarOldNameIncorrect = 6;
+    CannotCreateEmpireDuplicateName = 9;
+    CannotCreateEmpireBlankName = 10;
+    CannotSplitFleetUnequalSizes = 11;
+    CannotOrderFleetNotIdle = 12;
+    CannotMergeFleetDifferentDesign = 13;
+    CannotCollectTaxesAlreadyInProgress = 14;
+    CannotColonizePlanetAlreadyHasColony = 16;
+    CannotColonizePlanetNoColonyShips = 17;
+    InvalidImage = 18;
+    ShieldImageTooBig = 19;
+    EmpireNameExists = 20;
+    InvalidConversation = 21;
+    EmpireAlreadyInConversation = 22;
+    EmpireBanned = 23;
+    FleetBoostNoUpgrade = 24;
+    FleetBoostAlreadyBoosting = 25;
+    FleetBoostNotMoving = 26;
+    FleetMoveCannotMoveToEmptySpace = 27;
+    FleetMoveCannotMoveToStar = 28;
+    FleetNotOnWormhole = 29;
+    WormholeNotTuned = 30;
+    WormholeTooClose = 31;
+    FleetMoveTooCloseToStar = 32;
+    CannotVoteOnNonPendingRequest = 33;
+    NoWormholeDisruptorInRange = 34;
+    NetworkError = 35;
+    AuthenticationError = 36;
+    NotAnonymous = 37;
+  }
 }
-
 
 //
 // Contains details about an in-app purchase, used by various requests which require in-app purchase
 // information.
 //
-message PurchaseInfo
-{
-    optional string sku = 1;
-    optional string token = 2;
-    optional string order_id = 3;
-    optional string price = 4;
-    optional string developer_payload = 5;
+message PurchaseInfo {
+  optional string sku = 1;
+  optional string token = 2;
+  optional string order_id = 3;
+  optional string price = 4;
+  optional string developer_payload = 5;
 }
-
 
 //
 // Message to associate an empire with a "real" user account.
 //
-message AnonUserAssociate
-{
-    optional string user_email = 1;
+message AnonUserAssociate {
+  optional string user_email = 1;
 }
 
 //
 // Details of an empire's rank (such as number of ships, number of colonies etc)
-message EmpireRank
-{
-    optional string empire_key = 1;
-    optional int32 rank = 2;
-    optional int32 last_rank = 3;
-    optional int64 total_stars = 4;
-    optional int64 total_colonies = 5;
-    optional int64 total_ships = 6;
-    optional int64 total_buildings = 7;
-    optional int64 total_population = 8;
+message EmpireRank {
+  optional string empire_key = 1;
+  optional int32 rank = 2;
+  optional int32 last_rank = 3;
+  optional int64 total_stars = 4;
+  optional int64 total_colonies = 5;
+  optional int64 total_ships = 6;
+  optional int64 total_buildings = 7;
+  optional int64 total_population = 8;
 }
 
-message EmpireRanks
-{
-    repeated EmpireRank ranks = 1;
-    optional int64 date = 2;
+message EmpireRanks {
+  repeated EmpireRank ranks = 1;
+  optional int64 date = 2;
 }
 
 //
 // Contains details about an empire. Their "display" name, race (I guess?), display colour
 // and stuff like that.
 //
-message Empire
-{
-    // A unique identifier for the empire, useful for referencing him in other parts of the
-    // system. This won't be present in the initial "PUT"
-    optional string key = 1;
+message Empire {
+  // A unique identifier for the empire, useful for referencing him in other parts of the
+  // system. This won't be present in the initial "PUT"
+  optional string key = 1;
 
-    // The "display" name for the player, which is what other players see.
-    optional string display_name = 2;
+  // The "display" name for the player, which is what other players see.
+  optional string display_name = 2;
 
-    // The player's Google Account identifier (which is actually unique of their email address)
-    optional string user = 3;
+  // The player's Google Account identifier (which is actually unique of their email address)
+  optional string user = 3;
 
-    // The player's email address
-    optional string email = 4;
+  // The player's email address
+  optional string email = 4;
 
-    enum EmpireState
-    {
-        ACTIVE = 1;
-        BANNED = 2;
-        ABANDONED = 3;
-    }
-    optional EmpireState state = 5;
+  enum EmpireState {
+    ACTIVE = 1;
+    BANNED = 2;
+    ABANDONED = 3;
+  }
+  optional EmpireState state = 5;
 
-    // May not be set, but if it is this is all of the fleets owned by this empire
-    repeated Fleet fleets = 6;
+  // May not be set, but if it is this is all of the fleets owned by this empire
+  repeated Fleet fleets = 6;
 
-    // May not be set, but if it si this is all of the colonies owned by the empire
-    repeated Colony colonies = 7;
+  // May not be set, but if it si this is all of the colonies owned by the empire
+  repeated Colony colonies = 7;
 
-    // May not be set, but if it is then this will be all the build requests currently in progress
-    repeated BuildRequest build_requests = 10;
+  // May not be set, but if it is then this will be all the build requests currently in progress
+  repeated BuildRequest build_requests = 10;
 
-    // If this is set, then it will be a list of the stars referenced by the fleets,
-    // colonies and build requests. This is useful because you often want details of the stars the
-    // colony/fleet is on (so you can draw the icon, etc). Note that it will *only*
-    // be the stars and the planets, not colonies, build requests, etc.
-    //repeated Star stars = 8;
+  // If this is set, then it will be a list of the stars referenced by the fleets,
+  // colonies and build requests. This is useful because you often want details of the stars the
+  // colony/fleet is on (so you can draw the icon, etc). Note that it will *only*
+  // be the stars and the planets, not colonies, build requests, etc.
+  //repeated Star stars = 8;
 
-    // the amount of cash the empire currently has (todo: provide an estimate on the
-    // rate of change of cash, based on taxed income)
-    optional float cash = 9;
+  // the amount of cash the empire currently has (todo: provide an estimate on the
+  // rate of change of cash, based on taxed income)
+  optional float cash = 9;
 
-    // We can't change cash to 64-bit without breaking compatibility, so we'll add a second field.
-    optional double cash64 = 17;
+  // We can't change cash to 64-bit without breaking compatibility, so we'll add a second field.
+  optional double cash64 = 17;
 
-    // if specified, contains the details of the empire's rank
-    optional EmpireRank rank = 11;
+  // if specified, contains the details of the empire's rank
+  optional EmpireRank rank = 11;
 
-    // if specified, this is the empire's "home star", which is the star we should centre on when
-    // we're asked to view the empire. It's usually the start that contains the HQ or, if they don't
-    // have one, basically just a random star they control.
-    optional Star home_star = 12;
+  // if specified, this is the empire's "home star", which is the star we should centre on when
+  // we're asked to view the empire. It's usually the start that contains the HQ or, if they don't
+  // have one, basically just a random star they control.
+  optional Star home_star = 12;
 
-    // if this empire is part of an alliance, this will contain the details of the alliance.
-    optional Alliance alliance = 13;
+  // if this empire is part of an alliance, this will contain the details of the alliance.
+  optional Alliance alliance = 13;
 
-    // if set, this is the last date/time the empire's shield was updated (so we can detect if we
-    // need to re-download it)
-    optional int64 shield_image_last_update = 14;
+  // if set, this is the last date/time the empire's shield was updated (so we can detect if we
+  // need to re-download it)
+  optional int64 shield_image_last_update = 14;
 
-    // if set, this is the amount of taxes collected per hour for all stars in this empire combined.
-    optional double taxes_collected_per_hour = 15;
+  // if set, this is the amount of taxes collected per hour for all stars in this empire combined.
+  optional double taxes_collected_per_hour = 15;
 
-    // the time we last saw this empire.
-    optional int64 last_seen = 16;
+  // the time we last saw this empire.
+  optional int64 last_seen = 16;
+
+  // The Patreon supporter level for this empire.
+  enum PatreonLevel {
+    NONE = 0;
+    FAN = 1;
+    PATRON = 2;
+    EMPIRE = 3;
+  }
+  optional PatreonLevel patreon_level = 18;
 }
 
 
-message Empires
-{
-    repeated Empire empires = 1;
+message Empires {
+  repeated Empire empires = 1;
 }
-
 
 //
 // Represents an entry in the "cash audit" which is a history of all the cash that the empire
 // has spent/collected.
 //
-message EmpireCashAuditEntry
-{
-    optional string key = 1;
-    optional string empire_key = 2;
-    optional float difference = 3;
-    optional float old_cash = 4;
-    optional float new_cash = 5;
-    optional string reason = 6;
-    optional int64 time = 7;
+message EmpireCashAuditEntry {
+  optional string key = 1;
+  optional string empire_key = 2;
+  optional float difference = 3;
+  optional float old_cash = 4;
+  optional float new_cash = 5;
+  optional string reason = 6;
+  optional int64 time = 7;
 }
 
 
-message EmpireCashAudit
-{
-    repeated EmpireCashAuditEntry entries = 1;
+message EmpireCashAudit {
+  repeated EmpireCashAuditEntry entries = 1;
 }
-
 
 //
 // A request to rename an empire. The empire MUST be yourself, and we assume you've already
 // purchased the ability to do it...
 //
-message EmpireRenameRequest
-{
-    optional string key = 1;
-    optional string new_name = 2;
-    optional string old_name = 4;
-    optional PurchaseInfo purchase_info = 3;
+message EmpireRenameRequest {
+  optional string key = 1;
+  optional string new_name = 2;
+  optional string old_name = 4;
+  optional PurchaseInfo purchase_info = 3;
 }
-
 
 //
 // A request to change an empire's shield image. The empire MUST be yourself, and we assume you've already
 // purchased the ability to do it...
 //
-message EmpireChangeShieldRequest
-{
-    optional string key = 1;
-    optional bytes png_image = 2;
-    optional PurchaseInfo purchase_info = 3;
+message EmpireChangeShieldRequest {
+  optional string key = 1;
+  optional bytes png_image = 2;
+  optional PurchaseInfo purchase_info = 3;
 }
-
 
 //
 // A request to reset an empire.
 //
-message EmpireResetRequest
-{
-    optional PurchaseInfo purchase_info = 1;
+message EmpireResetRequest {
+  optional PurchaseInfo purchase_info = 1;
 }
-
 
 //
 // Contains a mapping of building designs to the number of buildings of that design in
 // your empire. Used to decide whether you can build a certain building, when it has
 // a "maxPerEmpire" restriction.
 //
-message EmpireBuildingStatistics
-{
-    message DesignCount
-    {
-        optional string design_id = 1;
-        optional int32 num_buildings = 2;
-    }
+message EmpireBuildingStatistics {
+  message DesignCount {
+    optional string design_id = 1;
+    optional int32 num_buildings = 2;
+  }
 
-    repeated DesignCount counts = 1;
+  repeated DesignCount counts = 1;
 }
-
 
 //
 // A request to remove ads for a given empire.
 //
-message EmpireAdsRemoveRequest
-{
-    optional PurchaseInfo purchase_info = 1;
+message EmpireAdsRemoveRequest {
+  optional PurchaseInfo purchase_info = 1;
 }
-
 
 //
 // Contains a record of (potential) alt accounts for an empire.
 //
-message EmpireAltAccounts
-{
+message EmpireAltAccounts {
+  optional int32 empire_id = 1;
+
+  message EmpireAltEmpire {
     optional int32 empire_id = 1;
+    optional string empire_name = 2;
+    optional string user_email = 3;
+    optional int32 alliance_id = 4;
+  }
+  repeated EmpireAltEmpire alt_empire = 2;
 
-    message EmpireAltEmpire
-    {
-        optional int32 empire_id = 1;
-        optional string empire_name = 2;
-        optional string user_email = 3;
-        optional int32 alliance_id = 4;
-    }
-    repeated EmpireAltEmpire alt_empire = 2;
-
-    message DeviceInfo
-    {
-        optional string device_id = 1;
-        optional string device_manufacturer = 2;
-        optional string device_model = 3;
-        optional string device_build = 4;
-        optional string device_version = 5;
-    }
-    repeated DeviceInfo device = 3;
+  message DeviceInfo {
+    optional string device_id = 1;
+    optional string device_manufacturer = 2;
+    optional string device_model = 3;
+    optional string device_build = 4;
+    optional string device_version = 5;
+  }
+  repeated DeviceInfo device = 3;
 }
-
 
 //
 // An EmpireStar is an entry in a "virtual array" of stars that belong to the
 // empire, order by the name of the star.
 //
-message EmpireStar
-{
-    optional Star star = 1;
-    optional int32 index = 2;
+message EmpireStar {
+  optional Star star = 1;
+  optional int32 index = 2;
 }
 
 
-message EmpireStars
-{
-    repeated EmpireStar stars = 1;
-    optional int32 total_stars = 2;
+message EmpireStars {
+  repeated EmpireStar stars = 1;
+  optional int32 total_stars = 2;
 }
 
 //
 // The "hello" request when you first join the game contains some info about yourself which we
 // record for posterity.
 //
-message HelloRequest
-{
-    // The value of android.os.Build.MODEL for this device
-    optional string device_model = 1;
+message HelloRequest {
+  // The value of android.os.Build.MODEL for this device
+  optional string device_model = 1;
 
-    // The value of android.os.Build.MANUFACTURER for this device
-    optional string device_manufacturer = 2;
+  // The value of android.os.Build.MANUFACTURER for this device
+  optional string device_manufacturer = 2;
 
-    // The value of android.os.Build.DISPLAY for this device
-    optional string device_build = 3;
+  // The value of android.os.Build.DISPLAY for this device
+  optional string device_build = 3;
 
-    // The value of android.os.Build.VERSION.RELEASE for this device (note that this can
-    // change if you upgrade the OS without re-registering your device!)
-    optional string device_version = 4;
+  // The value of android.os.Build.VERSION.RELEASE for this device (note that this can
+  // change if you upgrade the OS without re-registering your device!)
+  optional string device_version = 4;
 
-    // The memory class of your device -- basically, how much memory can we assume is available
-    // to the War Worlds app (in megabytes)
-    optional int32 memory_class = 5;
+  // The memory class of your device -- basically, how much memory can we assume is available
+  // to the War Worlds app (in megabytes)
+  optional int32 memory_class = 5;
 
-    // If present and set to true, we'll occasionally respond to requests with a protocol buffer
-    // wrapped in a NotficationWrapper message. This way, we can get notifications without having
-    // to wait for GCM.
-    optional bool allow_inline_notfications = 6;
+  // If present and set to true, we'll occasionally respond to requests with a protocol buffer
+  // wrapped in a NotficationWrapper message. This way, we can get notifications without having
+  // to wait for GCM.
+  optional bool allow_inline_notfications = 6;
 
-    // If true, we'll NOT return the list of star_ids that you own. Newer clients don't need
-    // it anymore, and it just wastes time/resources returning it.
-    optional bool no_star_list = 7;
+  // If true, we'll NOT return the list of star_ids that you own. Newer clients don't need
+  // it anymore, and it just wastes time/resources returning it.
+  optional bool no_star_list = 7;
 }
-
 
 //
 // The "hello" message is returned when you first connect to the game.
 //
-message HelloResponse
-{
-    // The current message of the day.
-    optional MessageOfTheDay motd = 1;
+message HelloResponse {
+  // The current message of the day.
+  optional MessageOfTheDay motd = 1;
 
-    // If specified, the Empire you're currently logged in as (if not specified, it means
-    // you haven't set up an empire yet, and you should do that before anything else...)
-    optional Empire empire = 2;
+  // If specified, the Empire you're currently logged in as (if not specified, it means
+  // you haven't set up an empire yet, and you should do that before anything else...)
+  optional Empire empire = 2;
 
-    // The list of colonies your empire owns. Typically, you'll want to start the
-    // starfield view centred on one of your own colonies...
-    repeated Colony colonies = 3;
+  // The list of colonies your empire owns. Typically, you'll want to start the
+  // starfield view centred on one of your own colonies...
+  repeated Colony colonies = 3;
 
-    // If true, it means we need to re-register with GCM (maybe because last time it failed)
-    optional bool require_gcm_register = 6;
+  // If true, it means we need to re-register with GCM (maybe because last time it failed)
+  optional bool require_gcm_register = 6;
 
-    // If present and true, it means your empire was reset (probably because your last colony
-    // was destroyed). Display some kind of message to the user to that effect. If
-    // empire_reset_reason is set, this is an administrator-specified reason for the reset
-    // (eg violation of rules, etc etc). If it's not set, the reason is just that you've run
-    // out of colonies.
-    optional bool was_empire_reset = 7;
-    optional string empire_reset_reason = 10;
+  // If present and true, it means your empire was reset (probably because your last colony
+  // was destroyed). Display some kind of message to the user to that effect. If
+  // empire_reset_reason is set, this is an administrator-specified reason for the reset
+  // (eg violation of rules, etc etc). If it's not set, the reason is just that you've run
+  // out of colonies.
+  optional bool was_empire_reset = 7;
+  optional string empire_reset_reason = 10;
 
-    // Building statistics that details the number of buildings of each design your empire
-    // has, once you've got it on the client, it can be kept track there...
-    optional EmpireBuildingStatistics building_statistics = 8;
+  // Building statistics that details the number of buildings of each design your empire
+  // has, once you've got it on the client, it can be kept track there...
+  optional EmpireBuildingStatistics building_statistics = 8;
 
-    // The collection of build requests. Once we've got the initial list from the server, the
-    // client is able to track them itself.
-    repeated BuildRequest build_requests = 9;
+  // The collection of build requests. Once we've got the initial list from the server, the
+  // client is able to track them itself.
+  repeated BuildRequest build_requests = 9;
 
-    // If true, we'll force the ads to be removed. If false, or not specified, we'll check
-    // whatever the In-App Purchase API has to say.
-    optional bool force_remove_ads = 11;
+  // If true, we'll force the ads to be removed. If false, or not specified, we'll check
+  // whatever the In-App Purchase API has to say.
+  optional bool force_remove_ads = 11;
 
-    // this is the list of all the stars this empire owns
-    repeated int64 star_ids = 12;
+  // this is the list of all the stars this empire owns
+  repeated int64 star_ids = 12;
 }
 
 //
 // Contains details about a device's registration with C2DM so that we can send you
 // messages and stuff (e.g. when your planet is under attack, etc)
 //
-message DeviceRegistration
-{
-    // Unique identifier for this particuilar registration (similar to device_registration_id,
-    // but that's specific to C2DN and is kind a long and unweildy string).
-    optional string key = 1;
+message DeviceRegistration {
+  // Unique identifier for this particuilar registration (similar to device_registration_id,
+  // but that's specific to C2DN and is kind a long and unweildy string).
+  optional string key = 1;
 
-    // The identifier of the device. You can have multiple accounts on one device, this
-    // will then refer to the device itself.
-    optional string device_id = 2;
+  // The identifier of the device. You can have multiple accounts on one device, this
+  // will then refer to the device itself.
+  optional string device_id = 2;
 
-    // The identifier of the GCM registration. When you complete the GCM registration
-    // process, you'll need to update this to include the GCM registration ID so that
-    // we can send you notifications.
-    optional string gcm_registration_id = 3;
+  // The identifier of the GCM registration. When you complete the GCM registration
+  // process, you'll need to update this to include the GCM registration ID so that
+  // we can send you notifications.
+  optional string gcm_registration_id = 3;
 
-    // The value of android.os.Build.MODEL for this device
-    optional string device_model = 4;
+  // The value of android.os.Build.MODEL for this device
+  optional string device_model = 4;
 
-    // The value of android.os.Build.MANUFACTURER for this device
-    optional string device_manufacturer = 5;
+  // The value of android.os.Build.MANUFACTURER for this device
+  optional string device_manufacturer = 5;
 
-    // The value of android.os.Build.DISPLAY for this device
-    optional string device_build = 6;
+  // The value of android.os.Build.DISPLAY for this device
+  optional string device_build = 6;
 
-    // The value of android.os.Build.VERSION.RELEASE for this device (note that this can
-    // change if you upgrade the OS without re-registering your device!)
-    optional string device_version = 7;
+  // The value of android.os.Build.VERSION.RELEASE for this device (note that this can
+  // change if you upgrade the OS without re-registering your device!)
+  optional string device_version = 7;
 
-    // If set, this is the user that the device belongs to. This is usually only returned
-    // when you fetch registrations, adding registrations you can obviously only register
-    // to yourself (i.e. if this is present, it's ignored anyway)
-    optional string user = 8;
+  // If set, this is the user that the device belongs to. This is usually only returned
+  // when you fetch registrations, adding registrations you can obviously only register
+  // to yourself (i.e. if this is present, it's ignored anyway)
+  optional string user = 8;
 }
 
 //
 // Represents a collection of device registrations.
 //
-message DeviceRegistrations
-{
-    repeated DeviceRegistration registrations = 1;
+message DeviceRegistrations {
+  repeated DeviceRegistration registrations = 1;
 }
-
 
 //
 // The "online" status of a device. We'll use this to update whether or not
 // to send chat messages via GCM (or wait until you poll) etc.
 //
-message DeviceOnlineStatus
-{
-    optional bool is_online = 1;
+message DeviceOnlineStatus {
+  optional bool is_online = 1;
 }
-
 
 //
 // Notifications are base-64 encoded strings (because that's all we can send via GCM).
 //
 message Notification {
-    optional string name = 1;
-    optional string value = 2;
+  optional string name = 1;
+  optional string value = 2;
 }
 
 message Notifications {
-    repeated Notification notifications = 1;
+  repeated Notification notifications = 1;
 }
 
 //
 // If we want to send a notification along with a message, this is what we wrap it in.
 //
 message NotificationWrapper {
-    optional bytes original_message = 1;
-    repeated Notification notifications = 2;
+  optional bytes original_message = 1;
+  repeated Notification notifications = 2;
 }
-
 
 //
 // A chat message, who it's from, the kind of message and whatnot.
 //
-message ChatMessage
-{
-    optional int32 id = 7;
-    optional string message = 1;
-    optional string empire_key = 2;
-    optional int64 date_posted = 3;
-    optional string alliance_key = 4;
+message ChatMessage {
+  optional int32 id = 7;
+  optional string message = 1;
+  optional string empire_key = 2;
+  optional int64 date_posted = 3;
+  optional string alliance_key = 4;
 
-    // if the message was auto-translated to english, this will be the english
-    // translation.
-    optional string message_en = 5;
+  // if the message was auto-translated to english, this will be the english
+  // translation.
+  optional string message_en = 5;
 
-    optional int32 conversation_id = 6;
+  optional int32 conversation_id = 6;
 
-    // "profanity" level, 0 == not profane, 1 == somewhat profane, 2 == very profane. Used in
-    // conjunction with client-side filtering of chat messages.
-    optional int32 profanity_level = 9;
+  // "profanity" level, 0 == not profane, 1 == somewhat profane, 2 == very profane. Used in
+  // conjunction with client-side filtering of chat messages.
+  optional int32 profanity_level = 9;
 
-    // The "action" of this message, allows us to notify participants of a conversation
-    // via special messages with a custom action.
-    enum MessageAction
-    {
-        Normal = 0; // a "normal" chat message, the default
-        ParticipantAdded = 1; // a new participant was added
-        ParticipantLeft = 2; // someone left the conversation
-    }
-    optional MessageAction action = 8;
+  // The "action" of this message, allows us to notify participants of a conversation
+  // via special messages with a custom action.
+  enum MessageAction {
+    Normal = 0; // a "normal" chat message, the default
+    ParticipantAdded = 1; // a new participant was added
+    ParticipantLeft = 2; // someone left the conversation
+  }
+  optional MessageAction action = 8;
 }
 
 
-message ChatMessages
-{
-    repeated ChatMessage messages = 1;
+message ChatMessages {
+  repeated ChatMessage messages = 1;
 }
-
 
 //
 // When you report a message for abuse, this is what you post to the server.
 //
-message ChatAbuseReport
-{
-    optional int32 chat_msg_id = 1;
+message ChatAbuseReport {
+  optional int32 chat_msg_id = 1;
 }
 
 //
 // A conversation is a private chat between two or more participants.
 //
-message ChatConversation
-{
-    optional int32 id = 1;
-    repeated ChatConversationParticipant participants = 2;
+message ChatConversation {
+  optional int32 id = 1;
+  repeated ChatConversationParticipant participants = 2;
 }
 
 
-message ChatConversations
-{
-    repeated ChatConversation conversations = 1;
+message ChatConversations {
+  repeated ChatConversation conversations = 1;
 }
-
 
 //
 // Refers to a participant of a chat conversation.
 //
-message ChatConversationParticipant
-{
-    optional int32 empire_id = 1;
-    optional bool is_muted = 2;
+message ChatConversationParticipant {
+  optional int32 empire_id = 1;
+  optional bool is_muted = 2;
 }
-
 
 //
 // Represents a "sector" of space, containing a number of stars and whatnot.
-message Sector
-{
-    // these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
-    // (1,1) is one sector up and to the right, and so on.
-    optional int64 x = 1;
-    optional int64 y = 2;
+message Sector {
+  // these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
+  // (1,1) is one sector up and to the right, and so on.
+  optional int64 x = 1;
+  optional int64 y = 2;
 
-    // number of colonies in this sector
-    optional int32 num_colonies = 5;
+  // number of colonies in this sector
+  optional int32 num_colonies = 5;
 
-    // the collection of stars in this sector.
-    repeated Star stars = 3;
+  // the collection of stars in this sector.
+  repeated Star stars = 3;
 
-    // a collection of colonies in this sector (TODO: full colony details? probably not needed...)
-    repeated Colony colonies = 4;
+  // a collection of colonies in this sector (TODO: full colony details? probably not needed...)
+  repeated Colony colonies = 4;
 
-    // a collection of fleets in this sector
-    repeated Fleet fleets = 6;
+  // a collection of fleets in this sector
+  repeated Fleet fleets = 6;
 }
 
 //
 // Represents a single star within a sector. The star can have a few planets, though this
 // is optional (we don't always return the list of planets with a star).
 //
-message Star
-{
-    // the identifier of the star, unique throughout the universe.
-    optional string key = 1;
+message Star {
+  // the identifier of the star, unique throughout the universe.
+  optional string key = 1;
 
-    // the sector this star is contained within
-    optional int64 sector_x = 11;
-    optional int64 sector_y = 12;
+  // the sector this star is contained within
+  optional int64 sector_x = 11;
+  optional int64 sector_y = 12;
 
-    // the name of the star
-    optional string name = 2;
+  // the name of the star
+  optional string name = 2;
 
-    // the classification of this star. The order of these enum values
-    // must correspond to the order of the StarTypes defined in sector.py
-    enum CLASSIFICATION
-    {
-        BLUE = 0;
-        WHITE = 1;
-        YELLOW = 2;
-        ORANGE = 3;
-        RED = 4;
-        NEUTRON = 5;
-        BLACKHOLE = 6;
-        MARKER = 7;
-        WORMHOLE = 8;
-    }
-    optional CLASSIFICATION classification = 3;
+  // the classification of this star. The order of these enum values
+  // must correspond to the order of the StarTypes defined in sector.py
+  enum CLASSIFICATION {
+    BLUE = 0;
+    WHITE = 1;
+    YELLOW = 2;
+    ORANGE = 3;
+    RED = 4;
+    NEUTRON = 5;
+    BLACKHOLE = 6;
+    MARKER = 7;
+    WORMHOLE = 8;
+  }
+  optional CLASSIFICATION classification = 3;
 
-    // the apparent "size" of the star (which is really just a display thing)
-    optional int32 size = 5;
+  // the apparent "size" of the star (which is really just a display thing)
+  optional int32 size = 5;
 
-    // the offset from the left edge of the sector, in pixels
-    optional int32 offset_x = 6;
+  // the offset from the left edge of the sector, in pixels
+  optional int32 offset_x = 6;
 
-    // the offset from the bottom edge of the sector, in pixels
-    optional int32 offset_y = 7;
+  // the offset from the bottom edge of the sector, in pixels
+  optional int32 offset_y = 7;
 
-    // the collection of planets orbiting this star (may be empty, for example in the list
-    // of stars in a sector)
-    repeated Planet planets = 9;
+  // the collection of planets orbiting this star (may be empty, for example in the list
+  // of stars in a sector)
+  repeated Planet planets = 9;
 
-    // collection of colonies on our planet(s)
-    repeated Colony colonies = 10;
+  // collection of colonies on our planet(s)
+  repeated Colony colonies = 10;
 
-    // collection of buildings in our colonies.
-    repeated Building buildings = 13;
+  // collection of buildings in our colonies.
+  repeated Building buildings = 13;
 
-    // collection of EmpirePresences details the presences of the empire(s) in this solar system.
-    repeated EmpirePresence empires = 14;
+  // collection of EmpirePresences details the presences of the empire(s) in this solar system.
+  repeated EmpirePresence empires = 14;
 
-    // collection of BuildRequests for colonies in this star
-    repeated BuildRequest build_requests = 15;
+  // collection of BuildRequests for colonies in this star
+  repeated BuildRequest build_requests = 15;
 
-    // List of fleets located in this star
-    repeated Fleet fleets = 16;
+  // List of fleets located in this star
+  repeated Fleet fleets = 16;
 
-    // This is the time (in seconds since Unix epoch) since this star "became" empty -- that is,
-    // after the colony was destroyed. This only has meaning if the star has no colonies currently.
-    optional int64 time_emptied = 17;
+  // This is the time (in seconds since Unix epoch) since this star "became" empty -- that is,
+  // after the colony was destroyed. This only has meaning if the star has no colonies currently.
+  optional int64 time_emptied = 17;
 
-    // Time, that this star was last simulated
-    optional int64 last_simulation = 18;
+  // Time, that this star was last simulated
+  optional int64 last_simulation = 18;
 
-    // If we're in the middle of combat, this will be the combat report for what's currently
-    // going on.
-    optional CombatReport current_combat_report = 19;
+  // If we're in the middle of combat, this will be the combat report for what's currently
+  // going on.
+  optional CombatReport current_combat_report = 19;
 
-    // These are extra details stored with a star, usually specific to the type of star it is.
-    message StarExtra
-    {
-        // The following are used by wormholes to store their state.
-        optional int32 wormhole_dest_star_id = 1;
-        optional int64 wormhole_tune_complete_time = 2;
-        repeated int64 wormhole_tune_history = 3;
-        optional int32 wormhole_empire_id = 4;
-    }
-    optional StarExtra extra = 20;
+  // These are extra details stored with a star, usually specific to the type of star it is.
+  message StarExtra {
+    // The following are used by wormholes to store their state.
+    optional int32 wormhole_dest_star_id = 1;
+    optional int64 wormhole_tune_complete_time = 2;
+    repeated int64 wormhole_tune_history = 3;
+    optional int32 wormhole_empire_id = 4;
+  }
+  optional StarExtra extra = 20;
 }
 
 
-message Stars
-{
-    repeated Star stars = 1;
+message Stars {
+  repeated Star stars = 1;
 }
 
 //
 // A request to rename a star, include the purchase details from the App Store.
 //
-message StarRenameRequest
-{
-    optional string star_key = 1;
-    optional string old_name = 2;
-    optional string new_name = 3;
+message StarRenameRequest {
+  optional string star_key = 1;
+  optional string old_name = 2;
+  optional string new_name = 3;
 
-    optional string DEPRECATED_purchase_order_id = 4;
-    optional int64 DEPRECATED_purchase_time = 5;
-    optional string DEPRECATED_purchase_developer_payload = 6;
-    optional string DEPRECATED_purchase_price = 7;
-    optional PurchaseInfo purchase_info = 8;
+  optional string DEPRECATED_purchase_order_id = 4;
+  optional int64 DEPRECATED_purchase_time = 5;
+  optional string DEPRECATED_purchase_developer_payload = 6;
+  optional string DEPRECATED_purchase_price = 7;
+  optional PurchaseInfo purchase_info = 8;
 }
 
 
-message WormholeTuneRequest
-{
-    optional int32 src_star_id = 1;
-    optional int32 dest_star_id = 2;
+message WormholeTuneRequest {
+  optional int32 src_star_id = 1;
+  optional int32 dest_star_id = 2;
 }
-
 
 //
 // Represents a planet in the star system. A planet orbits a \c Star which in turn belongs
 // to a \c Sector.
 //
-message Planet
-{
-    // The "index" of the planet represents how far it is from the sun. Planets are always
-    // in monotonically increasing order of distance (0, 1, 2, 3, etc)
-    optional int32 index = 2;
+message Planet {
+  // The "index" of the planet represents how far it is from the sun. Planets are always
+  // in monotonically increasing order of distance (0, 1, 2, 3, etc)
+  optional int32 index = 2;
 
-    // The various different "kinds" of planets. Planets are spawned in increasing order
-    // of probability (so "terran" is most likely, "gas giant" least likely).
-    enum PLANET_TYPE
-    {
-        GASGIANT = 1;
-        RADIATED = 2;
-        INFERNO = 3;
-        ASTEROIDS = 4;
-        WATER = 5;
-        TOXIC = 6;
-        DESERT = 7;
-        SWAMP = 8;
-        TERRAN = 9;
-    }
+  // The various different "kinds" of planets. Planets are spawned in increasing order
+  // of probability (so "terran" is most likely, "gas giant" least likely).
+  enum PLANET_TYPE {
+    GASGIANT = 1;
+    RADIATED = 2;
+    INFERNO = 3;
+    ASTEROIDS = 4;
+    WATER = 5;
+    TOXIC = 6;
+    DESERT = 7;
+    SWAMP = 8;
+    TERRAN = 9;
+  }
 
-    optional PLANET_TYPE planet_type = 3;
+  optional PLANET_TYPE planet_type = 3;
 
-    // The size of the planet. Certain planet_type's are predisposed to be certain sizes
-    // (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
-    optional int32 size = 4;
+  // The size of the planet. Certain planet_type's are predisposed to be certain sizes
+  // (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
+  optional int32 size = 4;
 
-    // How "congenial" is this planet to supporting population
-    optional int32 population_congeniality = 5;
+  // How "congenial" is this planet to supporting population
+  optional int32 population_congeniality = 5;
 
-    // How "congenial" is this planet to supporting farming
-    optional int32 farming_congeniality = 6;
+  // How "congenial" is this planet to supporting farming
+  optional int32 farming_congeniality = 6;
 
-    // How "congenial" is this planet to supporting mining
-    optional int32 mining_congeniality = 7;
+  // How "congenial" is this planet to supporting mining
+  optional int32 mining_congeniality = 7;
 }
-
 
 //
 // A collection of Planet messages.
 ///
-message Planets
-{
-    repeated Planet planets = 1;
+message Planets {
+  repeated Planet planets = 1;
 }
-
 
 //
 // Represents a list of sectors.
 //
-message Sectors
-{
-    repeated Sector sectors = 1;
+message Sectors {
+  repeated Sector sectors = 1;
 }
 
 //
 // Represents the details of an empire's "presence" in a star. For example, keeps track
 // of stored goods, etc.
 //
-message EmpirePresence
-{
-    optional string key = 1;
-    optional string empire_key = 2;
-    optional string star_key = 3;
+message EmpirePresence {
+  optional string key = 1;
+  optional string empire_key = 2;
+  optional string star_key = 3;
 
-    optional float total_goods = 4;
-    optional float total_minerals = 5;
+  optional float total_goods = 4;
+  optional float total_minerals = 5;
 
-    optional float goods_delta_per_hour = 6;
-    optional float minerals_delta_per_hour = 7;
+  optional float goods_delta_per_hour = 6;
+  optional float minerals_delta_per_hour = 7;
 
-    optional float max_goods = 8;
-    optional float max_minerals = 9;
+  optional float max_goods = 8;
+  optional float max_minerals = 9;
 
-    optional int64 goods_zero_time = 10;
+  optional int64 goods_zero_time = 10;
 }
 
 //
 // Represents a request to colonize a planet. PUT this to /colonies to colonize.
 //
-message ColonizeRequest
-{
-    // The index of the planet you want to colonize
-    optional int32 planet_index = 1;
+message ColonizeRequest {
+  // The index of the planet you want to colonize
+  optional int32 planet_index = 1;
 }
 
 //
 // Represents a colony that's on a planet.
 //
-message Colony
-{
-    // The key of this colony, which you can use to refer to it directly.
-    optional string key = 1;
+message Colony {
+  // The key of this colony, which you can use to refer to it directly.
+  optional string key = 1;
 
-    // The key of the empire that owns this colony.
-    optional string empire_key = 2;
+  // The key of the empire that owns this colony.
+  optional string empire_key = 2;
 
-    // The key of the planet and star this colony belongs to.
-    optional string star_key = 4;
-    optional int32 planet_index = 14;
+  // The key of the planet and star this colony belongs to.
+  optional string star_key = 4;
+  optional int32 planet_index = 14;
 
-    // In the backend, population is actually stored as a floating point value, but
-    // we don't care about that kind of accuracy.
-    optional float population = 5;
+  // In the backend, population is actually stored as a floating point value, but
+  // we don't care about that kind of accuracy.
+  optional float population = 5;
 
-    // Time, in seconds since Unix epoch, that this colony was last simulated (i.e.
-    // when the population and such was last calculated)
-    // NOT_USED_ANY_MORE
-    optional int64 DEPRECATED_last_simulation = 6;
+  // Time, in seconds since Unix epoch, that this colony was last simulated (i.e.
+  // when the population and such was last calculated)
+  // NOT_USED_ANY_MORE
+  optional int64 DEPRECATED_last_simulation = 6;
 
-    // The "focus" of this colony. These numbers must add up to 1.0 and represent
-    // the percentage of the population that is focused on the given task.
-    optional float focus_population = 7;
-    optional float focus_farming = 8;
-    optional float focus_mining = 9;
-    optional float focus_construction = 10;
+  // The "focus" of this colony. These numbers must add up to 1.0 and represent
+  // the percentage of the population that is focused on the given task.
+  optional float focus_population = 7;
+  optional float focus_farming = 8;
+  optional float focus_mining = 9;
+  optional float focus_construction = 10;
 
-    // After simulating, these will contain the delta values (i.e. how much do the goods
-    // or whatever changed in this colony) per hour.
-    optional float delta_population = 11;
-    optional float delta_goods = 12;
-    optional float delta_minerals = 13;
+  // After simulating, these will contain the delta values (i.e. how much do the goods
+  // or whatever changed in this colony) per hour.
+  optional float delta_population = 11;
+  optional float delta_goods = 12;
+  optional float delta_minerals = 13;
 
-    // Amount of uncollected taxes this colony has generated
-    optional float uncollected_taxes = 15;
+  // Amount of uncollected taxes this colony has generated
+  optional float uncollected_taxes = 15;
 
-    // The colony's defence bonus, which when multiplied by one quarter of
-    // the population gives the colony's total defence score.
-    optional float defence_bonus = 16;
+  // The colony's defence bonus, which when multiplied by one quarter of
+  // the population gives the colony's total defence score.
+  optional float defence_bonus = 16;
 
-    // When all bonuses and what-not are applies, what is this colony's maximum
-    // population?
-    optional float max_population = 17;
+  // When all bonuses and what-not are applies, what is this colony's maximum
+  // population?
+  optional float max_population = 17;
 
-    // If set, this is the time the "cooldown" period ends. While in cooldown, the colony will
-    // not lose population
-    optional int64 cooldown_end_time = 18;
+  // If set, this is the time the "cooldown" period ends. While in cooldown, the colony will
+  // not lose population
+  optional int64 cooldown_end_time = 18;
 }
-
 
 //
 // A collection of Colonies
 //
-message Colonies
-{
-    repeated Colony colonies = 1;
+message Colonies {
+  repeated Colony colonies = 1;
 }
-
 
 //
 // A request to build something (a building, a ship, etc)
 //
-message BuildRequest
-{
-    optional string key = 1;
+message BuildRequest {
+  optional string key = 1;
 
-    // The key of the colony you're trying to build at. Must have a shipyard to build
-    // a ship.
-    optional string colony_key = 2;
+  // The key of the colony you're trying to build at. Must have a shipyard to build
+  // a ship.
+  optional string colony_key = 2;
 
-    // The empire this build operation belongs to.
-    optional string empire_key = 3;
+  // The empire this build operation belongs to.
+  optional string empire_key = 3;
 
-    // The key of the star/planet this build request is happening on
-    optional string star_key = 11;
-    optional int32 planet_index = 12;
+  // The key of the star/planet this build request is happening on
+  optional string star_key = 11;
+  optional int32 planet_index = 12;
 
-    // What are you trying to build? A building or a ship?
-    // The values here should be in sync with com.codeka.warworlds.model.Design.DesignKind.
-    enum BUILD_KIND
-    {
-        BUILDING = 1;
-        SHIP = 2;
-    }
-    optional BUILD_KIND build_kind = 4;
+  // What are you trying to build? A building or a ship?
+  // The values here should be in sync with com.codeka.warworlds.model.Design.DesignKind.
+  enum BUILD_KIND {
+    BUILDING = 1;
+    SHIP = 2;
+  }
+  optional BUILD_KIND build_kind = 4;
 
-    // The name of the design you're trying to build
-    optional string design_name = 5;
+  // The name of the design you're trying to build
+  optional string design_name = 5;
 
-    // The number of things we're building in this single operation
-    optional int32 count = 9;
+  // The number of things we're building in this single operation
+  optional int32 count = 9;
 
-    // The date/time this build request started and the current predicted time of completion
-    optional int64 start_time = 6;
-    optional int64 end_time = 7;
+  // The date/time this build request started and the current predicted time of completion
+  optional int64 start_time = 6;
+  optional int64 end_time = 7;
 
-    // this is the "progress" of the build, from 0 (just started) to 1.0 (complete). It's not
-    // always going to relate to start_time/end_time (due to lack of resources, changing focus
-    // etc etc)
-    optional float progress = 8;
+  // this is the "progress" of the build, from 0 (just started) to 1.0 (complete). It's not
+  // always going to relate to start_time/end_time (due to lack of resources, changing focus
+  // etc etc)
+  optional float progress = 8;
 
-    // If this is set, then we're upgrading an existing building with the given key. This is only
-    // valid if build_kind is set to BUILDING and obviously the building has to exist in the
-    // current colony as well.
-    optional string existing_building_key = 10;
-    optional int32 existing_building_level = 13;
+  // If this is set, then we're upgrading an existing building with the given key. This is only
+  // valid if build_kind is set to BUILDING and obviously the building has to exist in the
+  // current colony as well.
+  optional string existing_building_key = 10;
+  optional int32 existing_building_level = 13;
 
-    // when upgrading a fleet, these will be set
-    optional int32 existing_fleet_id = 14;
-    optional string upgrade_id = 15;
+  // when upgrading a fleet, these will be set
+  optional int32 existing_fleet_id = 14;
+  optional string upgrade_id = 15;
 
-    // notes you can attach to the fleet/building when it's finished
-    optional string notes = 16;
+  // notes you can attach to the fleet/building when it's finished
+  optional string notes = 16;
 }
-
 
 //
 // A build queue is basically just a list of BuildRequests.
 //
-message BuildQueue
-{
-    repeated BuildRequest requests = 1;
+message BuildQueue {
+  repeated BuildRequest requests = 1;
 }
-
 
 //
 // Represents a completed building in a colony.
 //
-message Building
-{
-    // The unique key of this building.
-    optional string key = 1;
+message Building {
+  // The unique key of this building.
+  optional string key = 1;
 
-    // The key of the colony to which this building belongs.
-    optional string colony_key = 2;
+  // The key of the colony to which this building belongs.
+  optional string colony_key = 2;
 
-    // The name of the design of this building (defined in data/buildings.xml)
-    optional string design_name = 3;
+  // The name of the design of this building (defined in data/buildings.xml)
+  optional string design_name = 3;
 
-    // The level of this building
-    optional int32 level = 4;
+  // The level of this building
+  optional int32 level = 4;
 
-    // not as useful for buildings, but notes the player can attach
-    optional string notes = 5;
+  // not as useful for buildings, but notes the player can attach
+  optional string notes = 5;
 }
-
 
 //
 // An upgrade to a fleet
 //
-message FleetUpgrade
-{
-    optional string upgrade_id = 1;
-    optional string extra = 2;
+message FleetUpgrade {
+  optional string upgrade_id = 1;
+  optional string extra = 2;
 }
-
 
 //
 // A fleet represents one or more ships of the same(?) design.
 //
-message Fleet
-{
-    // The unique key for this fleet
-    optional string key = 1;
+message Fleet {
+  // The unique key for this fleet
+  optional string key = 1;
 
-    // The key of the empire who owns this fleet
-    optional string empire_key = 2;
+  // The key of the empire who owns this fleet
+  optional string empire_key = 2;
 
-    // The ID of the alliance this fleet belongs to. If not specified, it means the
-    // empire that owns this fleet does not belong to an alliance.
-    optional int32 alliance_id = 18;
+  // The ID of the alliance this fleet belongs to. If not specified, it means the
+  // empire that owns this fleet does not belong to an alliance.
+  optional int32 alliance_id = 18;
 
-    // The name of the ship design of the ship(s) in this fleet
-    optional string design_name = 3;
+  // The name of the ship design of the ship(s) in this fleet
+  optional string design_name = 3;
 
-    // The number of ships in this fleet. This is a floating point number because of the way
-    // damage is calculated in combat. We only ever display the Math.ceil() of this number to
-    // the user, however.
-    optional float num_ships = 4;
+  // The number of ships in this fleet. This is a floating point number because of the way
+  // damage is calculated in combat. We only ever display the Math.ceil() of this number to
+  // the user, however.
+  optional float num_ships = 4;
 
-    // The current state of the fleet: idle == orbiting a star, moving == moving
-    // between stars, attacking == attacking an enemy fleet, colony, etc
-    enum FLEET_STATE
-    {
-        IDLE = 1;
-        MOVING = 2;
-        ATTACKING = 3;
-    }
-    optional FLEET_STATE state = 5;
+  // The current state of the fleet: idle == orbiting a star, moving == moving
+  // between stars, attacking == attacking an enemy fleet, colony, etc
+  enum FLEET_STATE {
+    IDLE = 1;
+    MOVING = 2;
+    ATTACKING = 3;
+  }
+  optional FLEET_STATE state = 5;
 
-    // The time this fleet was moved into the current state (used to determine things like
-    // distance between planets when moving, etc)
-    optional int64 state_start_time = 6;
+  // The time this fleet was moved into the current state (used to determine things like
+  // distance between planets when moving, etc)
+  optional int64 state_start_time = 6;
 
-    // The star this fleet is associated with. If moving, star_key is the star we're moving
-    // FROM and destination_star_key is the star we're moving TO.
-    optional string star_key = 7;
-    optional string destination_star_key = 8;
+  // The star this fleet is associated with. If moving, star_key is the star we're moving
+  // FROM and destination_star_key is the star we're moving TO.
+  optional string star_key = 7;
+  optional string destination_star_key = 8;
 
-    // If in attacking state, this is the target fleet or colony we're attacking
-    optional string target_fleet_key = 9;
-    optional string target_colony_key = 10;
+  // If in attacking state, this is the target fleet or colony we're attacking
+  optional string target_fleet_key = 9;
+  optional string target_colony_key = 10;
 
-    // The stance of the fleet is how we react when an enemy fleet comes into our
-    // airspace: passive == ignore them (even if they attack first), neutral == attack
-    // if they attack first, aggressive == attack no matter what
-    enum FLEET_STANCE
-    {
-        PASSIVE = 1;
-        NEUTRAL = 2;
-        AGGRESSIVE = 3;
-    }
-    optional FLEET_STANCE stance = 11;
+  // The stance of the fleet is how we react when an enemy fleet comes into our
+  // airspace: passive == ignore them (even if they attack first), neutral == attack
+  // if they attack first, aggressive == attack no matter what
+  enum FLEET_STANCE {
+    PASSIVE = 1;
+    NEUTRAL = 2;
+    AGGRESSIVE = 3;
+  }
+  optional FLEET_STANCE stance = 11;
 
-    // This is used internally by the server, it'll never appear in a response from the server.
-    optional int64 time_destroyed = 12;
-    optional bool block_notification_on_destroy = 14;
+  // This is used internally by the server, it'll never appear in a response from the server.
+  optional int64 time_destroyed = 12;
+  optional bool block_notification_on_destroy = 14;
 
-    // This is the date/time of the last battle this fleet was victorious in,
-    // it's mostly useless on the client (used for some housekeeping on the
-    // server)
-    optional int64 last_victory = 13;
+  // This is the date/time of the last battle this fleet was victorious in,
+  // it's mostly useless on the client (used for some housekeeping on the
+  // server)
+  optional int64 last_victory = 13;
 
-    // for moving fleets, this is the time we expect it to arrive
-    optional int64 eta = 15;
+  // for moving fleets, this is the time we expect it to arrive
+  optional int64 eta = 15;
 
-    // a collection of upgrades to this fleet
-    repeated FleetUpgrade upgrades = 16;
+  // a collection of upgrades to this fleet
+  repeated FleetUpgrade upgrades = 16;
 
-    // notes the player has attached so that he can remember what the fleet was for.
-    optional string notes = 17;
+  // notes the player has attached so that he can remember what the fleet was for.
+  optional string notes = 17;
 }
 
 
-message Fleets
-{
-    repeated Fleet fleets = 1;
+message Fleets {
+  repeated Fleet fleets = 1;
 }
 
 
-message FleetOrder
-{
-    enum FLEET_ORDER
-    {
-        SPLIT = 1;
-        MERGE = 2;
-        MOVE = 3;
-        SET_STANCE = 5;
-        BOOST = 6;
-        ENTER_WORMHOLE = 7;
-    }
-    optional FLEET_ORDER order = 1;
+message FleetOrder {
+  enum FLEET_ORDER {
+    SPLIT = 1;
+    MERGE = 2;
+    MOVE = 3;
+    SET_STANCE = 5;
+    BOOST = 6;
+    ENTER_WORMHOLE = 7;
+  }
+  optional FLEET_ORDER order = 1;
 
-    // if the order is to split, this will be the number of ships
-    // in the "left" and "right" fleets. The numbers must add up to
-    // the original number of ships you had.
-    optional int32 split_left = 2;
-    optional int32 split_right = 3;
+  // if the order is to split, this will be the number of ships
+  // in the "left" and "right" fleets. The numbers must add up to
+  // the original number of ships you had.
+  optional int32 split_left = 2;
+  optional int32 split_right = 3;
 
-    // when moving or attacking, this represents the destination star
-    optional string star_key = 4;
+  // when moving or attacking, this represents the destination star
+  optional string star_key = 4;
 
-    // if the order is SET_STANCE, this will be the stance we want to change to
-    optional Fleet.FLEET_STANCE stance = 5;
+  // if the order is SET_STANCE, this will be the stance we want to change to
+  optional Fleet.FLEET_STANCE stance = 5;
 
-    // if the order is MERGE, this will be the fleet to merge with
-    optional string merge_fleet_key = 6;
+  // if the order is MERGE, this will be the fleet to merge with
+  optional string merge_fleet_key = 6;
 
-    // if it's a move command, but to empty space and not a star (e.g. for wormhole generators),
-    // then this represents the coordinates you want to move to
-    optional int64 sector_x = 7;
-    optional int64 sector_y = 8;
-    optional int32 offset_x = 9;
-    optional int32 offset_y = 10;
+  // if it's a move command, but to empty space and not a star (e.g. for wormhole generators),
+  // then this represents the coordinates you want to move to
+  optional int64 sector_x = 7;
+  optional int64 sector_y = 8;
+  optional int32 offset_x = 9;
+  optional int32 offset_y = 10;
 }
-
 
 //
 // A ScoutReport is a report generated by a fleet with the "scout" ability, and contains a
 // snapshot of a star (including enemy colonies, fleets and so on) and a point in time.
 //
-message ScoutReport
-{
-    // the identifier of this scout report, generally not needed by clients
-    optional string key = 1;
+message ScoutReport {
+  // the identifier of this scout report, generally not needed by clients
+  optional string key = 1;
 
-    // the identifier of the empire who owns this report
-    optional string empire_key = 2;
+  // the identifier of the empire who owns this report
+  optional string empire_key = 2;
 
-    // the identifier of the star this report is for
-    optional string star_key = 3;
+  // the identifier of the star this report is for
+  optional string star_key = 3;
 
-    // the date (in Unix epoch format) this report was taken
-    optional int64 date = 5;
+  // the date (in Unix epoch format) this report was taken
+  optional int64 date = 5;
 
-    // a serialized Star protobuf containing the "data" of this report.
-    optional bytes star_pb = 4;
+  // a serialized Star protobuf containing the "data" of this report.
+  optional bytes star_pb = 4;
 }
 
 
-message ScoutReports
-{
-    repeated ScoutReport reports = 1;
+message ScoutReports {
+  repeated ScoutReport reports = 1;
 }
-
 
 //
 // Whenever there's combat, we record the rounds of who hits whom and so on in one of these. One
 // will be created for every minute of fighting per star.
 //
-message CombatRound
-{
-    // The FleetSummary contains enough details about a fleets so that we can display info
-    // about it in the UI. Because the fleet might be destroyed by the time we display the
-    // report, we need to keep this info around.
-    // We store all FleetSummary in the fleets field, and then the other record types just refer
-    // to them by index.
-    message FleetSummary
-    {
-        repeated string fleet_keys = 1;
-        optional string empire_key = 2;
-        optional string design_id = 3;
-        optional float num_ships = 4;
-    }
+message CombatRound {
+  // The FleetSummary contains enough details about a fleets so that we can display info
+  // about it in the UI. Because the fleet might be destroyed by the time we display the
+  // report, we need to keep this info around.
+  // We store all FleetSummary in the fleets field, and then the other record types just refer
+  // to them by index.
+  message FleetSummary {
+    repeated string fleet_keys = 1;
+    optional string empire_key = 2;
+    optional string design_id = 3;
+    optional float num_ships = 4;
+  }
 
-    // This record is used when a fleet enters combat.
-    message FleetJoinedRecord
-    {
-        optional int32 fleet_index = 1;
-    }
+  // This record is used when a fleet enters combat.
+  message FleetJoinedRecord {
+    optional int32 fleet_index = 1;
+  }
 
-    // This record is used when a fleet choose a target.
-    message FleetTargetRecord
-    {
-        optional int32 fleet_index = 1;
-        optional int32 target_index = 2;
-    }
+  // This record is used when a fleet choose a target.
+  message FleetTargetRecord {
+    optional int32 fleet_index = 1;
+    optional int32 target_index = 2;
+  }
 
-    // This record is used when a fleet attacks another fleet
-    message FleetAttackRecord
-    {
-        optional int32 fleet_index = 1;
-        optional int32 target_index = 2;
-        optional float damage = 3;
-    }
+  // This record is used when a fleet attacks another fleet
+  message FleetAttackRecord {
+    optional int32 fleet_index = 1;
+    optional int32 target_index = 2;
+    optional float damage = 3;
+  }
 
-    // This record is used to record the damage done to a fleet
-    message FleetDamagedRecord
-    {
-        optional int32 fleet_index = 1;
-        optional float damage = 2;
-    }
+  // This record is used to record the damage done to a fleet
+  message FleetDamagedRecord {
+    optional int32 fleet_index = 1;
+    optional float damage = 2;
+  }
 
-    optional string star_key = 1;
-    optional int64 round_time = 2;
-    repeated FleetSummary fleets = 3;
-    repeated FleetJoinedRecord fleets_joined = 4;
-    repeated FleetTargetRecord fleets_targetted = 5;
-    repeated FleetAttackRecord fleets_attacked = 6;
-    repeated FleetDamagedRecord fleets_damaged = 7;
+  optional string star_key = 1;
+  optional int64 round_time = 2;
+  repeated FleetSummary fleets = 3;
+  repeated FleetJoinedRecord fleets_joined = 4;
+  repeated FleetTargetRecord fleets_targetted = 5;
+  repeated FleetAttackRecord fleets_attacked = 6;
+  repeated FleetDamagedRecord fleets_damaged = 7;
 }
-
 
 //
 // A CombatReport represents a "complete" conflict, from beginning to resolution.
 //
-message CombatReport
-{
-    optional string key = 1;
-    optional string star_key = 2;
+message CombatReport {
+  optional string key = 1;
+  optional string star_key = 2;
 
-    // The time the conflict started/finished
-    optional int64 start_time = 3;
-    optional int64 end_time = 4;
+  // The time the conflict started/finished
+  optional int64 start_time = 3;
+  optional int64 end_time = 4;
 
-    // A list of the empires who joined the conflict
-    repeated string start_empire_keys = 5;
+  // A list of the empires who joined the conflict
+  repeated string start_empire_keys = 5;
 
-    // A list of the empires who were left when the conflict was resolved
-    repeated string end_empire_keys = 6;
+  // A list of the empires who were left when the conflict was resolved
+  repeated string end_empire_keys = 6;
 
-    // The number of ships/buildings destroyed in the conflict
-    optional int32 num_destroyed = 7;
+  // The number of ships/buildings destroyed in the conflict
+  optional int32 num_destroyed = 7;
 
-    // A page of CombatRound objects that represent this set of results
-    repeated CombatRound rounds = 8;
+  // A page of CombatRound objects that represent this set of results
+  repeated CombatRound rounds = 8;
 }
 
 
-message CombatReports
-{
-    repeated CombatReport reports = 1;
+message CombatReports {
+  repeated CombatReport reports = 1;
 }
-
 
 //
 // When requesting situation reports, we can filter them by these values.
 //
 enum SituationReportFilter {
-    ShowAll = 0;
-    MoveComplete = 1;
-    BuildCompleteAny = 2;
-    FleetAttacked = 3;
-    FleetDestroyed = 4;
-    FleetVictorious = 5;
-    ColonyAttacked = 6;
-    ColonyDestroyed = 7;
-    BuildCompleteShips = 8;
-    BuildCompleteBuilding = 9;
+  ShowAll = 0;
+  MoveComplete = 1;
+  BuildCompleteAny = 2;
+  FleetAttacked = 3;
+  FleetDestroyed = 4;
+  FleetVictorious = 5;
+  ColonyAttacked = 6;
+  ColonyDestroyed = 7;
+  BuildCompleteShips = 8;
+  BuildCompleteBuilding = 9;
 }
-
 
 //
 // A SituationReport is basically anything of interest to the player. For example, when you
@@ -1185,301 +1090,276 @@ enum SituationReportFilter {
 // is generated, if your fleet is involved in combat, a Sit. Rep. is generated (one when it's
 // first attacked, and once more when it's defeated/victorious)
 //
-message SituationReport
-{
-    optional string key = 1;
-    optional string empire_key = 2;
-    optional int64 report_time = 3;
-    optional string star_key = 4;
-    optional int32 planet_index = 5;
+message SituationReport {
+  optional string key = 1;
+  optional string empire_key = 2;
+  optional int64 report_time = 3;
+  optional string star_key = 4;
+  optional int32 planet_index = 5;
 
-    // This is the name of the realm the situation report was generated from. Used so that we can
-    // fetch the correct star definitions, and display separate notifications for separate realms.
-    optional string realm = 14;
+  // This is the name of the realm the situation report was generated from. Used so that we can
+  // fetch the correct star definitions, and display separate notifications for separate realms.
+  optional string realm = 14;
 
-    // This record is used when a building has finished being built.
-    message BuildCompleteRecord
-    {
-        optional BuildRequest.BUILD_KIND build_kind = 1;
-        optional string design_id = 2;
-        optional int32 count = 3;
-        optional string build_request_key = 4;
-    }
-    optional BuildCompleteRecord build_complete_record = 6;
+  // This record is used when a building has finished being built.
+  message BuildCompleteRecord {
+    optional BuildRequest.BUILD_KIND build_kind = 1;
+    optional string design_id = 2;
+    optional int32 count = 3;
+    optional string build_request_key = 4;
+  }
+  optional BuildCompleteRecord build_complete_record = 6;
 
-    // This record is used when a fleet has completed a move to a star.
-    message MoveCompleteRecord
-    {
-        optional string fleet_key = 1;
-        optional string fleet_design_id = 3;
-        optional float num_ships = 4;
-        optional string scout_report_key = 5;
-    }
-    optional MoveCompleteRecord move_complete_record = 7;
+  // This record is used when a fleet has completed a move to a star.
+  message MoveCompleteRecord {
+    optional string fleet_key = 1;
+    optional string fleet_design_id = 3;
+    optional float num_ships = 4;
+    optional string scout_report_key = 5;
+  }
+  optional MoveCompleteRecord move_complete_record = 7;
 
-    // This record is used when a fleet comes under attack (also when it starts attacking
-    // another fleet)
-    message FleetUnderAttackRecord
-    {
-        optional string fleet_key = 1;
-        optional string fleet_design_id = 2;
-        optional float num_ships = 3;
-        optional string combat_report_key = 4;
-    }
-    optional FleetUnderAttackRecord fleet_under_attack_record = 8;
+  // This record is used when a fleet comes under attack (also when it starts attacking
+  // another fleet)
+  message FleetUnderAttackRecord {
+    optional string fleet_key = 1;
+    optional string fleet_design_id = 2;
+    optional float num_ships = 3;
+    optional string combat_report_key = 4;
+  }
+  optional FleetUnderAttackRecord fleet_under_attack_record = 8;
 
-    message FleetDestroyedRecord
-    {
-        optional string fleet_design_id = 1;
-        optional string combat_report_key = 2;
-    }
-    optional FleetDestroyedRecord fleet_destroyed_record = 9;
+  message FleetDestroyedRecord {
+    optional string fleet_design_id = 1;
+    optional string combat_report_key = 2;
+  }
+  optional FleetDestroyedRecord fleet_destroyed_record = 9;
 
-    message FleetVictoriousRecord
-    {
-        optional string fleet_key = 1;
-        optional string fleet_design_id = 2;
-        optional float num_ships = 3;
-        optional string combat_report_key = 4;
-    }
-    optional FleetVictoriousRecord fleet_victorious_record = 10;
+  message FleetVictoriousRecord {
+    optional string fleet_key = 1;
+    optional string fleet_design_id = 2;
+    optional float num_ships = 3;
+    optional string combat_report_key = 4;
+  }
+  optional FleetVictoriousRecord fleet_victorious_record = 10;
 
-    message ColonyDestroyedRecord
-    {
-        optional string colony_key = 1;
-        optional string enemy_empire_key = 2;
-    }
-    optional ColonyDestroyedRecord colony_destroyed_record = 11;
+  message ColonyDestroyedRecord {
+    optional string colony_key = 1;
+    optional string enemy_empire_key = 2;
+  }
+  optional ColonyDestroyedRecord colony_destroyed_record = 11;
 
-    message ColonyAttackedRecord
-    {
-        optional string colony_key = 1;
-        optional string enemy_empire_key = 2;
-        optional float num_ships = 3;
-    }
-    optional ColonyAttackedRecord colony_attacked_record = 12;
+  message ColonyAttackedRecord {
+    optional string colony_key = 1;
+    optional string enemy_empire_key = 2;
+    optional float num_ships = 3;
+  }
+  optional ColonyAttackedRecord colony_attacked_record = 12;
 
-    message StarRunOutOfGoodsRecord
-    {
-        optional string colony_key = 1;
-    }
-    optional StarRunOutOfGoodsRecord star_ran_out_of_goods_record = 13;
+  message StarRunOutOfGoodsRecord {
+    optional string colony_key = 1;
+  }
+  optional StarRunOutOfGoodsRecord star_ran_out_of_goods_record = 13;
 }
 
 
-message SituationReports
-{
-    repeated SituationReport situation_reports = 1;
+message SituationReports {
+  repeated SituationReport situation_reports = 1;
 
-    // a cursor used to fetch the remaining reports
-    optional string cursor = 2;
+  // a cursor used to fetch the remaining reports
+  optional string cursor = 2;
 }
 
 
-message CashAuditRecord
-{
-    optional int32 id = 1;
-    optional int32 empire_id = 2;
+message CashAuditRecord {
+  optional int32 id = 1;
+  optional int32 empire_id = 2;
 
-    enum Reason
-    {
-        FleetMove = 0;
-        BuildAccelerate = 1;
-        CollectFromColonies = 2;
-        CreateAlliance = 3;
-        AllianceDeposit = 4;  // deposited into alliance bank
-        AllianceWithdraw = 5; // withdrawn from alliance bank
-    }
-    optional Reason reason = 3;
+  enum Reason {
+    FleetMove = 0;
+    BuildAccelerate = 1;
+    CollectFromColonies = 2;
+    CreateAlliance = 3;
+    AllianceDeposit = 4; // deposited into alliance bank
+    AllianceWithdraw = 5; // withdrawn from alliance bank
+  }
+  optional Reason reason = 3;
 
-    optional float before_cash = 4;
-    optional float after_cash = 5;
-    optional int64 time = 16;
+  optional float before_cash = 4;
+  optional float after_cash = 5;
+  optional int64 time = 16;
 
-    // these will be filled out if it's a "FleetMove" operation
-    optional int32 fleet_id = 6;
-    optional string fleet_design_id = 7;
-    optional float num_ships = 8;
-    optional int32 star_id = 9;
-    optional string star_name = 10;
-    optional float move_distance = 11;
+  // these will be filled out if it's a "FleetMove" operation
+  optional int32 fleet_id = 6;
+  optional string fleet_design_id = 7;
+  optional float num_ships = 8;
+  optional int32 star_id = 9;
+  optional string star_name = 10;
+  optional float move_distance = 11;
 
-    // these will be filled out if it's a "BuildAccelerate" operation
-    optional string build_design_id = 12;
-    optional int32 build_count = 13;
-    optional float accelerate_amount = 14;
+  // these will be filled out if it's a "BuildAccelerate" operation
+  optional string build_design_id = 12;
+  optional int32 build_count = 13;
+  optional float accelerate_amount = 14;
 
-    // these will be filled out for the "CreateAlliance" operation
-    optional string alliance_name = 15;
+  // these will be filled out for the "CreateAlliance" operation
+  optional string alliance_name = 15;
 }
 
 
-message CashAuditRecords
-{
-    repeated CashAuditRecord records = 1;
+message CashAuditRecords {
+  repeated CashAuditRecord records = 1;
 }
-
 
 //
 // This is the main contains for alliances.
 //
-message Alliance
-{
-    optional string key = 1;
+message Alliance {
+  optional string key = 1;
 
-    // The name of the alliance
-    optional string name = 2;
+  // The name of the alliance
+  optional string name = 2;
 
-    // The time (in epoch form) the alliance was first created
-    optional int64 time_created = 3;
+  // The time (in epoch form) the alliance was first created
+  optional int64 time_created = 3;
 
-    // The key of the empire that created this alliance
-    optional string creator_empire_key = 4;
+  // The key of the empire that created this alliance
+  optional string creator_empire_key = 4;
 
-    // If this is our own alliance, it'll have the bank balance
-    optional double bank_balance = 7;
+  // If this is our own alliance, it'll have the bank balance
+  optional double bank_balance = 7;
 
-    // The current number of members in the alliance
-    optional int32 num_members = 5;
+  // The current number of members in the alliance
+  optional int32 num_members = 5;
 
-    // If set, the actual collection of members
-    repeated AllianceMember members = 6;
+  // If set, the actual collection of members
+  repeated AllianceMember members = 6;
 
-    // The date the alliance's image was last changed (so we know if
-    // we need to re-fetch a cached version).
-    optional int64 date_image_updated = 8;
+  // The date the alliance's image was last changed (so we know if
+  // we need to re-fetch a cached version).
+  optional int64 date_image_updated = 8;
 
-    // Only for our own alliance, this'll be the number of pending requests
-    // we have waiting for us.
-    optional int32 num_pending_requests = 9;
+  // Only for our own alliance, this'll be the number of pending requests
+  // we have waiting for us.
+  optional int32 num_pending_requests = 9;
 
-    // The total stars this alliance controls.
-    optional int64 total_stars = 10;
+  // The total stars this alliance controls.
+  optional int64 total_stars = 10;
 
-    // True if this alliance is still 'active'.
-    optional bool is_active = 11;
+  // True if this alliance is still 'active'.
+  optional bool is_active = 11;
 
-    // A user-defined description for this alliance.
-    optional string description = 12;
+  // A user-defined description for this alliance.
+  optional string description = 12;
 }
 
 
-message Alliances
-{
-    repeated Alliance alliances = 1;
+message Alliances {
+  repeated Alliance alliances = 1;
 }
 
 
-message AllianceMember
-{
-    optional string key = 1;
-    optional string empire_key = 2;
-    optional string alliance_key = 3;
-    optional int64 time_joined = 4;
+message AllianceMember {
+  optional string key = 1;
+  optional string empire_key = 2;
+  optional string alliance_key = 3;
+  optional int64 time_joined = 4;
 
-    enum Rank
-    {
-        CAPTAIN = 0;
-        LIEUTENANT = 1;
-        MEMBER = 2;
-    }
-    optional Rank rank = 5;
+  enum Rank {
+    CAPTAIN = 0;
+    LIEUTENANT = 1;
+    MEMBER = 2;
+  }
+  optional Rank rank = 5;
 }
 
-message AllianceRequest
-{
-    optional int32 id = 1;
-    optional int32 alliance_id = 2;
-    optional int32 request_empire_id = 3;
-    optional int64 request_date = 4;
+message AllianceRequest {
+  optional int32 id = 1;
+  optional int32 alliance_id = 2;
+  optional int32 request_empire_id = 3;
+  optional int64 request_date = 4;
 
-    enum RequestType
-    {
-        JOIN = 0;
-        LEAVE = 1;
-        KICK = 2;
-        DEPOSIT_CASH = 3;
-        WITHDRAW_CASH = 4;
-        CHANGE_IMAGE = 5;
-        CHANGE_NAME = 6;
-        CHANGE_DESCRIPTION = 7;
-    }
-    optional RequestType request_type = 5;
-    optional string message = 6;
+  enum RequestType {
+    JOIN = 0;
+    LEAVE = 1;
+    KICK = 2;
+    DEPOSIT_CASH = 3;
+    WITHDRAW_CASH = 4;
+    CHANGE_IMAGE = 5;
+    CHANGE_NAME = 6;
+    CHANGE_DESCRIPTION = 7;
+  }
+  optional RequestType request_type = 5;
+  optional string message = 6;
 
-    enum RequestState
-    {
-        PENDING = 0;
-        ACCEPTED = 1;
-        REJECTED = 2;
-        WITHDRAWN = 3;
-    }
-    optional RequestState state = 7;
+  enum RequestState {
+    PENDING = 0;
+    ACCEPTED = 1;
+    REJECTED = 2;
+    WITHDRAWN = 3;
+  }
+  optional RequestState state = 7;
 
-    optional int32 num_votes = 8;
+  optional int32 num_votes = 8;
 
-    // for KICK requests, this is the empire we're kicking
-    optional int32 target_empire_id = 9;
+  // for KICK requests, this is the empire we're kicking
+  optional int32 target_empire_id = 9;
 
-    // for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
-    optional float amount = 10;
+  // for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
+  optional float amount = 10;
 
-    // for CHANGE_IMAGE, the new image to use
-    optional bytes png_image = 11;
+  // for CHANGE_IMAGE, the new image to use
+  optional bytes png_image = 11;
 
-    // for CHANGE_NAME, the new name you want
-    optional string new_name = 12;
+  // for CHANGE_NAME, the new name you want
+  optional string new_name = 12;
 
-    // the votes we've received for this request so far.
-    repeated AllianceRequestVote vote = 13;
+  // the votes we've received for this request so far.
+  repeated AllianceRequestVote vote = 13;
 
-    // for CHANGE_DESCRIPTION, the new description you want
-    optional string new_description = 14;
+  // for CHANGE_DESCRIPTION, the new description you want
+  optional string new_description = 14;
 }
 
 
-message AllianceRequests
-{
-    repeated AllianceRequest requests = 1;
-    optional string cursor = 2;
+message AllianceRequests {
+  repeated AllianceRequest requests = 1;
+  optional string cursor = 2;
 }
 
 
-message AllianceRequestVote
-{
-    optional int32 id = 1;
-    optional int32 alliance_id = 2;
-    optional int32 alliance_request_id = 3;
-    optional int32 empire_id = 4;
-    optional int32 votes = 5;
-    optional int64 date = 6;
+message AllianceRequestVote {
+  optional int32 id = 1;
+  optional int32 alliance_id = 2;
+  optional int32 alliance_request_id = 3;
+  optional int32 empire_id = 4;
+  optional int32 votes = 5;
+  optional int64 date = 6;
 }
 
 
-message ErrorReport
-{
-    optional string android_version = 1;
-    optional string phone_model = 2;
-    optional string package_name = 3;
-    optional string app_version = 4;
-    optional string stack_trace = 5;
-    optional string message = 6;
-    optional int64 report_time = 7;
-    optional int32 empire_id = 8;
-    optional string context = 9;
-    optional string exception_class = 10;
-    optional int64 heap_size = 11;
-    optional int64 heap_allocated = 12;
-    optional int64 heap_free = 13;
-    optional int64 total_run_time = 14;
-    optional int64 foreground_run_time = 15;
-    optional string log_output = 16;
-    optional string server_request_qs = 17;
-    optional string server_request_user_agent = 18;
+message ErrorReport {
+  optional string android_version = 1;
+  optional string phone_model = 2;
+  optional string package_name = 3;
+  optional string app_version = 4;
+  optional string stack_trace = 5;
+  optional string message = 6;
+  optional int64 report_time = 7;
+  optional int32 empire_id = 8;
+  optional string context = 9;
+  optional string exception_class = 10;
+  optional int64 heap_size = 11;
+  optional int64 heap_allocated = 12;
+  optional int64 heap_free = 13;
+  optional int64 total_run_time = 14;
+  optional int64 foreground_run_time = 15;
+  optional string log_output = 16;
+  optional string server_request_qs = 17;
+  optional string server_request_user_agent = 18;
 }
 
-message ErrorReports
-{
-    repeated ErrorReport reports = 1;
+message ErrorReports {
+  repeated ErrorReport reports = 1;
 }
 
