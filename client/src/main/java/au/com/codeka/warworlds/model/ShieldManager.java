@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import org.andengine.opengl.texture.TextureOptions;
@@ -19,6 +20,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Build;
 
 import androidx.collection.LruCache;
@@ -91,6 +95,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
       }
       if (bmp == null) {
         bmp = getDefaultShield(shieldInfo);
+        bmp = addBadgeColor(bmp, shieldInfo);
         saveCachedShieldImage(context, shieldInfo, bmp);
       }
 
@@ -116,6 +121,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
         }
 
         Bitmap bmp = getDefaultShield(shieldInfo);
+        bmp = addBadgeColor(bmp, shieldInfo);
         saveCachedShieldImage(glActivity, shieldInfo, bmp);
       }
 
@@ -156,7 +162,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
             new BackgroundRunner<Void>() {
               @Override
               protected Void doInBackground() {
-                saveCachedShieldImage(App.i, shieldInfo, bmp);
+                saveCachedShieldImage(App.i, shieldInfo, addBadgeColor(bmp, shieldInfo));
                 return null;
               }
 
@@ -181,6 +187,28 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
       return null;
     }
     return BitmapFactory.decodeFile(fullPath);
+  }
+
+  private Bitmap addBadgeColor(Bitmap bitmap, ShieldInfo shieldInfo) {
+    if (shieldInfo.badgeColor == 0) {
+      return bitmap;
+    }
+
+    if (!bitmap.isMutable()) {
+      bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+    }
+    Canvas canvas = new Canvas(bitmap);
+    Paint paint = new Paint();
+    paint.setStyle(Paint.Style.FILL);
+    paint.setColor(shieldInfo.badgeColor);
+
+    float circleRadius = bitmap.getWidth() * 0.1f;
+    canvas.drawCircle(
+        bitmap.getWidth() - circleRadius * 2,
+        bitmap.getHeight() - circleRadius * 2,
+        circleRadius,
+        paint);
+    return bitmap;
   }
 
   private void saveCachedShieldImage(Context context, ShieldInfo shieldInfo, Bitmap bmp) {
@@ -219,20 +247,28 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
     File cacheDir = context.getCacheDir();
     String fullPath = cacheDir.getAbsolutePath() + File.separator + shieldInfo.kind
         + "-shields" + File.separator;
-    fullPath += String.format("%d-v3-%d-%d.png", RealmContext.i.getCurrentRealm().getID(),
-        shieldInfo.id, lastUpdate);
+    fullPath += String.format(Locale.US, "%d-v4-%d-%d-%d.png",
+        RealmContext.i.getCurrentRealm().getID(), shieldInfo.id, shieldInfo.badgeColor, lastUpdate);
     return fullPath;
   }
 
   protected class ShieldInfo {
-    public String kind;
-    public int id;
-    public Long lastUpdate;
+    String kind;
+    int id;
+    Long lastUpdate;
 
-    public ShieldInfo(String kind, int id, Long lastUpdate) {
+    /**
+     * The 'badge color' for this shield, which is a little circle in the bottom-right of the shield
+     * image and is mostly used to indicate an empire's patreon support level. Set to 0 to disable
+     * the badge.
+     */
+    int badgeColor;
+
+    ShieldInfo(String kind, int id, Long lastUpdate, int badgeColor) {
       this.kind = kind;
       this.id = id;
       this.lastUpdate = lastUpdate;
+      this.badgeColor = badgeColor;
     }
   }
 

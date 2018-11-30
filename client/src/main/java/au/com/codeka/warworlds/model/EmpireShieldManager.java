@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 
+import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BaseGlActivity;
 
@@ -82,7 +83,15 @@ public class EmpireShieldManager extends ShieldManager {
     int id = empire.getKey() == null ? 0 : Integer.parseInt(empire.getKey());
     Long lastUpdate =
         empire.getShieldLastUpdate() == null ? null : empire.getShieldLastUpdate().getMillis();
-    return new ShieldInfo(ShieldManager.EmpireShield, id, lastUpdate);
+    int badgeColor = 0;
+    if (empire.getPatreonLevel() == BaseEmpire.PatreonLevel.FAN) {
+      badgeColor = 0xffcd7f32; // bronze
+    } else if (empire.getPatreonLevel() == BaseEmpire.PatreonLevel.PATRON) {
+      badgeColor = 0xffc0c0c0; // silver
+    } else if (empire.getPatreonLevel() == BaseEmpire.PatreonLevel.EMPIRE) {
+      badgeColor = 0xffffd700; // gold
+    }
+    return new ShieldInfo(ShieldManager.EmpireShield, id, lastUpdate, badgeColor);
   }
 
   private void ensureBaseImage(Context context) {
