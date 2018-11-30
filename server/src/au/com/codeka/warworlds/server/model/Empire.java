@@ -39,7 +39,12 @@ public class Empire extends BaseEmpire {
     mLastSitrepReadTime = res.getDateTime("last_sitrep_read_time");
     mForceRemoveAds = res.getInt("remove_ads") != null && res.getInt("remove_ads") != 0;
     mShieldLastUpdate = res.getDateTime("shield_last_update");
-    mPatreonLevel = PatreonLevel.fromPledge(res.getInt("max_pledge"));
+    Integer maxPledge = res.getInt("max_pledge");
+    if (maxPledge == null) {
+      mPatreonLevel = PatreonLevel.NONE;
+    } else {
+      mPatreonLevel = PatreonLevel.fromPledge(maxPledge);
+    }
   }
 
   public int getID() {

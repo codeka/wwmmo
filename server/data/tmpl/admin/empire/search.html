@@ -66,6 +66,12 @@
     }
     div.spinner {
     }
+    div.email-addr {
+      max-width: 600px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
   </style>
 {% endblock %}
@@ -105,7 +111,11 @@
     <tr>
       <td align="center"><%=key%></td>
       <td align="center"><img src="/realms/{{realm}}/empires/<%=key%>/shield?final=1&size=32" width="32" height="32" /></td>
-      <td><a href="javascript:;" class="empire-name" data-id="<%=key%>"><%=display_name%></a><br/><span style="color: #aaa;"><%=email%></span></td>
+      <td>
+        <a href="javascript:;" class="empire-name" data-id="<%=key%>">
+          <%=display_name%>
+        </a>
+        <div style="color: #aaa;" class="email-addr"><%=email%></div></td>
       <td align="center"><% if (rank) { %><%=rank.rank%><% } %></td>
     </tr>
   </script>
@@ -142,6 +152,7 @@
           url: url,
           type: "GET",
           dataType: "json",
+          cache: false,
           success: function(data) {
             var text = "";
             text += spacePad("Date", 19);
@@ -208,6 +219,7 @@
       $.ajax({
         url: "/realms/{{realm}}/empires/search?ids="+id,
         dataType: "json",
+        cache: false,
         success: function (data, status, xhr) {
           setTimeout(function() {
             $("#search-time").html("<b>Time:</b> "+xhr.elapsedMs+"ms");

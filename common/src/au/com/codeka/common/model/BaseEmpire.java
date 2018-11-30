@@ -167,6 +167,7 @@ public abstract class BaseEmpire {
       pb.setTaxesCollectedPerHour(mTaxCollectedPerHour);
     }
 
+    log.info("#%s mPatreonLevel = %s", mKey, mPatreonLevel);
     pb.setPatreonLevel(Messages.Empire.PatreonLevel.forNumber(mPatreonLevel.getValue()));
   }
 
