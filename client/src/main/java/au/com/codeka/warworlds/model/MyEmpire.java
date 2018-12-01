@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import au.com.codeka.common.Log;
@@ -20,6 +21,7 @@ import au.com.codeka.warworlds.RunnableArg;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.model.billing.IabException;
+import au.com.codeka.warworlds.model.billing.IabHelper;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
 
@@ -176,27 +178,15 @@ public class MyEmpire extends Empire {
         }).build());
   }
 
-  public void rename(final String newName, final Purchase purchaseInfo,
+  public void rename(final String newName, @Nullable final Purchase purchaseInfo,
       @NotNull final RunnableArg<Boolean> onComplete) {
     String url = "empires/" + getKey() + "/display-name";
 
-    SkuDetails sku;
-    try {
-      sku = PurchaseManager.i.getInventory().getSkuDetails("rename_empire");
-    } catch (IabException e) {
-      onComplete.run(false);
-      return;
-    }
 
     Messages.EmpireRenameRequest renameRequestPb = Messages.EmpireRenameRequest.newBuilder()
         .setKey(getKey())
         .setNewName(newName)
-        .setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
-            .setSku("rename_empire")
-            .setToken(purchaseInfo.getToken())
-            .setOrderId(purchaseInfo.getOrderId())
-            .setPrice(sku.getPrice())
-            .setDeveloperPayload(purchaseInfo.getDeveloperPayload()))
+        .setPurchaseInfo(IabHelper.toProtobuf("empire_rename", purchaseInfo))
         .build();
 
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "PUT")
@@ -237,12 +227,7 @@ public class MyEmpire extends Empire {
     Messages.EmpireChangeShieldRequest pb = Messages.EmpireChangeShieldRequest.newBuilder()
         .setKey(getKey())
         .setPngImage(ByteString.copyFrom(outs.toByteArray()))
-        .setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
-            .setSku("decorate_empire")
-            .setToken(purchaseInfo.getToken())
-            .setOrderId(purchaseInfo.getOrderId())
-            .setPrice(sku.getPrice())
-            .setDeveloperPayload(purchaseInfo.getDeveloperPayload()))
+        .setPurchaseInfo(IabHelper.toProtobuf("decorate_empire", purchaseInfo))
         .build();
 
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "PUT").body(pb)
@@ -272,19 +257,7 @@ public class MyEmpire extends Empire {
 
     Messages.EmpireResetRequest.Builder pb = Messages.EmpireResetRequest.newBuilder();
     if (purchaseInfo != null) {
-      SkuDetails sku;
-      try {
-        sku = PurchaseManager.i.getInventory().getSkuDetails("rename_empire");
-      } catch (IabException e) {
-        return;
-      }
-
-      pb.setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
-          .setSku(skuName)
-          .setToken(purchaseInfo.getToken())
-          .setOrderId(purchaseInfo.getOrderId())
-          .setPrice(sku.getPrice())
-          .setDeveloperPayload(purchaseInfo.getDeveloperPayload()));
+      pb.setPurchaseInfo(IabHelper.toProtobuf(skuName, purchaseInfo));
     }
 
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST")

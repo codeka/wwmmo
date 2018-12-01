@@ -24,66 +24,67 @@ import au.com.codeka.warworlds.model.billing.IabResult;
 import au.com.codeka.warworlds.model.billing.Purchase;
 
 public class StarRenameDialog extends DialogFragment {
-    private Purchase mPurchase;
-    private View mView;
-    private Star mStar;
+  private Purchase mPurchase;
+  private View mView;
+  private Star mStar;
 
-    public void setPurchaseInfo(Purchase purchase) {
-        mPurchase = purchase;
-    }
-    public void setStar(Star star) {
-        mStar = star;
-    }
+  public void setPurchaseInfo(Purchase purchase) {
+    mPurchase = purchase;
+  }
 
-    @SuppressLint("InflateParams")
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        mView = inflater.inflate(R.layout.star_rename_dlg, null);
+  public void setStar(Star star) {
+    mStar = star;
+  }
 
-        EditText starNewName = (EditText) mView.findViewById(R.id.star_newname);
-        TextView starName = (TextView) mView.findViewById(R.id.star_name);
-        ImageView starIcon = (ImageView) mView.findViewById(R.id.star_icon);
+  @SuppressLint("InflateParams")
+  @Override
+  public Dialog onCreateDialog(Bundle savedInstanceState) {
+    LayoutInflater inflater = getActivity().getLayoutInflater();
+    mView = inflater.inflate(R.layout.star_rename_dlg, null);
 
-        starName.setText(mStar.getName());
-        starNewName.setText(mStar.getName());
+    EditText starNewName = mView.findViewById(R.id.star_newname);
+    TextView starName = mView.findViewById(R.id.star_name);
+    ImageView starIcon = mView.findViewById(R.id.star_icon);
 
-        int imageSize = (int)(mStar.getSize() * mStar.getStarType().getImageScale() * 2);
-        Sprite starSprite = StarImageManager.getInstance().getSprite(mStar, imageSize, true);
-        starIcon.setImageDrawable(new SpriteDrawable(starSprite));
+    starName.setText(mStar.getName());
+    starNewName.setText(mStar.getName());
 
-        starNewName.requestFocus();
+    int imageSize = (int) (mStar.getSize() * mStar.getStarType().getImageScale() * 2);
+    Sprite starSprite = StarImageManager.getInstance().getSprite(mStar, imageSize, true);
+    starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
-        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
-        b.setView(mView);
-        b.setNeutralButton("Rename", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                onRenameClicked();
-                dialog.dismiss();
-            }
-        });
-        return b.create();
-    }
+    starNewName.requestFocus();
 
-    public void onRenameClicked() {
-        EditText starNewName = (EditText) mView.findViewById(R.id.star_newname);
-        final String newStarName = starNewName.getText().toString();
+    StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
+    b.setView(mView);
+    b.setNeutralButton("Rename", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        onRenameClicked();
+        dialog.dismiss();
+      }
+    });
+    return b.create();
+  }
 
-        StarManager.i.renameStar(mPurchase, mStar, newStarName,
-            new StarManager.StarRenameCompleteHandler() {
+  public void onRenameClicked() {
+    EditText starNewName = mView.findViewById(R.id.star_newname);
+    final String newStarName = starNewName.getText().toString();
+
+    StarManager.i.renameStar(mPurchase, mStar, newStarName,
+        new StarManager.StarRenameCompleteHandler() {
+          @Override
+          public void onStarRename(Star star, boolean successful, String errorMessage) {
+            PurchaseManager.i.consume(mPurchase, new IabHelper.OnConsumeFinishedListener() {
               @Override
-              public void onStarRename(Star star, boolean successful, String errorMessage) {
-                PurchaseManager.i.consume(mPurchase, new IabHelper.OnConsumeFinishedListener() {
-                  @Override
-                  public void onConsumeFinished(Purchase purchase, IabResult result) {
-                    if (!result.isSuccess()) {
-                      // TODO: revert?
-                      return;
-                    }
-                  }
-                });
+              public void onConsumeFinished(Purchase purchase, IabResult result) {
+                if (!result.isSuccess()) {
+                  // TODO: revert?
+                  return;
+                }
               }
             });
-    }
+          }
+        });
+  }
 }

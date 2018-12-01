@@ -35,9 +35,9 @@ public class RenameDialog extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mView = inflater.inflate(R.layout.wormhole_rename_dlg, null);
 
-        EditText starNewName = (EditText) mView.findViewById(R.id.star_newname);
-        TextView starName = (TextView) mView.findViewById(R.id.star_name);
-        ImageView starIcon = (ImageView) mView.findViewById(R.id.star_icon);
+        EditText starNewName = mView.findViewById(R.id.star_newname);
+        TextView starName = mView.findViewById(R.id.star_name);
+        ImageView starIcon = mView.findViewById(R.id.star_icon);
 
         starName.setText(mStar.getName());
         starNewName.setText(mStar.getName());
@@ -62,7 +62,7 @@ public class RenameDialog extends DialogFragment {
 
     public void onRenameClicked() {
         final Activity activity = getActivity();
-        EditText starNewName = (EditText) mView.findViewById(R.id.star_newname);
+        EditText starNewName = mView.findViewById(R.id.star_newname);
         final String newStarName = starNewName.getText().toString();
 
         StarManager.i.renameStar(null, mStar, newStarName,

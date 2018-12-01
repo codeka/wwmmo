@@ -204,12 +204,7 @@ public class BannerAdView extends FrameLayout {
                 String url = "empires/" + EmpireManager.i.getEmpire().getKey() + "/ads";
 
                 Messages.EmpireAdsRemoveRequest pb = Messages.EmpireAdsRemoveRequest.newBuilder()
-                        .setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
-                                .setSku(purchase.getSku())
-                                .setOrderId(purchase.getOrderId())
-                                .setPrice(price)
-                                .setToken(purchase.getToken())
-                                .setDeveloperPayload(purchase.getDeveloperPayload()))
+                        .setPurchaseInfo(IabHelper.toProtobuf(purchase.getSku(), purchase))
                         .build();
                 try {
                     ApiClient.putProtoBuf(url, pb, null);

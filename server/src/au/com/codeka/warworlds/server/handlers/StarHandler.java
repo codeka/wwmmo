@@ -2,18 +2,22 @@ package au.com.codeka.warworlds.server.handlers;
 
 import java.util.ArrayList;
 
+import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
 import au.com.codeka.warworlds.server.ctrl.BuildingController;
+import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.PurchaseController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.BuildingPosition;
+import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Star;
+import au.com.codeka.warworlds.server.monitor.EmpireIpAddressMonitor;
 import au.com.codeka.warworlds.server.utils.NameValidator;
 
 /**
@@ -61,18 +65,22 @@ public class StarHandler extends RequestHandler {
         star_rename_request_pb.getNewName(),
         Configuration.i.getLimits().maxStarNameLength());
 
+    Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
     if (!star_rename_request_pb.hasPurchaseInfo()) {
-      // if there's no purchase info then you must be renaming a wormhole, and it must be
-      // one belonging to your alliance.
+      // if there's no purchase info then you must be either be an empire-level patron, or you're
+      // renaming a wormhole that belongs to your alliance.
       Star star = new StarController().getStar(starID);
       if (star.getWormholeExtra() == null) {
-        throw new RequestException(400, "You are not allowed to rename this star.");
-      }
-
-      Star.WormholeExtra wormhole = star.getWormholeExtra();
-      if (!new AllianceController()
-          .isSameAlliance(wormhole.getEmpireID(), getSession().getEmpireID())) {
-        throw new RequestException(400, "You cannot rename wormholes that do not belong to you.");
+        // it's not a wormhole, so you must be an empire-level patron to rename for free.
+        if (empire.getPatreonLevel() != BaseEmpire.PatreonLevel.EMPIRE) {
+          throw new RequestException(400, "You are not allowed to rename this star.");
+        }
+      } else {
+        Star.WormholeExtra wormhole = star.getWormholeExtra();
+        if (!new AllianceController()
+            .isSameAlliance(wormhole.getEmpireID(), getSession().getEmpireID())) {
+          throw new RequestException(400, "You cannot rename wormholes that do not belong to you.");
+        }
       }
     }
 
@@ -85,7 +93,8 @@ public class StarHandler extends RequestHandler {
       throw new RequestException(e);
     }
 
-    if (star_rename_request_pb.hasPurchaseInfo()) {
+    if (empire.getPatreonLevel() != BaseEmpire.PatreonLevel.EMPIRE
+        && star_rename_request_pb.hasPurchaseInfo()) {
       new PurchaseController()
           .addPurchase(getSession().getEmpireID(), star_rename_request_pb.getPurchaseInfo(),
               star_rename_request_pb);

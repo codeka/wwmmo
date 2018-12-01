@@ -4,6 +4,7 @@ import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.annotation.Nullable;
 
@@ -14,6 +15,7 @@ import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventBus;
 import au.com.codeka.warworlds.model.billing.IabException;
+import au.com.codeka.warworlds.model.billing.IabHelper;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
 
@@ -139,47 +141,33 @@ public class StarManager extends BaseManager {
 
   public void renameStar(final Purchase purchase, final Star star, final String newName,
       final StarRenameCompleteHandler onCompleteHandler) {
-    String price = "???";
-    SkuDetails sku = null;
-    if (purchase != null) {
-      try {
-        sku = PurchaseManager.i.getInventory().getSkuDetails(purchase.getSku());
-      } catch (IabException e1) {
-        // Just ignore.
-      }
-    }
-    if (sku != null) {
-      price = sku.getPrice();
-    }
-
     Messages.StarRenameRequest.Builder pb =
         Messages.StarRenameRequest.newBuilder().setStarKey(star.getKey())
             .setOldName(star.getName()).setNewName(newName);
     if (purchase != null) {
-      pb.setPurchaseInfo(Messages.PurchaseInfo.newBuilder().setSku(purchase.getSku())
-          .setOrderId(purchase.getOrderId()).setPrice(price).setToken(purchase.getToken())
-          .setDeveloperPayload(purchase.getDeveloperPayload()));
+      pb.setPurchaseInfo(IabHelper.toProtobuf(purchase.getSku(), purchase));
     }
 
-    ApiRequest request = new ApiRequest.Builder(String.format("stars/%d", star.getID()), "PUT")
-        .body(pb.build())
-        .completeCallback(new ApiRequest.CompleteCallback() {
-          @Override
-          public void onRequestComplete(ApiRequest request) {
-            // if failure() {
-            //  onCompleteHandler.onStarRename(null, false, errorMessage);
-            // }
-            Messages.Star starPb = request.body(Messages.Star.class);
-            Star star = new Star();
-            star.fromProtocolBuffer(starPb);
+    ApiRequest request =
+        new ApiRequest.Builder(String.format(Locale.ENGLISH, "stars/%d", star.getID()), "PUT")
+            .body(pb.build())
+            .completeCallback(new ApiRequest.CompleteCallback() {
+              @Override
+              public void onRequestComplete(ApiRequest request) {
+                // if failure() {
+                //  onCompleteHandler.onStarRename(null, false, errorMessage);
+                // }
+                Messages.Star starPb = request.body(Messages.Star.class);
+                Star star = new Star();
+                star.fromProtocolBuffer(starPb);
 
-            notifyStarUpdated(star);
-            if (onCompleteHandler != null) {
-              onCompleteHandler.onStarRename(star, true, null);
-            }
-          }
-        })
-        .build();
+                notifyStarUpdated(star);
+                if (onCompleteHandler != null) {
+                  onCompleteHandler.onStarRename(star, true, null);
+                }
+              }
+            })
+            .build();
     RequestManager.i.sendRequest(request);
   }
 

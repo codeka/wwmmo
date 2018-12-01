@@ -17,6 +17,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import java.util.Locale;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.BaseStar.StarType;
@@ -511,6 +512,12 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   }
 
   public void onRenameClick() {
+    // If you're an Empire-level patron, skip the cost stuff, it's free for you!
+    if (EmpireManager.i.getEmpire().getPatreonLevel() == BaseEmpire.PatreonLevel.EMPIRE) {
+      doRenameStar();
+      return;
+    }
+
     SkuDetails starRenameSku;
     try {
       starRenameSku = PurchaseManager.i.getInventory().getSkuDetails("star_rename");

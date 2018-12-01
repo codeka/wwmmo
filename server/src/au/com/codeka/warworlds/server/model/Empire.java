@@ -75,9 +75,10 @@ public class Empire extends BaseEmpire {
   /**
    * Gets a value which indicates whether the flag in the database has been set that will
    * force ads to be removed from the game. To be used when people complain of ads coming back.
+   * Also for Empire-level patrons, they don't get ads either.
    */
   public boolean getForceRemoveAds() {
-    return mForceRemoveAds;
+    return mForceRemoveAds || mPatreonLevel == PatreonLevel.EMPIRE;
   }
 
   public DateTime getLastSitrepReadTime() {
