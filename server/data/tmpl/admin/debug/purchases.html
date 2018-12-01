@@ -1,15 +1,15 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Purchases{% endblock %}
-{% block head %}
+{% block "title" %}Purchases{% end %}
+{% block "head" %}
   <style>
     span.name {
       font-weight: bold;
     }
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
-  <h1>Purchases</h1>
+{% block "content" %}
+  <h1>Purchases ({{ page_no }})</h1>
   <script>
     function display_extra(extra) {
       if (!extra.purchase_info) {
@@ -40,20 +40,20 @@
         display_extra(extra);
       </script></td>
     </tr>
-  {% endfor %}
+  {% end %}
   </table>
   <div style="text-align: center;">
     {{ total_pages }} page(s)
   </div>
-  <div style="text-align: center;">
-  {% if page_no > 0 %}
-    <a href="?page_no={{ page_no - 1 }}">&lt;- Previous</a>
-  {% endif %}
+  <div style="text-align: center; margin-bottom: 20pt;">
+  {% if page_no > 1 %}
+    <a href="?page={{ page_no - 1 }}">&lt;- Previous</a>
+  {% end %}
   {% if total_pages > page_no %}
-    {% if page_no > 0 %}
+    {% if page_no > 1 %}
       &bull;
-    {% endif %}
-    <a href="?page_no={{ page_no + 1 }}">Next -&gt;</a>
-  {% endif %}
+    {% end %}
+    <a href="?page={{ page_no + 1 }}">Next -&gt;</a>
+  {% end %}
   </div>
-{% endblock %}
+{% end %}

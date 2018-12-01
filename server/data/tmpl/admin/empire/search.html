@@ -1,6 +1,6 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Empires{% endblock %}
-{% block head %}
+{% block "title" %}Empires{% end %}
+{% block "head" %}
   <script src="/realms/{{realm}}/js/tmpl.js"></script>
   <script src="/realms/{{realm}}/js/hashparams.js"></script>
   <style>
@@ -74,16 +74,16 @@
     }
 
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
   <h1>Empires</h1>
   <p>To find the details of a given Empire, enter the email address below of the user
      who owns the Empire, or the Empire's key, then click &ldquo;Search&rdquo;.
   <div id="search-time"></div>
   <div id="search-results"></div>
   <form id="find-byemailidname">
-    <label for="search-email">Search:</label>
+    <label for="search-value">Search:</label>
     <div class="hack"><input type="text" id="search-value" placeholder="Key, email or name" /></div>
     <input type="submit" value="Search" />
   </form>
@@ -276,4 +276,4 @@
       }
     });
   </script>
-{% endblock %}
+{% end %}

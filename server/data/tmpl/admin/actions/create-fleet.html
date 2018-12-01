@@ -1,7 +1,7 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Create Fleet{% endblock %}
+{% block "title" %}Create Fleet{% end %}
 
-{% block head %}
+{% block "head" %}
   <style>
     form div.field input[type=text] {
       width: 300pt;
@@ -14,14 +14,14 @@
       padding: 4pt;
     }
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
   <h1>Create a fleet</h1>
   <p>Create a new fleet by entering it's details below. It'll be created IDLE and AGRESSIVE.</p>
   {% if complete %}
-    <p class="{% if success %}success{% else %}error{% endif %}">{% if msg %}{{ msg }}{% else %}Fleet created!{% endif %}</p>
-  {% endif %}
+    <p class="{% if success %}success{% else %}error{% endif %}">{% if msg %}{{ msg }}{% else %}Fleet created!{% end %}</p>
+  {% end %}
   <form method="post">
     <div class="field">
       <label for="star">Star:</label>
@@ -48,4 +48,4 @@
       <input type="submit" value="Create Fleet">
     </div>
   </form>
-{% endblock %}
+{% end %}

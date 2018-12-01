@@ -20,17 +20,17 @@ public class AdminDebugPurchasesHandler extends AdminHandler {
 
     int pageNo = 0;
     try {
-      pageNo = Integer.parseInt(getRequest().getParameter("page"));
+      pageNo = Integer.parseInt(getRequest().getParameter("page")) - 1;
     } catch (NumberFormatException e) {
     }
-    data.put("page_no", pageNo);
+    data.put("page_no", pageNo + 1);
 
-    String sql = "SELECT COUNT(*) from purchases";
+    String sql = "SELECT COUNT(*) as total_purchases from purchases";
     long totalPurchases = 0;
     try (SqlStmt stmt = DB.prepare(sql)) {
       SqlResult res = stmt.select();
       if (res.next()) {
-        totalPurchases = res.getLong(0);
+        totalPurchases = res.getLong("total_purchases");
       }
     } catch (Exception e) {
       // Ignore.

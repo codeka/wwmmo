@@ -1,6 +1,6 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Reports{% endblock %}
-{% block head %}
+{% block "title" %}Reports{% end %}
+{% block "head" %}
     <style>
         #update-form textarea {
             width: 800px;
@@ -59,9 +59,9 @@
             white-space: pre;
         }
     </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
     <h1>Reports</h1>
     <form id="scout-report-form">
         <label>Star:</label>
@@ -166,4 +166,4 @@
             });
         });
     </script>
-{% endblock %}
+{% end %}

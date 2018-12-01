@@ -1,6 +1,6 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Chat{% endblock %}
-{% block head %}
+{% block "title" %}Chat{% end %}
+{% block "head" %}
   <style>
     label {
       font-weight: bold;
@@ -16,9 +16,9 @@
       height: 100%;
     }
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
   <h1>Profanity Filter</h1>
   <form method="post">
     <label for="mild-words">Mild Profanity:</label>
@@ -27,4 +27,4 @@
     <div class="text-container"><textarea name="strong-words" id="strong-words">{{strong}}</textarea></div>
     <input type="submit" value="Save">
   </form>
-{% endblock %}
+{% end %}

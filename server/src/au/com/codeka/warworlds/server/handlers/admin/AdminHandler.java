@@ -11,14 +11,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.joda.time.DateTime;
-
-import au.com.codeka.carrot.base.CarrotException;
-import au.com.codeka.carrot.resource.FileResourceLocater;
-import au.com.codeka.carrot.interpret.CarrotInterpreter;
-import au.com.codeka.carrot.interpret.InterpretException;
-import au.com.codeka.carrot.lib.Filter;
-import au.com.codeka.carrot.template.TemplateEngine;
+import au.com.codeka.carrot.CarrotEngine;
+import au.com.codeka.carrot.CarrotException;
+import au.com.codeka.carrot.bindings.MapBindings;
+import au.com.codeka.carrot.resource.FileResourceLocator;
+import au.com.codeka.carrot.util.SafeString;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
@@ -30,22 +27,22 @@ import au.com.codeka.warworlds.server.model.BackendUser;
 import com.google.common.base.Throwables;
 import com.google.gson.JsonElement;
 
+import org.joda.time.DateTime;
+
 public class AdminHandler extends RequestHandler {
   private final Log log = new Log("AdminHandler");
 
-  private static final TemplateEngine TEMPLATE_ENGINE;
+  private static final CarrotEngine TEMPLATE_ENGINE;
   static {
-    TEMPLATE_ENGINE = new TemplateEngine();
-
-    TEMPLATE_ENGINE.getConfiguration().setResourceLocater(
-        new FileResourceLocater(TEMPLATE_ENGINE.getConfiguration(), new File(Configuration.i
-            .getDataDirectory(), "tmpl").getAbsolutePath()));
-    TEMPLATE_ENGINE.getConfiguration().setEncoding("utf-8");
-
-    TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new NumberFilter());
-    TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new AttrEscapeFilter());
-    TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new LocalDateFilter());
-    TEMPLATE_ENGINE.getConfiguration().getFilterLibrary().register(new IsInRoleFilter());
+    TEMPLATE_ENGINE = new CarrotEngine(
+        new au.com.codeka.carrot.Configuration.Builder()
+            .setResourceLocator(new FileResourceLocator.Builder()
+                .setBasePath(new File(Configuration.i.getDataDirectory(), "tmpl").getAbsolutePath()))
+            .setEncoding("utf-8")
+            .build(),
+        new MapBindings.Builder()
+            .set("Users", new UsersHelper())
+            .set("Format", new FormatHelper()));
   }
 
   @Override
@@ -65,7 +62,7 @@ public class AdminHandler extends RequestHandler {
   @Override
   protected void handleException(RequestException e) {
     try {
-      TreeMap<String, Object> data = new TreeMap<String, Object>();
+      TreeMap<String, Object> data = new TreeMap<>();
       data.put("exception", e);
       data.put("stack_trace", Throwables.getStackTraceAsString(e));
       render("exception.html", data);
@@ -76,7 +73,7 @@ public class AdminHandler extends RequestHandler {
 
   protected void render(String path, Map<String, Object> data) throws RequestException {
     if (data == null) {
-      data = new TreeMap<String, Object>();
+      data = new TreeMap<>();
     }
 
     data.put("realm", getRealm());
@@ -92,7 +89,7 @@ public class AdminHandler extends RequestHandler {
     getResponse().setContentType("text/html");
     getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
     try {
-      getResponse().getWriter().write(TEMPLATE_ENGINE.process(path, data));
+      getResponse().getWriter().write(TEMPLATE_ENGINE.process(path, new MapBindings(data)));
     } catch (CarrotException | IOException e) {
       log.error("Error rendering template!", e);
     }
@@ -119,7 +116,7 @@ public class AdminHandler extends RequestHandler {
   }
 
   protected void authenticate() {
-    URI requestUrl = null;
+    URI requestUrl;
     try {
       requestUrl = new URI(getRequestUrl());
     } catch (URISyntaxException e) {
@@ -136,6 +133,8 @@ public class AdminHandler extends RequestHandler {
 
     redirect(redirectUrl);
   }
+
+  /*
 
   private static class NumberFilter implements Filter {
     private static DecimalFormat sFormat = new DecimalFormat("#,##0");
@@ -186,41 +185,30 @@ public class AdminHandler extends RequestHandler {
     }
   }
 
-  private static class LocalDateFilter implements Filter {
-    @Override
-    public String getName() {
-      return "local-date";
+   */
+  private static class FormatHelper {
+    private static final DecimalFormat NUMBER_FORMAT = new DecimalFormat("#,##0");
+
+    public SafeString date(DateTime dt) {
+      return new SafeString(String.format(Locale.ENGLISH, "<script>(function() {"
+          + " var dt = new Date(\"%s\");" + " +document.write(dt.toLocaleString());"
+          + "})();</script>", dt));
     }
 
-    @Override
-    public Object filter(Object object, CarrotInterpreter interpreter, String... args)
-        throws InterpretException {
-      if (object instanceof DateTime) {
-        DateTime dt = (DateTime) object;
-        return String.format(Locale.ENGLISH, "<script>(function() {"
-            + " var dt = new Date(\"%s\");" + " +document.write(dt.toLocaleString());"
-            + "})();</script>", dt);
-      }
+    public String number(long n) {
+      return NUMBER_FORMAT.format(n);
+    }
 
-      throw new InterpretException("Expected a DateTime.");
+    public String number(double d) {
+      return NUMBER_FORMAT.format(d);
     }
   }
 
-  private static class IsInRoleFilter implements Filter {
-    @Override
-    public String getName() {
-      return "isinrole";
-    }
 
-    @Override
-    public Object filter(Object object, CarrotInterpreter interpreter, String... args)
-        throws InterpretException {
-      if (object instanceof BackendUser) {
-        BackendUser.Role role = BackendUser.Role.valueOf(args[0]);
-        return ((BackendUser) object).isInRole(role);
-      }
-
-      throw new InterpretException("Expected a BackendUser, not " + object);
+  private static class UsersHelper {
+    public boolean isInRole(BackendUser user, String roleName) {
+      BackendUser.Role role = BackendUser.Role.valueOf(roleName);
+      return user.isInRole(role);
     }
   }
 }

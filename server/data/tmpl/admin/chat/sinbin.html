@@ -1,6 +1,6 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Chat Sinbin{% endblock %}
-{% block head %}
+{% block "title" %}Chat Sinbin{% end %}
+{% block "head" %}
   <script src="/realms/{{realm}}/js/tmpl.js"></script>
   <script src="/realms/{{realm}}/js/empirestore.js"></script>
   <style>
@@ -14,9 +14,9 @@
       float: left;
     }
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
   <h1>Chat</h1>
   <fieldset id="sinbin">
     <legend>Sinbin</legend>
@@ -26,7 +26,7 @@
           [{{empire.empire_id}}]
           <a href="/realms/{{realm}}/admin/empire/search#search={{empire.empire_id}}&id={{empire.empire_id}}">{{empire.empireName}}</a>
           until <script>document.write(new Date({{empire.expiry}}).toLocaleString());</script></li>
-      {% endfor %}
+      {% end %}
     </ul>
   </fieldset>
   <fieldset id="reports">
@@ -50,7 +50,7 @@
           </td>
         </tr>
         </tr>
-      {% endfor %}
+      {% end %}
     </table>
   </fieldset>
-{% endblock %}
+{% end %}

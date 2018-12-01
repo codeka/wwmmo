@@ -1,9 +1,9 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Users{% endblock %}
-{% block head %}
+{% block "title" %}Users{% end %}
+{% block "head" %}
   <script src="/realms/{{realm}}/js/popup.js"></script>
-{% endblock %}
-{% block content %}
+{% end %}
+{% block "content" %}
   <h1>Users</h1>
   <p>Below are the users who have access to the backend, and the roles they have assigned.</p>
   <p><a href="javascript:;" id="newuser-link" class="button">New User</a></p>
@@ -20,12 +20,12 @@
       <td>
       {% for role in user.roles %}
         {{role}}
-      {% endfor %}
+      {% end %}
       </td>
       <td>{{user.lastLogin}}</td>
       <td><a href="javascript:editUser({{user.ID}});">Edit</a></td>
     </tr>
-  {% endfor %}
+  {% end %}
   </table>
   <div id="edituser" class="popup">
     <h2>New User</h2>
@@ -53,7 +53,7 @@
       $("input[type=submit]").attr("value", "Create");
       $("#edituser h2").html("New User");
       {% for role in user.roles %}
-      {% endfor %}
+      {% end %}
       $("#edituser").popup();
     });
 
@@ -65,12 +65,12 @@
         $("input[type=checkbox]").prop("checked", false);
         {% for role in user.roles %}
           $("input[name=role-{{role}}]").prop("checked", true);
-        {% endfor %}
+        {% end %}
       }
-    {% endfor %}
+    {% end %}
       $("#edituser h2").html("Edit User");
       $("input[type=submit]").attr("value", "Save");
       $("#edituser").popup();
     }
   </script>
-{% endblock %}
+{% end %}

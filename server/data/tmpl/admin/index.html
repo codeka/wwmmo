@@ -1,9 +1,9 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Dashboard{% endblock %}
-{% block head %}
+{% block "title" %}Dashboard{% end %}
+{% block "head" %}
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-{% endblock %}
-{% block content %}
+{% end %}
+{% block "content" %}
   <h1>Active Empires</h1>
   <div id="graph" style="width: 100%; margin: 0 auto;"></div>
   <script type="text/javascript">
@@ -22,8 +22,12 @@
       dataTable.addColumn("number", "New Signups");
       dataTable.addRows([
       {% for entry in graph_data %}
-        [new Date({{entry.year}}, {{entry.month|add:'1'}}, {{entry.day}}), {{entry.oneda|default:'0'}}, {{entry.sevenda|default:'0'}}, {{entry.signups|default:'0'}}],
-      {% endfor %}
+        [
+          new Date({{ entry.year }}, {{ entry.month + 1 }}, {{ entry.day }}),
+          {% if entry.oneda %}{{entry.oneda}}{% else %}0{% end %},
+          {% if entry.sevenda %}{{entry.sevenda}}{% else %}0{% end %},
+          {% if entry.signups %}{{entry.signups}}{% else %}0{% end %} ],
+      {% end %}
       ]);
 
       var dataView = new google.visualization.DataView(dataTable);
@@ -61,4 +65,4 @@
     $("p#oldest-star").on("click", "a", refreshOldestStar);
     refreshOldestStar();
   </script>
-{% endblock %}
+{% end %}

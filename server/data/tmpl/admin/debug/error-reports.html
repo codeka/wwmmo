@@ -1,8 +1,7 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Error Reports{% endblock %}
-{% block head %}
+{% block "title" %}Error Reports{% end %}
+{% block "head" %}
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-
   <style>
     div.stack-trace {
       white-space: pre-wrap;
@@ -55,9 +54,9 @@
       line-height: 30px;
     }
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
   <h1>Error Reports</h1>
   <div id="histogram" style="width: 90%; margin: 0 auto; height: 150px;"></div>
   <script type="text/javascript">
@@ -101,8 +100,8 @@
       <dt>Source:
       <dd><select name="source">
         <option value="both">Both</option>
-        <option value="server"{% if curr_source|equal:"server" %} selected{% endif %}>Server</option>
-        <option value="client"{% if curr_source|equal:"client" %} selected{% endif %}>Client</option>
+        <option value="server"{% if curr_source == "server" %} selected{% end %}>Server</option>
+        <option value="client"{% if curr_source == "client" %} selected{% end %}>Client</option>
       </select>
     </dl>
   </form>
@@ -110,13 +109,13 @@
     <tr><th>Time</th><th>Empire</th><th>Version</th><th>Context</th><th>Exception</th><th>Details</th></tr>
   {% for error_report in error_reports %}
     <tr>
-      <td>{{error_report.report_time|local-date}}</td>
+      <td>{{Format.date(error_report.report_time)}}</td>
       <td>
         {% if error_report.empire_id %}
           [<a href="mailto:{{error_report.empire_email}}">{{error_report.empire_id}}</a>] {{error_report.empire_name}}
         {% else %}
           <em>Server</em>
-        {% endif %}
+        {% end %}
       </td>
       <td>{{error_report.app_version}}</td>
       <td>{{error_report.context}}</td>
@@ -153,37 +152,45 @@
       <td colspan="6">
         <div class="details-extra">
           {% if error_report.app_version %}
-          <div style="text-align: right;"><a href="javascript:;" class="unobfuscate" data-id="row-{{loop.counter}}" data-version="{{error_report.app_version}}">Unobfuscate</a></div>
-          {% endif %}
+          <div style="text-align: right;">
+            <a href="javascript:;" class="unobfuscate" data-id="row-{{loop.counter}}"
+               data-version="{{error_report.app_version}}">Unobfuscate</a>
+          </div>
+          {% end %}
           <dl>
             <dt>Heap size:
-            <dd>{{error_report.heap_size|number}}
+            <dd>{{Format.number(error_report.heap_size)}}
             <dt>Allocated:
-            <dd>{{error_report.heap_allocated|number}}
+            <dd>{{Format.number(error_report.heap_allocated)}}
             <dt>Free:
-            <dd>{{error_report.heap_free|number}}
+            <dd>{{Format.number(error_report.heap_free)}}
             {% if error_report.empire_id %}
               <dt>Android:
-              <dd>{{error_report.android_version}}
+              <dd>{{Format.number(error_report.android_version)}}
               <dt>Phone:
-              <dd>{{error_report.phone_model}}
+              <dd>{{Format.number(error_report.phone_model)}}
               <dt>Run time:
-              <dd>{{error_report.total_run_time|number}} ms
+              <dd>{{Format.number(error_report.total_run_time)}} ms
               <dt>FG time:
-              <dd>{{error_report.foreground_run_time|number}} ms
+              <dd>{{Format.number(error_report.foreground_run_time)}} ms
             {% else %}
               <dt>Query:
-              <dd title="{{error_report.server_request_qs|attr-escape}}">{{error_report.server_request_qs}}
+              <dd title="{{error_report.server_request_qs}}">{{error_report.server_request_qs}}
               <dt>User-Agent:
-              <dd title="{{error_report.server_request_user_agent|attr-escape}}">{{error_report.server_request_user_agent}}
-            {% endif %}
+              <dd title="{{error_report.server_request_user_agent}}">{{error_report.server_request_user_agent}}
+            {% end %}
           </dl>
         </div>
-        <div class="stack-trace">{% if error_report.log_buffer %}{{error_report.log_buffer|escape}}{% else %}{{error_report.stack_trace|escape}}{% endif %}</div>
+        <div class="stack-trace">
+          {% if error_report.log_buffer %}
+            {{error_report.log_buffer}}
+          {% else %}
+            {{error_report.stack_trace}}
+          {% end %}</div>
         <div style="clear: both;"></div>
       </td>
     </tr>
-  {% endfor %}
+  {% end %}
   </table>
   <p><a href="?cursor={{cursor}}{% if curr_empire %}&empire={{curr_empire}}{% endif %}">Next Page &gt;&gt;</a></p>
   <script>
@@ -208,4 +215,4 @@
       });
     });
   </script>
-{% endblock %}
+{% end %}

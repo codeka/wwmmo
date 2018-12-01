@@ -1,6 +1,6 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Starfield{% endblock %}
-{% block head %}
+{% block "title" %}Starfield{% end %}
+{% block "head" %}
     <style>
         #update-form textarea {
             width: 800px;
@@ -44,9 +44,9 @@
              right: 162pt; top: 6pt;
         }
     </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
     <h1>Starfield</h1>
     <p>Enter the coordinates of the sector you want to look at, and click &ldquo;Display&rdquo;.
     <form id="sector-input-form">
@@ -128,4 +128,4 @@
             });
         });
     </script>
-{% endblock %}
+{% end %}

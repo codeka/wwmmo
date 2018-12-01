@@ -1,11 +1,11 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Alts{% endblock %}
-{% block head %}
+{% block "title" %}Alts{% end %}
+{% block "head" %}
   <style>
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
   <h1>Alts</h1>
   <form method="get">
     <fieldset>
@@ -22,4 +22,4 @@
     document.write(JSON.stringify(JSON.parse(json), null, "  "));
     document.write("</pre>");
   </script>
-{% endblock %}
+{% end %}

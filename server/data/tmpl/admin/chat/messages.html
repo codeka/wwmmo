@@ -1,6 +1,6 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Chat{% endblock %}
-{% block head %}
+{% block "title" %}Chat{% end %}
+{% block "head" %}
   <script src="/realms/{{realm}}/js/tmpl.js"></script>
   <script src="/realms/{{realm}}/js/empirestore.js"></script>
   <style>
@@ -48,9 +48,9 @@
       padding-top: 0;
     }
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
   <h1>Chat</h1>
   <section id="messages"></section>
   <form id="sendmsg">
@@ -62,7 +62,7 @@
     <ul>
       {% for empire in sinbin %}
         <li>[{{empire.empire_id}}] {{empire.empireName}} until <script>document.write(new Date({{empire.expiry}}).toLocaleString());</script></li>
-      {% endfor %}
+      {% end %}
     </ul>
   </fieldset>
   <script>
@@ -229,4 +229,4 @@
     fetchMessages();
     setInterval(fetchMessages, 15000);
   </script>
-{% endblock %}
+{% end %}

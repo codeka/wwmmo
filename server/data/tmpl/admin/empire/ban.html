@@ -1,7 +1,7 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Ban Empire{% endblock %}
+{% block "title" %}Ban Empire{% end %}
 
-{% block head %}
+{% block "head" %}
   <style>
     form div.field label {
       display: inline-block;
@@ -19,23 +19,27 @@
       width: 300pt;
     }
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
   <h1>Ban Empire</h1>
   <p class="big-warning">
-    Banning an empire means they will no longer be able to log in and will receive a message that they are no longer welcome.
+    Banning an empire means they will no longer be able to log in and will receive a message that
+    they are no longer welcome.
   </p>
   {% if complete %}
-    <p class="{% if success %}success{% else %}error{% endif %}">{% if msg %}{{ msg }}{% else %}Empire has been banned!{% endif %}</p>
-  {% endif %}
+    <p class="{% if success %}success{% else %}error{% endif %}">
+      {% if msg %}{{ msg }}{% else %}Empire has been banned!{% end %}
+    </p>
+  {% end %}
   <form method="post">
     <div class="field">
       <label for="empire_id">Empire:</label>
-      <input type="text" name="empire_id" id="empire_id" value="{{empire_id}}" placeholder="Empire ID">
+      <input type="text" name="empire_id" id="empire_id"
+             value="{{empire_id}}" placeholder="Empire ID">
     </div>
     <div class="field">
       <input type="submit" value="BAN">
     </div>
   </form>
-{% endblock %}
+{% end %}

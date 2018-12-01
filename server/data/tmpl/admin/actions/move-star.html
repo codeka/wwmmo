@@ -1,7 +1,7 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Move Star{% endblock %}
+{% block "title" %}Move Star{% end %}
 
-{% block head %}
+{% block "head" %}
   <style>
     form div.field input[type=text] {
       width: 300pt;
@@ -9,14 +9,14 @@
       padding: 4pt;
     }
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
   <h1>Move Star</h1>
   <p>Swap the location of a star with another star, including any colonies and whatnot.</p>
   {% if complete %}
-    <p class="{% if success %}success{% else %}error{% endif %}">{% if msg %}{{ msg }}{% else %}Stars swapped successfully.{% endif %}</p>
-  {% endif %}
+    <p class="{% if success %}success{% else %}error{% endif %}">{% if msg %}{{ msg }}{% else %}Stars swapped successfully.{% end %}</p>
+  {% end %}
   <form method="post">
     <div class="field">
       <label for="star1">Star 1:</label>
@@ -30,4 +30,4 @@
       <input type="submit" value="Swap">
     </div>
   </form>
-{% endblock %}
+{% end %}

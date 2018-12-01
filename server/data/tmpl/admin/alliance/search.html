@@ -1,6 +1,6 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Alliances{% endblock %}
-{% block head %}
+{% block "title" %}Alliances{% end %}
+{% block "head" %}
   <script src="/realms/{{realm}}/js/tmpl.js"></script>
   <script src="/realms/{{realm}}/js/time.js"></script>
   <script src="/realms/{{realm}}/js/empirestore.js"></script>
@@ -35,9 +35,9 @@
       color: #aaa;
     }
   </style>
-{% endblock %}
+{% end %}
 
-{% block content %}
+{% block "content" %}
   <h1>Alliances</h1>
   <div class="left-column">
     <table id="alliance-list">
@@ -229,4 +229,4 @@
       })
     });
   </script>
-{% endblock %}
+{% end %}
