@@ -28,6 +28,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
@@ -99,10 +100,25 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
       @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     view = inflater.inflate(R.layout.empire_settings_tab, null);
 
-    TextView txt = view.findViewById(R.id.patreon_desc);
-    txt.setText(Html.fromHtml(txt.getText().toString()));
+    MyEmpire myEmpire = EmpireManager.i.getEmpire();
 
+    TextView txt = view.findViewById(R.id.patreon_desc);
     final Button btn = view.findViewById(R.id.patreon_btn);
+    if (myEmpire.getPatreonLevel() == BaseEmpire.PatreonLevel.NONE) {
+      String html = "Connect your empire to your Patreon account in order to collect your" +
+                    " benefits!<br/><br/><a href='https://www.patreon.com/codeka'>And of course," +
+                    " click here to support me!</a>";
+      txt.setText(Html.fromHtml(html));
+      btn.setText("Connect to Patreon");
+    } else {
+      String html = "Thanks for your support! We'll refresh your support level daily, but if you " +
+                    " want to refresh now, you can click below. <br/><br/><a" +
+                    " href='https://www.patreon.com/codeka'>And of course, click here adjust" +
+                    " your Patreon plan!</a>";
+      txt.setText(Html.fromHtml(html));
+      btn.setText("Refresh Patreon");
+    }
+
     btn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -141,7 +157,7 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
     }
 
     final EditText renameEdit = view.findViewById(R.id.rename);
-    renameEdit.setText(EmpireManager.i.getEmpire().getDisplayName());
+    renameEdit.setText(myEmpire.getDisplayName());
 
     final Button renameBtn = view.findViewById(R.id.rename_btn);
     renameBtn.setOnClickListener(new View.OnClickListener() {

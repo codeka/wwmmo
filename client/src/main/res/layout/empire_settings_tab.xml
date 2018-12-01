@@ -24,7 +24,7 @@
       android:layout_marginRight="@dimen/tablet_margin_5dp"
       android:layout_marginBottom="5dp"
       android:layout_below="@+id/horz_sep_4"
-      android:text="Connect your empire to your Patreon account in order to collect your benefits!&lt;br/&gt;&lt;br/&gt;&lt;a href='https://www.patreon.com/codeka'&gt;And of course, click here to support me if you're not already!&lt;/a&gt;" />
+      android:text="Description of Patreon." />
 
     <Button
       android:id="@+id/patreon_btn"
