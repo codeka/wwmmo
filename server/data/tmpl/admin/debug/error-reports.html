@@ -120,10 +120,10 @@
       <td>{{error_report.app_version}}</td>
       <td>{{error_report.context}}</td>
       <td>{{error_report.exception_class}}</td>
-      <td><a href="javascript:;" id="show-hide-{{loop.counter}}">Show</a><script>
+      <td><a href="javascript:;" id="show-hide-{{loop.index}}">Show</a><script>
         $(function() {
-          var $a = $("#show-hide-{{loop.counter}}");
-          var $tr = $("#row-{{loop.counter}}");
+          var $a = $("#show-hide-{{loop.index}}");
+          var $tr = $("#row-{{loop.index}}");
           $a.click(function() {
             if ($a.html() == "Show") {
               $a.html("Hide");
@@ -135,10 +135,10 @@
           });
         });
       </script> &bull;
-      <a href="javascript:;" id="delete-{{loop.counter}}">Delete</a><script>
+      <a href="javascript:;" id="delete-{{loop.index}}">Delete</a><script>
         $(function() {
-          var $a = $("#delete-{{loop.counter}}");
-          var $tr = $("#row-{{loop.counter}}");
+          var $a = $("#delete-{{loop.index}}");
+          var $tr = $("#row-{{loop.index}}");
           $a.click(function() {
             $a.parents("tr").hide();
             $tr.hide();
@@ -148,12 +148,12 @@
         });
       </script></td>
     </tr>
-    <tr style="display: none;" id="row-{{loop.counter}}">
+    <tr style="display: none;" id="row-{{loop.index}}">
       <td colspan="6">
         <div class="details-extra">
           {% if error_report.app_version %}
           <div style="text-align: right;">
-            <a href="javascript:;" class="unobfuscate" data-id="row-{{loop.counter}}"
+            <a href="javascript:;" class="unobfuscate" data-id="row-{{loop.index}}"
                data-version="{{error_report.app_version}}">Unobfuscate</a>
           </div>
           {% end %}
@@ -166,9 +166,9 @@
             <dd>{{Format.number(error_report.heap_free)}}
             {% if error_report.empire_id %}
               <dt>Android:
-              <dd>{{Format.number(error_report.android_version)}}
+              <dd>{{error_report.android_version}}
               <dt>Phone:
-              <dd>{{Format.number(error_report.phone_model)}}
+              <dd>{{error_report.phone_model}}
               <dt>Run time:
               <dd>{{Format.number(error_report.total_run_time)}} ms
               <dt>FG time:
