@@ -7,9 +7,12 @@ import com.patreon.resources.User;
 
 import java.io.IOException;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.PatreonInfo;
@@ -28,6 +31,11 @@ public class PatreonController {
 
   public void savePatreonInfo(PatreonInfo patreonInfo) throws RequestException {
     db.savePatreonInfo(patreonInfo);
+  }
+
+  @Nullable
+  public PatreonInfo getPatreonInfo(long empireID) throws RequestException {
+    return db.getPatreonInfo(empireID);
   }
 
   public void updatePatreonInfo(PatreonInfo patreonInfo) throws RequestException {
@@ -116,6 +124,22 @@ public class PatreonController {
       } catch (Exception e) {
         throw new RequestException(e);
       }
+    }
+
+    @Nullable
+    PatreonInfo getPatreonInfo(long empireID) throws RequestException {
+      String sql = "SELECT * from patreon WHERE empire_id = ?";
+      try (SqlStmt stmt = DB.prepare(sql)) {
+        stmt.setLong(1, empireID);
+        SqlResult res = stmt.select();
+        if (res.next()) {
+          return PatreonInfo.from(res);
+        }
+      } catch (Exception e) {
+        throw new RequestException(e);
+      }
+
+      return null;
     }
   }
 }

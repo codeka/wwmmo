@@ -73,7 +73,16 @@
         <activity android:name=".EmpireResetActivity" />
         <activity android:name=".BlitzResetActivity" />
         <activity android:name=".game.build.BuildActivity" />
-        <activity android:name=".game.empire.EmpireActivity" />
+        <activity android:name=".game.empire.EmpireActivity" android:label="War Worlds">
+            <intent-filter android:label="War Worlds">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                  android:host="game.war-worlds.com"
+                  android:pathPrefix="/play/empire/settings" />
+            </intent-filter>
+        </activity>
         <activity android:name=".game.empire.EnemyEmpireActivity" />
         <activity android:name=".game.FleetMoveActivity" />
         <activity android:name=".game.solarsystem.SolarSystemActivity" />
