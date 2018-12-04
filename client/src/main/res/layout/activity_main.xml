@@ -10,22 +10,55 @@
       android:id="@+id/toolbar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:elevation="4dp"
-      android:visibility="gone" />
+      android:elevation="4dp" />
 
-  <au.com.codeka.warworlds.client.opengl.RenderSurfaceView
-      android:id="@+id/render_surface"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"/>
+  <androidx.drawerlayout.widget.DrawerLayout
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-  <FrameLayout
-      android:id="@+id/fragment_container"
+    <FrameLayout
       android:layout_width="match_parent"
-      android:layout_height="match_parent" />
+      android:layout_height="match_parent">
 
-  <au.com.codeka.warworlds.client.ctrl.DebugView
-      android:id="@+id/debug_view"
-      android:layout_gravity="top|end"
+      <au.com.codeka.warworlds.client.opengl.RenderSurfaceView
+        android:id="@+id/render_surface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+      <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?android:attr/actionBarSize" />
+
+      <View
+        android:id="@+id/top_pane"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        style="@style/TopPane" />
+
+      <au.com.codeka.warworlds.client.ctrl.DebugView
+        android:id="@+id/debug_view"
+        android:layout_gravity="top|end"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    </FrameLayout>
+
+    <LinearLayout
+      android:id="@+id/drawer_content"
+      android:layout_marginEnd="40dp"
+      android:layout_gravity="start"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content" />
+      android:layout_height="match_parent"
+      android:background="@drawable/left_pane_bg"
+      android:orientation="vertical">
+
+      <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TODO: drawer"/>
+    </LinearLayout>
+
+  </androidx.drawerlayout.widget.DrawerLayout>
 </FrameLayout>

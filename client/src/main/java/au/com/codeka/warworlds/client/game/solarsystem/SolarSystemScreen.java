@@ -3,8 +3,6 @@ package au.com.codeka.warworlds.client.game.solarsystem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.app.ActionBar;
-
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.build.BuildScreen;
@@ -15,8 +13,6 @@ import au.com.codeka.warworlds.client.ui.SharedViews;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Star;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A screen which shows a view of the solar system (star, planets, etc) and is the launching point
@@ -47,18 +43,7 @@ public class SolarSystemScreen extends Screen {
 
   @Override
   public View onShow() {
-    ActionBar actionBar = checkNotNull(context.getActivity().getSupportActionBar());
-    actionBar.show();
-    actionBar.setDisplayHomeAsUpEnabled(true);
-    actionBar.setHomeButtonEnabled(true);
-
     return layout;
-  }
-
-  @Override
-  public void onHide() {
-    ActionBar actionBar = checkNotNull(context.getActivity().getSupportActionBar());
-    actionBar.hide();
   }
 
   @Override

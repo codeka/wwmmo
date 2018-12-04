@@ -1,10 +1,15 @@
 package au.com.codeka.warworlds.client;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import au.com.codeka.warworlds.client.ctrl.DebugView;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
@@ -27,13 +32,49 @@ public class MainActivity extends AppCompatActivity {
   // Will be non-null between onCreate/onDestroy.
   @Nullable private ScreenStack screenStack;
 
+  // Will be non-null between onCreate/onDestroy.
+  @Nullable private ActionBarDrawerToggle drawerToggle;
+
+  // Will be non-null between onCreate/onDestroy.
+  @Nullable private DrawerLayout drawerLayout;
+
+  // Will be non-null between onCreate/onDestroy.
+  @Nullable private LinearLayout drawerContent;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    drawerLayout = findViewById(R.id.drawer_layout);
+    drawerContent = findViewById(R.id.drawer_content);
+
     setSupportActionBar(findViewById(R.id.toolbar));
-    checkNotNull(getSupportActionBar()).hide();
+    ActionBar actionBar = checkNotNull(getSupportActionBar());
+    actionBar.show();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+    actionBar.setHomeButtonEnabled(true);
+
+    drawerToggle =
+        new ActionBarDrawerToggle(
+            this, drawerLayout,
+            R.string.drawer_open,
+            R.string.drawer_close) {
+          @Override
+          public void onDrawerClosed(View view) {
+            super.onDrawerClosed(view);
+            refreshTitle();
+          }
+
+          @Override
+          public void onDrawerOpened(View drawerView) {
+            super.onDrawerOpened(drawerView);
+            refreshTitle();
+            //searchListAdapter.setCursor(StarManager.i.getMyStars());
+          }
+        };
+    drawerLayout.addDrawerListener(drawerToggle);
+    drawerToggle.syncState();
 
     RenderSurfaceView renderSurfaceView = checkNotNull(findViewById(R.id.render_surface));
     renderSurfaceView.setRenderer();
@@ -58,6 +99,12 @@ public class MainActivity extends AppCompatActivity {
   }
 
   @Override
+  public void onResume() {
+    super.onResume();
+    drawerToggle.syncState();
+  }
+
+  @Override
   public void onBackPressed() {
     if (!screenStack.pop()) {
       super.onBackPressed();
@@ -76,4 +123,14 @@ public class MainActivity extends AppCompatActivity {
     starfieldManager.destroy();
     starfieldManager = null;
   }
+
+  private void refreshTitle() {
+    ActionBar actionBar = checkNotNull(getSupportActionBar());
+    if (drawerLayout.isDrawerOpen(drawerContent)) {
+      actionBar.setTitle("Star Search");
+    } else {
+      actionBar.setTitle("War Worlds 2");
+    }
+  }
+
 }

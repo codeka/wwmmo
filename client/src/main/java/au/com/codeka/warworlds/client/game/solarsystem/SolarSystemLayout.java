@@ -9,23 +9,17 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import javax.annotation.Nonnull;
 
-import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.fleets.FleetListSimple;
-import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.Vector2;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The layout for the {@link SolarSystemScreen}.
@@ -42,8 +36,6 @@ public class SolarSystemLayout extends DrawerLayout {
 
   private static final Log log = new Log("SolarSystemLayout");
 
-  private final View drawer;
-  private final ActionBarDrawerToggle drawerToggle;
   private final SunAndPlanetsView sunAndPlanets;
   private final CongenialityView congeniality;
   private final PlanetSummaryView planetSummary;
@@ -71,7 +63,6 @@ public class SolarSystemLayout extends DrawerLayout {
     this.star = star;
     this.planetIndex = startPlanetIndex;
 
-    drawer = findViewById(R.id.drawer);
     sunAndPlanets = findViewById(R.id.solarsystem_view);
     congeniality = findViewById(R.id.congeniality);
     store = findViewById(R.id.store);
@@ -112,34 +103,7 @@ public class SolarSystemLayout extends DrawerLayout {
       }
     });
 
-    drawerToggle =
-        new ActionBarDrawerToggle(
-            (MainActivity) context,
-            this,
-            R.string.drawer_open,
-            R.string.drawer_close) {
-          @Override
-          public void onDrawerClosed(View view) {
-            super.onDrawerClosed(view);
-            refreshTitle();
-          }
-
-          @Override
-          public void onDrawerOpened(View drawerView) {
-            super.onDrawerOpened(drawerView);
-            refreshTitle();
-            searchListAdapter.setCursor(StarManager.i.getMyStars());
-          }
-        };
-    addDrawerListener(drawerToggle);
-
     refreshStar(star);
-  }
-
-  @Override
-  public void onAttachedToWindow() {
-    super.onAttachedToWindow();
-    drawerToggle.syncState();
   }
 
   /**
@@ -171,25 +135,6 @@ public class SolarSystemLayout extends DrawerLayout {
       log.debug("No planet selected");
     }
     refreshSelectedPlanet();
-  }
-
-  // TODO: this is pretty hacky...
-  private MainActivity getMainActivity() {
-    return (MainActivity) getContext();
-  }
-
-  private void refreshTitle() {
-    ActionBar actionBar = checkNotNull(getMainActivity().getSupportActionBar());
-    log.debug("Refreshing title. isDrawerOpen=%s star=%s actionBar.isShowing=%s",
-        isDrawerOpen(drawer) ? "true" : "false",
-        star.name,
-        actionBar.isShowing() ? "true" : "false");
-
-    if (isDrawerOpen(drawer)) {
-      actionBar.setTitle("Star Search");
-    } else {
-      actionBar.setTitle(star.name);
-    }
   }
 
   private void refreshSelectedPlanet() {
