@@ -50,10 +50,10 @@ public abstract class Screen {
    * Performs the "show". Calls {@link #onShow} to get the view, then creates a {@link Scene} (if
    * needed), and transitions to it.
    */
-  public void performShow(@Nullable SharedViews sharedViews) {
+  public void performShow(@Nullable SharedViews sharedViews, boolean transition) {
     View view = onShow();
     if (view != null) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      if (transition && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         if (scene == null) {
           scene = new Scene(container, view);
         }

@@ -35,9 +35,9 @@ public class InfobarView extends FrameLayout {
 
     handler = new Handler();
 
-    inflate(context, R.layout.ctrl_infovar_view, this);
-    empireName = (TextView) findViewById(R.id.empire_name);
-    working = (ProgressBar) findViewById(R.id.working);
+    inflate(context, R.layout.ctrl_infobar_view, this);
+    empireName = findViewById(R.id.empire_name);
+    working = findViewById(R.id.working);
   }
 
   public void hideEmpireName() {

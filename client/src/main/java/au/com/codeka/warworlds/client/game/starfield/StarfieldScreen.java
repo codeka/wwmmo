@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.chat.ChatScreen;
-import au.com.codeka.warworlds.client.game.empire.EmpireScreen;
 import au.com.codeka.warworlds.client.game.fleets.FleetsScreen;
 import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemScreen;
 import au.com.codeka.warworlds.client.ui.Screen;
@@ -57,44 +56,13 @@ public class StarfieldScreen extends Screen {
   }
 
   private void showEmptyBottomPane(boolean instant) {
-    EmptyBottomPane emptyBottomPane = new EmptyBottomPane(context.getActivity(),
-        new EmptyBottomPane.Callback() {
-      @Override
-      public void onEmpireClicked(View view) {
-        onEmpireClick();
-      }
-
-      @Override
-      public void onSitrepClicked(View view) {
-        onSitrepClick();
-      }
-
-      @Override
-      public void onAllianceClicked(View view) {
-        onAllianceClick();
-      }
-    });
+    EmptyBottomPane emptyBottomPane = new EmptyBottomPane(context.getActivity());
     layout.showBottomPane(emptyBottomPane, instant);
   }
 
   private void showStarSelectedBottomPane(Star star) {
     StarSelectedBottomPane starSelectedBottomPane = new StarSelectedBottomPane(
         context.getActivity(), star, new StarSelectedBottomPane.Callback() {
-      @Override
-      public void onEmpireClicked(View view) {
-        onEmpireClick();
-      }
-
-      @Override
-      public void onSitrepClicked(View view) {
-        onSitrepClick();
-      }
-
-      @Override
-      public void onAllianceClicked(View view) {
-        onAllianceClick();
-      }
-
       @Override
       public void onStarClicked(Star star, @Nullable Planet planet) {
         context.pushScreen(
@@ -116,34 +84,9 @@ public class StarfieldScreen extends Screen {
 
   private void showFleetSelectedBottomPane(Star star, Fleet fleet) {
     FleetSelectedBottomPane fleetSelectedBottomPane = new FleetSelectedBottomPane(
-        context.getActivity(), star, fleet, new FleetSelectedBottomPane.Callback() {
-      @Override
-      public void onEmpireClicked(View view) {
-        onEmpireClick();
-      }
-
-      @Override
-      public void onSitrepClicked(View view) {
-        onSitrepClick();
-      }
-
-      @Override
-      public void onAllianceClicked(View view) {
-        onAllianceClick();
-      }
-    });
+        context.getActivity(), star, fleet);
 
     layout.showBottomPane(fleetSelectedBottomPane, false /* instant */);
-  }
-
-  private void onEmpireClick() {
-    context.pushScreen(new EmpireScreen());
-  }
-
-  private void onSitrepClick() {
-  }
-
-  private void onAllianceClick() {
   }
 
   private SharedViews createSharedViews() {

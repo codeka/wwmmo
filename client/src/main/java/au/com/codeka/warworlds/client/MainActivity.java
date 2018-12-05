@@ -1,18 +1,23 @@
 package au.com.codeka.warworlds.client;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.navigation.NavigationView;
+
 import au.com.codeka.warworlds.client.ctrl.DebugView;
+import au.com.codeka.warworlds.client.game.empire.EmpireScreen;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
+import au.com.codeka.warworlds.client.game.starfield.StarfieldScreen;
 import au.com.codeka.warworlds.client.game.welcome.CreateEmpireScreen;
 import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeScreen;
 import au.com.codeka.warworlds.client.game.welcome.WelcomeScreen;
@@ -39,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
   @Nullable private DrawerLayout drawerLayout;
 
   // Will be non-null between onCreate/onDestroy.
-  @Nullable private LinearLayout drawerContent;
+  @Nullable private NavigationView navigationView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
 
     drawerLayout = findViewById(R.id.drawer_layout);
-    drawerContent = findViewById(R.id.drawer_content);
+    navigationView = findViewById(R.id.navigation_view);
 
     setSupportActionBar(findViewById(R.id.toolbar));
     ActionBar actionBar = checkNotNull(getSupportActionBar());
@@ -76,6 +81,22 @@ public class MainActivity extends AppCompatActivity {
     drawerLayout.addDrawerListener(drawerToggle);
     drawerToggle.syncState();
 
+    navigationView.setNavigationItemSelectedListener(item -> {
+      //item.setChecked(true);
+      switch (item.getItemId()) {
+        case R.id.nav_starfield:
+          screenStack.home();
+          screenStack.push(new StarfieldScreen());
+          break;
+        case R.id.nav_empire:
+          screenStack.home();
+          screenStack.push(new EmpireScreen());
+          break;
+      }
+      drawerLayout.closeDrawers();
+      return true;
+    });
+
     RenderSurfaceView renderSurfaceView = checkNotNull(findViewById(R.id.render_surface));
     renderSurfaceView.setRenderer();
     starfieldManager = new StarfieldManager(renderSurfaceView);
@@ -96,6 +117,17 @@ public class MainActivity extends AppCompatActivity {
     } else {
       screenStack.push(new WelcomeScreen());
     }
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        drawerLayout.openDrawer(GravityCompat.START);
+        return true;
+    }
+
+    return super.onOptionsItemSelected(item);
   }
 
   @Override
@@ -126,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
   private void refreshTitle() {
     ActionBar actionBar = checkNotNull(getSupportActionBar());
-    if (drawerLayout.isDrawerOpen(drawerContent)) {
+    if (drawerLayout.isDrawerOpen(navigationView)) {
       actionBar.setTitle("Star Search");
     } else {
       actionBar.setTitle("War Worlds 2");

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+  <group android:checkableBehavior="single">
+    <item
+      android:id="@+id/nav_starfield"
+      android:icon="@drawable/cog"
+      android:title="@string/starfield" />
+    <item
+      android:id="@+id/nav_empire"
+      android:icon="@drawable/cog"
+      android:title="@string/empire" />
+    <item
+      android:id="@+id/nav_alliance"
+      android:icon="@drawable/cog"
+      android:title="@string/alliance" />
+    <item
+      android:id="@+id/nav_sitrep"
+      android:icon="@drawable/cog"
+      android:title="@string/sitrep" />
+  </group>
+</menu>

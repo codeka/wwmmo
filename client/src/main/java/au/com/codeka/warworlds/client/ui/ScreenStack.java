@@ -61,7 +61,7 @@ public class ScreenStack {
       screen.onCreate(context, container);
     }
 
-    screen.performShow(sharedViews);
+    screen.performShow(sharedViews, true);
   }
 
   /**
@@ -71,6 +71,14 @@ public class ScreenStack {
    *     {@link Screen}.
    */
   public boolean pop() {
+    return popInternal(true);
+  }
+
+  private boolean popInternal(boolean transition) {
+    if (screens.empty()) {
+      return false;
+    }
+
     ScreenHolder screenHolder = screens.pop();
     if (screenHolder == null) {
       return false;
@@ -81,10 +89,10 @@ public class ScreenStack {
 
     if (!screens.isEmpty()) {
       screenHolder = screens.peek();
-      screenHolder.screen.performShow(screenHolder.sharedViews);
+      screenHolder.screen.performShow(screenHolder.sharedViews, transition);
       return true;
     }
-
+    container.removeAllViews();
     return false;
   }
 
@@ -92,7 +100,7 @@ public class ScreenStack {
    * Pop all screen from the stack, return to blank "home".
    */
   public void home() {
-    while (pop()) {
+    while (popInternal(false)) {
       // Keep going.
     }
   }
