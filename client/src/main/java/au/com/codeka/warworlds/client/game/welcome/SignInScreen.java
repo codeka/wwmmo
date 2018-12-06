@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.client.game.welcome;
 
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
@@ -13,6 +12,7 @@ import au.com.codeka.warworlds.client.net.HttpRequest;
 import au.com.codeka.warworlds.client.net.ServerUrl;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.AccountAssociateRequest;
@@ -40,7 +40,7 @@ public class SignInScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
+  public ShowInfo onShow() {
     updateState(null);
 
     GameSettings.SignInState signInState =
@@ -49,7 +49,7 @@ public class SignInScreen extends Screen {
       checkVerificationStatus();
     }
 
-    return layout;
+    return ShowInfo.builder().view(layout).toolbarVisible(false).build();
   }
 
   /** Updates the current state (or just refreshes the current state, if newState is null). */

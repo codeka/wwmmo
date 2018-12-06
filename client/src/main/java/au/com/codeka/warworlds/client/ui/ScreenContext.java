@@ -1,9 +1,8 @@
 package au.com.codeka.warworlds.client.ui;
 
-import android.app.Activity;
 import android.content.Intent;
 
-import androidx.appcompat.app.AppCompatActivity;
+import au.com.codeka.warworlds.client.MainActivity;
 
 /**
  * A context object that's passed to {@link Screen}s to allow them to access some Android
@@ -23,6 +22,6 @@ public interface ScreenContext {
   /** Pop the current screen off the stack. */
   void popScreen();
 
-  /** Gets the containing {@link Activity}. */
-  AppCompatActivity getActivity();
+  /** Gets the containing {@link MainActivity}. */
+  MainActivity getActivity();
 }

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.client.game.build;
 
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -11,6 +10,7 @@ import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Colony;
@@ -53,10 +53,10 @@ public class BuildScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
+  public ShowInfo onShow() {
     // Refresh immediately on show
     layout.post(refreshRunnable);
-    return layout;
+    return ShowInfo.builder().view(layout).build();
   }
 
   @Override

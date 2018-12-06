@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.client.game.chat;
 
 import android.os.Handler;
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.List;
 import au.com.codeka.warworlds.client.game.world.ChatManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatRoom;
 
@@ -28,9 +28,9 @@ public class ChatScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
+  public ShowInfo onShow() {
     refreshRooms();
-    return layout;
+    return ShowInfo.builder().view(layout).build();
 /*
     Bundle extras = getIntent().getExtras();
     if (extras != null) {

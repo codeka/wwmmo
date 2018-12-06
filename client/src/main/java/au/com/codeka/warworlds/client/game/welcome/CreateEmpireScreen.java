@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.client.game.welcome;
 
-import android.view.View;
 import android.view.ViewGroup;
 
 import au.com.codeka.warworlds.client.App;
@@ -11,6 +10,7 @@ import au.com.codeka.warworlds.client.net.ServerUrl;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.NewAccountRequest;
@@ -35,16 +35,12 @@ public class CreateEmpireScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
-    return layout;
+  public ShowInfo onShow() {
+    return ShowInfo.builder().view(layout).toolbarVisible(false).build();
   }
 
-  private final CreateEmpireLayout.Callbacks layoutCallbacks = new CreateEmpireLayout.Callbacks() {
-    @Override
-    public void onDoneClick(String empireName) {
-      registerEmpire(empireName);
-    }
-  };
+  private final CreateEmpireLayout.Callbacks layoutCallbacks =
+      empireName -> registerEmpire(empireName);
 
   private void registerEmpire(String empireName) {
     layout.showSpinner();

@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.client.game.fleets.FleetsScreen;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -42,8 +43,8 @@ public class SolarSystemScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
-    return layout;
+  public ShowInfo onShow() {
+    return ShowInfo.builder().view(layout).build();
   }
 
   @Override

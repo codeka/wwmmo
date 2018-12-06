@@ -1,11 +1,9 @@
 package au.com.codeka.warworlds.client.game.starfield;
 
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 
-import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.chat.ChatScreen;
 import au.com.codeka.warworlds.client.game.fleets.FleetsScreen;
@@ -13,6 +11,7 @@ import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemScreen;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
@@ -36,7 +35,7 @@ public class StarfieldScreen extends Screen {
     this.context = context;
     layout = new StarfieldLayout(context.getActivity(), layoutCallbacks);
 
-    starfieldManager = ((MainActivity) context.getActivity()).getStarfieldManager();
+    starfieldManager = context.getActivity().getStarfieldManager();
     if (starfieldManager.getSelectedStar() != null) {
       showStarSelectedBottomPane(starfieldManager.getSelectedStar());
     } else {
@@ -45,9 +44,9 @@ public class StarfieldScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
+  public ShowInfo onShow() {
     starfieldManager.addTapListener(tapListener);
-    return layout;
+    return ShowInfo.builder().view(layout).build();
   }
 
   @Override

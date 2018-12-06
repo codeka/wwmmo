@@ -1,15 +1,24 @@
 package au.com.codeka.warworlds.client.ui;
 
 import android.content.Intent;
+import android.os.Build;
+import android.transition.Scene;
+import android.transition.Transition;
+import android.transition.TransitionManager;
+import android.transition.TransitionSet;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Random;
 import java.util.Stack;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.warworlds.client.MainActivity;
 import au.com.codeka.warworlds.client.concurrency.Threads;
+import au.com.codeka.warworlds.common.Log;
 
 import static au.com.codeka.warworlds.client.concurrency.Threads.checkOnThread;
 
@@ -18,11 +27,14 @@ import static au.com.codeka.warworlds.client.concurrency.Threads.checkOnThread;
  * corresponding view in the {@link ViewGroup} that the stack is created with.
  */
 public class ScreenStack {
-  private final AppCompatActivity activity;
+  private static final Random RANDOM = new Random();
+  private static final Log log = new Log("ScreenStack");
+
+  private final MainActivity activity;
   private final ViewGroup container;
   private final Stack<ScreenHolder> screens = new Stack<>();
 
-  public ScreenStack(AppCompatActivity activity, ViewGroup container) {
+  public ScreenStack(MainActivity activity, ViewGroup container) {
     this.activity = activity;
     this.container = container;
   }
@@ -61,7 +73,7 @@ public class ScreenStack {
       screen.onCreate(context, container);
     }
 
-    screen.performShow(sharedViews, true);
+    performShow(screen, sharedViews, true);
   }
 
   /**
@@ -72,6 +84,15 @@ public class ScreenStack {
    */
   public boolean pop() {
     return popInternal(true);
+  }
+
+  /**
+   * Pop all screen from the stack, return to blank "home".
+   */
+  public void home() {
+    while (popInternal(false)) {
+      // Keep going.
+    }
   }
 
   private boolean popInternal(boolean transition) {
@@ -89,7 +110,7 @@ public class ScreenStack {
 
     if (!screens.isEmpty()) {
       screenHolder = screens.peek();
-      screenHolder.screen.performShow(screenHolder.sharedViews, transition);
+      performShow(screenHolder.screen, screenHolder.sharedViews, transition);
       return true;
     }
     container.removeAllViews();
@@ -97,12 +118,52 @@ public class ScreenStack {
   }
 
   /**
-   * Pop all screen from the stack, return to blank "home".
+   * Performs the "show". Calls {@link Screen#onShow} to get the view, then creates a {@link Scene}
+   * (if needed), and transitions to it.
    */
-  public void home() {
-    while (popInternal(false)) {
-      // Keep going.
+  private void performShow(Screen screen, @Nullable SharedViews sharedViews, boolean transition) {
+    ShowInfo showInfo = screen.onShow();
+    View view = showInfo.getView();
+    if (view != null) {
+      if (transition && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        Scene scene = new Scene(container, view);
+        TransitionSet mainTransition = new TransitionSet();
+        Transition fadeTransition = Transitions.fade().clone();
+        mainTransition.addTransition(fadeTransition);
+
+        if (sharedViews != null) {
+          Transition transformTransition = Transitions.transform().clone();
+          mainTransition.addTransition(transformTransition);
+          for (SharedViews.SharedView sharedView : sharedViews.getSharedViews()) {
+            if (sharedView.getViewId() != 0) {
+              fadeTransition.excludeTarget(sharedView.getViewId(), true);
+              transformTransition.addTarget(sharedView.getViewId());
+            } else {
+              String name = "shared-" + Long.toString(RANDOM.nextLong());
+              if (sharedView.getFromViewId() != 0 && sharedView.getToViewId() != 0) {
+                container.findViewById(sharedView.getFromViewId()).setTransitionName(name);
+                view.findViewById(sharedView.getToViewId()).setTransitionName(name);
+              } else if (sharedView.getFromView() != null && sharedView.getToViewId() != 0) {
+                sharedView.getFromView().setTransitionName(name);
+                view.findViewById(sharedView.getToViewId()).setTransitionName(name);
+              } else {
+                log.error("Unexpected SharedView configuration.");
+              }
+              fadeTransition.excludeTarget(name, true);
+              transformTransition.addTarget(name);
+            }
+          }
+        }
+        TransitionManager.go(scene, mainTransition);
+      } else {
+        container.removeAllViews();
+        container.addView(view);
+      }
+    } else {
+      container.removeAllViews();
     }
+
+    activity.setToolbarVisible(showInfo.getToolbarVisible());
   }
 
   /** Contains info we need about a {@link Screen} while it's on the stack. */
@@ -138,7 +199,7 @@ public class ScreenStack {
     }
 
     @Override
-    public AppCompatActivity getActivity() {
+    public MainActivity getActivity() {
       return activity;
     }
   };

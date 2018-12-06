@@ -1,8 +1,11 @@
 package au.com.codeka.warworlds.client;
 
+import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
   // Will be non-null between onCreate/onDestroy.
   @Nullable private NavigationView navigationView;
 
+  private FrameLayout fragmentContainer;
+  private View topPane;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -53,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     drawerLayout = findViewById(R.id.drawer_layout);
     navigationView = findViewById(R.id.navigation_view);
+    topPane = findViewById(R.id.top_pane);
 
     setSupportActionBar(findViewById(R.id.toolbar));
     ActionBar actionBar = checkNotNull(getSupportActionBar());
@@ -105,7 +112,8 @@ public class MainActivity extends AppCompatActivity {
     DebugView debugView = checkNotNull(findViewById(R.id.debug_view));
     debugView.setFrameCounter(renderSurfaceView.getFrameCounter());
 
-    screenStack = new ScreenStack(this, findViewById(R.id.fragment_container));
+    fragmentContainer = checkNotNull(findViewById(R.id.fragment_container));
+    screenStack = new ScreenStack(this, fragmentContainer);
 
     if (savedInstanceState != null) {
       // TODO: restore the view state?
@@ -117,6 +125,34 @@ public class MainActivity extends AppCompatActivity {
     } else {
       screenStack.push(new WelcomeScreen());
     }
+  }
+
+  public void setToolbarVisible(boolean visible) {
+    int marginSize;
+    if (visible) {
+      TypedValue typedValue = new TypedValue();
+      getTheme().resolveAttribute(android.R.attr.actionBarSize, typedValue, true);
+
+      int[] attribute = new int[] { android.R.attr.actionBarSize };
+      TypedArray array = obtainStyledAttributes(typedValue.resourceId, attribute);
+      marginSize = array.getDimensionPixelSize(0, -1);
+      array.recycle();
+
+      // Adjust the margin by a couple of dp, the top pane has that strip of transparent pixels
+      marginSize -= TypedValue.applyDimension(
+          TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
+
+      topPane.setVisibility(View.VISIBLE);
+      getSupportActionBar().show();
+    } else {
+      marginSize = 0;
+
+      topPane.setVisibility(View.GONE);
+      getSupportActionBar().hide();
+    }
+
+    log.info("setting margin size: %d", marginSize);
+    ((FrameLayout.LayoutParams) fragmentContainer.getLayoutParams()).topMargin = marginSize;
   }
 
   @Override

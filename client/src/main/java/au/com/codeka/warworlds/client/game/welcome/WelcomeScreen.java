@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
@@ -32,6 +31,7 @@ import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.client.util.GameSettings;
 import au.com.codeka.warworlds.client.util.UrlFetcher;
 import au.com.codeka.warworlds.client.util.Version;
@@ -78,7 +78,7 @@ public class WelcomeScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
+  public ShowInfo onShow() {
     welcomeLayout.setConnectionStatus(false, null);
     updateServerState(App.i.getServer().getCurrState());
 
@@ -100,7 +100,7 @@ public class WelcomeScreen extends Screen {
 //        }
 //      }
 //    });
-    return welcomeLayout;
+    return ShowInfo.builder().view(welcomeLayout).toolbarVisible(false).build();
   }
 
   @Override

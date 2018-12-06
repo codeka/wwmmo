@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.client.game.fleets;
 
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
@@ -10,6 +9,7 @@ import au.com.codeka.warworlds.client.game.world.MyEmpireStarCollection;
 import au.com.codeka.warworlds.client.game.world.StarCollection;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Star;
 
@@ -52,7 +52,7 @@ public class FleetsScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
-    return layout;
+  public ShowInfo onShow() {
+    return ShowInfo.builder().view(layout).build();
   }
 }

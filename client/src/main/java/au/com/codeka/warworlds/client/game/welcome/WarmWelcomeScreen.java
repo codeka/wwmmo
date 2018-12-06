@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.client.util.GameSettings;
 
 /**
@@ -56,7 +57,7 @@ public class WarmWelcomeScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
-    return layout;
+  public ShowInfo onShow() {
+    return ShowInfo.builder().view(layout).toolbarVisible(false).build();
   }
 }

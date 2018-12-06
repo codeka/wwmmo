@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.common.base.Preconditions;
@@ -9,6 +8,7 @@ import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Empire;
@@ -41,8 +41,8 @@ public class PlanetDetailsScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
-    return layout;
+  public ShowInfo onShow() {
+    return ShowInfo.builder().view(layout).build();
   }
 
   private final PlanetDetailsLayout.Callbacks layoutCallbacks = new PlanetDetailsLayout.Callbacks() {

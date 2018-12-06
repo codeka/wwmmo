@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.client.game.empire;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.view.View;
 import android.view.ViewGroup;
 
 import au.com.codeka.warworlds.client.App;
@@ -12,6 +11,7 @@ import au.com.codeka.warworlds.client.net.HttpRequest;
 import au.com.codeka.warworlds.client.net.ServerUrl;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
+import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.PatreonBeginRequest;
 import au.com.codeka.warworlds.common.proto.PatreonBeginResponse;
@@ -33,8 +33,8 @@ public class EmpireScreen extends Screen {
   }
 
   @Override
-  public View onShow() {
-    return layout;
+  public ShowInfo onShow() {
+    return ShowInfo.builder().view(layout).build();
   }
 
   private class SettingsCallbacks implements SettingsView.Callback {
