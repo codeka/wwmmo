@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
-    if (!screenStack.pop()) {
+    if (!screenStack.backTo(StarfieldScreen.class)) {
       super.onBackPressed();
     }
   }

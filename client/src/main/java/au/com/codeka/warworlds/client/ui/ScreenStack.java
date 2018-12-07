@@ -87,6 +87,32 @@ public class ScreenStack {
   }
 
   /**
+   * Implements "back" behaviour. This is basically "pop" but when we get to the last screen,
+   * something a bit different happens: if the last screen is the "home" screen (of the passed-in
+   * type), then we'll pop it and return false. Otherwise, the last screen will be replaced with
+   * a new instance of the home screen.
+   */
+  public boolean backTo(Class<? extends Screen> homeScreen) {
+    if (screens.size() == 1 && homeScreen.isInstance(screens.get(0).screen)) {
+      log.info("DEANH screens.size() == 1 && homeScreen.isInstance");
+      return pop();
+    } else if (screens.size() == 1) {
+      log.info("DEANH screens.size() == 1 && !homeScreen.isInstance");
+      pop();
+      try {
+        push(homeScreen.newInstance());
+      } catch (Exception e) {
+        log.error("Unexpected.", e);
+        return false;
+      }
+      return true;
+    }
+
+    log.info("DEANH just poppin'");
+    return pop();
+  }
+
+  /**
    * Pop all screen from the stack, return to blank "home".
    */
   public void home() {
