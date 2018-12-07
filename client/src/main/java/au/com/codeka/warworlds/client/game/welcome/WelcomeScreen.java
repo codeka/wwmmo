@@ -241,6 +241,7 @@ public class WelcomeScreen extends Screen {
   private final WelcomeLayout.Callbacks layoutCallbacks = new WelcomeLayout.Callbacks() {
     @Override
     public void onStartClick() {
+      context.home();
       context.pushScreen(new StarfieldScreen());
     }
 

@@ -210,6 +210,9 @@ public class ScreenStack {
     }
 
     @Override
+    public void home() { ScreenStack.this.home(); }
+
+    @Override
     public void pushScreen(Screen screen) {
       push(screen, null);
     }

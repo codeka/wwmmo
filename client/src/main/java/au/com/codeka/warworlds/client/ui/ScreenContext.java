@@ -13,6 +13,9 @@ public interface ScreenContext {
   /** Start an activity with the given {@link Intent}. */
   void startActivity(Intent intent);
 
+  /** Pop all screens until you get an empty stack. */
+  void home();
+
   /** Push a new screen onto the current stack. */
   void pushScreen(Screen screen);
 
