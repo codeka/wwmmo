@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Queue;
 
 import javax.annotation.Nonnull;
@@ -56,6 +57,9 @@ public class Server {
   /** A queue for storing packets while we attempt to reconnect. Will be null if we're connected. */
   @Nullable private Queue<Packet> queuedPackets;
 
+  /** A list of callbacks waiting for hello to complete. */
+  private ArrayList<Runnable> waitingForHello = new ArrayList<>();
+
   /** A lock used to guard access to the web socket/queue. */
   private final Object lock = new Object();
 
@@ -83,6 +87,20 @@ public class Server {
 
     updateState(ServerStateEvent.ConnectionState.CONNECTING, null);
     login(cookie);
+  }
+
+  /**
+   * Queue the given runnable to run once we've completed the server handshake. The running will
+   * be executed immediately if we've already get hello.
+   */
+  public void waitForHello(Runnable runnable) {
+    synchronized (lock) {
+      if (waitingForHello == null) {
+        runnable.run();
+      } else {
+        waitingForHello.add(runnable);
+      }
+    }
   }
 
   private void login(@Nonnull String cookie) {
@@ -151,6 +169,14 @@ public class Server {
 
       while (oldQueuedPackets != null && !oldQueuedPackets.isEmpty()) {
         send(oldQueuedPackets.remove());
+      }
+
+      ArrayList<Runnable> waitingForHello = this.waitingForHello;
+      synchronized (lock) {
+        this.waitingForHello = null;
+      }
+      for (Runnable r : waitingForHello) {
+        r.run();
       }
     } catch (IOException e) {
       gameSocket = null;

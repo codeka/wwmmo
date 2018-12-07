@@ -1,6 +1,9 @@
 package au.com.codeka.warworlds.client;
 
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.MenuItem;
@@ -16,7 +19,10 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.ctrl.DebugView;
 import au.com.codeka.warworlds.client.game.empire.EmpireScreen;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
@@ -24,6 +30,8 @@ import au.com.codeka.warworlds.client.game.starfield.StarfieldScreen;
 import au.com.codeka.warworlds.client.game.welcome.CreateEmpireScreen;
 import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeScreen;
 import au.com.codeka.warworlds.client.game.welcome.WelcomeScreen;
+import au.com.codeka.warworlds.client.game.world.EmpireManager;
+import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.ui.ScreenStack;
 import au.com.codeka.warworlds.client.util.GameSettings;
@@ -170,6 +178,33 @@ public class MainActivity extends AppCompatActivity {
   public void onResume() {
     super.onResume();
     drawerToggle.syncState();
+
+    // TODO: update this if your icon changes
+    // Replace the empire icon with... your empire's icon.
+    final MenuItem empireMenuItem = navigationView.getMenu().findItem(R.id.nav_empire);
+    App.i.getServer().waitForHello(() -> App.i.getTaskRunner().runTask(() -> {
+      String url = ImageHelper.getEmpireImageUrl(this, EmpireManager.i.getMyEmpire(), 48, 48);
+      Target target = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+          empireMenuItem.setIcon(new BitmapDrawable(getResources(), bitmap));
+        }
+
+        @Override
+        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+          empireMenuItem.setIcon(errorDrawable);
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+          empireMenuItem.setIcon(placeHolderDrawable);
+        }
+      };
+      // Picasso only keeps a weak reference to the target, but we want to keep it alive (at least
+      // as long as the nav menu is alive), so add it to a tag in the view.
+      navigationView.setTag(R.id.target_tag, target);
+      Picasso.get().load(url).into(target);
+    }, Threads.UI));
   }
 
   @Override

@@ -29,6 +29,7 @@ android {
     versionCode getVersionCodeFromGit()
     versionName "2.0"
     multiDexEnabled true
+    vectorDrawables.useSupportLibrary = true
   }
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
