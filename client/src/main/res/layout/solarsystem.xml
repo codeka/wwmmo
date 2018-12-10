@@ -2,155 +2,119 @@
 <merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="androidx.drawerlayout.widget.DrawerLayout"
+    tools:parentTag="android.widget.RelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-  <RelativeLayout
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
-
-    <au.com.codeka.warworlds.client.game.solarsystem.SunAndPlanetsView
-        android:id="@+id/solarsystem_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_pane"
-        android:layout_below="@+id/top_pane"
-        android:layout_marginTop="-8px"
-        android:layout_marginBottom="-8px" />
-
-    <au.com.codeka.warworlds.client.ctrl.ChatMiniView
-        android:id="@+id/mini_chat"
-        android:layout_height="50dp"
-        android:layout_width="fill_parent"
-        android:layout_above="@+id/bottom_pane"
-        android:layout_marginBottom="-4px" />
-
-    <RelativeLayout
-        android:id="@+id/bottom_pane"
-        style="@style/BottomPane"
-        android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:layout_alignParentBottom="true" >
-
-      <au.com.codeka.warworlds.client.ctrl.InfobarView
-          android:id="@+id/infobar"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_alignParentBottom="true" />
-
-      <LinearLayout
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:layout_alignParentTop="true"
-          android:layout_above="@id/infobar"
-          android:baselineAligned="false"
-          android:orientation="horizontal">
-
-        <RelativeLayout
-            android:id="@+id/bottom_left_pane"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent">
-
-          <TextView
-              android:id="@+id/planet_name"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:gravity="center_horizontal"
-              android:textAppearance="?android:attr/textAppearanceSmall"
-              tools:text="Planet name" />
-
-          <au.com.codeka.warworlds.client.game.solarsystem.PlanetSummaryView
-              android:id="@+id/planet_summary"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_below="@id/planet_name" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/bottom_right_pane"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent">
-
-          <View android:id="@+id/btn_spacer"
-              android:layout_width="1dp"
-              android:layout_height="10dp"
-              android:layout_marginTop="10dp"
-              android:layout_centerHorizontal="true" />
-
-          <Button
-              android:id="@+id/sitrep_btn"
-              style="@style/Button"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_alignParentEnd="true"
-              android:layout_toEndOf="@+id/btn_spacer"
-              android:layout_marginStart="2dp"
-              android:layout_marginEnd="5dp"
-              android:layout_marginTop="10dp"
-              android:text="@string/sitrep" />
-
-          <ScrollView
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_below="@+id/sitrep_btn">
-            <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
-                android:id="@+id/fleet_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-          </ScrollView>
-        </RelativeLayout>
-      </LinearLayout>
-    </RelativeLayout>
-
-    <au.com.codeka.warworlds.client.game.solarsystem.CongenialityView
-        android:id="@+id/congeniality"
-        android:layout_width="85dp"
-        android:layout_height="64dp"
-        android:layout_alignParentTop="true"
-        android:visibility="gone" />
-
-    <au.com.codeka.warworlds.client.game.solarsystem.StoreView
-        android:id="@+id/store"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="5dp" />
-
-  </RelativeLayout>
-
-  <RelativeLayout
-      android:id="@+id/drawer"
+  <au.com.codeka.warworlds.client.game.solarsystem.SunAndPlanetsView
+      android:id="@+id/solarsystem_view"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:layout_marginEnd="40dp"
-      android:layout_gravity="start"
-      android:background="@drawable/left_pane_bg">
+      android:layout_above="@+id/bottom_pane"
+      android:layout_below="@+id/top_pane"
+      android:layout_marginTop="-8px"
+      android:layout_marginBottom="-8px" />
 
-    <EditText
-        android:id="@+id/search_text"
+  <au.com.codeka.warworlds.client.ctrl.ChatMiniView
+      android:id="@+id/mini_chat"
+      android:layout_height="50dp"
+      android:layout_width="fill_parent"
+      android:layout_above="@+id/bottom_pane"
+      android:layout_marginBottom="-4px" />
+
+  <RelativeLayout
+      android:id="@+id/bottom_pane"
+      style="@style/BottomPane"
+      android:layout_width="match_parent"
+      android:layout_height="180dp"
+      android:layout_alignParentBottom="true" >
+
+    <au.com.codeka.warworlds.client.ctrl.InfobarView
+        android:id="@+id/infobar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="?android:attr/actionBarSize"
-        android:layout_toStartOf="@+id/search_button"
-        android:inputType="text"
-        android:imeOptions="actionSearch" />
+        android:layout_alignParentBottom="true" />
 
-    <ImageButton
-        android:id="@+id/search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="?android:attr/actionBarSize"
-        android:layout_alignParentEnd="true"
-        android:src="@android:drawable/ic_menu_search" />
-
-    <ListView
-        android:id="@+id/search_result"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/search_button" />
+        android:layout_alignParentTop="true"
+        android:layout_above="@id/infobar"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+      <RelativeLayout
+          android:id="@+id/bottom_left_pane"
+          android:layout_width="0dp"
+          android:layout_weight="1"
+          android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/planet_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            tools:text="Planet name" />
+
+        <au.com.codeka.warworlds.client.game.solarsystem.PlanetSummaryView
+            android:id="@+id/planet_summary"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/planet_name" />
+      </RelativeLayout>
+
+      <RelativeLayout
+          android:id="@+id/bottom_right_pane"
+          android:layout_width="0dp"
+          android:layout_weight="1"
+          android:layout_height="match_parent">
+
+        <View android:id="@+id/btn_spacer"
+            android:layout_width="1dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:id="@+id/sitrep_btn"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/btn_spacer"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/sitrep" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/sitrep_btn">
+          <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
+              android:id="@+id/fleet_list"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical" />
+        </ScrollView>
+      </RelativeLayout>
+    </LinearLayout>
   </RelativeLayout>
+
+  <au.com.codeka.warworlds.client.game.solarsystem.CongenialityView
+      android:id="@+id/congeniality"
+      android:layout_width="85dp"
+      android:layout_height="64dp"
+      android:layout_alignParentTop="true"
+      android:visibility="gone" />
+
+  <au.com.codeka.warworlds.client.game.solarsystem.StoreView
+      android:id="@+id/store"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentEnd="true"
+      android:layout_marginEnd="5dp" />
+
 </merge>
+

@@ -46,15 +46,13 @@
         android:layout_height="wrap_content" />
     </FrameLayout>
 
-    <com.google.android.material.navigation.NavigationView
-      android:id="@+id/navigation_view"
+    <FrameLayout
+      android:id="@+id/drawer_content"
       android:layout_marginEnd="40dp"
       android:layout_gravity="start"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="@drawable/left_pane_bg"
-      app:menu="@menu/drawer"
-      app:headerLayout="@layout/drawer_header" />
+      android:background="@drawable/left_pane_bg" />
 
   </androidx.drawerlayout.widget.DrawerLayout>
 </FrameLayout>

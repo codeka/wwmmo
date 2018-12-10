@@ -9,8 +9,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import javax.annotation.Nonnull;
 
 import au.com.codeka.warworlds.client.R;
@@ -25,7 +23,7 @@ import au.com.codeka.warworlds.common.proto.Star;
  * The layout for the {@link SolarSystemScreen}.
  */
 // TODO: it probably makes sense to split these into a bunch of sub-views.
-public class SolarSystemLayout extends DrawerLayout {
+public class SolarSystemLayout extends RelativeLayout {
   public interface Callbacks {
     void onBuildClick(int planetIndex);
     void onFocusClick(int planetIndex);
