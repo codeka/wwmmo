@@ -41,7 +41,7 @@ public class SolarSystemLayout extends RelativeLayout {
   private final TextView planetName;
   private final FleetListSimple fleetList;
 
-  private final StarSearchListAdapter searchListAdapter;
+ // private final StarSearchListAdapter searchListAdapter;
 
   @Nonnull private Star star;
   private int planetIndex;
@@ -88,7 +88,7 @@ public class SolarSystemLayout extends RelativeLayout {
     sitrepButton.setOnClickListener(v -> callbacks.onSitrepClick());
     planetViewButton.setOnClickListener(v -> callbacks.onViewColonyClick(planetIndex));
     fleetList.setFleetSelectedHandler(fleet -> callbacks.onFleetClick(fleet.id));
-
+/*
     ListView searchList = findViewById(R.id.search_result);
     searchListAdapter = new StarSearchListAdapter(
         LayoutInflater.from(getContext()));
@@ -100,7 +100,7 @@ public class SolarSystemLayout extends RelativeLayout {
         refreshStar(s);
       }
     });
-
+*/
     refreshStar(star);
   }
 
@@ -117,7 +117,7 @@ public class SolarSystemLayout extends RelativeLayout {
   public void refreshStar(Star star) {
     this.star = star;
 
-    searchListAdapter.addToLastStars(star);
+ //   searchListAdapter.addToLastStars(star);
     fleetList.setStar(star);
     sunAndPlanets.setStar(star);
     store.setStar(star);

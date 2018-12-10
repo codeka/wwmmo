@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
@@ -11,6 +13,8 @@ import androidx.core.view.GravityCompat;
 import com.google.android.material.navigation.NavigationView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.util.zip.Inflater;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.MainActivity;
@@ -23,14 +27,16 @@ import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.ui.ScreenStack;
 
 public class RootDrawerPage implements DrawerPage {
-  // Will be non-null between onCreate/onDestroy.
-  @Nullable
-  private NavigationView navigationView;
+  private final NavigationView navigationView;
 
   public RootDrawerPage(
       MainActivity activity,
       DrawerController drawerController,
-      ScreenStack screenStack) {
+      ScreenStack screenStack,
+      ViewGroup containerView) {
+
+    View v = activity.getLayoutInflater().inflate(R.layout.drawer_root, containerView, true);
+    navigationView = v.findViewById(R.id.navigation_view);
 
     navigationView.setNavigationItemSelectedListener(item -> {
       //item.setChecked(true);
@@ -75,5 +81,4 @@ public class RootDrawerPage implements DrawerPage {
       Picasso.get().load(url).into(target);
     }, Threads.UI));
   }
-
 }

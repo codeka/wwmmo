@@ -63,7 +63,7 @@ public class DrawerController {
     drawerLayout.addDrawerListener(drawerToggle);
     drawerToggle.syncState();
 
-    pageStack.push(new RootDrawerPage(activity, this, screenStack));
+    pageStack.push(new RootDrawerPage(activity, this, screenStack, drawerContent));
   }
 
   public void openDrawer() {
