@@ -120,12 +120,16 @@ public class DrawerController {
     }, Threads.UI));
   }
 
-  public void openDrawer() {
-    drawerLayout.openDrawer(GravityCompat.START);
-  }
-
   public void closeDrawer() {
     drawerLayout.closeDrawer(GravityCompat.START);
+  }
+
+  public void toggleDrawer() {
+    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+      drawerLayout.closeDrawer(GravityCompat.START);
+    } else {
+      drawerLayout.openDrawer(GravityCompat.START);
+    }
   }
 
   private void refreshTitle() {
