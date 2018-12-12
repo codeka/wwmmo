@@ -16,7 +16,7 @@
   <string name="next">Next</string>
   <string name="back">Back</string>
   <string name="empire">Empire</string>
-  <string name="sitrep">Sit. Rep.</string>
+  <string name="sitrep">Situation report</string>
   <string name="view">View</string>
   <string name="rename">Rename</string>
   <string name="alliance">Alliance</string>
@@ -54,6 +54,7 @@
   <string name="upgrade">Upgrade</string>
   <string name="settings">Settings</string>
   <string name="starfield">Starfield</string>
+  <string name="star_search">Search stars</string>
 
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to

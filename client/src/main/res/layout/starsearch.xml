@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical" android:layout_width="match_parent"
+<merge
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  tools:parentTag="android.widget.RelativeLayout"
+  android:layout_width="match_parent"
   android:layout_height="match_parent">
 
   <EditText
     android:id="@+id/search_text"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="?android:attr/actionBarSize"
     android:layout_toStartOf="@+id/search_button"
     android:inputType="text"
     android:imeOptions="actionSearch" />
@@ -16,7 +18,6 @@
     android:id="@+id/search_button"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="?android:attr/actionBarSize"
     android:layout_alignParentEnd="true"
     android:src="@android:drawable/ic_menu_search" />
 
@@ -26,4 +27,4 @@
     android:layout_height="match_parent"
     android:layout_below="@+id/search_button" />
 
-</RelativeLayout>
+</merge>

@@ -6,6 +6,10 @@
       android:icon="@drawable/ic_house"
       android:title="@string/starfield" />
     <item
+      android:id="@+id/nav_star_search"
+      android:icon="@drawable/ic_search"
+      android:title="@string/star_search"/>
+    <item
       android:id="@+id/nav_empire"
       android:title="@string/empire" />
     <item

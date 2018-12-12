@@ -1,12 +1,12 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
-import android.view.View;
 import android.view.ViewGroup;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.build.BuildScreen;
 import au.com.codeka.warworlds.client.game.fleets.FleetsScreen;
+import au.com.codeka.warworlds.client.game.starsearch.StarRecentHistoryManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;
@@ -44,6 +44,7 @@ public class SolarSystemScreen extends Screen {
 
   @Override
   public ShowInfo onShow() {
+    StarRecentHistoryManager.i.addToLastStars(star);
     return ShowInfo.builder().view(layout).build();
   }
 

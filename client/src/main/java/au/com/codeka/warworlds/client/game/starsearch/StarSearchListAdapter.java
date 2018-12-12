@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.game.solarsystem;
+package au.com.codeka.warworlds.client.game.starsearch;
 
 
 import android.graphics.Color;
@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import au.com.codeka.warworlds.client.R;
@@ -25,15 +25,13 @@ import au.com.codeka.warworlds.common.proto.Star;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A list adapter for showing a list of stars.
+ */
 class StarSearchListAdapter extends BaseAdapter {
   private LayoutInflater inflater;
   private StarCursor cursor;
-
-  // We keep the last 5 stars you've visited in an LRU cache so we can display them at the top
-  // of the search list (note we actually keep 6 but ignore the most recent one, which is always
-  // "this star").
-  private static final ArrayList<Star> lastStars = new ArrayList<>();
-  private static final int LAST_STARS_MAX_SIZE = 6;
+  private final List<Star> recentStars;
 
   private static final int VIEW_TYPE_STAR = 0;
   private static final int VIEW_TYPE_SEPARATOR = 1;
@@ -41,6 +39,7 @@ class StarSearchListAdapter extends BaseAdapter {
 
   StarSearchListAdapter(LayoutInflater inflater) {
     this.inflater = inflater;
+    this.recentStars = StarRecentHistoryManager.i.getRecentStars();
   }
 
   /** Sets the {@link StarCursor} that we'll use to display stars. */
@@ -49,23 +48,6 @@ class StarSearchListAdapter extends BaseAdapter {
     notifyDataSetChanged();
   }
 
-  void addToLastStars(Star star) {
-    synchronized (lastStars) {
-      for (int i = 0; i < lastStars.size(); i++) {
-        if (lastStars.get(i).id.equals(star.id)) {
-          lastStars.remove(i);
-          break;
-        }
-      }
-      lastStars.add(0, star);
-      while (lastStars.size() > LAST_STARS_MAX_SIZE) {
-        lastStars.remove(lastStars.size() - 1);
-      }
-    }
-    notifyDataSetChanged();
-  }
-
-
   @Override
   public int getViewTypeCount() {
     return NUM_VIEW_TYPES;
@@ -73,7 +55,7 @@ class StarSearchListAdapter extends BaseAdapter {
 
   @Override
   public int getItemViewType(int position) {
-    if (position == lastStars.size() - 1) {
+    if (position == recentStars.size() - 1) {
       return VIEW_TYPE_SEPARATOR;
     } else {
       return VIEW_TYPE_STAR;
@@ -82,7 +64,7 @@ class StarSearchListAdapter extends BaseAdapter {
 
   @Override
   public int getCount() {
-    int count = lastStars.size() - 1;
+    int count = recentStars.size() - 1;
     if (cursor != null) {
       count += cursor.getSize() + 1; // +1 for the spacer view
     }
@@ -91,12 +73,16 @@ class StarSearchListAdapter extends BaseAdapter {
 
   @Override
   public Object getItem(int position) {
-    if (position < lastStars.size() - 1) {
-      return lastStars.get(position + 1);
-    } else if (position == lastStars.size() - 1) {
+    return getStar(position);
+  }
+
+  public Star getStar(int position) {
+    if (position < recentStars.size() - 1) {
+      return recentStars.get(position + 1);
+    } else if (position == recentStars.size() - 1) {
       return null;
     } else {
-      return cursor.getValue(position - lastStars.size());
+      return cursor.getValue(position - recentStars.size());
     }
   }
 
@@ -109,7 +95,7 @@ class StarSearchListAdapter extends BaseAdapter {
   public View getView(int position, View convertView, ViewGroup parent) {
     View view = convertView;
     if (view == null) {
-      if (position == lastStars.size() - 1) {
+      if (position == recentStars.size() - 1) {
         // it's just a spacer
         view = new View(inflater.getContext());
         view.setLayoutParams(
@@ -119,7 +105,7 @@ class StarSearchListAdapter extends BaseAdapter {
       }
     }
 
-    if (position == lastStars.size() - 1) {
+    if (position == recentStars.size() - 1) {
       return view;
     }
 

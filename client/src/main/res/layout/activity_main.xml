@@ -52,7 +52,15 @@
       android:layout_gravity="start"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="@drawable/left_pane_bg" />
+      android:background="@drawable/left_pane_bg">
+      <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:menu="@menu/drawer"
+        app:headerLayout="@layout/drawer_header" />
+    </FrameLayout>
+
 
   </androidx.drawerlayout.widget.DrawerLayout>
 </FrameLayout>
