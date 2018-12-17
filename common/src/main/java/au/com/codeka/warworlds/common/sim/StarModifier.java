@@ -514,10 +514,15 @@ public class StarModifier {
             fleet.empire_id);
       }
 
+      Design design = DesignHelper.getDesign(fleet.design_type);
+      float fuelFraction= fleet.fuel_amount / (design.fuel_size * fleet.num_ships);
+
       logHandler.log("- splitting fleet");
       // Modify the existing fleet to change it's number of ships
+      float existingFleetNumShips = fleet.num_ships - modification.count;
       star.fleets.set(fleetIndex, fleet
-          .num_ships(fleet.num_ships - modification.count)
+          .num_ships(existingFleetNumShips)
+          .fuel_amount(fuelFraction * (design.fuel_size * existingFleetNumShips))
           .build());
 
       // Add a new fleet, that's a copy of the existing fleet, but with the new number of ships.
@@ -525,6 +530,7 @@ public class StarModifier {
       star.fleets.add(fleet
           .id(identifierGenerator.nextIdentifier())
           .num_ships((float) modification.count)
+          .fuel_amount(fuelFraction * (design.fuel_size * modification.count))
           .build());
     } else {
       throw new SuspiciousModificationException(

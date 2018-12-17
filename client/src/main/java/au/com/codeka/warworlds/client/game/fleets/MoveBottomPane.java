@@ -132,12 +132,13 @@ public class MoveBottomPane extends RelativeLayout {
       int mins = (int) Math.floor((timeInHours - hrs) * 60.0f);
 
       double estimatedFuel = design.fuel_cost_per_px * distanceInParsecs * fleet.num_ships;
-      String fuel = String.format(Locale.US, "%.1f", estimatedFuel);
+      double actualFuel = fleet.fuel_amount == null ? 0 : fleet.fuel_amount;
+      String fuel = String.format(Locale.US, "%.1f / %.1f", estimatedFuel, actualFuel);
 
       String fontOpen = "";
       String fontClose = "";
       EmpireStorage storage = StarHelper.getStorage(star, EmpireManager.i.getMyEmpire().id);
-      if (storage == null || estimatedFuel > storage.total_energy) {
+      if (storage == null || estimatedFuel > actualFuel) {
         fontOpen = "<font color=\"#ff0000\">";
         fontClose = "</font>";
       }
