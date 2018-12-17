@@ -600,6 +600,7 @@ public class StarModifier {
           // TODO: make sure it has the same upgrades, otherwise we have to remove it.
 
           fleet.num_ships(fleet.num_ships + thisFleet.num_ships);
+          fleet.fuel_amount(fleet.fuel_amount + thisFleet.fuel_amount);
           logHandler.log(String.format(Locale.US,
               "  removing fleet %d (num_ships=%.2f)", thisFleet.id, thisFleet.num_ships));
 
