@@ -1,36 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:baselineAligned="false"
-    android:background="@drawable/list_selector" >
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@drawable/list_selector"
+  android:baselineAligned="false">
 
-    <ImageView
-        android:id="@+id/fleet_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp" />
+  <ImageView
+    android:id="@+id/fleet_icon"
+    android:layout_width="32dp"
+    android:layout_height="32dp"
+    tools:src="@drawable/ship_fighter" />
 
-    <TextView
-        android:id="@+id/fleet_row1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/fleet_icon"
-        android:layout_toEndOf="@+id/fleet_icon"
-        android:layout_alignParentTop="true"
-        android:gravity="center_vertical" />
+  <TextView
+    android:id="@+id/fleet_row1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:layout_toEndOf="@+id/fleet_icon"
+    android:layout_toStartOf="@+id/fuel_level"
+    android:gravity="center_vertical"
+    tools:text="Fleet name"/>
 
-    <TextView
-        android:id="@+id/fleet_row2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/fleet_icon"
-        android:layout_toEndOf="@+id/fleet_icon"
-        android:layout_below="@id/fleet_row1"
-        android:gravity="center_vertical" />
+  <TextView
+    android:id="@+id/fleet_row2"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/fleet_row1"
+    android:layout_toEndOf="@+id/fleet_icon"
+    android:layout_toStartOf="@+id/fuel_level"
+    android:gravity="center_vertical"
+    tools:text="Fleet description" />
 
-    <View android:id="@+id/separator"
-          android:layout_width="match_parent"
-          android:layout_height="1px"
-          android:layout_alignParentBottom="true"
-          android:background="#33ffffff" />
+  <ProgressBar
+    android:id="@+id/fuel_level"
+    style="@style/WarWorlds.ProgressBar.Vertical"
+    android:layout_width="10dp"
+    android:layout_height="wrap_content"
+    android:layout_alignTop="@+id/fleet_row1"
+    android:layout_alignBottom="@+id/fleet_row2"
+    android:layout_alignParentEnd="true" />
+
 </RelativeLayout>

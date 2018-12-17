@@ -100,4 +100,14 @@
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
   </style>
+
+  <style name="WarWorlds.ProgressBar">
+  </style>
+  <style name="WarWorlds.ProgressBar.Vertical">
+    <item name="android:indeterminateOnly">false</item>
+    <item name="android:progressDrawable">@drawable/progress_bar_vertical</item>
+    <item name="android:indeterminateDrawable">@android:drawable/progress_indeterminate_horizontal</item>
+    <item name="android:minWidth">1dip</item>
+    <item name="android:maxWidth">12dip</item>
+  </style>
 </resources>

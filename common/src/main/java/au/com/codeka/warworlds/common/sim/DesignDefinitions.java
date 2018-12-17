@@ -31,6 +31,7 @@ public class DesignDefinitions {
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
           .fuel_cost_per_px(3.5f)
+          .fuel_size(700)
           .image_url("colony.png")
           .speed_px_per_hour(128.0f)
           .upgrades(Lists.newArrayList(
@@ -78,6 +79,7 @@ public class DesignDefinitions {
               new Design.Effect.Builder().type(Design.EffectType.SCOUT_SHIP).build(),
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
           .fuel_cost_per_px(0.2f)
+          .fuel_size(10)
           .image_url("scout.png")
           .speed_px_per_hour(4096.0f)
           .upgrades(Lists.newArrayList(
@@ -123,6 +125,7 @@ public class DesignDefinitions {
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
           .fuel_cost_per_px(0.005f)
+          .fuel_size(1)
           .image_url("fighter.png")
           .speed_px_per_hour(768.0f)
           .upgrades(Lists.newArrayList(
@@ -166,6 +169,7 @@ public class DesignDefinitions {
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
           .fuel_cost_per_px(0.005f)
+          .fuel_size(1)
           .image_url("troopcarrier.png")
           .speed_px_per_hour(600.0f)
           .build(),
@@ -193,6 +197,7 @@ public class DesignDefinitions {
               new Design.Effect.Builder().type(Design.EffectType.EMPTY_SPACE_MOVER).build(),
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
           .fuel_cost_per_px(51.2f)
+          .fuel_size(450)
           .image_url("wormhole-generator.png")
           .speed_px_per_hour(128.0f)
           .build(),

@@ -307,7 +307,7 @@ public class Simulation {
       star.planets.set(i, planet.newBuilder().colony(colony.build()).build());
     }
 
-    // A second loop though the colonies, once the goods/minerals have been calculated.
+    // A second loop though the colonies, once the goods/minerals/energy has been calculated.
     for (int i = 0; i < star.planets.size(); i++) {
       Planet.Builder planet = star.planets.get(i).newBuilder();
       if (planet.colony == null) {
@@ -485,6 +485,38 @@ public class Simulation {
         star.planets.set(i, planet.colony(
             colony.build_requests(completeBuildRequests).build()).build());
       }
+    }
+
+    // Now loop through the fleets and see if there's any that needs more fuel. Fill 'em up if there
+    // is.
+    for (int i = 0; i < star.fleets.size(); i++) {
+      if (storage.total_energy < 0.001f) {
+        break;
+      }
+
+      Fleet.Builder fleet = star.fleets.get(i).newBuilder();
+      if (!equalEmpire(fleet.empire_id, empireId)) {
+        continue;
+      }
+
+      // TODO: this shouldn't happen normally, it's just for fleets that we added before adding fuel
+      // to the game.
+      if (fleet.fuel_amount == null) {
+        fleet.fuel_amount(0.0f);
+      }
+
+      Design design = DesignHelper.getDesign(fleet.design_type);
+      float neededFuelTotal = (float) design.fuel_size * fleet.num_ships;
+      if (fleet.fuel_amount < neededFuelTotal) {
+        float neededFuelRemaining = neededFuelTotal - fleet.fuel_amount;
+        float actual = Math.min(neededFuelRemaining, storage.total_energy);
+        fleet.fuel_amount += actual;
+        storage.total_energy -= actual;
+        log("--- Fleet %d [%s x %.0f] re-fueling: %.2f",
+            fleet.id, design.display_name, fleet.num_ships, actual);
+      }
+
+      star.fleets.set(i, fleet.build());
     }
 
     // Finally, update the population. The first thing we need to do is evenly distribute goods

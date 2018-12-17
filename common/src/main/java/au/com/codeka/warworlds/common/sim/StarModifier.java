@@ -273,6 +273,7 @@ public class StarModifier {
           .id(identifierGenerator.nextIdentifier())
           .state(attack ? Fleet.FLEET_STATE.ATTACKING : Fleet.FLEET_STATE.IDLE)
           .state_start_time(System.currentTimeMillis())
+          .fuel_amount(0.0f) // Will be updated when we simulate anyway
           .destination_star_id(null)
           .eta(null)
           .build());
@@ -283,6 +284,7 @@ public class StarModifier {
           .empire_id(modification.empire_id)
           .id(identifierGenerator.nextIdentifier())
           .num_ships((float) modification.count)
+          .fuel_amount(0.0f) // Will be updated when we simulate anyway
           .stance(Fleet.FLEET_STANCE.AGGRESSIVE)
           .state(attack ? Fleet.FLEET_STATE.ATTACKING : Fleet.FLEET_STATE.IDLE)
           .state_start_time(System.currentTimeMillis())
@@ -662,27 +664,22 @@ public class StarModifier {
     double timeInHours = distance / design.speed_px_per_hour;
     double fuel = design.fuel_cost_per_px * distance * fleet.num_ships;
 
-    int storageIndex = StarHelper.getStorageIndex(star, fleet.empire_id);
-    if (storageIndex < 0) {
-      // No storage. TODO: some kind of portable fuel?
-      logHandler.log("  no storages on this star.");
-      return;
-    }
-
-    EmpireStorage.Builder empireStorageBuilder = star.empire_stores.get(storageIndex).newBuilder();
-    if (empireStorageBuilder.total_energy < fuel) {
-      logHandler.log(String.format(Locale.US,
-          "  not enough energy for move (%.2f < %.2f)", empireStorageBuilder.total_energy, fuel));
+    if (fleet.fuel_amount < fuel) {
+      // Not enough fuel. We won't count it as suspicious, maybe a race condition.
+      logHandler.log(
+          String.format(
+              Locale.US,
+              "  not enough fuel in the fleet (needed %.2f, have %.2f",
+              fuel, fleet.fuel_amount));
       return;
     }
 
     logHandler.log(String.format(Locale.US, "  cost=%.2f", fuel));
-    star.empire_stores.set(storageIndex, empireStorageBuilder
-        .total_energy(empireStorageBuilder.total_energy - (float) fuel)
-        .build());
+
     star.fleets.set(fleetIndex, star.fleets.get(fleetIndex).newBuilder()
         .destination_star_id(targetStar.id)
         .state(Fleet.FLEET_STATE.MOVING)
+        .fuel_amount(fleet.fuel_amount - (float) fuel)
         .state_start_time(System.currentTimeMillis())
         .eta(System.currentTimeMillis() + (long)(timeInHours * HOURS_MS))
         .build());

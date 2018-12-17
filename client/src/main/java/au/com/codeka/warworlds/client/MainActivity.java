@@ -10,7 +10,6 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
 
 import au.com.codeka.warworlds.client.ctrl.DebugView;
 import au.com.codeka.warworlds.client.ctrl.drawer.DrawerController;
@@ -22,13 +21,10 @@ import au.com.codeka.warworlds.client.game.welcome.WelcomeScreen;
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.client.ui.ScreenStack;
 import au.com.codeka.warworlds.client.util.GameSettings;
-import au.com.codeka.warworlds.common.Log;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MainActivity extends AppCompatActivity {
-  private static final Log log = new Log("MainActivity");
-
   // Will be non-null between of onCreate/onDestroy.
   @Nullable private StarfieldManager starfieldManager;
 
@@ -104,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
       getSupportActionBar().hide();
     }
 
-    log.info("setting margin size: %d", marginSize);
     ((FrameLayout.LayoutParams) fragmentContainer.getLayoutParams()).topMargin = marginSize;
   }
 

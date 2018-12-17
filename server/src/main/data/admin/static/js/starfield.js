@@ -88,7 +88,7 @@ $(function() {
     var VISIBLE_FIELDS = {
       "COLONIZE": ["empire_id", "planet_index"],
       "ADJUST_FOCUS": [/*"empire_id", "colony_id", "focus"*/],
-      "CREATE_FLEET": ["empire_id", "design_kind", "count"],
+      "CREATE_FLEET": ["empire_id", "design_type", "count"],
       "ADD_BUILD_REQUEST": ["empire_id", "colony_id", "design_type", "count"],
       "CREATE_BUILDING": ["empire_id", "colony_id", "design_type"],
       "SPLIT_FLEET": ["empire_id", "fleet_id", "count"],

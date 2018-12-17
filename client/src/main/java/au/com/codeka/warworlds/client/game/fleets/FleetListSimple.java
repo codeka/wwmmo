@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -82,6 +83,18 @@ public class FleetListSimple extends LinearLayout {
     ImageView icon = view.findViewById(R.id.fleet_icon);
     TextView row1 = view.findViewById(R.id.fleet_row1);
     TextView row2 = view.findViewById(R.id.fleet_row2);
+    ProgressBar fuelLevel = view.findViewById(R.id.fuel_level);
+
+
+    int maxFuel = (int) (design.fuel_size * fleet.num_ships);
+    int fuelAmount = fleet.fuel_amount == null ? 0 : (int) (float) fleet.fuel_amount;
+    if (maxFuel == fuelAmount) {
+      fuelLevel.setVisibility(View.GONE);
+    } else {
+      fuelLevel.setVisibility(View.VISIBLE);
+      fuelLevel.setMax(maxFuel);
+      fuelLevel.setProgress(fuelAmount);
+    }
 
     BuildViewHelper.setDesignIcon(design, icon);
 

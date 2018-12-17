@@ -140,6 +140,7 @@
               <img data-empireid="<%= fleets[i].empire_id %>" width="16" height="16" />
               <b><span data-empireid="<%= fleets[i].empire_id %>">...</span></b>
               <%= design.display_name %> x <%= fleets[i].num_ships %>
+              Fuel: <%= fleets[i].fuel_amount %> / <%= design.fuel_size * fleets[i].num_ships %>
             </div>
             <div>
               <%= fleets[i].state %> <% if (fleets[i].state == "MOVING") { %>
