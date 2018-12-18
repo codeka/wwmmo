@@ -78,8 +78,8 @@ public class DesignDefinitions {
           .effect(Lists.newArrayList(
               new Design.Effect.Builder().type(Design.EffectType.SCOUT_SHIP).build(),
               new Design.Effect.Builder().type(Design.EffectType.FIGHTER_SHIP).build()))
-          .fuel_cost_per_px(0.2f)
-          .fuel_size(10)
+          .fuel_cost_per_px(0.02f)
+          .fuel_size(100)
           .image_url("scout.png")
           .speed_px_per_hour(4096.0f)
           .upgrades(Lists.newArrayList(
