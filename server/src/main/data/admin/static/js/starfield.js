@@ -384,6 +384,9 @@ $(function() {
         if (!shown) {
           showStar(null);
         }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error(textStatus + " " + errorThrown);
       }
     });
   }

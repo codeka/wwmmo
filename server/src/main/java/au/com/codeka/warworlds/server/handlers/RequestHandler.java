@@ -163,9 +163,17 @@ public class RequestHandler {
       PrintWriter writer = response.getWriter();
       Gson gson = new GsonBuilder()
           .registerTypeAdapterFactory(new WireTypeAdapterFactory())
+          .serializeSpecialFloatingPointValues()
           .disableHtmlEscaping()
           .create();
-      writer.write(gson.toJson(pb));
+      String json = gson.toJson(pb);
+      // serializeSpecialFloatingPointValues() will insert literal "Infinity" "-Infinity" and "NaN"
+      // which is not valid JSON. We'll replace those with nulls in a kind-naive way.
+      json = json
+          .replaceAll(":Infinity", ":null")
+          .replaceAll(":-Infinity", ":null")
+          .replaceAll(":NaN", ":null");
+      writer.write(json);
       writer.flush();
     } catch (IOException e) {
       // Ignore.
