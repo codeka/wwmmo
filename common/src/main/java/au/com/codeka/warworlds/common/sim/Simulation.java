@@ -33,6 +33,11 @@ public class Simulation {
 
   private static final boolean sDebug = false;
 
+  /**
+   * A small floating-point value, if you have fewer ships than this, then you basically have none.
+   */
+  private static final double EPSILON = 0.1;
+
   /** Step time is 10 minutes. */
   public static final long STEP_TIME = 10 * Time.MINUTE;
 
@@ -273,6 +278,25 @@ public class Simulation {
         }
       }
 
+      // Some sanity checks.
+      if (Float.isNaN(storage.total_energy) || Float.isInfinite(storage.total_energy)) {
+        storage.total_energy = 0.0f;
+      }
+      if (Float.isNaN(storage.total_goods) || Float.isInfinite(storage.total_goods)) {
+        storage.total_goods = 0.0f;
+      }
+      if (Float.isNaN(storage.total_minerals) || Float.isInfinite(storage.total_minerals)) {
+        storage.total_minerals = 0.0f;
+      }
+
+      if (Float.isNaN(colony.focus.construction) || Float.isInfinite(colony.focus.construction) ||
+          Float.isNaN(colony.focus.farming) || Float.isInfinite(colony.focus.farming) ||
+          Float.isNaN(colony.focus.mining) || Float.isInfinite(colony.focus.mining) ||
+          Float.isNaN(colony.focus.energy) || Float.isInfinite(colony.focus.energy)) {
+        colony.focus(colony.focus.newBuilder()
+            .construction(0.25f).energy(0.25f).farming(0.25f).mining(0.25f).build());
+      }
+
       log("--- Colony [planetIndex=%d] [population=%.2f]", i, colony.population);
 
       // Calculate the output from farming this turn and add it to the star global
@@ -353,6 +377,10 @@ public class Simulation {
         ArrayList<BuildRequest> completeBuildRequests = new ArrayList<>();
         for (int j = 0; j < colony.build_requests.size(); j++) {
           BuildRequest.Builder br = colony.build_requests.get(j).newBuilder();
+          // Sanity check.
+          if (Float.isNaN(br.progress)) {
+            br.progress(0.0f);
+          }
           Design design = DesignHelper.getDesign(br.design_type);
 
           long startTime = br.start_time;
@@ -714,7 +742,7 @@ public class Simulation {
           continue;
         }
 
-        if (fleet.num_ships <= damage) {
+        if (damage - fleet.num_ships <= EPSILON) {
           log("      Fleet=%d destroyed (num_ships=%.4f <= damage=%.4f).",
               fleet.id, fleet.num_ships, damage);
           star.fleets.set(i, fleet.newBuilder()
@@ -727,8 +755,8 @@ public class Simulation {
           if (fleet.stance == Fleet.FLEET_STANCE.PASSIVE) {
             state = fleet.state;
           }
-          log("      Fleet=%d numShips=%.4f state=%s.",
-              fleet.id, fleet.num_ships - (float) (double) damage, state);
+          log("      Fleet=%d numShips=%.8f damage=%.8f state=%s.",
+              fleet.id, fleet.num_ships, damage, state);
           star.fleets.set(i, fleet.newBuilder()
               .num_ships(fleet.num_ships - (float) (double) damage)
               .state(state)

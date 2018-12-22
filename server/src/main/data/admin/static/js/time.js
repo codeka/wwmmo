@@ -70,7 +70,7 @@ var time = {
       var now = new Date();
       var diff = dt.getTime() - now.getTime();
 
-      if ($(this).hasClass("timer") && diff < (24 * 60 * 60 * 1000)) {
+      if ($(this).hasClass("timer") && diff > 0 && diff < (24 * 60 * 60 * 1000)) {
         var diffHours = parseInt(diff / (60 * 60 * 1000));
         var str = "";
         if (diffHours > 0) {

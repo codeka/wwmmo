@@ -91,19 +91,7 @@ public class StarSimulatorQueue {
           long startTime = System.nanoTime();
           WatchableObject<Star> watchableStar = StarManager.i.getStar(star.id);
           try {
-            StarManager.i.modifyStar(watchableStar, Lists.newArrayList(),
-                new Simulation.LogHandler() {
-                  private String starName;
-                  @Override
-                  public void setStarName(String starName) {
-                    this.starName = starName;
-                  }
-
-                  @Override
-                  public void log(String message) {
-                    log.info("[%s] %s", starName, message);
-                  }
-                });
+            StarManager.i.modifyStar(watchableStar, Lists.newArrayList(), null /* logHandler */);
           } catch (SuspiciousModificationException e) {
             // Shouldn't ever happen, as we're passing an empty list of modifications.
             log.warning("Unexpected suspicious modification.", e);
