@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.server.store;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -113,6 +114,26 @@ public class StarsStore extends BaseStore {
       log.error("Unexpected.", e);
     }
     return null;
+  }
+
+  /**
+   * Fetches all stars that are queued for simulation, in order. {@link #nextStarForSimulate()} will
+   * just return the first one.
+   */
+  public ArrayList<Star> fetchSimulationQueue(int count) {
+    try (
+        QueryResult res = newReader()
+            .stmt("SELECT star FROM stars WHERE next_simulation IS NOT NULL ORDER BY next_simulation ASC")
+            .query()) {
+      ArrayList<Star> stars = new ArrayList<>();
+      while (res.next() && stars.size() < count) {
+        stars.add(processStar(Star.ADAPTER.decode(res.getBytes(0))));
+      }
+      return stars;
+    } catch (Exception e) {
+      log.error("Unexpected.", e);
+    }
+    return new ArrayList<>();
   }
 
   public ArrayList<Star> getStarsForSector(long sectorX, long sectorY) {

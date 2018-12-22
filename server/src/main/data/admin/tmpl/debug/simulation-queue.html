@@ -1,0 +1,23 @@
+{% extends "skeleton.html" %}
+{% block "title" %}Build queue{% end %}
+{% block "head" %}
+<link rel="stylesheet" href="/admin/css/star.css">
+<script type="text/javascript" src="/admin/js/tmpl.js"></script>
+<script type="text/javascript" src="/admin/js/time.js"></script>
+{% end %}
+{% block "content" %}
+<h1>Simulation queue</h1>
+<table>
+  <tr>
+    <th>Star</th>
+    <th>Simulation time</th>
+  </tr>
+  {% for star in stars %}
+  <tr>
+    <td>{% include "inc/star_name.html" %}</td>
+    <td><time timestamp="{{ star.next_simulation }}" class="timer"></time></td>
+  </tr>
+  {% end %}
+</table>
+
+{% end %}
