@@ -186,8 +186,15 @@ public class Player {
             otherEmpireId));
         return;
       }
-    }
 
+      if (modification.full_fuel != null && modification.full_fuel) {
+        // Clients shouldn't be trying to create fleets at all, but they should also not be trying
+        // fill them with fuel. That's suspicious.
+        SuspiciousEventManager.i.addSuspiciousEvent(new SuspiciousModificationException(
+            pkt.star_id, modification, "Modification tried to set full_fuel to true."));
+        return;
+      }
+    }
 
     try {
       StarManager.i.modifyStar(star, pkt.modification, null /* logHandler */);

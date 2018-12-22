@@ -97,24 +97,28 @@ public class EmpireManager {
               .empire_id(id)
               .design_type(Design.DesignType.COLONY_SHIP)
               .count(3) // note: one is destroyed by COLONIZE below
+              .full_fuel(true)
               .build(),
           new StarModification.Builder()
               .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
               .empire_id(id)
               .design_type(Design.DesignType.FIGHTER)
               .count(50)
+              .full_fuel(true)
               .build(),
           new StarModification.Builder()
               .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
               .empire_id(id)
               .design_type(Design.DesignType.TROOP_CARRIER)
               .count(200)
+              .full_fuel(true)
               .build(),
           new StarModification.Builder()
               .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
               .empire_id(id)
               .design_type(Design.DesignType.SCOUT)
               .count(10)
+              .full_fuel(true)
               .build(),
           new StarModification.Builder()
               .empire_id(id)

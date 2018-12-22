@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
+import sun.security.krb5.internal.crypto.Des;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -182,8 +183,14 @@ public class StarModifier {
           if (Math.ceil(fleet.num_ships) == 1.0f) {
             star.fleets.remove(i);
           } else {
+            // Make sure we don't have too much fuel.
+            Design design = DesignHelper.getDesign(fleet.design_type);
+            float maxFuelAmount = design.fuel_size * (fleet.num_ships - 1);
+            float fuelAmount = Math.max(fleet.fuel_amount, maxFuelAmount);
+
             star.fleets.set(i, fleet.newBuilder()
                 .num_ships(fleet.num_ships - 1)
+                .fuel_amount(fuelAmount)
                 .build());
           }
           found = true;
@@ -264,6 +271,17 @@ public class StarModifier {
       }
     }
 
+    float fuelAmount = 0.0f;
+    Design design =
+        DesignHelper.getDesign(
+            modification.fleet == null
+                ? modification.design_type
+                : modification.fleet.design_type);
+    if (modification.full_fuel != null && modification.full_fuel) {
+      float numShips = modification.fleet == null ? modification.count : modification.fleet.num_ships;
+      fuelAmount = design.fuel_size * numShips;
+    }
+
     // Now add the fleet itself.
     logHandler.log(String.format(Locale.US, "- creating fleet (%s) numAttacking=%d",
         attack ? "attacking" : "not attacking",
@@ -273,7 +291,7 @@ public class StarModifier {
           .id(identifierGenerator.nextIdentifier())
           .state(attack ? Fleet.FLEET_STATE.ATTACKING : Fleet.FLEET_STATE.IDLE)
           .state_start_time(System.currentTimeMillis())
-          .fuel_amount(0.0f) // Will be updated when we simulate anyway
+          .fuel_amount(fuelAmount)
           .destination_star_id(null)
           .eta(null)
           .build());
@@ -284,7 +302,7 @@ public class StarModifier {
           .empire_id(modification.empire_id)
           .id(identifierGenerator.nextIdentifier())
           .num_ships((float) modification.count)
-          .fuel_amount(0.0f) // Will be updated when we simulate anyway
+          .fuel_amount(fuelAmount)
           .stance(Fleet.FLEET_STANCE.AGGRESSIVE)
           .state(attack ? Fleet.FLEET_STATE.ATTACKING : Fleet.FLEET_STATE.IDLE)
           .state_start_time(System.currentTimeMillis())

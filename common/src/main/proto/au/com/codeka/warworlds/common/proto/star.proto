@@ -251,4 +251,8 @@ message StarModification {
   optional int64 star_id = 9;
   optional Fleet fleet = 10;
   repeated int64 additional_fleet_ids = 11;
+
+  // If true, the fleet that's created will have a full fuel tank. This is ignored in modifications
+  // requests sent from the client.
+  optional bool full_fuel = 14;
 }

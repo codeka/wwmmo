@@ -104,6 +104,7 @@ public class Server {
   }
 
   private void login(@Nonnull String cookie) {
+    log.info("Fetching firebase instance ID...");
     App.i.getTaskRunner().runTask(FirebaseInstanceId.getInstance().getInstanceId())
       .then((InstanceIdResult instanceIdResult) -> {
         log.info("Logging in: %s", ServerUrl.getUrl("/login"));
@@ -175,8 +176,10 @@ public class Server {
       synchronized (lock) {
         this.waitingForHello = null;
       }
-      for (Runnable r : waitingForHello) {
-        r.run();
+      if (waitingForHello != null) {
+        for (Runnable r : waitingForHello) {
+          r.run();
+        }
       }
     } catch (IOException e) {
       gameSocket = null;
