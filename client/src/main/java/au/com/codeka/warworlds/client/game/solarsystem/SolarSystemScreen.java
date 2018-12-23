@@ -4,9 +4,11 @@ import android.view.ViewGroup;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.build.BuildScreen;
 import au.com.codeka.warworlds.client.game.fleets.FleetsScreen;
 import au.com.codeka.warworlds.client.game.starsearch.StarRecentHistoryManager;
+import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.SharedViews;
@@ -26,6 +28,7 @@ public class SolarSystemScreen extends Screen {
   private SolarSystemLayout layout;
   private Star star;
   private int planetIndex;
+  private boolean isCreated;
 
   public SolarSystemScreen(Star star, int planetIndex) {
     this.star = star;
@@ -35,10 +38,12 @@ public class SolarSystemScreen extends Screen {
   @Override
   public void onCreate(ScreenContext context, ViewGroup container) {
     super.onCreate(context, container);
+    isCreated = true;
     this.context = context;
 
     layout = new SolarSystemLayout(context.getActivity(), layoutCallbacks, star, planetIndex);
 
+    App.i.getTaskRunner().runTask(this::doRefresh, Threads.BACKGROUND, 100);
     App.i.getEventBus().register(eventHandler);
   }
 
@@ -50,6 +55,7 @@ public class SolarSystemScreen extends Screen {
 
   @Override
   public void onDestroy() {
+    isCreated = false;
     App.i.getEventBus().unregister(eventHandler);
   }
 
@@ -66,6 +72,18 @@ public class SolarSystemScreen extends Screen {
       }
     }
   };
+
+  /**
+   * Called on a background thread, we'll simulate the star so that it gets update with correct
+   * energy, minerals, etc. We'll schedule it to run every 5 seconds we're on this screen.
+   */
+  private void doRefresh() {
+    StarManager.i.simulateStarSync(star);
+
+    if (isCreated) {
+      App.i.getTaskRunner().runTask(this::doRefresh, Threads.BACKGROUND, 5000);
+    }
+  }
 
   private final SolarSystemLayout.Callbacks layoutCallbacks = new SolarSystemLayout.Callbacks() {
     @Override

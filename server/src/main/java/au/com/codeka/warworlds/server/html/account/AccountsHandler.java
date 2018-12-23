@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.html.account;
 
+import java.util.List;
+
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Account;
 import au.com.codeka.warworlds.common.proto.Empire;
@@ -34,12 +36,25 @@ public class AccountsHandler extends ProtobufRequestHandler {
     NameValidator.NameStatus nameStatus = NameValidator.validate(
         req.empire_name,
         Configuration.i.getLimits().getMaxEmpireNameLength());
-    if (!nameStatus.isValid) {
+    if (!nameStatus.isValid || nameStatus.name == null) {
       writeProtobuf(
           new NewAccountResponse.Builder()
               .message(nameStatus.errorMsg)
               .build());
       return;
+    }
+
+    List<WatchableObject<Empire>> existingEmpires = EmpireManager.i.search(nameStatus.name);
+    // The parameter to search is a query, so it'll find non-exact matches, but that's all we care
+    // about, so we'll have to check manually.
+    for (WatchableObject<Empire> existingEmpire : existingEmpires) {
+      if (existingEmpire.get().display_name.compareToIgnoreCase(nameStatus.name) == 0) {
+        writeProtobuf(
+            new NewAccountResponse.Builder()
+                .message("An empire with that name already exists.")
+                .build());
+        return;
+      }
     }
 
     // Generate a cookie for the user to authenticate with in the future.
@@ -67,5 +82,4 @@ public class AccountsHandler extends ProtobufRequestHandler {
             .cookie(cookie)
             .build());
   }
-
 }

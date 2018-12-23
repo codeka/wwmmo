@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.server.proto.PatreonInfo;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
+import au.com.codeka.warworlds.server.store.base.StoreReader;
 
 /** Storage for empires. */
 public class EmpiresStore extends BaseStore {
@@ -39,20 +40,26 @@ public class EmpiresStore extends BaseStore {
     return null;
   }
 
-  public List<Empire> search() {
-    ArrayList<Empire> empires = new ArrayList<>();
-    try (
-        QueryResult res = newReader()
-            .stmt("SELECT empire FROM empires")
-            .query()
-        ) {
+  public List<Long> search(@Nullable String query) {
+    ArrayList<Long> empireIds = new ArrayList<>();
+
+    StoreReader reader = newReader();
+    if (query == null) {
+      reader.stmt("SELECT id FROM empires");
+    } else {
+      reader
+          .stmt("SELECT id FROM empires WHERE empire_name LIKE ?")
+          .param(0, query + "%");
+    }
+
+    try (QueryResult res = reader.query()) {
       while (res.next()) {
-        empires.add(Empire.ADAPTER.decode(res.getBytes(0)));
+        empireIds.add(res.getLong(0));
       }
     } catch (Exception e) {
       log.error("Unexpected.", e);
     }
-    return empires;
+    return empireIds;
   }
 
   public void put(long id, Empire empire) {

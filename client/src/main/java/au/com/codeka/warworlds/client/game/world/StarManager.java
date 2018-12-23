@@ -77,13 +77,20 @@ public class StarManager {
   public void queueSimulateStar(Star star) {
     // Something more scalable that just queuing them all to the background threadpool...
     App.i.getTaskRunner().runTask(() -> {
-      Star.Builder starBuilder = star.newBuilder();
-      new Simulation().simulate(starBuilder);
-
-      // No need to save the star, it's just a simulation, but publish it to the event bus so
-      // clients can see it.
-      App.i.getEventBus().publish(starBuilder.build());
+      simulateStarSync(star);
     }, Threads.BACKGROUND);
+  }
+
+  /**
+   * Simulate the star on the current thread.
+   */
+  public void simulateStarSync(Star star) {
+    Star.Builder starBuilder = star.newBuilder();
+    new Simulation().simulate(starBuilder);
+
+    // No need to save the star, it's just a simulation, but publish it to the event bus so
+    // clients can see it.
+    App.i.getEventBus().publish(starBuilder.build());
   }
 
   public void updateStar(final Star star, final StarModification.Builder modificationBuilder) {

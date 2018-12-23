@@ -4,7 +4,9 @@ import com.github.jasminb.jsonapi.JSONAPIDocument;
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -50,6 +52,18 @@ public class EmpireManager {
       }
       return watchableEmpire;
     }
+  }
+
+  /**
+   * Searches the database for empires matching the given query string.
+   */
+  public List<WatchableObject<Empire>> search(String query) {
+    List<Long> empireIds = DataStore.i.empires().search(query);
+    List<WatchableObject<Empire>> empires = new ArrayList<>();
+    for (Long id : empireIds) {
+      empires.add(getEmpire(id));
+    }
+    return empires;
   }
 
   /**
