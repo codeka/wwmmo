@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.server.store;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -11,7 +13,6 @@ import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.server.proto.PatreonInfo;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
-import com.patreon.PatreonOAuth;
 
 /** Storage for empires. */
 public class EmpiresStore extends BaseStore {
@@ -57,9 +58,10 @@ public class EmpiresStore extends BaseStore {
   public void put(long id, Empire empire) {
     try {
       newWriter()
-          .stmt("INSERT OR REPLACE INTO empires (id, empire) VALUES (?, ?)")
+          .stmt("INSERT OR REPLACE INTO empires (id, empire, empire_name) VALUES (?, ?, ?)")
           .param(0, id)
           .param(1, empire.encode())
+          .param(2, empire.display_name)
           .execute();
     } catch (StoreException e) {
       log.error("Unexpected.", e);
@@ -164,6 +166,49 @@ public class EmpiresStore extends BaseStore {
                   "  token_expiry_time INTEGER," +
                   "  patreon_info BLOB)")
           .execute();
+      diskVersion++;
+    }
+    if (diskVersion == 3) {
+      newWriter()
+          .stmt(
+              "ALTER TABLE empires ADD COLUMN empire_name STRING")
+          .execute();
+      newWriter()
+          .stmt("CREATE UNIQUE INDEX IX_empires_empire_name ON empires (empire_name)")
+          .execute();
+
+      // Update the empires, make sure their names are unique as we go.
+      QueryResult res = newReader()
+          .stmt("SELECT empire FROM empires")
+          .query();
+      ArrayList<Empire> empires = new ArrayList<>();
+      while (res.next()) {
+        try {
+          empires.add(Empire.ADAPTER.decode(res.getBytes(0)));
+        } catch (IOException e) {
+          throw new StoreException(e);
+        }
+      }
+
+      HashSet<String> seenNames = new HashSet<>();
+      for (Empire empire : empires) {
+        if (empire.display_name.trim().equals("")) {
+          empire = empire.newBuilder().display_name("~").build();
+        }
+
+        while (seenNames.contains(empire.display_name)) {
+          empire = empire.newBuilder().display_name(empire.display_name + "~").build();
+        }
+        seenNames.add(empire.display_name);
+
+        newWriter()
+            .stmt("UPDATE empires SET empire_name=?, empire=? WHERE id=?")
+            .param(0, empire.display_name)
+            .param(1, empire.encode())
+            .param(2, empire.id)
+            .execute();
+      }
+
       diskVersion++;
     }
 

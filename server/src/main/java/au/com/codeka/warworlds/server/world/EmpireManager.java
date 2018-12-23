@@ -1,12 +1,10 @@
 package au.com.codeka.warworlds.server.world;
 
-import au.com.codeka.warworlds.server.handlers.RequestException;
 import com.github.jasminb.jsonapi.JSONAPIDocument;
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -23,7 +21,6 @@ import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder;
 import com.patreon.PatreonAPI;
-import com.patreon.PatreonOAuth;
 import com.patreon.resources.Pledge;
 import com.patreon.resources.User;
 
@@ -87,6 +84,11 @@ public class EmpireManager {
     long id = DataStore.i.seq().nextIdentifier();
 
     WatchableObject<Star> star = StarManager.i.getStar(newStarFinder.getStar().id);
+    if (star == null) {
+      // Shouldn't happen, NewStarFinder should actually find a star.
+      log.error("Unknown star?");
+      return null;
+    }
     try {
       StarManager.i.modifyStar(star, Lists.newArrayList(
           new StarModification.Builder()

@@ -23,5 +23,11 @@
     "clientId": null,
     "clientSecret": null,
     "redirectUri": null
+  },
+
+  // Configuration on limits of things.
+  "limits": {
+    // Maximum length of an empire name we allow.
+    "maxEmpireNameLength": 40
   }
 }

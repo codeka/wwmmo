@@ -35,6 +35,7 @@ public class Configuration {
   @Expose private SmtpConfig smtp;
   @Expose private JsonElement firebase;
   @Expose private PatreonConfig patreon;
+  @Expose private LimitsConfig limits;
 
   @Nullable
   private GoogleCredentials firebaseCredentials;
@@ -70,6 +71,10 @@ public class Configuration {
 
   public PatreonConfig getPatreon() {
     return patreon;
+  }
+
+  public LimitsConfig getLimits() {
+    return limits;
   }
 
   public GoogleCredentials getFirebaseCredentials() {
@@ -144,6 +149,14 @@ public class Configuration {
 
     public String getRedirectUri() {
       return redirectUri;
+    }
+  }
+
+  public static class LimitsConfig {
+    @Expose private int maxEmpireNameLength;
+
+    public int getMaxEmpireNameLength() {
+      return maxEmpireNameLength;
     }
   }
 }
