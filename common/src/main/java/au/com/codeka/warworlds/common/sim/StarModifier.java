@@ -331,6 +331,7 @@ public class StarModifier {
           String.format(Locale.US, "- creating building, colony_id=%d", modification.colony_id));
       Colony.Builder colony = planet.colony.newBuilder();
       colony.buildings.add(new Building.Builder()
+          .id(identifierGenerator.nextIdentifier())
           .design_type(modification.design_type)
           .level(1)
           .build());
