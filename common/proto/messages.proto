@@ -1182,6 +1182,7 @@ message CashAuditRecord {
     CreateAlliance = 3;
     AllianceDeposit = 4; // deposited into alliance bank
     AllianceWithdraw = 5; // withdrawn from alliance bank
+    ColonyDestroyed = 6; // -neg means my colony destroyed, +ve means I destroyed a colony.
   }
   optional Reason reason = 3;
 
@@ -1204,6 +1205,9 @@ message CashAuditRecord {
 
   // these will be filled out for the "CreateAlliance" operation
   optional string alliance_name = 15;
+
+  // these will be filled out for the ColonyDestroyed operation (along with star_id).
+  optional int32 colony_id = 17;
 }
 
 

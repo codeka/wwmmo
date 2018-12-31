@@ -91038,6 +91038,23 @@ public final class Messages {
      */
     com.google.protobuf.ByteString
         getAllianceNameBytes();
+
+    /**
+     * <pre>
+     * these will be filled out for the ColonyDestroyed operation (along with star_id).
+     * </pre>
+     *
+     * <code>optional int32 colony_id = 17;</code>
+     */
+    boolean hasColonyId();
+    /**
+     * <pre>
+     * these will be filled out for the ColonyDestroyed operation (along with star_id).
+     * </pre>
+     *
+     * <code>optional int32 colony_id = 17;</code>
+     */
+    int getColonyId();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.CashAuditRecord}
@@ -91067,6 +91084,7 @@ public final class Messages {
       buildCount_ = 0;
       accelerateAmount_ = 0F;
       allianceName_ = "";
+      colonyId_ = 0;
     }
 
     @java.lang.Override
@@ -91187,6 +91205,11 @@ public final class Messages {
               time_ = input.readInt64();
               break;
             }
+            case 136: {
+              bitField0_ |= 0x00010000;
+              colonyId_ = input.readInt32();
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -91248,6 +91271,14 @@ public final class Messages {
        * <code>AllianceWithdraw = 5;</code>
        */
       AllianceWithdraw(5),
+      /**
+       * <pre>
+       * -neg means my colony destroyed, +ve means I destroyed a colony.
+       * </pre>
+       *
+       * <code>ColonyDestroyed = 6;</code>
+       */
+      ColonyDestroyed(6),
       ;
 
       /**
@@ -91282,6 +91313,14 @@ public final class Messages {
        * <code>AllianceWithdraw = 5;</code>
        */
       public static final int AllianceWithdraw_VALUE = 5;
+      /**
+       * <pre>
+       * -neg means my colony destroyed, +ve means I destroyed a colony.
+       * </pre>
+       *
+       * <code>ColonyDestroyed = 6;</code>
+       */
+      public static final int ColonyDestroyed_VALUE = 6;
 
 
       public final int getNumber() {
@@ -91304,6 +91343,7 @@ public final class Messages {
           case 3: return CreateAlliance;
           case 4: return AllianceDeposit;
           case 5: return AllianceWithdraw;
+          case 6: return ColonyDestroyed;
           default: return null;
         }
       }
@@ -91735,6 +91775,29 @@ public final class Messages {
       }
     }
 
+    public static final int COLONY_ID_FIELD_NUMBER = 17;
+    private int colonyId_;
+    /**
+     * <pre>
+     * these will be filled out for the ColonyDestroyed operation (along with star_id).
+     * </pre>
+     *
+     * <code>optional int32 colony_id = 17;</code>
+     */
+    public boolean hasColonyId() {
+      return ((bitField0_ & 0x00010000) == 0x00010000);
+    }
+    /**
+     * <pre>
+     * these will be filled out for the ColonyDestroyed operation (along with star_id).
+     * </pre>
+     *
+     * <code>optional int32 colony_id = 17;</code>
+     */
+    public int getColonyId() {
+      return colonyId_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -91794,6 +91857,9 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeInt64(16, time_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        output.writeInt32(17, colonyId_);
       }
       unknownFields.writeTo(output);
     }
@@ -91862,6 +91928,10 @@ public final class Messages {
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(16, time_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(17, colonyId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -91969,6 +92039,11 @@ public final class Messages {
         result = result && getAllianceName()
             .equals(other.getAllianceName());
       }
+      result = result && (hasColonyId() == other.hasColonyId());
+      if (hasColonyId()) {
+        result = result && (getColonyId()
+            == other.getColonyId());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -92049,6 +92124,10 @@ public final class Messages {
       if (hasAllianceName()) {
         hash = (37 * hash) + ALLIANCE_NAME_FIELD_NUMBER;
         hash = (53 * hash) + getAllianceName().hashCode();
+      }
+      if (hasColonyId()) {
+        hash = (37 * hash) + COLONY_ID_FIELD_NUMBER;
+        hash = (53 * hash) + getColonyId();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -92211,6 +92290,8 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00004000);
         allianceName_ = "";
         bitField0_ = (bitField0_ & ~0x00008000);
+        colonyId_ = 0;
+        bitField0_ = (bitField0_ & ~0x00010000);
         return this;
       }
 
@@ -92299,6 +92380,10 @@ public final class Messages {
           to_bitField0_ |= 0x00008000;
         }
         result.allianceName_ = allianceName_;
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+          to_bitField0_ |= 0x00010000;
+        }
+        result.colonyId_ = colonyId_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -92396,6 +92481,9 @@ public final class Messages {
           bitField0_ |= 0x00008000;
           allianceName_ = other.allianceName_;
           onChanged();
+        }
+        if (other.hasColonyId()) {
+          setColonyId(other.getColonyId());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -93177,6 +93265,54 @@ public final class Messages {
   }
   bitField0_ |= 0x00008000;
         allianceName_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int colonyId_ ;
+      /**
+       * <pre>
+       * these will be filled out for the ColonyDestroyed operation (along with star_id).
+       * </pre>
+       *
+       * <code>optional int32 colony_id = 17;</code>
+       */
+      public boolean hasColonyId() {
+        return ((bitField0_ & 0x00010000) == 0x00010000);
+      }
+      /**
+       * <pre>
+       * these will be filled out for the ColonyDestroyed operation (along with star_id).
+       * </pre>
+       *
+       * <code>optional int32 colony_id = 17;</code>
+       */
+      public int getColonyId() {
+        return colonyId_;
+      }
+      /**
+       * <pre>
+       * these will be filled out for the ColonyDestroyed operation (along with star_id).
+       * </pre>
+       *
+       * <code>optional int32 colony_id = 17;</code>
+       */
+      public Builder setColonyId(int value) {
+        bitField0_ |= 0x00010000;
+        colonyId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * these will be filled out for the ColonyDestroyed operation (along with star_id).
+       * </pre>
+       *
+       * <code>optional int32 colony_id = 17;</code>
+       */
+      public Builder clearColonyId() {
+        bitField0_ = (bitField0_ & ~0x00010000);
+        colonyId_ = 0;
         onChanged();
         return this;
       }
@@ -107335,7 +107471,7 @@ public final class Messages {
       "key\030\001 \001(\t\"m\n\020SituationReports\022I\n\021situati" +
       "on_reports\030\001 \003(\0132..au.com.codeka.common." +
       "protobuf.SituationReport\022\016\n\006cursor\030\002 \001(\t" +
-      "\"\216\004\n\017CashAuditRecord\022\n\n\002id\030\001 \001(\005\022\021\n\tempi" +
+      "\"\266\004\n\017CashAuditRecord\022\n\n\002id\030\001 \001(\005\022\021\n\tempi" +
       "re_id\030\002 \001(\005\022E\n\006reason\030\003 \001(\01625.au.com.cod" +
       "eka.common.protobuf.CashAuditRecord.Reas" +
       "on\022\023\n\013before_cash\030\004 \001(\002\022\022\n\nafter_cash\030\005 " +
@@ -107344,13 +107480,14 @@ public final class Messages {
       "\017\n\007star_id\030\t \001(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n\rm" +
       "ove_distance\030\013 \001(\002\022\027\n\017build_design_id\030\014 " +
       "\001(\t\022\023\n\013build_count\030\r \001(\005\022\031\n\021accelerate_a" +
-      "mount\030\016 \001(\002\022\025\n\ralliance_name\030\017 \001(\t\"\204\001\n\006R" +
-      "eason\022\r\n\tFleetMove\020\000\022\023\n\017BuildAccelerate\020" +
-      "\001\022\027\n\023CollectFromColonies\020\002\022\022\n\016CreateAlli" +
-      "ance\020\003\022\023\n\017AllianceDeposit\020\004\022\024\n\020AllianceW" +
-      "ithdraw\020\005\"S\n\020CashAuditRecords\022?\n\007records" +
-      "\030\001 \003(\0132..au.com.codeka.common.protobuf.C" +
-      "ashAuditRecord\"\271\002\n\010Alliance\022\013\n\003key\030\001 \001(\t",
+      "mount\030\016 \001(\002\022\025\n\ralliance_name\030\017 \001(\t\022\021\n\tco" +
+      "lony_id\030\021 \001(\005\"\231\001\n\006Reason\022\r\n\tFleetMove\020\000\022" +
+      "\023\n\017BuildAccelerate\020\001\022\027\n\023CollectFromColon" +
+      "ies\020\002\022\022\n\016CreateAlliance\020\003\022\023\n\017AllianceDep" +
+      "osit\020\004\022\024\n\020AllianceWithdraw\020\005\022\023\n\017ColonyDe" +
+      "stroyed\020\006\"S\n\020CashAuditRecords\022?\n\007records" +
+      "\030\001 \003(\0132..au.com.codeka.common.protobuf.C",
+      "ashAuditRecord\"\271\002\n\010Alliance\022\013\n\003key\030\001 \001(\t" +
       "\022\014\n\004name\030\002 \001(\t\022\024\n\014time_created\030\003 \001(\003\022\032\n\022" +
       "creator_empire_key\030\004 \001(\t\022\024\n\014bank_balance" +
       "\030\007 \001(\001\022\023\n\013num_members\030\005 \001(\005\022>\n\007members\030\006" +
@@ -107359,8 +107496,8 @@ public final class Messages {
       "\034\n\024num_pending_requests\030\t \001(\005\022\023\n\013total_s" +
       "tars\030\n \001(\003\022\021\n\tis_active\030\013 \001(\010\022\023\n\013descrip" +
       "tion\030\014 \001(\t\"G\n\tAlliances\022:\n\talliances\030\001 \003" +
-      "(\0132\'.au.com.codeka.common.protobuf.Allia" +
-      "nce\"\317\001\n\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022\n\ne",
+      "(\0132\'.au.com.codeka.common.protobuf.Allia",
+      "nce\"\317\001\n\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022\n\ne" +
       "mpire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n" +
       "\013time_joined\030\004 \001(\003\022@\n\004rank\030\005 \001(\01622.au.co" +
       "m.codeka.common.protobuf.AllianceMember." +
@@ -107369,8 +107506,8 @@ public final class Messages {
       "\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\031\n\021request_em" +
       "pire_id\030\003 \001(\005\022\024\n\014request_date\030\004 \001(\003\022P\n\014r" +
       "equest_type\030\005 \001(\0162:.au.com.codeka.common" +
-      ".protobuf.AllianceRequest.RequestType\022\017\n" +
-      "\007message\030\006 \001(\t\022J\n\005state\030\007 \001(\0162;.au.com.c",
+      ".protobuf.AllianceRequest.RequestType\022\017\n",
+      "\007message\030\006 \001(\t\022J\n\005state\030\007 \001(\0162;.au.com.c" +
       "odeka.common.protobuf.AllianceRequest.Re" +
       "questState\022\021\n\tnum_votes\030\010 \001(\005\022\030\n\020target_" +
       "empire_id\030\t \001(\005\022\016\n\006amount\030\n \001(\002\022\021\n\tpng_i" +
@@ -107379,8 +107516,8 @@ public final class Messages {
       "nceRequestVote\022\027\n\017new_description\030\016 \001(\t\"" +
       "\214\001\n\013RequestType\022\010\n\004JOIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004" +
       "KICK\020\002\022\020\n\014DEPOSIT_CASH\020\003\022\021\n\rWITHDRAW_CAS" +
-      "H\020\004\022\020\n\014CHANGE_IMAGE\020\005\022\017\n\013CHANGE_NAME\020\006\022\026" +
-      "\n\022CHANGE_DESCRIPTION\020\007\"F\n\014RequestState\022\013",
+      "H\020\004\022\020\n\014CHANGE_IMAGE\020\005\022\017\n\013CHANGE_NAME\020\006\022\026",
+      "\n\022CHANGE_DESCRIPTION\020\007\"F\n\014RequestState\022\013" +
       "\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002\022" +
       "\r\n\tWITHDRAWN\020\003\"d\n\020AllianceRequests\022@\n\010re" +
       "quests\030\001 \003(\0132..au.com.codeka.common.prot" +
@@ -107389,8 +107526,8 @@ public final class Messages {
       "ance_id\030\002 \001(\005\022\033\n\023alliance_request_id\030\003 \001" +
       "(\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004" +
       "date\030\006 \001(\003\"\243\003\n\013ErrorReport\022\027\n\017android_ve" +
-      "rsion\030\001 \001(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014pack" +
-      "age_name\030\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013s",
+      "rsion\030\001 \001(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014pack",
+      "age_name\030\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013s" +
       "tack_trace\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013rep" +
       "ort_time\030\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007con" +
       "text\030\t \001(\t\022\027\n\017exception_class\030\n \001(\t\022\021\n\th" +
@@ -107399,8 +107536,8 @@ public final class Messages {
       "\003\022\033\n\023foreground_run_time\030\017 \001(\003\022\022\n\nlog_ou" +
       "tput\030\020 \001(\t\022\031\n\021server_request_qs\030\021 \001(\t\022!\n" +
       "\031server_request_user_agent\030\022 \001(\t\"K\n\014Erro" +
-      "rReports\022;\n\007reports\030\001 \003(\0132*.au.com.codek" +
-      "a.common.protobuf.ErrorReport*\344\001\n\025Situat",
+      "rReports\022;\n\007reports\030\001 \003(\0132*.au.com.codek",
+      "a.common.protobuf.ErrorReport*\344\001\n\025Situat" +
       "ionReportFilter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComp" +
       "lete\020\001\022\024\n\020BuildCompleteAny\020\002\022\021\n\rFleetAtt" +
       "acked\020\003\022\022\n\016FleetDestroyed\020\004\022\023\n\017FleetVict" +
@@ -107875,7 +108012,7 @@ public final class Messages {
     internal_static_au_com_codeka_common_protobuf_CashAuditRecord_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_au_com_codeka_common_protobuf_CashAuditRecord_descriptor,
-        new java.lang.String[] { "Id", "EmpireId", "Reason", "BeforeCash", "AfterCash", "Time", "FleetId", "FleetDesignId", "NumShips", "StarId", "StarName", "MoveDistance", "BuildDesignId", "BuildCount", "AccelerateAmount", "AllianceName", });
+        new java.lang.String[] { "Id", "EmpireId", "Reason", "BeforeCash", "AfterCash", "Time", "FleetId", "FleetDesignId", "NumShips", "StarId", "StarName", "MoveDistance", "BuildDesignId", "BuildCount", "AccelerateAmount", "AllianceName", "ColonyId", });
     internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor =
       getDescriptor().getMessageTypes().get(59);
     internal_static_au_com_codeka_common_protobuf_CashAuditRecords_fieldAccessorTable = new

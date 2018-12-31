@@ -27,7 +27,7 @@ public abstract class BaseDesignManager {
 
     /** Call this to parse the design file. */
     public void parseDesigns() {
-        mDesigns = new TreeMap<DesignKind, SortedMap<String, Design>>();
+        mDesigns = new TreeMap<>();
         for (DesignKind designKind : DesignKind.values()) {
             Document xmldoc;
             try {

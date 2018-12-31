@@ -145,6 +145,10 @@ public class MyEmpire extends Empire {
             star.fromProtocolBuffer(pb);
             StarManager.i.refreshStar(star.getID());
 
+            // Refresh my own empire, because we'll have a bunch more cash (assuming we successfully
+            // destroyed them, of course).
+            EmpireManager.i.refreshEmpire();
+
             if (callback != null) {
               callback.onComplete();
             }
