@@ -54,7 +54,7 @@ public class EnemyPlanetActivity extends BaseActivity {
     View rootView = findViewById(android.R.id.content);
     ActivityBackgroundGenerator.setBackground(rootView);
 
-    Button attackBtn = (Button) findViewById(R.id.attack_btn);
+    Button attackBtn = findViewById(R.id.attack_btn);
     attackBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -130,7 +130,7 @@ public class EnemyPlanetActivity extends BaseActivity {
       }
     }
 
-    final Button attackBtn = (Button) findViewById(R.id.attack_btn);
+    final Button attackBtn = findViewById(R.id.attack_btn);
     if (colony != null) {
       colonyEmpire = EmpireManager.i.getEmpire(colony.getEmpireID());
       if (colonyEmpire == null) {
@@ -142,14 +142,14 @@ public class EnemyPlanetActivity extends BaseActivity {
       attackBtn.setVisibility(View.GONE);
     }
 
-    PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
+    PlanetDetailsView planetDetails = findViewById(R.id.planet_details);
     planetDetails.setup(star, planet, colony);
   }
 
   private void refreshEmpireDetails() {
-    ImageView enemyIcon = (ImageView) findViewById(R.id.enemy_empire_icon);
-    TextView enemyName = (TextView) findViewById(R.id.enemy_empire_name);
-    TextView enemyDefence = (TextView) findViewById(R.id.enemy_empire_defence);
+    ImageView enemyIcon = findViewById(R.id.enemy_empire_icon);
+    TextView enemyName = findViewById(R.id.enemy_empire_name);
+    TextView enemyDefence = findViewById(R.id.enemy_empire_defence);
 
     int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
     if (defence < 1) {
