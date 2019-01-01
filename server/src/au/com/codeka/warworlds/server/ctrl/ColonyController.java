@@ -6,6 +6,8 @@ import java.util.Locale;
 
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
@@ -104,16 +106,21 @@ public class ColonyController {
           "Colony destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
           remainingPopulation, remainingShips));
       EmpireController empireController = new EmpireController();
-      Empire empire = empireController.getEmpire(colony.getEmpireID());
+      Empire empire = null;
+      if (colony.getEmpireID() != null) {
+        empire = empireController.getEmpire(colony.getEmpireID());
+      }
 
       // Transfer the cash that results from this to the attacker.
       double cashTransferred = getAttackCashValue(empire, colony);
       log.info(String.format(Locale.US, " - transferring cash: %.2f", cashTransferred));
-      empireController.adjustBalance(colony.getEmpireID(), (float) -cashTransferred,
-          Messages.CashAuditRecord.newBuilder()
-              .setEmpireId(colony.getEmpireID())
-              .setColonyId(colony.getID())
-              .setReason(Messages.CashAuditRecord.Reason.ColonyDestroyed));
+      if (colony.getEmpireID() != null) {
+        empireController.adjustBalance(colony.getEmpireID(), (float) -cashTransferred,
+            Messages.CashAuditRecord.newBuilder()
+                .setEmpireId(colony.getEmpireID())
+                .setColonyId(colony.getID())
+                .setReason(Messages.CashAuditRecord.Reason.ColonyDestroyed));
+      }
       empireController.adjustBalance(empireID, (float) cashTransferred,
           Messages.CashAuditRecord.newBuilder()
               .setEmpireId(empireID)
@@ -193,9 +200,13 @@ public class ColonyController {
    *    <dd><code>cash</code> / <code>total_colonies</code></dd>
    * </dl>
    */
-  public double getAttackCashValue(Empire empire, Colony colony) throws RequestException {
+  public double getAttackCashValue(@Nullable Empire empire, Colony colony) throws RequestException {
     boolean isHq = false;
     boolean hasHqElsewhere = false;
+
+    if (empire == null) {
+      return 10000.0;
+    }
 
     for (BaseBuilding baseBuilding : colony.getBuildings()) {
       if (baseBuilding.getDesignID().equals("hq")) {

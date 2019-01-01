@@ -468,7 +468,7 @@ public class EmpireController {
       }
       try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
         stmt.setString(1, validatedName);
-        stmt.setDouble(2, 2000.0);
+        stmt.setDouble(2, 50000.0);
         stmt.setInt(3, ((Star) empire.getHomeStar()).getID());
         stmt.setString(4, empire.getEmailAddr());
         if (empire.getKey() != null && empire.getID() != 0) {
