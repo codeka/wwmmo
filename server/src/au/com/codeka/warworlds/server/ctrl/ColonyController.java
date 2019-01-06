@@ -88,7 +88,8 @@ public class ColonyController {
     }
 
     float remainingShips = totalTroopCarriers - colonyDefence;
-    float remainingPopulation = colony.getPopulation() - (totalTroopCarriers * 4.0f / colony.getDefenceBoost());
+    float remainingPopulation = colony.getPopulation()
+        - (totalTroopCarriers * 4.0f / colony.getDefenceBoost());
 
     Messages.SituationReport.Builder sitrep_pb = null;
     if (colony.getEmpireID() != null) {
@@ -110,6 +111,9 @@ public class ColonyController {
       if (colony.getEmpireID() != null) {
         empire = empireController.getEmpire(colony.getEmpireID());
       }
+
+      // Record the colony in the stats for the destroyer.
+      new BattleRankController().recordColonyDestroyed(empireID, colony.getPopulation());
 
       // Transfer the cash that results from this to the attacker.
       double cashTransferred = getAttackCashValue(empire, colony);
@@ -149,16 +153,19 @@ public class ColonyController {
       // star is reset
       boolean anotherColonyExists = false;
       for (BaseColony baseColony : star.getColonies()) {
-        if (baseColony.getEmpireKey() != null && baseColony.getEmpireKey().equals(colony.getEmpireKey())) {
+        if (baseColony.getEmpireKey() != null &
+            baseColony.getEmpireKey().equals(colony.getEmpireKey())) {
           anotherColonyExists = true;
         }
       }
-      if (!anotherColonyExists && new EmpireController().getEmpire(empireID).getHomeStarID() == star.getID()) {
+      if (!anotherColonyExists &&
+          new EmpireController().getEmpire(empireID).getHomeStarID() == star.getID()) {
         new EmpireController().findNewHomeStar(empireID);
       }
 
       if (sitrep_pb != null) {
-        Messages.SituationReport.ColonyDestroyedRecord.Builder colony_destroyed_pb = Messages.SituationReport.ColonyDestroyedRecord.newBuilder();
+        Messages.SituationReport.ColonyDestroyedRecord.Builder colony_destroyed_pb =
+            Messages.SituationReport.ColonyDestroyedRecord.newBuilder();
         colony_destroyed_pb.setColonyKey(colony.getKey());
         colony_destroyed_pb.setEnemyEmpireKey(Integer.toString(empireID));
         sitrep_pb.setColonyDestroyedRecord(colony_destroyed_pb);
@@ -172,7 +179,8 @@ public class ColonyController {
       }
 
       if (sitrep_pb != null) {
-        Messages.SituationReport.ColonyAttackedRecord.Builder colony_attacked_pb = Messages.SituationReport.ColonyAttackedRecord.newBuilder();
+        Messages.SituationReport.ColonyAttackedRecord.Builder colony_attacked_pb =
+            Messages.SituationReport.ColonyAttackedRecord.newBuilder();
         colony_attacked_pb.setColonyKey(colony.getKey());
         colony_attacked_pb.setEnemyEmpireKey(Integer.toString(empireID));
         colony_attacked_pb.setNumShips(totalTroopCarriers);
@@ -255,7 +263,8 @@ public class ColonyController {
     }
   }
 
-  public Colony colonize(Empire empire, Star star, int planetIndex, float population) throws RequestException {
+  public Colony colonize(
+      Empire empire, Star star, int planetIndex, float population) throws RequestException {
     Colony colony = null;
 
     // add the initial colony and fleets to the star

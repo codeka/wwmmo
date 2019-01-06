@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
+import java.util.Locale;
 import java.util.Random;
 import java.util.regex.Matcher;
 
@@ -167,15 +168,16 @@ public class RequestHandler {
 
   /**
    * Sets the required headers so that the client will know this response can be cached for the
-   * given number of hours. The default response includes no caching headers.
+   * given number of hours. The default response includes caching headers to indicate no caching
+   * allowed at all.
    *
-   * @param hours
+   * @param hours The number of hours this response can be cached for.
    * @param etag An optional value to include in the ETag header. This can be any string at all,
    *             and we will hash and base-64 encode it for you.
    */
   protected void setCacheTime(float hours, @Nullable String etag) {
-    response.setHeader("Cache-Control", String.format("private, max-age=%d",
-        (int)(hours * 3600)));
+    response.setHeader("Cache-Control",
+        String.format(Locale.US, "private, max-age=%d", (int)(hours * 3600)));
     if (etag != null) {
       etag = BaseEncoding.base64().encode(
           Hashing.sha1().hashString(etag, Charset.defaultCharset()).asBytes());

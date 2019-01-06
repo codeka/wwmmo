@@ -3,6 +3,8 @@ package au.com.codeka.warworlds.server;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
+import java.util.Locale;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.server.ctrl.StarController;
@@ -19,11 +21,9 @@ public class StarSimulatorThread {
   private boolean stopped;
   private final StarSimulatorThreadManager manager;
 
-  private static int WAIT_TIME_NO_STARS = 10 * 60 * 1000; // 10 minutes, after
-                                                          // no stars found
+  private static int WAIT_TIME_NO_STARS = 10 * 60 * 1000; // 10 minutes, after no stars found
   private static int WAIT_TIME_ERROR = 60 * 1000; // 1 minute, in case of error
-  private static int WAIT_TIME_NORMAL = 0; // don't wait if there's more stars
-                                           // to simulate
+  private static int WAIT_TIME_NORMAL = 0; // don't wait if there's more stars to simulate
 
   public StarSimulatorThread(StarSimulatorThreadManager manager) {
     this.manager = manager;
@@ -34,12 +34,7 @@ public class StarSimulatorThread {
       stop();
     }
 
-    thread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        threadproc();
-      }
-    });
+    thread = new Thread(this::threadproc);
     thread.setDaemon(true);
     thread.setName("Star-Simulator");
     thread.setPriority(Thread.NORM_PRIORITY - 1);
@@ -77,8 +72,10 @@ public class StarSimulatorThread {
         if (waitTimeMs > WAIT_TIME_ERROR) {
           waitTimeMs = WAIT_TIME_ERROR;
         }
-        log.info(String
-            .format("Waiting %d seconds before simulating next star.", waitTimeMs / 1000));
+        log.info(String.format(
+            Locale.US,
+            "Waiting %d seconds before simulating next star.",
+            waitTimeMs / 1000));
         try {
           Thread.sleep(waitTimeMs);
         } catch (InterruptedException e) {
@@ -115,7 +112,7 @@ public class StarSimulatorThread {
       new StarController().update(star, false);
 
       long endTime = System.currentTimeMillis();
-      log.info(String.format(
+      log.info(String.format(Locale.US,
           "Simulated star (%d colonies, %d fleets) in %dms (%dms in DB): \"%s\" [%d]", star
               .getColonies().size(), star.getFleets().size(), endTime - startTime, endTime
               - simulateEndTime, star.getName(), star.getID()));

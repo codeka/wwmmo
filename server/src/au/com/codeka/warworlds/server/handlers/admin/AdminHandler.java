@@ -20,10 +20,9 @@ public class AdminHandler extends RenderingHandler {
   @Override
   public void onBeforeHandle() {
     if (!(this instanceof AdminLoginHandler)) {
-      // if we're not the Login handler and we're not yet authed, auth now
+      // If we're not the Login handler and we're not yet authed, auth now.
       if (getSessionNoError() == null || !getSessionNoError().isAdmin()) {
-        // if they're not authenticated yet, we'll have to redirect them to the
-        // authentication
+        // If they're not authenticated yet, we'll have to redirect them to the authentication
         // page first.
         authenticate();
         return;

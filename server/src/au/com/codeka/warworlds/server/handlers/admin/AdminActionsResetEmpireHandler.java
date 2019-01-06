@@ -15,7 +15,7 @@ public class AdminActionsResetEmpireHandler extends AdminGenericHandler {
         int empireID = Integer.parseInt(getRequest().getParameter("empire_id"));
         String reason = getRequest().getParameter("reason");
 
-        TreeMap<String, Object> data = new TreeMap<String, Object>();
+        TreeMap<String, Object> data = new TreeMap<>();
         data.put("complete", true);
 
         try {
