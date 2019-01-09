@@ -113,7 +113,7 @@ public class ColonyController {
       }
 
       // Record the colony in the stats for the destroyer.
-      
+
       new BattleRankController().recordColonyDestroyed(empireID, colony.getPopulation());
 
       // Transfer the cash that results from this to the attacker.
@@ -154,7 +154,7 @@ public class ColonyController {
       // star is reset
       boolean anotherColonyExists = false;
       for (BaseColony baseColony : star.getColonies()) {
-        if (baseColony.getEmpireKey() != null &
+        if (baseColony.getEmpireKey() != null && colony.getEmpireKey() != null &&
             baseColony.getEmpireKey().equals(colony.getEmpireKey())) {
           anotherColonyExists = true;
         }
