@@ -86,6 +86,7 @@ public class BattleRankController {
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setLong(1, battleRank.empireID);
         stmt.setInt(2, battleRank.day);
+        stmt.update();
       }
 
       sql = "INSERT INTO empire_battle_ranks (" +
