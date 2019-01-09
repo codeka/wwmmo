@@ -41,7 +41,7 @@ public class BuildCompleteEvent extends Event {
     String sql = "SELECT" +
         " id, star_id, colony_id, empire_id, existing_building_id, existing_fleet_id, upgrade_id," +
         " design_kind, design_id, count, notes, disable_notification " +
-        "FROM build_requests" +
+        "FROM build_requests " +
         "WHERE end_time < ?" +
         " AND processing = 0" +
         "LIMIT 10";
