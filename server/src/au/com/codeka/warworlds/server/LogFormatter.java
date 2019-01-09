@@ -2,25 +2,48 @@ package au.com.codeka.warworlds.server;
 
 import java.util.Locale;
 import java.util.logging.Formatter;
+import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
+import java.util.regex.Pattern;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.google.common.base.Throwables;
 
+import javax.annotation.Nullable;
+
 /**
  * SimpleFormatter is supposed to take a format string, but I couldn't get it work. Doing our
  * own custom class lets us do some extra stuff, too.
  */
 public class LogFormatter extends Formatter {
-  private final DateTimeFormatter mDateTimeFormatter = DateTimeFormat.forPattern(
+  private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern(
       "yyyy-MM-dd HH:mm:ss");
 
+  @Nullable
+  private final Pattern tagFilterPattern;
+
+  public LogFormatter() {
+    System.out.println(getClass().getName() + ".filter");
+    String filter =
+        LogManager.getLogManager().getProperty(getClass().getName() + ".filter");
+    System.out.println("filter: " + filter);
+    if (filter != null && !filter.isEmpty()) {
+      tagFilterPattern = Pattern.compile(filter);
+    } else {
+      tagFilterPattern = null;
+    }
+  }
+
   public String format(LogRecord record) {
+    if (tagFilterPattern != null && !tagFilterPattern.matcher(record.getLoggerName()).matches()) {
+      return null;
+    }
+
     StringBuilder sb = new StringBuilder();
 
-    mDateTimeFormatter.printTo(sb, record.getMillis());
+    DATE_TIME_FORMATTER.printTo(sb, record.getMillis());
     sb.append(" ");
     sb.append(record.getLevel().toString());
     sb.append(" ");

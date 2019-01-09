@@ -23,7 +23,7 @@ adb reverse tcp:8081 tcp:8081
 pushd %RUNPATH%
 SET DEFAULT_JVM_OPTS=
 SET JAVA_OPTS=
-SET SERVER_OPTS=
+SET SERVER_OPTS=-Dorg.eclipse.jetty.LEVEL=NONE
 SET SERVER_OPTS=-Dau.com.codeka.warworlds.server.ConfigFile=%INSTALLPATH%\data\config-debug.json
 SET SERVER_OPTS=%SERVER_OPTS% -Djava.util.logging.config.file=%INSTALLPATH%\logging-debug.properties
 CALL %INSTALLPATH%\bin\server.bat %*

@@ -125,11 +125,9 @@ public class FleetDestroyedEvent extends Event {
           // of the report, and then assume the victorious fleet killed everything. It's not perfect
           // but it's probably close enough.
           double numShips = 0;
-          for (CombatReport.FleetSummary fleetSummary : rounds.get(0).getFleets()) {
-            for (BaseFleet baseFleet : fleetSummary.getFleets()) {
-              if (baseFleet.getKey().equals(fleet.getKey())) {
-                numShips += fleetSummary.getNumShips() / fleetSummary.getFleets().size();
-              }
+          for (CombatReport.FleetAttackRecord attack : rounds.get(0).getFleetAttackRecords()) {
+            if (!attack.getTarget().getEmpireKey().equals(fleet.getKey())) {
+              numShips += attack.getDamage();
             }
           }
           new BattleRankController().recordFleetDestroyed(
