@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.server.handlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import au.com.codeka.common.Log;
@@ -30,9 +31,7 @@ public class EmpiresSearchHandler extends RequestHandler {
 
     str = getRequest().getParameter("name");
     if (str != null) {
-      for (Empire empire : ctrl.getEmpiresByName(str, 25)) {
-        empires.add(empire);
-      }
+      empires.addAll(ctrl.getEmpiresByName(str, 25));
     }
 
     str = getRequest().getParameter("ids");
@@ -43,9 +42,7 @@ public class EmpiresSearchHandler extends RequestHandler {
         ids[i] = Integer.parseInt(parts[i]);
       }
 
-      for (Empire empire : ctrl.getEmpires(ids)) {
-        empires.add(empire);
-      }
+      empires.addAll(ctrl.getEmpires(ids));
     }
 
     str = getRequest().getParameter("minRank");
@@ -63,13 +60,10 @@ public class EmpiresSearchHandler extends RequestHandler {
         maxRank = minRank + 5;
       }
 
-      for (Empire empire : ctrl.getEmpiresByRank(minRank, maxRank)) {
-        empires.add(empire);
-      }
-      if (minRank > 3) {
-        for (Empire empire : ctrl.getEmpiresByRank(1, 3)) {
-          empires.add(empire);
-        }
+      str = getRequest().getParameter("noLeader");
+      empires.addAll(ctrl.getEmpiresByRank(minRank, maxRank));
+      if (minRank > 3 && (str == null || !str.equals("1"))) {
+        empires.addAll(ctrl.getEmpiresByRank(1, 3));
       }
     }
 
@@ -115,10 +109,11 @@ public class EmpiresSearchHandler extends RequestHandler {
       }
       Double taxRate = taxRates.get(empire.getID());
       if (taxRate != null) {
-        log.debug(String.format("Setting tax for empire %d to %f", empire.getID(), taxRate));
+        log.debug(
+            String.format(Locale.US, "Setting tax for empire %d to %f", empire.getID(), taxRate));
         empire_pb.setTaxesCollectedPerHour(taxRate);
       } else {
-        log.debug(String.format("No tax for empire %d", empire.getID()));
+        log.debug(String.format(Locale.US, "No tax for empire %d", empire.getID()));
       }
       pb.addEmpires(empire_pb);
       etag.append(":");

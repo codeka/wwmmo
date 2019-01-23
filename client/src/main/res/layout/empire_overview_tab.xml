@@ -75,7 +75,7 @@
         android:layout_alignParentRight="true"
         android:text="Search" />
 
-    <au.com.codeka.warworlds.ctrl.EmpireRankList
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/empire_rankings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

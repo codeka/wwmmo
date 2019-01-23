@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import au.com.codeka.warworlds.ctrl.EmpireRankList;
@@ -29,12 +28,12 @@ public class BlitzResetActivity extends BaseActivity {
         View rootView = findViewById(android.R.id.content);
         ActivityBackgroundGenerator.setBackground(rootView);
 
-        mEmpireList = (EmpireRankList) findViewById(R.id.empire_rankings);
-        final ProgressBar progress = (ProgressBar) findViewById(R.id.progress_bar);
+        mEmpireList = findViewById(R.id.empire_rankings);
+        final ProgressBar progress = findViewById(R.id.progress_bar);
         progress.setVisibility(View.VISIBLE);
         mEmpireList.setVisibility(View.GONE);
 
-        Button startBtn = (Button) findViewById(R.id.start_btn);
+        Button startBtn = findViewById(R.id.start_btn);
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

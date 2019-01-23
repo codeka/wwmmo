@@ -166,6 +166,7 @@ public class EmpireManager {
       final SearchCompleteHandler handler) {
     Uri uri = Uri.parse("empires/search")
         .buildUpon()
+        .appendQueryParameter("noLeader", "1")
         .appendQueryParameter("minRank", Integer.toString(minRank))
         .appendQueryParameter("maxRank", Integer.toString(maxRank))
         .build();

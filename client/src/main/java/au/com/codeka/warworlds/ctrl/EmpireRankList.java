@@ -35,8 +35,8 @@ import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
 public class EmpireRankList extends ListView {
-  private RankListAdapter mRankListAdapter;
-  private Context mContext;
+  private RankListAdapter rankListAdapter;
+  private Context context;
 
   public EmpireRankList(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -44,9 +44,9 @@ public class EmpireRankList extends ListView {
       return;
     }
 
-    mContext = context;
-    mRankListAdapter = new RankListAdapter();
-    setAdapter(mRankListAdapter);
+    this.context = context;
+    rankListAdapter = new RankListAdapter();
+    setAdapter(rankListAdapter);
   }
 
   @Override
@@ -70,16 +70,16 @@ public class EmpireRankList extends ListView {
   }
 
   public void setEmpires(List<Empire> empires, boolean addGaps) {
-    mRankListAdapter.setEmpires(empires, addGaps);
+    rankListAdapter.setEmpires(empires, addGaps);
   }
 
   public void setEmpireRanks(List<EmpireRank> ranks) {
-    mRankListAdapter.setEmpireRanks(ranks, true);
+    rankListAdapter.setEmpireRanks(ranks, true);
   }
 
   public Empire getEmpireAt(int position) {
     RankListAdapter.ItemEntry entry =
-        (RankListAdapter.ItemEntry) mRankListAdapter.getItem(position);
+        (RankListAdapter.ItemEntry) rankListAdapter.getItem(position);
     if (entry != null) {
       return entry.getEmpire();
     }
@@ -89,12 +89,12 @@ public class EmpireRankList extends ListView {
   private Object mEventHandler = new Object() {
     @EventHandler
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
-      mRankListAdapter.notifyDataSetChanged();
+      rankListAdapter.notifyDataSetChanged();
     }
 
     @EventHandler
     public void onEmpireUpdated(Empire empire) {
-      mRankListAdapter.onEmpireUpdated(empire);
+      rankListAdapter.onEmpireUpdated(empire);
     }
   };
 
@@ -234,27 +234,27 @@ public class EmpireRankList extends ListView {
       View view = convertView;
 
       if (view == null) {
-        view = View.inflate(mContext, R.layout.empire_rank_list_ctrl_row, null);
+        view = View.inflate(context, R.layout.empire_rank_list_ctrl_row, null);
       }
 
-      TextView rankView = (TextView) view.findViewById(R.id.rank);
-      ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
-      TextView empireName = (TextView) view.findViewById(R.id.empire_name);
-      TextView lastSeen = (TextView) view.findViewById(R.id.last_seen);
-      TextView totalPopulation = (TextView) view.findViewById(R.id.total_population);
-      TextView totalStars = (TextView) view.findViewById(R.id.total_stars);
-      TextView totalColonies = (TextView) view.findViewById(R.id.total_colonies);
-      TextView totalShips = (TextView) view.findViewById(R.id.total_ships);
-      TextView totalBuildings = (TextView) view.findViewById(R.id.total_buildings);
-      TextView allianceName = (TextView) view.findViewById(R.id.alliance_name);
-      ImageView allianceIcon = (ImageView) view.findViewById(R.id.alliance_icon);
+      TextView rankView = view.findViewById(R.id.rank);
+      ImageView empireIcon = view.findViewById(R.id.empire_icon);
+      TextView empireName = view.findViewById(R.id.empire_name);
+      TextView lastSeen = view.findViewById(R.id.last_seen);
+      TextView totalPopulation = view.findViewById(R.id.total_population);
+      TextView totalStars = view.findViewById(R.id.total_stars);
+      TextView totalColonies = view.findViewById(R.id.total_colonies);
+      TextView totalShips = view.findViewById(R.id.total_ships);
+      TextView totalBuildings = view.findViewById(R.id.total_buildings);
+      TextView allianceName = view.findViewById(R.id.alliance_name);
+      ImageView allianceIcon = view.findViewById(R.id.alliance_icon);
 
       Empire empire = entry.getEmpire();
       EmpireRank rank = entry.getRank();
 
       if (empire != null) {
         empireName.setText(empire.getDisplayName());
-        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
+        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
         if (empire.getLastSeen() == null) {
           lastSeen.setText(Html.fromHtml("Last seen: <i>never</i>"));
         } else {
@@ -265,7 +265,7 @@ public class EmpireRankList extends ListView {
         Alliance alliance = (Alliance) empire.getAlliance();
         if (alliance != null) {
           allianceName.setText(alliance.getName());
-          allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(mContext, alliance));
+          allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(context, alliance));
           allianceName.setVisibility(View.VISIBLE);
           allianceIcon.setVisibility(View.VISIBLE);
         } else {
