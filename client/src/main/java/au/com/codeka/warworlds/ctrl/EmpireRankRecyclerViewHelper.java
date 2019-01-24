@@ -16,6 +16,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import au.com.codeka.common.TimeFormatter;
@@ -66,6 +67,10 @@ public class EmpireRankRecyclerViewHelper {
     recyclerView.setVisibility(View.GONE);
     recyclerView.setAdapter(adapter);
 
+    DividerItemDecoration dividerItemDecoration =
+        new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
+    recyclerView.addItemDecoration(dividerItemDecoration);
+
     callbacks.fetchRows(0, 30, rowsFetchCallback);
   }
 
@@ -86,7 +91,6 @@ public class EmpireRankRecyclerViewHelper {
   public void setEmpires(@Nullable List<Empire> empires) {
     adapter.setEmpires(empires);
   }
-
   public class EmpireAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private LayoutInflater layoutInflater;
     private List<Empire> empires;
@@ -166,7 +170,8 @@ public class EmpireRankRecyclerViewHelper {
   }
 
   private class EmpireViewHolder extends RecyclerView.ViewHolder {
-    //a reference to the View
+    private Empire empire;
+
     private View itemView;
     private TextView rankView;
     private ImageView empireIcon;
@@ -195,9 +200,19 @@ public class EmpireRankRecyclerViewHelper {
       totalBuildings = itemView.findViewById(R.id.total_buildings);
       allianceName = itemView.findViewById(R.id.alliance_name);
       allianceIcon = itemView.findViewById(R.id.alliance_icon);
+
+      view.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          if (empire != null) {
+            callbacks.onEmpireClick(empire);
+          }
+        }
+      });
     }
 
     public void setEmpire(Empire empire){
+      this.empire = empire;
       EmpireRank rank = (EmpireRank) empire.getRank();
 
       empireName.setText(empire.getDisplayName());
