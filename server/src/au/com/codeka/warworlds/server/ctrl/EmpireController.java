@@ -634,7 +634,8 @@ public class EmpireController {
           " SUM(population_destroyed) AS population_destroyed," +
           " SUM(colonies_destroyed) AS colonies_destroyed " +
           "FROM beta.empire_battle_ranks " +
-          "WHERE day >= ? GROUP BY empire_id";
+          "WHERE day >= ? GROUP BY empire_id " +
+          "ORDER BY colonies_destroyed DESC, ships_destroyed DESC";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, day);
         SqlResult res = stmt.select();
