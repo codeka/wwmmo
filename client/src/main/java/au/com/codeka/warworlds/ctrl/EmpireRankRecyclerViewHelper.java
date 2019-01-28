@@ -24,6 +24,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireBattleRank;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireRank;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -36,6 +37,7 @@ import au.com.codeka.warworlds.model.MyEmpire;
 public class EmpireRankRecyclerViewHelper {
   public interface RowsFetchCallback {
     void onRowsFetched(List<Empire> empires);
+    void onBattleRankRowsFetched(List<EmpireBattleRank> ranks);
   }
 
   public interface Callbacks {
@@ -82,6 +84,14 @@ public class EmpireRankRecyclerViewHelper {
         recyclerView.setVisibility(View.VISIBLE);
       }
     }
+
+    @Override
+    public void onBattleRankRowsFetched(List<EmpireBattleRank> ranks) {
+      adapter.addBattleRanks(ranks);
+      if (recyclerView.getVisibility() == View.GONE) {
+        recyclerView.setVisibility(View.VISIBLE);
+      }
+    }
   };
 
   /**
@@ -91,9 +101,20 @@ public class EmpireRankRecyclerViewHelper {
   public void setEmpires(@Nullable List<Empire> empires) {
     adapter.setEmpires(empires);
   }
+
+  /**
+   * Clear out all existing state and refresh from scratch.
+   */
+  public void refresh() {
+    adapter.empires.clear();
+    adapter.battleRanks.clear();
+    callbacks.fetchRows(0, 30, rowsFetchCallback);
+  }
+
   public class EmpireAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private LayoutInflater layoutInflater;
     private List<Empire> empires;
+    private List<EmpireBattleRank> battleRanks;
     private int firstRank;
     private boolean includeLoadingPlaceholder;
 
@@ -101,15 +122,24 @@ public class EmpireRankRecyclerViewHelper {
       layoutInflater = LayoutInflater.from(recyclerView.getContext());
       includeLoadingPlaceholder = true;
       this.empires = new ArrayList<>();
+      this.battleRanks = new ArrayList<>();
     }
 
     public void setEmpires(List<Empire> empires) {
+      this.battleRanks.clear();
       this.empires = empires;
       sortEmpires();
       notifyDataSetChanged();
     }
 
+    public void addBattleRanks(List<EmpireBattleRank> battleRanks) {
+      this.empires.clear();
+      this.battleRanks.addAll(battleRanks);
+      notifyDataSetChanged();
+    }
+
     public void addEmpires(List<Empire> empires) {
+      this.battleRanks.clear();
       this.empires.addAll(empires);
       sortEmpires();
       notifyDataSetChanged();
@@ -132,21 +162,36 @@ public class EmpireRankRecyclerViewHelper {
 
     @Override
     public int getItemCount() {
-      return (includeLoadingPlaceholder ? 1 : 0) + empires.size();
+      int size = 0;
+      if (battleRanks.size() > 0) {
+        size = battleRanks.size();
+      } else if (empires.size() > 0) {
+        size = empires.size();
+      }
+      if (includeLoadingPlaceholder) {
+        size += 1;
+      }
+      return size;
     }
 
     @Override
     public int getItemViewType(int position) {
-      if (!includeLoadingPlaceholder || position < empires.size()) {
+      if (battleRanks.size() > 0 && position < battleRanks.size()) {
         return 0;
+      } else if (empires.size() > 0 && position < empires.size()) {
+        return 1;
+      } else {
+        return 2;
       }
-      return 1;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
       if (viewType == 0) {
+        View itemView = layoutInflater.inflate(R.layout.empire_rank_list_ctrl_row, parent, false);
+        return new BattleRankViewHolder(itemView);
+      } if (viewType == 1) {
         View itemView = layoutInflater.inflate(R.layout.empire_rank_list_ctrl_row, parent, false);
         return new EmpireViewHolder(itemView);
       } else {
@@ -161,11 +206,97 @@ public class EmpireRankRecyclerViewHelper {
       if (holder instanceof EmpireViewHolder) {
         Empire empire = empires.get(position);
         ((EmpireViewHolder) holder).setEmpire(empire);
+      } else if (holder instanceof BattleRankViewHolder) {
+        EmpireBattleRank battleRank = battleRanks.get(position);
+        ((BattleRankViewHolder) holder).setBattleRank(battleRank, position);
       } else if (holder instanceof LoadingIndicatorViewHolder) {
         // This means we're near the end, let's start loading the rest of the elements.
-        int startRank = empires.get(empires.size() - 1).getRank().getRank();
-        callbacks.fetchRows(startRank, startRank + 30, rowsFetchCallback);
+        callbacks.fetchRows(position, 30, rowsFetchCallback);
       }
+    }
+  }
+
+  private class BattleRankViewHolder extends RecyclerView.ViewHolder {
+    private EmpireBattleRank battleRank;
+
+    private View itemView;
+    private TextView rankView;
+    private ImageView empireIcon;
+    private TextView empireName;
+    private TextView lastSeen;
+    private TextView totalPopulation;
+    private TextView totalStars;
+    private TextView totalColonies;
+    private TextView totalShips;
+    private TextView totalBuildings;
+    private TextView allianceName;
+    private ImageView allianceIcon;
+
+    private BattleRankViewHolder(@NonNull View view){
+      super(view);
+      itemView = view;
+
+      rankView = itemView.findViewById(R.id.rank);
+      empireIcon = itemView.findViewById(R.id.empire_icon);
+      empireName = itemView.findViewById(R.id.empire_name);
+      lastSeen = itemView.findViewById(R.id.last_seen);
+      totalPopulation = itemView.findViewById(R.id.total_population);
+      totalStars = itemView.findViewById(R.id.total_stars);
+      totalColonies = itemView.findViewById(R.id.total_colonies);
+      totalShips = itemView.findViewById(R.id.total_ships);
+      totalBuildings = itemView.findViewById(R.id.total_buildings);
+      allianceName = itemView.findViewById(R.id.alliance_name);
+      allianceIcon = itemView.findViewById(R.id.alliance_icon);
+
+      view.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          if (battleRank != null) {
+            callbacks.onEmpireClick(battleRank.getEmpire());
+          }
+        }
+      });
+    }
+
+    public void setBattleRank(EmpireBattleRank battleRank, int position){
+      this.battleRank = battleRank;
+      Empire empire = battleRank.getEmpire();
+
+      empireName.setText(empire.getDisplayName());
+      empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(recyclerView.getContext(), empire));
+      if (empire.getLastSeen() == null) {
+        lastSeen.setText(Html.fromHtml("Last seen: <i>never</i>"));
+      } else {
+        lastSeen.setText(
+            String.format("Last seen: %s", TimeFormatter.create().format(empire.getLastSeen())));
+      }
+
+      Alliance alliance = (Alliance) empire.getAlliance();
+      if (alliance != null) {
+        allianceName.setText(alliance.getName());
+        allianceIcon.setImageBitmap(
+            AllianceShieldManager.i.getShield(recyclerView.getContext(), alliance));
+        allianceName.setVisibility(View.VISIBLE);
+        allianceIcon.setVisibility(View.VISIBLE);
+      } else {
+        allianceName.setVisibility(View.GONE);
+        allianceIcon.setVisibility(View.GONE);
+      }
+
+      DecimalFormat formatter = new DecimalFormat("#,##0");
+      rankView.setText(formatter.format(position + 1));
+      totalPopulation.setText(Html.fromHtml(
+          String.format("Ships destroyed: <b>%s</b>",
+              formatter.format(battleRank.getShipsDestroyed()))));
+      totalStars.setText(Html.fromHtml(
+          String.format("Colonies destroyed: <b>%s</b>",
+              formatter.format(battleRank.getColoniesDestroyed()))));
+      totalColonies.setText(Html.fromHtml(
+          String.format("Population destroyed: <b>%s</b>",
+              formatter.format(battleRank.getPopulationDestroyed()))));
+
+      totalShips.setText("");
+      totalBuildings.setText("");
     }
   }
 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  tools:context=".game.empire.EmpireActivity" >
+
+  <item
+    android:id="@+id/stars_rank"
+    android:title="Overall rank"
+    android:visible="true"/>
+
+  <item
+    android:id="@+id/battle_rank_7d"
+    android:title="Battle rank (last week)"
+    android:visible="true"/>
+
+  <item
+    android:id="@+id/battle_rank_14d"
+    android:title="Battle rank (14 days)"
+    android:visible="true"/>
+
+  <item
+    android:id="@+id/battle_rank_28d"
+    android:title="Battle rank (last month)"
+    android:visible="true"/>
+</menu>

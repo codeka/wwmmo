@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -21,6 +22,8 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.R;
@@ -30,6 +33,7 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireBattleRank;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -39,6 +43,7 @@ public class OverviewFragment extends BaseFragment {
   private static final Log log = new Log("OverviewFragment");
   private View rootView;
   private EmpireRankRecyclerViewHelper empireRankListHelper;
+  private int rankType = R.id.battle_rank_7d;
 
   @Override
   public void onStart() {
@@ -88,37 +93,32 @@ public class OverviewFragment extends BaseFragment {
     final ProgressBar progress = rootView.findViewById(R.id.progress_bar);
     progress.setVisibility(View.VISIBLE);
 
-    empireRankListHelper = new EmpireRankRecyclerViewHelper(recyclerView,
-        new EmpireRankRecyclerViewHelper.Callbacks() {
-      @Override
-      public void onEmpireClick(Empire empire) {
-        Intent intent = new Intent(getActivity(), EnemyEmpireActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.EmpireKey", empire.getKey());
-        Activity activity = getActivity();
-        if (activity != null) {
-          activity.startActivity(intent);
-        }
-      }
+    empireRankListHelper = new EmpireRankRecyclerViewHelper(recyclerView, rankCallbacks);
+    refresh();
 
+    rootView.findViewById(R.id.popup_menu).setOnClickListener(new View.OnClickListener() {
       @Override
-      public void fetchRows(
-          int startPosition,
-          int count,
-          final EmpireRankRecyclerViewHelper.RowsFetchCallback callback) {
-        EmpireManager.i.searchEmpiresByRank(startPosition + 1, startPosition + 1 + count,
-            new EmpireManager.SearchCompleteHandler() {
-              @Override
-              public void onSearchComplete(List<Empire> empires) {
-                callback.onRowsFetched(empires);
-                if (progress.getVisibility() == View.VISIBLE) {
-                  progress.setVisibility(View.GONE);
-                }
-              }
-            });
+      public void onClick(View view) {
+        FragmentActivity activity = getActivity();
+        if (activity == null) {
+          return;
+        }
+        PopupMenu popupMenu = new PopupMenu(activity, rootView.findViewById(R.id.popup_menu));
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+          @Override
+          public boolean onMenuItemClick(MenuItem item) {
+            // Change the rank type and then refresh.
+            rankType = item.getItemId();
+            recyclerView.setVisibility(View.GONE);
+            progress.setVisibility(View.VISIBLE);
+            empireRankListHelper.refresh();
+            return false;
+          }
+        });
+        popupMenu.inflate(R.menu.empire_rank_menu);
+        popupMenu.show();
       }
     });
-
-    refresh();
 
     TextView empireSearch = rootView.findViewById(R.id.empire_search);
     empireSearch.setOnEditorActionListener(new OnEditorActionListener() {
@@ -188,4 +188,50 @@ public class OverviewFragment extends BaseFragment {
           }
         });
   }
+
+  private final EmpireRankRecyclerViewHelper.Callbacks rankCallbacks =
+      new EmpireRankRecyclerViewHelper.Callbacks() {
+    @Override
+    public void onEmpireClick(Empire empire) {
+      Intent intent = new Intent(getActivity(), EnemyEmpireActivity.class);
+      intent.putExtra("au.com.codeka.warworlds.EmpireKey", empire.getKey());
+      Activity activity = getActivity();
+      if (activity != null) {
+        activity.startActivity(intent);
+      }
+    }
+
+    @Override
+    public void fetchRows(
+        int startPosition,
+        int count,
+        final EmpireRankRecyclerViewHelper.RowsFetchCallback callback) {
+      final ProgressBar progress = rootView.findViewById(R.id.progress_bar);
+      if (rankType == R.id.stars_rank) {
+        EmpireManager.i.searchEmpiresByRank(startPosition + 1, startPosition + 1 + count,
+            new EmpireManager.SearchCompleteHandler() {
+              @Override
+              public void onSearchComplete(List<Empire> empires) {
+                callback.onRowsFetched(empires);
+                if (progress.getVisibility() == View.VISIBLE) {
+                  progress.setVisibility(View.GONE);
+                }
+              }
+            });
+      } else {
+        int numDays =
+            (rankType == R.id.battle_rank_7d ? 7 : rankType == R.id.battle_rank_14d ? 14 : 28);
+        EmpireManager.i.getEmpireBattleRanks(startPosition, count, numDays,
+            new EmpireManager.BattleRankCompleteHandler() {
+          @Override
+          public void onComplete(List<EmpireBattleRank> battleRanks) {
+            callback.onBattleRankRowsFetched(battleRanks);
+            if (progress.getVisibility() == View.VISIBLE) {
+              progress.setVisibility(View.GONE);
+            }
+          }
+        });
+      }
+    }
+  };
 }

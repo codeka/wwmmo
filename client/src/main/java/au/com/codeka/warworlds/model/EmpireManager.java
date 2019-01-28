@@ -175,6 +175,22 @@ public class EmpireManager {
         .build());
   }
 
+  public void getEmpireBattleRanks(
+      final int offset,
+      final int count,
+      final int numDays,
+      final BattleRankCompleteHandler handler) {
+    Uri uri = Uri.parse("empires/battle-ranks")
+        .buildUpon()
+        .appendQueryParameter("offset", Integer.toString(offset))
+        .appendQueryParameter("count", Integer.toString(count))
+        .appendQueryParameter("numDays", Integer.toString(numDays))
+        .build();
+    RequestManager.i.sendRequest(new ApiRequest.Builder(uri, "GET")
+        .completeCallback(createBattleRankCompleteCallback(handler))
+        .build());
+  }
+
   public void searchEmpires(final String nameSearch, final SearchCompleteHandler handler) {
     Uri uri = Uri.parse("empires/search")
         .buildUpon()
@@ -225,6 +241,28 @@ public class EmpireManager {
     };
   }
 
+  private ApiRequest.CompleteCallback createBattleRankCompleteCallback(
+      final BattleRankCompleteHandler handler) {
+    return new ApiRequest.CompleteCallback() {
+      @Override
+      public void onRequestComplete(ApiRequest request) {
+        List<EmpireBattleRank> ranks = new ArrayList<>();
+
+        Messages.EmpireBattleRanks battleRanksPb = request.body(Messages.EmpireBattleRanks.class);
+        if (battleRanksPb == null) {
+          return;
+        }
+        for (Messages.EmpireBattleRank pb : battleRanksPb.getRanksList()) {
+          EmpireBattleRank battleRank = new EmpireBattleRank();
+          battleRank.fromProtocolBuffer(pb);
+          ranks.add(battleRank);
+        }
+
+        handler.onComplete(ranks);
+      }
+    };
+  }
+
   private final Object eventHandler = new Object() {
     @EventHandler
     public void onAllianceUpdated(Alliance alliance) {
@@ -246,6 +284,10 @@ public class EmpireManager {
   };
 
   public interface SearchCompleteHandler {
-    public void onSearchComplete(List<Empire> empires);
+    void onSearchComplete(List<Empire> empires);
+  }
+
+  public interface BattleRankCompleteHandler {
+    void onComplete(List<EmpireBattleRank> battleRanks);
   }
 }
