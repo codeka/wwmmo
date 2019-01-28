@@ -167,7 +167,7 @@ public class OverviewFragment extends BaseFragment {
   private void onEmpireSearch() {
     final TextView empireSearch = rootView.findViewById(R.id.empire_search);
     final ProgressBar progress = rootView.findViewById(R.id.progress_bar);
-    final ListView rankList = rootView.findViewById(R.id.empire_rankings);
+    final RecyclerView rankList = rootView.findViewById(R.id.empire_rankings);
 
     progress.setVisibility(View.VISIBLE);
     rankList.setVisibility(View.GONE);
