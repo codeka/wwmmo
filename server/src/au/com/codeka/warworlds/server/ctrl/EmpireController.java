@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import org.joda.time.DateTime;
 
@@ -27,6 +29,7 @@ import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.AllianceRequest;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
+import au.com.codeka.warworlds.server.model.EmpireBattleRank;
 import au.com.codeka.warworlds.server.model.EmpireStarStats;
 import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.Star;
@@ -92,6 +95,16 @@ public class EmpireController {
   public List<Empire> getEmpiresByRank(int minRank, int maxRank) throws RequestException {
     try {
       return Lists.newArrayList(db.getEmpiresByRank(minRank, maxRank));
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
+  public ArrayList<EmpireBattleRank> getEmpireBattleRanks(
+      int numDays, int offset, int count) throws RequestException {
+
+    try {
+      return db.getEmpireBattleRanks(numDays, offset, count);
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -501,6 +514,10 @@ public class EmpireController {
     }
 
     public Collection<Empire> getEmpires(int[] ids) throws Exception {
+      if (ids.length == 0) {
+        return new ArrayList<>();
+      }
+
       String sql = getSelectEmpire("empires.id IN " + buildInClause(ids), true, null);
 
       try (SqlStmt stmt = prepare(sql)) {
@@ -515,6 +532,21 @@ public class EmpireController {
         populateEmpires(empires);
         return empires.values();
       }
+    }
+
+    public Collection<Empire> getEmpires(Collection<Integer> ids) throws Exception {
+      if (ids.size() == 0) {
+        return new ArrayList<>();
+      }
+
+      int[] arrayIds = new int[ids.size()];
+      int i = 0;
+      for (Integer id : ids) {
+        arrayIds[i] = id;
+        i++;
+      }
+
+      return getEmpires(arrayIds);
     }
 
     public Map<Integer, Double> getTaxCollectedPerHour(Collection<Integer> empireIDs)
@@ -589,6 +621,46 @@ public class EmpireController {
 
         populateEmpires(empires);
         return empires.values();
+      }
+    }
+
+    public ArrayList<EmpireBattleRank> getEmpireBattleRanks(
+        int numDays, int offset, int count) throws Exception {
+      DateTime dt = new DateTime().plusDays(-numDays);
+      int day = dt.getYear() * 10000 + dt.getMonthOfYear() * 100 + dt.getDayOfMonth();
+
+      String sql = "SELECT" +
+          " empire_id, SUM(ships_destroyed) AS ships_destroyed," +
+          " SUM(population_destroyed) AS population_destroyed," +
+          " SUM(colonies_destroyed) AS colonies_destroyed " +
+          "FROM beta.empire_battle_ranks " +
+          "WHERE day >= ? GROUP BY empire_id";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, day);
+        SqlResult res = stmt.select();
+
+        Set<Integer> empireIDs = new HashSet<>();
+        ArrayList<EmpireBattleRank> result = new ArrayList<>();
+        while (res.next()) {
+          if (offset > 0) {
+            offset--;
+            continue;
+          }
+
+          EmpireBattleRank battleRank = new EmpireBattleRank(res);
+          result.add(battleRank);
+          empireIDs.add(battleRank.getEmpireID());
+          if (result.size() == count) {
+            break;
+          }
+        }
+
+        Collection<Empire> empires = getEmpires(empireIDs);
+        for (EmpireBattleRank battleRank : result) {
+          battleRank.updateEmpire(empires);
+        }
+
+        return result;
       }
     }
 

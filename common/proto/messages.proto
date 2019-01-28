@@ -94,6 +94,20 @@ message EmpireRanks {
   optional int64 date = 2;
 }
 
+// The rank of an empire based on their recent battles.
+message EmpireBattleRank {
+  optional Empire empire = 1;
+  optional int32 ships_destroyed = 2;
+  optional int32 population_destroyed = 3;
+  optional int32 colonies_destroyed = 4;
+}
+
+// A list of empire battle ranks.
+message EmpireBattleRanks {
+  repeated EmpireBattleRank ranks = 1;
+  optional int32 num_days = 2;
+}
+
 //
 // Contains details about an empire. Their "display" name, race (I guess?), display colour
 // and stuff like that.

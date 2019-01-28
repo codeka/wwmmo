@@ -38,6 +38,7 @@ public class RequestRouter extends AbstractHandler {
     sRoutes.add(new Route("chat", ChatHandler.class));
     sRoutes.add(new Route("empires/patreon", EmpiresPatreonHandler.class));
     sRoutes.add(new Route("empires/search", EmpiresSearchHandler.class));
+    sRoutes.add(new Route("empires/battle-ranks", EmpireBattleRankListHandler.class));
     sRoutes.add(new Route("empires/(?<empireid>[0-9]+)/stars", EmpiresStarsHandler.class));
     sRoutes.add(new Route("empires/(?<empireid>[0-9]+)/taxes", EmpiresTaxesHandler.class));
     sRoutes.add(new Route("empires/(?<empireid>[0-9]+)/cash-audit", EmpiresCashAuditHandler.class));
