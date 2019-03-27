@@ -104,7 +104,11 @@ public class EmpireSetupActivity extends BaseActivity {
           public void onRequestError(ApiRequest request, Messages.GenericError error) {
             pleaseWaitDialog.dismiss();
 
-            StyledDialog.showErrorMessage(context, error.getErrorMessage());
+            if (error != null) {
+              StyledDialog.showErrorMessage(context, error.getErrorMessage());
+            } else {
+              StyledDialog.showErrorMessage(context, "An expected error occurred.");
+            }
           }
         }).build());
   }
