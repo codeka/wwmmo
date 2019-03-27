@@ -22,7 +22,7 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
         if (!isAdmin()) {
             return;
         }
-        TreeMap<String, Object> data = new TreeMap<String, Object>();
+        TreeMap<String, Object> data = new TreeMap<>();
 
         long cursor = 0;
         if (getRequest().getParameter("cursor") != null) {
@@ -30,14 +30,14 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
         }
         data.put("curr_cursor", cursor);
 
-        ArrayList<String> parameters = new ArrayList<String>();
+        ArrayList<String> parameters = new ArrayList<>();
 
         String sql = "SELECT error_reports.*, empires.name AS empire_name, empires.user_email AS empire_email" +
                     " FROM error_reports" +
                     " LEFT JOIN empires ON error_reports.empire_id = empires.id" +
                     " WHERE 1 = 1";
         if (cursor != 0) {
-            sql += " AND report_date < "+cursor;
+            sql += " AND report_date < to_timestamp(" + cursor + ")";
         }
         if (getRequest().getParameter("empire") != null && !getRequest().getParameter("empire").equals("")) {
             String empire = getRequest().getParameter("empire");
@@ -78,9 +78,9 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
                 stmt.setString(i + 1, parameters.get(i));
             }
             SqlResult res = stmt.select();
-            ArrayList<TreeMap<String, Object>> results = new ArrayList<TreeMap<String, Object>>();
+            ArrayList<TreeMap<String, Object>> results = new ArrayList<>();
             while (res.next()) {
-                TreeMap<String, Object> result = new TreeMap<String, Object>();
+                TreeMap<String, Object> result = new TreeMap<>();
                 result.put("empire_name", res.getString("empire_name"));
                 result.put("empire_email", res.getString("empire_email"));
 
@@ -115,8 +115,8 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
         data.put("cursor", cursor);
 
         // add some data so we can display a histogram of the number of errors we're getting
-        ArrayList<Integer> maxValues = new ArrayList<Integer>();
-        ArrayList<TreeMap<String, Object>> histogram = new ArrayList<TreeMap<String, Object>>();
+        ArrayList<Integer> maxValues = new ArrayList<>();
+        ArrayList<TreeMap<String, Object>> histogram = new ArrayList<>();
         sql = "SELECT DATE(report_date AT TIME ZONE 'Australia/Sydney') AS date," +
                     " SUM(CASE WHEN empire_id IS NULL THEN 0 ELSE 1 END) AS num_client_errors," +
                     " SUM(CASE WHEN empire_id IS NULL THEN 1 ELSE 0 END) AS num_server_errors," +
