@@ -226,7 +226,8 @@ public class ColonyController {
       // If the empire has a HQ, that HQ will by definition be on empire's home star.
       Star homeStar = (Star) empire.getHomeStar();
       for (BaseColony baseColony : homeStar.getColonies()) {
-        if (baseColony.getEmpireKey().equals(empire.getKey())) {
+        if (baseColony.getEmpireKey() != null &&
+            baseColony.getEmpireKey().equals(empire.getKey())) {
           for (BaseBuilding baseBuilding : baseColony.getBuildings()) {
             if (baseBuilding.getDesignID().equals("hq")) {
               hasHqElsewhere = true;
