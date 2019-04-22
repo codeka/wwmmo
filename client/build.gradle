@@ -7,8 +7,8 @@ props.load(new FileInputStream(file('signing.properties')))
 
 dependencies {
   implementation fileTree(include: '*.jar', dir: 'libs')
-  implementation 'com.google.android.gms:play-services-base:16.0.1'
-  implementation 'com.google.android.gms:play-services-ads:17.1.0'
+  implementation 'com.google.android.gms:play-services-base:16.1.0'
+  implementation 'com.google.android.gms:play-services-ads:17.2.0'
   implementation 'com.google.android.gms:play-services-auth:16.0.1'
   implementation 'com.google.guava:guava:24.1-android'
   implementation 'com.google.code.gson:gson:2.8.2'
@@ -19,7 +19,7 @@ dependencies {
   implementation 'androidx.legacy:legacy-support-v4:1.0.0'
   implementation 'androidx.vectordrawable:vectordrawable:1.0.1'
   implementation 'androidx.appcompat:appcompat:1.0.2'
-  implementation 'com.google.android.material:material:1.1.0-alpha01'
+  implementation 'com.google.android.material:material:1.1.0-alpha05'
   implementation 'com.squareup.okhttp3:okhttp:3.11.0'
   implementation project(':common')
   implementation project(':control-field')
@@ -27,116 +27,120 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+  compileSdkVersion 28
+  buildToolsVersion '28.0.3'
 
-    // TODO: remove the dependency on this.
-    useLibrary 'org.apache.http.legacy'
+  // TODO: remove the dependency on this.
+  useLibrary 'org.apache.http.legacy'
 
-    defaultConfig {
-        multiDexEnabled true
-        minSdkVersion 14
-        targetSdkVersion 28
-        vectorDrawables.useSupportLibrary = true
+  defaultConfig {
+    multiDexEnabled true
+    minSdkVersion 14
+    targetSdkVersion 28
+    vectorDrawables.useSupportLibrary = true
+  }
+
+  packagingOptions {
+    // Don't include NOTICE.txt or LICENSE.txt, many libraries define both and the duplicates
+    // confuse the build process.
+    exclude 'META-INF/NOTICE.txt'
+    exclude 'META-INF/LICENSE.txt'
+  }
+
+  dexOptions {
+    javaMaxHeapSize "2g"
+  }
+
+  signingConfigs {
+    release {
+      storeFile file(props['keystore'])
+      storePassword props['password']
+      keyAlias props['alias']
+      keyPassword props['password']
     }
+  }
 
-    packagingOptions {
-        // Don't include NOTICE.txt or LICENSE.txt, many libraries define both and the duplicates
-        // confuse the build process.
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/LICENSE.txt'
-    }
+  configurations {
+    all*.exclude group: 'com.google.guava', module: 'listenablefuture'
+  }
 
-    dexOptions {
-        javaMaxHeapSize "2g"
+  buildTypes {
+    debug {
+      debuggable true
+      manifestPlaceholders = [applicationLabel: "@string/app_name_debug"]
+      applicationIdSuffix ".debug"
     }
-
-    signingConfigs {
-        release {
-            storeFile file(props['keystore'])
-            storePassword props['password']
-            keyAlias props['alias']
-            keyPassword props['password']
-        }
+    release {
+      manifestPlaceholders = [applicationLabel: "@string/app_name"]
+      signingConfig signingConfigs.release
     }
-
-    buildTypes {
-        debug {
-            debuggable true
-            manifestPlaceholders = [ applicationLabel: "@string/app_name_debug" ]
-            applicationIdSuffix ".debug"
-        }
-        release {
-            manifestPlaceholders = [ applicationLabel: "@string/app_name" ]
-            signingConfig signingConfigs.release
-        }
-    }
+  }
 }
 
 // This is a task which will increment the build # in AndroidManifest.xml
 task('incrementVersionCode') {
-    doLast {
-        def manifestFile = file("src/main/AndroidManifest.xml")
+  doLast {
+    def manifestFile = file("src/main/AndroidManifest.xml")
 
-        // First do the versionCode element, increment the new build #
-        def pattern = Pattern.compile("versionCode=\"(\\d+)\"")
-        def manifestText = manifestFile.getText()
-        def matcher = pattern.matcher(manifestText)
-        matcher.find()
+    // First do the versionCode element, increment the new build #
+    def pattern = Pattern.compile("versionCode=\"(\\d+)\"")
+    def manifestText = manifestFile.getText()
+    def matcher = pattern.matcher(manifestText)
+    matcher.find()
 
-        def versionCode = Integer.parseInt(matcher.group(1)) + 1
-        manifestText = matcher.replaceAll("versionCode=\"" + versionCode + "\"")
+    def versionCode = Integer.parseInt(matcher.group(1)) + 1
+    manifestText = matcher.replaceAll("versionCode=\"" + versionCode + "\"")
 
-        // Now do versionName with the same build #.
-        pattern = Pattern.compile("versionName=\"([0-9]+)\\.([0-9]+)\\.[0-9]+\"")
-        matcher = pattern.matcher(manifestText)
-        manifestText = matcher.replaceAll("versionName=\"\$1.\$2." + versionCode + "\"")
+    // Now do versionName with the same build #.
+    pattern = Pattern.compile("versionName=\"([0-9]+)\\.([0-9]+)\\.[0-9]+\"")
+    matcher = pattern.matcher(manifestText)
+    manifestText = matcher.replaceAll("versionName=\"\$1.\$2." + versionCode + "\"")
 
-        manifestFile.write(manifestText)
-    }
+    manifestFile.write(manifestText)
+  }
 }
 
 // This is a task which makes sure the warworlds.properties file is sanitized for release builds
 task('resetReleaseWarworldsPropertiesFile') {
-    doLast {
-        def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
-        def content = warworldsPropertiesFile.getText()
+  doLast {
+    def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
+    def content = warworldsPropertiesFile.getText()
 
-        // make sure on_behalf_of is commented out
-        content = content.replaceAll("#?user.on_behalf_of\\s*=.*", "#user.on_behalf_of=nobody")
+    // make sure on_behalf_of is commented out
+    content = content.replaceAll("#?user.on_behalf_of\\s*=.*", "#user.on_behalf_of=nobody")
 
-        // make sure debug is set to 'false'
-        content = content.replaceAll("debug\\s*=.*", "debug=false")
+    // make sure debug is set to 'false'
+    content = content.replaceAll("debug\\s*=.*", "debug=false")
 
-        // change all of the in-app purchase fields to their defaults
-        content = content.replaceAll("iap\\.([^=]+)=.*", "iap.\$1=\$1")
+    // change all of the in-app purchase fields to their defaults
+    content = content.replaceAll("iap\\.([^=]+)=.*", "iap.\$1=\$1")
 
-        // make sure the welcome.rss field is pointing to the live server
-        content = content.replaceAll("welcome.rss=.*\$",
-            "welcome.rss=http://www.war-worlds.com/forum/announcements/rss")
+    // make sure the welcome.rss field is pointing to the live server
+    content = content.replaceAll("welcome.rss=.*\$",
+        "welcome.rss=http://www.war-worlds.com/forum/announcements/rss")
 
-        warworldsPropertiesFile.write(content)
-    }
+    warworldsPropertiesFile.write(content)
+  }
 }
 
 // This is a task which makes sure the warworlds.properties file is sanitized for debug builds
 task('resetDebugWarworldsPropertiesFile') {
-    doLast {
-        def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
-        def content = warworldsPropertiesFile.getText()
+  doLast {
+    def warworldsPropertiesFile = file("src/main/assets/warworlds.properties")
+    def content = warworldsPropertiesFile.getText()
 
-        // make sure debug is set to 'true'
-        content = content.replaceAll("debug\\s*=.*", "debug=true")
+    // make sure debug is set to 'true'
+    content = content.replaceAll("debug\\s*=.*", "debug=true")
 
-        warworldsPropertiesFile.write(content)
-    }
+    warworldsPropertiesFile.write(content)
+  }
 }
 
 tasks.whenTaskAdded { task ->
-    if (task.name == 'generateReleaseBuildConfig') {
-        task.dependsOn 'incrementVersionCode'
-        task.dependsOn 'resetReleaseWarworldsPropertiesFile'
-    } else if (task.name == 'generateDebugBuildConfig') {
-        task.dependsOn 'resetDebugWarworldsPropertiesFile'
-    }
+  if (task.name == 'generateReleaseBuildConfig') {
+    task.dependsOn 'incrementVersionCode'
+    task.dependsOn 'resetReleaseWarworldsPropertiesFile'
+  } else if (task.name == 'generateDebugBuildConfig') {
+    task.dependsOn 'resetDebugWarworldsPropertiesFile'
+  }
 }
