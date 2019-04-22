@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -47,7 +48,7 @@ public class Authenticator {
    * @throws ApiException
    */
   public boolean authenticate(@Nullable Activity activity, Realm realm) throws ApiException {
-    // make sure we don't try to authenticate WHILE WE'RE AUTHENTICATING...
+    // Make sure we don't try to authenticate WHILE WE'RE AUTHENTICATING.
     if (authenticating) {
       return true;
     }
@@ -66,7 +67,7 @@ public class Authenticator {
     if (accountName.endsWith("@anon.war-worlds.com")) {
       // If it's an anonymous account, there's no password/authentication required. We just pass
       // the email address directly as the cookie.
-      cookie = String.format("SESSION=%s",accountName.replace('@', '_'));
+      cookie = String.format("SESSION=%s", accountName.replace('@', '_'));
       authenticating = false;
     } else {
       try {
@@ -109,6 +110,7 @@ public class Authenticator {
     if (impersonate != null) {
       url += "&impersonate=" + impersonate;
     }
+    log.info("url: " + url);
 
     ApiRequest request = new ApiRequest.Builder(url, "GET")
         .errorCallback(new ApiRequest.ErrorCallback() {

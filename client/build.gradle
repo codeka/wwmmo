@@ -61,6 +61,7 @@ android {
   }
 
   configurations {
+    // This seems like a weird bug... something else includes listenablefuture from guava.
     all*.exclude group: 'com.google.guava', module: 'listenablefuture'
   }
 

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.RealmManager;
@@ -20,101 +21,105 @@ import au.com.codeka.warworlds.model.SpriteManager;
  * retrieving shared preferences.
  */
 public class Util {
-    /**
-     * Key for shared preferences.
-     */
-    private static final String SHARED_PREFS = "WARWORLDS_PREFS";
+  private static final Log log = new Log("Util");
+  /**
+   * Key for shared preferences.
+   */
+  private static final String SHARED_PREFS = "WARWORLDS_PREFS";
 
-    private static Properties sProperties;
-    private static boolean sWasSetup;
-    private static String sVersion;
+  private static Properties sProperties;
+  private static boolean sWasSetup;
+  private static String sVersion;
 
-    /**
-     * This should be called from every entry-point into the process to make
-     * sure the various globals are up and running.
-     */
-    public static boolean setup(Context context) {
-        if (sWasSetup) {
-            return false;
+  /**
+   * This should be called from every entry-point into the process to make
+   * sure the various globals are up and running.
+   */
+  public static boolean setup(Context context) {
+    if (sWasSetup) {
+      return false;
+    }
+
+    SpriteManager.i.setup(context);
+    DesignManager.setup(context);
+    PurchaseManager.i.setup();
+    RealmManager.i.setup();
+
+    try {
+      PackageInfo packageInfo = App.i.getPackageManager().getPackageInfo(App.i.getPackageName(), 0);
+      sVersion = packageInfo.versionName;
+    } catch (Exception e) {
+      sVersion = "??";
+    }
+
+    sWasSetup = true;
+    return true;
+  }
+
+  public static boolean isSetup() {
+    return sWasSetup;
+  }
+
+  public static String getVersion() {
+    return sVersion;
+  }
+
+  /**
+   * Must be called before other methods on this class. We load up the initial properties,
+   * preferences and settings to make later calls easier (and not require a \c Context parameter).
+   */
+  public static Properties loadProperties() {
+    log.info("DEANH Util.loadProperties()");
+    if (sProperties != null) {
+      // if it's already loaded, don't do it again
+      log.info("DEANH Util.loadProperties() already loaded: " + sProperties);
+      return sProperties;
+    }
+
+    // load the warworlds.properties file and populate mProperties.
+    AssetManager assetManager = App.i.getAssets();
+
+    InputStream inputStream = null;
+    try {
+      log.info("DEANH loading warworlds.properties");
+      inputStream = assetManager.open("warworlds.properties");
+      sProperties = new Properties();
+      sProperties.load(inputStream);
+    } catch (IOException e) {
+      log.info("exception", e);
+      sProperties = null;
+    } finally {
+      try {
+        if (inputStream != null) {
+          inputStream.close();
         }
-
-        SpriteManager.i.setup(context);
-        DesignManager.setup(context);
-        PurchaseManager.i.setup();
-        RealmManager.i.setup();
-
-        try {
-            PackageInfo packageInfo = App.i.getPackageManager().getPackageInfo(App.i.getPackageName(), 0);
-            sVersion = packageInfo.versionName;
-        } catch (Exception e) {
-            sVersion = "??";
-        }
-
-        sWasSetup = true;
-        return true;
+      } catch (IOException e) {
+      }
     }
 
-    public static boolean isSetup() {
-        return sWasSetup;
-    }
+    return sProperties;
+  }
 
-    public static String getVersion() {
-        return sVersion;
-    }
+  /**
+   * Gets the contents of the warworlds.properties as a \c Properties. These are the static
+   * properties that govern things like which server to connect to and so on.
+   */
+  public static Properties getProperties() {
+    return sProperties;
+  }
 
-    /**
-     * Must be called before other methods on this class. We load up the initial
-     * properties, preferences and settings to make later calls easier (and not
-     * require a \c Context parameter)
-     */
-    public static Properties loadProperties() {
-        if (sProperties != null) {
-            // if it's already loaded, don't do it again
-            return sProperties;
-        }
+  /**
+   * Returns true if we are running against a dev mode appengine instance.
+   */
+  public static boolean isDebug() {
+    final String debugValue = sProperties.getProperty("debug");
+    return debugValue.equals("true");
+  }
 
-        // load the warworlds.properties file and populate mProperties.
-        AssetManager assetManager = App.i.getAssets();
-
-        InputStream inputStream = null;
-        try {
-            inputStream = assetManager.open("warworlds.properties");
-            sProperties = new Properties();
-            sProperties.load(inputStream);
-        } catch (IOException e) {
-            sProperties = null;
-        } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-            } catch(IOException e) {
-            }
-        }
-
-        return sProperties;
-    }
-
-    /**
-     * Gets the contents of the warworlds.properties as a \c Properties. These are the static
-     * properties that govern things like which server to connect to and so on.
-     */
-    public static Properties getProperties() {
-        return sProperties;
-    }
-
-    /**
-     * Returns true if we are running against a dev mode appengine instance.
-     */
-    public static boolean isDebug() {
-        final String debugValue = sProperties.getProperty("debug");
-        return debugValue.equals("true");
-    }
-
-    /**
-     * Helper method to get a SharedPreferences instance.
-     */
-    public static SharedPreferences getSharedPreferences() {
-        return App.i.getSharedPreferences(SHARED_PREFS, 0);
-    }
+  /**
+   * Helper method to get a SharedPreferences instance.
+   */
+  public static SharedPreferences getSharedPreferences() {
+    return App.i.getSharedPreferences(SHARED_PREFS, 0);
+  }
 }
