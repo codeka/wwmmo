@@ -57,6 +57,9 @@ public class SqlStateTranslater {
     }
 
     public boolean isError(String sqlState) {
+      if (sqlState == null) {
+        return true;
+      }
       if (this.sqlState.endsWith("*")) {
         return sqlState.startsWith(this.sqlState.substring(0, this.sqlState.length() - 1));
       }
