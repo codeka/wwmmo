@@ -84,7 +84,7 @@ public class WormholeFragment extends BaseGlFragment {
       Bundle savedInstanceState) {
     contentView = super.onCreateView(inflater, container, savedInstanceState);
 
-    Button renameBtn = (Button) contentView.findViewById(R.id.rename_btn);
+    Button renameBtn = contentView.findViewById(R.id.rename_btn);
     renameBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -94,16 +94,15 @@ public class WormholeFragment extends BaseGlFragment {
       }
     });
 
-    Button destinationBtn = (Button) contentView.findViewById(R.id.destination_btn);
+    Button destinationBtn = contentView.findViewById(R.id.destination_btn);
     destinationBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        DestinationDialog dialog = DestinationDialog.newInstance(star);
-        dialog.show(getActivity().getSupportFragmentManager(), "");
+        startActivity(DestinationActivity.newStartIntent(getActivity(), star));
       }
     });
 
-    Button viewDestinationBtn = (Button) contentView.findViewById(R.id.view_destination_btn);
+    Button viewDestinationBtn = contentView.findViewById(R.id.view_destination_btn);
     viewDestinationBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
