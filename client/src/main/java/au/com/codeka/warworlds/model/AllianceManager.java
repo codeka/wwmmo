@@ -48,7 +48,7 @@ public class AllianceManager {
   }
 
   public void fetchWormholes(int allianceID, @Nonnull final FetchWormholesCompleteHandler handler) {
-    String url = String.format("alliances/%d/wormholes", allianceID);
+    String url = String.format(Locale.ENGLISH, "alliances/%d/wormholes", allianceID);
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "GET")
         .completeCallback(new ApiRequest.CompleteCallback() {
           @Override

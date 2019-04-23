@@ -1,73 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <LinearLayout
+    android:id="@+id/top_pane"
+    style="@style/TopPane"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/star_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/app_icon" />
+      android:id="@+id/star_icon"
+      android:layout_width="40dp"
+      android:layout_height="40dp"
+      android:src="@drawable/app_icon" />
 
     <TextView
-        android:id="@+id/star_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/star_icon"
-        android:layout_toRightOf="@+id/star_icon"
-        android:text="Wormhole Name"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+      android:id="@+id/star_name"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="10dp"
+      android:layout_marginStart="10dp"
+      android:text="Wormhole Name"
+      android:textAppearance="?android:attr/textAppearanceLarge" />
+  </LinearLayout>
 
-    <TextView
-        android:id="@+id/destination_summary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/star_name"
-        android:layout_toRightOf="@+id/star_icon"
-        android:layout_alignParentRight="true"
-        android:text="Tune the destination of this wormhole to another wormhole in your alliance."
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+  <TextView
+    android:id="@+id/destination_summary"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/top_pane"
+    android:text="Tune the destination of this wormhole to another wormhole in your alliance."
+    android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <LinearLayout
-        android:id="@+id/wormholes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/destination_summary"
-        android:orientation="vertical" />
+  <TextView
+    android:id="@+id/tune_time"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/destination_summary"
+    android:gravity="center"
+    android:text="Tune time: xx hr"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    tools:visibility="visible"  />
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/star_icon"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp" />
+  <androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/wormholes"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/tune_time"
+    android:layout_above="@+id/button_container"
+    tools:visibility="visible" />
 
-    <TextView 
-        android:id="@+id/no_wormholes_msg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/star_icon"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:gravity="center"
-        android:textStyle="italic"
-        android:text="You don't have any other wormholes in your alliance." />
+  <ProgressBar
+    android:id="@+id/progress_bar"
+    style="?android:attr/progressBarStyleLarge"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/top_pane"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="90dp"
+    tools:visibility="gone" />
 
-    <TextView
-        android:id="@+id/tune_time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/wormholes"
-        android:gravity="center"
-        android:text="Tune time: xx hr"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+  <TextView
+    android:id="@+id/no_wormholes_msg"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/top_pane"
+    android:layout_marginLeft="50dp"
+    android:layout_marginTop="90dp"
+    android:layout_marginRight="50dp"
+    android:layout_marginBottom="20dp"
+    android:gravity="center"
+    android:text="You don't have any other wormholes in your alliance."
+    android:textStyle="italic"
+    tools:visibility="gone" />
+
+  <LinearLayout
+    android:id="@+id/button_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:orientation="horizontal">
+
+    <Button
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_margin="10dp"
+      android:text="Cancel"/>
+
+    <Button
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_margin="10dp"
+      android:text="Tune"/>
+
+  </LinearLayout>
 
 </RelativeLayout>
