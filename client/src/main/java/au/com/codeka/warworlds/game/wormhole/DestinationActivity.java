@@ -3,18 +3,14 @@ package au.com.codeka.warworlds.game.wormhole;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.List;
-import java.util.Locale;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
@@ -97,7 +93,10 @@ public class DestinationActivity extends BaseActivity {
           final int count,
           final DestinationRecyclerViewHelper.RowsFetchCallback callback) {
         if (myEmpire.getAlliance() != null) {
-          AllianceManager.i.fetchWormholes(Integer.parseInt(myEmpire.getAlliance().getKey()),
+          AllianceManager.i.fetchWormholes(
+              Integer.parseInt(myEmpire.getAlliance().getKey()),
+              startPosition,
+              count,
               new AllianceManager.FetchWormholesCompleteHandler() {
                 @Override
                 public void onWormholesFetched(List<Star> wormholes) {

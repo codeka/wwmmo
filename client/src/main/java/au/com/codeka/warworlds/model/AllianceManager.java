@@ -47,13 +47,26 @@ public class AllianceManager {
         .build());
   }
 
-  public void fetchWormholes(int allianceID, @Nonnull final FetchWormholesCompleteHandler handler) {
-    String url = String.format(Locale.ENGLISH, "alliances/%d/wormholes", allianceID);
+  public void fetchWormholes(
+      int allianceID,
+      int startIndex,
+      int count,
+      @Nonnull final FetchWormholesCompleteHandler handler) {
+    String url = String.format(
+        Locale.ENGLISH,
+        "alliances/%d/wormholes?startIndex=%d&count=%d",
+        allianceID,
+        startIndex,
+        count);
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "GET")
         .completeCallback(new ApiRequest.CompleteCallback() {
           @Override
           public void onRequestComplete(ApiRequest request) {
             Messages.Stars pb = request.body(Messages.Stars.class);
+            if (pb == null) {
+              // Something went wrong... TODO: report error
+              handler.onWormholesFetched(new ArrayList<Star>());
+            }
             ArrayList<Star> wormholes = new ArrayList<>();
             for (Messages.Star star_pb : pb.getStarsList()) {
               Star wormhole = new Star();
