@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.handlers;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 import au.com.codeka.common.model.BaseStar;
@@ -46,8 +47,8 @@ public class AllianceWormholeHandler extends RequestHandler {
       // name is a substring to search in the list for the name of the star
       s = getRequest().getParameter("name");
       if (s != null) {
-        String name = s;
-        allStars.removeIf(star -> !star.getName().contains(name));
+        String name = s.toLowerCase(Locale.ENGLISH);
+        allStars.removeIf(star -> !star.getName().toLowerCase(Locale.ENGLISH).contains(name));
       }
 
       stars = new ArrayList<>();

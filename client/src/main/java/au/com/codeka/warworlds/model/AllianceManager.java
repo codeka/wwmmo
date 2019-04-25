@@ -51,6 +51,7 @@ public class AllianceManager {
       int allianceID,
       int startIndex,
       int count,
+      @Nullable String searchQuery,
       @Nonnull final FetchWormholesCompleteHandler handler) {
     String url = String.format(
         Locale.ENGLISH,
@@ -58,6 +59,9 @@ public class AllianceManager {
         allianceID,
         startIndex,
         count);
+    if (searchQuery != null) {
+      url += "&name=" + searchQuery;
+    }
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "GET")
         .completeCallback(new ApiRequest.CompleteCallback() {
           @Override

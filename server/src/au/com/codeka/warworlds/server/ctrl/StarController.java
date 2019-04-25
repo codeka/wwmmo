@@ -285,10 +285,10 @@ public class StarController {
 
     public List<Star> getStars(int[] ids) throws RequestException {
       if (ids.length == 0) {
-        return new ArrayList<Star>();
+        return new ArrayList<>();
       }
 
-      ArrayList<Star> stars = new ArrayList<Star>();
+      ArrayList<Star> stars = new ArrayList<>();
       final String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
           " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
           " extra, last_simulation, time_emptied" +
@@ -312,10 +312,10 @@ public class StarController {
       int[] starIds = new int[stars.size()];
       for (int i = 0; i < stars.size(); i++) {
         Star star = stars.get(i);
-        star.setColonies(new ArrayList<BaseColony>());
-        star.setFleets(new ArrayList<BaseFleet>());
-        star.setEmpires(new ArrayList<BaseEmpirePresence>());
-        star.setBuildRequests(new ArrayList<BaseBuildRequest>());
+        star.setColonies(new ArrayList<>());
+        star.setFleets(new ArrayList<>());
+        star.setEmpires(new ArrayList<>());
+        star.setBuildRequests(new ArrayList<>());
         starIds[i] = star.getID();
       }
 
@@ -334,6 +334,8 @@ public class StarController {
       return stars;
     }
 
+    // TODO: This is super inefficient! only select the wormholes for this alliance.
+    // TODO: also paginate results, and support searching by name.
     public List<Star> getWormholesForAlliance(Alliance alliance) throws Exception {
       String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
           " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
@@ -344,7 +346,7 @@ public class StarController {
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
 
-        ArrayList<Star> stars = new ArrayList<Star>();
+        ArrayList<Star> stars = new ArrayList<>();
         while (res.next()) {
           Star star = new Star(res);
           if (star.getWormholeExtra() == null) {

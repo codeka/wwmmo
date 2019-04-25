@@ -44,11 +44,34 @@
     android:textAppearance="?android:attr/textAppearanceMedium"
     tools:visibility="visible"  />
 
+  <EditText
+    android:id="@+id/search"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_toLeftOf="@+id/search_btn"
+    android:layout_toStartOf="@+id/search_btn"
+    android:layout_below="@+id/tune_time"
+    android:layout_margin="10dp"
+    android:hint="Search" />
+
+  <ImageButton
+    android:id="@+id/search_btn"
+    style="@style/ImageButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignTop="@+id/search"
+    android:layout_alignBottom="@+id/search"
+    android:layout_alignParentRight="true"
+    android:layout_alignParentEnd="true"
+    android:layout_marginRight="10dp"
+    android:layout_marginLeft="10dp"
+    android:src="@android:drawable/ic_menu_search"/>
+
   <androidx.recyclerview.widget.RecyclerView
     android:id="@+id/wormholes"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_below="@+id/tune_time"
+    android:layout_below="@+id/search"
     android:layout_above="@+id/button_container"
     tools:visibility="visible" />
 

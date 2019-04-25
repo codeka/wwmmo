@@ -5,11 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageButton android:id="@+id/search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:src="@android:drawable/ic_menu_search" />
+    <ImageButton
+      style="@style/ImageButton"
+      android:id="@+id/search_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentRight="true"
+      android:src="@android:drawable/ic_menu_search" />
 
     <EditText android:id="@+id/search_text"
         android:layout_width="match_parent"

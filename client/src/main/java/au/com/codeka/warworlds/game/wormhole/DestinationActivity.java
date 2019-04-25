@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,6 +41,7 @@ public class DestinationActivity extends BaseActivity {
   private Star srcWormhole;
   private Star destWormhole;
   private DestinationRecyclerViewHelper recyclerViewHelper;
+  @Nullable private String searchQuery;
 
   /** Create an {@link Intent} needed to start this activity. */
   public static Intent newStartIntent(Context context, Star srcWormhole) {
@@ -97,6 +100,7 @@ public class DestinationActivity extends BaseActivity {
               Integer.parseInt(myEmpire.getAlliance().getKey()),
               startPosition,
               count,
+              searchQuery,
               new AllianceManager.FetchWormholesCompleteHandler() {
                 @Override
                 public void onWormholesFetched(List<Star> wormholes) {
@@ -143,12 +147,25 @@ public class DestinationActivity extends BaseActivity {
     Sprite starSprite = StarImageManager.getInstance().getSprite(getSrcWormhole(), 60, true);
     starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
-    /*
-    int tuneTimeHours = getSrcWormhole().getWormholeExtra() == null ? 0 : getSrcWormhole()
-        .getWormholeExtra().getTuneTimeHours();
-    tuneTime.setText(String.format(Locale.ENGLISH, "Tune time: %d hr%s", tuneTimeHours,
-        tuneTimeHours == 1 ? "" : "s"));
-    */
+    int tuneTimeHours =
+        getSrcWormhole().getWormholeExtra() == null
+            ? 0
+            : getSrcWormhole().getWormholeExtra().getTuneTimeHours();
+    tuneTime.setText(
+        String.format(
+            Locale.ENGLISH,
+            "Tune time: %d hr%s",
+            tuneTimeHours,
+            tuneTimeHours == 1 ? "" : "s"));
+
+    final EditText search = findViewById(R.id.search);
+    findViewById(R.id.search_btn).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+         searchQuery = search.getText().toString();
+         recyclerViewHelper.refresh();
+      }
+    });
 
     /*
     b.setPositiveButton("Tune", new DialogInterface.OnClickListener() {
