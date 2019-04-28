@@ -19,7 +19,7 @@ public class CronJobRegistry {
     sCronJobs.put("find-abandoned-empires", FindAbandonedEmpiresCronJob.class);
     sCronJobs.put("find-alts", FindAltAccountsCronJob.class);
     sCronJobs.put("update-dashboard", UpdateDashboardCronJob.class);
-    sCronJobs.put("fix-names", FixNamesCronJob.class);
+    sCronJobs.put("fix-wormhole-empire-ids", FixWormholeEmpireIdsJob.class);
     sCronJobs.put("update-active-alliances", UpdateActiveAlliancesCronJob.class);
     sCronJobs.put("patreon", PatreonCronJob.class);
   }
