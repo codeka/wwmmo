@@ -395,7 +395,8 @@ public class StarController {
           " name = ?," +
           " star_type = ?," +
           " empire_count = ?," +
-          " extra = ?" +
+          " extra = ?," +
+          " wormhole_empire_id = ?" +
           " WHERE id = ?";
       try (SqlStmt stmt = prepare(sql)) {
         DateTime lastSimulation = star.getLastSimulation();
@@ -433,7 +434,9 @@ public class StarController {
           stmt.setBytes(5, star_extra_pb.build().toByteArray());
         }
 
-        stmt.setInt(6, star.getID());
+        stmt.setInt(6, star.getWormholeEmpireID());
+
+        stmt.setInt(7, star.getID());
         stmt.update();
       }
 

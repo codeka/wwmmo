@@ -28,19 +28,25 @@ public class SessionController {
           @Override
           public Session load(@Nonnull String cookie) throws Exception {
             log.info("Loading session for cookie: %s", cookie);
+            Session session = null;
             try (SqlStmt stmt = DB.prepare("SELECT * FROM sessions WHERE session_cookie=?")) {
               stmt.setString(1, cookie);
               SqlResult res = stmt.select();
               if (res.next()) {
-                return new Session(res);
+                session = new Session(res);
               }
             }
 
-            if (cookie.endsWith("_anon.war-worlds.com")) {
+            if (session == null && cookie.endsWith("_anon.war-worlds.com")) {
               // Anonymous cookies are OK, we always accept them.
               log.info("Session cookie indicates anonymous user: %s", cookie.replace('_', '@'));
-              return new LoginController().createSession(cookie, cookie.replace('_', '@'),
-                  null, false);
+              return new LoginController().createSession(
+                  cookie, cookie.replace('_', '@'), null, false);
+            }
+
+            if (session != null) {
+              new LoginController().updateSession(session);
+              return session;
             }
 
             throw new RequestException(403, "Could not find session, session cookie: " + cookie);

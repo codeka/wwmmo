@@ -145,8 +145,7 @@ public class RequestRouter extends AbstractHandler {
           sessionCookieValue = cookie.getValue();
           log.info("Got SESSION cookie: %s", sessionCookieValue);
           try {
-            session = new SessionController().getSession(
-                sessionCookieValue, impersonate);
+            session = new SessionController().getSession(sessionCookieValue, impersonate);
           } catch (RequestException e) {
             log.error("Error getting session: cookie=" + sessionCookieValue, e);
           }

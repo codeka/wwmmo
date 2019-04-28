@@ -79,6 +79,9 @@ public class Session {
         }
         return mAllianceID;
     }
+    public void setAllianceID(int allianceID) {
+        mAllianceID = allianceID;
+    }
     public boolean isAdmin() {
         return mIsAdmin;
     }

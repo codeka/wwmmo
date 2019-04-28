@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
@@ -16,12 +17,18 @@ import au.com.codeka.warworlds.server.model.Star;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class AllianceWormholeHandler extends RequestHandler {
+  private static final Log log = new Log("AllianceWormholeHandler");
+
   @Override
   protected void get() throws RequestException {
     int allianceID = Integer.parseInt(getUrlParameter("allianceid"));
 
     // only admins and people in this alliance can view the list of wormholes
     if (!getSession().isAdmin() && getSession().getAllianceID() != allianceID) {
+      log.warning(
+          "Current session's alliance (%d) not the same as requested alliance (%d)",
+          getSession().getAllianceID(),
+          allianceID);
       throw new RequestException(403);
     }
 

@@ -64,7 +64,10 @@ public class LoginController {
     return cookie.toString();
   }
 
-  public Session createSession(String cookie, String emailAddr, @Nullable String impersonateUser,
+  public Session createSession(
+      String cookie,
+      String emailAddr,
+      @Nullable String impersonateUser,
       boolean isAdmin) throws RequestException {
     int empireID = 0;
     int allianceID = 0;
@@ -98,10 +101,43 @@ public class LoginController {
           "You have been banned for misconduct.");
     }
 
-    Session session = new Session(
-        cookie.toString(), emailAddr, DateTime.now(), empireID, allianceID, isAdmin);
+    Session session = new Session(cookie, emailAddr, DateTime.now(), empireID, allianceID, isAdmin);
     new SessionController().saveSession(session);
 
     return session;
+  }
+
+  /**
+   * Updates the given session, makes sure things like alliance ID are right.
+   * @param session
+   */
+  public void updateSession(Session session) throws RequestException {
+    boolean banned = false;
+
+    String sql = "SELECT alliance_id, state FROM empires WHERE id = ?";
+    try (SqlStmt stmt = DB.prepare(sql)) {
+      stmt.setInt(1, session.getEmpireID());
+
+      SqlResult res = stmt.select();
+      if (res.next()) {
+        int allianceID = 0;
+        if (res.getInt(1) != null) {
+          allianceID = res.getInt(1);
+        }
+        BaseEmpire.State state = BaseEmpire.State.fromNumber(res.getInt(2));
+        if (state == BaseEmpire.State.BANNED) {
+          banned = true;
+        }
+
+        session.setAllianceID(allianceID);
+      }
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+
+    if (banned) {
+      throw new RequestException(403, Messages.GenericError.ErrorCode.EmpireBanned,
+          "You have been banned for misconduct.");
+    }
   }
 }
