@@ -398,6 +398,7 @@ public class StarController {
       if (name != null) {
         sql += "   AND stars.name ILIKE '%" + name + "%'";
       }
+      sql += " ORDER BY stars.name";
       sql += String.format(Locale.ENGLISH, " LIMIT %d OFFSET %d", count, startIndex);
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
