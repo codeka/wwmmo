@@ -1,3 +1,5 @@
+# COPY THIS FILE TO warworlds.properties
+
 
 # Admins can impersonate other users (for debugging), setting this to another
 # email address will allow an admin to impersonate that user.
