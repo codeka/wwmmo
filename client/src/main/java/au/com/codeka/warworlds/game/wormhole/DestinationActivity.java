@@ -4,6 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -41,6 +45,12 @@ public class DestinationActivity extends BaseActivity {
   private Star srcWormhole;
   private Star destWormhole;
   private DestinationRecyclerViewHelper recyclerViewHelper;
+
+  private int searchTextChangeCount;
+  private boolean searchTextChangePosted;
+  private final Handler handler = new Handler();
+  private static final int SEARCH_DELAY_MS = 500;
+
   @Nullable private String searchQuery;
 
   /** Create an {@link Intent} needed to start this activity. */
@@ -87,7 +97,8 @@ public class DestinationActivity extends BaseActivity {
         new DestinationRecyclerViewHelper.Callbacks() {
       @Override
       public void onWormholeClick(Star wormhole) {
-
+        destWormhole = wormhole;
+        findViewById(R.id.tune_btn).setEnabled(true);
       }
 
       @Override
@@ -159,6 +170,23 @@ public class DestinationActivity extends BaseActivity {
             tuneTimeHours == 1 ? "" : "s"));
 
     final EditText search = findViewById(R.id.search);
+    search.addTextChangedListener(new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int before, int count) {}
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int count, int after) {
+        searchTextChangeCount ++;
+        if (!searchTextChangePosted) {
+          handler.postDelayed(
+              new SearchTextChangedRunnable(searchTextChangeCount), SEARCH_DELAY_MS);
+        }
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {}
+    });
+
     findViewById(R.id.search_btn).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -167,24 +195,20 @@ public class DestinationActivity extends BaseActivity {
       }
     });
 
-    /*
-    b.setPositiveButton("Tune", new DialogInterface.OnClickListener() {
+    findViewById(R.id.tune_btn).setOnClickListener(new View.OnClickListener() {
       @Override
-      public void onClick(DialogInterface d, int id) {
+      public void onClick(View view) {
         onTuneClicked();
-        d.dismiss();
       }
     });
-    b.setNegativeButton("Cancel", null);
 
-    dialog = b.create();
-    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+    findViewById(R.id.cancel_btn).setOnClickListener(new View.OnClickListener() {
       @Override
-      public void onShow(DialogInterface d) {
-        dialog.getPositiveButton().setEnabled(false);
+      public void onClick(View view) {
+        finish();
       }
     });
-*/
+
     EmpireManager.eventBus.register(eventHandler);
   }
 
@@ -193,15 +217,6 @@ public class DestinationActivity extends BaseActivity {
     super.onDestroy();
     EmpireManager.eventBus.unregister(eventHandler);
   }
-
-  private final View.OnClickListener itemClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      destWormhole = (Star) v.getTag();
-      // TODO: enable 'tune' button
-      //dialog.getPositiveButton().setEnabled(true);
-    }
-  };
 
   private void onTuneClicked() {
     if (destWormhole == null) {
@@ -229,6 +244,7 @@ public class DestinationActivity extends BaseActivity {
       protected void onComplete(Star star) {
         if (star != null) {
           StarManager.i.notifyStarUpdated(star);
+          finish();
         }
       }
     }.execute();
@@ -247,4 +263,27 @@ public class DestinationActivity extends BaseActivity {
       }*/
     }
   };
+
+  /**
+   * Runnable that is posted delayed to perform a search when the text in the search query changes.
+   */
+  private class SearchTextChangedRunnable implements Runnable {
+    private final int changeCount;
+
+    SearchTextChangedRunnable(int changeCount) {
+      this.changeCount = changeCount;
+    }
+
+    @Override
+    public void run() {
+      final EditText search = findViewById(R.id.search);
+      searchQuery = search.getText().toString();
+      recyclerViewHelper.refresh();
+
+      if (searchTextChangeCount != changeCount) {
+        // The text has changed again since we were posted, wait a bit again and post
+        handler.postDelayed(new SearchTextChangedRunnable(searchTextChangeCount), SEARCH_DELAY_MS);
+      }
+    }
+  }
 }

@@ -107,18 +107,21 @@
     android:orientation="horizontal">
 
     <Button
+      android:id="@+id/cancel_btn"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_weight="1"
       android:layout_margin="10dp"
-      android:text="Cancel"/>
+      android:text="Cancel" />
 
     <Button
+      android:id="@+id/tune_btn"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_weight="1"
       android:layout_margin="10dp"
-      android:text="Tune"/>
+      android:text="Tune"
+      android:enabled="false" />
 
   </LinearLayout>
 

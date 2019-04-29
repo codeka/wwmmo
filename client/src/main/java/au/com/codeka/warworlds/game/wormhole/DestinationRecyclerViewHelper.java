@@ -50,6 +50,7 @@ public class DestinationRecyclerViewHelper {
 
   private final RecyclerView recyclerView;
   private final Star srcWormhole;
+  @Nullable Star destWormhole;
   private final Callbacks callbacks;
   private final WormholeAdapter adapter;
 
@@ -156,8 +157,6 @@ public class DestinationRecyclerViewHelper {
   }
 
   private class WormholeViewHolder extends RecyclerView.ViewHolder {
-    private boolean isSelected;
-
     @Nullable
     private Star wormhole;
 
@@ -182,7 +181,9 @@ public class DestinationRecyclerViewHelper {
         @Override
         public void onClick(View view) {
           if (wormhole != null) {
+            destWormhole = wormhole;
             callbacks.onWormholeClick(wormhole);
+            adapter.notifyDataSetChanged();
           }
         }
       });
@@ -210,7 +211,7 @@ public class DestinationRecyclerViewHelper {
       distance.setText(String.format(Locale.ENGLISH, "%s %.1f pc", wormhole.getCoordinateString(),
           distanceInPc));
 
-      if (isSelected) {
+      if (destWormhole != null && destWormhole.getID() == wormhole.getID()) {
         itemView.setBackgroundResource(R.color.list_item_selected);
       } else {
         itemView.setBackgroundResource(android.R.color.transparent);

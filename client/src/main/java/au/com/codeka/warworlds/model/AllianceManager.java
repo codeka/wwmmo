@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.model;
 
+import android.net.Uri;
+
 import com.google.protobuf.ByteString;
 
 import java.util.ArrayList;
@@ -60,7 +62,7 @@ public class AllianceManager {
         startIndex,
         count);
     if (searchQuery != null) {
-      url += "&name=" + searchQuery;
+      url += "&name=" + Uri.encode(searchQuery);
     }
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "GET")
         .completeCallback(new ApiRequest.CompleteCallback() {
