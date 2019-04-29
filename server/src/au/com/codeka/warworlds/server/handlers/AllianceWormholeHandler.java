@@ -32,42 +32,33 @@ public class AllianceWormholeHandler extends RequestHandler {
       throw new RequestException(403);
     }
 
-    List<Star> allStars = new StarController().getWormholesForAlliance(allianceID);
-    allStars.sort((lhs, rhs) -> lhs.getName().compareTo(rhs.getName()));
 
     List<Star> stars;
     String s = getRequest().getParameter("startIndex");
     if (s != null) {
       int startIndex = Integer.parseInt(s);
       int count = Integer.parseInt(getRequest().getParameter("count"));
+      int empireId = 0;
+      String name = null;
 
       // empireId means only wormholes owned by the given empire
       s = getRequest().getParameter("empireId");
       if (s != null) {
-        int empireId = Integer.parseInt(s);
-        allStars.removeIf(star -> {
-          BaseStar.WormholeExtra wormhole = checkNotNull(star.getWormholeExtra());
-          return (wormhole.getEmpireID() != empireId);
-        });
+        empireId = Integer.parseInt(s);
       }
 
       // name is a substring to search in the list for the name of the star
       s = getRequest().getParameter("name");
       if (s != null) {
-        String name = s.toLowerCase(Locale.ENGLISH);
-        allStars.removeIf(star -> !star.getName().toLowerCase(Locale.ENGLISH).contains(name));
+        name = s.toLowerCase(Locale.ENGLISH);
       }
 
-      stars = new ArrayList<>();
-      for (int i = startIndex; i < (startIndex + count); i++) {
-        if (i >= allStars.size()) {
-          break;
-        }
-        stars.add(allStars.get(i));
-      }
+      stars = new StarController().getWormholesForAlliance(
+          allianceID, empireId, name, startIndex, count);
     } else {
       // Old behavior, just return everything
-      stars = allStars;
+      stars = new StarController().getWormholesForAlliance(allianceID);
+      stars.sort((lhs, rhs) -> lhs.getName().compareTo(rhs.getName()));
     }
 
     Messages.Stars.Builder stars_pb = Messages.Stars.newBuilder();
@@ -78,5 +69,4 @@ public class AllianceWormholeHandler extends RequestHandler {
     }
     setResponseBody(stars_pb.build());
   }
-
 }

@@ -103,7 +103,11 @@ public class DestinationRecyclerViewHelper {
     }
 
     void addWormholes(List<Star> wormholes) {
-      this.wormholes.addAll(wormholes);
+      if (wormholes.size() == 0) {
+        includeLoadingPlaceholder = false;
+      } else {
+        this.wormholes.addAll(wormholes);
+      }
       notifyDataSetChanged();
     }
 

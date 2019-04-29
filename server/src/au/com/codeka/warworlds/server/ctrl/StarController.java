@@ -14,6 +14,8 @@ import java.util.TreeMap;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseBuildRequest;
@@ -81,10 +83,25 @@ public class StarController {
     return db.getStars(idArray);
   }
 
+  @Deprecated
   public List<Star> getWormholesForAlliance(int allianceID) throws RequestException {
     Alliance alliance = new AllianceController().getAlliance(allianceID);
     try {
       return db.getWormholesForAlliance(alliance);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
+  public List<Star> getWormholesForAlliance(
+      int allianceID,
+      int empireId,
+      @Nullable String name,
+      int startIndex,
+      int count) throws RequestException {
+    Alliance alliance = new AllianceController().getAlliance(allianceID);
+    try {
+      return db.getWormholes(alliance, empireId, name, startIndex, count);
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -334,8 +351,7 @@ public class StarController {
       return stars;
     }
 
-    // TODO: This is super inefficient! only select the wormholes for this alliance.
-    // TODO: also paginate results, and support searching by name.
+    @Deprecated
     public List<Star> getWormholesForAlliance(Alliance alliance) throws Exception {
       String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
           " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
@@ -343,6 +359,46 @@ public class StarController {
           " FROM stars" +
           " INNER JOIN sectors ON stars.sector_id = sectors.id" +
           " WHERE star_type = " + Star.Type.Wormhole.ordinal();
+      try (SqlStmt stmt = prepare(sql)) {
+        SqlResult res = stmt.select();
+
+        ArrayList<Star> stars = new ArrayList<>();
+        while (res.next()) {
+          Star star = new Star(res);
+          if (star.getWormholeExtra() == null) {
+            continue;
+          }
+          int empireID = star.getWormholeExtra().getEmpireID();
+          if (alliance.isEmpireMember(empireID)) {
+            stars.add(star);
+          }
+        }
+
+        return stars;
+      }
+    }
+
+    public List<Star> getWormholes(
+        Alliance alliance,
+        int empireId,
+        @Nullable String name,
+        int startIndex,
+        int count) throws Exception {
+      String sql = "SELECT stars.id, sector_id, stars.name, sectors.x AS sector_x," +
+          " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets, extra," +
+          " last_simulation, time_emptied" +
+          " FROM stars" +
+          " INNER JOIN sectors ON stars.sector_id = sectors.id" +
+          " INNER JOIN empires ON stars.wormhole_empire_id = empires.id" +
+          " WHERE star_type = " + Star.Type.Wormhole.ordinal() +
+          "   AND empires.alliance_id = " + alliance.getID();
+      if (empireId > 0) {
+        sql += "   AND empires.id = " + empireId;
+      }
+      if (name != null) {
+        sql += "   AND stars.name ILIKE '%" + name + "%'";
+      }
+      sql += String.format(Locale.ENGLISH, " LIMIT %d OFFSET %d", count, startIndex);
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
 
