@@ -7,10 +7,14 @@ import javax.annotation.Nullable;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -42,7 +46,7 @@ public class FleetsFragment extends StarsFragment {
   private static final Log log = new Log("FleetsFragment");
   private ExpandableListView starsList;
   private FleetsStarsListAdapter adapter;
-  private final EmpireStarsFetcher fetcher;
+  private EmpireStarsFetcher fetcher;
   private FleetSelectionPanel fleetSelectionPanel;
   private Integer starOfFleetToSelect;
   private Integer indexOfStarOfFleetToSelect;
@@ -57,11 +61,11 @@ public class FleetsFragment extends StarsFragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
     View v = inflater.inflate(R.layout.empire_fleets_tab, container, false);
-    starsList = (ExpandableListView) v.findViewById(R.id.stars);
+    starsList = v.findViewById(R.id.stars);
     adapter = new FleetsStarsListAdapter(inflater, fetcher);
     starsList.setAdapter(adapter);
 
-    fleetSelectionPanel = (FleetSelectionPanel) v.findViewById(R.id.bottom_pane);
+    fleetSelectionPanel = v.findViewById(R.id.bottom_pane);
     fleetSelectionPanel.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
       @Override
       public void onFleetView(Star star, Fleet fleet) {
@@ -129,6 +133,26 @@ public class FleetsFragment extends StarsFragment {
       }
     });
 
+    final EditText searchBox = v.findViewById(R.id.search_text);
+    searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+      @Override
+      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+          performSearch(searchBox.getText().toString());
+          return true;
+        }
+        return false;
+      }
+    });
+
+    ImageButton searchBtn = v.findViewById(R.id.search_button);
+    searchBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        performSearch(searchBox.getText().toString());
+      }
+    });
+
     Bundle arguments = getArguments();
     if (arguments != null) {
       int fleetID = arguments.getInt("au.com.codeka.warworlds.FleetID");
@@ -147,6 +171,11 @@ public class FleetsFragment extends StarsFragment {
   public void onDestroy() {
     super.onDestroy();
     StarManager.eventBus.unregister(eventHandler);
+  }
+
+  private void performSearch(String search) {
+    fetcher = new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Fleets, search);
+    adapter.updateFetcher(fetcher);
   }
 
   private Object eventHandler = new Object() {
