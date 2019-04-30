@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.model;
 
+import org.joda.time.DateTime;
+
 import java.sql.SQLException;
 
 import au.com.codeka.common.model.BaseAllianceRequestVote;
@@ -15,6 +17,13 @@ public class AllianceRequestVote extends BaseAllianceRequestVote {
         mEmpireID = res.getInt("empire_id");
         mVotes = res.getInt("votes");
         mDate = res.getDateTime("date");
+    }
+    public AllianceRequestVote(int allianceId, int requestId, int empireId) {
+        mAllianceID = allianceId;
+        mAllianceRequestID = requestId;
+        mEmpireID = empireId;
+        mVotes = 9999;
+        mDate = DateTime.now();
     }
 
     public void setEmpireID(int empireID) {

@@ -81,7 +81,18 @@
       </table>
     </div>
     <div id="alliance-requests">
-      <p>Requests</p>
+      <table id="request-list">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Requester</th>
+            <th>Date</th>
+            <th>Request</th>
+            <th>Votes</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
     <div id="alliance-audit">
       <table id="audit-list">
@@ -129,6 +140,19 @@
     </tr>
     <tr>
       <td class="notes" colspan="5"><%= message %></td>
+    </tr>
+  </script>
+
+  <script type="text/html" id="alliance-request-tmpl">
+    <tr>
+      <td><%= id %></td>
+      <td>
+        <img src="/realms/{{realm}}/empires/<%= request_empire_id %>/shield?final=1&size=32" width="32" height="32" />
+        <a href="/realms/{{realm}}/admin/empire/search#id=<%= request_empire_id %>" class="empire-name"></a>
+      </td>
+      <td><time timestamp="<%= request_date / 1000 %>"><%= request_date %></time></td>
+      <td><%= details %></td>
+      <td><%= votes %> <a href="javascript:;" class="force-accept">Force accept</a></td>
     </tr>
   </script>
 
@@ -188,6 +212,79 @@
         auditList.append(html);
       }
 
+      var requestTmpl = $("#alliance-request-tmpl");
+      function appendRequest(requestList, request) {
+
+        var state = "Unknown";
+        switch (request.state) {
+        case 0:
+          state = "PENDING";
+          break;
+        case 1:
+          state = "ACCEPTED";
+          break;
+        case 2:
+          state = "REJECTED";
+          break;
+        case 3:
+          state = "WITHDRAWN";
+          break;
+        }
+
+        var details;
+        switch (request.request_type) {
+        case 0:
+          details = "JOIN";
+          break;
+        case 1:
+          details = "LEAVE";
+          break;
+        case 2:
+          details = "KICK";
+          break;
+        case 3:
+          details = "DEPOSIT_CASH $" + request.amount;
+          break;
+        case 4:
+          details = "WITHDRAW_CASH";
+          break;
+        case 5:
+          details = "CHANGE_IMAGE";
+          break;
+        case 6:
+          details = "CHANGE_NAME";
+          break;
+        case 7:
+          details = "CHANGE_DESCRIPTION";
+          break;
+        }
+
+        request.details = state + " &bull; " + details;
+
+        var html = $(requestTmpl.applyTemplate(request));
+        empireStore.getEmpire(request.request_empire_id, function(empireName) {
+          html.find(".empire-name").html(empireName);
+        });
+        html.find(".force-accept").on("click", function() {
+          var url =
+              "/realms/{{realm}}/admin/alliance/" + request.alliance_id +
+              "/requests/" + request.id + "/force-accept"
+          $.ajax({
+            url: url,
+            type: "POST",
+            dataType: "json",
+            success: function(data) {
+              alert("success");
+            },
+            error: function(xhr, status, err) {
+              alert("An error occurred, check server logs: " + xhr.status);
+            }
+          });
+        });
+
+        requestList.append(html);
+      }
+
       $("#alliance-header").html($("#alliance-header-tmpl").applyTemplate(
               alliances[$(this).data("id")]));
       var url = "/realms/{{realm}}/alliances/" + $(this).data("id");
@@ -224,9 +321,26 @@
           fix_times();
         },
         error: function(xhr, status, err) {
-          alert("An error occured, check server logs: " + xhr.status);
+          alert("An error occurred, check server logs: " + xhr.status);
         }
-      })
+      });
+
+      $.ajax({
+        url: "/realms/{{realm}}/admin/alliance/" + $(this).data("id") + "/details?section=requests",
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          var requestList = $("#request-list tbody");
+          requestList.empty();
+          for (var i = 0; i < data.length; i++) {
+            appendRequest(requestList, data[i]);
+          }
+          fix_times();
+        },
+        error: function(xhr, status, err) {
+          alert("An error occurred, check server logs: " + xhr.status);
+        }
+      });
     });
   </script>
 {% end %}

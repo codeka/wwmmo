@@ -445,7 +445,7 @@ public class AllianceController {
       // if they're already voted for this request, then update the existing vote
       String sql = "SELECT id FROM alliance_request_votes " +
           "WHERE alliance_request_id = ? AND empire_id = ?";
-      Long id = null;
+      Long id;
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, vote.getAllianceRequestID());
         stmt.setInt(2, vote.getEmpireID());
