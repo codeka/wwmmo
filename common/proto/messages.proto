@@ -827,6 +827,9 @@ message BuildRequest {
 
   // notes you can attach to the fleet/building when it's finished
   optional string notes = 16;
+
+  // Set in the request to ask the server to immediately accelerate the build to 100%.
+  optional bool accelerate_immediately = 17;
 }
 
 //

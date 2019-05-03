@@ -1,95 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <ImageView
+    android:id="@+id/building_icon"
+    android:layout_width="48dp"
+    android:layout_height="48dp" />
+
+  <TextView
+    android:id="@+id/building_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:layout_toEndOf="@id/building_icon"
+    android:layout_toRightOf="@id/building_icon"
+    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+  <TextView
+    android:id="@+id/building_description"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="wrap_content"
+    android:layout_below="@id/building_name"
+    android:layout_alignLeft="@id/building_name"
+    android:layout_alignStart="@id/building_name" />
 
-    <ImageView
-        android:id="@+id/building_icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp" />
+  <FrameLayout
+    android:id="@+id/upgrade_vs_new_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/building_description"
+    android:layout_toRightOf="@id/building_icon"
+    android:layout_toEndOf="@id/building_icon">
 
-    <TextView
-        android:id="@+id/building_name"
+    <RelativeLayout
+      android:id="@+id/build_count_container"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:visibility="visible">
+
+      <TextView
+        android:id="@+id/build_count_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@id/building_icon"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:text="Number to build:"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/building_description"
+      <SeekBar
+        android:id="@+id/build_count_seek"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/building_name"
-        android:layout_below="@id/building_name"/>
+        android:layout_below="@id/build_count_label"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_toLeftOf="@+id/build_count_edit"
+        android:layout_toStartOf="@+id/build_count_edit" />
 
-    <FrameLayout android:id="@+id/upgrade_vs_new_container"
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:layout_below="@id/building_description"
-                 android:layout_toRightOf="@id/building_icon">
-        <RelativeLayout
-            android:id="@+id/build_count_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="visible">
+      <EditText
+        android:id="@+id/build_count_edit"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/build_count_seek"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:inputType="number" >
 
-            <TextView
-                android:id="@+id/build_count_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:text="Number to build:"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold" />
+        <requestFocus />
+      </EditText>
+    </RelativeLayout>
 
-            <SeekBar
-                android:id="@+id/build_count_seek"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/build_count_label"
-                android:layout_toLeftOf="@+id/build_count_edit"
-                android:layout_marginRight="10dp"
-                android:layout_alignParentLeft="true" />
+    <RelativeLayout
+      android:id="@+id/upgrade_container"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:visibility="gone">
 
-            <EditText
-                android:id="@+id/build_count_edit"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignBottom="@id/build_count_seek"
-                android:inputType="number" >
-                <requestFocus />
-            </EditText>
-        </RelativeLayout>
-
-        <RelativeLayout android:id="@+id/upgrade_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone">
-            <TextView android:id="@+id/upgrade_current_level_label"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_alignParentTop="true"
-                      android:text="Current Level:"
-                      android:textAppearance="?android:attr/textAppearanceSmall"
-                      android:textStyle="bold" />
-            <TextView android:id="@+id/upgrade_current_level"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_alignBaseline="@+id/upgrade_current_level_label"
-                      android:layout_toRightOf="@+id/upgrade_current_level_label"
-                      android:layout_marginLeft="10dp"
-                      android:text="1" />
-
-        </RelativeLayout>
-    </FrameLayout>
-
-    <au.com.codeka.warworlds.ctrl.BuildEstimateView
-        android:id="@+id/build_estimate"
+      <TextView
+        android:id="@+id/upgrade_current_level_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/upgrade_vs_new_container"
-        android:layout_toRightOf="@+id/building_icon" />
+        android:layout_alignParentTop="true"
+        android:text="Current Level:"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/upgrade_current_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/upgrade_current_level_label"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_toRightOf="@+id/upgrade_current_level_label"
+        android:layout_toEndOf="@+id/upgrade_current_level_label"
+        tools:text="1" />
+
+    </RelativeLayout>
+  </FrameLayout>
+
+  <au.com.codeka.warworlds.ctrl.BuildEstimateView
+    android:id="@+id/build_estimate"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/upgrade_vs_new_container"
+    android:layout_toRightOf="@+id/building_icon"
+    android:layout_toEndOf="@+id/building_icon" />
+
+  <Button
+    android:id="@+id/build_now_btn"
+    android:background="@drawable/dialog_button_extra_bg"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_below="@id/build_estimate"
+    android:text="Build now" />
 
 </RelativeLayout>

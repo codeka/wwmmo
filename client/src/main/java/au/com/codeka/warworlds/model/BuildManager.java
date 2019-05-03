@@ -43,7 +43,7 @@ public class BuildManager {
   }
 
   public void build(final Context context, final Colony colony, final Design design,
-      final Building existingBuilding, final int count) {
+      final Building existingBuilding, final int count, final boolean accelerateImmediately) {
     Messages.BuildRequest.BUILD_KIND kind;
     if (design.getDesignKind() == DesignKind.BUILDING) {
       kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
@@ -56,6 +56,7 @@ public class BuildManager {
             .setColonyKey(colony.getKey()).setEmpireKey(colony.getEmpireKey())
             .setDesignName(design.getID()).setCount(count)
             .setExistingBuildingKey(existingBuilding == null ? "" : existingBuilding.getKey())
+            .setAccelerateImmediately(accelerateImmediately)
             .build();
 
     build(context, build_request_pb);
