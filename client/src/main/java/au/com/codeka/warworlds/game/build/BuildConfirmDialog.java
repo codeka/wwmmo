@@ -296,7 +296,11 @@ public class BuildConfirmDialog extends DialogFragment {
     double cost = mineralsToUse * getCount();
 
     Button btn = view.findViewById(R.id.build_now_btn);
-    btn.setText(String.format(Locale.ENGLISH, "Build now ($%.0f)", cost));
+    btn.setText(String.format(
+        Locale.ENGLISH,
+        "%s now ($%.0f)",
+        existingBuilding == null ? "Build" : "Upgrade",
+        cost));
   }
 
   private void onBuildClick(boolean buildNow) {
