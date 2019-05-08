@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.DesignKind;
@@ -117,6 +119,21 @@ public class BuildCompleteEvent extends Event {
     }
   }
 
+  @Nullable
+  public Fleet processImmediateBuildRequest(
+      Star star, Colony colony, int empireID, String designID, DesignKind designKind,  float count,
+      String notes, @Nullable Integer existingBuildingID, @Nullable Integer existingFleetID,
+      String upgradeID) throws RequestException {
+    Fleet fleet = null;
+    if (designKind == DesignKind.BUILDING) {
+      processBuildingBuild(star, colony, empireID, existingBuildingID, designID, notes);
+    } else {
+      fleet = processFleetBuild(
+          star, colony, empireID, existingFleetID, upgradeID, designID, count, notes);
+    }
+    return fleet;
+  }
+
   private void processBuildRequest(
       int buildRequestID, Star star, Colony colony, int empireID, Integer existingBuildingID,
       Integer existingFleetID, String upgradeID, DesignKind designKind, String designID,
@@ -124,12 +141,9 @@ public class BuildCompleteEvent extends Event {
     Simulation sim = new Simulation();
     sim.simulate(star);
 
-    Fleet fleet = null;
-    if (designKind == DesignKind.BUILDING) {
-      processBuildingBuild(star, colony, empireID, existingBuildingID, designID, notes);
-    } else {
-      fleet = processFleetBuild(star, colony, empireID, existingFleetID, upgradeID, designID, count, notes);
-    }
+    Fleet fleet = processImmediateBuildRequest(
+        star, colony, empireID, designID, designKind, count, notes, existingBuildingID,
+        existingFleetID, upgradeID);
 
     sim.simulate(star); // simulate again to re-calculate the end times
     new StarController().update(star);

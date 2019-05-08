@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server.model;
 
 import java.sql.SQLException;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
@@ -71,7 +73,9 @@ public class BuildRequest extends BaseBuildRequest {
     public int getEmpireID() {
         return mEmpireID;
     }
-    public int getExistingBuildingID() {
+
+    @Nullable
+    public Integer getExistingBuildingID() {
         return mExistingBuildingID;
     }
 

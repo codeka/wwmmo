@@ -3,17 +3,20 @@ package au.com.codeka.warworlds.server.handlers;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.BuildQueueController;
+import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.events.BuildCompleteEvent;
 import au.com.codeka.warworlds.server.model.BuildRequest;
 import au.com.codeka.warworlds.server.model.Colony;
+import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildQueueHandler extends RequestHandler {
@@ -54,20 +57,42 @@ public class BuildQueueHandler extends RequestHandler {
       buildRequest.setPlanetIndex(colony.getPlanetIndex());
       buildRequest.setStartTime(DateTime.now());
       buildRequest.setEndTime(DateTime.now().plusMinutes(5));
-      new BuildQueueController(t).build(buildRequest);
-
-      // add the build request to the star and simulate again
-      star.getBuildRequests().add(buildRequest);
-      new Simulation().simulate(star);
-      new StarController(t).update(star);
-
-      t.commit();
 
       if (build_request_pb.getAccelerateImmediately()) {
-        new BuildQueueController().accelerate(star, buildRequest, 1.0f);
-        new BuildQueueController().saveBuildRequest(buildRequest);
-        new BuildCompleteEvent().process();
+        // If we're accelerating immediately, skip all the build request stuff, just take their
+        // cash an add the building/fleet.
+        float cost = buildRequest.getDesign().getBuildCost().getCostInMinerals()
+            * buildRequest.getCount();
+
+        Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder();
+        audit_record_pb.setEmpireId(buildRequest.getEmpireID());
+        audit_record_pb.setBuildDesignId(buildRequest.getDesignID());
+        audit_record_pb.setBuildCount(buildRequest.getCount());
+        audit_record_pb.setAccelerateAmount(1.0f);
+        if (!new EmpireController().withdrawCash(
+            buildRequest.getEmpireID(), cost, audit_record_pb)) {
+          throw new RequestException(400, Messages.GenericError.ErrorCode.InsufficientCash,
+              "You don't have enough cash to accelerate this build.");
+        }
+
+        // This actually directly adds the building/fleet, skipping all the stuff that saves the
+        // build request, simulates the star, finishes the request, simulates and save the star
+        // again.
+        new BuildCompleteEvent().processImmediateBuildRequest(
+            star, colony, buildRequest.getEmpireID(), buildRequest.getDesign().getID(),
+            buildRequest.getDesignKind(), buildRequest.getCount(), buildRequest.getNotes(),
+            buildRequest.getExistingBuildingID(), buildRequest.getExistingFleetID(),
+            buildRequest.getUpgradeID());
+      } else {
+        new BuildQueueController(t).build(buildRequest);
+
+        // add the build request to the star and simulate again
+        star.getBuildRequests().add(buildRequest);
+        new Simulation().simulate(star);
+        new StarController(t).update(star);
       }
+
+      t.commit();
 
       Messages.BuildRequest.Builder build_request_pb_builder = Messages.BuildRequest.newBuilder();
       buildRequest.toProtocolBuffer(build_request_pb_builder);
