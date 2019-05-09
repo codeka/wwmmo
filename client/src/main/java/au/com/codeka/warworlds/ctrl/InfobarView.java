@@ -17,15 +17,14 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 
 /**
- * The "infobar" control displays the current empire name, your cash level and
- * few other indicators that we want visible (almost) everywhere.
+ * The "infobar" control displays the current empire name, your cash level and few other indicators
+ * that we want visible (almost) everywhere.
  */
 public class InfobarView extends FrameLayout {
   private Handler handler;
   private View view;
 
-  // The cash value we're currently displaying, so we can animate to the "real"
-  // value as it's
+  // The cash value we're currently displaying, so we can animate to the "real" value as it's
   // updated.
   private static double sCurrCash;
   private static double sRealCash;

@@ -38,7 +38,8 @@ public class BuildAccelerateHandler extends RequestHandler {
         }
 
         if (buildRequest.getCount() < 1) {
-          throw new RequestException(500, "Shouldn't be able to see " + buildRequest.getCount() + " ships?");
+          throw new RequestException(
+              500, "Shouldn't be able to see " + buildRequest.getCount() + " ships?");
         }
 
         if (new BuildQueueController().accelerate(star, buildRequest, accelerateAmount)) {

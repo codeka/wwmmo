@@ -204,9 +204,6 @@ public class BuildAccelerateDialog extends DialogFragment {
         // Tell the StarManager that this star has been updated.
         StarManager.i.refreshStar(Integer.parseInt(star.getKey()));
 
-        // tell the EmpireManager to update the empire (since our cash will have gone down)
-        //EmpireManager.i.refreshEmpire();
-
         if (mErrorMsg != null && activity != null) {
           new StyledDialog.Builder(activity.getApplicationContext())
               .setMessage(mErrorMsg)

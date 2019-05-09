@@ -238,10 +238,17 @@ public class EmpireController {
       audit_record_pb.setAfterCash((float) (cashBefore + amount));
       audit_record_pb.setTime(DateTime.now().getMillis() / 1000);
 
-      stmt = t.prepare("UPDATE empires SET cash = cash + ? WHERE id = ?");
+      stmt = t.prepare("UPDATE empires SET cash = cash + ? WHERE id = ? RETURNING cash");
       stmt.setDouble(1, amount);
       stmt.setInt(2, empireId);
-      stmt.update();
+      SqlResult res = stmt.updateAndSelect();
+      if (res.next()) {
+        double totalCash = res.getDouble(1);
+
+        // Send a notification that cash has been updated.
+        new NotificationController().sendNotificationToOnlineEmpire(
+            empireId, "cash", Double.toString(totalCash));
+      }
 
       stmt = t.prepare("INSERT INTO empire_cash_audit (empire_id, cash_before, cash_after,"
           + " time, reason) VALUES (?, ?, ?, ?, ?)");
@@ -255,6 +262,8 @@ public class EmpireController {
       if (!existingTransaction) {
         t.commit();
       }
+
+
       return true;
     } catch (Exception e) {
       throw new RequestException(e);

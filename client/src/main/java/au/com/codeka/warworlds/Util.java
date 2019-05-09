@@ -69,10 +69,8 @@ public class Util {
    * preferences and settings to make later calls easier (and not require a \c Context parameter).
    */
   public static Properties loadProperties() {
-    log.info("DEANH Util.loadProperties()");
     if (sProperties != null) {
       // if it's already loaded, don't do it again
-      log.info("DEANH Util.loadProperties() already loaded: " + sProperties);
       return sProperties;
     }
 
@@ -81,7 +79,6 @@ public class Util {
 
     InputStream inputStream = null;
     try {
-      log.info("DEANH loading warworlds.properties");
       inputStream = assetManager.open("warworlds.properties");
       sProperties = new Properties();
       sProperties.load(inputStream);

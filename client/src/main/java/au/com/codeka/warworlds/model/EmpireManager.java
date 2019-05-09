@@ -113,7 +113,7 @@ public class EmpireManager {
       return;
     }
 
-    refreshEmpire(myEmpire.getID(), false);
+    refreshEmpire(myEmpire.getID(), true);
   }
 
   public void refreshEmpire(final Integer empireID) {

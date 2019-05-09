@@ -182,10 +182,8 @@ public class RequestManager {
   }
 
   private static class LoggingInterceptor implements Interceptor {
-
     @Override
     public Response intercept(Chain chain) throws IOException {
-      log.info("chain!!");
       Request request = chain.request();
       if (!DBG) {
         return chain.proceed(request);
