@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "110304633160-f81qr5lvsg0672ia93mmpmivs3088ljv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.codeka.warworlds2",
+            "certificate_hash": "be6ffde6e562eb268f5e7dd7cfa0e497ba1a74ae"
+          }
+        },
+        {
+          "client_id": "110304633160-3rfdtgab2m1ovmi6que40r4gguhr30ha.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.codeka.warworlds2",
+            "certificate_hash": "a6a9a0972dccd5cf5e78dac1fd304169674c8621"
+          }
+        },
+        {
           "client_id": "110304633160-tj811p2e5768vv6ps3t98hl9c9h4aaig.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -25,20 +41,13 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "110304633160-tj811p2e5768vv6ps3t98hl9c9h4aaig.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }

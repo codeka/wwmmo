@@ -21,7 +21,6 @@ import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
-import sun.security.krb5.internal.crypto.Des;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -268,7 +267,7 @@ public class StarModifier {
             .state_start_time(System.currentTimeMillis())
             .build());
         numAttacking++;
-
+      }
     }
     float fuelAmount = 0.0f;
     Design design =

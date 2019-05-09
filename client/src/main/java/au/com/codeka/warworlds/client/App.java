@@ -4,6 +4,7 @@ import android.app.Application;
 import android.os.Handler;
 
 import com.google.common.base.Preconditions;
+import com.google.firebase.FirebaseApp;
 
 import au.com.codeka.warworlds.client.concurrency.TaskRunner;
 import au.com.codeka.warworlds.client.concurrency.Threads;

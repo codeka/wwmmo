@@ -11,7 +11,7 @@ SET INSTALLPATH=%ROOTPATH%\server\build\install\server
 SET RUNPATH=%ROOTPATH%\server\src\main
 
 PUSHD %ROOTPATH%
-CALL gradlew.bat --daemon :server:installDist
+CALL gradlew.bat --daemon :server:installDist -Pandroid.debug.obsoleteApi=true
 POPD
 
 rem This is so the app running on the phone will be able to connect to us. 8080 for the normal

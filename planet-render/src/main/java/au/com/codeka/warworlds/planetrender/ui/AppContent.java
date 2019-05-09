@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.planetrender.ui;
 
-import org.omg.CORBA.Environment;
-
 import au.com.codeka.warworlds.common.Colour;
 import au.com.codeka.warworlds.common.Image;
 import au.com.codeka.warworlds.common.PerlinNoise;
@@ -23,7 +21,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;

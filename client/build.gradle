@@ -1,10 +1,10 @@
 buildscript {
   repositories {
-    mavenCentral()
+    jcenter()
   }
 
   dependencies {
-    classpath 'org.ajoberstar:grgit:1.5.0'
+    classpath 'org.ajoberstar.grgit:grgit-core:3.1.1'
   }
 }
 
@@ -43,6 +43,12 @@ android {
       keyPassword signingProps['password']
     }
   }
+
+  configurations {
+    // This seems like a weird bug... something else includes listenablefuture from guava.
+    all*.exclude group: 'com.google.guava', module: 'listenablefuture'
+  }
+
   buildTypes {
     release {
       minifyEnabled false
@@ -87,19 +93,19 @@ android.applicationVariants.all { variant ->
   }
 }
 
-static def getVersionCodeFromGit() {
+def getVersionCodeFromGit() {
   // Same as running:
   // git rev-list <checked out branch name> | wc -l
-  return Grgit.open().log().size()
+  return Grgit.open(dir: project.buildscript.sourceFile.parentFile.parent).log().size()
 }
 
 dependencies {
   implementation 'androidx.appcompat:appcompat:1.0.2'
-  implementation 'com.google.android.material:material:1.1.0-alpha01'
-  implementation 'androidx.preference:preference:1.1.0-alpha01'
-  implementation 'com.google.android.gms:play-services-base:16.0.1'
-  implementation 'com.google.firebase:firebase-core:16.0.5'
-  implementation 'com.google.firebase:firebase-messaging:17.3.4'
+  implementation 'com.google.android.material:material:1.1.0-alpha06'
+  implementation 'androidx.preference:preference:1.1.0-alpha05'
+  implementation 'com.google.android.gms:play-services-base:16.1.0'
+  implementation 'com.google.firebase:firebase-core:16.0.9'
+  implementation 'com.google.firebase:firebase-messaging:18.0.0'
   implementation 'com.google.guava:guava:24.1-android'
   implementation 'com.squareup.picasso:picasso:2.71828'
   implementation 'com.squareup.wire:wire-runtime:2.1.2'
