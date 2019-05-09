@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import org.joda.time.DateTime;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -21,7 +22,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
@@ -42,218 +45,230 @@ import au.com.codeka.warworlds.model.Star;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class ShipUpgradeDialog extends DialogFragment {
-    private final Log log = new Log("ShipUpgradeDialog");
-    private View mView;
-    private Star mStar;
-    private Colony mColony;
-    private Fleet mFleet;
-    private BuildEstimateView mBuildEstimateView;
-    private ShipDesign.Upgrade mUpgrade;
+  private final Log log = new Log("ShipUpgradeDialog");
+  private Star star;
+  private Colony colony;
+  private Fleet fleet;
+  private BuildEstimateView buildEstimateView;
+  private ShipDesign.Upgrade upgrade;
 
-    public void setup(Star star, Colony colony, Fleet fleet) {
-        Bundle args = new Bundle();
+  public void setup(Star star, Colony colony, Fleet fleet) {
+    Bundle args = new Bundle();
 
-        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
-        star.toProtocolBuffer(star_pb);
-        args.putByteArray("au.com.codeka.warworlds.Star", star_pb.build().toByteArray());
-        args.putString("au.com.codeka.warworlds.FleetKey", fleet.getKey());
-        args.putString("au.com.codeka.warworlds.ColonyKey", colony.getKey());
+    Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+    star.toProtocolBuffer(star_pb);
+    args.putByteArray("au.com.codeka.warworlds.Star", star_pb.build().toByteArray());
+    args.putString("au.com.codeka.warworlds.FleetKey", fleet.getKey());
+    args.putString("au.com.codeka.warworlds.ColonyKey", colony.getKey());
 
-        setArguments(args);
+    setArguments(args);
+  }
+
+  @Override
+  @NonNull
+  public Dialog onCreateDialog(Bundle savedInstanceState) {
+    super.onCreateDialog(savedInstanceState);
+    fetchArguments();
+
+    final Activity activity = checkNotNull(getActivity());
+    LayoutInflater inflater = activity.getLayoutInflater();
+    @SuppressLint("InflateParams") // no parent for dialogs
+    View view = inflater.inflate(R.layout.build_ship_upgrade_dlg, null);
+
+    ImageView fleetIcon = view.findViewById(R.id.fleet_icon);
+    TextView fleetName = view.findViewById(R.id.fleet_name);
+    ListView upgradesList = view.findViewById(R.id.upgrades);
+    TextView upgradesNone = view.findViewById(R.id.upgrades_none);
+    buildEstimateView = view.findViewById(R.id.build_estimate);
+    buildEstimateView.setOnBuildEstimateRefreshRequired(
+        new BuildEstimateView.BuildEstimateRefreshRequiredHandler() {
+          @Override
+          public void onBuildEstimateRefreshRequired() {
+            refreshBuildEstimate();
+          }
+        });
+
+    ShipDesign design = fleet.getDesign();
+    Sprite sprite = SpriteManager.i.getSprite(design.getSpriteName());
+    fleetIcon.setImageDrawable(new SpriteDrawable(sprite));
+
+    fleetName.setText(String.format(Locale.ENGLISH, "%d × %s",
+        (int) fleet.getNumShips(), design.getDisplayName()));
+
+    final UpgradeListAdapter upgradeListAdapter = new UpgradeListAdapter();
+    upgradesList.setAdapter(upgradeListAdapter);
+
+    ArrayList<ShipDesign.Upgrade> upgrades = new ArrayList<>();
+    for (ShipDesign.Upgrade upgrade : design.getUpgrades()) {
+      if (!fleet.hasUpgrade(upgrade.getID())) {
+        upgrades.add(upgrade);
+      }
+    }
+    if (upgrades.size() > 0) {
+      log.debug("%d updates available.", upgrades.size());
+      upgradeListAdapter.setup(upgrades);
+
+      // select the first one by default
+      upgradeListAdapter.setSelectedItem(0);
+      upgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(0);
+      refreshBuildEstimate();
+
+      upgradesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
+          upgradeListAdapter.setSelectedItem(position);
+
+          upgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(position);
+          refreshBuildEstimate();
+        }
+      });
+    } else {
+      log.debug("No upgrades available.");
+      upgradesList.setVisibility(View.GONE);
+      upgradesNone.setVisibility(View.VISIBLE);
+    }
+
+    return new StyledDialog.Builder(getActivity())
+        .setView(view)
+        .setPositiveButton("Upgrade", new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            onUpgradeClick();
+          }
+        })
+        .setNegativeButton("Cancel", null)
+        .create();
+  }
+
+  private void fetchArguments() {
+    try {
+      Bundle args = checkNotNull(getArguments());
+      Messages.Star star_pb =
+          Messages.Star.parseFrom(args.getByteArray("au.com.codeka.warworlds.Star"));
+      star = new Star();
+      star.fromProtocolBuffer(star_pb);
+
+      String fleetKey = args.getString("au.com.codeka.warworlds.FleetKey");
+      for (BaseFleet baseFleet : star.getFleets()) {
+        if (baseFleet.getKey().equals(fleetKey)) {
+          fleet = (Fleet) baseFleet;
+          break;
+        }
+      }
+
+      String colonyKey = args.getString("au.com.codeka.warworlds.ColonyKey");
+      for (BaseColony baseColony : star.getColonies()) {
+        if (baseColony.getKey().equals(colonyKey)) {
+          colony = (Colony) baseColony;
+          break;
+        }
+      }
+    } catch (InvalidProtocolBufferException e) {
+      // ignore . . .
+    }
+  }
+
+  private void refreshBuildEstimate() {
+    if (upgrade == null) {
+      buildEstimateView.refresh(star, null);
+      return;
+    }
+
+    final DateTime startTime = DateTime.now();
+
+    BuildRequest buildRequest = new BuildRequest("FAKE_BUILD_REQUEST",
+        DesignKind.SHIP, fleet.getDesignID(), colony.getKey(), startTime,
+        (int) fleet.getNumShips(), null, 0, Integer.parseInt(fleet.getKey()),
+        upgrade.getID(), star.getKey(), colony.getPlanetIndex(), colony.getEmpireKey(),
+        null);
+
+    buildEstimateView.refresh(star, buildRequest);
+  }
+
+  private void onUpgradeClick() {
+    if (upgrade == null) {
+      dismiss();
+      return;
+    }
+
+    final Activity activity = getActivity();
+
+    BuildManager.i.build(activity, colony, fleet.getDesign(), Integer.parseInt(fleet.getKey()),
+        (int) fleet.getNumShips(), upgrade.getID());
+
+    dismiss();
+  }
+
+  /**
+   * This adapter is used to populate the list of upgrade designs in our view.
+   */
+  private class UpgradeListAdapter extends BaseAdapter {
+    private List<ShipDesign.Upgrade> mEntries;
+    private ShipDesign.Upgrade mSelectedEntry;
+
+    public void setup(List<ShipDesign.Upgrade> upgrades) {
+      mEntries = new ArrayList<>(upgrades);
+      notifyDataSetChanged();
+    }
+
+    void setSelectedItem(int position) {
+      mSelectedEntry = mEntries.get(position);
+      notifyDataSetChanged();
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        super.onCreateDialog(savedInstanceState);
-        fetchArguments();
-
-        final Activity activity = getActivity();
-        LayoutInflater inflater = activity.getLayoutInflater();
-        mView = inflater.inflate(R.layout.build_ship_upgrade_dlg, null);
-
-        ImageView fleetIcon = (ImageView) mView.findViewById(R.id.fleet_icon);
-        TextView fleetName = (TextView) mView.findViewById(R.id.fleet_name);
-        ListView upgradesList = (ListView) mView.findViewById(R.id.upgrades);
-        TextView upgradesNone = (TextView) mView.findViewById(R.id.upgrades_none);
-        mBuildEstimateView = (BuildEstimateView) mView.findViewById(R.id.build_estimate);
-        mBuildEstimateView.setOnBuildEstimateRefreshRequired(new BuildEstimateView.BuildEstimateRefreshRequiredHandler() {
-            @Override
-            public void onBuildEstimateRefreshRequired() {
-                refreshBuildEstimate();
-            }
-        });
-
-        ShipDesign design = mFleet.getDesign();
-        Sprite sprite = SpriteManager.i.getSprite(design.getSpriteName());
-        fleetIcon.setImageDrawable(new SpriteDrawable(sprite));
-
-        fleetName.setText(String.format(Locale.ENGLISH, "%d × %s",
-                (int) mFleet.getNumShips(), design.getDisplayName()));
-
-        final UpgradeListAdapter upgradeListAdapter = new UpgradeListAdapter();
-        upgradesList.setAdapter(upgradeListAdapter);
-
-        ArrayList<ShipDesign.Upgrade> upgrades = new ArrayList<ShipDesign.Upgrade>();
-        for (ShipDesign.Upgrade upgrade : design.getUpgrades()) {
-            if (!mFleet.hasUpgrade(upgrade.getID())) {
-                upgrades.add(upgrade);
-            }
-        }
-        if (upgrades.size() > 0) {
-            log.debug("%d updates available.", upgrades.size());
-            upgradeListAdapter.setup(upgrades);
-
-            // select the first one by default
-            upgradeListAdapter.setSelectedItem(0);
-            mUpgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(0);
-            refreshBuildEstimate();
-
-            upgradesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
-                    upgradeListAdapter.setSelectedItem(position);
-    
-                    mUpgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(position);
-                    refreshBuildEstimate();
-                }
-            });
-        } else {
-            log.debug("No upgrades available.");
-            upgradesList.setVisibility(View.GONE);
-            upgradesNone.setVisibility(View.VISIBLE);
-        }
-
-        return new StyledDialog.Builder(getActivity())
-               .setView(mView)
-               .setPositiveButton("Upgrade", new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which) {
-                       onUpgradeClick();
-                   }
-               })
-               .setNegativeButton("Cancel", null)
-                       .create();
+    public int getCount() {
+      if (mEntries == null)
+        return 0;
+      return mEntries.size();
     }
 
-    private void fetchArguments() {
-        try {
-            Bundle args = getArguments();
-            Messages.Star star_pb = Messages.Star.parseFrom(args.getByteArray("au.com.codeka.warworlds.Star"));
-            mStar = new Star();
-            mStar.fromProtocolBuffer(star_pb);
-
-            String fleetKey = args.getString("au.com.codeka.warworlds.FleetKey");
-            for (BaseFleet baseFleet : mStar.getFleets()) {
-                if (baseFleet.getKey().equals(fleetKey)) {
-                    mFleet = (Fleet) baseFleet;
-                    break;
-                }
-            }
-
-            String colonyKey = args.getString("au.com.codeka.warworlds.ColonyKey");
-            for (BaseColony baseColony : mStar.getColonies()) {
-                if (baseColony.getKey().equals(colonyKey)) {
-                    mColony = (Colony) baseColony;
-                    break;
-                }
-            }
-        } catch (InvalidProtocolBufferException e) {
-            // ignore . . .
-        }
+    @Override
+    public Object getItem(int position) {
+      if (mEntries == null)
+        return null;
+      return mEntries.get(position);
     }
 
-    private void refreshBuildEstimate() {
-        if (mUpgrade == null) {
-            mBuildEstimateView.refresh(mStar, null);
-            return;
-        }
-
-        final DateTime startTime = DateTime.now();
-
-        BuildRequest buildRequest = new BuildRequest("FAKE_BUILD_REQUEST",
-                DesignKind.SHIP, mFleet.getDesignID(), mColony.getKey(), startTime,
-                (int) mFleet.getNumShips(), null, 0, Integer.parseInt(mFleet.getKey()),
-                mUpgrade.getID(), mStar.getKey(), mColony.getPlanetIndex(), mColony.getEmpireKey(),
-                null);
-
-        mBuildEstimateView.refresh(mStar, buildRequest);
+    @Override
+    public long getItemId(int position) {
+      return position;
     }
 
-    private void onUpgradeClick() {
-        if (mUpgrade == null) {
-            dismiss();
-            return;
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      ShipDesign.Upgrade entry = mEntries.get(position);
+
+      View view = convertView;
+      if (view == null) {
+        Activity activity = getActivity();
+        if (activity == null) {
+          return null;
         }
 
-        final Activity activity = getActivity();
+        LayoutInflater inflater =
+            (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view = inflater.inflate(R.layout.build_ship_upgrade_row, parent, false);
+      }
 
-        BuildManager.i.build(activity, mColony, mFleet.getDesign(), Integer.parseInt(mFleet.getKey()),
-                (int) mFleet.getNumShips(), mUpgrade.getID());
+      if (mSelectedEntry != null && mSelectedEntry.getID().equals(entry.getID())) {
+        view.setBackgroundResource(R.color.list_item_selected);
+      } else {
+        view.setBackgroundResource(R.color.list_item_normal);
+      }
 
-        dismiss();
+      ImageView upgradeIcon = view.findViewById(R.id.upgrade_icon);
+      TextView upgradeName = view.findViewById(R.id.upgrade_name);
+      TextView upgradeDescription = view.findViewById(R.id.upgrade_description);
+
+      upgradeIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(entry.getSpriteName())));
+      upgradeName.setText(entry.getDisplayName());
+      upgradeDescription.setText(Html.fromHtml(entry.getDescription()));
+
+      return view;
     }
-
-    /** This adapter is used to populate the list of upgrade designs in our view. */
-    private class UpgradeListAdapter extends BaseAdapter {
-        private List<ShipDesign.Upgrade> mEntries;
-        private ShipDesign.Upgrade mSelectedEntry;
-
-        public void setup(List<ShipDesign.Upgrade> upgrades) {
-            mEntries = new ArrayList<>(upgrades);
-            notifyDataSetChanged();
-        }
-
-        public void setSelectedItem(int position) {
-            mSelectedEntry = mEntries.get(position);
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            if (mEntries == null)
-                return 0;
-            return mEntries.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            if (mEntries == null)
-                return null;
-            return mEntries.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ShipDesign.Upgrade entry = mEntries.get(position);
-
-            View view = convertView;
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
-                        (Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.build_ship_upgrade_row, parent, false);
-            }
-
-            if (mSelectedEntry != null && mSelectedEntry.getID().equals(entry.getID())) {
-                view.setBackgroundResource(R.color.list_item_selected);
-            } else {
-                view.setBackgroundResource(R.color.list_item_normal);
-            }
-
-            ImageView upgradeIcon = (ImageView) view.findViewById(R.id.upgrade_icon);
-            TextView upgradeName = (TextView) view.findViewById(R.id.upgrade_name);
-            TextView upgradeDescription = (TextView) view.findViewById(R.id.upgrade_description);
-
-            upgradeIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(entry.getSpriteName())));
-            upgradeName.setText(entry.getDisplayName());
-            upgradeDescription.setText(Html.fromHtml(entry.getDescription()));
-
-            return view;
-        }
-    }
+  }
 }
