@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,6 +38,7 @@ import au.com.codeka.warworlds.ctrl.BuildEstimateView;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
@@ -49,6 +51,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ShipUpgradeDialog extends DialogFragment {
   private final Log log = new Log("ShipUpgradeDialog");
+  private Button buildNowBtn;
   private Star star;
   private Colony colony;
   private Fleet fleet;
@@ -77,6 +80,7 @@ public class ShipUpgradeDialog extends DialogFragment {
     LayoutInflater inflater = activity.getLayoutInflater();
     @SuppressLint("InflateParams") // no parent for dialogs
     View view = inflater.inflate(R.layout.build_ship_upgrade_dlg, null);
+    buildNowBtn = view.findViewById(R.id.build_now_btn);
 
     ImageView fleetIcon = view.findViewById(R.id.fleet_icon);
     TextView fleetName = view.findViewById(R.id.fleet_name);
@@ -88,6 +92,7 @@ public class ShipUpgradeDialog extends DialogFragment {
           @Override
           public void onBuildEstimateRefreshRequired() {
             refreshBuildEstimate();
+            refreshBuildNowCost();
           }
         });
 
@@ -115,6 +120,7 @@ public class ShipUpgradeDialog extends DialogFragment {
       upgradeListAdapter.setSelectedItem(0);
       upgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(0);
       refreshBuildEstimate();
+      refreshBuildNowCost();
 
       upgradesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         @Override
@@ -123,6 +129,7 @@ public class ShipUpgradeDialog extends DialogFragment {
 
           upgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(position);
           refreshBuildEstimate();
+          refreshBuildNowCost();
         }
       });
     } else {
@@ -131,12 +138,19 @@ public class ShipUpgradeDialog extends DialogFragment {
       upgradesNone.setVisibility(View.VISIBLE);
     }
 
+    buildNowBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        onUpgradeClick(true);
+      }
+    });
+
     return new StyledDialog.Builder(getActivity())
         .setView(view)
         .setPositiveButton("Upgrade", new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
-            onUpgradeClick();
+            onUpgradeClick(false);
           }
         })
         .setNegativeButton("Cancel", null)
@@ -188,7 +202,12 @@ public class ShipUpgradeDialog extends DialogFragment {
     buildEstimateView.refresh(star, buildRequest);
   }
 
-  private void onUpgradeClick() {
+  private void refreshBuildNowCost() {
+    double cost = upgrade.getBuildCost().getCostInMinerals() * fleet.getNumShips();
+    buildNowBtn.setText(String.format(Locale.ENGLISH, "Upgrade now ($%.0f)", cost));
+  }
+
+  private void onUpgradeClick(boolean accelerateImmediately) {
     if (upgrade == null) {
       dismiss();
       return;
@@ -196,9 +215,9 @@ public class ShipUpgradeDialog extends DialogFragment {
 
     final Activity activity = getActivity();
 
-    BuildManager.i.build(activity, colony, fleet.getDesign(), Integer.parseInt(fleet.getKey()),
-        (int) fleet.getNumShips(), upgrade.getID());
-
+    BuildManager.i.build(
+        activity, colony, fleet.getDesign(), Integer.parseInt(fleet.getKey()),
+        (int) fleet.getNumShips(), upgrade.getID(), accelerateImmediately);
     dismiss();
   }
 

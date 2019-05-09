@@ -1,49 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
 
-    <ImageView android:id="@+id/fleet_icon"
-               android:layout_width="48dp"
-               android:layout_height="48dp"
-               android:src="@drawable/app_icon" />
+  <ImageView
+    android:id="@+id/fleet_icon"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:src="@drawable/app_icon" />
 
-    <TextView android:id="@+id/fleet_name"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_alignParentTop="true"
-              android:layout_toRightOf="@id/fleet_icon"
-              android:text="Fleet Name"
-              android:textAppearance="?android:attr/textAppearanceMedium" />
+  <TextView
+    android:id="@+id/fleet_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:layout_toRightOf="@id/fleet_icon"
+    android:layout_toEndOf="@id/fleet_icon"
+    tools:text="Fleet Name"
+    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView android:id="@+id/fleet_description"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_alignLeft="@id/fleet_name"
-              android:layout_below="@id/fleet_name"
-              android:text="Some extra details" />
+  <TextView
+    android:id="@+id/fleet_description"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/fleet_name"
+    android:layout_alignLeft="@id/fleet_name"
+    android:layout_alignStart="@id/fleet_name"
+    tools:text="Some extra details" />
 
-    <ListView android:id="@+id/upgrades"
-              android:layout_above="@+id/build_estimate"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_below="@+id/fleet_icon" />
+  <ListView
+    android:id="@+id/upgrades"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:layout_height="90dp"
+    android:layout_below="@+id/fleet_icon" />
 
-    <TextView android:id="@+id/upgrades_none"
-              android:layout_above="@+id/build_estimate"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_below="@+id/fleet_icon"
-              android:gravity="center_horizontal"
-              android:layout_marginTop="20dp"
-              android:text="No upgrades available for this fleet."
-              android:visibility="gone" />
+  <TextView
+    android:id="@+id/upgrades_none"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_above="@+id/build_estimate"
+    android:layout_below="@+id/fleet_icon"
+    android:layout_marginTop="20dp"
+    android:gravity="center_horizontal"
+    android:text="No upgrades available for this fleet."
+    android:visibility="gone" />
 
-    <au.com.codeka.warworlds.ctrl.BuildEstimateView
-        android:id="@+id/build_estimate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="50dp" />
+  <au.com.codeka.warworlds.ctrl.BuildEstimateView
+    android:id="@+id/build_estimate"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/upgrades"
+    android:layout_marginLeft="50dp"
+    android:layout_marginStart="50dp" />
 
+  <Button
+    android:id="@+id/build_now_btn"
+    android:background="@drawable/dialog_button_extra_bg"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_below="@id/build_estimate"
+    tools:text="Upgrade now ($xxx)" />
+  
 </RelativeLayout>

@@ -42,8 +42,9 @@ public class BuildManager {
     RequestManager.i.sendRequest(new ApiRequest.Builder("buildqueue", "PUT").body(build).build());
   }
 
-  public void build(final Context context, final Colony colony, final Design design,
-      final Building existingBuilding, final int count, final boolean accelerateImmediately) {
+  public void build(
+      Context context, Colony colony, Design design, Building existingBuilding, int count,
+      boolean accelerateImmediately) {
     Messages.BuildRequest.BUILD_KIND kind;
     if (design.getDesignKind() == DesignKind.BUILDING) {
       kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
@@ -62,12 +63,14 @@ public class BuildManager {
     build(context, build_request_pb);
   }
 
-  public void build(final Context context, final Colony colony, final Design design,
-      final int fleetID, final int count, final String upgradeID) {
+  public void build(
+      Context context, Colony colony, Design design, int fleetID, int count, String upgradeID,
+      boolean accelerateImmediately) {
     Messages.BuildRequest build_request_pb =
         Messages.BuildRequest.newBuilder().setBuildKind(Messages.BuildRequest.BUILD_KIND.SHIP)
             .setStarKey(colony.getStarKey()).setColonyKey(colony.getKey())
             .setEmpireKey(colony.getEmpireKey()).setDesignName(design.getID())
+            .setAccelerateImmediately(accelerateImmediately)
             .setExistingFleetId(fleetID).setCount(count).setUpgradeId(upgradeID).build();
 
     build(context, build_request_pb);
