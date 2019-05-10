@@ -141,7 +141,7 @@ public class BuildQueueController {
         if (otherBuildRequest.getExistingBuildingKey() == null) {
           continue;
         }
-        if (otherBuildRequest.getExistingBuildingID() == buildRequest.getExistingBuildingID()) {
+        if (otherBuildRequest.getExistingBuildingID().equals(buildRequest.getExistingBuildingID())) {
           throw new RequestException(400,
               Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
               String.format("Cannot upgrade %s, upgrade is already in progress.",
