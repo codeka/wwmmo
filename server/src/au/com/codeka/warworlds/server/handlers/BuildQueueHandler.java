@@ -78,6 +78,7 @@ public class BuildQueueHandler extends RequestHandler {
         // This actually directly adds the building/fleet, skipping all the stuff that saves the
         // build request, simulates the star, finishes the request, simulates and save the star
         // again.
+        new BuildQueueController().ensureBuildAllowed(star, buildRequest);
         new BuildCompleteEvent().processImmediateBuildRequest(
             star, colony, buildRequest.getEmpireID(), buildRequest.getDesign().getID(),
             buildRequest.getDesignKind(), buildRequest.getCount(), buildRequest.getNotes(),

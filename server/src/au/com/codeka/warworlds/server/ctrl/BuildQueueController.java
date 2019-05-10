@@ -37,12 +37,19 @@ public class BuildQueueController {
     db = new DataBase(trans);
   }
 
-  public void build(BuildRequest buildRequest) throws RequestException {
-    Star star = new StarController(db.getTransaction()).getStar(buildRequest.getStarID());
+  /**
+   * Ensures that the given {@link BuildRequest} is allowed, and throws a {@link RequestException}
+   * if it is not.
+   *
+   * @param star The {@link Star} this build request is being performed on.
+   * @param buildRequest The {@link BuildRequest} to validate.
+   * @throws RequestException if the request should not be allowed to proceed.
+   */
+  public void ensureBuildAllowed(Star star, BuildRequest buildRequest) throws RequestException {
     Colony colony = star.getColony(buildRequest.getColonyID());
 
-    Design design = DesignManager.i.getDesign(buildRequest.getDesignKind(),
-        buildRequest.getDesignID());
+    Design design =
+        DesignManager.i.getDesign(buildRequest.getDesignKind(), buildRequest.getDesignID());
 
     if (buildRequest.getCount() <= 0) {
       throw new RequestException(400, "Cannot build negative count.");
@@ -226,6 +233,11 @@ public class BuildQueueController {
                 shipDesign.getDisplayName()));
       }
     }
+  }
+
+  public void build(BuildRequest buildRequest) throws RequestException {
+    Star star = new StarController(db.getTransaction()).getStar(buildRequest.getStarID());
+    ensureBuildAllowed(star, buildRequest);
 
     // OK, we're good to go, let's go!
     String sql = "INSERT INTO build_requests (star_id, planet_index, colony_id, empire_id," +
