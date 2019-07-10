@@ -14,7 +14,7 @@ public class RealmContext {
     private Realm mGlobalRealm;
 
     private RealmContext() {
-        mThreadRealms = new ThreadLocal<Realm>();
+        mThreadRealms = new ThreadLocal<>();
         mGlobalRealm = null;
     }
 

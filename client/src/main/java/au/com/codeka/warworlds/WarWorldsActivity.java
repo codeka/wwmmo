@@ -64,11 +64,11 @@ public class WarWorldsActivity extends BaseActivity {
     View rootView = findViewById(android.R.id.content);
     ActivityBackgroundGenerator.setBackground(rootView);
 
-    startGameButton = (Button) findViewById(R.id.start_game_btn);
-    connectionStatus = (TextView) findViewById(R.id.connection_status);
-    realmName = (TextView) findViewById(R.id.realm_name);
-    final Button realmSelectButton = (Button) findViewById(R.id.realm_select_btn);
-    final Button optionsButton = (Button) findViewById(R.id.options_btn);
+    startGameButton = findViewById(R.id.start_game_btn);
+    connectionStatus = findViewById(R.id.connection_status);
+    realmName = findViewById(R.id.realm_name);
+    final Button realmSelectButton = findViewById(R.id.realm_select_btn);
+    final Button optionsButton = findViewById(R.id.options_btn);
 
     refreshWelcomeMessage();
 
@@ -139,8 +139,8 @@ public class WarWorldsActivity extends BaseActivity {
     realmName.setText(String
         .format(Locale.ENGLISH, "Realm: %s", RealmContext.i.getCurrentRealm().getDisplayName()));
 
-    final TextView empireName = (TextView) findViewById(R.id.empire_name);
-    final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
+    final TextView empireName = findViewById(R.id.empire_name);
+    final ImageView empireIcon = findViewById(R.id.empire_icon);
     empireName.setText("");
     empireIcon.setImageBitmap(null);
 
@@ -280,7 +280,7 @@ public class WarWorldsActivity extends BaseActivity {
           }
         }
 
-        TransparentWebView motdView = (TransparentWebView) findViewById(R.id.motd);
+        TransparentWebView motdView = findViewById(R.id.motd);
         motdView.loadHtml("html/skeleton.html", motd.toString());
       }
     }.execute();
@@ -299,7 +299,7 @@ public class WarWorldsActivity extends BaseActivity {
       // if it's the same as our empire, we'll need to update the icon we're currently showing.
       MyEmpire empire = EmpireManager.i.getEmpire();
       if (event.id == Integer.parseInt(empire.getKey())) {
-        ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
+        ImageView empireIcon = findViewById(R.id.empire_icon);
         empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
       }
     }
@@ -311,7 +311,7 @@ public class WarWorldsActivity extends BaseActivity {
     @Override
     public void onRetry(final int retries) {
       numRetries = retries + 1;
-      connectionStatus.setText(String.format("Retrying (#%d)...", numRetries));
+      connectionStatus.setText(String.format(Locale.ENGLISH, "Retrying (#%d)...", numRetries));
     }
 
     @Override

@@ -41,7 +41,7 @@ public class RealmSelectActivity extends BaseActivity {
               realm.getDisplayName(), realm.getDescription()));
     }
 
-    final ListView realmsListView = (ListView) findViewById(R.id.realms);
+    final ListView realmsListView = findViewById(R.id.realms);
     realmsListView.setAdapter(new ArrayAdapter<>(context, R.layout.account, realmNames));
     realmsListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     for (int i = 0; i < realmNames.length; i++) {
@@ -51,7 +51,7 @@ public class RealmSelectActivity extends BaseActivity {
       }
     }
 
-    Button startBtn = (Button) findViewById(R.id.start_btn);
+    Button startBtn = findViewById(R.id.start_btn);
     startBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {

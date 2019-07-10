@@ -188,8 +188,8 @@ public class ServerGreeter {
           }
         }
 
-        // Schedule registration with GCM, which will update our device
-        // when we get the registration ID
+        // Schedule registration with GCM, which will update our device when we get the
+        // registration ID
         GCMIntentService.register(activity);
         String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey();
         if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {

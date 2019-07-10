@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.server.handlers;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
@@ -16,7 +15,6 @@ import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.events.BuildCompleteEvent;
 import au.com.codeka.warworlds.server.model.BuildRequest;
 import au.com.codeka.warworlds.server.model.Colony;
-import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildQueueHandler extends RequestHandler {
@@ -59,6 +57,11 @@ public class BuildQueueHandler extends RequestHandler {
       buildRequest.setEndTime(DateTime.now().plusMinutes(5));
 
       if (build_request_pb.getAccelerateImmediately()) {
+        // This actually directly adds the building/fleet, skipping all the stuff that saves the
+        // build request, simulates the star, finishes the request, simulates and save the star
+        // again.
+        new BuildQueueController().ensureBuildAllowed(star, buildRequest);
+
         // If we're accelerating immediately, skip all the build request stuff, just take their
         // cash an add the building/fleet.
         float cost = buildRequest.getDesign().getBuildCost().getCostInMinerals()
@@ -75,10 +78,6 @@ public class BuildQueueHandler extends RequestHandler {
               "You don't have enough cash to accelerate this build.");
         }
 
-        // This actually directly adds the building/fleet, skipping all the stuff that saves the
-        // build request, simulates the star, finishes the request, simulates and save the star
-        // again.
-        new BuildQueueController().ensureBuildAllowed(star, buildRequest);
         new BuildCompleteEvent().processImmediateBuildRequest(
             star, colony, buildRequest.getEmpireID(), buildRequest.getDesign().getID(),
             buildRequest.getDesignKind(), buildRequest.getCount(), buildRequest.getNotes(),
