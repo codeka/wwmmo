@@ -11,9 +11,8 @@ import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.model.Star;
 
 /**
- * This is a background thread that runs every 2 seconds and simulates the
- * oldest star in the system. This ensures we never let our stars get TOO
- * out-of-date.
+ * This is a background thread that runs every 2 seconds and simulates the oldest star in the
+ * system. This ensures we never let our stars get TOO out-of-date.
  */
 public class StarSimulatorThread {
   private static final Log log = new Log("StarSimulatorThread");
@@ -21,9 +20,9 @@ public class StarSimulatorThread {
   private boolean stopped;
   private final StarSimulatorThreadManager manager;
 
-  private static int WAIT_TIME_NO_STARS = 10 * 60 * 1000; // 10 minutes, after no stars found
-  private static int WAIT_TIME_ERROR = 60 * 1000; // 1 minute, in case of error
-  private static int WAIT_TIME_NORMAL = 0; // don't wait if there's more stars to simulate
+  private static final int WAIT_TIME_NO_STARS = 10 * 60 * 1000; // 10 minutes, after no stars found
+  private static final int WAIT_TIME_ERROR = 60 * 1000; // 1 minute, in case of error
+  private static final int WAIT_TIME_NORMAL = 0; // don't wait if there's more stars to simulate
 
   public StarSimulatorThread(StarSimulatorThreadManager manager) {
     this.manager = manager;
@@ -34,7 +33,7 @@ public class StarSimulatorThread {
       stop();
     }
 
-    thread = new Thread(this::threadproc);
+    thread = new Thread(this::threadProc);
     thread.setDaemon(true);
     thread.setName("Star-Simulator");
     thread.setPriority(Thread.NORM_PRIORITY - 1);
@@ -57,7 +56,7 @@ public class StarSimulatorThread {
     thread = null;
   }
 
-  private void threadproc() {
+  private void threadProc() {
     int numSimulatedSinceEventProcessorPinged = 0;
     while (!stopped) {
       int waitTimeMs = simulateOneStar();
@@ -79,6 +78,7 @@ public class StarSimulatorThread {
         try {
           Thread.sleep(waitTimeMs);
         } catch (InterruptedException e) {
+          // Ignore.
         }
       } else {
         Thread.yield();
@@ -97,9 +97,8 @@ public class StarSimulatorThread {
 
       Star star = new StarController().getStar(starID);
       if (star.getLastSimulation().isAfter(DateTime.now().minusHours(1))) {
-        // how long would we have to wait (in seconds) before there WOULD HAVE
-        // been one
-        // hour since it was last simulated?
+        // how long would we have to wait (in seconds) before there WOULD HAVE been one hour since
+        // it was last simulated?
         int seconds = Seconds
             .secondsBetween(DateTime.now().minusHours(1), star.getLastSimulation()).getSeconds();
         return seconds * 1000;
@@ -107,8 +106,7 @@ public class StarSimulatorThread {
 
       new Simulation().simulate(star);
       long simulateEndTime = System.currentTimeMillis();
-      // we don't ping event processor now, because we rather do it once every
-      // 50 stars or so.
+      // we don't ping event processor now, because we rather do it once every 50 stars or so.
       new StarController().update(star, false);
 
       long endTime = System.currentTimeMillis();

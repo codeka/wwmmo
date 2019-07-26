@@ -297,7 +297,8 @@ public class BuildQueueController {
   /**
    * Accelerate the given build. Returns {@code true} if the build is now complete.
    */
-  public boolean accelerate(Star star, BuildRequest buildRequest, float accelerateAmount) throws RequestException {
+  public boolean accelerate(
+      Star star, BuildRequest buildRequest, float accelerateAmount) throws RequestException {
     if (accelerateAmount > 0.99f) {
       accelerateAmount = 1.0f;
     }
@@ -331,7 +332,10 @@ public class BuildQueueController {
   }
 
   public void saveBuildRequest(BuildRequest buildRequest) throws RequestException {
-    String sql = "UPDATE build_requests SET progress = ?, end_time = ?, disable_notification = ? WHERE id = ?";
+    String sql =
+        "UPDATE build_requests " +
+        "SET progress = ?, end_time = ?, disable_notification = ? " +
+        "WHERE id = ?";
     try (SqlStmt stmt = db.prepare(sql)) {
       stmt.setDouble(1, buildRequest.getProgress(false));
       stmt.setDateTime(2, buildRequest.getEndTime());

@@ -32,8 +32,12 @@ public class RequestRouter extends AbstractHandler {
     sRoutes.add(new Route("devices", DevicesHandler.class));
     sRoutes.add(new Route("hello/(?<deviceid>[0-9]+)", HelloHandler.class));
     sRoutes.add(new Route("chat/(?<msgid>[0-9]+)/abuse-reports", ChatAbuseReportHandler.class));
-    sRoutes.add(new Route("chat/conversations/(?<conversationid>[0-9]+)/participants/(?<empireid>[0-9]+)", ChatConversationParticipantHandler.class));
-    sRoutes.add(new Route("chat/conversations/(?<conversationid>[0-9]+)/participants", ChatConversationParticipantsHandler.class));
+    sRoutes.add(new Route(
+        "chat/conversations/(?<conversationid>[0-9]+)/participants/(?<empireid>[0-9]+)",
+        ChatConversationParticipantHandler.class));
+    sRoutes.add(new Route(
+        "chat/conversations/(?<conversationid>[0-9]+)/participants",
+        ChatConversationParticipantsHandler.class));
     sRoutes.add(new Route("chat/conversations", ChatConversationsHandler.class));
     sRoutes.add(new Route("chat", ChatHandler.class));
     sRoutes.add(new Route("empires/patreon", EmpiresPatreonHandler.class));
@@ -42,7 +46,8 @@ public class RequestRouter extends AbstractHandler {
     sRoutes.add(new Route("empires/(?<empireid>[0-9]+)/stars", EmpiresStarsHandler.class));
     sRoutes.add(new Route("empires/(?<empireid>[0-9]+)/taxes", EmpiresTaxesHandler.class));
     sRoutes.add(new Route("empires/(?<empireid>[0-9]+)/cash-audit", EmpiresCashAuditHandler.class));
-    sRoutes.add(new Route("empires/(?<empireid>[0-9]+)/display-name", EmpiresDisplayNameHandler.class));
+    sRoutes.add(new Route(
+        "empires/(?<empireid>[0-9]+)/display-name", EmpiresDisplayNameHandler.class));
     sRoutes.add(new Route("empires/(?<empireid>[0-9]+)/shield", EmpiresShieldHandler.class));
     sRoutes.add(new Route("empires/(?<empireid>[0-9]+)/reset", EmpiresResetHandler.class));
     sRoutes.add(new Route("empires/(?<empireid>[0-9]+)/ads", EmpiresAdsHandler.class));
@@ -50,47 +55,70 @@ public class RequestRouter extends AbstractHandler {
     sRoutes.add(new Route("buildqueue", BuildQueueHandler.class));
     sRoutes.add(new Route("sectors", SectorsHandler.class));
     sRoutes.add(new Route("stars/(?<starid>[0-9]+)/simulate", StarSimulateHandler.class));
-    sRoutes.add(new Route("stars/(?<starid>[0-9]+)/build/(?<buildid>[0-9]+)/accelerate", BuildAccelerateHandler.class));
-    sRoutes.add(new Route("stars/(?<starid>[0-9]+)/build/(?<buildid>[0-9]+)/stop", BuildStopHandler.class));
-    sRoutes.add(new Route("stars/(?<starid>[0-9]+)/colonies/(?<colonyid>[0-9]+)", ColonyHandler.class));
-    sRoutes.add(new Route("stars/(?<starid>[0-9]+)/colonies/(?<colonyid>[0-9]+)/attack", ColonyAttackHandler.class));
+    sRoutes.add(new Route(
+        "stars/(?<starid>[0-9]+)/build/(?<buildid>[0-9]+)/accelerate",
+        BuildAccelerateHandler.class));
+    sRoutes.add(new Route(
+        "stars/(?<starid>[0-9]+)/build/(?<buildid>[0-9]+)/stop", BuildStopHandler.class));
+    sRoutes.add(new Route(
+        "stars/(?<starid>[0-9]+)/colonies/(?<colonyid>[0-9]+)", ColonyHandler.class));
+    sRoutes.add(new Route(
+        "stars/(?<starid>[0-9]+)/colonies/(?<colonyid>[0-9]+)/attack", ColonyAttackHandler.class));
     sRoutes.add(new Route("stars/(?<starid>[0-9]+)/colonies", ColoniesHandler.class));
-    sRoutes.add(new Route("stars/(?<starid>[0-9]+)/combat-reports/(?<combatreportid>[0-9]+)", CombatReportHandler.class));
-    sRoutes.add(new Route("stars/(?<starid>[0-9]+)/fleets/(?<fleetid>[0-9]+)/orders", FleetOrdersHandler.class));
+    sRoutes.add(new Route(
+        "stars/(?<starid>[0-9]+)/combat-reports/(?<combatreportid>[0-9]+)",
+        CombatReportHandler.class));
+    sRoutes.add(new Route(
+        "stars/(?<starid>[0-9]+)/fleets/(?<fleetid>[0-9]+)/orders", FleetOrdersHandler.class));
     sRoutes.add(new Route("stars/(?<starid>[0-9]+)/fleets/(?<fleetid>[0-9]+)", FleetHandler.class));
     sRoutes.add(new Route("stars/(?<starid>[0-9]+)/scout-reports", ScoutReportsHandler.class));
     sRoutes.add(new Route("stars/(?<starid>[0-9]+)/sit-reports", SitReportsHandler.class));
     sRoutes.add(new Route("stars/(?<starid>[0-9]+)/wormhole/tune", WormholeTuneHandler.class));
-    sRoutes.add(new Route("stars/(?<starid>[0-9]+)/wormhole/destroy", WormholeDestroyHandler.class));
-    sRoutes.add(new Route("stars/(?<starid>[0-9]+)/wormhole/take-over", WormholeTakeOverHandler.class));
-    sRoutes.add(new Route("stars/(?<starid>[0-9]+)/wormhole/disruptor-nearby", WormholeDisruptorNearbyHandler.class));
+    sRoutes.add(new Route(
+        "stars/(?<starid>[0-9]+)/wormhole/destroy", WormholeDestroyHandler.class));
+    sRoutes.add(new Route(
+        "stars/(?<starid>[0-9]+)/wormhole/take-over", WormholeTakeOverHandler.class));
+    sRoutes.add(new Route(
+        "stars/(?<starid>[0-9]+)/wormhole/disruptor-nearby", WormholeDisruptorNearbyHandler.class));
     sRoutes.add(new Route("stars/(?<starid>[0-9]+)", StarHandler.class));
     sRoutes.add(new Route("stars", StarsHandler.class));
-    sRoutes.add(new Route("alliances/(?<allianceid>[0-9]+)/requests/(?<requestid>[0-9]+)", AllianceRequestHandler.class));
-    sRoutes.add(new Route("alliances/(?<allianceid>[0-9]+)/requests", AllianceRequestsHandler.class));
+    sRoutes.add(new Route(
+        "alliances/(?<allianceid>[0-9]+)/requests/(?<requestid>[0-9]+)",
+        AllianceRequestHandler.class));
+    sRoutes.add(new Route(
+        "alliances/(?<allianceid>[0-9]+)/requests", AllianceRequestsHandler.class));
     sRoutes.add(new Route("alliances/(?<allianceid>[0-9]+)/shield", AllianceShieldHandler.class));
-    sRoutes.add(new Route("alliances/(?<allianceid>[0-9]+)/wormholes", AllianceWormholeHandler.class));
+    sRoutes.add(new Route(
+        "alliances/(?<allianceid>[0-9]+)/wormholes", AllianceWormholeHandler.class));
     sRoutes.add(new Route("alliances/(?<allianceid>[0-9]+)", AllianceHandler.class));
     sRoutes.add(new Route("alliances", AlliancesHandler.class));
     sRoutes.add(new Route("sit-reports/read", SitReportsReadHandler.class));
     sRoutes.add(new Route("sit-reports", SitReportsHandler.class));
-    sRoutes.add(new Route("rankings/(?<year>[0-9]+)/(?<month>[0-9]+)", RankingHistoryHandler.class));
+    sRoutes.add(new Route(
+        "rankings/(?<year>[0-9]+)/(?<month>[0-9]+)", RankingHistoryHandler.class));
     sRoutes.add(new Route("motd", MotdHandler.class));
     sRoutes.add(new Route("notifications", NotificationHandler.class));
     sRoutes.add(new Route("error-reports", ErrorReportsHandler.class));
     sRoutes.add(new Route("anon-associate", AnonUserAssociateHandler.class));
 
     sRoutes.add(new Route("admin/login", AdminLoginHandler.class));
-    sRoutes.add(new Route("admin/(?<path>actions/move-star)", AdminActionsMoveStarHandler.class, "admin/"));
-    sRoutes.add(new Route("admin/(?<path>actions/reset-empire)", AdminActionsResetEmpireHandler.class, "admin/"));
-    sRoutes.add(new Route("admin/(?<path>actions/create-fleet)", AdminActionsCreateFleetHandler.class, "admin/"));
-    sRoutes.add(new Route("admin/alliance/(?<allianceid>[0-9]+)/details", AdminAllianceDetailsHandler.class));
-    sRoutes.add(new Route("admin/alliance/(?<allianceid>[0-9]+)/requests/(?<requestid>[0-9]+)/force-accept", AdminAllianceRequestForceAcceptHandler.class));
+    sRoutes.add(new Route(
+        "admin/(?<path>actions/move-star)", AdminActionsMoveStarHandler.class, "admin/"));
+    sRoutes.add(new Route(
+        "admin/(?<path>actions/reset-empire)", AdminActionsResetEmpireHandler.class, "admin/"));
+    sRoutes.add(new Route(
+        "admin/(?<path>actions/create-fleet)", AdminActionsCreateFleetHandler.class, "admin/"));
+    sRoutes.add(new Route(
+        "admin/alliance/(?<allianceid>[0-9]+)/details", AdminAllianceDetailsHandler.class));
+    sRoutes.add(new Route(
+        "admin/alliance/(?<allianceid>[0-9]+)/requests/(?<requestid>[0-9]+)/force-accept",
+        AdminAllianceRequestForceAcceptHandler.class));
     sRoutes.add(new Route("admin/chat", AdminChatHandler.class));
     sRoutes.add(new Route("admin/chat/profanity", AdminChatProfanityHandler.class));
     sRoutes.add(new Route("admin/chat/sinbin", AdminChatSinbinHandler.class));
     sRoutes.add(new Route("admin/debug/purchases", AdminDebugPurchasesHandler.class, "admin/"));
-    sRoutes.add(new Route("admin/debug/error-reports", AdminDebugErrorReportsHandler.class, "admin/"));
+    sRoutes.add(new Route(
+        "admin/debug/error-reports", AdminDebugErrorReportsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/debug/retrace", AdminDebugRetraceHandler.class, "admin/"));
     sRoutes.add(new Route("admin/empire/shields", AdminEmpireShieldsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/empire/alts", AdminEmpireAltsHandler.class, "admin/"));

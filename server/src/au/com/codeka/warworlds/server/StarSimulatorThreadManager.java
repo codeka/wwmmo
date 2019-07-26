@@ -14,9 +14,9 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 public class StarSimulatorThreadManager {
   private static final Log log = new Log("StarSimulatorThreadManager");
 
-  private final ArrayList<StarSimulatorThread> threads = new ArrayList<StarSimulatorThread>();
-  private final Queue<Integer> starIDs = new ArrayDeque<Integer>();
-  private final Set<Integer> lastStarIDs = new HashSet<Integer>();
+  private final ArrayList<StarSimulatorThread> threads = new ArrayList<>();
+  private final Queue<Integer> starIDs = new ArrayDeque<>();
+  private final Set<Integer> lastStarIDs = new HashSet<>();
   private final Object lock = new Object();
 
   public void start() {
