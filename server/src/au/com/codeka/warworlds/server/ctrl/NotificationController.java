@@ -170,6 +170,8 @@ public class NotificationController {
 
   /** Sends the given {@link Message} to the given list of devices. */
   private void sendNotification(Message msg, Map<String, String> devices) throws RequestException {
+    // Temporarily disabled as this endpoint is deprecated.
+    /*
     Sender sender = new Sender(API_KEY);
     try {
       List<String> registrationIds = new ArrayList<String>();
@@ -209,6 +211,7 @@ public class NotificationController {
     } catch (IOException e) {
       log.error("Error caught sending notification.", e);
     }
+    */
   }
 
   private void handleNotRegisteredError(String registrationId, String userEmail, Result result)
