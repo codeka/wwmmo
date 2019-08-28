@@ -11,24 +11,24 @@ import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.EmpirePresence;
 
 public class StorageBuildingEffect extends BuildingEffect {
-    private float mGoods;
-    private float mMinerals;
+  private float goods;
+  private float minerals;
 
-    @Override
-    public void load(Element effectElement) {
-        mGoods = Float.parseFloat(effectElement.getAttribute("goods"));
-        mMinerals = Float.parseFloat(effectElement.getAttribute("minerals"));
-    }
+  @Override
+  public void load(Element effectElement) {
+    goods = Float.parseFloat(effectElement.getAttribute("goods"));
+    minerals = Float.parseFloat(effectElement.getAttribute("minerals"));
+  }
 
-    @Override
-    public void apply(BaseStar star, BaseColony baseColony, BaseBuilding building) {
-        Colony colony = (Colony) baseColony;
-        for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
-            EmpirePresence empirePresence = (EmpirePresence) baseEmpirePresence;
-            if (empirePresence.getEmpireID() == colony.getEmpireID()) {
-                empirePresence.setMaxGoods(empirePresence.getMaxGoods() + mGoods);
-                empirePresence.setMaxMinerals(empirePresence.getMaxMinerals() + mMinerals);
-            }
-        }
+  @Override
+  public void apply(BaseStar star, BaseColony baseColony, BaseBuilding building) {
+    Colony colony = (Colony) baseColony;
+    for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
+      EmpirePresence empirePresence = (EmpirePresence) baseEmpirePresence;
+      if (empirePresence.getEmpireID() == colony.getEmpireID()) {
+        empirePresence.setMaxGoods(empirePresence.getMaxGoods() + goods);
+        empirePresence.setMaxMinerals(empirePresence.getMaxMinerals() + minerals);
+      }
     }
+  }
 }

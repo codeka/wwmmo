@@ -282,4 +282,56 @@
     </upgrades>
     <show inSolarSystem="true" />
   </design>
+  <design id="greenhouse">
+    <name>Greenhouse</name>
+    <sprite>building.greenhouse</sprite>
+    <description><![CDATA[
+      <p>A greenhouse allows you to grow things on even the most inhospitable planet.</p>
+      <p>Each upgrade of the Greenhouse will add 15%, or 150 points of Goods to the planet
+       (whichever is greater).</p>
+    ]]></description>
+    <effects>
+      <effect kind="goodsBoost" boost="15" minBoost="150" />
+    </effects>
+    <cost minerals="400" time="3.4" />
+    <limits maxPerColony="1" />
+    <upgrades>
+      <upgrade level="2">
+        <cost minerals="400" time="3.4" />
+        <effects>
+          <effect kind="goodsBoost" boost="15" minBoost="20" />
+        </effects>
+        <dependencies>
+          <requires building="research" level="1" />
+        </dependencies>
+      </upgrade>
+      <upgrade level="3">
+        <cost minerals="400" time="3.4" />
+        <effects>
+          <effect kind="goodsBoost" boost="30" minBoost="40" />
+        </effects>
+        <dependencies>
+          <requires building="research" level="1" />
+        </dependencies>
+      </upgrade>
+      <upgrade level="4">
+        <cost minerals="400" time="3.4" />
+        <effects>
+          <effect kind="goodsBoost" boost="45" minBoost="60" />
+        </effects>
+        <dependencies>
+          <requires building="research" level="1" />
+        </dependencies>
+      </upgrade>
+      <upgrade level="5">
+        <cost minerals="400" time="3.4" />
+        <effects>
+          <effect kind="goodsBoost" boost="60" minBoost="80" />
+        </effects>
+        <dependencies>
+          <requires building="research" level="1" />
+        </dependencies>
+      </upgrade>
+    </upgrades>
+  </design>
 </designs>

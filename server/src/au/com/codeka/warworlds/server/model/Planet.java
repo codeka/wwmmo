@@ -7,12 +7,12 @@ public class Planet extends BasePlanet {
     }
     public Planet(Star star, int planetIndex, int planetTypeID, int size,
                   int populationCongeniality, int farmingCongeniality, int miningCongeniality) {
-        mStar = star;
-        mIndex = planetIndex;
-        mPlanetType = sPlanetTypes[planetTypeID];
-        mSize = size;
-        mPopulationCongeniality = populationCongeniality;
-        mFarmingCongeniality = farmingCongeniality;
-        mMiningCongeniality = miningCongeniality;
+        this.star = star;
+        index = planetIndex;
+        planetType = sPlanetTypes[planetTypeID];
+        this.size = size;
+        this.populationCongeniality = populationCongeniality;
+        this.farmingCongeniality = farmingCongeniality;
+        this.miningCongeniality = miningCongeniality;
     }
 }

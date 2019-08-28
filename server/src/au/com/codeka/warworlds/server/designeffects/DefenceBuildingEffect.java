@@ -9,16 +9,16 @@ import au.com.codeka.common.model.BuildingEffect;
 import au.com.codeka.warworlds.server.model.Colony;
 
 public class DefenceBuildingEffect extends BuildingEffect {
-    private float mBonus;
+  private float bonus;
 
-    @Override
-    public void load(Element effectElem) {
-        mBonus = Float.parseFloat(effectElem.getAttribute("bonus"));
-    }
+  @Override
+  public void load(Element effectElem) {
+    bonus = Float.parseFloat(effectElem.getAttribute("bonus"));
+  }
 
-    @Override
-    public void apply(BaseStar star, BaseColony baseColony, BaseBuilding building) {
-        Colony colony = (Colony) baseColony;
-        colony.setDefenceBoost(colony.getDefenceBoost() + mBonus);
-    }
+  @Override
+  public void apply(BaseStar star, BaseColony baseColony, BaseBuilding building) {
+    Colony colony = (Colony) baseColony;
+    colony.setDefenceBoost(colony.getDefenceBoost() + bonus);
+  }
 }

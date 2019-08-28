@@ -20,96 +20,99 @@ import au.com.codeka.common.XmlIterator;
  * This is the base "manager" class that manages designs for ships and buildings.
  */
 public abstract class BaseDesignManager {
-    private static final Log log = new Log("BaseDesignManager");
-    public static BaseDesignManager i;
+  private static final Log log = new Log("BaseDesignManager");
+  public static BaseDesignManager i;
 
-    private SortedMap<DesignKind, SortedMap<String, Design>> mDesigns;
+  private SortedMap<DesignKind, SortedMap<String, Design>> mDesigns;
 
-    /** Call this to parse the design file. */
-    public void parseDesigns() {
-        mDesigns = new TreeMap<>();
-        for (DesignKind designKind : DesignKind.values()) {
-            Document xmldoc;
-            try {
-                InputStream ins = open(designKind);
-                DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-                builderFactory.setValidating(false);
+  /**
+   * Call this to parse the design file.
+   */
+  public void parseDesigns() {
+    mDesigns = new TreeMap<>();
+    for (DesignKind designKind : DesignKind.values()) {
+      Document xmldoc;
+      try {
+        InputStream ins = open(designKind);
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setValidating(false);
 
-                DocumentBuilder builder = builderFactory.newDocumentBuilder();
-                xmldoc = builder.parse(ins);
-            } catch (Exception e) {
-                log.error("Error loading %s", designKind, e);
-                return;
-            }
+        DocumentBuilder builder = builderFactory.newDocumentBuilder();
+        xmldoc = builder.parse(ins);
+      } catch (Exception e) {
+        log.error("Error loading %s", designKind, e);
+        return;
+      }
 
-            List<Design> designs = null;
-            try {
-                designs = parseDesigns(designKind, xmldoc);
-            } catch (ParseException e) {
-                log.error("Error loading %s", designKind, e);
-                return;
-            }
+      List<Design> designs = null;
+      try {
+        designs = parseDesigns(designKind, xmldoc);
+      } catch (ParseException e) {
+        log.error("Error loading %s", designKind, e);
+        return;
+      }
 
-            TreeMap<String, Design> designMap = new TreeMap<String, Design>();
-            for(Design design : designs) {
-                designMap.put(design.getID(), design);
-            }
-            mDesigns.put(designKind, designMap);
-        }
+      TreeMap<String, Design> designMap = new TreeMap<String, Design>();
+      for (Design design : designs) {
+        designMap.put(design.getID(), design);
+      }
+      mDesigns.put(designKind, designMap);
+    }
+  }
+
+  protected abstract InputStream open(DesignKind designKind) throws IOException;
+
+  public abstract Design.Effect createEffect(DesignKind designKind, Element effectElement);
+
+  /**
+   * Gets the collection of designs.
+   */
+  public SortedMap<String, Design> getDesigns(DesignKind kind) {
+    return mDesigns.get(kind);
+  }
+
+  /**
+   * Gets the design with the given identifier.
+   */
+  public Design getDesign(DesignKind kind, String designID) {
+    return mDesigns.get(kind).get(designID);
+  }
+
+  /**
+   * Parses the buildings.xml file, generating a list of \c BuildingDesign objects.
+   */
+  private List<Design> parseDesigns(DesignKind kind, Document xmldoc) throws ParseException {
+    Element designsElement = xmldoc.getDocumentElement();
+    if (!designsElement.getTagName().equals("designs")) {
+      throw new ParseException("Expected root <designs> element.");
     }
 
-    protected abstract InputStream open(DesignKind designKind) throws IOException;
-    public abstract Design.Effect createEffect(DesignKind designKind, Element effectElement);
+    List<Design> designs = new ArrayList<Design>();
+    for (Element designElement : XmlIterator.childElements(designsElement, "design")) {
+      designs.add(parseDesign(kind, designElement));
+    }
+    return designs;
+  }
 
-    /**
-     * Gets the collection of designs.
-     */
-    public SortedMap<String, Design> getDesigns(DesignKind kind) {
-        return mDesigns.get(kind);
+  private Design parseDesign(DesignKind kind, Element designElement) {
+    if (kind == DesignKind.BUILDING) {
+      return new BuildingDesign.Factory(designElement).get();
+    } else if (kind == DesignKind.SHIP) {
+      return new ShipDesign.Factory(designElement).get();
     }
 
-    /**
-     * Gets the design with the given identifier.
-     */
-    public Design getDesign(DesignKind kind, String designID) {
-        return mDesigns.get(kind).get(designID);
+    return null;
+  }
+
+  private static class ParseException extends Exception {
+    private static final long serialVersionUID = 1L;
+
+    public ParseException(String msg) {
+      super(msg);
     }
+  }
 
-    /**
-     * Parses the buildings.xml file, generating a list of \c BuildingDesign objects.
-     */
-    private List<Design> parseDesigns(DesignKind kind, Document xmldoc) throws ParseException {
-        Element designsElement = xmldoc.getDocumentElement();
-        if (!designsElement.getTagName().equals("designs")) {
-            throw new ParseException("Expected root <designs> element.");
-        }
-
-        List<Design> designs = new ArrayList<Design>();
-        for (Element designElement : XmlIterator.childElements(designsElement, "design")) {
-            designs.add(parseDesign(kind, designElement));
-        }
-        return designs;
-    }
-
-    private Design parseDesign(DesignKind kind, Element designElement) {
-        if (kind == DesignKind.BUILDING) {
-            return new BuildingDesign.Factory(designElement).get();
-        } else if (kind == DesignKind.SHIP) {
-            return new ShipDesign.Factory(designElement).get();
-        }
-
-        return null;
-    }
-
-    private static class ParseException extends Exception {
-        private static final long serialVersionUID = 1L;
-
-        public ParseException(String msg) {
-            super(msg);
-        }
-    }
-
-    public interface DesignsChangedListener {
-        void onDesignsChanged();
-    }
+  public interface DesignsChangedListener {
+    void onDesignsChanged();
+  }
 }

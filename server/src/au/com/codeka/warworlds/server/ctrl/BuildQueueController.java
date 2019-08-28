@@ -25,6 +25,8 @@ import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class BuildQueueController {
   private static final Log log = new Log("BuildQueueController");
   private DataBase db;
@@ -48,8 +50,8 @@ public class BuildQueueController {
   public void ensureBuildAllowed(Star star, BuildRequest buildRequest) throws RequestException {
     Colony colony = star.getColony(buildRequest.getColonyID());
 
-    Design design =
-        DesignManager.i.getDesign(buildRequest.getDesignKind(), buildRequest.getDesignID());
+    Design design = checkNotNull(
+        DesignManager.i.getDesign(buildRequest.getDesignKind(), buildRequest.getDesignID()));
 
     if (buildRequest.getCount() <= 0) {
       throw new RequestException(400, "Cannot build negative count.");

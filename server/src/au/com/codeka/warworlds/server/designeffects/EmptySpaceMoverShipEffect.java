@@ -6,16 +6,16 @@ import au.com.codeka.common.XmlIterator;
 import au.com.codeka.common.model.ShipEffect;
 
 public class EmptySpaceMoverShipEffect extends ShipEffect {
-    private float mMinStarDistance;
+  private float minStarDistance;
 
-    @Override
-    public void load(Element effectElem) {
-        for (Element childElement : XmlIterator.childElements(effectElem, "star-distance")) {
-            mMinStarDistance = Float.parseFloat(childElement.getAttribute("min"));
-        }
+  @Override
+  public void load(Element effectElem) {
+    for (Element childElement : XmlIterator.childElements(effectElem, "star-distance")) {
+      minStarDistance = Float.parseFloat(childElement.getAttribute("min"));
     }
+  }
 
-    public float getMinStarDistance() {
-        return mMinStarDistance;
-    }
+  public float getMinStarDistance() {
+    return minStarDistance;
+  }
 }

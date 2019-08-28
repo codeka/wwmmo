@@ -33,6 +33,10 @@
       <rect location="1,91" size="19x56" />
       <direction>0,1</direction>
     </sprite>
+    <sprite name="building.greenhouse">
+      <rect location="23,117" size="48x56" />
+      <direction>0,1</direction>
+    </sprite>
 
     <sprite name="ship.colony">
       <rect location="0,28" size="50x58" />

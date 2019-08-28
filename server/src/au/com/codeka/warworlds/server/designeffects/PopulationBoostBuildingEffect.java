@@ -9,22 +9,22 @@ import au.com.codeka.common.model.BuildingEffect;
 import au.com.codeka.warworlds.server.model.Colony;
 
 public class PopulationBoostBuildingEffect extends BuildingEffect {
-    private float mBoost;
-    private float mMinimumBoost;
+  private float boost;
+  private float minimumBoost;
 
-    @Override
-    public void load(Element effectElem) {
-        mBoost = Float.parseFloat(effectElem.getAttribute("boost"));
-        mMinimumBoost = Float.parseFloat(effectElem.getAttribute("min"));
-    }
+  @Override
+  public void load(Element effectElem) {
+    boost = Float.parseFloat(effectElem.getAttribute("boost"));
+    minimumBoost = Float.parseFloat(effectElem.getAttribute("min"));
+  }
 
-    @Override
-    public void apply(BaseStar star, BaseColony baseColony, BaseBuilding building) {
-        Colony colony = (Colony) baseColony;
-        float extraPopulation = colony.getMaxPopulation() * mBoost;
-        if (extraPopulation < mMinimumBoost) {
-            extraPopulation = mMinimumBoost;
-        }
-        colony.setMaxPopulation(colony.getMaxPopulation() + extraPopulation);
+  @Override
+  public void apply(BaseStar star, BaseColony baseColony, BaseBuilding building) {
+    Colony colony = (Colony) baseColony;
+    float extraPopulation = colony.getMaxPopulation() * boost;
+    if (extraPopulation < minimumBoost) {
+      extraPopulation = minimumBoost;
     }
+    colony.setMaxPopulation(colony.getMaxPopulation() + extraPopulation);
+  }
 }
