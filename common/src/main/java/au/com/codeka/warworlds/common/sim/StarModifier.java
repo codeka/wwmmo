@@ -269,7 +269,7 @@ public class StarModifier {
         numAttacking++;
       }
     }
-    float fuelAmount = 0.0f;
+    float fuelAmount;
     Design design =
         DesignHelper.getDesign(
             modification.fleet == null
@@ -284,11 +284,13 @@ public class StarModifier {
         fuelAmount -= modification.fleet.fuel_amount;
       }
 
-      int storageIndex = StarHelper.getStorageIndex(star, modification.empire_id);
-      EmpireStorage.Builder empireStorage = star.empire_stores.get(storageIndex).newBuilder();
-      fuelAmount = Math.min(fuelAmount, empireStorage.total_energy);
-      empireStorage.total_energy(empireStorage.total_energy - fuelAmount);
-      star.empire_stores.set(storageIndex, empireStorage.build());
+      if (modification.empire_id != null) {
+        int storageIndex = StarHelper.getStorageIndex(star, modification.empire_id);
+        EmpireStorage.Builder empireStorage = star.empire_stores.get(storageIndex).newBuilder();
+        fuelAmount = Math.min(fuelAmount, empireStorage.total_energy);
+        empireStorage.total_energy(empireStorage.total_energy - fuelAmount);
+        star.empire_stores.set(storageIndex, empireStorage.build());
+      }
     }
 
     // Now add the fleet itself.

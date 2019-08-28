@@ -38,7 +38,7 @@ public abstract class BaseStore {
       SQLiteConfig config = new SQLiteConfig();
 
       // Disable fsync calls, trusting that the filesystem will do the right thing. It's not always
-      // the best assumption, but we are file with losing ~1 day of data (basically, the time
+      // the best assumption, but we are fine with losing ~1 day of data (basically, the time
       // between backups). Additionally, switch to write-ahead-logging for the journal. We could
       // turn it off completely as well, and rely on backups in the event of data loss, but that's
       // slightly more painful for development (where "crashes" are more likely).
