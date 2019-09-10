@@ -94,7 +94,11 @@ public class SchemaUpdater {
     Pattern pattern = Pattern.compile("schema-([0-9]+)\\.sql");
     File folder = new File(Configuration.i.getDataDirectory(), "schema");
     log.debug("Scanning '%s' for schema files.", folder);
-    for (File file : folder.listFiles()) {
+    File[] files = folder.listFiles();
+    if (files == null) {
+      throw new RuntimeException("Could not get schema files.");
+    }
+    for (File file : files) {
       Matcher matcher = pattern.matcher(file.getName());
       if (file.isFile() && matcher.matches()) {
         int version = Integer.parseInt(matcher.group(1));
