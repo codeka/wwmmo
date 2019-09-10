@@ -7,11 +7,11 @@ props.load(new FileInputStream(file('signing.properties')))
 
 dependencies {
   implementation fileTree(include: '*.jar', dir: 'libs')
-  implementation 'com.google.android.gms:play-services-base:16.1.0'
-  implementation 'com.google.android.gms:play-services-ads:17.2.0'
-  implementation 'com.google.android.gms:play-services-auth:16.0.1'
+  implementation 'com.google.android.gms:play-services-base:17.1.0'
+  implementation 'com.google.android.gms:play-services-ads:18.2.0'
+  implementation 'com.google.android.gms:play-services-auth:17.0.0'
   implementation 'com.google.guava:guava:24.1-android'
-  implementation 'com.google.code.gson:gson:2.8.2'
+  implementation 'com.google.code.gson:gson:2.8.5'
   implementation 'joda-time:joda-time:2.9.9'
   implementation 'com.google.protobuf:protobuf-java:3.6.0'
   implementation 'com.google.code.findbugs:jsr305:3.0.2'
@@ -19,7 +19,7 @@ dependencies {
   implementation 'androidx.legacy:legacy-support-v4:1.0.0'
   implementation 'androidx.vectordrawable:vectordrawable:1.0.1'
   implementation 'androidx.appcompat:appcompat:1.0.2'
-  implementation 'com.google.android.material:material:1.1.0-alpha05'
+  implementation 'com.google.android.material:material:1.1.0-alpha09'
   implementation 'com.squareup.okhttp3:okhttp:3.11.0'
   implementation project(':common')
   implementation project(':control-field')
