@@ -58,6 +58,12 @@ android {
       keyAlias props['alias']
       keyPassword props['password']
     }
+    debug {
+      storeFile file('debug.keystore')
+      storePassword 'warworlds'
+      keyAlias 'Codeka'
+      keyPassword 'warworlds'
+    }
   }
 
   configurations {
@@ -70,6 +76,7 @@ android {
       debuggable true
       manifestPlaceholders = [applicationLabel: "@string/app_name_debug"]
       applicationIdSuffix ".debug"
+      signingConfig signingConfigs.debug
     }
     release {
       manifestPlaceholders = [applicationLabel: "@string/app_name"]
