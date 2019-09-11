@@ -40,16 +40,14 @@ public abstract class BaseDesignManager {
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         xmldoc = builder.parse(ins);
       } catch (Exception e) {
-        log.error("Error loading %s", designKind, e);
-        return;
+        throw new RuntimeException(e);
       }
 
       List<Design> designs = null;
       try {
         designs = parseDesigns(designKind, xmldoc);
       } catch (ParseException e) {
-        log.error("Error loading %s", designKind, e);
-        return;
+        throw new RuntimeException(e);
       }
 
       TreeMap<String, Design> designMap = new TreeMap<String, Design>();

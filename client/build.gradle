@@ -78,6 +78,17 @@ android {
   }
 }
 
+// This task copies the buildings.xml and ships.xml file from the server directory so that we don't
+// need to maintain two identical files separately.
+task('copyBuildingShipXml') {
+  doLast {
+    file('src/main/assets/buildings.xml').text = "<!-- THIS FILE IS AUTO-GENERATED! EDIT THE FILE IN server/data/designs -->\n\n" +
+            file('../server/data/designs/buildings.xml').getText()
+    file('src/main/assets/ships.xml').text = "<!-- THIS FILE IS AUTO-GENERATED! EDIT THE FILE IN server/data/designs -->\n\n" +
+            file('../server/data/designs/ships.xml').getText()
+  }
+}
+
 // This is a task which will increment the build # in AndroidManifest.xml
 task('incrementVersionCode') {
   doLast {
@@ -145,3 +156,5 @@ tasks.whenTaskAdded { task ->
     task.dependsOn 'resetDebugWarworldsPropertiesFile'
   }
 }
+
+preBuild.dependsOn 'copyBuildingShipXml'

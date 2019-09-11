@@ -7,6 +7,8 @@ SCRIPTPATH=`dirname $SCRIPT`
 ROOTPATH=`dirname $SCRIPTPATH`
 INSTALLPATH=$ROOTPATH/server/build/install/server
 
+adb reverse tcp:8080 tcp:8080 || true
+
 pushd $ROOTPATH > /dev/null
 ./gradlew --daemon :server:installDist
 popd > /dev/null

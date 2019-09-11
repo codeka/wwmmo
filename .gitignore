@@ -36,3 +36,6 @@ server/release
 #Ignore generated android code
 ** gen/
 gen/
+client/src/main/assets/buildings.xml
+client/src/main/assets/ships.xml
+
