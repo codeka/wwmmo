@@ -3,12 +3,14 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
@@ -148,10 +150,16 @@ public class ColonyController {
         throw new RequestException(e);
       }
       new StarController(db.getTransaction()).removeEmpirePresences(colony.getStarID());
+
+      // Remove any build requests currently in progress in this colony.
+      star.getBuildRequests().removeIf(
+          buildRequest -> buildRequest.getPlanetIndex() == colony.getPlanetIndex());
+
+      // Remove the colony itself.
       star.getColonies().remove(colony);
 
-      // if this is the last colony for this empire on this star, make sure the empire's home
-      // star is reset
+      // If this is the last colony for this empire on this star, make sure the empire's home
+      // star is reset.
       boolean anotherColonyExists = false;
       for (BaseColony baseColony : star.getColonies()) {
         if (baseColony.getEmpireKey() != null && colony.getEmpireKey() != null &&
