@@ -360,7 +360,13 @@ public class ColonyController {
     }
 
     public void destroyColony(int starID, int colonyID) throws Exception {
-      String sql = "DELETE FROM buildings WHERE colony_id = ?";
+      String sql = "DELETE FROM build_requests WHERE colony_id = ?";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, colonyID);
+        stmt.update();
+      }
+      
+      sql = "DELETE FROM buildings WHERE colony_id = ?";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, colonyID);
         stmt.update();
