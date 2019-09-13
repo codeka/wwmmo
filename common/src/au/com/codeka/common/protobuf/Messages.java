@@ -223,6 +223,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.MessageOfTheDay)
       MessageOfTheDayOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use MessageOfTheDay.newBuilder() to construct.
     private MessageOfTheDay(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -242,6 +243,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -253,13 +257,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -270,6 +267,13 @@ public final class Messages {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
               lastUpdate_ = bs;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -289,6 +293,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_MessageOfTheDay_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_MessageOfTheDay_fieldAccessorTable
@@ -382,6 +387,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -391,6 +397,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -402,6 +409,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -418,7 +426,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -534,6 +541,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -541,6 +549,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.MessageOfTheDay prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -568,6 +577,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_MessageOfTheDay_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_MessageOfTheDay_fieldAccessorTable
@@ -590,6 +600,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         message_ = "";
@@ -599,15 +610,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_MessageOfTheDay_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.MessageOfTheDay getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.MessageOfTheDay.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.MessageOfTheDay build() {
         au.com.codeka.common.protobuf.Messages.MessageOfTheDay result = buildPartial();
         if (!result.isInitialized()) {
@@ -616,6 +630,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.MessageOfTheDay buildPartial() {
         au.com.codeka.common.protobuf.Messages.MessageOfTheDay result = new au.com.codeka.common.protobuf.Messages.MessageOfTheDay(this);
         int from_bitField0_ = bitField0_;
@@ -633,32 +648,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.MessageOfTheDay) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.MessageOfTheDay)other);
@@ -685,10 +707,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -859,11 +883,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -885,11 +911,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<MessageOfTheDay>
         PARSER = new com.google.protobuf.AbstractParser<MessageOfTheDay>() {
+      @java.lang.Override
       public MessageOfTheDay parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new MessageOfTheDay(input, extensionRegistry);
+        return new MessageOfTheDay(input, extensionRegistry);
       }
     };
 
@@ -902,6 +929,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.MessageOfTheDay getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -947,6 +975,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.GenericError)
       GenericErrorOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use GenericError.newBuilder() to construct.
     private GenericError(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -966,6 +995,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -977,13 +1009,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               errorCode_ = input.readInt32();
@@ -993,6 +1018,13 @@ public final class Messages {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
               errorMessage_ = bs;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -1012,6 +1044,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_GenericError_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_GenericError_fieldAccessorTable
@@ -1483,6 +1516,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1492,6 +1526,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -1503,6 +1538,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1520,7 +1556,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -1636,6 +1671,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1643,6 +1679,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.GenericError prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1671,6 +1708,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_GenericError_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_GenericError_fieldAccessorTable
@@ -1693,6 +1731,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         errorCode_ = 0;
@@ -1702,15 +1741,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_GenericError_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.GenericError getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.GenericError.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.GenericError build() {
         au.com.codeka.common.protobuf.Messages.GenericError result = buildPartial();
         if (!result.isInitialized()) {
@@ -1719,6 +1761,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.GenericError buildPartial() {
         au.com.codeka.common.protobuf.Messages.GenericError result = new au.com.codeka.common.protobuf.Messages.GenericError(this);
         int from_bitField0_ = bitField0_;
@@ -1736,32 +1779,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.GenericError) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.GenericError)other);
@@ -1786,10 +1836,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1916,11 +1968,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1942,11 +1996,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<GenericError>
         PARSER = new com.google.protobuf.AbstractParser<GenericError>() {
+      @java.lang.Override
       public GenericError parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new GenericError(input, extensionRegistry);
+        return new GenericError(input, extensionRegistry);
       }
     };
 
@@ -1959,6 +2014,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.GenericError getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2051,6 +2107,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.PurchaseInfo)
       PurchaseInfoOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use PurchaseInfo.newBuilder() to construct.
     private PurchaseInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -2073,6 +2130,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -2084,13 +2144,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -2121,6 +2174,13 @@ public final class Messages {
               developerPayload_ = bs;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -2138,6 +2198,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_PurchaseInfo_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_PurchaseInfo_fieldAccessorTable
@@ -2357,6 +2418,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2366,6 +2428,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -2386,6 +2449,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2411,7 +2475,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -2554,6 +2617,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2561,6 +2625,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.PurchaseInfo prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2589,6 +2654,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_PurchaseInfo_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_PurchaseInfo_fieldAccessorTable
@@ -2611,6 +2677,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         sku_ = "";
@@ -2626,15 +2693,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_PurchaseInfo_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.PurchaseInfo getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.PurchaseInfo.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.PurchaseInfo build() {
         au.com.codeka.common.protobuf.Messages.PurchaseInfo result = buildPartial();
         if (!result.isInitialized()) {
@@ -2643,6 +2713,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.PurchaseInfo buildPartial() {
         au.com.codeka.common.protobuf.Messages.PurchaseInfo result = new au.com.codeka.common.protobuf.Messages.PurchaseInfo(this);
         int from_bitField0_ = bitField0_;
@@ -2672,32 +2743,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.PurchaseInfo) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.PurchaseInfo)other);
@@ -2739,10 +2817,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3141,11 +3221,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3167,11 +3249,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<PurchaseInfo>
         PARSER = new com.google.protobuf.AbstractParser<PurchaseInfo>() {
+      @java.lang.Override
       public PurchaseInfo parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new PurchaseInfo(input, extensionRegistry);
+        return new PurchaseInfo(input, extensionRegistry);
       }
     };
 
@@ -3184,6 +3267,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.PurchaseInfo getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3219,6 +3303,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.AnonUserAssociate)
       AnonUserAssociateOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use AnonUserAssociate.newBuilder() to construct.
     private AnonUserAssociate(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -3237,6 +3322,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -3248,17 +3336,17 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
               userEmail_ = bs;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -3278,6 +3366,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AnonUserAssociate_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AnonUserAssociate_fieldAccessorTable
@@ -3329,6 +3418,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3338,6 +3428,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -3346,6 +3437,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3359,7 +3451,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -3466,6 +3557,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3473,6 +3565,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AnonUserAssociate prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3500,6 +3593,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AnonUserAssociate_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AnonUserAssociate_fieldAccessorTable
@@ -3522,6 +3616,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         userEmail_ = "";
@@ -3529,15 +3624,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AnonUserAssociate_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AnonUserAssociate getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.AnonUserAssociate.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AnonUserAssociate build() {
         au.com.codeka.common.protobuf.Messages.AnonUserAssociate result = buildPartial();
         if (!result.isInitialized()) {
@@ -3546,6 +3644,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AnonUserAssociate buildPartial() {
         au.com.codeka.common.protobuf.Messages.AnonUserAssociate result = new au.com.codeka.common.protobuf.Messages.AnonUserAssociate(this);
         int from_bitField0_ = bitField0_;
@@ -3559,32 +3658,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.AnonUserAssociate) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.AnonUserAssociate)other);
@@ -3606,10 +3712,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3704,11 +3812,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3730,11 +3840,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<AnonUserAssociate>
         PARSER = new com.google.protobuf.AbstractParser<AnonUserAssociate>() {
+      @java.lang.Override
       public AnonUserAssociate parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new AnonUserAssociate(input, extensionRegistry);
+        return new AnonUserAssociate(input, extensionRegistry);
       }
     };
 
@@ -3747,6 +3858,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.AnonUserAssociate getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3845,6 +3957,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireRank)
       EmpireRankOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireRank.newBuilder() to construct.
     private EmpireRank(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -3870,6 +3983,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -3881,13 +3997,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -3929,6 +4038,13 @@ public final class Messages {
               totalPopulation_ = input.readInt64();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -3946,6 +4062,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRank_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRank_fieldAccessorTable
@@ -4102,6 +4219,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -4111,6 +4229,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -4140,6 +4259,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -4181,7 +4301,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -4356,6 +4475,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -4363,6 +4483,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireRank prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -4390,6 +4511,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRank_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRank_fieldAccessorTable
@@ -4412,6 +4534,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         empireKey_ = "";
@@ -4433,15 +4556,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRank_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireRank getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireRank.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireRank build() {
         au.com.codeka.common.protobuf.Messages.EmpireRank result = buildPartial();
         if (!result.isInitialized()) {
@@ -4450,6 +4576,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireRank buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireRank result = new au.com.codeka.common.protobuf.Messages.EmpireRank(this);
         int from_bitField0_ = bitField0_;
@@ -4491,32 +4618,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireRank) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireRank)other);
@@ -4559,10 +4693,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4881,11 +5017,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -4907,11 +5045,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireRank>
         PARSER = new com.google.protobuf.AbstractParser<EmpireRank>() {
+      @java.lang.Override
       public EmpireRank parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireRank(input, extensionRegistry);
+        return new EmpireRank(input, extensionRegistry);
       }
     };
 
@@ -4924,6 +5063,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireRank getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -4974,6 +5114,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireRanks)
       EmpireRanksOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireRanks.newBuilder() to construct.
     private EmpireRanks(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -4993,6 +5134,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -5004,13 +5148,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 ranks_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.EmpireRank>();
@@ -5023,6 +5160,13 @@ public final class Messages {
             case 16: {
               bitField0_ |= 0x00000001;
               date_ = input.readInt64();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -5045,6 +5189,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRanks_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRanks_fieldAccessorTable
@@ -5104,6 +5249,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -5113,6 +5259,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < ranks_.size(); i++) {
@@ -5124,6 +5271,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -5142,7 +5290,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -5256,6 +5403,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -5263,6 +5411,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireRanks prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -5286,6 +5435,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRanks_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRanks_fieldAccessorTable
@@ -5309,6 +5459,7 @@ public final class Messages {
           getRanksFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (ranksBuilder_ == null) {
@@ -5322,15 +5473,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRanks_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireRanks getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireRanks.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireRanks build() {
         au.com.codeka.common.protobuf.Messages.EmpireRanks result = buildPartial();
         if (!result.isInitialized()) {
@@ -5339,6 +5493,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireRanks buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireRanks result = new au.com.codeka.common.protobuf.Messages.EmpireRanks(this);
         int from_bitField0_ = bitField0_;
@@ -5361,32 +5516,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireRanks) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireRanks)other);
@@ -5432,10 +5594,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5726,11 +5890,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -5752,11 +5918,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireRanks>
         PARSER = new com.google.protobuf.AbstractParser<EmpireRanks>() {
+      @java.lang.Override
       public EmpireRanks parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireRanks(input, extensionRegistry);
+        return new EmpireRanks(input, extensionRegistry);
       }
     };
 
@@ -5769,6 +5936,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireRanks getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -5830,6 +5998,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireBattleRank)
       EmpireBattleRankOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireBattleRank.newBuilder() to construct.
     private EmpireBattleRank(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -5850,6 +6019,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -5861,13 +6033,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               au.com.codeka.common.protobuf.Messages.Empire.Builder subBuilder = null;
               if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -5896,6 +6061,13 @@ public final class Messages {
               coloniesDestroyed_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -5913,6 +6085,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBattleRank_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBattleRank_fieldAccessorTable
@@ -5988,6 +6161,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -5997,6 +6171,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -6014,6 +6189,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -6040,7 +6216,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -6174,6 +6349,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -6181,6 +6357,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireBattleRank prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -6208,6 +6385,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBattleRank_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBattleRank_fieldAccessorTable
@@ -6231,6 +6409,7 @@ public final class Messages {
           getEmpireFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (empireBuilder_ == null) {
@@ -6248,15 +6427,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBattleRank_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireBattleRank getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireBattleRank.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireBattleRank build() {
         au.com.codeka.common.protobuf.Messages.EmpireBattleRank result = buildPartial();
         if (!result.isInitialized()) {
@@ -6265,6 +6447,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireBattleRank buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireBattleRank result = new au.com.codeka.common.protobuf.Messages.EmpireBattleRank(this);
         int from_bitField0_ = bitField0_;
@@ -6294,32 +6477,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireBattleRank) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireBattleRank)other);
@@ -6348,10 +6538,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6584,11 +6776,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -6610,11 +6804,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireBattleRank>
         PARSER = new com.google.protobuf.AbstractParser<EmpireBattleRank>() {
+      @java.lang.Override
       public EmpireBattleRank parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireBattleRank(input, extensionRegistry);
+        return new EmpireBattleRank(input, extensionRegistry);
       }
     };
 
@@ -6627,6 +6822,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireBattleRank getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -6681,6 +6877,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireBattleRanks)
       EmpireBattleRanksOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireBattleRanks.newBuilder() to construct.
     private EmpireBattleRanks(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -6700,6 +6897,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -6711,13 +6911,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 ranks_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.EmpireBattleRank>();
@@ -6730,6 +6923,13 @@ public final class Messages {
             case 16: {
               bitField0_ |= 0x00000001;
               numDays_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -6752,6 +6952,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBattleRanks_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBattleRanks_fieldAccessorTable
@@ -6811,6 +7012,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -6820,6 +7022,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < ranks_.size(); i++) {
@@ -6831,6 +7034,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -6849,7 +7053,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -6962,6 +7165,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -6969,6 +7173,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireBattleRanks prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -6996,6 +7201,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBattleRanks_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBattleRanks_fieldAccessorTable
@@ -7019,6 +7225,7 @@ public final class Messages {
           getRanksFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (ranksBuilder_ == null) {
@@ -7032,15 +7239,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBattleRanks_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireBattleRanks getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireBattleRanks.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireBattleRanks build() {
         au.com.codeka.common.protobuf.Messages.EmpireBattleRanks result = buildPartial();
         if (!result.isInitialized()) {
@@ -7049,6 +7259,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireBattleRanks buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireBattleRanks result = new au.com.codeka.common.protobuf.Messages.EmpireBattleRanks(this);
         int from_bitField0_ = bitField0_;
@@ -7071,32 +7282,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireBattleRanks) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireBattleRanks)other);
@@ -7142,10 +7360,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -7436,11 +7656,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -7462,11 +7684,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireBattleRanks>
         PARSER = new com.google.protobuf.AbstractParser<EmpireBattleRanks>() {
+      @java.lang.Override
       public EmpireBattleRanks parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireBattleRanks(input, extensionRegistry);
+        return new EmpireBattleRanks(input, extensionRegistry);
       }
     };
 
@@ -7479,6 +7702,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireBattleRanks getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -7928,6 +8152,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Empire)
       EmpireOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Empire.newBuilder() to construct.
     private Empire(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -7959,6 +8184,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -7970,13 +8198,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -8003,6 +8224,7 @@ public final class Messages {
             }
             case 40: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.Empire.EmpireState value = au.com.codeka.common.protobuf.Messages.Empire.EmpireState.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(5, rawValue);
@@ -8105,12 +8327,20 @@ public final class Messages {
             }
             case 144: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.Empire.PatreonLevel value = au.com.codeka.common.protobuf.Messages.Empire.PatreonLevel.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(18, rawValue);
               } else {
                 bitField0_ |= 0x00002000;
                 patreonLevel_ = rawValue;
+              }
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
               }
               break;
             }
@@ -8140,6 +8370,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Empire_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Empire_fieldAccessorTable
@@ -8590,6 +8821,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
      */
     public au.com.codeka.common.protobuf.Messages.Empire.EmpireState getState() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.Empire.EmpireState result = au.com.codeka.common.protobuf.Messages.Empire.EmpireState.valueOf(state_);
       return result == null ? au.com.codeka.common.protobuf.Messages.Empire.EmpireState.ACTIVE : result;
     }
@@ -8995,11 +9227,13 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.Empire.PatreonLevel patreon_level = 18;</code>
      */
     public au.com.codeka.common.protobuf.Messages.Empire.PatreonLevel getPatreonLevel() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.Empire.PatreonLevel result = au.com.codeka.common.protobuf.Messages.Empire.PatreonLevel.valueOf(patreonLevel_);
       return result == null ? au.com.codeka.common.protobuf.Messages.Empire.PatreonLevel.NONE : result;
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -9009,6 +9243,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -9065,6 +9300,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -9139,7 +9375,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -9390,6 +9625,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -9397,6 +9633,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Empire prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -9425,6 +9662,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Empire_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Empire_fieldAccessorTable
@@ -9453,6 +9691,7 @@ public final class Messages {
           getAllianceFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -9516,15 +9755,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Empire_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Empire getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Empire.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Empire build() {
         au.com.codeka.common.protobuf.Messages.Empire result = buildPartial();
         if (!result.isInitialized()) {
@@ -9533,6 +9775,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Empire buildPartial() {
         au.com.codeka.common.protobuf.Messages.Empire result = new au.com.codeka.common.protobuf.Messages.Empire(this);
         int from_bitField0_ = bitField0_;
@@ -9637,32 +9880,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Empire) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Empire)other);
@@ -9807,10 +10057,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10247,6 +10499,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
        */
       public au.com.codeka.common.protobuf.Messages.Empire.EmpireState getState() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.Empire.EmpireState result = au.com.codeka.common.protobuf.Messages.Empire.EmpireState.valueOf(state_);
         return result == null ? au.com.codeka.common.protobuf.Messages.Empire.EmpireState.ACTIVE : result;
       }
@@ -11947,6 +12200,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.Empire.PatreonLevel patreon_level = 18;</code>
        */
       public au.com.codeka.common.protobuf.Messages.Empire.PatreonLevel getPatreonLevel() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.Empire.PatreonLevel result = au.com.codeka.common.protobuf.Messages.Empire.PatreonLevel.valueOf(patreonLevel_);
         return result == null ? au.com.codeka.common.protobuf.Messages.Empire.PatreonLevel.NONE : result;
       }
@@ -11971,11 +12225,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -11997,11 +12253,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Empire>
         PARSER = new com.google.protobuf.AbstractParser<Empire>() {
+      @java.lang.Override
       public Empire parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Empire(input, extensionRegistry);
+        return new Empire(input, extensionRegistry);
       }
     };
 
@@ -12014,6 +12271,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Empire getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -12055,6 +12313,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Empires)
       EmpiresOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Empires.newBuilder() to construct.
     private Empires(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -12073,6 +12332,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -12084,13 +12346,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 empires_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.Empire>();
@@ -12098,6 +12353,13 @@ public final class Messages {
               }
               empires_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.Empire.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -12120,6 +12382,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Empires_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Empires_fieldAccessorTable
@@ -12163,6 +12426,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -12172,6 +12436,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < empires_.size(); i++) {
@@ -12180,6 +12445,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -12194,7 +12460,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -12298,6 +12563,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -12305,6 +12571,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Empires prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -12328,6 +12595,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Empires_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Empires_fieldAccessorTable
@@ -12351,6 +12619,7 @@ public final class Messages {
           getEmpiresFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (empiresBuilder_ == null) {
@@ -12362,15 +12631,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Empires_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Empires getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Empires.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Empires build() {
         au.com.codeka.common.protobuf.Messages.Empires result = buildPartial();
         if (!result.isInitialized()) {
@@ -12379,6 +12651,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Empires buildPartial() {
         au.com.codeka.common.protobuf.Messages.Empires result = new au.com.codeka.common.protobuf.Messages.Empires(this);
         int from_bitField0_ = bitField0_;
@@ -12395,32 +12668,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Empires) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Empires)other);
@@ -12463,10 +12743,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12725,11 +13007,13 @@ public final class Messages {
         }
         return empiresBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -12751,11 +13035,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Empires>
         PARSER = new com.google.protobuf.AbstractParser<Empires>() {
+      @java.lang.Override
       public Empires parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Empires(input, extensionRegistry);
+        return new Empires(input, extensionRegistry);
       }
     };
 
@@ -12768,6 +13053,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Empires getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -12868,6 +13154,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireCashAuditEntry)
       EmpireCashAuditEntryOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireCashAuditEntry.newBuilder() to construct.
     private EmpireCashAuditEntry(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -12892,6 +13179,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -12903,13 +13193,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -12948,6 +13231,13 @@ public final class Messages {
               time_ = input.readInt64();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -12965,6 +13255,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireCashAuditEntry_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireCashAuditEntry_fieldAccessorTable
@@ -13160,6 +13451,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -13169,6 +13461,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -13195,6 +13488,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -13230,7 +13524,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -13401,6 +13694,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -13408,6 +13702,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -13436,6 +13731,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireCashAuditEntry_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireCashAuditEntry_fieldAccessorTable
@@ -13458,6 +13754,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -13477,15 +13774,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireCashAuditEntry_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry build() {
         au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry result = buildPartial();
         if (!result.isInitialized()) {
@@ -13494,6 +13794,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry result = new au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry(this);
         int from_bitField0_ = bitField0_;
@@ -13531,32 +13832,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry)other);
@@ -13600,10 +13908,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -13978,11 +14288,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -14004,11 +14316,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireCashAuditEntry>
         PARSER = new com.google.protobuf.AbstractParser<EmpireCashAuditEntry>() {
+      @java.lang.Override
       public EmpireCashAuditEntry parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireCashAuditEntry(input, extensionRegistry);
+        return new EmpireCashAuditEntry(input, extensionRegistry);
       }
     };
 
@@ -14021,6 +14334,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -14062,6 +14376,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireCashAudit)
       EmpireCashAuditOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireCashAudit.newBuilder() to construct.
     private EmpireCashAudit(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -14080,6 +14395,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -14091,13 +14409,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 entries_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry>();
@@ -14105,6 +14416,13 @@ public final class Messages {
               }
               entries_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.EmpireCashAuditEntry.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -14127,6 +14445,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireCashAudit_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireCashAudit_fieldAccessorTable
@@ -14170,6 +14489,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -14179,6 +14499,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < entries_.size(); i++) {
@@ -14187,6 +14508,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -14201,7 +14523,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -14305,6 +14626,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -14312,6 +14634,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireCashAudit prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -14335,6 +14658,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireCashAudit_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireCashAudit_fieldAccessorTable
@@ -14358,6 +14682,7 @@ public final class Messages {
           getEntriesFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (entriesBuilder_ == null) {
@@ -14369,15 +14694,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireCashAudit_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireCashAudit getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireCashAudit.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireCashAudit build() {
         au.com.codeka.common.protobuf.Messages.EmpireCashAudit result = buildPartial();
         if (!result.isInitialized()) {
@@ -14386,6 +14714,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireCashAudit buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireCashAudit result = new au.com.codeka.common.protobuf.Messages.EmpireCashAudit(this);
         int from_bitField0_ = bitField0_;
@@ -14402,32 +14731,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireCashAudit) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireCashAudit)other);
@@ -14470,10 +14806,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -14732,11 +15070,13 @@ public final class Messages {
         }
         return entriesBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -14758,11 +15098,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireCashAudit>
         PARSER = new com.google.protobuf.AbstractParser<EmpireCashAudit>() {
+      @java.lang.Override
       public EmpireCashAudit parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireCashAudit(input, extensionRegistry);
+        return new EmpireCashAudit(input, extensionRegistry);
       }
     };
 
@@ -14775,6 +15116,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireCashAudit getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -14852,6 +15194,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireRenameRequest)
       EmpireRenameRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireRenameRequest.newBuilder() to construct.
     private EmpireRenameRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -14872,6 +15215,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -14883,13 +15229,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -14921,6 +15260,13 @@ public final class Messages {
               oldName_ = bs;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -14938,6 +15284,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRenameRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRenameRequest_fieldAccessorTable
@@ -15094,6 +15441,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -15103,6 +15451,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -15120,6 +15469,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -15143,7 +15493,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -15277,6 +15626,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -15284,6 +15634,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireRenameRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -15312,6 +15663,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRenameRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRenameRequest_fieldAccessorTable
@@ -15335,6 +15687,7 @@ public final class Messages {
           getPurchaseInfoFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -15352,15 +15705,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRenameRequest_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireRenameRequest getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireRenameRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireRenameRequest build() {
         au.com.codeka.common.protobuf.Messages.EmpireRenameRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -15369,6 +15725,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireRenameRequest buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireRenameRequest result = new au.com.codeka.common.protobuf.Messages.EmpireRenameRequest(this);
         int from_bitField0_ = bitField0_;
@@ -15398,32 +15755,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireRenameRequest) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireRenameRequest)other);
@@ -15458,10 +15822,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -15826,11 +16192,13 @@ public final class Messages {
         }
         return purchaseInfoBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -15852,11 +16220,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireRenameRequest>
         PARSER = new com.google.protobuf.AbstractParser<EmpireRenameRequest>() {
+      @java.lang.Override
       public EmpireRenameRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireRenameRequest(input, extensionRegistry);
+        return new EmpireRenameRequest(input, extensionRegistry);
       }
     };
 
@@ -15869,6 +16238,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireRenameRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -15927,6 +16297,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireChangeShieldRequest)
       EmpireChangeShieldRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireChangeShieldRequest.newBuilder() to construct.
     private EmpireChangeShieldRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -15946,6 +16317,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -15957,13 +16331,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -15988,6 +16355,13 @@ public final class Messages {
               bitField0_ |= 0x00000004;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -16005,6 +16379,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireChangeShieldRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireChangeShieldRequest_fieldAccessorTable
@@ -16092,6 +16467,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -16101,6 +16477,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -16115,6 +16492,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -16136,7 +16514,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -16261,6 +16638,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -16268,6 +16646,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -16296,6 +16675,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireChangeShieldRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireChangeShieldRequest_fieldAccessorTable
@@ -16319,6 +16699,7 @@ public final class Messages {
           getPurchaseInfoFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -16334,15 +16715,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireChangeShieldRequest_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest build() {
         au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -16351,6 +16735,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest result = new au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest(this);
         int from_bitField0_ = bitField0_;
@@ -16376,32 +16761,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest)other);
@@ -16429,10 +16821,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -16680,11 +17074,13 @@ public final class Messages {
         }
         return purchaseInfoBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -16706,11 +17102,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireChangeShieldRequest>
         PARSER = new com.google.protobuf.AbstractParser<EmpireChangeShieldRequest>() {
+      @java.lang.Override
       public EmpireChangeShieldRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireChangeShieldRequest(input, extensionRegistry);
+        return new EmpireChangeShieldRequest(input, extensionRegistry);
       }
     };
 
@@ -16723,6 +17120,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireChangeShieldRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -16757,6 +17155,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireResetRequest)
       EmpireResetRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireResetRequest.newBuilder() to construct.
     private EmpireResetRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -16774,6 +17173,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -16785,13 +17187,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder subBuilder = null;
               if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -16803,6 +17198,13 @@ public final class Messages {
                 purchaseInfo_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000001;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -16822,6 +17224,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireResetRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireResetRequest_fieldAccessorTable
@@ -16852,6 +17255,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -16861,6 +17265,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -16869,6 +17274,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -16883,7 +17289,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -16990,6 +17395,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -16997,6 +17403,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireResetRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -17024,6 +17431,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireResetRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireResetRequest_fieldAccessorTable
@@ -17047,6 +17455,7 @@ public final class Messages {
           getPurchaseInfoFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (purchaseInfoBuilder_ == null) {
@@ -17058,15 +17467,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireResetRequest_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireResetRequest getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireResetRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireResetRequest build() {
         au.com.codeka.common.protobuf.Messages.EmpireResetRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -17075,6 +17487,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireResetRequest buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireResetRequest result = new au.com.codeka.common.protobuf.Messages.EmpireResetRequest(this);
         int from_bitField0_ = bitField0_;
@@ -17092,32 +17505,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireResetRequest) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireResetRequest)other);
@@ -17137,10 +17557,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -17277,11 +17699,13 @@ public final class Messages {
         }
         return purchaseInfoBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -17303,11 +17727,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireResetRequest>
         PARSER = new com.google.protobuf.AbstractParser<EmpireResetRequest>() {
+      @java.lang.Override
       public EmpireResetRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireResetRequest(input, extensionRegistry);
+        return new EmpireResetRequest(input, extensionRegistry);
       }
     };
 
@@ -17320,6 +17745,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireResetRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -17367,6 +17793,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireBuildingStatistics)
       EmpireBuildingStatisticsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireBuildingStatistics.newBuilder() to construct.
     private EmpireBuildingStatistics(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -17385,6 +17812,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -17396,13 +17826,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 counts_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount>();
@@ -17410,6 +17833,13 @@ public final class Messages {
               }
               counts_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -17432,6 +17862,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_fieldAccessorTable
@@ -17473,6 +17904,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireBuildingStatistics.DesignCount)
         DesignCountOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use DesignCount.newBuilder() to construct.
       private DesignCount(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -17492,6 +17924,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -17503,13 +17938,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000001;
@@ -17519,6 +17947,13 @@ public final class Messages {
               case 16: {
                 bitField0_ |= 0x00000002;
                 numBuildings_ = input.readInt32();
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -17538,6 +17973,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_DesignCount_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_DesignCount_fieldAccessorTable
@@ -17604,6 +18040,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -17613,6 +18050,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -17624,6 +18062,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -17641,7 +18080,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -17757,6 +18195,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -17764,6 +18203,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -17787,6 +18227,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_DesignCount_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_DesignCount_fieldAccessorTable
@@ -17809,6 +18250,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           designId_ = "";
@@ -17818,15 +18260,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_DesignCount_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount build() {
           au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount result = buildPartial();
           if (!result.isInitialized()) {
@@ -17835,6 +18280,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount buildPartial() {
           au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount result = new au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount(this);
           int from_bitField0_ = bitField0_;
@@ -17852,32 +18298,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount)other);
@@ -17902,10 +18355,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -18032,11 +18487,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -18058,11 +18515,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<DesignCount>
           PARSER = new com.google.protobuf.AbstractParser<DesignCount>() {
+        @java.lang.Override
         public DesignCount parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new DesignCount(input, extensionRegistry);
+          return new DesignCount(input, extensionRegistry);
         }
       };
 
@@ -18075,6 +18533,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.DesignCount getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -18117,6 +18576,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -18126,6 +18586,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < counts_.size(); i++) {
@@ -18134,6 +18595,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -18148,7 +18610,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -18252,6 +18713,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -18259,6 +18721,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -18288,6 +18751,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_fieldAccessorTable
@@ -18311,6 +18775,7 @@ public final class Messages {
           getCountsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (countsBuilder_ == null) {
@@ -18322,15 +18787,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics build() {
         au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics result = buildPartial();
         if (!result.isInitialized()) {
@@ -18339,6 +18807,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics result = new au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics(this);
         int from_bitField0_ = bitField0_;
@@ -18355,32 +18824,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics)other);
@@ -18423,10 +18899,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -18685,11 +19163,13 @@ public final class Messages {
         }
         return countsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -18711,11 +19191,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireBuildingStatistics>
         PARSER = new com.google.protobuf.AbstractParser<EmpireBuildingStatistics>() {
+      @java.lang.Override
       public EmpireBuildingStatistics parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireBuildingStatistics(input, extensionRegistry);
+        return new EmpireBuildingStatistics(input, extensionRegistry);
       }
     };
 
@@ -18728,6 +19209,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireBuildingStatistics getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -18762,6 +19244,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireAdsRemoveRequest)
       EmpireAdsRemoveRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireAdsRemoveRequest.newBuilder() to construct.
     private EmpireAdsRemoveRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -18779,6 +19262,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -18790,13 +19276,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               au.com.codeka.common.protobuf.Messages.PurchaseInfo.Builder subBuilder = null;
               if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -18808,6 +19287,13 @@ public final class Messages {
                 purchaseInfo_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000001;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -18827,6 +19313,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAdsRemoveRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAdsRemoveRequest_fieldAccessorTable
@@ -18857,6 +19344,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -18866,6 +19354,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -18874,6 +19363,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -18888,7 +19378,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -18995,6 +19484,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -19002,6 +19492,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -19029,6 +19520,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAdsRemoveRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAdsRemoveRequest_fieldAccessorTable
@@ -19052,6 +19544,7 @@ public final class Messages {
           getPurchaseInfoFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (purchaseInfoBuilder_ == null) {
@@ -19063,15 +19556,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAdsRemoveRequest_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest build() {
         au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -19080,6 +19576,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest result = new au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest(this);
         int from_bitField0_ = bitField0_;
@@ -19097,32 +19594,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest)other);
@@ -19142,10 +19646,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -19282,11 +19788,13 @@ public final class Messages {
         }
         return purchaseInfoBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -19308,11 +19816,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireAdsRemoveRequest>
         PARSER = new com.google.protobuf.AbstractParser<EmpireAdsRemoveRequest>() {
+      @java.lang.Override
       public EmpireAdsRemoveRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireAdsRemoveRequest(input, extensionRegistry);
+        return new EmpireAdsRemoveRequest(input, extensionRegistry);
       }
     };
 
@@ -19325,6 +19834,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireAdsRemoveRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -19403,6 +19913,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireAltAccounts)
       EmpireAltAccountsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireAltAccounts.newBuilder() to construct.
     private EmpireAltAccounts(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -19423,6 +19934,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -19434,13 +19948,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               empireId_ = input.readInt32();
@@ -19462,6 +19969,13 @@ public final class Messages {
               }
               device_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -19487,6 +20001,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_fieldAccessorTable
@@ -19551,6 +20066,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireAltAccounts.EmpireAltEmpire)
         EmpireAltEmpireOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use EmpireAltEmpire.newBuilder() to construct.
       private EmpireAltEmpire(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -19572,6 +20088,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -19583,13 +20102,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 8: {
                 bitField0_ |= 0x00000001;
                 empireId_ = input.readInt32();
@@ -19612,6 +20124,13 @@ public final class Messages {
                 allianceId_ = input.readInt32();
                 break;
               }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -19629,6 +20148,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_EmpireAltEmpire_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_EmpireAltEmpire_fieldAccessorTable
@@ -19752,6 +20272,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -19761,6 +20282,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -19778,6 +20300,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -19802,7 +20325,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -19936,6 +20458,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -19943,6 +20466,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -19966,6 +20490,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_EmpireAltEmpire_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_EmpireAltEmpire_fieldAccessorTable
@@ -19988,6 +20513,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           empireId_ = 0;
@@ -20001,15 +20527,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_EmpireAltEmpire_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire build() {
           au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire result = buildPartial();
           if (!result.isInitialized()) {
@@ -20018,6 +20547,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire buildPartial() {
           au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire result = new au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire(this);
           int from_bitField0_ = bitField0_;
@@ -20043,32 +20573,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire)other);
@@ -20101,10 +20638,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -20339,11 +20878,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -20365,11 +20906,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireAltEmpire>
           PARSER = new com.google.protobuf.AbstractParser<EmpireAltEmpire>() {
+        @java.lang.Override
         public EmpireAltEmpire parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new EmpireAltEmpire(input, extensionRegistry);
+          return new EmpireAltEmpire(input, extensionRegistry);
         }
       };
 
@@ -20382,6 +20924,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.EmpireAltEmpire getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -20469,6 +21012,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireAltAccounts.DeviceInfo)
         DeviceInfoOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use DeviceInfo.newBuilder() to construct.
       private DeviceInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -20491,6 +21035,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -20502,13 +21049,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000001;
@@ -20539,6 +21079,13 @@ public final class Messages {
                 deviceVersion_ = bs;
                 break;
               }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -20556,6 +21103,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_DeviceInfo_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_DeviceInfo_fieldAccessorTable
@@ -20775,6 +21323,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -20784,6 +21333,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -20804,6 +21354,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -20829,7 +21380,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -20972,6 +21522,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -20979,6 +21530,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -21002,6 +21554,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_DeviceInfo_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_DeviceInfo_fieldAccessorTable
@@ -21024,6 +21577,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           deviceId_ = "";
@@ -21039,15 +21593,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_DeviceInfo_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo build() {
           au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo result = buildPartial();
           if (!result.isInitialized()) {
@@ -21056,6 +21613,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo buildPartial() {
           au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo result = new au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo(this);
           int from_bitField0_ = bitField0_;
@@ -21085,32 +21643,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo)other);
@@ -21152,10 +21717,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -21554,11 +22121,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -21580,11 +22149,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<DeviceInfo>
           PARSER = new com.google.protobuf.AbstractParser<DeviceInfo>() {
+        @java.lang.Override
         public DeviceInfo parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new DeviceInfo(input, extensionRegistry);
+          return new DeviceInfo(input, extensionRegistry);
         }
       };
 
@@ -21597,6 +22167,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.DeviceInfo getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -21690,6 +22261,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -21699,6 +22271,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -21713,6 +22286,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -21735,7 +22309,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -21854,6 +22427,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -21861,6 +22435,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireAltAccounts prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -21888,6 +22463,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_fieldAccessorTable
@@ -21912,6 +22488,7 @@ public final class Messages {
           getDeviceFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         empireId_ = 0;
@@ -21931,15 +22508,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireAltAccounts_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireAltAccounts.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts build() {
         au.com.codeka.common.protobuf.Messages.EmpireAltAccounts result = buildPartial();
         if (!result.isInitialized()) {
@@ -21948,6 +22528,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireAltAccounts result = new au.com.codeka.common.protobuf.Messages.EmpireAltAccounts(this);
         int from_bitField0_ = bitField0_;
@@ -21979,32 +22560,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireAltAccounts) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireAltAccounts)other);
@@ -22076,10 +22664,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -22610,11 +23200,13 @@ public final class Messages {
         }
         return deviceBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -22636,11 +23228,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireAltAccounts>
         PARSER = new com.google.protobuf.AbstractParser<EmpireAltAccounts>() {
+      @java.lang.Override
       public EmpireAltAccounts parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireAltAccounts(input, extensionRegistry);
+        return new EmpireAltAccounts(input, extensionRegistry);
       }
     };
 
@@ -22653,6 +23246,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireAltAccounts getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -22697,6 +23291,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireStar)
       EmpireStarOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireStar.newBuilder() to construct.
     private EmpireStar(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -22715,6 +23310,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -22726,13 +23324,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               au.com.codeka.common.protobuf.Messages.Star.Builder subBuilder = null;
               if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -22749,6 +23340,13 @@ public final class Messages {
             case 16: {
               bitField0_ |= 0x00000002;
               index_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -22768,6 +23366,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireStar_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireStar_fieldAccessorTable
@@ -22813,6 +23412,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -22822,6 +23422,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -22833,6 +23434,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -22851,7 +23453,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -22967,6 +23568,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -22974,6 +23576,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireStar prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -23002,6 +23605,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireStar_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireStar_fieldAccessorTable
@@ -23025,6 +23629,7 @@ public final class Messages {
           getStarFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (starBuilder_ == null) {
@@ -23038,15 +23643,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireStar_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireStar getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireStar.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireStar build() {
         au.com.codeka.common.protobuf.Messages.EmpireStar result = buildPartial();
         if (!result.isInitialized()) {
@@ -23055,6 +23663,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireStar buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireStar result = new au.com.codeka.common.protobuf.Messages.EmpireStar(this);
         int from_bitField0_ = bitField0_;
@@ -23076,32 +23685,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireStar) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireStar)other);
@@ -23124,10 +23740,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -23296,11 +23914,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -23322,11 +23942,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireStar>
         PARSER = new com.google.protobuf.AbstractParser<EmpireStar>() {
+      @java.lang.Override
       public EmpireStar parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireStar(input, extensionRegistry);
+        return new EmpireStar(input, extensionRegistry);
       }
     };
 
@@ -23339,6 +23960,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireStar getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -23389,6 +24011,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpireStars)
       EmpireStarsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpireStars.newBuilder() to construct.
     private EmpireStars(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -23408,6 +24031,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -23419,13 +24045,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 stars_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.EmpireStar>();
@@ -23438,6 +24057,13 @@ public final class Messages {
             case 16: {
               bitField0_ |= 0x00000001;
               totalStars_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -23460,6 +24086,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireStars_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireStars_fieldAccessorTable
@@ -23519,6 +24146,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -23528,6 +24156,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < stars_.size(); i++) {
@@ -23539,6 +24168,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -23557,7 +24187,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -23670,6 +24299,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -23677,6 +24307,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireStars prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -23700,6 +24331,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireStars_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireStars_fieldAccessorTable
@@ -23723,6 +24355,7 @@ public final class Messages {
           getStarsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (starsBuilder_ == null) {
@@ -23736,15 +24369,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireStars_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireStars getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpireStars.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireStars build() {
         au.com.codeka.common.protobuf.Messages.EmpireStars result = buildPartial();
         if (!result.isInitialized()) {
@@ -23753,6 +24389,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpireStars buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpireStars result = new au.com.codeka.common.protobuf.Messages.EmpireStars(this);
         int from_bitField0_ = bitField0_;
@@ -23775,32 +24412,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireStars) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireStars)other);
@@ -23846,10 +24490,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -24140,11 +24786,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -24166,11 +24814,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpireStars>
         PARSER = new com.google.protobuf.AbstractParser<EmpireStars>() {
+      @java.lang.Override
       public EmpireStars parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpireStars(input, extensionRegistry);
+        return new EmpireStars(input, extensionRegistry);
       }
     };
 
@@ -24183,6 +24832,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpireStars getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -24371,6 +25021,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.HelloRequest)
       HelloRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use HelloRequest.newBuilder() to construct.
     private HelloRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -24395,6 +25046,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -24406,13 +25060,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -24452,6 +25099,13 @@ public final class Messages {
               noStarList_ = input.readBool();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -24469,6 +25123,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_HelloRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_HelloRequest_fieldAccessorTable
@@ -24774,6 +25429,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -24783,6 +25439,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -24809,6 +25466,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -24843,7 +25501,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -25006,6 +25663,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -25013,6 +25671,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.HelloRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -25041,6 +25700,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_HelloRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_HelloRequest_fieldAccessorTable
@@ -25063,6 +25723,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         deviceModel_ = "";
@@ -25082,15 +25743,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_HelloRequest_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.HelloRequest getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.HelloRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.HelloRequest build() {
         au.com.codeka.common.protobuf.Messages.HelloRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -25099,6 +25763,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.HelloRequest buildPartial() {
         au.com.codeka.common.protobuf.Messages.HelloRequest result = new au.com.codeka.common.protobuf.Messages.HelloRequest(this);
         int from_bitField0_ = bitField0_;
@@ -25136,32 +25801,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.HelloRequest) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.HelloRequest)other);
@@ -25207,10 +25879,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -25795,11 +26469,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -25821,11 +26497,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<HelloRequest>
         PARSER = new com.google.protobuf.AbstractParser<HelloRequest>() {
+      @java.lang.Override
       public HelloRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new HelloRequest(input, extensionRegistry);
+        return new HelloRequest(input, extensionRegistry);
       }
     };
 
@@ -25838,6 +26515,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.HelloRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -26138,6 +26816,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.HelloResponse)
       HelloResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use HelloResponse.newBuilder() to construct.
     private HelloResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -26162,6 +26841,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -26173,13 +26855,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               au.com.codeka.common.protobuf.Messages.MessageOfTheDay.Builder subBuilder = null;
               if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -26279,6 +26954,13 @@ public final class Messages {
               input.popLimit(limit);
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -26305,6 +26987,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_HelloResponse_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_HelloResponse_fieldAccessorTable
@@ -26694,6 +27377,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -26703,6 +27387,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -26738,6 +27423,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -26792,7 +27478,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -26974,6 +27659,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -26981,6 +27667,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.HelloResponse prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -27008,6 +27695,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_HelloResponse_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_HelloResponse_fieldAccessorTable
@@ -27035,6 +27723,7 @@ public final class Messages {
           getBuildRequestsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (motdBuilder_ == null) {
@@ -27080,15 +27769,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_HelloResponse_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.HelloResponse getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.HelloResponse.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.HelloResponse build() {
         au.com.codeka.common.protobuf.Messages.HelloResponse result = buildPartial();
         if (!result.isInitialized()) {
@@ -27097,6 +27789,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.HelloResponse buildPartial() {
         au.com.codeka.common.protobuf.Messages.HelloResponse result = new au.com.codeka.common.protobuf.Messages.HelloResponse(this);
         int from_bitField0_ = bitField0_;
@@ -27169,32 +27862,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.HelloResponse) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.HelloResponse)other);
@@ -27296,10 +27996,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -28792,11 +29494,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -28818,11 +29522,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<HelloResponse>
         PARSER = new com.google.protobuf.AbstractParser<HelloResponse>() {
+      @java.lang.Override
       public HelloResponse parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new HelloResponse(input, extensionRegistry);
+        return new HelloResponse(input, extensionRegistry);
       }
     };
 
@@ -28835,6 +29540,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.HelloResponse getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -29086,6 +29792,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.DeviceRegistration)
       DeviceRegistrationOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use DeviceRegistration.newBuilder() to construct.
     private DeviceRegistration(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -29111,6 +29818,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -29122,13 +29832,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -29177,6 +29880,13 @@ public final class Messages {
               user_ = bs;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -29194,6 +29904,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceRegistration_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceRegistration_fieldAccessorTable
@@ -29656,6 +30367,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -29665,6 +30377,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -29694,6 +30407,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -29728,7 +30442,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -29898,6 +30611,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -29905,6 +30619,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.DeviceRegistration prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -29933,6 +30648,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceRegistration_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceRegistration_fieldAccessorTable
@@ -29955,6 +30671,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -29976,15 +30693,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceRegistration_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.DeviceRegistration getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.DeviceRegistration.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.DeviceRegistration build() {
         au.com.codeka.common.protobuf.Messages.DeviceRegistration result = buildPartial();
         if (!result.isInitialized()) {
@@ -29993,6 +30713,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.DeviceRegistration buildPartial() {
         au.com.codeka.common.protobuf.Messages.DeviceRegistration result = new au.com.codeka.common.protobuf.Messages.DeviceRegistration(this);
         int from_bitField0_ = bitField0_;
@@ -30034,32 +30755,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.DeviceRegistration) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.DeviceRegistration)other);
@@ -30116,10 +30844,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -30980,11 +31710,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -31006,11 +31738,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<DeviceRegistration>
         PARSER = new com.google.protobuf.AbstractParser<DeviceRegistration>() {
+      @java.lang.Override
       public DeviceRegistration parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new DeviceRegistration(input, extensionRegistry);
+        return new DeviceRegistration(input, extensionRegistry);
       }
     };
 
@@ -31023,6 +31756,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.DeviceRegistration getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -31068,6 +31802,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.DeviceRegistrations)
       DeviceRegistrationsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use DeviceRegistrations.newBuilder() to construct.
     private DeviceRegistrations(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -31086,6 +31821,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -31097,13 +31835,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 registrations_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.DeviceRegistration>();
@@ -31111,6 +31842,13 @@ public final class Messages {
               }
               registrations_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.DeviceRegistration.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -31133,6 +31871,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceRegistrations_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceRegistrations_fieldAccessorTable
@@ -31176,6 +31915,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -31185,6 +31925,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < registrations_.size(); i++) {
@@ -31193,6 +31934,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -31207,7 +31949,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -31311,6 +32052,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -31318,6 +32060,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.DeviceRegistrations prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -31345,6 +32088,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceRegistrations_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceRegistrations_fieldAccessorTable
@@ -31368,6 +32112,7 @@ public final class Messages {
           getRegistrationsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (registrationsBuilder_ == null) {
@@ -31379,15 +32124,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceRegistrations_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.DeviceRegistrations getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.DeviceRegistrations.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.DeviceRegistrations build() {
         au.com.codeka.common.protobuf.Messages.DeviceRegistrations result = buildPartial();
         if (!result.isInitialized()) {
@@ -31396,6 +32144,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.DeviceRegistrations buildPartial() {
         au.com.codeka.common.protobuf.Messages.DeviceRegistrations result = new au.com.codeka.common.protobuf.Messages.DeviceRegistrations(this);
         int from_bitField0_ = bitField0_;
@@ -31412,32 +32161,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.DeviceRegistrations) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.DeviceRegistrations)other);
@@ -31480,10 +32236,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -31742,11 +32500,13 @@ public final class Messages {
         }
         return registrationsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -31768,11 +32528,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<DeviceRegistrations>
         PARSER = new com.google.protobuf.AbstractParser<DeviceRegistrations>() {
+      @java.lang.Override
       public DeviceRegistrations parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new DeviceRegistrations(input, extensionRegistry);
+        return new DeviceRegistrations(input, extensionRegistry);
       }
     };
 
@@ -31785,6 +32546,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.DeviceRegistrations getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -31816,6 +32578,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.DeviceOnlineStatus)
       DeviceOnlineStatusOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use DeviceOnlineStatus.newBuilder() to construct.
     private DeviceOnlineStatus(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -31834,6 +32597,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -31845,16 +32611,16 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               isOnline_ = input.readBool();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -31874,6 +32640,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceOnlineStatus_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceOnlineStatus_fieldAccessorTable
@@ -31898,6 +32665,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -31907,6 +32675,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -31915,6 +32684,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -31929,7 +32699,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -32037,6 +32806,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -32044,6 +32814,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -32072,6 +32843,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceOnlineStatus_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceOnlineStatus_fieldAccessorTable
@@ -32094,6 +32866,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         isOnline_ = false;
@@ -32101,15 +32874,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_DeviceOnlineStatus_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus build() {
         au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus result = buildPartial();
         if (!result.isInitialized()) {
@@ -32118,6 +32894,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus buildPartial() {
         au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus result = new au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus(this);
         int from_bitField0_ = bitField0_;
@@ -32131,32 +32908,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus)other);
@@ -32176,10 +32960,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -32230,11 +33016,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -32256,11 +33044,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<DeviceOnlineStatus>
         PARSER = new com.google.protobuf.AbstractParser<DeviceOnlineStatus>() {
+      @java.lang.Override
       public DeviceOnlineStatus parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new DeviceOnlineStatus(input, extensionRegistry);
+        return new DeviceOnlineStatus(input, extensionRegistry);
       }
     };
 
@@ -32273,6 +33062,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.DeviceOnlineStatus getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -32322,6 +33112,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Notification)
       NotificationOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Notification.newBuilder() to construct.
     private Notification(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -32341,6 +33132,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -32352,13 +33146,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -32369,6 +33156,13 @@ public final class Messages {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
               value_ = bs;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -32388,6 +33182,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Notification_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Notification_fieldAccessorTable
@@ -32481,6 +33276,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -32490,6 +33286,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -32501,6 +33298,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -32517,7 +33315,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -32633,6 +33430,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -32640,6 +33438,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Notification prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -32667,6 +33466,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Notification_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Notification_fieldAccessorTable
@@ -32689,6 +33489,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         name_ = "";
@@ -32698,15 +33499,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Notification_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Notification getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Notification.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Notification build() {
         au.com.codeka.common.protobuf.Messages.Notification result = buildPartial();
         if (!result.isInitialized()) {
@@ -32715,6 +33519,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Notification buildPartial() {
         au.com.codeka.common.protobuf.Messages.Notification result = new au.com.codeka.common.protobuf.Messages.Notification(this);
         int from_bitField0_ = bitField0_;
@@ -32732,32 +33537,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Notification) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Notification)other);
@@ -32784,10 +33596,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -32958,11 +33772,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -32984,11 +33800,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Notification>
         PARSER = new com.google.protobuf.AbstractParser<Notification>() {
+      @java.lang.Override
       public Notification parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Notification(input, extensionRegistry);
+        return new Notification(input, extensionRegistry);
       }
     };
 
@@ -33001,6 +33818,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Notification getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -33042,6 +33860,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Notifications)
       NotificationsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Notifications.newBuilder() to construct.
     private Notifications(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -33060,6 +33879,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -33071,13 +33893,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 notifications_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.Notification>();
@@ -33085,6 +33900,13 @@ public final class Messages {
               }
               notifications_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.Notification.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -33107,6 +33929,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Notifications_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Notifications_fieldAccessorTable
@@ -33150,6 +33973,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -33159,6 +33983,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < notifications_.size(); i++) {
@@ -33167,6 +33992,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -33181,7 +34007,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -33285,6 +34110,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -33292,6 +34118,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Notifications prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -33315,6 +34142,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Notifications_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Notifications_fieldAccessorTable
@@ -33338,6 +34166,7 @@ public final class Messages {
           getNotificationsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (notificationsBuilder_ == null) {
@@ -33349,15 +34178,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Notifications_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Notifications getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Notifications.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Notifications build() {
         au.com.codeka.common.protobuf.Messages.Notifications result = buildPartial();
         if (!result.isInitialized()) {
@@ -33366,6 +34198,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Notifications buildPartial() {
         au.com.codeka.common.protobuf.Messages.Notifications result = new au.com.codeka.common.protobuf.Messages.Notifications(this);
         int from_bitField0_ = bitField0_;
@@ -33382,32 +34215,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Notifications) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Notifications)other);
@@ -33450,10 +34290,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -33712,11 +34554,13 @@ public final class Messages {
         }
         return notificationsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -33738,11 +34582,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Notifications>
         PARSER = new com.google.protobuf.AbstractParser<Notifications>() {
+      @java.lang.Override
       public Notifications parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Notifications(input, extensionRegistry);
+        return new Notifications(input, extensionRegistry);
       }
     };
 
@@ -33755,6 +34600,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Notifications getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -33809,6 +34655,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.NotificationWrapper)
       NotificationWrapperOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use NotificationWrapper.newBuilder() to construct.
     private NotificationWrapper(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -33828,6 +34675,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -33839,13 +34689,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               bitField0_ |= 0x00000001;
               originalMessage_ = input.readBytes();
@@ -33858,6 +34701,13 @@ public final class Messages {
               }
               notifications_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.Notification.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -33880,6 +34730,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_NotificationWrapper_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_NotificationWrapper_fieldAccessorTable
@@ -33939,6 +34790,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -33948,6 +34800,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -33959,6 +34812,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -33977,7 +34831,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -34090,6 +34943,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -34097,6 +34951,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.NotificationWrapper prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -34124,6 +34979,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_NotificationWrapper_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_NotificationWrapper_fieldAccessorTable
@@ -34147,6 +35003,7 @@ public final class Messages {
           getNotificationsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         originalMessage_ = com.google.protobuf.ByteString.EMPTY;
@@ -34160,15 +35017,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_NotificationWrapper_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.NotificationWrapper getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.NotificationWrapper.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.NotificationWrapper build() {
         au.com.codeka.common.protobuf.Messages.NotificationWrapper result = buildPartial();
         if (!result.isInitialized()) {
@@ -34177,6 +35037,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.NotificationWrapper buildPartial() {
         au.com.codeka.common.protobuf.Messages.NotificationWrapper result = new au.com.codeka.common.protobuf.Messages.NotificationWrapper(this);
         int from_bitField0_ = bitField0_;
@@ -34199,32 +35060,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.NotificationWrapper) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.NotificationWrapper)other);
@@ -34270,10 +35138,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -34567,11 +35437,13 @@ public final class Messages {
         }
         return notificationsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -34593,11 +35465,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<NotificationWrapper>
         PARSER = new com.google.protobuf.AbstractParser<NotificationWrapper>() {
+      @java.lang.Override
       public NotificationWrapper parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new NotificationWrapper(input, extensionRegistry);
+        return new NotificationWrapper(input, extensionRegistry);
       }
     };
 
@@ -34610,6 +35483,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.NotificationWrapper getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -34757,6 +35631,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ChatMessage)
       ChatMessageOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ChatMessage.newBuilder() to construct.
     private ChatMessage(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -34783,6 +35658,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -34794,13 +35672,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
@@ -34842,6 +35713,7 @@ public final class Messages {
             }
             case 64: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.ChatMessage.MessageAction value = au.com.codeka.common.protobuf.Messages.ChatMessage.MessageAction.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(8, rawValue);
@@ -34854,6 +35726,13 @@ public final class Messages {
             case 72: {
               bitField0_ |= 0x00000080;
               profanityLevel_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -34873,6 +35752,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatMessage_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatMessage_fieldAccessorTable
@@ -35274,11 +36154,13 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.ChatMessage.MessageAction action = 8;</code>
      */
     public au.com.codeka.common.protobuf.Messages.ChatMessage.MessageAction getAction() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.ChatMessage.MessageAction result = au.com.codeka.common.protobuf.Messages.ChatMessage.MessageAction.valueOf(action_);
       return result == null ? au.com.codeka.common.protobuf.Messages.ChatMessage.MessageAction.Normal : result;
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -35288,6 +36170,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
@@ -35320,6 +36203,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -35362,7 +36246,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -35541,6 +36424,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -35548,6 +36432,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ChatMessage prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -35575,6 +36460,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatMessage_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatMessage_fieldAccessorTable
@@ -35597,6 +36483,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = 0;
@@ -35620,15 +36507,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatMessage_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatMessage getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ChatMessage.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatMessage build() {
         au.com.codeka.common.protobuf.Messages.ChatMessage result = buildPartial();
         if (!result.isInitialized()) {
@@ -35637,6 +36527,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatMessage buildPartial() {
         au.com.codeka.common.protobuf.Messages.ChatMessage result = new au.com.codeka.common.protobuf.Messages.ChatMessage(this);
         int from_bitField0_ = bitField0_;
@@ -35682,32 +36573,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ChatMessage) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ChatMessage)other);
@@ -35759,10 +36657,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -36275,6 +37175,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.ChatMessage.MessageAction action = 8;</code>
        */
       public au.com.codeka.common.protobuf.Messages.ChatMessage.MessageAction getAction() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.ChatMessage.MessageAction result = au.com.codeka.common.protobuf.Messages.ChatMessage.MessageAction.valueOf(action_);
         return result == null ? au.com.codeka.common.protobuf.Messages.ChatMessage.MessageAction.Normal : result;
       }
@@ -36299,11 +37200,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -36325,11 +37228,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ChatMessage>
         PARSER = new com.google.protobuf.AbstractParser<ChatMessage>() {
+      @java.lang.Override
       public ChatMessage parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ChatMessage(input, extensionRegistry);
+        return new ChatMessage(input, extensionRegistry);
       }
     };
 
@@ -36342,6 +37246,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ChatMessage getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -36383,6 +37288,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ChatMessages)
       ChatMessagesOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ChatMessages.newBuilder() to construct.
     private ChatMessages(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -36401,6 +37307,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -36412,13 +37321,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 messages_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.ChatMessage>();
@@ -36426,6 +37328,13 @@ public final class Messages {
               }
               messages_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.ChatMessage.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -36448,6 +37357,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatMessages_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatMessages_fieldAccessorTable
@@ -36491,6 +37401,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -36500,6 +37411,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < messages_.size(); i++) {
@@ -36508,6 +37420,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -36522,7 +37435,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -36626,6 +37538,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -36633,6 +37546,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ChatMessages prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -36656,6 +37570,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatMessages_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatMessages_fieldAccessorTable
@@ -36679,6 +37594,7 @@ public final class Messages {
           getMessagesFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (messagesBuilder_ == null) {
@@ -36690,15 +37606,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatMessages_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatMessages getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ChatMessages.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatMessages build() {
         au.com.codeka.common.protobuf.Messages.ChatMessages result = buildPartial();
         if (!result.isInitialized()) {
@@ -36707,6 +37626,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatMessages buildPartial() {
         au.com.codeka.common.protobuf.Messages.ChatMessages result = new au.com.codeka.common.protobuf.Messages.ChatMessages(this);
         int from_bitField0_ = bitField0_;
@@ -36723,32 +37643,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ChatMessages) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ChatMessages)other);
@@ -36791,10 +37718,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -37053,11 +37982,13 @@ public final class Messages {
         }
         return messagesBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -37079,11 +38010,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ChatMessages>
         PARSER = new com.google.protobuf.AbstractParser<ChatMessages>() {
+      @java.lang.Override
       public ChatMessages parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ChatMessages(input, extensionRegistry);
+        return new ChatMessages(input, extensionRegistry);
       }
     };
 
@@ -37096,6 +38028,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ChatMessages getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -37126,6 +38059,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ChatAbuseReport)
       ChatAbuseReportOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ChatAbuseReport.newBuilder() to construct.
     private ChatAbuseReport(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -37144,6 +38078,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -37155,16 +38092,16 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               chatMsgId_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -37184,6 +38121,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatAbuseReport_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatAbuseReport_fieldAccessorTable
@@ -37208,6 +38146,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -37217,6 +38156,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -37225,6 +38165,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -37239,7 +38180,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -37346,6 +38286,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -37353,6 +38294,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ChatAbuseReport prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -37380,6 +38322,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatAbuseReport_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatAbuseReport_fieldAccessorTable
@@ -37402,6 +38345,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         chatMsgId_ = 0;
@@ -37409,15 +38353,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatAbuseReport_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatAbuseReport getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ChatAbuseReport.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatAbuseReport build() {
         au.com.codeka.common.protobuf.Messages.ChatAbuseReport result = buildPartial();
         if (!result.isInitialized()) {
@@ -37426,6 +38373,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatAbuseReport buildPartial() {
         au.com.codeka.common.protobuf.Messages.ChatAbuseReport result = new au.com.codeka.common.protobuf.Messages.ChatAbuseReport(this);
         int from_bitField0_ = bitField0_;
@@ -37439,32 +38387,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ChatAbuseReport) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ChatAbuseReport)other);
@@ -37484,10 +38439,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -37538,11 +38495,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -37564,11 +38523,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ChatAbuseReport>
         PARSER = new com.google.protobuf.AbstractParser<ChatAbuseReport>() {
+      @java.lang.Override
       public ChatAbuseReport parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ChatAbuseReport(input, extensionRegistry);
+        return new ChatAbuseReport(input, extensionRegistry);
       }
     };
 
@@ -37581,6 +38541,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ChatAbuseReport getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -37635,6 +38596,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ChatConversation)
       ChatConversationOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ChatConversation.newBuilder() to construct.
     private ChatConversation(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -37654,6 +38616,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -37665,13 +38630,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               id_ = input.readInt32();
@@ -37684,6 +38642,13 @@ public final class Messages {
               }
               participants_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.ChatConversationParticipant.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -37706,6 +38671,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversation_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversation_fieldAccessorTable
@@ -37765,6 +38731,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -37774,6 +38741,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -37785,6 +38753,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -37803,7 +38772,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -37916,6 +38884,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -37923,6 +38892,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ChatConversation prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -37950,6 +38920,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversation_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversation_fieldAccessorTable
@@ -37973,6 +38944,7 @@ public final class Messages {
           getParticipantsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = 0;
@@ -37986,15 +38958,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversation_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatConversation getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ChatConversation.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatConversation build() {
         au.com.codeka.common.protobuf.Messages.ChatConversation result = buildPartial();
         if (!result.isInitialized()) {
@@ -38003,6 +38978,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatConversation buildPartial() {
         au.com.codeka.common.protobuf.Messages.ChatConversation result = new au.com.codeka.common.protobuf.Messages.ChatConversation(this);
         int from_bitField0_ = bitField0_;
@@ -38025,32 +39001,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ChatConversation) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ChatConversation)other);
@@ -38096,10 +39079,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -38390,11 +39375,13 @@ public final class Messages {
         }
         return participantsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -38416,11 +39403,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ChatConversation>
         PARSER = new com.google.protobuf.AbstractParser<ChatConversation>() {
+      @java.lang.Override
       public ChatConversation parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ChatConversation(input, extensionRegistry);
+        return new ChatConversation(input, extensionRegistry);
       }
     };
 
@@ -38433,6 +39421,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ChatConversation getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -38474,6 +39463,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ChatConversations)
       ChatConversationsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ChatConversations.newBuilder() to construct.
     private ChatConversations(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -38492,6 +39482,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -38503,13 +39496,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 conversations_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.ChatConversation>();
@@ -38517,6 +39503,13 @@ public final class Messages {
               }
               conversations_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.ChatConversation.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -38539,6 +39532,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversations_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversations_fieldAccessorTable
@@ -38582,6 +39576,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -38591,6 +39586,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < conversations_.size(); i++) {
@@ -38599,6 +39595,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -38613,7 +39610,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -38717,6 +39713,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -38724,6 +39721,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ChatConversations prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -38747,6 +39745,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversations_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversations_fieldAccessorTable
@@ -38770,6 +39769,7 @@ public final class Messages {
           getConversationsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (conversationsBuilder_ == null) {
@@ -38781,15 +39781,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversations_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatConversations getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ChatConversations.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatConversations build() {
         au.com.codeka.common.protobuf.Messages.ChatConversations result = buildPartial();
         if (!result.isInitialized()) {
@@ -38798,6 +39801,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatConversations buildPartial() {
         au.com.codeka.common.protobuf.Messages.ChatConversations result = new au.com.codeka.common.protobuf.Messages.ChatConversations(this);
         int from_bitField0_ = bitField0_;
@@ -38814,32 +39818,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ChatConversations) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ChatConversations)other);
@@ -38882,10 +39893,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -39144,11 +40157,13 @@ public final class Messages {
         }
         return conversationsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -39170,11 +40185,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ChatConversations>
         PARSER = new com.google.protobuf.AbstractParser<ChatConversations>() {
+      @java.lang.Override
       public ChatConversations parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ChatConversations(input, extensionRegistry);
+        return new ChatConversations(input, extensionRegistry);
       }
     };
 
@@ -39187,6 +40203,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ChatConversations getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -39226,6 +40243,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ChatConversationParticipant)
       ChatConversationParticipantOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ChatConversationParticipant.newBuilder() to construct.
     private ChatConversationParticipant(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -39245,6 +40263,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -39256,13 +40277,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               empireId_ = input.readInt32();
@@ -39271,6 +40285,13 @@ public final class Messages {
             case 16: {
               bitField0_ |= 0x00000002;
               isMuted_ = input.readBool();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -39290,6 +40311,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversationParticipant_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversationParticipant_fieldAccessorTable
@@ -39329,6 +40351,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -39338,6 +40361,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -39349,6 +40373,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -39367,7 +40392,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -39484,6 +40508,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -39491,6 +40516,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ChatConversationParticipant prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -39518,6 +40544,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversationParticipant_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversationParticipant_fieldAccessorTable
@@ -39540,6 +40567,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         empireId_ = 0;
@@ -39549,15 +40577,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ChatConversationParticipant_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatConversationParticipant getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ChatConversationParticipant.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatConversationParticipant build() {
         au.com.codeka.common.protobuf.Messages.ChatConversationParticipant result = buildPartial();
         if (!result.isInitialized()) {
@@ -39566,6 +40597,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ChatConversationParticipant buildPartial() {
         au.com.codeka.common.protobuf.Messages.ChatConversationParticipant result = new au.com.codeka.common.protobuf.Messages.ChatConversationParticipant(this);
         int from_bitField0_ = bitField0_;
@@ -39583,32 +40615,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ChatConversationParticipant) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ChatConversationParticipant)other);
@@ -39631,10 +40670,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -39717,11 +40758,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -39743,11 +40786,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ChatConversationParticipant>
         PARSER = new com.google.protobuf.AbstractParser<ChatConversationParticipant>() {
+      @java.lang.Override
       public ChatConversationParticipant parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ChatConversationParticipant(input, extensionRegistry);
+        return new ChatConversationParticipant(input, extensionRegistry);
       }
     };
 
@@ -39760,6 +40804,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ChatConversationParticipant getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -39958,6 +41003,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Sector)
       SectorOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Sector.newBuilder() to construct.
     private Sector(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -39981,6 +41027,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -39992,13 +41041,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               x_ = input.readInt64();
@@ -40041,6 +41083,13 @@ public final class Messages {
                   input.readMessage(au.com.codeka.common.protobuf.Messages.Fleet.PARSER, extensionRegistry));
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -40067,6 +41116,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Sector_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Sector_fieldAccessorTable
@@ -40304,6 +41354,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -40313,6 +41364,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -40336,6 +41388,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -40370,7 +41423,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -40515,6 +41567,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -40522,6 +41575,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Sector prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -40549,6 +41603,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Sector_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Sector_fieldAccessorTable
@@ -40574,6 +41629,7 @@ public final class Messages {
           getFleetsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         x_ = 0L;
@@ -40603,15 +41659,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Sector_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Sector getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Sector.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Sector build() {
         au.com.codeka.common.protobuf.Messages.Sector result = buildPartial();
         if (!result.isInitialized()) {
@@ -40620,6 +41679,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Sector buildPartial() {
         au.com.codeka.common.protobuf.Messages.Sector result = new au.com.codeka.common.protobuf.Messages.Sector(this);
         int from_bitField0_ = bitField0_;
@@ -40668,32 +41728,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Sector) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Sector)other);
@@ -40797,10 +41864,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -41887,11 +42956,13 @@ public final class Messages {
         }
         return fleetsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -41913,11 +42984,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Sector>
         PARSER = new com.google.protobuf.AbstractParser<Sector>() {
+      @java.lang.Override
       public Sector parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Sector(input, extensionRegistry);
+        return new Sector(input, extensionRegistry);
       }
     };
 
@@ -41930,6 +43002,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Sector getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -42436,6 +43509,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Star)
       StarOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Star.newBuilder() to construct.
     private Star(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -42469,6 +43543,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -42480,13 +43557,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -42501,6 +43571,7 @@ public final class Messages {
             }
             case 24: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.Star.CLASSIFICATION value = au.com.codeka.common.protobuf.Messages.Star.CLASSIFICATION.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(3, rawValue);
@@ -42625,6 +43696,13 @@ public final class Messages {
               bitField0_ |= 0x00000800;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -42660,6 +43738,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Star_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Star_fieldAccessorTable
@@ -42888,6 +43967,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Star.StarExtra)
         StarExtraOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use StarExtra.newBuilder() to construct.
       private StarExtra(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -42909,6 +43989,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -42920,13 +44003,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 8: {
                 bitField0_ |= 0x00000001;
                 wormholeDestStarId_ = input.readInt32();
@@ -42963,6 +44039,13 @@ public final class Messages {
                 wormholeEmpireId_ = input.readInt32();
                 break;
               }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -42983,6 +44066,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Star_StarExtra_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Star_StarExtra_fieldAccessorTable
@@ -43067,6 +44151,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -43076,6 +44161,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -43093,6 +44179,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -43124,7 +44211,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -43256,6 +44342,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -43263,6 +44350,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Star.StarExtra prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -43290,6 +44378,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Star_StarExtra_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Star_StarExtra_fieldAccessorTable
@@ -43312,6 +44401,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           wormholeDestStarId_ = 0;
@@ -43325,15 +44415,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Star_StarExtra_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.Star.StarExtra getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.Star.StarExtra.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.Star.StarExtra build() {
           au.com.codeka.common.protobuf.Messages.Star.StarExtra result = buildPartial();
           if (!result.isInitialized()) {
@@ -43342,6 +44435,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.Star.StarExtra buildPartial() {
           au.com.codeka.common.protobuf.Messages.Star.StarExtra result = new au.com.codeka.common.protobuf.Messages.Star.StarExtra(this);
           int from_bitField0_ = bitField0_;
@@ -43368,32 +44462,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.Star.StarExtra) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.Star.StarExtra)other);
@@ -43429,10 +44530,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -43629,11 +44732,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -43655,11 +44760,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<StarExtra>
           PARSER = new com.google.protobuf.AbstractParser<StarExtra>() {
+        @java.lang.Override
         public StarExtra parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new StarExtra(input, extensionRegistry);
+          return new StarExtra(input, extensionRegistry);
         }
       };
 
@@ -43672,6 +44778,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Star.StarExtra getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -43837,6 +44944,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.Star.CLASSIFICATION classification = 3;</code>
      */
     public au.com.codeka.common.protobuf.Messages.Star.CLASSIFICATION getClassification() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.Star.CLASSIFICATION result = au.com.codeka.common.protobuf.Messages.Star.CLASSIFICATION.valueOf(classification_);
       return result == null ? au.com.codeka.common.protobuf.Messages.Star.CLASSIFICATION.BLUE : result;
     }
@@ -44351,6 +45459,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -44360,6 +45469,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -44419,6 +45529,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -44499,7 +45610,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -44744,6 +45854,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -44751,6 +45862,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Star prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -44779,6 +45891,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Star_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Star_fieldAccessorTable
@@ -44809,6 +45922,7 @@ public final class Messages {
           getExtraFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -44882,15 +45996,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Star_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Star getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Star.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Star build() {
         au.com.codeka.common.protobuf.Messages.Star result = buildPartial();
         if (!result.isInitialized()) {
@@ -44899,6 +46016,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Star buildPartial() {
         au.com.codeka.common.protobuf.Messages.Star result = new au.com.codeka.common.protobuf.Messages.Star(this);
         int from_bitField0_ = bitField0_;
@@ -45018,32 +46136,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Star) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Star)other);
@@ -45256,10 +46381,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -45570,6 +46697,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.Star.CLASSIFICATION classification = 3;</code>
        */
       public au.com.codeka.common.protobuf.Messages.Star.CLASSIFICATION getClassification() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.Star.CLASSIFICATION result = au.com.codeka.common.protobuf.Messages.Star.CLASSIFICATION.valueOf(classification_);
         return result == null ? au.com.codeka.common.protobuf.Messages.Star.CLASSIFICATION.BLUE : result;
       }
@@ -48009,11 +49137,13 @@ public final class Messages {
         }
         return extraBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -48035,11 +49165,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Star>
         PARSER = new com.google.protobuf.AbstractParser<Star>() {
+      @java.lang.Override
       public Star parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Star(input, extensionRegistry);
+        return new Star(input, extensionRegistry);
       }
     };
 
@@ -48052,6 +49183,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Star getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -48093,6 +49225,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Stars)
       StarsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Stars.newBuilder() to construct.
     private Stars(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -48111,6 +49244,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -48122,13 +49258,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 stars_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.Star>();
@@ -48136,6 +49265,13 @@ public final class Messages {
               }
               stars_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.Star.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -48158,6 +49294,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Stars_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Stars_fieldAccessorTable
@@ -48201,6 +49338,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -48210,6 +49348,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < stars_.size(); i++) {
@@ -48218,6 +49357,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -48232,7 +49372,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -48336,6 +49475,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -48343,6 +49483,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Stars prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -48366,6 +49507,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Stars_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Stars_fieldAccessorTable
@@ -48389,6 +49531,7 @@ public final class Messages {
           getStarsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (starsBuilder_ == null) {
@@ -48400,15 +49543,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Stars_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Stars getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Stars.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Stars build() {
         au.com.codeka.common.protobuf.Messages.Stars result = buildPartial();
         if (!result.isInitialized()) {
@@ -48417,6 +49563,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Stars buildPartial() {
         au.com.codeka.common.protobuf.Messages.Stars result = new au.com.codeka.common.protobuf.Messages.Stars(this);
         int from_bitField0_ = bitField0_;
@@ -48433,32 +49580,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Stars) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Stars)other);
@@ -48501,10 +49655,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -48763,11 +49919,13 @@ public final class Messages {
         }
         return starsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -48789,11 +49947,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Stars>
         PARSER = new com.google.protobuf.AbstractParser<Stars>() {
+      @java.lang.Override
       public Stars parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Stars(input, extensionRegistry);
+        return new Stars(input, extensionRegistry);
       }
     };
 
@@ -48806,6 +49965,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Stars getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -48933,6 +50093,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.StarRenameRequest)
       StarRenameRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use StarRenameRequest.newBuilder() to construct.
     private StarRenameRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -48957,6 +50118,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -48968,13 +50132,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -49029,6 +50186,13 @@ public final class Messages {
               bitField0_ |= 0x00000080;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -49046,6 +50210,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_StarRenameRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_StarRenameRequest_fieldAccessorTable
@@ -49343,6 +50508,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -49352,6 +50518,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -49381,6 +50548,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -49417,7 +50585,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -49588,6 +50755,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -49595,6 +50763,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.StarRenameRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -49622,6 +50791,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_StarRenameRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_StarRenameRequest_fieldAccessorTable
@@ -49645,6 +50815,7 @@ public final class Messages {
           getPurchaseInfoFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         starKey_ = "";
@@ -49670,15 +50841,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_StarRenameRequest_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.StarRenameRequest getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.StarRenameRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.StarRenameRequest build() {
         au.com.codeka.common.protobuf.Messages.StarRenameRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -49687,6 +50861,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.StarRenameRequest buildPartial() {
         au.com.codeka.common.protobuf.Messages.StarRenameRequest result = new au.com.codeka.common.protobuf.Messages.StarRenameRequest(this);
         int from_bitField0_ = bitField0_;
@@ -49732,32 +50907,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.StarRenameRequest) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.StarRenameRequest)other);
@@ -49810,10 +50992,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -50438,11 +51622,13 @@ public final class Messages {
         }
         return purchaseInfoBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -50464,11 +51650,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<StarRenameRequest>
         PARSER = new com.google.protobuf.AbstractParser<StarRenameRequest>() {
+      @java.lang.Override
       public StarRenameRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new StarRenameRequest(input, extensionRegistry);
+        return new StarRenameRequest(input, extensionRegistry);
       }
     };
 
@@ -50481,6 +51668,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.StarRenameRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -50516,6 +51704,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.WormholeTuneRequest)
       WormholeTuneRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use WormholeTuneRequest.newBuilder() to construct.
     private WormholeTuneRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -50535,6 +51724,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -50546,13 +51738,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               srcStarId_ = input.readInt32();
@@ -50561,6 +51746,13 @@ public final class Messages {
             case 16: {
               bitField0_ |= 0x00000002;
               destStarId_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -50580,6 +51772,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_WormholeTuneRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_WormholeTuneRequest_fieldAccessorTable
@@ -50619,6 +51812,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -50628,6 +51822,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -50639,6 +51834,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -50657,7 +51853,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -50773,6 +51968,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -50780,6 +51976,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.WormholeTuneRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -50803,6 +52000,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_WormholeTuneRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_WormholeTuneRequest_fieldAccessorTable
@@ -50825,6 +52023,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         srcStarId_ = 0;
@@ -50834,15 +52033,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_WormholeTuneRequest_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.WormholeTuneRequest getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.WormholeTuneRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.WormholeTuneRequest build() {
         au.com.codeka.common.protobuf.Messages.WormholeTuneRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -50851,6 +52053,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.WormholeTuneRequest buildPartial() {
         au.com.codeka.common.protobuf.Messages.WormholeTuneRequest result = new au.com.codeka.common.protobuf.Messages.WormholeTuneRequest(this);
         int from_bitField0_ = bitField0_;
@@ -50868,32 +52071,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.WormholeTuneRequest) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.WormholeTuneRequest)other);
@@ -50916,10 +52126,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -51002,11 +52214,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -51028,11 +52242,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<WormholeTuneRequest>
         PARSER = new com.google.protobuf.AbstractParser<WormholeTuneRequest>() {
+      @java.lang.Override
       public WormholeTuneRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new WormholeTuneRequest(input, extensionRegistry);
+        return new WormholeTuneRequest(input, extensionRegistry);
       }
     };
 
@@ -51045,6 +52260,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.WormholeTuneRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -51165,6 +52381,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Planet)
       PlanetOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Planet.newBuilder() to construct.
     private Planet(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -51188,6 +52405,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -51199,13 +52419,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 16: {
               bitField0_ |= 0x00000001;
               index_ = input.readInt32();
@@ -51213,6 +52426,7 @@ public final class Messages {
             }
             case 24: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE value = au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(3, rawValue);
@@ -51242,6 +52456,13 @@ public final class Messages {
               miningCongeniality_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -51259,6 +52480,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Planet_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Planet_fieldAccessorTable
@@ -51462,6 +52684,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
      */
     public au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE getPlanetType() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE result = au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE.valueOf(planetType_);
       return result == null ? au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE.GASGIANT : result;
     }
@@ -51561,6 +52784,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -51570,6 +52794,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -51593,6 +52818,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -51627,7 +52853,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -51778,6 +53003,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -51785,6 +53011,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Planet prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -51813,6 +53040,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Planet_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Planet_fieldAccessorTable
@@ -51835,6 +53063,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         index_ = 0;
@@ -51852,15 +53081,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Planet_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Planet getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Planet.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Planet build() {
         au.com.codeka.common.protobuf.Messages.Planet result = buildPartial();
         if (!result.isInitialized()) {
@@ -51869,6 +53101,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Planet buildPartial() {
         au.com.codeka.common.protobuf.Messages.Planet result = new au.com.codeka.common.protobuf.Messages.Planet(this);
         int from_bitField0_ = bitField0_;
@@ -51902,32 +53135,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Planet) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Planet)other);
@@ -51962,10 +53202,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -52048,6 +53290,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
        */
       public au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE getPlanetType() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE result = au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE.valueOf(planetType_);
         return result == null ? au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE.GASGIANT : result;
       }
@@ -52268,11 +53511,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -52294,11 +53539,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Planet>
         PARSER = new com.google.protobuf.AbstractParser<Planet>() {
+      @java.lang.Override
       public Planet parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Planet(input, extensionRegistry);
+        return new Planet(input, extensionRegistry);
       }
     };
 
@@ -52311,6 +53557,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Planet getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -52357,6 +53604,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Planets)
       PlanetsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Planets.newBuilder() to construct.
     private Planets(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -52375,6 +53623,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -52386,13 +53637,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 planets_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.Planet>();
@@ -52400,6 +53644,13 @@ public final class Messages {
               }
               planets_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.Planet.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -52422,6 +53673,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Planets_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Planets_fieldAccessorTable
@@ -52465,6 +53717,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -52474,6 +53727,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < planets_.size(); i++) {
@@ -52482,6 +53736,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -52496,7 +53751,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -52600,6 +53854,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -52607,6 +53862,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Planets prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -52635,6 +53891,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Planets_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Planets_fieldAccessorTable
@@ -52658,6 +53915,7 @@ public final class Messages {
           getPlanetsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (planetsBuilder_ == null) {
@@ -52669,15 +53927,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Planets_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Planets getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Planets.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Planets build() {
         au.com.codeka.common.protobuf.Messages.Planets result = buildPartial();
         if (!result.isInitialized()) {
@@ -52686,6 +53947,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Planets buildPartial() {
         au.com.codeka.common.protobuf.Messages.Planets result = new au.com.codeka.common.protobuf.Messages.Planets(this);
         int from_bitField0_ = bitField0_;
@@ -52702,32 +53964,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Planets) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Planets)other);
@@ -52770,10 +54039,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -53032,11 +54303,13 @@ public final class Messages {
         }
         return planetsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -53058,11 +54331,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Planets>
         PARSER = new com.google.protobuf.AbstractParser<Planets>() {
+      @java.lang.Override
       public Planets parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Planets(input, extensionRegistry);
+        return new Planets(input, extensionRegistry);
       }
     };
 
@@ -53075,6 +54349,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Planets getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -53120,6 +54395,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Sectors)
       SectorsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Sectors.newBuilder() to construct.
     private Sectors(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -53138,6 +54414,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -53149,13 +54428,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 sectors_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.Sector>();
@@ -53163,6 +54435,13 @@ public final class Messages {
               }
               sectors_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.Sector.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -53185,6 +54464,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Sectors_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Sectors_fieldAccessorTable
@@ -53228,6 +54508,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -53237,6 +54518,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < sectors_.size(); i++) {
@@ -53245,6 +54527,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -53259,7 +54542,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -53363,6 +54645,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -53370,6 +54653,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Sectors prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -53397,6 +54681,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Sectors_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Sectors_fieldAccessorTable
@@ -53420,6 +54705,7 @@ public final class Messages {
           getSectorsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (sectorsBuilder_ == null) {
@@ -53431,15 +54717,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Sectors_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Sectors getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Sectors.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Sectors build() {
         au.com.codeka.common.protobuf.Messages.Sectors result = buildPartial();
         if (!result.isInitialized()) {
@@ -53448,6 +54737,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Sectors buildPartial() {
         au.com.codeka.common.protobuf.Messages.Sectors result = new au.com.codeka.common.protobuf.Messages.Sectors(this);
         int from_bitField0_ = bitField0_;
@@ -53464,32 +54754,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Sectors) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Sectors)other);
@@ -53532,10 +54829,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -53794,11 +55093,13 @@ public final class Messages {
         }
         return sectorsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -53820,11 +55121,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Sectors>
         PARSER = new com.google.protobuf.AbstractParser<Sectors>() {
+      @java.lang.Override
       public Sectors parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Sectors(input, extensionRegistry);
+        return new Sectors(input, extensionRegistry);
       }
     };
 
@@ -53837,6 +55139,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Sectors getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -53964,6 +55267,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.EmpirePresence)
       EmpirePresenceOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use EmpirePresence.newBuilder() to construct.
     private EmpirePresence(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -53991,6 +55295,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -54002,13 +55309,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -54062,6 +55362,13 @@ public final class Messages {
               goodsZeroTime_ = input.readInt64();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -54079,6 +55386,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpirePresence_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpirePresence_fieldAccessorTable
@@ -54319,6 +55627,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -54328,6 +55637,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -54363,6 +55673,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -54410,7 +55721,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -54617,6 +55927,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -54624,6 +55935,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpirePresence prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -54652,6 +55964,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpirePresence_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpirePresence_fieldAccessorTable
@@ -54674,6 +55987,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -54699,15 +56013,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpirePresence_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpirePresence getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.EmpirePresence.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpirePresence build() {
         au.com.codeka.common.protobuf.Messages.EmpirePresence result = buildPartial();
         if (!result.isInitialized()) {
@@ -54716,6 +56033,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.EmpirePresence buildPartial() {
         au.com.codeka.common.protobuf.Messages.EmpirePresence result = new au.com.codeka.common.protobuf.Messages.EmpirePresence(this);
         int from_bitField0_ = bitField0_;
@@ -54765,32 +56083,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.EmpirePresence) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpirePresence)other);
@@ -54843,10 +56168,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -55317,11 +56644,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -55343,11 +56672,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<EmpirePresence>
         PARSER = new com.google.protobuf.AbstractParser<EmpirePresence>() {
+      @java.lang.Override
       public EmpirePresence parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EmpirePresence(input, extensionRegistry);
+        return new EmpirePresence(input, extensionRegistry);
       }
     };
 
@@ -55360,6 +56690,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.EmpirePresence getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -55398,6 +56729,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ColonizeRequest)
       ColonizeRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ColonizeRequest.newBuilder() to construct.
     private ColonizeRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -55416,6 +56748,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -55427,16 +56762,16 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               planetIndex_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -55456,6 +56791,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ColonizeRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ColonizeRequest_fieldAccessorTable
@@ -55488,6 +56824,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -55497,6 +56834,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -55505,6 +56843,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -55519,7 +56858,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -55626,6 +56964,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -55633,6 +56972,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ColonizeRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -55660,6 +57000,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ColonizeRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ColonizeRequest_fieldAccessorTable
@@ -55682,6 +57023,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         planetIndex_ = 0;
@@ -55689,15 +57031,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ColonizeRequest_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ColonizeRequest getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ColonizeRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ColonizeRequest build() {
         au.com.codeka.common.protobuf.Messages.ColonizeRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -55706,6 +57051,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ColonizeRequest buildPartial() {
         au.com.codeka.common.protobuf.Messages.ColonizeRequest result = new au.com.codeka.common.protobuf.Messages.ColonizeRequest(this);
         int from_bitField0_ = bitField0_;
@@ -55719,32 +57065,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ColonizeRequest) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ColonizeRequest)other);
@@ -55764,10 +57117,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -55834,11 +57189,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -55860,11 +57217,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ColonizeRequest>
         PARSER = new com.google.protobuf.AbstractParser<ColonizeRequest>() {
+      @java.lang.Override
       public ColonizeRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ColonizeRequest(input, extensionRegistry);
+        return new ColonizeRequest(input, extensionRegistry);
       }
     };
 
@@ -55877,6 +57235,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ColonizeRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -56182,6 +57541,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Colony)
       ColonyOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Colony.newBuilder() to construct.
     private Colony(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -56216,6 +57576,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -56227,13 +57590,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -56322,6 +57678,13 @@ public final class Messages {
               cooldownEndTime_ = input.readInt64();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -56339,6 +57702,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Colony_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Colony_fieldAccessorTable
@@ -56800,6 +58164,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -56809,6 +58174,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -56865,6 +58231,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -56940,7 +58307,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -57226,6 +58592,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -57233,6 +58600,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Colony prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -57260,6 +58628,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Colony_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Colony_fieldAccessorTable
@@ -57282,6 +58651,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -57321,15 +58691,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Colony_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Colony getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Colony.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Colony build() {
         au.com.codeka.common.protobuf.Messages.Colony result = buildPartial();
         if (!result.isInitialized()) {
@@ -57338,6 +58711,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Colony buildPartial() {
         au.com.codeka.common.protobuf.Messages.Colony result = new au.com.codeka.common.protobuf.Messages.Colony(this);
         int from_bitField0_ = bitField0_;
@@ -57415,32 +58789,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Colony) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Colony)other);
@@ -57514,10 +58895,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -58444,11 +59827,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -58470,11 +59855,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Colony>
         PARSER = new com.google.protobuf.AbstractParser<Colony>() {
+      @java.lang.Override
       public Colony parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Colony(input, extensionRegistry);
+        return new Colony(input, extensionRegistry);
       }
     };
 
@@ -58487,6 +59873,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Colony getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -58532,6 +59919,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Colonies)
       ColoniesOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Colonies.newBuilder() to construct.
     private Colonies(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -58550,6 +59938,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -58561,13 +59952,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 colonies_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.Colony>();
@@ -58575,6 +59959,13 @@ public final class Messages {
               }
               colonies_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.Colony.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -58597,6 +59988,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Colonies_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Colonies_fieldAccessorTable
@@ -58640,6 +60032,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -58649,6 +60042,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < colonies_.size(); i++) {
@@ -58657,6 +60051,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -58671,7 +60066,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -58775,6 +60169,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -58782,6 +60177,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Colonies prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -58809,6 +60205,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Colonies_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Colonies_fieldAccessorTable
@@ -58832,6 +60229,7 @@ public final class Messages {
           getColoniesFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (coloniesBuilder_ == null) {
@@ -58843,15 +60241,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Colonies_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Colonies getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Colonies.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Colonies build() {
         au.com.codeka.common.protobuf.Messages.Colonies result = buildPartial();
         if (!result.isInitialized()) {
@@ -58860,6 +60261,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Colonies buildPartial() {
         au.com.codeka.common.protobuf.Messages.Colonies result = new au.com.codeka.common.protobuf.Messages.Colonies(this);
         int from_bitField0_ = bitField0_;
@@ -58876,32 +60278,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Colonies) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Colonies)other);
@@ -58944,10 +60353,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -59206,11 +60617,13 @@ public final class Messages {
         }
         return coloniesBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -59232,11 +60645,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Colonies>
         PARSER = new com.google.protobuf.AbstractParser<Colonies>() {
+      @java.lang.Override
       public Colonies parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Colonies(input, extensionRegistry);
+        return new Colonies(input, extensionRegistry);
       }
     };
 
@@ -59249,6 +60663,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Colonies getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -59588,6 +61003,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.BuildRequest)
       BuildRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use BuildRequest.newBuilder() to construct.
     private BuildRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -59622,6 +61038,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -59633,13 +61052,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -59660,6 +61072,7 @@ public final class Messages {
             }
             case 32: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND value = au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(4, rawValue);
@@ -59739,6 +61152,13 @@ public final class Messages {
               accelerateImmediately_ = input.readBool();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -59756,6 +61176,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_BuildRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_BuildRequest_fieldAccessorTable
@@ -60093,6 +61514,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
      */
     public au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND getBuildKind() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND result = au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.valueOf(buildKind_);
       return result == null ? au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.BUILDING : result;
     }
@@ -60457,6 +61879,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -60466,6 +61889,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -60522,6 +61946,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -60592,7 +62017,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -60848,6 +62272,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -60855,6 +62280,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.BuildRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -60882,6 +62308,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_BuildRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_BuildRequest_fieldAccessorTable
@@ -60904,6 +62331,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -60943,15 +62371,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_BuildRequest_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.BuildRequest getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.BuildRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.BuildRequest build() {
         au.com.codeka.common.protobuf.Messages.BuildRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -60960,6 +62391,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.BuildRequest buildPartial() {
         au.com.codeka.common.protobuf.Messages.BuildRequest result = new au.com.codeka.common.protobuf.Messages.BuildRequest(this);
         int from_bitField0_ = bitField0_;
@@ -61037,32 +62469,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.BuildRequest) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.BuildRequest)other);
@@ -61146,10 +62585,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -61594,6 +63035,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
        */
       public au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND getBuildKind() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND result = au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.valueOf(buildKind_);
         return result == null ? au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.BUILDING : result;
       }
@@ -62318,11 +63760,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -62344,11 +63788,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<BuildRequest>
         PARSER = new com.google.protobuf.AbstractParser<BuildRequest>() {
+      @java.lang.Override
       public BuildRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new BuildRequest(input, extensionRegistry);
+        return new BuildRequest(input, extensionRegistry);
       }
     };
 
@@ -62361,6 +63806,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.BuildRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -62406,6 +63852,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.BuildQueue)
       BuildQueueOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use BuildQueue.newBuilder() to construct.
     private BuildQueue(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -62424,6 +63871,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -62435,13 +63885,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 requests_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.BuildRequest>();
@@ -62449,6 +63892,13 @@ public final class Messages {
               }
               requests_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.BuildRequest.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -62471,6 +63921,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_BuildQueue_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_BuildQueue_fieldAccessorTable
@@ -62514,6 +63965,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -62523,6 +63975,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < requests_.size(); i++) {
@@ -62531,6 +63984,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -62545,7 +63999,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -62649,6 +64102,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -62656,6 +64110,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.BuildQueue prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -62683,6 +64138,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_BuildQueue_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_BuildQueue_fieldAccessorTable
@@ -62706,6 +64162,7 @@ public final class Messages {
           getRequestsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (requestsBuilder_ == null) {
@@ -62717,15 +64174,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_BuildQueue_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.BuildQueue getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.BuildQueue.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.BuildQueue build() {
         au.com.codeka.common.protobuf.Messages.BuildQueue result = buildPartial();
         if (!result.isInitialized()) {
@@ -62734,6 +64194,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.BuildQueue buildPartial() {
         au.com.codeka.common.protobuf.Messages.BuildQueue result = new au.com.codeka.common.protobuf.Messages.BuildQueue(this);
         int from_bitField0_ = bitField0_;
@@ -62750,32 +64211,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.BuildQueue) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.BuildQueue)other);
@@ -62818,10 +64286,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -63080,11 +64550,13 @@ public final class Messages {
         }
         return requestsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -63106,11 +64578,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<BuildQueue>
         PARSER = new com.google.protobuf.AbstractParser<BuildQueue>() {
+      @java.lang.Override
       public BuildQueue parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new BuildQueue(input, extensionRegistry);
+        return new BuildQueue(input, extensionRegistry);
       }
     };
 
@@ -63123,6 +64596,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.BuildQueue getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -63265,6 +64739,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Building)
       BuildingOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Building.newBuilder() to construct.
     private Building(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -63287,6 +64762,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -63298,13 +64776,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -63334,6 +64805,13 @@ public final class Messages {
               notes_ = bs;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -63351,6 +64829,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Building_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Building_fieldAccessorTable
@@ -63599,6 +65078,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -63608,6 +65088,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -63628,6 +65109,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -63654,7 +65136,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -63797,6 +65278,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -63804,6 +65286,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Building prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -63831,6 +65314,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Building_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Building_fieldAccessorTable
@@ -63853,6 +65337,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -63868,15 +65353,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Building_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Building getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Building.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Building build() {
         au.com.codeka.common.protobuf.Messages.Building result = buildPartial();
         if (!result.isInitialized()) {
@@ -63885,6 +65373,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Building buildPartial() {
         au.com.codeka.common.protobuf.Messages.Building result = new au.com.codeka.common.protobuf.Messages.Building(this);
         int from_bitField0_ = bitField0_;
@@ -63914,32 +65403,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Building) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Building)other);
@@ -63979,10 +65475,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -64449,11 +65947,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -64475,11 +65975,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Building>
         PARSER = new com.google.protobuf.AbstractParser<Building>() {
+      @java.lang.Override
       public Building parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Building(input, extensionRegistry);
+        return new Building(input, extensionRegistry);
       }
     };
 
@@ -64492,6 +65993,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Building getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -64541,6 +66043,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.FleetUpgrade)
       FleetUpgradeOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use FleetUpgrade.newBuilder() to construct.
     private FleetUpgrade(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -64560,6 +66063,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -64571,13 +66077,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -64588,6 +66087,13 @@ public final class Messages {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
               extra_ = bs;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -64607,6 +66113,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_FleetUpgrade_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_FleetUpgrade_fieldAccessorTable
@@ -64700,6 +66207,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -64709,6 +66217,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -64720,6 +66229,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -64736,7 +66246,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -64852,6 +66361,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -64859,6 +66369,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.FleetUpgrade prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -64886,6 +66397,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_FleetUpgrade_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_FleetUpgrade_fieldAccessorTable
@@ -64908,6 +66420,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         upgradeId_ = "";
@@ -64917,15 +66430,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_FleetUpgrade_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.FleetUpgrade getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.FleetUpgrade.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.FleetUpgrade build() {
         au.com.codeka.common.protobuf.Messages.FleetUpgrade result = buildPartial();
         if (!result.isInitialized()) {
@@ -64934,6 +66450,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.FleetUpgrade buildPartial() {
         au.com.codeka.common.protobuf.Messages.FleetUpgrade result = new au.com.codeka.common.protobuf.Messages.FleetUpgrade(this);
         int from_bitField0_ = bitField0_;
@@ -64951,32 +66468,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.FleetUpgrade) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.FleetUpgrade)other);
@@ -65003,10 +66527,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -65177,11 +66703,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -65203,11 +66731,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<FleetUpgrade>
         PARSER = new com.google.protobuf.AbstractParser<FleetUpgrade>() {
+      @java.lang.Override
       public FleetUpgrade parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new FleetUpgrade(input, extensionRegistry);
+        return new FleetUpgrade(input, extensionRegistry);
       }
     };
 
@@ -65220,6 +66749,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.FleetUpgrade getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -65613,6 +67143,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Fleet)
       FleetOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Fleet.newBuilder() to construct.
     private Fleet(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -65648,6 +67179,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -65659,13 +67193,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -65691,6 +67218,7 @@ public final class Messages {
             }
             case 40: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STATE value = au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STATE.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(5, rawValue);
@@ -65731,6 +67259,7 @@ public final class Messages {
             }
             case 88: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE value = au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(11, rawValue);
@@ -65780,6 +67309,13 @@ public final class Messages {
               allianceId_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -65800,6 +67336,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Fleet_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Fleet_fieldAccessorTable
@@ -66243,6 +67780,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.Fleet.FLEET_STATE state = 5;</code>
      */
     public au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STATE getState() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STATE result = au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STATE.valueOf(state_);
       return result == null ? au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STATE.IDLE : result;
     }
@@ -66479,6 +68017,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.Fleet.FLEET_STANCE stance = 11;</code>
      */
     public au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE getStance() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE result = au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE.valueOf(stance_);
       return result == null ? au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE.PASSIVE : result;
     }
@@ -66681,6 +68220,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -66690,6 +68230,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -66749,6 +68290,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -66823,7 +68365,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -67086,6 +68627,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -67093,6 +68635,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Fleet prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -67120,6 +68663,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Fleet_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Fleet_fieldAccessorTable
@@ -67143,6 +68687,7 @@ public final class Messages {
           getUpgradesFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -67188,15 +68733,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Fleet_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Fleet getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Fleet.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Fleet build() {
         au.com.codeka.common.protobuf.Messages.Fleet result = buildPartial();
         if (!result.isInitialized()) {
@@ -67205,6 +68753,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Fleet buildPartial() {
         au.com.codeka.common.protobuf.Messages.Fleet result = new au.com.codeka.common.protobuf.Messages.Fleet(this);
         int from_bitField0_ = bitField0_;
@@ -67291,32 +68840,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Fleet) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Fleet)other);
@@ -67426,10 +68982,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -67868,6 +69426,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.Fleet.FLEET_STATE state = 5;</code>
        */
       public au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STATE getState() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STATE result = au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STATE.valueOf(state_);
         return result == null ? au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STATE.IDLE : result;
       }
@@ -68314,6 +69873,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.Fleet.FLEET_STANCE stance = 11;</code>
        */
       public au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE getStance() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE result = au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE.valueOf(stance_);
         return result == null ? au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE.PASSIVE : result;
       }
@@ -68934,11 +70494,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -68960,11 +70522,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Fleet>
         PARSER = new com.google.protobuf.AbstractParser<Fleet>() {
+      @java.lang.Override
       public Fleet parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Fleet(input, extensionRegistry);
+        return new Fleet(input, extensionRegistry);
       }
     };
 
@@ -68977,6 +70540,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Fleet getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -69018,6 +70582,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Fleets)
       FleetsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Fleets.newBuilder() to construct.
     private Fleets(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -69036,6 +70601,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -69047,13 +70615,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 fleets_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.Fleet>();
@@ -69061,6 +70622,13 @@ public final class Messages {
               }
               fleets_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.Fleet.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -69083,6 +70651,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Fleets_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Fleets_fieldAccessorTable
@@ -69126,6 +70695,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -69135,6 +70705,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < fleets_.size(); i++) {
@@ -69143,6 +70714,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -69157,7 +70729,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -69261,6 +70832,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -69268,6 +70840,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Fleets prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -69291,6 +70864,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Fleets_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Fleets_fieldAccessorTable
@@ -69314,6 +70888,7 @@ public final class Messages {
           getFleetsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (fleetsBuilder_ == null) {
@@ -69325,15 +70900,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Fleets_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Fleets getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Fleets.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Fleets build() {
         au.com.codeka.common.protobuf.Messages.Fleets result = buildPartial();
         if (!result.isInitialized()) {
@@ -69342,6 +70920,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Fleets buildPartial() {
         au.com.codeka.common.protobuf.Messages.Fleets result = new au.com.codeka.common.protobuf.Messages.Fleets(this);
         int from_bitField0_ = bitField0_;
@@ -69358,32 +70937,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Fleets) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Fleets)other);
@@ -69426,10 +71012,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -69688,11 +71276,13 @@ public final class Messages {
         }
         return fleetsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -69714,11 +71304,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Fleets>
         PARSER = new com.google.protobuf.AbstractParser<Fleets>() {
+      @java.lang.Override
       public Fleets parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Fleets(input, extensionRegistry);
+        return new Fleets(input, extensionRegistry);
       }
     };
 
@@ -69731,6 +71322,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Fleets getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -69902,6 +71494,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.FleetOrder)
       FleetOrderOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use FleetOrder.newBuilder() to construct.
     private FleetOrder(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -69929,6 +71522,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -69940,15 +71536,9 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER value = au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(1, rawValue);
@@ -69976,6 +71566,7 @@ public final class Messages {
             }
             case 40: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE value = au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(5, rawValue);
@@ -70011,6 +71602,13 @@ public final class Messages {
               offsetY_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -70028,6 +71626,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_FleetOrder_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_FleetOrder_fieldAccessorTable
@@ -70174,6 +71773,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
      */
     public au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER getOrder() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER result = au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER.valueOf(order_);
       return result == null ? au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER.SPLIT : result;
     }
@@ -70294,6 +71894,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.Fleet.FLEET_STANCE stance = 5;</code>
      */
     public au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE getStance() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE result = au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE.valueOf(stance_);
       return result == null ? au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE.PASSIVE : result;
     }
@@ -70423,6 +72024,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -70432,6 +72034,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -70467,6 +72070,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -70515,7 +72119,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -70703,6 +72306,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -70710,6 +72314,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.FleetOrder prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -70733,6 +72338,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_FleetOrder_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_FleetOrder_fieldAccessorTable
@@ -70755,6 +72361,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         order_ = 1;
@@ -70780,15 +72387,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_FleetOrder_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.FleetOrder getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.FleetOrder.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.FleetOrder build() {
         au.com.codeka.common.protobuf.Messages.FleetOrder result = buildPartial();
         if (!result.isInitialized()) {
@@ -70797,6 +72407,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.FleetOrder buildPartial() {
         au.com.codeka.common.protobuf.Messages.FleetOrder result = new au.com.codeka.common.protobuf.Messages.FleetOrder(this);
         int from_bitField0_ = bitField0_;
@@ -70846,32 +72457,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.FleetOrder) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.FleetOrder)other);
@@ -70922,10 +72540,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -70956,6 +72576,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
        */
       public au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER getOrder() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER result = au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER.valueOf(order_);
         return result == null ? au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER.SPLIT : result;
       }
@@ -71188,6 +72809,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.Fleet.FLEET_STANCE stance = 5;</code>
        */
       public au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE getStance() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE result = au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE.valueOf(stance_);
         return result == null ? au.com.codeka.common.protobuf.Messages.Fleet.FLEET_STANCE.PASSIVE : result;
       }
@@ -71468,11 +73090,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -71494,11 +73118,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<FleetOrder>
         PARSER = new com.google.protobuf.AbstractParser<FleetOrder>() {
+      @java.lang.Override
       public FleetOrder parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new FleetOrder(input, extensionRegistry);
+        return new FleetOrder(input, extensionRegistry);
       }
     };
 
@@ -71511,6 +73136,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.FleetOrder getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -71645,6 +73271,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ScoutReport)
       ScoutReportOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ScoutReport.newBuilder() to construct.
     private ScoutReport(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -71667,6 +73294,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -71678,13 +73308,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -71713,6 +73336,13 @@ public final class Messages {
               date_ = input.readInt64();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -71730,6 +73360,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ScoutReport_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ScoutReport_fieldAccessorTable
@@ -71947,6 +73578,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -71956,6 +73588,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -71976,6 +73609,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -72003,7 +73637,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -72147,6 +73780,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -72154,6 +73788,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ScoutReport prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -72182,6 +73817,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ScoutReport_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ScoutReport_fieldAccessorTable
@@ -72204,6 +73840,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -72219,15 +73856,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ScoutReport_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ScoutReport getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ScoutReport.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ScoutReport build() {
         au.com.codeka.common.protobuf.Messages.ScoutReport result = buildPartial();
         if (!result.isInitialized()) {
@@ -72236,6 +73876,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ScoutReport buildPartial() {
         au.com.codeka.common.protobuf.Messages.ScoutReport result = new au.com.codeka.common.protobuf.Messages.ScoutReport(this);
         int from_bitField0_ = bitField0_;
@@ -72265,32 +73906,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ScoutReport) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ScoutReport)other);
@@ -72328,10 +73976,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -72749,11 +74399,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -72775,11 +74427,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ScoutReport>
         PARSER = new com.google.protobuf.AbstractParser<ScoutReport>() {
+      @java.lang.Override
       public ScoutReport parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ScoutReport(input, extensionRegistry);
+        return new ScoutReport(input, extensionRegistry);
       }
     };
 
@@ -72792,6 +74445,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ScoutReport getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -72833,6 +74487,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ScoutReports)
       ScoutReportsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ScoutReports.newBuilder() to construct.
     private ScoutReports(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -72851,6 +74506,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -72862,13 +74520,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 reports_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.ScoutReport>();
@@ -72876,6 +74527,13 @@ public final class Messages {
               }
               reports_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.ScoutReport.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -72898,6 +74556,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ScoutReports_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ScoutReports_fieldAccessorTable
@@ -72941,6 +74600,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -72950,6 +74610,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < reports_.size(); i++) {
@@ -72958,6 +74619,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -72972,7 +74634,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -73076,6 +74737,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -73083,6 +74745,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ScoutReports prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -73106,6 +74769,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ScoutReports_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ScoutReports_fieldAccessorTable
@@ -73129,6 +74793,7 @@ public final class Messages {
           getReportsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (reportsBuilder_ == null) {
@@ -73140,15 +74805,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ScoutReports_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ScoutReports getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ScoutReports.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ScoutReports build() {
         au.com.codeka.common.protobuf.Messages.ScoutReports result = buildPartial();
         if (!result.isInitialized()) {
@@ -73157,6 +74825,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ScoutReports buildPartial() {
         au.com.codeka.common.protobuf.Messages.ScoutReports result = new au.com.codeka.common.protobuf.Messages.ScoutReports(this);
         int from_bitField0_ = bitField0_;
@@ -73173,32 +74842,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ScoutReports) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ScoutReports)other);
@@ -73241,10 +74917,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -73503,11 +75181,13 @@ public final class Messages {
         }
         return reportsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -73529,11 +75209,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ScoutReports>
         PARSER = new com.google.protobuf.AbstractParser<ScoutReports>() {
+      @java.lang.Override
       public ScoutReports parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ScoutReports(input, extensionRegistry);
+        return new ScoutReports(input, extensionRegistry);
       }
     };
 
@@ -73546,6 +75227,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ScoutReports getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -73711,6 +75393,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.CombatRound)
       CombatRoundOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use CombatRound.newBuilder() to construct.
     private CombatRound(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -73735,6 +75418,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -73746,13 +75432,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -73809,6 +75488,13 @@ public final class Messages {
                   input.readMessage(au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord.PARSER, extensionRegistry));
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -73841,6 +75527,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_fieldAccessorTable
@@ -73923,6 +75610,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.CombatRound.FleetSummary)
         FleetSummaryOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use FleetSummary.newBuilder() to construct.
       private FleetSummary(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -73944,6 +75632,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -73955,13 +75646,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -73988,6 +75672,13 @@ public final class Messages {
                 numShips_ = input.readFloat();
                 break;
               }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -74008,6 +75699,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetSummary_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetSummary_fieldAccessorTable
@@ -74145,6 +75837,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -74154,6 +75847,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         for (int i = 0; i < fleetKeys_.size(); i++) {
@@ -74171,6 +75865,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -74199,7 +75894,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -74333,6 +76027,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -74340,6 +76035,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -74371,6 +76067,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetSummary_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetSummary_fieldAccessorTable
@@ -74393,6 +76090,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           fleetKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
@@ -74406,15 +76104,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetSummary_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary build() {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary result = buildPartial();
           if (!result.isInitialized()) {
@@ -74423,6 +76124,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary buildPartial() {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary result = new au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary(this);
           int from_bitField0_ = bitField0_;
@@ -74449,32 +76151,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary)other);
@@ -74514,10 +76223,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -74813,11 +76524,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -74839,11 +76552,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<FleetSummary>
           PARSER = new com.google.protobuf.AbstractParser<FleetSummary>() {
+        @java.lang.Override
         public FleetSummary parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new FleetSummary(input, extensionRegistry);
+          return new FleetSummary(input, extensionRegistry);
         }
       };
 
@@ -74856,6 +76570,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -74886,6 +76601,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.CombatRound.FleetJoinedRecord)
         FleetJoinedRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use FleetJoinedRecord.newBuilder() to construct.
       private FleetJoinedRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -74904,6 +76620,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -74915,16 +76634,16 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 8: {
                 bitField0_ |= 0x00000001;
                 fleetIndex_ = input.readInt32();
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -74944,6 +76663,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetJoinedRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetJoinedRecord_fieldAccessorTable
@@ -74968,6 +76688,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -74977,6 +76698,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -74985,6 +76707,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -74999,7 +76722,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -75106,6 +76828,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -75113,6 +76836,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -75140,6 +76864,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetJoinedRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetJoinedRecord_fieldAccessorTable
@@ -75162,6 +76887,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           fleetIndex_ = 0;
@@ -75169,15 +76895,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetJoinedRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord build() {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -75186,6 +76915,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord result = new au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord(this);
           int from_bitField0_ = bitField0_;
@@ -75199,32 +76929,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord)other);
@@ -75244,10 +76981,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -75298,11 +77037,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -75324,11 +77065,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<FleetJoinedRecord>
           PARSER = new com.google.protobuf.AbstractParser<FleetJoinedRecord>() {
+        @java.lang.Override
         public FleetJoinedRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new FleetJoinedRecord(input, extensionRegistry);
+          return new FleetJoinedRecord(input, extensionRegistry);
         }
       };
 
@@ -75341,6 +77083,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatRound.FleetJoinedRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -75380,6 +77123,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.CombatRound.FleetTargetRecord)
         FleetTargetRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use FleetTargetRecord.newBuilder() to construct.
       private FleetTargetRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -75399,6 +77143,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -75410,13 +77157,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 8: {
                 bitField0_ |= 0x00000001;
                 fleetIndex_ = input.readInt32();
@@ -75425,6 +77165,13 @@ public final class Messages {
               case 16: {
                 bitField0_ |= 0x00000002;
                 targetIndex_ = input.readInt32();
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -75444,6 +77191,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetTargetRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetTargetRecord_fieldAccessorTable
@@ -75483,6 +77231,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -75492,6 +77241,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -75503,6 +77253,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -75521,7 +77272,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -75637,6 +77387,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -75644,6 +77395,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -75671,6 +77423,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetTargetRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetTargetRecord_fieldAccessorTable
@@ -75693,6 +77446,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           fleetIndex_ = 0;
@@ -75702,15 +77456,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetTargetRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord build() {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -75719,6 +77476,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord result = new au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord(this);
           int from_bitField0_ = bitField0_;
@@ -75736,32 +77494,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord)other);
@@ -75784,10 +77549,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -75870,11 +77637,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -75896,11 +77665,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<FleetTargetRecord>
           PARSER = new com.google.protobuf.AbstractParser<FleetTargetRecord>() {
+        @java.lang.Override
         public FleetTargetRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new FleetTargetRecord(input, extensionRegistry);
+          return new FleetTargetRecord(input, extensionRegistry);
         }
       };
 
@@ -75913,6 +77683,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatRound.FleetTargetRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -75961,6 +77732,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.CombatRound.FleetAttackRecord)
         FleetAttackRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use FleetAttackRecord.newBuilder() to construct.
       private FleetAttackRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -75981,6 +77753,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -75992,13 +77767,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 8: {
                 bitField0_ |= 0x00000001;
                 fleetIndex_ = input.readInt32();
@@ -76012,6 +77780,13 @@ public final class Messages {
               case 29: {
                 bitField0_ |= 0x00000004;
                 damage_ = input.readFloat();
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -76031,6 +77806,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetAttackRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetAttackRecord_fieldAccessorTable
@@ -76085,6 +77861,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -76094,6 +77871,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -76108,6 +77886,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -76130,7 +77909,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -76258,6 +78036,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -76265,6 +78044,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -76292,6 +78072,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetAttackRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetAttackRecord_fieldAccessorTable
@@ -76314,6 +78095,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           fleetIndex_ = 0;
@@ -76325,15 +78107,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetAttackRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord build() {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -76342,6 +78127,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord result = new au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord(this);
           int from_bitField0_ = bitField0_;
@@ -76363,32 +78149,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord)other);
@@ -76414,10 +78207,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -76532,11 +78327,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -76558,11 +78355,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<FleetAttackRecord>
           PARSER = new com.google.protobuf.AbstractParser<FleetAttackRecord>() {
+        @java.lang.Override
         public FleetAttackRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new FleetAttackRecord(input, extensionRegistry);
+          return new FleetAttackRecord(input, extensionRegistry);
         }
       };
 
@@ -76575,6 +78373,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatRound.FleetAttackRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -76614,6 +78413,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.CombatRound.FleetDamagedRecord)
         FleetDamagedRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use FleetDamagedRecord.newBuilder() to construct.
       private FleetDamagedRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -76633,6 +78433,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -76644,13 +78447,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 8: {
                 bitField0_ |= 0x00000001;
                 fleetIndex_ = input.readInt32();
@@ -76659,6 +78455,13 @@ public final class Messages {
               case 21: {
                 bitField0_ |= 0x00000002;
                 damage_ = input.readFloat();
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -76678,6 +78481,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetDamagedRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetDamagedRecord_fieldAccessorTable
@@ -76717,6 +78521,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -76726,6 +78531,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -76737,6 +78543,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -76755,7 +78562,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -76874,6 +78680,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -76881,6 +78688,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -76908,6 +78716,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetDamagedRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetDamagedRecord_fieldAccessorTable
@@ -76930,6 +78739,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           fleetIndex_ = 0;
@@ -76939,15 +78749,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_FleetDamagedRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord build() {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -76956,6 +78769,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord result = new au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord(this);
           int from_bitField0_ = bitField0_;
@@ -76973,32 +78787,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord)other);
@@ -77021,10 +78842,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -77107,11 +78930,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -77133,11 +78958,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<FleetDamagedRecord>
           PARSER = new com.google.protobuf.AbstractParser<FleetDamagedRecord>() {
+        @java.lang.Override
         public FleetDamagedRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new FleetDamagedRecord(input, extensionRegistry);
+          return new FleetDamagedRecord(input, extensionRegistry);
         }
       };
 
@@ -77150,6 +78976,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatRound.FleetDamagedRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -77390,6 +79217,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -77399,6 +79227,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -77425,6 +79254,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -77462,7 +79292,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -77609,6 +79438,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -77616,6 +79446,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CombatRound prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -77644,6 +79475,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_fieldAccessorTable
@@ -77671,6 +79503,7 @@ public final class Messages {
           getFleetsDamagedFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         starKey_ = "";
@@ -77710,15 +79543,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatRound_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatRound getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.CombatRound.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatRound build() {
         au.com.codeka.common.protobuf.Messages.CombatRound result = buildPartial();
         if (!result.isInitialized()) {
@@ -77727,6 +79563,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatRound buildPartial() {
         au.com.codeka.common.protobuf.Messages.CombatRound result = new au.com.codeka.common.protobuf.Messages.CombatRound(this);
         int from_bitField0_ = bitField0_;
@@ -77789,32 +79626,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.CombatRound) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.CombatRound)other);
@@ -77969,10 +79813,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -79299,11 +81145,13 @@ public final class Messages {
         }
         return fleetsDamagedBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -79325,11 +81173,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<CombatRound>
         PARSER = new com.google.protobuf.AbstractParser<CombatRound>() {
+      @java.lang.Override
       public CombatRound parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new CombatRound(input, extensionRegistry);
+        return new CombatRound(input, extensionRegistry);
       }
     };
 
@@ -79342,6 +81191,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.CombatRound getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -79548,6 +81398,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.CombatReport)
       CombatReportOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use CombatReport.newBuilder() to construct.
     private CombatReport(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -79573,6 +81424,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -79584,13 +81438,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -79645,6 +81492,13 @@ public final class Messages {
                   input.readMessage(au.com.codeka.common.protobuf.Messages.CombatRound.PARSER, extensionRegistry));
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -79671,6 +81525,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatReport_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatReport_fieldAccessorTable
@@ -79970,6 +81825,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -79979,6 +81835,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -80008,6 +81865,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -80056,7 +81914,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -80219,6 +82076,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -80226,6 +82084,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CombatReport prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -80253,6 +82112,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatReport_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatReport_fieldAccessorTable
@@ -80276,6 +82136,7 @@ public final class Messages {
           getRoundsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -80301,15 +82162,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatReport_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatReport getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.CombatReport.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatReport build() {
         au.com.codeka.common.protobuf.Messages.CombatReport result = buildPartial();
         if (!result.isInitialized()) {
@@ -80318,6 +82182,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatReport buildPartial() {
         au.com.codeka.common.protobuf.Messages.CombatReport result = new au.com.codeka.common.protobuf.Messages.CombatReport(this);
         int from_bitField0_ = bitField0_;
@@ -80366,32 +82231,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.CombatReport) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.CombatReport)other);
@@ -80473,10 +82345,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -81345,11 +83219,13 @@ public final class Messages {
         }
         return roundsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -81371,11 +83247,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<CombatReport>
         PARSER = new com.google.protobuf.AbstractParser<CombatReport>() {
+      @java.lang.Override
       public CombatReport parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new CombatReport(input, extensionRegistry);
+        return new CombatReport(input, extensionRegistry);
       }
     };
 
@@ -81388,6 +83265,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.CombatReport getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -81429,6 +83307,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.CombatReports)
       CombatReportsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use CombatReports.newBuilder() to construct.
     private CombatReports(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -81447,6 +83326,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -81458,13 +83340,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 reports_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.CombatReport>();
@@ -81472,6 +83347,13 @@ public final class Messages {
               }
               reports_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.CombatReport.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -81494,6 +83376,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatReports_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatReports_fieldAccessorTable
@@ -81537,6 +83420,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -81546,6 +83430,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < reports_.size(); i++) {
@@ -81554,6 +83439,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -81568,7 +83454,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -81672,6 +83557,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -81679,6 +83565,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CombatReports prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -81702,6 +83589,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatReports_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatReports_fieldAccessorTable
@@ -81725,6 +83613,7 @@ public final class Messages {
           getReportsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (reportsBuilder_ == null) {
@@ -81736,15 +83625,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CombatReports_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatReports getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.CombatReports.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatReports build() {
         au.com.codeka.common.protobuf.Messages.CombatReports result = buildPartial();
         if (!result.isInitialized()) {
@@ -81753,6 +83645,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CombatReports buildPartial() {
         au.com.codeka.common.protobuf.Messages.CombatReports result = new au.com.codeka.common.protobuf.Messages.CombatReports(this);
         int from_bitField0_ = bitField0_;
@@ -81769,32 +83662,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.CombatReports) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.CombatReports)other);
@@ -81837,10 +83737,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -82099,11 +84001,13 @@ public final class Messages {
         }
         return reportsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -82125,11 +84029,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<CombatReports>
         PARSER = new com.google.protobuf.AbstractParser<CombatReports>() {
+      @java.lang.Override
       public CombatReports parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new CombatReports(input, extensionRegistry);
+        return new CombatReports(input, extensionRegistry);
       }
     };
 
@@ -82142,6 +84047,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.CombatReports getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -82359,6 +84265,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.SituationReport)
       SituationReportOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use SituationReport.newBuilder() to construct.
     private SituationReport(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -82382,6 +84289,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -82393,13 +84303,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -82538,6 +84441,13 @@ public final class Messages {
               realm_ = bs;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -82555,6 +84465,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_fieldAccessorTable
@@ -82623,6 +84534,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord)
         BuildCompleteRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use BuildCompleteRecord.newBuilder() to construct.
       private BuildCompleteRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -82644,6 +84556,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -82655,15 +84570,9 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 8: {
                 int rawValue = input.readEnum();
+                  @SuppressWarnings("deprecation")
                 au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND value = au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.valueOf(rawValue);
                 if (value == null) {
                   unknownFields.mergeVarintField(1, rawValue);
@@ -82690,6 +84599,13 @@ public final class Messages {
                 buildRequestKey_ = bs;
                 break;
               }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -82707,6 +84623,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_BuildCompleteRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_BuildCompleteRecord_fieldAccessorTable
@@ -82727,6 +84644,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 1;</code>
        */
       public au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND getBuildKind() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND result = au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.valueOf(buildKind_);
         return result == null ? au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.BUILDING : result;
       }
@@ -82831,6 +84749,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -82840,6 +84759,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -82857,6 +84777,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -82881,7 +84802,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -83014,6 +84934,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -83021,6 +84942,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -83048,6 +84970,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_BuildCompleteRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_BuildCompleteRecord_fieldAccessorTable
@@ -83070,6 +84993,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           buildKind_ = 1;
@@ -83083,15 +85007,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_BuildCompleteRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord build() {
           au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -83100,6 +85027,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord result = new au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord(this);
           int from_bitField0_ = bitField0_;
@@ -83125,32 +85053,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord)other);
@@ -83183,10 +85118,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -83217,6 +85154,7 @@ public final class Messages {
          * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 1;</code>
          */
         public au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND getBuildKind() {
+          @SuppressWarnings("deprecation")
           au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND result = au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.valueOf(buildKind_);
           return result == null ? au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.BUILDING : result;
         }
@@ -83425,11 +85363,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -83451,11 +85391,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<BuildCompleteRecord>
           PARSER = new com.google.protobuf.AbstractParser<BuildCompleteRecord>() {
+        @java.lang.Override
         public BuildCompleteRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new BuildCompleteRecord(input, extensionRegistry);
+          return new BuildCompleteRecord(input, extensionRegistry);
         }
       };
 
@@ -83468,6 +85409,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -83540,6 +85482,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.SituationReport.MoveCompleteRecord)
         MoveCompleteRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use MoveCompleteRecord.newBuilder() to construct.
       private MoveCompleteRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -83561,6 +85504,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -83572,13 +85518,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000001;
@@ -83602,6 +85541,13 @@ public final class Messages {
                 scoutReportKey_ = bs;
                 break;
               }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -83619,6 +85565,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_MoveCompleteRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_MoveCompleteRecord_fieldAccessorTable
@@ -83769,6 +85716,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -83778,6 +85726,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -83795,6 +85744,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -83818,7 +85768,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -83955,6 +85904,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -83962,6 +85912,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -83989,6 +85940,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_MoveCompleteRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_MoveCompleteRecord_fieldAccessorTable
@@ -84011,6 +85963,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           fleetKey_ = "";
@@ -84024,15 +85977,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_MoveCompleteRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord build() {
           au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -84041,6 +85997,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord result = new au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord(this);
           int from_bitField0_ = bitField0_;
@@ -84066,32 +86023,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord)other);
@@ -84126,10 +86090,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -84408,11 +86374,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -84434,11 +86402,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<MoveCompleteRecord>
           PARSER = new com.google.protobuf.AbstractParser<MoveCompleteRecord>() {
+        @java.lang.Override
         public MoveCompleteRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new MoveCompleteRecord(input, extensionRegistry);
+          return new MoveCompleteRecord(input, extensionRegistry);
         }
       };
 
@@ -84451,6 +86420,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -84524,6 +86494,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.SituationReport.FleetUnderAttackRecord)
         FleetUnderAttackRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use FleetUnderAttackRecord.newBuilder() to construct.
       private FleetUnderAttackRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -84545,6 +86516,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -84556,13 +86530,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000001;
@@ -84586,6 +86553,13 @@ public final class Messages {
                 combatReportKey_ = bs;
                 break;
               }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -84603,6 +86577,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetUnderAttackRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetUnderAttackRecord_fieldAccessorTable
@@ -84753,6 +86728,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -84762,6 +86738,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -84779,6 +86756,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -84802,7 +86780,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -84939,6 +86916,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -84946,6 +86924,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -84974,6 +86953,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetUnderAttackRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetUnderAttackRecord_fieldAccessorTable
@@ -84996,6 +86976,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           fleetKey_ = "";
@@ -85009,15 +86990,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetUnderAttackRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord build() {
           au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -85026,6 +87010,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord result = new au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord(this);
           int from_bitField0_ = bitField0_;
@@ -85051,32 +87036,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord)other);
@@ -85111,10 +87103,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -85393,11 +87387,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -85419,11 +87415,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<FleetUnderAttackRecord>
           PARSER = new com.google.protobuf.AbstractParser<FleetUnderAttackRecord>() {
+        @java.lang.Override
         public FleetUnderAttackRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new FleetUnderAttackRecord(input, extensionRegistry);
+          return new FleetUnderAttackRecord(input, extensionRegistry);
         }
       };
 
@@ -85436,6 +87433,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -85481,6 +87479,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.SituationReport.FleetDestroyedRecord)
         FleetDestroyedRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use FleetDestroyedRecord.newBuilder() to construct.
       private FleetDestroyedRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -85500,6 +87499,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -85511,13 +87513,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000001;
@@ -85528,6 +87523,13 @@ public final class Messages {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000002;
                 combatReportKey_ = bs;
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -85547,6 +87549,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetDestroyedRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetDestroyedRecord_fieldAccessorTable
@@ -85640,6 +87643,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -85649,6 +87653,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -85660,6 +87665,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -85676,7 +87682,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -85792,6 +87797,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -85799,6 +87805,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -85822,6 +87829,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetDestroyedRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetDestroyedRecord_fieldAccessorTable
@@ -85844,6 +87852,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           fleetDesignId_ = "";
@@ -85853,15 +87862,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetDestroyedRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord build() {
           au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -85870,6 +87882,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord result = new au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord(this);
           int from_bitField0_ = bitField0_;
@@ -85887,32 +87900,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord)other);
@@ -85939,10 +87959,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -86113,11 +88135,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -86139,11 +88163,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<FleetDestroyedRecord>
           PARSER = new com.google.protobuf.AbstractParser<FleetDestroyedRecord>() {
+        @java.lang.Override
         public FleetDestroyedRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new FleetDestroyedRecord(input, extensionRegistry);
+          return new FleetDestroyedRecord(input, extensionRegistry);
         }
       };
 
@@ -86156,6 +88181,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -86224,6 +88250,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.SituationReport.FleetVictoriousRecord)
         FleetVictoriousRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use FleetVictoriousRecord.newBuilder() to construct.
       private FleetVictoriousRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -86245,6 +88272,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -86256,13 +88286,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000001;
@@ -86286,6 +88309,13 @@ public final class Messages {
                 combatReportKey_ = bs;
                 break;
               }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -86303,6 +88333,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetVictoriousRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetVictoriousRecord_fieldAccessorTable
@@ -86453,6 +88484,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -86462,6 +88494,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -86479,6 +88512,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -86502,7 +88536,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -86639,6 +88672,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -86646,6 +88680,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -86669,6 +88704,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetVictoriousRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetVictoriousRecord_fieldAccessorTable
@@ -86691,6 +88727,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           fleetKey_ = "";
@@ -86704,15 +88741,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_FleetVictoriousRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord build() {
           au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -86721,6 +88761,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord result = new au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord(this);
           int from_bitField0_ = bitField0_;
@@ -86746,32 +88787,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord)other);
@@ -86806,10 +88854,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -87088,11 +89138,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -87114,11 +89166,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<FleetVictoriousRecord>
           PARSER = new com.google.protobuf.AbstractParser<FleetVictoriousRecord>() {
+        @java.lang.Override
         public FleetVictoriousRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new FleetVictoriousRecord(input, extensionRegistry);
+          return new FleetVictoriousRecord(input, extensionRegistry);
         }
       };
 
@@ -87131,6 +89184,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -87176,6 +89230,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.SituationReport.ColonyDestroyedRecord)
         ColonyDestroyedRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use ColonyDestroyedRecord.newBuilder() to construct.
       private ColonyDestroyedRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -87195,6 +89250,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -87206,13 +89264,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000001;
@@ -87223,6 +89274,13 @@ public final class Messages {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000002;
                 enemyEmpireKey_ = bs;
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -87242,6 +89300,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_ColonyDestroyedRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_ColonyDestroyedRecord_fieldAccessorTable
@@ -87335,6 +89394,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -87344,6 +89404,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -87355,6 +89416,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -87371,7 +89433,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -87487,6 +89548,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -87494,6 +89556,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -87517,6 +89580,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_ColonyDestroyedRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_ColonyDestroyedRecord_fieldAccessorTable
@@ -87539,6 +89603,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           colonyKey_ = "";
@@ -87548,15 +89613,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_ColonyDestroyedRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord build() {
           au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -87565,6 +89633,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord result = new au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord(this);
           int from_bitField0_ = bitField0_;
@@ -87582,32 +89651,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord)other);
@@ -87634,10 +89710,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -87808,11 +89886,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -87834,11 +89914,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<ColonyDestroyedRecord>
           PARSER = new com.google.protobuf.AbstractParser<ColonyDestroyedRecord>() {
+        @java.lang.Override
         public ColonyDestroyedRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new ColonyDestroyedRecord(input, extensionRegistry);
+          return new ColonyDestroyedRecord(input, extensionRegistry);
         }
       };
 
@@ -87851,6 +89932,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -87905,6 +89987,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.SituationReport.ColonyAttackedRecord)
         ColonyAttackedRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use ColonyAttackedRecord.newBuilder() to construct.
       private ColonyAttackedRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -87925,6 +90008,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -87936,13 +90022,6 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000001;
@@ -87958,6 +90037,13 @@ public final class Messages {
               case 29: {
                 bitField0_ |= 0x00000004;
                 numShips_ = input.readFloat();
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -87977,6 +90063,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_ColonyAttackedRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_ColonyAttackedRecord_fieldAccessorTable
@@ -88085,6 +90172,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -88094,6 +90182,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -88108,6 +90197,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -88128,7 +90218,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -88256,6 +90345,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -88263,6 +90353,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -88286,6 +90377,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_ColonyAttackedRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_ColonyAttackedRecord_fieldAccessorTable
@@ -88308,6 +90400,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           colonyKey_ = "";
@@ -88319,15 +90412,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_ColonyAttackedRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord build() {
           au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -88336,6 +90432,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord result = new au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord(this);
           int from_bitField0_ = bitField0_;
@@ -88357,32 +90454,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord)other);
@@ -88412,10 +90516,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -88618,11 +90724,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -88644,11 +90752,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<ColonyAttackedRecord>
           PARSER = new com.google.protobuf.AbstractParser<ColonyAttackedRecord>() {
+        @java.lang.Override
         public ColonyAttackedRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new ColonyAttackedRecord(input, extensionRegistry);
+          return new ColonyAttackedRecord(input, extensionRegistry);
         }
       };
 
@@ -88661,6 +90770,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -88692,6 +90802,7 @@ public final class Messages {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.SituationReport.StarRunOutOfGoodsRecord)
         StarRunOutOfGoodsRecordOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use StarRunOutOfGoodsRecord.newBuilder() to construct.
       private StarRunOutOfGoodsRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -88710,6 +90821,9 @@ public final class Messages {
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -88721,17 +90835,17 @@ public final class Messages {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 com.google.protobuf.ByteString bs = input.readBytes();
                 bitField0_ |= 0x00000001;
                 colonyKey_ = bs;
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -88751,6 +90865,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_StarRunOutOfGoodsRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_StarRunOutOfGoodsRecord_fieldAccessorTable
@@ -88802,6 +90917,7 @@ public final class Messages {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -88811,6 +90927,7 @@ public final class Messages {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -88819,6 +90936,7 @@ public final class Messages {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -88832,7 +90950,6 @@ public final class Messages {
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -88939,6 +91056,7 @@ public final class Messages {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -88946,6 +91064,7 @@ public final class Messages {
       public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -88969,6 +91088,7 @@ public final class Messages {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_StarRunOutOfGoodsRecord_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_StarRunOutOfGoodsRecord_fieldAccessorTable
@@ -88991,6 +91111,7 @@ public final class Messages {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           colonyKey_ = "";
@@ -88998,15 +91119,18 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_StarRunOutOfGoodsRecord_descriptor;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord getDefaultInstanceForType() {
           return au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord.getDefaultInstance();
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord build() {
           au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord result = buildPartial();
           if (!result.isInitialized()) {
@@ -89015,6 +91139,7 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord buildPartial() {
           au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord result = new au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord(this);
           int from_bitField0_ = bitField0_;
@@ -89028,32 +91153,39 @@ public final class Messages {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
           return (Builder) super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
           return (Builder) super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
           return (Builder) super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord) {
             return mergeFrom((au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord)other);
@@ -89075,10 +91207,12 @@ public final class Messages {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -89173,11 +91307,13 @@ public final class Messages {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -89199,11 +91335,12 @@ public final class Messages {
 
       @java.lang.Deprecated public static final com.google.protobuf.Parser<StarRunOutOfGoodsRecord>
           PARSER = new com.google.protobuf.AbstractParser<StarRunOutOfGoodsRecord>() {
+        @java.lang.Override
         public StarRunOutOfGoodsRecord parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new StarRunOutOfGoodsRecord(input, extensionRegistry);
+          return new StarRunOutOfGoodsRecord(input, extensionRegistry);
         }
       };
 
@@ -89216,6 +91353,7 @@ public final class Messages {
         return PARSER;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -89605,6 +91743,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -89614,6 +91753,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -89661,6 +91801,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -89723,7 +91864,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -89948,6 +92088,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -89955,6 +92096,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.SituationReport prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -89985,6 +92127,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_fieldAccessorTable
@@ -90015,6 +92158,7 @@ public final class Messages {
           getStarRanOutOfGoodsRecordFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -90080,15 +92224,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReport_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.SituationReport.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport build() {
         au.com.codeka.common.protobuf.Messages.SituationReport result = buildPartial();
         if (!result.isInitialized()) {
@@ -90097,6 +92244,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReport buildPartial() {
         au.com.codeka.common.protobuf.Messages.SituationReport result = new au.com.codeka.common.protobuf.Messages.SituationReport(this);
         int from_bitField0_ = bitField0_;
@@ -90194,32 +92342,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.SituationReport) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.SituationReport)other);
@@ -90286,10 +92441,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -91650,11 +93807,13 @@ public final class Messages {
         }
         return starRanOutOfGoodsRecordBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -91676,11 +93835,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<SituationReport>
         PARSER = new com.google.protobuf.AbstractParser<SituationReport>() {
+      @java.lang.Override
       public SituationReport parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new SituationReport(input, extensionRegistry);
+        return new SituationReport(input, extensionRegistry);
       }
     };
 
@@ -91693,6 +93853,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.SituationReport getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -91760,6 +93921,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.SituationReports)
       SituationReportsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use SituationReports.newBuilder() to construct.
     private SituationReports(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -91779,6 +93941,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -91790,13 +93955,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 situationReports_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.SituationReport>();
@@ -91810,6 +93968,13 @@ public final class Messages {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
               cursor_ = bs;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -91832,6 +93997,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReports_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReports_fieldAccessorTable
@@ -91930,6 +94096,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -91939,6 +94106,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < situationReports_.size(); i++) {
@@ -91950,6 +94118,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -91967,7 +94136,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -92080,6 +94248,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -92087,6 +94256,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.SituationReports prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -92110,6 +94280,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReports_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReports_fieldAccessorTable
@@ -92133,6 +94304,7 @@ public final class Messages {
           getSituationReportsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (situationReportsBuilder_ == null) {
@@ -92146,15 +94318,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_SituationReports_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReports getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.SituationReports.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReports build() {
         au.com.codeka.common.protobuf.Messages.SituationReports result = buildPartial();
         if (!result.isInitialized()) {
@@ -92163,6 +94338,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.SituationReports buildPartial() {
         au.com.codeka.common.protobuf.Messages.SituationReports result = new au.com.codeka.common.protobuf.Messages.SituationReports(this);
         int from_bitField0_ = bitField0_;
@@ -92185,32 +94361,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.SituationReports) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.SituationReports)other);
@@ -92258,10 +94441,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -92620,11 +94805,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -92646,11 +94833,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<SituationReports>
         PARSER = new com.google.protobuf.AbstractParser<SituationReports>() {
+      @java.lang.Override
       public SituationReports parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new SituationReports(input, extensionRegistry);
+        return new SituationReports(input, extensionRegistry);
       }
     };
 
@@ -92663,6 +94851,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.SituationReports getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -92893,6 +95082,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.CashAuditRecord)
       CashAuditRecordOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use CashAuditRecord.newBuilder() to construct.
     private CashAuditRecord(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -92927,6 +95117,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -92938,13 +95131,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               id_ = input.readInt32();
@@ -92957,6 +95143,7 @@ public final class Messages {
             }
             case 24: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason value = au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(3, rawValue);
@@ -93040,6 +95227,13 @@ public final class Messages {
               colonyId_ = input.readInt32();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -93057,6 +95251,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecord_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecord_fieldAccessorTable
@@ -93109,6 +95304,14 @@ public final class Messages {
        * <code>ColonyDestroyed = 6;</code>
        */
       ColonyDestroyed(6),
+      /**
+       * <pre>
+       * admin has awarded some bonus cash for whatever reason
+       * </pre>
+       *
+       * <code>BonusAward = 7;</code>
+       */
+      BonusAward(7),
       ;
 
       /**
@@ -93151,6 +95354,14 @@ public final class Messages {
        * <code>ColonyDestroyed = 6;</code>
        */
       public static final int ColonyDestroyed_VALUE = 6;
+      /**
+       * <pre>
+       * admin has awarded some bonus cash for whatever reason
+       * </pre>
+       *
+       * <code>BonusAward = 7;</code>
+       */
+      public static final int BonusAward_VALUE = 7;
 
 
       public final int getNumber() {
@@ -93174,6 +95385,7 @@ public final class Messages {
           case 4: return AllianceDeposit;
           case 5: return AllianceWithdraw;
           case 6: return ColonyDestroyed;
+          case 7: return BonusAward;
           default: return null;
         }
       }
@@ -93266,6 +95478,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.CashAuditRecord.Reason reason = 3;</code>
      */
     public au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason getReason() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason result = au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason.valueOf(reason_);
       return result == null ? au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason.FleetMove : result;
     }
@@ -93629,6 +95842,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -93638,6 +95852,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -93694,6 +95909,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -93768,7 +95984,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -94034,6 +96249,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -94041,6 +96257,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CashAuditRecord prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -94064,6 +96281,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecord_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecord_fieldAccessorTable
@@ -94086,6 +96304,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = 0;
@@ -94125,15 +96344,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecord_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CashAuditRecord getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.CashAuditRecord.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CashAuditRecord build() {
         au.com.codeka.common.protobuf.Messages.CashAuditRecord result = buildPartial();
         if (!result.isInitialized()) {
@@ -94142,6 +96364,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CashAuditRecord buildPartial() {
         au.com.codeka.common.protobuf.Messages.CashAuditRecord result = new au.com.codeka.common.protobuf.Messages.CashAuditRecord(this);
         int from_bitField0_ = bitField0_;
@@ -94219,32 +96442,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.CashAuditRecord) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.CashAuditRecord)other);
@@ -94320,10 +96550,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -94418,6 +96650,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.CashAuditRecord.Reason reason = 3;</code>
        */
       public au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason getReason() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason result = au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason.valueOf(reason_);
         return result == null ? au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason.FleetMove : result;
       }
@@ -95146,11 +97379,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -95172,11 +97407,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<CashAuditRecord>
         PARSER = new com.google.protobuf.AbstractParser<CashAuditRecord>() {
+      @java.lang.Override
       public CashAuditRecord parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new CashAuditRecord(input, extensionRegistry);
+        return new CashAuditRecord(input, extensionRegistry);
       }
     };
 
@@ -95189,6 +97425,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.CashAuditRecord getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -95230,6 +97467,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.CashAuditRecords)
       CashAuditRecordsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use CashAuditRecords.newBuilder() to construct.
     private CashAuditRecords(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -95248,6 +97486,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -95259,13 +97500,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 records_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.CashAuditRecord>();
@@ -95273,6 +97507,13 @@ public final class Messages {
               }
               records_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.CashAuditRecord.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -95295,6 +97536,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecords_fieldAccessorTable
@@ -95338,6 +97580,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -95347,6 +97590,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < records_.size(); i++) {
@@ -95355,6 +97599,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -95369,7 +97614,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -95473,6 +97717,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -95480,6 +97725,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CashAuditRecords prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -95503,6 +97749,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecords_fieldAccessorTable
@@ -95526,6 +97773,7 @@ public final class Messages {
           getRecordsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (recordsBuilder_ == null) {
@@ -95537,15 +97785,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CashAuditRecords getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.CashAuditRecords.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CashAuditRecords build() {
         au.com.codeka.common.protobuf.Messages.CashAuditRecords result = buildPartial();
         if (!result.isInitialized()) {
@@ -95554,6 +97805,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.CashAuditRecords buildPartial() {
         au.com.codeka.common.protobuf.Messages.CashAuditRecords result = new au.com.codeka.common.protobuf.Messages.CashAuditRecords(this);
         int from_bitField0_ = bitField0_;
@@ -95570,32 +97822,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.CashAuditRecords) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.CashAuditRecords)other);
@@ -95638,10 +97897,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -95900,11 +98161,13 @@ public final class Messages {
         }
         return recordsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -95926,11 +98189,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<CashAuditRecords>
         PARSER = new com.google.protobuf.AbstractParser<CashAuditRecords>() {
+      @java.lang.Override
       public CashAuditRecords parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new CashAuditRecords(input, extensionRegistry);
+        return new CashAuditRecords(input, extensionRegistry);
       }
     };
 
@@ -95943,6 +98207,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.CashAuditRecords getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -96223,6 +98488,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Alliance)
       AllianceOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Alliance.newBuilder() to construct.
     private Alliance(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -96252,6 +98518,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -96263,13 +98532,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -96338,6 +98600,13 @@ public final class Messages {
               description_ = bs;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -96358,6 +98627,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Alliance_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Alliance_fieldAccessorTable
@@ -96791,6 +99061,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -96800,6 +99071,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -96841,6 +99113,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -96895,7 +99168,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -97105,6 +99377,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -97112,6 +99385,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Alliance prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -97139,6 +99413,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Alliance_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Alliance_fieldAccessorTable
@@ -97162,6 +99437,7 @@ public final class Messages {
           getMembersFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -97195,15 +99471,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Alliance_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Alliance getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Alliance.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Alliance build() {
         au.com.codeka.common.protobuf.Messages.Alliance result = buildPartial();
         if (!result.isInitialized()) {
@@ -97212,6 +99491,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Alliance buildPartial() {
         au.com.codeka.common.protobuf.Messages.Alliance result = new au.com.codeka.common.protobuf.Messages.Alliance(this);
         int from_bitField0_ = bitField0_;
@@ -97274,32 +99554,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Alliance) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Alliance)other);
@@ -97383,10 +99670,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -98437,11 +100726,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -98463,11 +100754,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Alliance>
         PARSER = new com.google.protobuf.AbstractParser<Alliance>() {
+      @java.lang.Override
       public Alliance parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Alliance(input, extensionRegistry);
+        return new Alliance(input, extensionRegistry);
       }
     };
 
@@ -98480,6 +100772,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Alliance getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -98521,6 +100814,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.Alliances)
       AlliancesOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Alliances.newBuilder() to construct.
     private Alliances(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -98539,6 +100833,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -98550,13 +100847,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 alliances_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.Alliance>();
@@ -98564,6 +100854,13 @@ public final class Messages {
               }
               alliances_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.Alliance.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -98586,6 +100883,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Alliances_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Alliances_fieldAccessorTable
@@ -98629,6 +100927,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -98638,6 +100937,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < alliances_.size(); i++) {
@@ -98646,6 +100946,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -98660,7 +100961,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -98764,6 +101064,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -98771,6 +101072,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.Alliances prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -98794,6 +101096,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Alliances_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Alliances_fieldAccessorTable
@@ -98817,6 +101120,7 @@ public final class Messages {
           getAlliancesFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (alliancesBuilder_ == null) {
@@ -98828,15 +101132,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_Alliances_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Alliances getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.Alliances.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Alliances build() {
         au.com.codeka.common.protobuf.Messages.Alliances result = buildPartial();
         if (!result.isInitialized()) {
@@ -98845,6 +101152,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.Alliances buildPartial() {
         au.com.codeka.common.protobuf.Messages.Alliances result = new au.com.codeka.common.protobuf.Messages.Alliances(this);
         int from_bitField0_ = bitField0_;
@@ -98861,32 +101169,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.Alliances) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.Alliances)other);
@@ -98929,10 +101244,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -99191,11 +101508,13 @@ public final class Messages {
         }
         return alliancesBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -99217,11 +101536,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<Alliances>
         PARSER = new com.google.protobuf.AbstractParser<Alliances>() {
+      @java.lang.Override
       public Alliances parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Alliances(input, extensionRegistry);
+        return new Alliances(input, extensionRegistry);
       }
     };
 
@@ -99234,6 +101554,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.Alliances getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -99311,6 +101632,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.AllianceMember)
       AllianceMemberOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use AllianceMember.newBuilder() to construct.
     private AllianceMember(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -99333,6 +101655,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -99344,13 +101669,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -99376,12 +101694,20 @@ public final class Messages {
             }
             case 40: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.AllianceMember.Rank value = au.com.codeka.common.protobuf.Messages.AllianceMember.Rank.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(5, rawValue);
               } else {
                 bitField0_ |= 0x00000010;
                 rank_ = rawValue;
+              }
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
               }
               break;
             }
@@ -99402,6 +101728,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceMember_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceMember_fieldAccessorTable
@@ -99662,11 +101989,13 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;</code>
      */
     public au.com.codeka.common.protobuf.Messages.AllianceMember.Rank getRank() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.AllianceMember.Rank result = au.com.codeka.common.protobuf.Messages.AllianceMember.Rank.valueOf(rank_);
       return result == null ? au.com.codeka.common.protobuf.Messages.AllianceMember.Rank.CAPTAIN : result;
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -99676,6 +102005,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -99696,6 +102026,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -99723,7 +102054,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -99866,6 +102196,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -99873,6 +102204,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AllianceMember prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -99896,6 +102228,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceMember_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceMember_fieldAccessorTable
@@ -99918,6 +102251,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -99933,15 +102267,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceMember_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceMember getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.AllianceMember.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceMember build() {
         au.com.codeka.common.protobuf.Messages.AllianceMember result = buildPartial();
         if (!result.isInitialized()) {
@@ -99950,6 +102287,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceMember buildPartial() {
         au.com.codeka.common.protobuf.Messages.AllianceMember result = new au.com.codeka.common.protobuf.Messages.AllianceMember(this);
         int from_bitField0_ = bitField0_;
@@ -99979,32 +102317,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.AllianceMember) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.AllianceMember)other);
@@ -100042,10 +102387,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -100336,6 +102683,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;</code>
        */
       public au.com.codeka.common.protobuf.Messages.AllianceMember.Rank getRank() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.AllianceMember.Rank result = au.com.codeka.common.protobuf.Messages.AllianceMember.Rank.valueOf(rank_);
         return result == null ? au.com.codeka.common.protobuf.Messages.AllianceMember.Rank.CAPTAIN : result;
       }
@@ -100360,11 +102708,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -100386,11 +102736,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<AllianceMember>
         PARSER = new com.google.protobuf.AbstractParser<AllianceMember>() {
+      @java.lang.Override
       public AllianceMember parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new AllianceMember(input, extensionRegistry);
+        return new AllianceMember(input, extensionRegistry);
       }
     };
 
@@ -100403,6 +102754,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.AllianceMember getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -100644,6 +102996,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.AllianceRequest)
       AllianceRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use AllianceRequest.newBuilder() to construct.
     private AllianceRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -100675,6 +103028,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -100686,13 +103042,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               id_ = input.readInt32();
@@ -100715,6 +103064,7 @@ public final class Messages {
             }
             case 40: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType value = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(5, rawValue);
@@ -100732,6 +103082,7 @@ public final class Messages {
             }
             case 56: {
               int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
               au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState value = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(7, rawValue);
@@ -100782,6 +103133,13 @@ public final class Messages {
               newDescription_ = bs;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -100802,6 +103160,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequest_fieldAccessorTable
@@ -101134,6 +103493,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;</code>
      */
     public au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType getRequestType() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType result = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.valueOf(requestType_);
       return result == null ? au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.JOIN : result;
     }
@@ -101192,6 +103552,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;</code>
      */
     public au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState getState() {
+      @SuppressWarnings("deprecation")
       au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState result = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.valueOf(state_);
       return result == null ? au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.PENDING : result;
     }
@@ -101444,6 +103805,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -101453,6 +103815,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -101500,6 +103863,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -101563,7 +103927,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -101786,6 +104149,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -101793,6 +104157,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AllianceRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -101816,6 +104181,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequest_fieldAccessorTable
@@ -101839,6 +104205,7 @@ public final class Messages {
           getVoteFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = 0;
@@ -101876,15 +104243,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceRequest getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.AllianceRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceRequest build() {
         au.com.codeka.common.protobuf.Messages.AllianceRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -101893,6 +104263,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceRequest buildPartial() {
         au.com.codeka.common.protobuf.Messages.AllianceRequest result = new au.com.codeka.common.protobuf.Messages.AllianceRequest(this);
         int from_bitField0_ = bitField0_;
@@ -101963,32 +104334,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.AllianceRequest) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.AllianceRequest)other);
@@ -102076,10 +104454,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -102238,6 +104618,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;</code>
        */
       public au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType getRequestType() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType result = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.valueOf(requestType_);
         return result == null ? au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.JOIN : result;
       }
@@ -102350,6 +104731,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;</code>
        */
       public au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState getState() {
+        @SuppressWarnings("deprecation")
         au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState result = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.valueOf(state_);
         return result == null ? au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.PENDING : result;
       }
@@ -103065,11 +105447,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -103091,11 +105475,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<AllianceRequest>
         PARSER = new com.google.protobuf.AbstractParser<AllianceRequest>() {
+      @java.lang.Override
       public AllianceRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new AllianceRequest(input, extensionRegistry);
+        return new AllianceRequest(input, extensionRegistry);
       }
     };
 
@@ -103108,6 +105493,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.AllianceRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -103163,6 +105549,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.AllianceRequests)
       AllianceRequestsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use AllianceRequests.newBuilder() to construct.
     private AllianceRequests(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -103182,6 +105569,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -103193,13 +105583,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 requests_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.AllianceRequest>();
@@ -103213,6 +105596,13 @@ public final class Messages {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
               cursor_ = bs;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -103235,6 +105625,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequests_fieldAccessorTable
@@ -103321,6 +105712,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -103330,6 +105722,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < requests_.size(); i++) {
@@ -103341,6 +105734,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -103358,7 +105752,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -103471,6 +105864,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -103478,6 +105872,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AllianceRequests prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -103501,6 +105896,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequests_fieldAccessorTable
@@ -103524,6 +105920,7 @@ public final class Messages {
           getRequestsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (requestsBuilder_ == null) {
@@ -103537,15 +105934,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceRequests getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.AllianceRequests.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceRequests build() {
         au.com.codeka.common.protobuf.Messages.AllianceRequests result = buildPartial();
         if (!result.isInitialized()) {
@@ -103554,6 +105954,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceRequests buildPartial() {
         au.com.codeka.common.protobuf.Messages.AllianceRequests result = new au.com.codeka.common.protobuf.Messages.AllianceRequests(this);
         int from_bitField0_ = bitField0_;
@@ -103576,32 +105977,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.AllianceRequests) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.AllianceRequests)other);
@@ -103649,10 +106057,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -103987,11 +106397,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -104013,11 +106425,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<AllianceRequests>
         PARSER = new com.google.protobuf.AbstractParser<AllianceRequests>() {
+      @java.lang.Override
       public AllianceRequests parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new AllianceRequests(input, extensionRegistry);
+        return new AllianceRequests(input, extensionRegistry);
       }
     };
 
@@ -104030,6 +106443,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.AllianceRequests getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -104101,6 +106515,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.AllianceRequestVote)
       AllianceRequestVoteOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use AllianceRequestVote.newBuilder() to construct.
     private AllianceRequestVote(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -104124,6 +106539,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -104135,13 +106553,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               bitField0_ |= 0x00000001;
               id_ = input.readInt32();
@@ -104172,6 +106583,13 @@ public final class Messages {
               date_ = input.readInt64();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -104189,6 +106607,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_fieldAccessorTable
@@ -104288,6 +106707,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -104297,6 +106717,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -104320,6 +106741,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -104354,7 +106776,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -104507,6 +106928,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -104514,6 +106936,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AllianceRequestVote prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -104537,6 +106960,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_fieldAccessorTable
@@ -104559,6 +106983,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = 0;
@@ -104576,15 +107001,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceRequestVote getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.AllianceRequestVote.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceRequestVote build() {
         au.com.codeka.common.protobuf.Messages.AllianceRequestVote result = buildPartial();
         if (!result.isInitialized()) {
@@ -104593,6 +107021,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.AllianceRequestVote buildPartial() {
         au.com.codeka.common.protobuf.Messages.AllianceRequestVote result = new au.com.codeka.common.protobuf.Messages.AllianceRequestVote(this);
         int from_bitField0_ = bitField0_;
@@ -104626,32 +107055,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.AllianceRequestVote) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.AllianceRequestVote)other);
@@ -104686,10 +107122,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -104900,11 +107338,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -104926,11 +107366,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<AllianceRequestVote>
         PARSER = new com.google.protobuf.AbstractParser<AllianceRequestVote>() {
+      @java.lang.Override
       public AllianceRequestVote parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new AllianceRequestVote(input, extensionRegistry);
+        return new AllianceRequestVote(input, extensionRegistry);
       }
     };
 
@@ -104943,6 +107384,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.AllianceRequestVote getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -105177,6 +107619,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ErrorReport)
       ErrorReportOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ErrorReport.newBuilder() to construct.
     private ErrorReport(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -105212,6 +107655,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -105223,13 +107669,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
@@ -105331,6 +107770,13 @@ public final class Messages {
               serverRequestUserAgent_ = bs;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -105348,6 +107794,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable
@@ -105924,6 +108371,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -105933,6 +108381,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -105992,6 +108441,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -106063,7 +108513,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -106329,6 +108778,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -106336,6 +108786,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ErrorReport prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -106359,6 +108810,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable
@@ -106381,6 +108833,7 @@ public final class Messages {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         androidVersion_ = "";
@@ -106422,15 +108875,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ErrorReport getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ErrorReport.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ErrorReport build() {
         au.com.codeka.common.protobuf.Messages.ErrorReport result = buildPartial();
         if (!result.isInitialized()) {
@@ -106439,6 +108895,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ErrorReport buildPartial() {
         au.com.codeka.common.protobuf.Messages.ErrorReport result = new au.com.codeka.common.protobuf.Messages.ErrorReport(this);
         int from_bitField0_ = bitField0_;
@@ -106520,32 +108977,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ErrorReport) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ErrorReport)other);
@@ -106638,10 +109102,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -107720,11 +110186,13 @@ public final class Messages {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -107746,11 +110214,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ErrorReport>
         PARSER = new com.google.protobuf.AbstractParser<ErrorReport>() {
+      @java.lang.Override
       public ErrorReport parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ErrorReport(input, extensionRegistry);
+        return new ErrorReport(input, extensionRegistry);
       }
     };
 
@@ -107763,6 +110232,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ErrorReport getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -107804,6 +110274,7 @@ public final class Messages {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:au.com.codeka.common.protobuf.ErrorReports)
       ErrorReportsOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use ErrorReports.newBuilder() to construct.
     private ErrorReports(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -107822,6 +110293,9 @@ public final class Messages {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -107833,13 +110307,6 @@ public final class Messages {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 reports_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.ErrorReport>();
@@ -107847,6 +110314,13 @@ public final class Messages {
               }
               reports_.add(
                   input.readMessage(au.com.codeka.common.protobuf.Messages.ErrorReport.PARSER, extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -107869,6 +110343,7 @@ public final class Messages {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable
@@ -107912,6 +110387,7 @@ public final class Messages {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -107921,6 +110397,7 @@ public final class Messages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < reports_.size(); i++) {
@@ -107929,6 +110406,7 @@ public final class Messages {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -107943,7 +110421,6 @@ public final class Messages {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -108047,6 +110524,7 @@ public final class Messages {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -108054,6 +110532,7 @@ public final class Messages {
     public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ErrorReports prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -108077,6 +110556,7 @@ public final class Messages {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable
@@ -108100,6 +110580,7 @@ public final class Messages {
           getReportsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (reportsBuilder_ == null) {
@@ -108111,15 +110592,18 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ErrorReports getDefaultInstanceForType() {
         return au.com.codeka.common.protobuf.Messages.ErrorReports.getDefaultInstance();
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ErrorReports build() {
         au.com.codeka.common.protobuf.Messages.ErrorReports result = buildPartial();
         if (!result.isInitialized()) {
@@ -108128,6 +110612,7 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public au.com.codeka.common.protobuf.Messages.ErrorReports buildPartial() {
         au.com.codeka.common.protobuf.Messages.ErrorReports result = new au.com.codeka.common.protobuf.Messages.ErrorReports(this);
         int from_bitField0_ = bitField0_;
@@ -108144,32 +110629,39 @@ public final class Messages {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof au.com.codeka.common.protobuf.Messages.ErrorReports) {
           return mergeFrom((au.com.codeka.common.protobuf.Messages.ErrorReports)other);
@@ -108212,10 +110704,12 @@ public final class Messages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -108474,11 +110968,13 @@ public final class Messages {
         }
         return reportsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -108500,11 +110996,12 @@ public final class Messages {
 
     @java.lang.Deprecated public static final com.google.protobuf.Parser<ErrorReports>
         PARSER = new com.google.protobuf.AbstractParser<ErrorReports>() {
+      @java.lang.Override
       public ErrorReports parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ErrorReports(input, extensionRegistry);
+        return new ErrorReports(input, extensionRegistry);
       }
     };
 
@@ -108517,6 +111014,7 @@ public final class Messages {
       return PARSER;
     }
 
+    @java.lang.Override
     public au.com.codeka.common.protobuf.Messages.ErrorReports getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -108976,7 +111474,7 @@ public final class Messages {
       "ony\020\002\022\032\n\026CannotAttackColonyGone\020\007\022\037\n\033Can" +
       "notBuildDependencyNotMet\020\003\022\"\n\036CannotBuil" +
       "dMaxPerColonyReached\020\004\022\"\n\036CannotBuildMax" +
-      "PerEmpireReached\020\010\022\036\n\032CannotBuildMaxLeve",
+      "PerEmpireReached\020\010\022\036\n\032CannotBuildMaxLeve" +
       "lReached\020\005\022\036\n\032RenameStarOldNameIncorrect" +
       "\020\006\022#\n\037CannotCreateEmpireDuplicateName\020\t\022" +
       "\037\n\033CannotCreateEmpireBlankName\020\n\022 \n\034Cann" +
@@ -108986,7 +111484,7 @@ public final class Messages {
       "yInProgress\020\016\022(\n$CannotColonizePlanetAlr" +
       "eadyHasColony\020\020\022%\n!CannotColonizePlanetN" +
       "oColonyShips\020\021\022\020\n\014InvalidImage\020\022\022\025\n\021Shie" +
-      "ldImageTooBig\020\023\022\024\n\020EmpireNameExists\020\024\022\027\n",
+      "ldImageTooBig\020\023\022\024\n\020EmpireNameExists\020\024\022\027\n" +
       "\023InvalidConversation\020\025\022\037\n\033EmpireAlreadyI" +
       "nConversation\020\026\022\020\n\014EmpireBanned\020\027\022\027\n\023Fle" +
       "etBoostNoUpgrade\020\030\022\035\n\031FleetBoostAlreadyB" +
@@ -108996,7 +111494,7 @@ public final class Messages {
       "hole\020\035\022\024\n\020WormholeNotTuned\020\036\022\024\n\020Wormhole" +
       "TooClose\020\037\022\033\n\027FleetMoveTooCloseToStar\020 \022" +
       "!\n\035CannotVoteOnNonPendingRequest\020!\022\036\n\032No" +
-      "WormholeDisruptorInRange\020\"\022\020\n\014NetworkErr",
+      "WormholeDisruptorInRange\020\"\022\020\n\014NetworkErr" +
       "or\020#\022\027\n\023AuthenticationError\020$\022\020\n\014NotAnon" +
       "ymous\020%\"f\n\014PurchaseInfo\022\013\n\003sku\030\001 \001(\t\022\r\n\005" +
       "token\030\002 \001(\t\022\020\n\010order_id\030\003 \001(\t\022\r\n\005price\030\004" +
@@ -109006,7 +111504,7 @@ public final class Messages {
       "\005\022\021\n\tlast_rank\030\003 \001(\005\022\023\n\013total_stars\030\004 \001(" +
       "\003\022\026\n\016total_colonies\030\005 \001(\003\022\023\n\013total_ships" +
       "\030\006 \001(\003\022\027\n\017total_buildings\030\007 \001(\003\022\030\n\020total" +
-      "_population\030\010 \001(\003\"U\n\013EmpireRanks\0228\n\005rank",
+      "_population\030\010 \001(\003\"U\n\013EmpireRanks\0228\n\005rank" +
       "s\030\001 \003(\0132).au.com.codeka.common.protobuf." +
       "EmpireRank\022\014\n\004date\030\002 \001(\003\"\234\001\n\020EmpireBattl" +
       "eRank\0225\n\006empire\030\001 \001(\0132%.au.com.codeka.co" +
@@ -109016,7 +111514,7 @@ public final class Messages {
       "anks\022>\n\005ranks\030\001 \003(\0132/.au.com.codeka.comm" +
       "on.protobuf.EmpireBattleRank\022\020\n\010num_days" +
       "\030\002 \001(\005\"\233\006\n\006Empire\022\013\n\003key\030\001 \001(\t\022\024\n\014displa" +
-      "y_name\030\002 \001(\t\022\014\n\004user\030\003 \001(\t\022\r\n\005email\030\004 \001(",
+      "y_name\030\002 \001(\t\022\014\n\004user\030\003 \001(\t\022\r\n\005email\030\004 \001(" +
       "\t\022@\n\005state\030\005 \001(\01621.au.com.codeka.common." +
       "protobuf.Empire.EmpireState\0224\n\006fleets\030\006 " +
       "\003(\0132$.au.com.codeka.common.protobuf.Flee" +
@@ -109026,7 +111524,7 @@ public final class Messages {
       "Request\022\014\n\004cash\030\t \001(\002\022\016\n\006cash64\030\021 \001(\001\0227\n" +
       "\004rank\030\013 \001(\0132).au.com.codeka.common.proto" +
       "buf.EmpireRank\0226\n\thome_star\030\014 \001(\0132#.au.c" +
-      "om.codeka.common.protobuf.Star\0229\n\010allian",
+      "om.codeka.common.protobuf.Star\0229\n\010allian" +
       "ce\030\r \001(\0132\'.au.com.codeka.common.protobuf" +
       ".Alliance\022 \n\030shield_image_last_update\030\016 " +
       "\001(\003\022 \n\030taxes_collected_per_hour\030\017 \001(\001\022\021\n" +
@@ -109036,7 +111534,7 @@ public final class Messages {
       "\n\006BANNED\020\002\022\r\n\tABANDONED\020\003\"9\n\014PatreonLeve" +
       "l\022\010\n\004NONE\020\000\022\007\n\003FAN\020\001\022\n\n\006PATRON\020\002\022\n\n\006EMPI" +
       "RE\020\003\"A\n\007Empires\0226\n\007empires\030\001 \003(\0132%.au.co" +
-      "m.codeka.common.protobuf.Empire\"\215\001\n\024Empi",
+      "m.codeka.common.protobuf.Empire\"\215\001\n\024Empi" +
       "reCashAuditEntry\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_" +
       "key\030\002 \001(\t\022\022\n\ndifference\030\003 \001(\002\022\020\n\010old_cas" +
       "h\030\004 \001(\002\022\020\n\010new_cash\030\005 \001(\002\022\016\n\006reason\030\006 \001(" +
@@ -109046,7 +111544,7 @@ public final class Messages {
       "eRequest\022\013\n\003key\030\001 \001(\t\022\020\n\010new_name\030\002 \001(\t\022" +
       "\020\n\010old_name\030\004 \001(\t\022B\n\rpurchase_info\030\003 \001(\013" +
       "2+.au.com.codeka.common.protobuf.Purchas" +
-      "eInfo\"\177\n\031EmpireChangeShieldRequest\022\013\n\003ke",
+      "eInfo\"\177\n\031EmpireChangeShieldRequest\022\013\n\003ke" +
       "y\030\001 \001(\t\022\021\n\tpng_image\030\002 \001(\014\022B\n\rpurchase_i" +
       "nfo\030\003 \001(\0132+.au.com.codeka.common.protobu" +
       "f.PurchaseInfo\"X\n\022EmpireResetRequest\022B\n\r" +
@@ -109056,7 +111554,7 @@ public final class Messages {
       "odeka.common.protobuf.EmpireBuildingStat" +
       "istics.DesignCount\0327\n\013DesignCount\022\021\n\tdes" +
       "ign_id\030\001 \001(\t\022\025\n\rnum_buildings\030\002 \001(\005\"\\\n\026E" +
-      "mpireAdsRemoveRequest\022B\n\rpurchase_info\030\001",
+      "mpireAdsRemoveRequest\022B\n\rpurchase_info\030\001" +
       " \001(\0132+.au.com.codeka.common.protobuf.Pur" +
       "chaseInfo\"\260\003\n\021EmpireAltAccounts\022\021\n\tempir" +
       "e_id\030\001 \001(\005\022T\n\nalt_empire\030\002 \003(\0132@.au.com." +
@@ -109066,7 +111564,7 @@ public final class Messages {
       "ts.DeviceInfo\032b\n\017EmpireAltEmpire\022\021\n\tempi" +
       "re_id\030\001 \001(\005\022\023\n\013empire_name\030\002 \001(\t\022\022\n\nuser" +
       "_email\030\003 \001(\t\022\023\n\013alliance_id\030\004 \001(\005\032\200\001\n\nDe" +
-      "viceInfo\022\021\n\tdevice_id\030\001 \001(\t\022\033\n\023device_ma",
+      "viceInfo\022\021\n\tdevice_id\030\001 \001(\t\022\033\n\023device_ma" +
       "nufacturer\030\002 \001(\t\022\024\n\014device_model\030\003 \001(\t\022\024" +
       "\n\014device_build\030\004 \001(\t\022\026\n\016device_version\030\005" +
       " \001(\t\"N\n\nEmpireStar\0221\n\004star\030\001 \001(\0132#.au.co" +
@@ -109076,7 +111574,7 @@ public final class Messages {
       "\013total_stars\030\002 \001(\005\"\276\001\n\014HelloRequest\022\024\n\014d" +
       "evice_model\030\001 \001(\t\022\033\n\023device_manufacturer" +
       "\030\002 \001(\t\022\024\n\014device_build\030\003 \001(\t\022\026\n\016device_v" +
-      "ersion\030\004 \001(\t\022\024\n\014memory_class\030\005 \001(\005\022!\n\031al",
+      "ersion\030\004 \001(\t\022\024\n\014memory_class\030\005 \001(\005\022!\n\031al" +
       "low_inline_notfications\030\006 \001(\010\022\024\n\014no_star" +
       "_list\030\007 \001(\010\"\331\003\n\rHelloResponse\022<\n\004motd\030\001 " +
       "\001(\0132..au.com.codeka.common.protobuf.Mess" +
@@ -109086,7 +111584,7 @@ public final class Messages {
       "ony\022\034\n\024require_gcm_register\030\006 \001(\010\022\030\n\020was" +
       "_empire_reset\030\007 \001(\010\022\033\n\023empire_reset_reas" +
       "on\030\n \001(\t\022T\n\023building_statistics\030\010 \001(\01327." +
-      "au.com.codeka.common.protobuf.EmpireBuil",
+      "au.com.codeka.common.protobuf.EmpireBuil" +
       "dingStatistics\022C\n\016build_requests\030\t \003(\0132+" +
       ".au.com.codeka.common.protobuf.BuildRequ" +
       "est\022\030\n\020force_remove_ads\030\013 \001(\010\022\020\n\010star_id" +
@@ -109096,7 +111594,7 @@ public final class Messages {
       "ice_manufacturer\030\005 \001(\t\022\024\n\014device_build\030\006" +
       " \001(\t\022\026\n\016device_version\030\007 \001(\t\022\014\n\004user\030\010 \001" +
       "(\t\"_\n\023DeviceRegistrations\022H\n\rregistratio" +
-      "ns\030\001 \003(\01321.au.com.codeka.common.protobuf",
+      "ns\030\001 \003(\01321.au.com.codeka.common.protobuf" +
       ".DeviceRegistration\"\'\n\022DeviceOnlineStatu" +
       "s\022\021\n\tis_online\030\001 \001(\010\"+\n\014Notification\022\014\n\004" +
       "name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"S\n\rNotificatio" +
@@ -109106,7 +111604,7 @@ public final class Messages {
       "B\n\rnotifications\030\002 \003(\0132+.au.com.codeka.c" +
       "ommon.protobuf.Notification\"\301\002\n\013ChatMess" +
       "age\022\n\n\002id\030\007 \001(\005\022\017\n\007message\030\001 \001(\t\022\022\n\nempi" +
-      "re_key\030\002 \001(\t\022\023\n\013date_posted\030\003 \001(\003\022\024\n\014all",
+      "re_key\030\002 \001(\t\022\023\n\013date_posted\030\003 \001(\003\022\024\n\014all" +
       "iance_key\030\004 \001(\t\022\022\n\nmessage_en\030\005 \001(\t\022\027\n\017c" +
       "onversation_id\030\006 \001(\005\022\027\n\017profanity_level\030" +
       "\t \001(\005\022H\n\006action\030\010 \001(\01628.au.com.codeka.co" +
@@ -109116,7 +111614,7 @@ public final class Messages {
       "essages\022<\n\010messages\030\001 \003(\0132*.au.com.codek" +
       "a.common.protobuf.ChatMessage\"&\n\017ChatAbu" +
       "seReport\022\023\n\013chat_msg_id\030\001 \001(\005\"p\n\020ChatCon" +
-      "versation\022\n\n\002id\030\001 \001(\005\022P\n\014participants\030\002 ",
+      "versation\022\n\n\002id\030\001 \001(\005\022P\n\014participants\030\002 " +
       "\003(\0132:.au.com.codeka.common.protobuf.Chat" +
       "ConversationParticipant\"[\n\021ChatConversat" +
       "ions\022F\n\rconversations\030\001 \003(\0132/.au.com.cod" +
@@ -109126,7 +111624,7 @@ public final class Messages {
       "\030\001 \001(\003\022\t\n\001y\030\002 \001(\003\022\024\n\014num_colonies\030\005 \001(\005\022" +
       "2\n\005stars\030\003 \003(\0132#.au.com.codeka.common.pr" +
       "otobuf.Star\0227\n\010colonies\030\004 \003(\0132%.au.com.c" +
-      "odeka.common.protobuf.Colony\0224\n\006fleets\030\006",
+      "odeka.common.protobuf.Colony\0224\n\006fleets\030\006" +
       " \003(\0132$.au.com.codeka.common.protobuf.Fle" +
       "et\"\357\007\n\004Star\022\013\n\003key\030\001 \001(\t\022\020\n\010sector_x\030\013 \001" +
       "(\003\022\020\n\010sector_y\030\014 \001(\003\022\014\n\004name\030\002 \001(\t\022J\n\016cl" +
@@ -109136,7 +111634,7 @@ public final class Messages {
       "\0226\n\007planets\030\t \003(\0132%.au.com.codeka.common" +
       ".protobuf.Planet\0227\n\010colonies\030\n \003(\0132%.au." +
       "com.codeka.common.protobuf.Colony\022:\n\tbui" +
-      "ldings\030\r \003(\0132\'.au.com.codeka.common.prot",
+      "ldings\030\r \003(\0132\'.au.com.codeka.common.prot" +
       "obuf.Building\022>\n\007empires\030\016 \003(\0132-.au.com." +
       "codeka.common.protobuf.EmpirePresence\022C\n" +
       "\016build_requests\030\017 \003(\0132+.au.com.codeka.co" +
@@ -109146,7 +111644,7 @@ public final class Messages {
       "n\030\022 \001(\003\022J\n\025current_combat_report\030\023 \001(\0132+" +
       ".au.com.codeka.common.protobuf.CombatRep" +
       "ort\022<\n\005extra\030\024 \001(\0132-.au.com.codeka.commo" +
-      "n.protobuf.Star.StarExtra\032\212\001\n\tStarExtra\022",
+      "n.protobuf.Star.StarExtra\032\212\001\n\tStarExtra\022" +
       "\035\n\025wormhole_dest_star_id\030\001 \001(\005\022#\n\033wormho" +
       "le_tune_complete_time\030\002 \001(\003\022\035\n\025wormhole_" +
       "tune_history\030\003 \003(\003\022\032\n\022wormhole_empire_id" +
@@ -109156,7 +111654,7 @@ public final class Messages {
       "\n\010WORMHOLE\020\010\";\n\005Stars\0222\n\005stars\030\001 \003(\0132#.a" +
       "u.com.codeka.common.protobuf.Star\"\247\002\n\021St" +
       "arRenameRequest\022\020\n\010star_key\030\001 \001(\t\022\020\n\010old" +
-      "_name\030\002 \001(\t\022\020\n\010new_name\030\003 \001(\t\022$\n\034DEPRECA",
+      "_name\030\002 \001(\t\022\020\n\010new_name\030\003 \001(\t\022$\n\034DEPRECA" +
       "TED_purchase_order_id\030\004 \001(\t\022 \n\030DEPRECATE" +
       "D_purchase_time\030\005 \001(\003\022-\n%DEPRECATED_purc" +
       "hase_developer_payload\030\006 \001(\t\022!\n\031DEPRECAT" +
@@ -109166,7 +111664,7 @@ public final class Messages {
       "c_star_id\030\001 \001(\005\022\024\n\014dest_star_id\030\002 \001(\005\"\311\002" +
       "\n\006Planet\022\r\n\005index\030\002 \001(\005\022F\n\013planet_type\030\003" +
       " \001(\01621.au.com.codeka.common.protobuf.Pla" +
-      "net.PLANET_TYPE\022\014\n\004size\030\004 \001(\005\022\037\n\027populat",
+      "net.PLANET_TYPE\022\014\n\004size\030\004 \001(\005\022\037\n\027populat" +
       "ion_congeniality\030\005 \001(\005\022\034\n\024farming_congen" +
       "iality\030\006 \001(\005\022\033\n\023mining_congeniality\030\007 \001(" +
       "\005\"~\n\013PLANET_TYPE\022\014\n\010GASGIANT\020\001\022\014\n\010RADIAT" +
@@ -109176,7 +111674,7 @@ public final class Messages {
       "au.com.codeka.common.protobuf.Planet\"A\n\007" +
       "Sectors\0226\n\007sectors\030\001 \003(\0132%.au.com.codeka" +
       ".common.protobuf.Sector\"\361\001\n\016EmpirePresen" +
-      "ce\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010s",
+      "ce\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010s" +
       "tar_key\030\003 \001(\t\022\023\n\013total_goods\030\004 \001(\002\022\026\n\016to" +
       "tal_minerals\030\005 \001(\002\022\034\n\024goods_delta_per_ho" +
       "ur\030\006 \001(\002\022\037\n\027minerals_delta_per_hour\030\007 \001(" +
@@ -109186,7 +111684,7 @@ public final class Messages {
       "\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010star" +
       "_key\030\004 \001(\t\022\024\n\014planet_index\030\016 \001(\005\022\022\n\npopu" +
       "lation\030\005 \001(\002\022\"\n\032DEPRECATED_last_simulati" +
-      "on\030\006 \001(\003\022\030\n\020focus_population\030\007 \001(\002\022\025\n\rfo",
+      "on\030\006 \001(\003\022\030\n\020focus_population\030\007 \001(\002\022\025\n\rfo" +
       "cus_farming\030\010 \001(\002\022\024\n\014focus_mining\030\t \001(\002\022" +
       "\032\n\022focus_construction\030\n \001(\002\022\030\n\020delta_pop" +
       "ulation\030\013 \001(\002\022\023\n\013delta_goods\030\014 \001(\002\022\026\n\016de" +
@@ -109196,7 +111694,7 @@ public final class Messages {
       "C\n\010Colonies\0227\n\010colonies\030\001 \003(\0132%.au.com.c" +
       "odeka.common.protobuf.Colony\"\327\003\n\014BuildRe" +
       "quest\022\013\n\003key\030\001 \001(\t\022\022\n\ncolony_key\030\002 \001(\t\022\022" +
-      "\n\nempire_key\030\003 \001(\t\022\020\n\010star_key\030\013 \001(\t\022\024\n\014",
+      "\n\nempire_key\030\003 \001(\t\022\020\n\010star_key\030\013 \001(\t\022\024\n\014" +
       "planet_index\030\014 \001(\005\022J\n\nbuild_kind\030\004 \001(\01626" +
       ".au.com.codeka.common.protobuf.BuildRequ" +
       "est.BUILD_KIND\022\023\n\013design_name\030\005 \001(\t\022\r\n\005c" +
@@ -109206,7 +111704,7 @@ public final class Messages {
       "evel\030\r \001(\005\022\031\n\021existing_fleet_id\030\016 \001(\005\022\022\n" +
       "\nupgrade_id\030\017 \001(\t\022\r\n\005notes\030\020 \001(\t\022\036\n\026acce" +
       "lerate_immediately\030\021 \001(\010\"$\n\nBUILD_KIND\022\014" +
-      "\n\010BUILDING\020\001\022\010\n\004SHIP\020\002\"K\n\nBuildQueue\022=\n\010",
+      "\n\010BUILDING\020\001\022\010\n\004SHIP\020\002\"K\n\nBuildQueue\022=\n\010" +
       "requests\030\001 \003(\0132+.au.com.codeka.common.pr" +
       "otobuf.BuildRequest\"^\n\010Building\022\013\n\003key\030\001" +
       " \001(\t\022\022\n\ncolony_key\030\002 \001(\t\022\023\n\013design_name\030" +
@@ -109216,7 +111714,7 @@ public final class Messages {
       "key\030\002 \001(\t\022\023\n\013alliance_id\030\022 \001(\005\022\023\n\013design" +
       "_name\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(\002\022?\n\005state\030" +
       "\005 \001(\01620.au.com.codeka.common.protobuf.Fl" +
-      "eet.FLEET_STATE\022\030\n\020state_start_time\030\006 \001(",
+      "eet.FLEET_STATE\022\030\n\020state_start_time\030\006 \001(" +
       "\003\022\020\n\010star_key\030\007 \001(\t\022\034\n\024destination_star_" +
       "key\030\010 \001(\t\022\030\n\020target_fleet_key\030\t \001(\t\022\031\n\021t" +
       "arget_colony_key\030\n \001(\t\022A\n\006stance\030\013 \001(\01621" +
@@ -109226,7 +111724,7 @@ public final class Messages {
       "_victory\030\r \001(\003\022\013\n\003eta\030\017 \001(\003\022=\n\010upgrades\030" +
       "\020 \003(\0132+.au.com.codeka.common.protobuf.Fl" +
       "eetUpgrade\022\r\n\005notes\030\021 \001(\t\"2\n\013FLEET_STATE" +
-      "\022\010\n\004IDLE\020\001\022\n\n\006MOVING\020\002\022\r\n\tATTACKING\020\003\"8\n",
+      "\022\010\n\004IDLE\020\001\022\n\n\006MOVING\020\002\022\r\n\tATTACKING\020\003\"8\n" +
       "\014FLEET_STANCE\022\013\n\007PASSIVE\020\001\022\013\n\007NEUTRAL\020\002\022" +
       "\016\n\nAGGRESSIVE\020\003\">\n\006Fleets\0224\n\006fleets\030\001 \003(" +
       "\0132$.au.com.codeka.common.protobuf.Fleet\"" +
@@ -109236,7 +111734,7 @@ public final class Messages {
       "\003 \001(\005\022\020\n\010star_key\030\004 \001(\t\022A\n\006stance\030\005 \001(\0162" +
       "1.au.com.codeka.common.protobuf.Fleet.FL" +
       "EET_STANCE\022\027\n\017merge_fleet_key\030\006 \001(\t\022\020\n\010s" +
-      "ector_x\030\007 \001(\003\022\020\n\010sector_y\030\010 \001(\003\022\020\n\010offse",
+      "ector_x\030\007 \001(\003\022\020\n\010sector_y\030\010 \001(\003\022\020\n\010offse" +
       "t_x\030\t \001(\005\022\020\n\010offset_y\030\n \001(\005\"\\\n\013FLEET_ORD" +
       "ER\022\t\n\005SPLIT\020\001\022\t\n\005MERGE\020\002\022\010\n\004MOVE\020\003\022\016\n\nSE" +
       "T_STANCE\020\005\022\t\n\005BOOST\020\006\022\022\n\016ENTER_WORMHOLE\020" +
@@ -109246,7 +111744,7 @@ public final class Messages {
       "ports\030\001 \003(\0132*.au.com.codeka.common.proto" +
       "buf.ScoutReport\"\252\006\n\013CombatRound\022\020\n\010star_" +
       "key\030\001 \001(\t\022\022\n\nround_time\030\002 \001(\003\022G\n\006fleets\030" +
-      "\003 \003(\01327.au.com.codeka.common.protobuf.Co",
+      "\003 \003(\01327.au.com.codeka.common.protobuf.Co" +
       "mbatRound.FleetSummary\022S\n\rfleets_joined\030" +
       "\004 \003(\0132<.au.com.codeka.common.protobuf.Co" +
       "mbatRound.FleetJoinedRecord\022V\n\020fleets_ta" +
@@ -109256,7 +111754,7 @@ public final class Messages {
       "mon.protobuf.CombatRound.FleetAttackReco" +
       "rd\022U\n\016fleets_damaged\030\007 \003(\0132=.au.com.code" +
       "ka.common.protobuf.CombatRound.FleetDama" +
-      "gedRecord\032\\\n\014FleetSummary\022\022\n\nfleet_keys\030",
+      "gedRecord\032\\\n\014FleetSummary\022\022\n\nfleet_keys\030" +
       "\001 \003(\t\022\022\n\nempire_key\030\002 \001(\t\022\021\n\tdesign_id\030\003" +
       " \001(\t\022\021\n\tnum_ships\030\004 \001(\002\032(\n\021FleetJoinedRe" +
       "cord\022\023\n\013fleet_index\030\001 \001(\005\032>\n\021FleetTarget" +
@@ -109266,7 +111764,7 @@ public final class Messages {
       "age\030\003 \001(\002\0329\n\022FleetDamagedRecord\022\023\n\013fleet" +
       "_index\030\001 \001(\005\022\016\n\006damage\030\002 \001(\002\"\332\001\n\014CombatR" +
       "eport\022\013\n\003key\030\001 \001(\t\022\020\n\010star_key\030\002 \001(\t\022\022\n\n" +
-      "start_time\030\003 \001(\003\022\020\n\010end_time\030\004 \001(\003\022\031\n\021st",
+      "start_time\030\003 \001(\003\022\020\n\010end_time\030\004 \001(\003\022\031\n\021st" +
       "art_empire_keys\030\005 \003(\t\022\027\n\017end_empire_keys" +
       "\030\006 \003(\t\022\025\n\rnum_destroyed\030\007 \001(\005\022:\n\006rounds\030" +
       "\010 \003(\0132*.au.com.codeka.common.protobuf.Co" +
@@ -109276,7 +111774,7 @@ public final class Messages {
       "\t\022\022\n\nempire_key\030\002 \001(\t\022\023\n\013report_time\030\003 \001" +
       "(\003\022\020\n\010star_key\030\004 \001(\t\022\024\n\014planet_index\030\005 \001" +
       "(\005\022\r\n\005realm\030\016 \001(\t\022a\n\025build_complete_reco" +
-      "rd\030\006 \001(\0132B.au.com.codeka.common.protobuf",
+      "rd\030\006 \001(\0132B.au.com.codeka.common.protobuf" +
       ".SituationReport.BuildCompleteRecord\022_\n\024" +
       "move_complete_record\030\007 \001(\0132A.au.com.code" +
       "ka.common.protobuf.SituationReport.MoveC" +
@@ -109286,7 +111784,7 @@ public final class Messages {
       "c\n\026fleet_destroyed_record\030\t \001(\0132C.au.com" +
       ".codeka.common.protobuf.SituationReport." +
       "FleetDestroyedRecord\022e\n\027fleet_victorious" +
-      "_record\030\n \001(\0132D.au.com.codeka.common.pro",
+      "_record\030\n \001(\0132D.au.com.codeka.common.pro" +
       "tobuf.SituationReport.FleetVictoriousRec" +
       "ord\022e\n\027colony_destroyed_record\030\013 \001(\0132D.a" +
       "u.com.codeka.common.protobuf.SituationRe" +
@@ -109296,7 +111794,7 @@ public final class Messages {
       "dRecord\022l\n\034star_ran_out_of_goods_record\030" +
       "\r \001(\0132F.au.com.codeka.common.protobuf.Si" +
       "tuationReport.StarRunOutOfGoodsRecord\032\236\001" +
-      "\n\023BuildCompleteRecord\022J\n\nbuild_kind\030\001 \001(",
+      "\n\023BuildCompleteRecord\022J\n\nbuild_kind\030\001 \001(" +
       "\01626.au.com.codeka.common.protobuf.BuildR" +
       "equest.BUILD_KIND\022\021\n\tdesign_id\030\002 \001(\t\022\r\n\005" +
       "count\030\003 \001(\005\022\031\n\021build_request_key\030\004 \001(\t\032m" +
@@ -109306,7 +111804,7 @@ public final class Messages {
       "derAttackRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fl" +
       "eet_design_id\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031" +
       "\n\021combat_report_key\030\004 \001(\t\032J\n\024FleetDestro" +
-      "yedRecord\022\027\n\017fleet_design_id\030\001 \001(\t\022\031\n\021co",
+      "yedRecord\022\027\n\017fleet_design_id\030\001 \001(\t\022\031\n\021co" +
       "mbat_report_key\030\002 \001(\t\032q\n\025FleetVictorious" +
       "Record\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_desig" +
       "n_id\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021combat_" +
@@ -109316,9 +111814,9 @@ public final class Messages {
       "y_key\030\001 \001(\t\022\030\n\020enemy_empire_key\030\002 \001(\t\022\021\n" +
       "\tnum_ships\030\003 \001(\002\032-\n\027StarRunOutOfGoodsRec" +
       "ord\022\022\n\ncolony_key\030\001 \001(\t\"m\n\020SituationRepo" +
-      "rts\022I\n\021situation_reports\030\001 \003(\0132..au.com.",
+      "rts\022I\n\021situation_reports\030\001 \003(\0132..au.com." +
       "codeka.common.protobuf.SituationReport\022\016" +
-      "\n\006cursor\030\002 \001(\t\"\266\004\n\017CashAuditRecord\022\n\n\002id" +
+      "\n\006cursor\030\002 \001(\t\"\306\004\n\017CashAuditRecord\022\n\n\002id" +
       "\030\001 \001(\005\022\021\n\tempire_id\030\002 \001(\005\022E\n\006reason\030\003 \001(" +
       "\01625.au.com.codeka.common.protobuf.CashAu" +
       "ditRecord.Reason\022\023\n\013before_cash\030\004 \001(\002\022\022\n" +
@@ -109326,71 +111824,72 @@ public final class Messages {
       "_id\030\006 \001(\005\022\027\n\017fleet_design_id\030\007 \001(\t\022\021\n\tnu" +
       "m_ships\030\010 \001(\002\022\017\n\007star_id\030\t \001(\005\022\021\n\tstar_n" +
       "ame\030\n \001(\t\022\025\n\rmove_distance\030\013 \001(\002\022\027\n\017buil" +
-      "d_design_id\030\014 \001(\t\022\023\n\013build_count\030\r \001(\005\022\031",
+      "d_design_id\030\014 \001(\t\022\023\n\013build_count\030\r \001(\005\022\031" +
       "\n\021accelerate_amount\030\016 \001(\002\022\025\n\ralliance_na" +
-      "me\030\017 \001(\t\022\021\n\tcolony_id\030\021 \001(\005\"\231\001\n\006Reason\022\r" +
+      "me\030\017 \001(\t\022\021\n\tcolony_id\030\021 \001(\005\"\251\001\n\006Reason\022\r" +
       "\n\tFleetMove\020\000\022\023\n\017BuildAccelerate\020\001\022\027\n\023Co" +
       "llectFromColonies\020\002\022\022\n\016CreateAlliance\020\003\022" +
       "\023\n\017AllianceDeposit\020\004\022\024\n\020AllianceWithdraw" +
-      "\020\005\022\023\n\017ColonyDestroyed\020\006\"S\n\020CashAuditReco" +
-      "rds\022?\n\007records\030\001 \003(\0132..au.com.codeka.com" +
-      "mon.protobuf.CashAuditRecord\"\271\002\n\010Allianc" +
-      "e\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\024\n\014time_cre" +
-      "ated\030\003 \001(\003\022\032\n\022creator_empire_key\030\004 \001(\t\022\024",
-      "\n\014bank_balance\030\007 \001(\001\022\023\n\013num_members\030\005 \001(" +
-      "\005\022>\n\007members\030\006 \003(\0132-.au.com.codeka.commo" +
-      "n.protobuf.AllianceMember\022\032\n\022date_image_" +
-      "updated\030\010 \001(\003\022\034\n\024num_pending_requests\030\t " +
-      "\001(\005\022\023\n\013total_stars\030\n \001(\003\022\021\n\tis_active\030\013 " +
-      "\001(\010\022\023\n\013description\030\014 \001(\t\"G\n\tAlliances\022:\n" +
-      "\talliances\030\001 \003(\0132\'.au.com.codeka.common." +
-      "protobuf.Alliance\"\317\001\n\016AllianceMember\022\013\n\003" +
-      "key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\024\n\014allianc" +
-      "e_key\030\003 \001(\t\022\023\n\013time_joined\030\004 \001(\003\022@\n\004rank",
-      "\030\005 \001(\01622.au.com.codeka.common.protobuf.A" +
-      "llianceMember.Rank\"/\n\004Rank\022\013\n\007CAPTAIN\020\000\022" +
-      "\016\n\nLIEUTENANT\020\001\022\n\n\006MEMBER\020\002\"\246\005\n\017Alliance" +
-      "Request\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005" +
-      "\022\031\n\021request_empire_id\030\003 \001(\005\022\024\n\014request_d" +
-      "ate\030\004 \001(\003\022P\n\014request_type\030\005 \001(\0162:.au.com" +
-      ".codeka.common.protobuf.AllianceRequest." +
-      "RequestType\022\017\n\007message\030\006 \001(\t\022J\n\005state\030\007 " +
-      "\001(\0162;.au.com.codeka.common.protobuf.Alli" +
-      "anceRequest.RequestState\022\021\n\tnum_votes\030\010 ",
-      "\001(\005\022\030\n\020target_empire_id\030\t \001(\005\022\016\n\006amount\030" +
-      "\n \001(\002\022\021\n\tpng_image\030\013 \001(\014\022\020\n\010new_name\030\014 \001" +
-      "(\t\022@\n\004vote\030\r \003(\01322.au.com.codeka.common." +
-      "protobuf.AllianceRequestVote\022\027\n\017new_desc" +
-      "ription\030\016 \001(\t\"\214\001\n\013RequestType\022\010\n\004JOIN\020\000\022" +
-      "\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014DEPOSIT_CASH\020\003\022\021" +
-      "\n\rWITHDRAW_CASH\020\004\022\020\n\014CHANGE_IMAGE\020\005\022\017\n\013C" +
-      "HANGE_NAME\020\006\022\026\n\022CHANGE_DESCRIPTION\020\007\"F\n\014" +
-      "RequestState\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022" +
-      "\014\n\010REJECTED\020\002\022\r\n\tWITHDRAWN\020\003\"d\n\020Alliance",
-      "Requests\022@\n\010requests\030\001 \003(\0132..au.com.code" +
-      "ka.common.protobuf.AllianceRequest\022\016\n\006cu" +
-      "rsor\030\002 \001(\t\"\203\001\n\023AllianceRequestVote\022\n\n\002id" +
-      "\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\033\n\023alliance_" +
-      "request_id\030\003 \001(\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n\005v" +
-      "otes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003\"\243\003\n\013ErrorReport" +
-      "\022\027\n\017android_version\030\001 \001(\t\022\023\n\013phone_model" +
-      "\030\002 \001(\t\022\024\n\014package_name\030\003 \001(\t\022\023\n\013app_vers" +
-      "ion\030\004 \001(\t\022\023\n\013stack_trace\030\005 \001(\t\022\017\n\007messag" +
-      "e\030\006 \001(\t\022\023\n\013report_time\030\007 \001(\003\022\021\n\tempire_i",
-      "d\030\010 \001(\005\022\017\n\007context\030\t \001(\t\022\027\n\017exception_cl" +
-      "ass\030\n \001(\t\022\021\n\theap_size\030\013 \001(\003\022\026\n\016heap_all" +
-      "ocated\030\014 \001(\003\022\021\n\theap_free\030\r \001(\003\022\026\n\016total" +
-      "_run_time\030\016 \001(\003\022\033\n\023foreground_run_time\030\017" +
-      " \001(\003\022\022\n\nlog_output\030\020 \001(\t\022\031\n\021server_reque" +
-      "st_qs\030\021 \001(\t\022!\n\031server_request_user_agent" +
-      "\030\022 \001(\t\"K\n\014ErrorReports\022;\n\007reports\030\001 \003(\0132" +
-      "*.au.com.codeka.common.protobuf.ErrorRep" +
-      "ort*\344\001\n\025SituationReportFilter\022\013\n\007ShowAll" +
-      "\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020BuildCompleteAny",
-      "\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016FleetDestroyed\020" +
-      "\004\022\023\n\017FleetVictorious\020\005\022\022\n\016ColonyAttacked" +
-      "\020\006\022\023\n\017ColonyDestroyed\020\007\022\026\n\022BuildComplete" +
-      "Ships\020\010\022\031\n\025BuildCompleteBuilding\020\t"
+      "\020\005\022\023\n\017ColonyDestroyed\020\006\022\016\n\nBonusAward\020\007\"" +
+      "S\n\020CashAuditRecords\022?\n\007records\030\001 \003(\0132..a" +
+      "u.com.codeka.common.protobuf.CashAuditRe" +
+      "cord\"\271\002\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002" +
+      " \001(\t\022\024\n\014time_created\030\003 \001(\003\022\032\n\022creator_em" +
+      "pire_key\030\004 \001(\t\022\024\n\014bank_balance\030\007 \001(\001\022\023\n\013" +
+      "num_members\030\005 \001(\005\022>\n\007members\030\006 \003(\0132-.au." +
+      "com.codeka.common.protobuf.AllianceMembe" +
+      "r\022\032\n\022date_image_updated\030\010 \001(\003\022\034\n\024num_pen" +
+      "ding_requests\030\t \001(\005\022\023\n\013total_stars\030\n \001(\003" +
+      "\022\021\n\tis_active\030\013 \001(\010\022\023\n\013description\030\014 \001(\t" +
+      "\"G\n\tAlliances\022:\n\talliances\030\001 \003(\0132\'.au.co" +
+      "m.codeka.common.protobuf.Alliance\"\317\001\n\016Al" +
+      "lianceMember\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030" +
+      "\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n\013time_join" +
+      "ed\030\004 \001(\003\022@\n\004rank\030\005 \001(\01622.au.com.codeka.c" +
+      "ommon.protobuf.AllianceMember.Rank\"/\n\004Ra" +
+      "nk\022\013\n\007CAPTAIN\020\000\022\016\n\nLIEUTENANT\020\001\022\n\n\006MEMBE" +
+      "R\020\002\"\246\005\n\017AllianceRequest\022\n\n\002id\030\001 \001(\005\022\023\n\013a" +
+      "lliance_id\030\002 \001(\005\022\031\n\021request_empire_id\030\003 " +
+      "\001(\005\022\024\n\014request_date\030\004 \001(\003\022P\n\014request_typ" +
+      "e\030\005 \001(\0162:.au.com.codeka.common.protobuf." +
+      "AllianceRequest.RequestType\022\017\n\007message\030\006" +
+      " \001(\t\022J\n\005state\030\007 \001(\0162;.au.com.codeka.comm" +
+      "on.protobuf.AllianceRequest.RequestState" +
+      "\022\021\n\tnum_votes\030\010 \001(\005\022\030\n\020target_empire_id\030" +
+      "\t \001(\005\022\016\n\006amount\030\n \001(\002\022\021\n\tpng_image\030\013 \001(\014" +
+      "\022\020\n\010new_name\030\014 \001(\t\022@\n\004vote\030\r \003(\01322.au.co" +
+      "m.codeka.common.protobuf.AllianceRequest" +
+      "Vote\022\027\n\017new_description\030\016 \001(\t\"\214\001\n\013Reques" +
+      "tType\022\010\n\004JOIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014" +
+      "DEPOSIT_CASH\020\003\022\021\n\rWITHDRAW_CASH\020\004\022\020\n\014CHA" +
+      "NGE_IMAGE\020\005\022\017\n\013CHANGE_NAME\020\006\022\026\n\022CHANGE_D" +
+      "ESCRIPTION\020\007\"F\n\014RequestState\022\013\n\007PENDING\020" +
+      "\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002\022\r\n\tWITHDRA",
+      "WN\020\003\"d\n\020AllianceRequests\022@\n\010requests\030\001 \003" +
+      "(\0132..au.com.codeka.common.protobuf.Allia" +
+      "nceRequest\022\016\n\006cursor\030\002 \001(\t\"\203\001\n\023AllianceR" +
+      "equestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002 " +
+      "\001(\005\022\033\n\023alliance_request_id\030\003 \001(\005\022\021\n\tempi" +
+      "re_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003" +
+      "\"\243\003\n\013ErrorReport\022\027\n\017android_version\030\001 \001(" +
+      "\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014package_name\030\003" +
+      " \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013stack_trace" +
+      "\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013report_time\030\007" +
+      " \001(\003\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007context\030\t \001(\t" +
+      "\022\027\n\017exception_class\030\n \001(\t\022\021\n\theap_size\030\013" +
+      " \001(\003\022\026\n\016heap_allocated\030\014 \001(\003\022\021\n\theap_fre" +
+      "e\030\r \001(\003\022\026\n\016total_run_time\030\016 \001(\003\022\033\n\023foreg" +
+      "round_run_time\030\017 \001(\003\022\022\n\nlog_output\030\020 \001(\t" +
+      "\022\031\n\021server_request_qs\030\021 \001(\t\022!\n\031server_re" +
+      "quest_user_agent\030\022 \001(\t\"K\n\014ErrorReports\022;" +
+      "\n\007reports\030\001 \003(\0132*.au.com.codeka.common.p" +
+      "rotobuf.ErrorReport*\344\001\n\025SituationReportF" +
+      "ilter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020" +
+      "BuildCompleteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n" +
+      "\016FleetDestroyed\020\004\022\023\n\017FleetVictorious\020\005\022\022" +
+      "\n\016ColonyAttacked\020\006\022\023\n\017ColonyDestroyed\020\007\022" +
+      "\026\n\022BuildCompleteShips\020\010\022\031\n\025BuildComplete" +
+      "Building\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

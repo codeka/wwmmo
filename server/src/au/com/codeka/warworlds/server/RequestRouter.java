@@ -124,6 +124,7 @@ public class RequestRouter extends AbstractHandler {
     sRoutes.add(new Route("admin/empire/shields", AdminEmpireShieldsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/empire/alts", AdminEmpireAltsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/empire/refresh-ranks", AdminRefreshRanksHandler.class, "admin/"));
+    sRoutes.add(new Route("admin/(?<path>empire/bonus-cash)", AdminEmpireBonusCashHandler.class, "admin/"));
     sRoutes.add(new Route("admin/(?<path>empire/ban)", AdminEmpireBanHandler.class, "admin/"));
     sRoutes.add(new Route("admin/users", AdminUsersHandler.class, "admin/"));
     sRoutes.add(new Route("admin/(?<path>.+)", AdminGenericHandler.class, "admin/"));

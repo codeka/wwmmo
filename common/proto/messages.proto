@@ -1200,6 +1200,7 @@ message CashAuditRecord {
     AllianceDeposit = 4; // deposited into alliance bank
     AllianceWithdraw = 5; // withdrawn from alliance bank
     ColonyDestroyed = 6; // -neg means my colony destroyed, +ve means I destroyed a colony.
+    BonusAward = 7; // admin has awarded some bonus cash for whatever reason
   }
   optional Reason reason = 3;
 

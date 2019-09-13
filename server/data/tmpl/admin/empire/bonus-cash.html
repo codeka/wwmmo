@@ -1,0 +1,37 @@
+{% extends "admin/skeleton.html" %}
+{% block "title" %}Award bonus cash{% end %}
+
+{% block "head" %}
+<style>
+    form div.field label {
+      display: inline-block;
+      width: 100pt;
+    }
+    form div.field input[type=text], form div.field input[type=number] {
+      width: 300pt;
+      border: solid 1px #666;
+      padding: 4pt;
+    }
+  </style>
+{% end %}
+
+{% block "content" %}
+<h1>Award bonus cash</h1>
+<p>
+  You can award bonus cash to an empire here. Enter the Empire ID and the amount of cash below.
+</p>
+<form method="post">
+  <div class="field">
+    <label for="empire_id">Empire ID:</label>
+    <input type="text" name="empire_id" id="empire_id"
+           value="{{empire_id}}" placeholder="Empire ID">
+  </div>
+  <div class="field">
+    <label for="cash">Cash amount:</label>
+    <input type="number" name="cash" id="cash" placeholder="Cash amount in dollars">
+  </div>
+  <div class="field">
+    <input type="submit" value="Award cash">
+  </div>
+</form>
+{% end %}
