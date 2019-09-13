@@ -120,6 +120,7 @@ public class RequestRouter extends AbstractHandler {
     sRoutes.add(new Route(
         "admin/debug/error-reports", AdminDebugErrorReportsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/debug/retrace", AdminDebugRetraceHandler.class, "admin/"));
+    sRoutes.add(new Route("admin/debug/moving-fleets", AdminMovingFleetsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/empire/shields", AdminEmpireShieldsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/empire/alts", AdminEmpireAltsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/(?<path>empire/ban)", AdminEmpireBanHandler.class, "admin/"));

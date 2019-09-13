@@ -1,0 +1,54 @@
+{% extends "admin/skeleton.html" %}
+{% block "title" %}Moving fleets{% end %}
+{% block "head" %}
+<script src="/realms/{{realm}}/js/empirestore.js"></script>
+<style>
+</style>
+{% end %}
+
+{% block "content" %}
+<h1>Moving fleets</h1>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Empire</th>
+    <th>Design</th>
+    <th># ships</th>
+    <th>Source</th>
+    <th>Destination</th>
+    <th></th>
+  </tr>
+  {% for fleet in fleets %}
+  <tr data-fleetid="{{fleet.key}}">
+    <td>{{ fleet.key }}</td>
+    <td>{{ fleet.empireKey }}</td>
+    <td>{{ fleet.design.getDisplayName() }}</td>
+    <td>{{ fleet.numShips }}</td>
+    <td>{{ fleet.starKey }}</td>
+    <td>{{ fleet.destinationStarKey }}</td>
+    <td>
+      <a href="javascript:;" class="move-complete" title="Click to complete this fleet movement now.">Complete movement</a>
+    </td>
+  </tr>
+  {% end %}
+</table>
+
+
+<script>
+  $(".move-complete").click(function(evnt) {
+    evnt.preventDefault();
+    var fleetId = $(this).parent().parent().data("fleetid");
+
+    $.ajax({
+      type: "POST",
+      data: {action: "complete-movement", fleet_id: fleetId},
+      success: function(data, textStatus, jqXHR) {
+        alert(data);
+      },
+      error: function(jqXHR, textStatus, err) {
+        alert("An error occurred, check server logs.");
+      }
+    });
+  });
+</script>
+{% end %}
