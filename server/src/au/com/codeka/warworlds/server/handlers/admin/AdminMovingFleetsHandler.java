@@ -5,7 +5,6 @@ import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
-import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
@@ -16,8 +15,6 @@ import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class AdminMovingFleetsHandler extends AdminHandler {
-  private final static Log log = new Log("AdminMovingFleetsHandler");
-
   @Override
   protected void get() throws RequestException {
     if (!isAdmin()) {
@@ -48,6 +45,10 @@ public class AdminMovingFleetsHandler extends AdminHandler {
 
   @Override
   protected void post() throws RequestException {
+    if (!isAdmin()) {
+      return;
+    }
+
     String action = getRequest().getParameter("action");
     if (action.equals("complete-movement")) {
       int fleetID = Integer.parseInt(getRequest().getParameter("fleet_id"));
