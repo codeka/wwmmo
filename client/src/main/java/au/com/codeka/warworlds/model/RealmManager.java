@@ -13,12 +13,13 @@ public class RealmManager {
   public static RealmManager i = new RealmManager();
 
   private List<Realm> mRealms;
-  private ArrayList<RealmChangedHandler> mRealmChangedHandlers;
+  private final ArrayList<RealmChangedHandler> mRealmChangedHandlers;
 
   // The IDs for the realms can NEVER change, once set
   public static final int DEBUG_REALM_ID = 1000;
-  public static final int ALPHA_REALM_ID = 1;
+  //public static final int ALPHA_REALM_ID = 1;
   public static final int BETA_REALM_ID = 2;
+  public static final int DEF_REALM_ID = 3;
   public static final int BLITZ_REALM_ID = 10;
 
   private RealmManager() {
@@ -31,9 +32,12 @@ public class RealmManager {
             "Debug",
             "The debug realm runs on my local dev box for testing."));
       }
+      mRealms.add(new Realm(DEF_REALM_ID, "https://game.war-worlds.com/realms/def/",
+          "Default",
+          "The default realm. If you're new to War Worlds, you should join this realm."));
       mRealms.add(new Realm(BETA_REALM_ID, "https://game.war-worlds.com/realms/beta/",
           "Beta",
-          "If you're new to War Worlds, you should join this realm. eXplore, eXpand, eXploit, eXterminate!"));
+          "The old beta realm. Currently down, please choose Default."));
       if (Util.isDebug()) {
         mRealms.add(new Realm(BLITZ_REALM_ID, "https://game.war-worlds.com/realms/blitz/",
             "Blitz",
@@ -120,7 +124,7 @@ public class RealmManager {
     if (saveSelection) {
       Util.getSharedPreferences().edit()
           .putString("RealmName", currentRealm == null ? null : currentRealm.getDisplayName())
-          .commit();
+          .apply();
     }
 
     fireRealmChangedHandler(currentRealm);

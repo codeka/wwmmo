@@ -10,6 +10,7 @@ import java.util.concurrent.TimeoutException;
 import javax.validation.constraints.NotNull;
 
 import au.com.codeka.common.Log;
+import okhttp3.Response;
 
 /**
  * This is the main "client" that accesses the War Worlds API.
@@ -86,9 +87,13 @@ public class ApiClient {
   private static boolean putOrPostProtoBuf(String method, String url, Message pb)
       throws ApiException {
 
-    return RequestManager.i.sendRequestSync(new ApiRequest.Builder(url, method)
+    Response resp = RequestManager.i.sendRequestSync(new ApiRequest.Builder(url, method)
         .body(pb)
         .build());
+    if (resp == null || !resp.isSuccessful()) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -113,7 +118,8 @@ public class ApiClient {
       final Class<T> protoBuffFactory) throws ApiException {
 
     ApiRequest request = new ApiRequest.Builder(url, method).body(pb).build();
-    if (!RequestManager.i.sendRequestSync(request)) {
+    Response resp = RequestManager.i.sendRequestSync(request);
+    if (resp == null || !resp.isSuccessful()) {
       throw new ApiException();
     }
 

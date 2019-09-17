@@ -46,7 +46,7 @@ public class RealmSelectActivity extends BaseActivity {
     realmsListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     for (int i = 0; i < realmNames.length; i++) {
       Realm realm = RealmManager.i.getRealms().get(i);
-      if (realm.getDisplayName().equals("Beta")) {
+      if (realm.getDisplayName().equals("Default")) {
         realmsListView.setItemChecked(i, true);
       }
     }

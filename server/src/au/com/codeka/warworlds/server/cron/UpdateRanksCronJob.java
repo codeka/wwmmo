@@ -140,17 +140,17 @@ public class UpdateRanksCronJob extends CronJob {
     }
 
     // Also update the alliance's "total_stars" field while we're here.
-    sql = " UPDATE beta.alliances" +
+    sql = " UPDATE alliances" +
         " SET" +
         "   total_stars=sub.total_stars" +
         " FROM (" +
         "   SELECT" +
         "     alliances.id," +
         "     SUM(empire_ranks.total_stars) AS total_stars" +
-        "   FROM beta.alliances" +
-        "   INNER JOIN beta.empires" +
+        "   FROM alliances" +
+        "   INNER JOIN empires" +
         "     ON alliances.id = empires.alliance_id" +
-        "   INNER JOIN beta.empire_ranks" +
+        "   INNER JOIN empire_ranks" +
         "     ON empires.id = empire_ranks.empire_id" +
         "   GROUP BY alliances.id" +
         " ) AS sub" +

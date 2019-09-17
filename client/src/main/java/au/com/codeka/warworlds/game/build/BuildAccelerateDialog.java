@@ -30,6 +30,7 @@ import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import okhttp3.Response;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -177,7 +178,8 @@ public class BuildAccelerateDialog extends DialogFragment {
 
         try {
           ApiRequest request = new ApiRequest.Builder(url, "POST").body(null).build();
-          if (!RequestManager.i.sendRequestSync(request)) {
+          Response resp = RequestManager.i.sendRequestSync(request);
+          if (resp != null && !resp.isSuccessful()) {
             throw new ApiException();
           }
 

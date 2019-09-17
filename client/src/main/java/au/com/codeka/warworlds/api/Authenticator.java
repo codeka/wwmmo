@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.Realm;
+import okhttp3.Response;
 
 public class Authenticator {
   private static final Log log = new Log("Authenticator");
@@ -120,7 +121,11 @@ public class Authenticator {
                 error.getErrorCode(), error.getErrorMessage());
           }
         }).build();
-    RequestManager.i.sendRequestSync(request);
+    Response resp = RequestManager.i.sendRequestSync(request);
+    if (resp != null && !resp.isSuccessful()) {
+      log.error("Got invalid response: " + resp.message());
+      return null;
+    }
     String cookie = request.bodyString();
     if (cookie == null) {
       return null;

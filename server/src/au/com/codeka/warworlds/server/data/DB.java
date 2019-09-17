@@ -21,7 +21,7 @@ public class DB {
 
   private static final IConnectionCustomizer connectionCustomizer = new IConnectionCustomizer() {
     @Override
-    public void customize(Connection connection) throws SQLException {
+    public void customize(Connection connection) {
       try {
         CallableStatement stmt = connection.prepareCall(
             String.format("SET search_path TO '%s'", schemaName));
@@ -50,6 +50,9 @@ public class DB {
       config.setConnectionCustomizer(connectionCustomizer);
       dataSource = new HikariDataSource(config);
       schemaName = dbconfig.getSchema();
+
+      log.info("Database configured: username=%s, password=%s, schema=%s",
+          dbconfig.getUsername(), dbconfig.getPassword(), dbconfig.getSchema());
     } catch (Exception e) {
       log.error("Error loading PostgreSQL driver.", e);
       throw new RuntimeException("Error loading PostgreSQL driver.", e);
