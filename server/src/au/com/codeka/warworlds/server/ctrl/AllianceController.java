@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import com.google.api.client.http.HttpStatusCodes;
+
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,6 +22,7 @@ import au.com.codeka.warworlds.server.model.AllianceMember;
 import au.com.codeka.warworlds.server.model.AllianceRequest;
 import au.com.codeka.warworlds.server.model.AllianceRequestVote;
 import au.com.codeka.warworlds.server.model.Empire;
+import au.com.codeka.warworlds.server.model.EmpireRank;
 import au.com.codeka.warworlds.server.utils.NameValidator;
 
 public class AllianceController {
@@ -101,6 +104,15 @@ public class AllianceController {
           request.getNewName(),
           Configuration.i.getLimits().maxAllianceNameLength());
       request.setNewName(newName);
+    }
+
+    if (request.getRequestType() == BaseAllianceRequest.RequestType.DEPOSIT_CASH) {
+      // In order to deposit cash, you must have at least 10 stars in your empire.
+      Empire empire = new EmpireController().getEmpire(request.getRequestEmpireID());
+      EmpireRank rank = (EmpireRank) empire.getRank();
+      if (rank.getTotalStars() < 10) {
+        throw new RequestException(403, "Cannot deposit cash until you have at least 10 stars.");
+      }
     }
 
     if (request.getRequestType() == BaseAllianceRequest.RequestType.CHANGE_DESCRIPTION) {
