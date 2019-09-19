@@ -32,6 +32,7 @@
       <ul>
         <li><a href="/realms/{{realm}}/admin">Dashboard</a>
         <li><a href="/realms/{{realm}}/admin/users">Users</a>
+        <li><a href="/realms/{{realm}}/admin/cron">Cron</a></li>
         {% if Users.isInRole(backend_user, "ChatRead") %}
         <li><span><span>Chat</span></span>
           <ul>

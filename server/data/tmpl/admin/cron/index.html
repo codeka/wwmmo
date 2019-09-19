@@ -1,0 +1,40 @@
+{% extends "admin/skeleton.html" %}
+{% block "title" %}Cron{% end %}
+{% block "head" %}
+<script src="/realms/{{realm}}/js/popup.js"></script>
+{% end %}
+{% block "content" %}
+<h1>Cron</h1>
+
+<a id="newjob-link" href="">New job</a>
+
+<div id="edit-cron" class="popup">
+  <h2>Edit job</h2>
+  <form action="/realms/{{realm}}/admin/cron" method="post">
+    <input type="hidden" name="id" value="">
+    <dl>
+      <dt><b>Job</b>
+      <dd><select id="jobs" name="class_name">
+        {% for job in jobs %}
+          <option value="{{ job.className }}">{{ job.annotation.name }}</option>
+        {% end %}
+      </select>
+      <dt><b>Parameters</b>
+      <dd><input type="text" id="params" name="params">
+    </dl>
+    <div class="popup-buttons">
+      <input type="submit" value="Save">
+      <input type="button" class="close" value="Close" />
+    </div>
+  </form>
+</div>
+
+<script>
+  $("#newjob-link").click(function(event) {
+    event.preventDefault();
+    var container = $("#edit-cron");
+    $("form", container).trigger("reset");
+    container.popup();
+  });
+</script>
+{% end %}
