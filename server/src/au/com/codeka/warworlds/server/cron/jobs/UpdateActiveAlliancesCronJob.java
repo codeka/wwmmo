@@ -1,13 +1,13 @@
-package au.com.codeka.warworlds.server.cron;
+package au.com.codeka.warworlds.server.cron.jobs;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.joda.time.Duration;
 
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
+import au.com.codeka.warworlds.server.cron.AbstractCronJob;
+import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -16,11 +16,14 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
  * Goes through all the alliances and marks inactive any alliance whose member has not logged in for
  * a while.
  */
-public class UpdateActiveAlliancesCronJob extends CronJob {
+@CronJob(
+    name = "Update Active Alliances",
+    desc = "Updates the alliances and marks inactive ones as such.")
+public class UpdateActiveAlliancesCronJob extends AbstractCronJob {
   /**
    * If no empire has logged in within this number of days, we'll consider the alliance inactive.
    */
-  long ACTIVE_DAYS_SINCE_LOGIN = 60;
+  private long ACTIVE_DAYS_SINCE_LOGIN = 60;
 
   @Override
   public void run(String extra) throws Exception {

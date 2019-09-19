@@ -3,8 +3,7 @@ package au.com.codeka.warworlds.server;
 import org.eclipse.jetty.server.Server;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.warworlds.server.cron.CronJob;
-import au.com.codeka.warworlds.server.cron.CronJobRegistry;
+import au.com.codeka.warworlds.server.cron.CronRunnerThread;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
 import au.com.codeka.warworlds.server.data.SchemaUpdater;
 import au.com.codeka.warworlds.server.model.DesignManager;
@@ -22,40 +21,24 @@ public class Runner {
       DesignManager.setup();
       NameGenerator.setup();
 
-      if (args.length >= 2 && args[0].equals("cron")) {
-        String extra = null;
-        if (args.length >= 3) {
-          extra = args[2];
-        }
-        cronMain(args[1], extra);
-      } else {
-        gameMain();
-      }
+      EventProcessor.i.ping();
+
+      StarSimulatorThreadManager starSimulatorThreadManager = new StarSimulatorThreadManager();
+      starSimulatorThreadManager.start();
+
+      CronRunnerThread.setup();
+
+      int port = Configuration.i.getListenPort();
+      Server server = new Server(port);
+      server.setHandler(new RequestRouter());
+      server.start();
+      log.info("Server started on http://localhost:%d/", port);
+      server.join();
+
+      starSimulatorThreadManager.stop();
+
     } catch (Exception e) {
       log.error("Exception on main thread, aborting.", e);
     }
-  }
-
-  private static void cronMain(String method, String extra) throws Exception {
-    CronJob job = CronJobRegistry.getJob(method);
-    if (job != null) {
-      job.run(extra);
-    }
-  }
-
-  private static void gameMain() throws Exception {
-    EventProcessor.i.ping();
-
-    StarSimulatorThreadManager starSimulatorThreadManager = new StarSimulatorThreadManager();
-    starSimulatorThreadManager.start();
-
-    int port = Configuration.i.getListenPort();
-    Server server = new Server(port);
-    server.setHandler(new RequestRouter());
-    server.start();
-    log.info("Server started on http://localhost:%d/", port);
-    server.join();
-
-    starSimulatorThreadManager.stop();
   }
 }

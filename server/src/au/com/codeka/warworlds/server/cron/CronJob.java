@@ -1,19 +1,16 @@
 package au.com.codeka.warworlds.server.cron;
 
-/**
- * This is the base class for all cron jobs.
- */
-public abstract class CronJob {
-  public abstract void run(String extra) throws Exception;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-  protected static int extraToNum(String extra, int minNumber, int defaultNumber) {
-    int num = defaultNumber;
-    if (extra != null) {
-      num = Integer.parseInt(extra);
-    }
-    if (num < minNumber) {
-      num = minNumber;
-    }
-    return num;
-  }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface CronJob {
+  /** The display name of this cron job, shown to the admin. */
+  String name();
+
+  /** A more complete description of the job. Could be empty. */
+  String desc() default "";
 }

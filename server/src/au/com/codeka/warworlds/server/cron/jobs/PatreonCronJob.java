@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.cron;
+package au.com.codeka.warworlds.server.cron.jobs;
 
 import com.patreon.PatreonOAuth;
 
@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.cron.AbstractCronJob;
+import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.ctrl.PatreonController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -17,7 +19,8 @@ import au.com.codeka.warworlds.server.model.PatreonInfo;
 /**
  * Goes through the patreon table, and makes sure everything's up-to-date.
  */
-public class PatreonCronJob extends CronJob {
+@CronJob(name = "Patreon", desc = "Makes sure the Patreon associations are up-to-date.")
+public class PatreonCronJob extends AbstractCronJob {
   @Override
   public void run(String extra) throws Exception {
     ArrayList<PatreonInfo> patreonInfos = new ArrayList<>();

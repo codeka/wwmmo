@@ -1,10 +1,12 @@
-package au.com.codeka.warworlds.server.cron;
+package au.com.codeka.warworlds.server.cron.jobs;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.cron.AbstractCronJob;
+import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -13,7 +15,10 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
  * This cron job runs once per day an searches the database for potential alts. We use this to
  * display the alts on the empire's info screen in the backend.
  */
-public class FindAltAccountsCronJob extends CronJob {
+@CronJob(
+    name = "Find Alt Accounts",
+    desc = "Searches the empire data and associates possible alt accounts.")
+public class FindAltAccountsCronJob extends AbstractCronJob {
   private static final Log log = new Log("FindAltAccountsCronJob");
 
   @Override

@@ -1,7 +1,7 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
 import au.com.codeka.warworlds.server.RequestException;
-import au.com.codeka.warworlds.server.cron.UpdateRanksCronJob;
+import au.com.codeka.warworlds.server.cron.jobs.UpdateRanksCronJob;
 
 /**
  * Runs the UpdateRanksCronJob immediately. TODO: have a generic interface for us to run cron jobs

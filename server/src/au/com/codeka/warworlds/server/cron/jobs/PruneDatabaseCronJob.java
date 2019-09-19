@@ -1,11 +1,14 @@
-package au.com.codeka.warworlds.server.cron;
+package au.com.codeka.warworlds.server.cron.jobs;
 
 import org.joda.time.DateTime;
 
+import au.com.codeka.warworlds.server.cron.AbstractCronJob;
+import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
-public class PruneDatabaseCronJob extends CronJob {
+@CronJob(name = "Prune Database", desc = "Prunes the database of old data.")
+public class PruneDatabaseCronJob extends AbstractCronJob {
   @Override
   public void run(String extra) throws Exception {
     pruneCombatReportsOlderThan(DateTime.now().minusDays(30));

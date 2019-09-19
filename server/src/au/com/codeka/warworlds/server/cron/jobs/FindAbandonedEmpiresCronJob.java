@@ -1,9 +1,11 @@
-package au.com.codeka.warworlds.server.cron;
+package au.com.codeka.warworlds.server.cron.jobs;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.server.cron.AbstractCronJob;
+import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -25,7 +27,11 @@ import au.com.codeka.warworlds.server.model.Star;
  * message with help text explaining that their empire expired. If they log in again and their
  * name has been changed, they'll be required to choose another.
  */
-public class FindAbandonedEmpiresCronJob extends CronJob {
+@CronJob(
+    name = "Find Abandoned Empires",
+    desc = "Finds empires where the user hasn't logged in for a while, and only have one start "
+         + "under their control.")
+public class FindAbandonedEmpiresCronJob extends AbstractCronJob {
   private static final Log log = new Log("FindAbandonedEmpiresCronJob");
 
   @Override

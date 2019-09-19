@@ -1,8 +1,10 @@
-package au.com.codeka.warworlds.server.cron;
+package au.com.codeka.warworlds.server.cron.jobs;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import au.com.codeka.warworlds.server.cron.AbstractCronJob;
+import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -12,7 +14,8 @@ import au.com.codeka.warworlds.server.model.EmpireRank;
 /**
  * Updates the ranks of empires.
  */
-public class UpdateRanksCronJob extends CronJob {
+@CronJob(name = "Update Ranks", desc = "Updates the empire ranks.")
+public class UpdateRanksCronJob extends AbstractCronJob {
   @Override
   public void run(String extra) throws Exception {
     TreeMap<Integer, EmpireRank> ranks = new TreeMap<>();

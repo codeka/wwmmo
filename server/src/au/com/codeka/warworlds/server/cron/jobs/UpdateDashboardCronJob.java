@@ -1,8 +1,10 @@
-package au.com.codeka.warworlds.server.cron;
+package au.com.codeka.warworlds.server.cron.jobs;
 
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
+import au.com.codeka.warworlds.server.cron.AbstractCronJob;
+import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -10,7 +12,8 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 /**
  * Updates the tables used to render the admin dashboard.
  */
-public class UpdateDashboardCronJob extends CronJob {
+@CronJob(name = "Update Dashboard", desc = "Updates the main dashboard data.")
+public class UpdateDashboardCronJob extends AbstractCronJob {
 
     @Override
     public void run(String extra) throws Exception {
