@@ -8,15 +8,33 @@
 
 <a id="newjob-link" href="">New job</a>
 
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Job</th>
+    <th>Parameter</th>
+    <th></th>
+  </tr>
+  {% for job in jobs %}
+  <tr>
+    <td>{{ job.id }}</td>
+    <td>{{ job.annotation.name }}</td>
+    <td>{{ job.parameters }}</td>
+    <td><a href="javascript:runJob({{ job.id }});">Run now</a> &bull; Edit &bull; Delete</td>
+  </tr>
+  {% end %}
+</table>
+
 <div id="edit-cron" class="popup">
   <h2>Edit job</h2>
   <form action="/realms/{{realm}}/admin/cron" method="post">
+    <input type="hidden" name="action" value="edit-cron" />
     <input type="hidden" name="id" value="">
     <dl>
       <dt><b>Job</b>
-      <dd><select id="jobs" name="class_name">
-        {% for job in jobs %}
-          <option value="{{ job.className }}">{{ job.annotation.name }}</option>
+      <dd><select name="class_name">
+        {% for cls in classes %}
+          <option value="{{ cls.className }}">{{ cls.annotation.name }}</option>
         {% end %}
       </select>
       <dt><b>Parameters</b>
@@ -36,5 +54,22 @@
     $("form", container).trigger("reset");
     container.popup();
   });
+
+  function runJob(id) {
+    $.ajax({
+      url: "/realms/{{realm}}/admin/cron",
+      type: "POST",
+      data: {
+        "action": "run-now",
+        "id": id
+      },
+      success: function(data) {
+        location.reload();
+      },
+      error: function(xhr, status, err) {
+        alert("An error occurred, check server logs: " + xhr.status);
+      }
+    });
+  }
 </script>
 {% end %}
