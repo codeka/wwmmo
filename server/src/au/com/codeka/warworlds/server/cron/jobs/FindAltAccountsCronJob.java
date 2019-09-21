@@ -22,7 +22,7 @@ public class FindAltAccountsCronJob extends AbstractCronJob {
   private static final Log log = new Log("FindAltAccountsCronJob");
 
   @Override
-  public void run(String extra) throws Exception {
+  public String run(String extra) throws Exception {
     ArrayList<String> emailAddresses = new ArrayList<>();
 
     // First, find all the email addresses of all empires in the database. We look for alts
@@ -85,6 +85,8 @@ public class FindAltAccountsCronJob extends AbstractCronJob {
         stmt.update();
       }
     }
+
+    return "Success.";
   }
 
   private void addDeviceInfo(Messages.EmpireAltAccounts.Builder alt_acct_pb, SqlResult res)

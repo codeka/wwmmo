@@ -10,10 +10,12 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 @CronJob(name = "Prune Database", desc = "Prunes the database of old data.")
 public class PruneDatabaseCronJob extends AbstractCronJob {
   @Override
-  public void run(String extra) throws Exception {
+  public String run(String extra) throws Exception {
     pruneCombatReportsOlderThan(DateTime.now().minusDays(30));
     pruneSitReportsOlderThan(DateTime.now().minusDays(30));
     pruneSessionsOlderThan(DateTime.now().minusDays(7));
+
+    return "Success.";
   }
 
   private void pruneCombatReportsOlderThan(DateTime dt) throws Exception {

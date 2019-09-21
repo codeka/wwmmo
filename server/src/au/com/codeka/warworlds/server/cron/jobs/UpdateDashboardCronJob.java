@@ -16,7 +16,7 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 public class UpdateDashboardCronJob extends AbstractCronJob {
 
     @Override
-    public void run(String extra) throws Exception {
+    public String run(String extra) throws Exception {
         DateTime dt = DateTime.now();
         if (extra != null && extra.length() > 0) {
             dt = dt.minusDays(Integer.parseInt(extra));
@@ -69,5 +69,7 @@ public class UpdateDashboardCronJob extends AbstractCronJob {
             stmt.setInt(4, newSignups);
             stmt.update();
         }
+
+        return "Success.";
     }
 }

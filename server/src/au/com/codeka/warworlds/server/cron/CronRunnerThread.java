@@ -1,10 +1,15 @@
 package au.com.codeka.warworlds.server.cron;
 
+import org.joda.time.DateTime;
+
 import java.util.concurrent.TimeUnit;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.cron.jobs.UpdateDashboardCronJob;
 import au.com.codeka.warworlds.server.cron.jobs.UpdateRanksCronJob;
+import au.com.codeka.warworlds.server.ctrl.CronController;    // TODO: save details of the run to the database.
+
 import au.com.codeka.warworlds.server.model.CronJobDetails;
 
 public class CronRunnerThread extends Thread {
@@ -28,12 +33,18 @@ public class CronRunnerThread extends Thread {
     }
 
     try {
-      job.run(jobDetails.getParameters());
+      jobDetails.setLastStatus(job.run(jobDetails.getParameters()));
     } catch (Exception e) {
       log.error("Error running job.", e);
+      jobDetails.setLastStatus(e.toString());
     }
 
-    // TODO: save details of the run to the database.
+    jobDetails.setLastRunTime(DateTime.now());
+    try {
+      new CronController().save(jobDetails);
+    } catch (RequestException e) {
+      log.error("Error saving cron job back to database.", e);
+    }
   }
 
   @Override

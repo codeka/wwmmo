@@ -17,7 +17,7 @@ import au.com.codeka.warworlds.server.model.EmpireRank;
 @CronJob(name = "Update Ranks", desc = "Updates the empire ranks.")
 public class UpdateRanksCronJob extends AbstractCronJob {
   @Override
-  public void run(String extra) throws Exception {
+  public String run(String extra) throws Exception {
     TreeMap<Integer, EmpireRank> ranks = new TreeMap<>();
 
     String sql = "SELECT id AS empire_id FROM empires WHERE state <> 2";
@@ -161,5 +161,7 @@ public class UpdateRanksCronJob extends AbstractCronJob {
     try (SqlStmt stmt = DB.prepare(sql)) {
       stmt.update();
     }
+
+    return "Success.";
   }
 }

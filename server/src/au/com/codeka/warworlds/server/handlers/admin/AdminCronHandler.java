@@ -54,7 +54,16 @@ public class AdminCronHandler extends AdminHandler {
   }
 
   private void handleEditCron() throws RequestException {
-    CronJobDetails jobDetails = new CronJobDetails(getRequest());
+    String sid = getRequest().getParameter("id");
+    if (sid.isEmpty()) {
+      throw new RequestException(400, "No ID");
+    }
+    long id = Long.parseLong(sid);
+    CronJobDetails jobDetails = new CronController().get(id);
+    if (jobDetails == null) {
+      throw new RequestException(404, "Job not found: " + id);
+    }
+    jobDetails.update(getRequest());
     new CronController().save(jobDetails);
   }
 

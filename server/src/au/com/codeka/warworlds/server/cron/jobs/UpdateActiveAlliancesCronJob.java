@@ -26,7 +26,7 @@ public class UpdateActiveAlliancesCronJob extends AbstractCronJob {
   private long ACTIVE_DAYS_SINCE_LOGIN = 60;
 
   @Override
-  public void run(String extra) throws Exception {
+  public String run(String extra) throws Exception {
     Map<Integer, DateTime> allianceLastLogins = new TreeMap<>();
     String sql = "SELECT" +
         "  alliances.id," +
@@ -70,5 +70,7 @@ public class UpdateActiveAlliancesCronJob extends AbstractCronJob {
         stmt.update();
       }
     }
+
+    return "Success.";
   }
 }

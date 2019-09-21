@@ -26,7 +26,7 @@ function fix_times() {
 
     var now = new Date();
     var seconds = (now.getTime() - dt.getTime()) / 1000.0;
-    if (seconds < (5 * 60)) {
+    if (seconds < (5 * 60) && seconds > 0) {
       // less than five minutes ago
       $(this).html("Just now")
              .attr("title", dtstr);

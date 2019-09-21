@@ -35,7 +35,7 @@ public class FindAbandonedEmpiresCronJob extends AbstractCronJob {
   private static final Log log = new Log("FindAbandonedEmpiresCronJob");
 
   @Override
-  public void run(String extra) throws Exception {
+  public String run(String extra) throws Exception {
     ArrayList<Integer> abandonedEmpires = new ArrayList<Integer>();
 
     // first, find all empires not already marked "abandoned" that only have one star and
@@ -73,6 +73,8 @@ public class FindAbandonedEmpiresCronJob extends AbstractCronJob {
     }
 
     updateAbandonedStars();
+
+    return "Success.";
   }
 
   private void updateAbandonedStars() throws Exception {

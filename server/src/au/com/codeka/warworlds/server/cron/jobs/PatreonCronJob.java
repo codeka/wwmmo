@@ -22,7 +22,7 @@ import au.com.codeka.warworlds.server.model.PatreonInfo;
 @CronJob(name = "Patreon", desc = "Makes sure the Patreon associations are up-to-date.")
 public class PatreonCronJob extends AbstractCronJob {
   @Override
-  public void run(String extra) throws Exception {
+  public String run(String extra) throws Exception {
     ArrayList<PatreonInfo> patreonInfos = new ArrayList<>();
     String sql = "SELECT * from patreon";
     try (SqlStmt stmt = DB.prepare(sql)) {
@@ -62,5 +62,7 @@ public class PatreonCronJob extends AbstractCronJob {
       // Otherwise, just refresh the pledges.
       new PatreonController().updatePatreonInfo(patreonInfo);
     }
+
+    return "Success.";
   }
 }
