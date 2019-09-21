@@ -3,6 +3,14 @@
 {% block "head" %}
 <script src="/realms/{{realm}}/js/time.js"></script>
 <script src="/realms/{{realm}}/js/popup.js"></script>
+<style>
+  pre {
+    margin: 0;
+  }
+  tr.job td {
+    border-top: solid 1px #ccc;
+  }
+</style>
 {% end %}
 {% block "content" %}
 <h1>Cron</h1>
@@ -20,7 +28,7 @@
     <th></th>
   </tr>
   {% for job in jobs %}
-  <tr>
+  <tr class="job">
     <td>{{ job.id }}</td>
     <td title="{{ job.annotation.desc }}">{{ job.annotation.name }}</td>
     <td>{{ job.parameters }}</td>
@@ -43,7 +51,7 @@
   </tr>
   <tr>
     <td></td>
-    <td colspan="6"><code>{{ job.lastStatus }}</code></td>
+    <td colspan="6"><code><pre>{{ job.lastStatus }}</pre></code></td>
   </tr>
   {% end %}
 </table>

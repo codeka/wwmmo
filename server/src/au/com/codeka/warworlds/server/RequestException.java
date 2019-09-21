@@ -53,7 +53,7 @@ public class RequestException extends Exception {
             return "SQL Error: " + sqlExc.getErrorCode();
         }
 
-        return "Unknown Exception";
+        return e.getMessage();
     }
 
     @SuppressWarnings("unchecked")

@@ -39,7 +39,7 @@ public class PatreonController {
   }
 
   public void updatePatreonInfo(PatreonInfo patreonInfo) throws RequestException {
-    log.info("Refreshing Patreon pledges for %d.",patreonInfo.getEmpireId());
+    log.info("Refreshing Patreon pledges for %d.", patreonInfo.getEmpireId());
 
     PatreonAPI apiClient = new PatreonAPI(patreonInfo.getAccessToken());
     User user;

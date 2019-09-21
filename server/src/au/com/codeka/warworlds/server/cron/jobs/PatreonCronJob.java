@@ -5,15 +5,18 @@ import com.patreon.PatreonOAuth;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.cron.AbstractCronJob;
 import au.com.codeka.warworlds.server.cron.CronJob;
+import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.PatreonController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.PatreonInfo;
 
 /**
@@ -23,7 +26,11 @@ import au.com.codeka.warworlds.server.model.PatreonInfo;
 public class PatreonCronJob extends AbstractCronJob {
   @Override
   public String run(String extra) throws Exception {
+    ArrayList<String> errors = new ArrayList<>();
+    int numSuccessful = 0;
+
     ArrayList<PatreonInfo> patreonInfos = new ArrayList<>();
+
     String sql = "SELECT * from patreon";
     try (SqlStmt stmt = DB.prepare(sql)) {
       SqlResult res = stmt.select();
@@ -60,9 +67,31 @@ public class PatreonCronJob extends AbstractCronJob {
       }
 
       // Otherwise, just refresh the pledges.
-      new PatreonController().updatePatreonInfo(patreonInfo);
+      try {
+        new PatreonController().updatePatreonInfo(patreonInfo);
+      } catch (RequestException e) {
+
+        Empire empire = new EmpireController().getEmpire((int) patreonInfo.getEmpireId());
+        String msg = String.format(Locale.ENGLISH,
+            "[%d] %s (%s)\n%s",
+            patreonInfo.getEmpireId(),
+            empire.getDisplayName(),
+            patreonInfo.getEmail(),
+            e.getMessage());
+        errors.add(msg);
+      }
+
+      numSuccessful ++;
     }
 
-    return "Success.";
+    if (errors.size() == 0) {
+      return String.format(Locale.ENGLISH, "%d patreon infos\nsuccessfully updated.", numSuccessful);
+    } else {
+      return String.format(Locale.ENGLISH,
+          "%d successfully updated, %d errors.\n\n%s",
+          numSuccessful,
+          errors.size(),
+          String.join("\n\n", errors));
+    }
   }
 }
