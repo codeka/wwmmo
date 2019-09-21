@@ -2,22 +2,22 @@ package au.com.codeka.warworlds.server.cron;
 
 import org.joda.time.DateTime;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
-import au.com.codeka.warworlds.server.cron.jobs.UpdateDashboardCronJob;
-import au.com.codeka.warworlds.server.cron.jobs.UpdateRanksCronJob;
-import au.com.codeka.warworlds.server.ctrl.CronController;    // TODO: save details of the run to the database.
+import au.com.codeka.warworlds.server.ctrl.CronController;
 
 import au.com.codeka.warworlds.server.model.CronJobDetails;
 
 public class CronRunnerThread extends Thread {
   private static final Log log = new Log("CronRunnerThread");
 
+  private static final CronRunnerThread thread = new CronRunnerThread();
+
   /** Called at startup to begin the cron thread. */
   public static void setup() {
-    CronRunnerThread thread = new CronRunnerThread();
     thread.start();
   }
 
@@ -47,20 +47,51 @@ public class CronRunnerThread extends Thread {
     }
   }
 
+  /**
+   * Called when you a cron job is edited, we might need to re-order what the next job will be.
+   */
+  public static void ping() {
+    thread.interrupt();
+  }
+
   @Override
   public void run() {
     while (true) {
       try {
-        new UpdateRanksCronJob().run("");
-        new UpdateDashboardCronJob().run("");
-      } catch (Exception e) {
-        log.error("Error running jobs.", e);
-      }
+        List<CronJobDetails> jobs = new CronController().list();
 
-      try {
-        Thread.sleep(TimeUnit.HOURS.toMillis(1));
-      } catch (InterruptedException e) {
-        return;
+        // Find the next job.
+        CronJobDetails nextJob = null;
+        for (CronJobDetails job : jobs) {
+          if (nextJob == null || nextJob.getNextRunTime().isAfter(job.getNextRunTime())) {
+            nextJob = job;
+          }
+        }
+
+        long sleepTime;
+        if (nextJob == null) {
+          log.info("No upcoming jobs.");
+          sleepTime = TimeUnit.HOURS.toMillis(1);
+        } else {
+          sleepTime = nextJob.getNextRunTime().getMillis() - DateTime.now().getMillis();
+          if (sleepTime < 0) {
+            sleepTime = 0;
+          }
+          log.info("Next job: %s, in %d", nextJob.getAnnotation().name(), sleepTime);
+        }
+
+        try {
+          Thread.sleep(sleepTime);
+        } catch(InterruptedException e) {
+          log.info("Sleep interrupted, checking for new jobs.");
+          continue;
+        }
+
+        if (nextJob != null) {
+          runNow(nextJob);
+        }
+      } catch (Exception e) {
+        log.error("Exception running cron job.", e);
       }
     }
   }

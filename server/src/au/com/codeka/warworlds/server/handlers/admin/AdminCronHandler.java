@@ -65,6 +65,8 @@ public class AdminCronHandler extends AdminHandler {
     }
     jobDetails.update(getRequest());
     new CronController().save(jobDetails);
+
+    CronRunnerThread.ping();
   }
 
   private void handleRunNow() throws RequestException {
