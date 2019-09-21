@@ -69,8 +69,8 @@ public class PatreonCronJob extends AbstractCronJob {
       // Otherwise, just refresh the pledges.
       try {
         new PatreonController().updatePatreonInfo(patreonInfo);
+        numSuccessful ++;
       } catch (RequestException e) {
-
         Empire empire = new EmpireController().getEmpire((int) patreonInfo.getEmpireId());
         String msg = String.format(Locale.ENGLISH,
             "[%d] %s (%s)\n%s",
@@ -80,8 +80,6 @@ public class PatreonCronJob extends AbstractCronJob {
             e.getMessage());
         errors.add(msg);
       }
-
-      numSuccessful ++;
     }
 
     if (errors.size() == 0) {

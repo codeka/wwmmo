@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.cron.jobs;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.TreeMap;
 
 import au.com.codeka.warworlds.server.cron.AbstractCronJob;
@@ -162,6 +163,6 @@ public class UpdateRanksCronJob extends AbstractCronJob {
       stmt.update();
     }
 
-    return "Success.";
+    return String.format(Locale.ENGLISH, "%d empire ranks updated.", sortedRanks.size());
   }
 }
