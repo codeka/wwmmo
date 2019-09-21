@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.TreeMap;
 
 import au.com.codeka.common.Log;
@@ -30,6 +31,7 @@ public class AdminCronHandler extends AdminHandler {
     for (Class<?> jobClass : AbstractCronJob.findAllJobClasses()) {
       classes.add(new JobClassDefinition(jobClass));
     }
+    classes.sort((lhs, rhs) -> lhs.annotation.name().compareTo(rhs.annotation.name()));
     data.put("classes", classes);
 
     data.put("jobs", new CronController().list());
@@ -55,13 +57,15 @@ public class AdminCronHandler extends AdminHandler {
 
   private void handleEditCron() throws RequestException {
     String sid = getRequest().getParameter("id");
-    if (sid.isEmpty()) {
-      throw new RequestException(400, "No ID");
-    }
-    long id = Long.parseLong(sid);
-    CronJobDetails jobDetails = new CronController().get(id);
-    if (jobDetails == null) {
-      throw new RequestException(404, "Job not found: " + id);
+    CronJobDetails jobDetails;
+    if (!sid.isEmpty()) {
+      long id = Long.parseLong(sid);
+      jobDetails = new CronController().get(id);
+      if (jobDetails == null) {
+        throw new RequestException(404, "Invalid job ID: " + id);
+      }
+    } else {
+      jobDetails = new CronJobDetails();
     }
     jobDetails.update(getRequest());
     new CronController().save(jobDetails);

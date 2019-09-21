@@ -49,7 +49,7 @@ public class FindAbandonedEmpiresCronJob extends AbstractCronJob {
         "SELECT empire_id, COUNT(*) AS num_stars FROM empire_presences" +
         " GROUP BY empire_id) stars ON stars.empire_id = empires.id" +
         " WHERE state = " + Empire.State.ACTIVE.getValue() +
-        " AND last_login < DATE_ADD(NOW(), INTERVAL -14 DAY)" +
+        " AND last_login < CURRENT_DATE + INTERVAL '-14 day'" +
         " AND num_stars <= 1";
     try (SqlStmt stmt = DB.prepare(sql)) {
       SqlResult res = stmt.select();

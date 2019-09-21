@@ -22,6 +22,11 @@ public class CronJobDetails {
   private String lastStatus;
   private boolean enabled;
 
+  public CronJobDetails() {
+    id = 0;
+    nextRunTime = new DateTime();
+  }
+
   public CronJobDetails(SqlResult result) throws SQLException, RequestException {
     id = result.getLong("job_id");
     cls = loadClass(result.getString("class_name"));

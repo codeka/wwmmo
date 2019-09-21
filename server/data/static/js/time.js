@@ -35,11 +35,14 @@ function fix_times() {
       var nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       var timestr = zero_pad(hours)+":"+zero_pad(dt.getMinutes())+" "+ampm;
       var days = (nowDate.getTime() - dtDate.getTime()) / (1000 * 60 * 60 * 24);
-      if (days < 1) {
+      if (days == 0) {
         $(this).html("Today, "+timestr)
                .attr("title", dtstr);
-      } else if (days < 2) {
+      } else if (days == 1) {
         $(this).html("Yesterday, "+timestr)
+               .attr("title", dtstr);
+      } else if (days == -1) {
+        $(this).html("Tomorrow, "+timestr)
                .attr("title", dtstr);
       } else {
         $(this).html(dtstr);

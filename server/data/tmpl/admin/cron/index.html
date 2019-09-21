@@ -22,9 +22,9 @@
   {% for job in jobs %}
   <tr>
     <td>{{ job.id }}</td>
-    <td>{{ job.annotation.name }}</td>
+    <td title="{{ job.annotation.desc }}">{{ job.annotation.name }}</td>
     <td>{{ job.parameters }}</td>
-    <td>{{ job.schedule }}</td>
+    <td><code>{{ job.schedule }}</code></td>
     <td><time timestamp="{{ job.lastRunTime.millis / 1000 }}"></time></td>
     <td>
       {% if !job.enabled %}

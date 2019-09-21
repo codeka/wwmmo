@@ -118,6 +118,9 @@ public class CronController {
     }
     if (nextTime != null) {
       jobDetails.setNextRunTime(nextTime.toDateTimeToday());
+    } else {
+      // No more times today, switch to the first time tomorrow.
+      jobDetails.setNextRunTime(times.get(0).toDateTimeToday().plusDays(1));
     }
 
     try {
@@ -160,7 +163,7 @@ public class CronController {
       String sql;
       if (jobDetails.getId() == 0) {
         sql = "INSERT INTO cron (class_name, params, schedule, last_run_time, next_run_time,"
-            + " enabled, last_status) VALUES (?, ?, ?, ?, ?)";
+            + " enabled, last_status) VALUES (?, ?, ?, ?, ?, ?, ?)";
       } else {
         sql = "UPDATE cron SET class_name = ?, params = ?, schedule = ?, last_run_time = ?,"
             + " next_run_time = ?, enabled = ?, last_status = ? "
