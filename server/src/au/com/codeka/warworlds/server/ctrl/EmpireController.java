@@ -642,7 +642,7 @@ public class EmpireController {
           " empire_id, SUM(ships_destroyed) AS ships_destroyed," +
           " SUM(population_destroyed) AS population_destroyed," +
           " SUM(colonies_destroyed) AS colonies_destroyed " +
-          "FROM beta.empire_battle_ranks " +
+          "FROM empire_battle_ranks " +
           "WHERE day >= ? GROUP BY empire_id " +
           "ORDER BY colonies_destroyed DESC, ships_destroyed DESC";
       try (SqlStmt stmt = prepare(sql)) {
@@ -766,7 +766,7 @@ public class EmpireController {
             + " SELECT star_id FROM fleets WHERE empire_id = ?" + ")";
         break;
       case Building:
-        sql = "SELECT id FROM beta.stars WHERE id IN ("
+        sql = "SELECT id FROM stars WHERE id IN ("
             + " SELECT star_id FROM build_requests WHERE empire_id = ?" + ")";
         break;
       case NotBuilding:

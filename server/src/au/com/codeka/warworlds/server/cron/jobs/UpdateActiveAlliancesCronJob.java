@@ -42,7 +42,7 @@ public class UpdateActiveAlliancesCronJob extends AbstractCronJob {
         "    SELECT" +
         "      empire_id," +
         "      MAX(date) AS last_login" +
-        "      FROM beta.empire_logins" +
+        "      FROM empire_logins" +
         "      GROUP BY empire_id" +
         "   ) logins ON logins.empire_id = empires.id" +
         " ) empires" +
