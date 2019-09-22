@@ -34,7 +34,6 @@ public class NotificationHandler extends RequestHandler {
 
             Messages.Notifications.Builder notifications_pb = Messages.Notifications.newBuilder();
             for (String key : notification.values.keySet()) {
-                log.info("Adding notification: "+key);
                 notifications_pb.addNotifications(Messages.Notification.newBuilder()
                         .setName(key)
                         .setValue(notification.values.get(key))

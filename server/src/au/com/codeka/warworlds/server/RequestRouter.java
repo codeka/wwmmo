@@ -176,7 +176,6 @@ public class RequestRouter extends AbstractHandler {
       for (Cookie cookie : request.getCookies()) {
         if (cookie.getName().equals("SESSION")) {
           sessionCookieValue = cookie.getValue();
-          log.info("Got SESSION cookie: %s", sessionCookieValue);
           try {
             session = new SessionController().getSession(sessionCookieValue, impersonate);
           } catch (RequestException e) {

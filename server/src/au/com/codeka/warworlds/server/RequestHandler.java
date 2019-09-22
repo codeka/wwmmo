@@ -68,7 +68,7 @@ public class RequestHandler {
     this.extraOption = extraOption;
     this.session = session;
 
-    RequestContext.i.setContext(request);
+    RequestContext.i.setContext(request, session);
 
     // start off with status 200, but the handler might change it
     this.response.setStatus(200);

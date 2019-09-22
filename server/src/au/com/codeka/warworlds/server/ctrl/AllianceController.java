@@ -110,7 +110,7 @@ public class AllianceController {
       // In order to deposit cash, you must have at least 10 stars in your empire.
       Empire empire = new EmpireController().getEmpire(request.getRequestEmpireID());
       EmpireRank rank = (EmpireRank) empire.getRank();
-      if (rank.getTotalStars() < 10) {
+      if (rank == null || rank.getTotalStars() < 10) {
         throw new RequestException(403, "Cannot deposit cash until you have at least 10 stars.");
       }
     }

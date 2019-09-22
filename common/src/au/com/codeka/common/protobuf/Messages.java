@@ -107611,6 +107611,20 @@ public final class Messages {
      */
     com.google.protobuf.ByteString
         getServerRequestUserAgentBytes();
+
+    /**
+     * <code>optional string remote_addr = 19;</code>
+     */
+    boolean hasRemoteAddr();
+    /**
+     * <code>optional string remote_addr = 19;</code>
+     */
+    java.lang.String getRemoteAddr();
+    /**
+     * <code>optional string remote_addr = 19;</code>
+     */
+    com.google.protobuf.ByteString
+        getRemoteAddrBytes();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.ErrorReport}
@@ -107643,6 +107657,7 @@ public final class Messages {
       logOutput_ = "";
       serverRequestQs_ = "";
       serverRequestUserAgent_ = "";
+      remoteAddr_ = "";
     }
 
     @java.lang.Override
@@ -107768,6 +107783,12 @@ public final class Messages {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00020000;
               serverRequestUserAgent_ = bs;
+              break;
+            }
+            case 154: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00040000;
+              remoteAddr_ = bs;
               break;
             }
             default: {
@@ -108370,6 +108391,48 @@ public final class Messages {
       }
     }
 
+    public static final int REMOTE_ADDR_FIELD_NUMBER = 19;
+    private volatile java.lang.Object remoteAddr_;
+    /**
+     * <code>optional string remote_addr = 19;</code>
+     */
+    public boolean hasRemoteAddr() {
+      return ((bitField0_ & 0x00040000) == 0x00040000);
+    }
+    /**
+     * <code>optional string remote_addr = 19;</code>
+     */
+    public java.lang.String getRemoteAddr() {
+      java.lang.Object ref = remoteAddr_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          remoteAddr_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string remote_addr = 19;</code>
+     */
+    public com.google.protobuf.ByteString
+        getRemoteAddrBytes() {
+      java.lang.Object ref = remoteAddr_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        remoteAddr_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -108437,6 +108500,9 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 18, serverRequestUserAgent_);
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 19, remoteAddr_);
       }
       unknownFields.writeTo(output);
     }
@@ -108507,6 +108573,9 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(18, serverRequestUserAgent_);
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(19, remoteAddr_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -108614,6 +108683,11 @@ public final class Messages {
         result = result && getServerRequestUserAgent()
             .equals(other.getServerRequestUserAgent());
       }
+      result = result && (hasRemoteAddr() == other.hasRemoteAddr());
+      if (hasRemoteAddr()) {
+        result = result && getRemoteAddr()
+            .equals(other.getRemoteAddr());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -108702,6 +108776,10 @@ public final class Messages {
       if (hasServerRequestUserAgent()) {
         hash = (37 * hash) + SERVER_REQUEST_USER_AGENT_FIELD_NUMBER;
         hash = (53 * hash) + getServerRequestUserAgent().hashCode();
+      }
+      if (hasRemoteAddr()) {
+        hash = (37 * hash) + REMOTE_ADDR_FIELD_NUMBER;
+        hash = (53 * hash) + getRemoteAddr().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -108872,6 +108950,8 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00010000);
         serverRequestUserAgent_ = "";
         bitField0_ = (bitField0_ & ~0x00020000);
+        remoteAddr_ = "";
+        bitField0_ = (bitField0_ & ~0x00040000);
         return this;
       }
 
@@ -108972,6 +109052,10 @@ public final class Messages {
           to_bitField0_ |= 0x00020000;
         }
         result.serverRequestUserAgent_ = serverRequestUserAgent_;
+        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
+          to_bitField0_ |= 0x00040000;
+        }
+        result.remoteAddr_ = remoteAddr_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -109095,6 +109179,11 @@ public final class Messages {
         if (other.hasServerRequestUserAgent()) {
           bitField0_ |= 0x00020000;
           serverRequestUserAgent_ = other.serverRequestUserAgent_;
+          onChanged();
+        }
+        if (other.hasRemoteAddr()) {
+          bitField0_ |= 0x00040000;
+          remoteAddr_ = other.remoteAddr_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -110183,6 +110272,82 @@ public final class Messages {
   }
   bitField0_ |= 0x00020000;
         serverRequestUserAgent_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object remoteAddr_ = "";
+      /**
+       * <code>optional string remote_addr = 19;</code>
+       */
+      public boolean hasRemoteAddr() {
+        return ((bitField0_ & 0x00040000) == 0x00040000);
+      }
+      /**
+       * <code>optional string remote_addr = 19;</code>
+       */
+      public java.lang.String getRemoteAddr() {
+        java.lang.Object ref = remoteAddr_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            remoteAddr_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string remote_addr = 19;</code>
+       */
+      public com.google.protobuf.ByteString
+          getRemoteAddrBytes() {
+        java.lang.Object ref = remoteAddr_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          remoteAddr_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string remote_addr = 19;</code>
+       */
+      public Builder setRemoteAddr(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00040000;
+        remoteAddr_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string remote_addr = 19;</code>
+       */
+      public Builder clearRemoteAddr() {
+        bitField0_ = (bitField0_ & ~0x00040000);
+        remoteAddr_ = getDefaultInstance().getRemoteAddr();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string remote_addr = 19;</code>
+       */
+      public Builder setRemoteAddrBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00040000;
+        remoteAddr_ = value;
         onChanged();
         return this;
       }
@@ -111871,7 +112036,7 @@ public final class Messages {
       "equestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002 " +
       "\001(\005\022\033\n\023alliance_request_id\030\003 \001(\005\022\021\n\tempi" +
       "re_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003" +
-      "\"\243\003\n\013ErrorReport\022\027\n\017android_version\030\001 \001(" +
+      "\"\270\003\n\013ErrorReport\022\027\n\017android_version\030\001 \001(" +
       "\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014package_name\030\003" +
       " \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013stack_trace" +
       "\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013report_time\030\007" +
@@ -111881,15 +112046,15 @@ public final class Messages {
       "e\030\r \001(\003\022\026\n\016total_run_time\030\016 \001(\003\022\033\n\023foreg" +
       "round_run_time\030\017 \001(\003\022\022\n\nlog_output\030\020 \001(\t" +
       "\022\031\n\021server_request_qs\030\021 \001(\t\022!\n\031server_re" +
-      "quest_user_agent\030\022 \001(\t\"K\n\014ErrorReports\022;" +
-      "\n\007reports\030\001 \003(\0132*.au.com.codeka.common.p" +
-      "rotobuf.ErrorReport*\344\001\n\025SituationReportF" +
-      "ilter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020" +
-      "BuildCompleteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n" +
-      "\016FleetDestroyed\020\004\022\023\n\017FleetVictorious\020\005\022\022" +
-      "\n\016ColonyAttacked\020\006\022\023\n\017ColonyDestroyed\020\007\022" +
-      "\026\n\022BuildCompleteShips\020\010\022\031\n\025BuildComplete" +
-      "Building\020\t"
+      "quest_user_agent\030\022 \001(\t\022\023\n\013remote_addr\030\023 " +
+      "\001(\t\"K\n\014ErrorReports\022;\n\007reports\030\001 \003(\0132*.a" +
+      "u.com.codeka.common.protobuf.ErrorReport" +
+      "*\344\001\n\025SituationReportFilter\022\013\n\007ShowAll\020\000\022" +
+      "\020\n\014MoveComplete\020\001\022\024\n\020BuildCompleteAny\020\002\022" +
+      "\021\n\rFleetAttacked\020\003\022\022\n\016FleetDestroyed\020\004\022\023" +
+      "\n\017FleetVictorious\020\005\022\022\n\016ColonyAttacked\020\006\022" +
+      "\023\n\017ColonyDestroyed\020\007\022\026\n\022BuildCompleteShi" +
+      "ps\020\010\022\031\n\025BuildCompleteBuilding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -112418,7 +112583,7 @@ public final class Messages {
     internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor,
-        new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", "Context", "ExceptionClass", "HeapSize", "HeapAllocated", "HeapFree", "TotalRunTime", "ForegroundRunTime", "LogOutput", "ServerRequestQs", "ServerRequestUserAgent", });
+        new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", "Context", "ExceptionClass", "HeapSize", "HeapAllocated", "HeapFree", "TotalRunTime", "ForegroundRunTime", "LogOutput", "ServerRequestQs", "ServerRequestUserAgent", "RemoteAddr", });
     internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor =
       getDescriptor().getMessageTypes().get(69);
     internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable = new

@@ -8,88 +8,99 @@ import au.com.codeka.warworlds.server.data.SqlResult;
 
 /**
  * Represents details about the current session, such as your username, empire_id and so on.
- * @author dean
  *
+ * @author dean
  */
 public class Session {
-    private String mCookie;
-    private String mActualEmail;
-    private String mEmail;
-    private DateTime mLoginTime;
-    private int mEmpireID;
-    private Integer mAllianceID;
-    private boolean mIsAdmin;
+  private String cookie;
+  private String actualEmail;
+  private String email;
+  private DateTime loginTime;
+  private int empireID;
+  private Integer allianceID;
+  private boolean isAdmin;
 
-    public Session() {
-    }
-    public Session(SqlResult res) throws SQLException {
-        mCookie = res.getString("session_cookie");
-        mActualEmail = res.getString("user_email");
-        mEmail = mActualEmail;
-        mLoginTime = res.getDateTime("login_time");
-        if (res.getInt("empire_id") == null) {
-            mEmpireID = 0;
-        } else {
-            mEmpireID = res.getInt("empire_id");
-        }
-        mAllianceID = res.getInt("alliance_id");
-        mIsAdmin = res.getInt("is_admin") == 1;
-    }
-    public Session(Session copy) {
-        mCookie = copy.mCookie;
-        mActualEmail = copy.mActualEmail;
-        mEmail = mActualEmail;
-        mLoginTime = copy.mLoginTime;
-        mEmpireID = copy.mEmpireID;
-        mAllianceID = copy.mAllianceID;
-        mIsAdmin = copy.mIsAdmin;
-    }
-    public Session(String cookie, String email, DateTime loginTime, int empireID,
-            Integer allianceID, boolean isAdmin) {
-        mCookie = cookie;
-        mActualEmail = email;
-        mEmail = mActualEmail;
-        mLoginTime = loginTime;
-        mEmpireID = empireID;
-        mAllianceID = allianceID;
-        mIsAdmin = isAdmin;
-    }
+  public Session() {
+  }
 
-    public String getCookie() {
-        return mCookie;
+  public Session(SqlResult res) throws SQLException {
+    cookie = res.getString("session_cookie");
+    actualEmail = res.getString("user_email");
+    email = actualEmail;
+    loginTime = res.getDateTime("login_time");
+    if (res.getInt("empire_id") == null) {
+      empireID = 0;
+    } else {
+      empireID = res.getInt("empire_id");
     }
-    public String getEmail() {
-        return mEmail;
-    }
-    public String getActualEmail() {
-        return mActualEmail;
-    }
-    public DateTime getLoginTime() {
-        return mLoginTime;
-    }
-    public int getEmpireID() {
-        return mEmpireID;
-    }
-    public void setEmpireID(int empireID) {
-        mEmpireID = empireID;
-    }
-    public int getAllianceID() {
-        if (mAllianceID == null) {
-            return 0;
-        }
-        return mAllianceID;
-    }
-    public void setAllianceID(int allianceID) {
-        mAllianceID = allianceID;
-    }
-    public boolean isAdmin() {
-        return mIsAdmin;
-    }
+    allianceID = res.getInt("alliance_id");
+    isAdmin = res.getInt("is_admin") == 1;
+  }
 
-    public Session impersonate(String email, int empireID) {
-        Session newSession = new Session(this);
-        newSession.mEmail = email;
-        newSession.mEmpireID = empireID;
-        return newSession;
+  public Session(Session copy) {
+    cookie = copy.cookie;
+    actualEmail = copy.actualEmail;
+    email = actualEmail;
+    loginTime = copy.loginTime;
+    empireID = copy.empireID;
+    allianceID = copy.allianceID;
+    isAdmin = copy.isAdmin;
+  }
+
+  public Session(String cookie, String email, DateTime loginTime, int empireID,
+                 Integer allianceID, boolean isAdmin) {
+    this.cookie = cookie;
+    actualEmail = email;
+    this.email = actualEmail;
+    this.loginTime = loginTime;
+    this.empireID = empireID;
+    this.allianceID = allianceID;
+    this.isAdmin = isAdmin;
+  }
+
+  public String getCookie() {
+    return cookie;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public String getActualEmail() {
+    return actualEmail;
+  }
+
+  public DateTime getLoginTime() {
+    return loginTime;
+  }
+
+  public int getEmpireID() {
+    return empireID;
+  }
+
+  public void setEmpireID(int empireID) {
+    this.empireID = empireID;
+  }
+
+  public int getAllianceID() {
+    if (allianceID == null) {
+      return 0;
     }
+    return allianceID;
+  }
+
+  public void setAllianceID(int allianceID) {
+    this.allianceID = allianceID;
+  }
+
+  public boolean isAdmin() {
+    return isAdmin;
+  }
+
+  public Session impersonate(String email, int empireID) {
+    Session newSession = new Session(this);
+    newSession.email = email;
+    newSession.empireID = empireID;
+    return newSession;
+  }
 }

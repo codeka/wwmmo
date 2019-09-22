@@ -114,7 +114,10 @@
         {% if error_report.empire_id %}
           [<a href="mailto:{{error_report.empire_email}}">{{error_report.empire_id}}</a>] {{error_report.empire_name}}
         {% else %}
-          <em>Server</em>
+          <em>Unknown</em>
+        {% end %}
+        {% if error_report.remote_addr %}
+          [{{error_report.remote_addr}}]
         {% end %}
       </td>
       <td>{{error_report.app_version}}</td>

@@ -19,87 +19,89 @@ import au.com.codeka.warworlds.server.ctrl.ErrorReportsController;
  * then writes errors to the database.
  */
 public class ErrorReportingLoggingHandler extends Handler {
-    private ArrayList<String> mLogBuffer;
-    private SimpleFormatter mSimpleFormatter;
+  private ArrayList<String> mLogBuffer;
+  private SimpleFormatter mSimpleFormatter;
 
-    public ErrorReportingLoggingHandler() {
-        mLogBuffer = new ArrayList<String>();
-        mSimpleFormatter = new SimpleFormatter();
+  public ErrorReportingLoggingHandler() {
+    mLogBuffer = new ArrayList<>();
+    mSimpleFormatter = new SimpleFormatter();
+  }
+
+  /**
+   * This is called when the server starts, we need to install ourselves in the logger stream.
+   */
+  public static void setup() {
+    Logger.getGlobal().addHandler(new ErrorReportingLoggingHandler());
+  }
+
+  /**
+   * This is called when a log record needs to actually published. If the record is error level or
+   * above, we'll write our buffer of logs to the database. Otherwise, we'll just append this to
+   * the buffer.
+   */
+  @Override
+  public void publish(LogRecord record) {
+    // ignore anything below 'info' level...
+    if (record.getLevel() == Level.FINE || record.getLevel() == Level.FINER || record.getLevel() == Level.FINEST) {
+      return;
     }
 
-    /**
-     * This is called when the server starts, we need to install ourselves in the logger stream.
-     */
-    public static void setup() {
-        Logger.getGlobal().addHandler(new ErrorReportingLoggingHandler());
+    mLogBuffer.add(mSimpleFormatter.format(record));
+    if (mLogBuffer.size() > 10) {
+      mLogBuffer.remove(0);
     }
 
-    /**
-     * This is called when a log record needs to actually published. If the record is error level or
-     * above, we'll write our buffer of logs to the database. Otherwise, we'll just append this to
-     * the buffer.
-     */
-    @Override
-    public void publish(LogRecord record) {
-        // ignore anything below 'info' level...
-        if (record.getLevel() == Level.FINE || record.getLevel() == Level.FINER || record.getLevel() == Level.FINEST) {
-            return;
+    if (record.getLevel() == Level.SEVERE) {
+      saveErrorReport(record);
+    }
+  }
+
+  private void saveErrorReport(LogRecord record) {
+    try {
+      Messages.ErrorReport.Builder error_report_pb = Messages.ErrorReport.newBuilder();
+      error_report_pb.setContext(RequestContext.i.getContextName());
+      Runtime rt = Runtime.getRuntime();
+      error_report_pb.setHeapSize(rt.totalMemory());
+      error_report_pb.setHeapFree(rt.freeMemory());
+      error_report_pb.setHeapAllocated(rt.totalMemory() - rt.freeMemory());
+      StringBuilder sb = new StringBuilder();
+      for (String line : mLogBuffer) {
+        sb.append(line);
+        sb.append("\r\n");
+      }
+      error_report_pb.setLogOutput(sb.toString());
+      error_report_pb.setReportTime(DateTime.now().getMillis());
+      error_report_pb.setServerRequestUserAgent(RequestContext.i.getUserAgent());
+      error_report_pb.setServerRequestQs(RequestContext.i.getQueryString());
+      error_report_pb.setEmpireId(RequestContext.i.getEmpireId());
+      error_report_pb.setRemoteAddr(RequestContext.i.getIpAddress());
+
+      if (record.getThrown() != null) {
+        Throwable thrown = record.getThrown();
+
+        Throwable innermostThrowable = thrown;
+        while (innermostThrowable.getCause() != null) {
+          innermostThrowable = innermostThrowable.getCause();
         }
 
-        mLogBuffer.add(mSimpleFormatter.format(record));
-        if (mLogBuffer.size() > 10) {
-            mLogBuffer.remove(0);
-        }
+        error_report_pb.setExceptionClass(innermostThrowable.getClass().getName());
+        error_report_pb.setMessage(thrown.getMessage());
+        StringWriter stacktrace = new StringWriter();
+        thrown.printStackTrace(new PrintWriter(stacktrace));
+        error_report_pb.setStackTrace(stacktrace.toString());
+      }
 
-        if (record.getLevel() == Level.SEVERE) {
-            saveErrorReport(record);
-        }
+      new ErrorReportsController().saveErrorReport(error_report_pb.build());
+    } catch (Exception e) {
+      // this is probably bad, but we'll just ignore them...
     }
+  }
 
-    private void saveErrorReport(LogRecord record) {
-        try {
-            Messages.ErrorReport.Builder error_report_pb = Messages.ErrorReport.newBuilder();
-            error_report_pb.setContext(RequestContext.i.getContextName());
-            Runtime rt = Runtime.getRuntime();
-            error_report_pb.setHeapSize(rt.totalMemory());
-            error_report_pb.setHeapFree(rt.freeMemory());
-            error_report_pb.setHeapAllocated(rt.totalMemory() - rt.freeMemory());
-            StringBuilder sb = new StringBuilder();
-            for (String line : mLogBuffer) {
-                sb.append(line);
-                sb.append("\r\n");
-            }
-            error_report_pb.setLogOutput(sb.toString());
-            error_report_pb.setReportTime(DateTime.now().getMillis());
-            error_report_pb.setServerRequestUserAgent(RequestContext.i.getUserAgent());
-            error_report_pb.setServerRequestQs(RequestContext.i.getQueryString());
+  @Override
+  public void close() throws SecurityException {
+  }
 
-            if (record.getThrown() != null) {
-                Throwable thrown = record.getThrown();
-
-                Throwable innermostThrowable = thrown;
-                while (innermostThrowable.getCause() != null) {
-                    innermostThrowable = innermostThrowable.getCause();
-                }
-
-                error_report_pb.setExceptionClass(innermostThrowable.getClass().getName());
-                error_report_pb.setMessage(thrown.getMessage());
-                StringWriter stacktrace = new StringWriter();
-                thrown.printStackTrace(new PrintWriter(stacktrace));
-                error_report_pb.setStackTrace(stacktrace.toString());
-            }
-
-            new ErrorReportsController().saveErrorReport(error_report_pb.build());
-        } catch (Exception e) {
-            // this is probably bad, but we'll just ignore them...
-        }
-    }
-
-    @Override
-    public void close() throws SecurityException {
-    }
-
-    @Override
-    public void flush() {
-    }
+  @Override
+  public void flush() {
+  }
 }
