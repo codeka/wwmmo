@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.model.BaseAllianceRequest;
 import au.com.codeka.common.protobuf.Messages;
@@ -111,7 +113,8 @@ public class AllianceController {
       Empire empire = new EmpireController().getEmpire(request.getRequestEmpireID());
       EmpireRank rank = (EmpireRank) empire.getRank();
       if (rank == null || rank.getTotalStars() < 10) {
-        throw new RequestException(403, "Cannot deposit cash until you have at least 10 stars.");
+        throw new RequestException(403, "Cannot deposit cash until you have at least 10 stars.")
+            .with(request);
       }
     }
 
@@ -137,7 +140,7 @@ public class AllianceController {
 
       return requestID;
     } catch (Exception e) {
-      throw new RequestException(e);
+      throw new RequestException(e, request);
     }
   }
 
@@ -335,18 +338,23 @@ public class AllianceController {
     }
 
     public int addRequest(AllianceRequest request) throws Exception {
+      String sql;
+
       // if you make another request while you've still got one pending, the new request
       // will overwrite the old one.
-      String sql = "DELETE FROM alliance_requests" +
-          " WHERE request_empire_id = ?" +
-          " AND alliance_id = ?" +
-          " AND request_type = ?" +
-          " AND state = " + BaseAllianceRequest.RequestState.PENDING.getNumber();
-      try (SqlStmt stmt = prepare(sql)) {
-        stmt.setInt(1, request.getRequestEmpireID());
-        stmt.setInt(2, request.getAllianceID());
-        stmt.setInt(3, request.getRequestType().getNumber());
-        stmt.update();
+      AllianceRequest existingRequest = findPendingRequest(request);
+      if (existingRequest != null) {
+        sql = "DELETE FROM alliance_request_votes WHERE alliance_request_id = ?";
+        try (SqlStmt stmt = prepare(sql)) {
+          stmt.setInt(1, existingRequest.getID());
+          stmt.update();
+        }
+
+        sql = "DELETE FROM alliance_requests WHERE id = ?";
+        try (SqlStmt stmt = prepare(sql)) {
+          stmt.setInt(1, existingRequest.getID());
+          stmt.update();
+        }
       }
 
       sql = "INSERT INTO alliance_requests (" +
@@ -451,6 +459,32 @@ public class AllianceController {
       }
 
       throw new RequestException(404, "No such alliance request found!");
+    }
+
+    /**
+     * Search for an equivalent pending request to the given one, assuming the given one doesn't
+     * already know the ID. That is, search to see if you're adding a new request that's the same
+     * as an existing one.
+     */
+    @Nullable
+    public AllianceRequest findPendingRequest(AllianceRequest request) throws Exception {
+      String sql = "SELECT * FROM alliance_requests" +
+          " WHERE request_empire_id = ?" +
+          " AND alliance_id = ?" +
+          " AND request_type = ?" +
+          " AND state = " + BaseAllianceRequest.RequestState.PENDING.getNumber();
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, request.getRequestEmpireID());
+        stmt.setInt(2, request.getAllianceID());
+        stmt.setInt(3, request.getRequestType().getNumber());
+        SqlResult res = stmt.select();
+
+        if (res.next()) {
+          return new AllianceRequest(res);
+        }
+      }
+
+      return null;
     }
 
     public void vote(AllianceRequestVote vote) throws Exception {

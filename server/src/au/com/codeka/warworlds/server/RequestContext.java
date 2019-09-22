@@ -1,10 +1,6 @@
 package au.com.codeka.warworlds.server;
 
-import java.util.HashMap;
-
 import javax.servlet.http.HttpServletRequest;
-
-import au.com.codeka.common.Log;
 
 /**
  * This class contains "context" information about the current request, mostly used for error reporting
