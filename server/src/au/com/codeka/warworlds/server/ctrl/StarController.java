@@ -127,7 +127,7 @@ public class StarController {
     try {
       updateNoRetry(star);
     } catch (Exception e) {
-      throw new RequestException(e);
+      throw new RequestException(e, star);
     }
 
     if (pingEventProcessor) {

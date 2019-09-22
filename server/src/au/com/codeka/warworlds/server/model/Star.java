@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.model;
 
+import com.google.api.client.util.Objects;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -201,5 +203,28 @@ public class Star extends BaseStar {
     Star clone = new Star();
     clone.fromProtocolBuffer(star_pb.build());
     return clone;
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+        .add("key", mKey)
+        .add("name", mName)
+        .add("type", mStarType)
+        .add("size", mSize)
+        .add("sectorX", mSectorX)
+        .add("sectorY", mSectorY)
+        .add("offsetX", mOffsetX)
+        .add("offsetY", mOffsetY)
+        .add("planets", mPlanets)
+        .add("colonies", mColonies)
+        .add("empires", mEmpires)
+        .add("fleets", mFleets)
+        .add("buildRequests", mBuildRequests)
+        .add("lastSimulation", mLastSimulation)
+        .add("timeEmptied", mTimeEmptied)
+        .add("combatReport", mCombatReport)
+        .add("wormhole", mWormholeExtra)
+        .toString();
   }
 }

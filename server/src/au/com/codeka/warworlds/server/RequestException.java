@@ -52,6 +52,7 @@ public class RequestException extends Exception {
     if (reqExc != null) {
       httpErrorCode = reqExc.httpErrorCode;
       genericError = reqExc.genericError;
+      this.extraObjects = reqExc.extraObjects;
     } else {
       httpErrorCode = 500;
     }
@@ -65,7 +66,7 @@ public class RequestException extends Exception {
 
   public RequestException with(Object extraObject) {
     if (extraObjects == null) {
-      extraObject = new ArrayList<>();
+      extraObjects = new ArrayList<>();
     }
     extraObjects.add(extraObject);
     return this;
@@ -118,13 +119,15 @@ public class RequestException extends Exception {
   public String toString() {
     if (extraObjects != null) {
       StringBuilder sb = new StringBuilder();
+      sb.append(super.toString());
+      sb.append("\n");
+
       for (Object extraObject : extraObjects) {
+        sb.append("\n");
         sb.append(extraObject);
         sb.append("\n");
       }
 
-      sb.append("\n\n");
-      sb.append(super.toString());
       return sb.toString();
     }
 
