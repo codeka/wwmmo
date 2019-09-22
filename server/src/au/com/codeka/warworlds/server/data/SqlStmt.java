@@ -22,6 +22,8 @@ public class SqlStmt implements AutoCloseable {
   private static final Log log = new Log("SqlStmt");
   private static Calendar sUTC;
 
+  private static boolean DBG = false;
+
   static {
     sUTC = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
   }
@@ -201,7 +203,7 @@ public class SqlStmt implements AutoCloseable {
   }
 
   private void logStatement() {
-    if (wasStatementLogged) {
+    if (wasStatementLogged || !DBG) {
       return;
     }
     wasStatementLogged = true;
