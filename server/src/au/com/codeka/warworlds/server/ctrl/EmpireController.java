@@ -38,6 +38,8 @@ import au.com.codeka.warworlds.server.utils.NameValidator;
 public class EmpireController {
   private DataBase db;
 
+  public static final double STARTING_CASH_BONUS = 250000;
+
   public EmpireController() {
     db = new DataBase();
   }
@@ -490,7 +492,7 @@ public class EmpireController {
       }
       try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
         stmt.setString(1, validatedName);
-        stmt.setDouble(2, 250000.0);
+        stmt.setDouble(2, STARTING_CASH_BONUS);
         stmt.setInt(3, ((Star) empire.getHomeStar()).getID());
         stmt.setString(4, empire.getEmailAddr());
         if (empire.getKey() != null && empire.getID() != 0) {

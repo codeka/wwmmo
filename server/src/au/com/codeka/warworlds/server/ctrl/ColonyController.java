@@ -206,9 +206,12 @@ public class ColonyController {
    * Calculates the total amount of cash transferred to you if you were to destroy the given colony,
    * owned by the given {@link Empire}.
    * <p>
-   * The amount transferred is (where <code>cash</code> is the empire's total cash, and
-   * <code>total_colonies</code> is the empire's total number of colonies):
+   * The amount transferred is (where <code>cash</code> is the empire's total cash, minus $250k
+   * (which is the new empire starting bonus) and <code>total_colonies</code> is the empire's total
+   * number of colonies):
    * <dl>
+   *    <dt>If the colony is less than 10 total star, and less than 3 months old,</dt>
+   *    <dd>0</dd>
    *    <dt>If the colony had an HQ</dt>
    *    <dd><code>cash</code> * 0.1</dd>
    *    <dt>If the empire has a HQ somewhere else</dt>
@@ -251,6 +254,11 @@ public class ColonyController {
 
     EmpireStarStats stats = new EmpireController().getEmpireStarStats(empire.getID());
     double totalCash = empire.getCash();
+    totalCash -= EmpireController.STARTING_CASH_BONUS; // remove the starting bonus
+    if (totalCash < 0) {
+      return 0;
+    }
+
     if (isHq) {
       return totalCash * 0.1;
     } else if (hasHqElsewhere) {
