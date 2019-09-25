@@ -58,6 +58,7 @@ public class ChatHandler extends RequestHandler {
     String sql = "SELECT * FROM chat_messages" +
         " WHERE posted_date > ?" +
         " AND posted_date <= ?" +
+        " AND empire_id NOT IN (SELECT blocked_empire_id FROM chat_blocked WHERE empire_id = ?)" +
         " AND (conversation_id IN (SELECT conversation_id FROM chat_conversation_participants WHERE empire_id = ?)" +
         " OR (conversation_id IS NULL" +
         (getSession().isAdmin()
@@ -73,6 +74,7 @@ public class ChatHandler extends RequestHandler {
       int i = 1;
       stmt.setDateTime(i++, after);
       stmt.setDateTime(i++, before);
+      stmt.setInt(i++, getSession().getEmpireID());
       if (!getSession().isAdmin()) {
         stmt.setInt(i++, getSession().getEmpireID());
         stmt.setInt(i++, getSession().getAllianceID());

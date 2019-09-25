@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -17,6 +18,7 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
+import au.com.codeka.warworlds.server.model.ChatBlock;
 import au.com.codeka.warworlds.server.model.ChatConversation;
 import au.com.codeka.warworlds.server.model.ChatMessage;
 
@@ -73,6 +75,22 @@ public class ChatController {
       }
     } catch (Exception e) {
       throw new RequestException(e);
+    }
+  }
+
+  public List<ChatBlock> getBlocksForEmpire(int empireID) throws RequestException {
+    try {
+      return db.getBlocksForEmpire(empireID);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
+  public void addBlock(ChatBlock block) throws RequestException {
+    try {
+      db.addBlock(block);
+    } catch (Exception e) {
+      throw new RequestException(e, block);
     }
   }
 
@@ -225,15 +243,15 @@ public class ChatController {
   }
 
   private static class DataBase extends BaseDataBase {
-    public DataBase() {
+    DataBase() {
       super();
     }
 
-    public DataBase(Transaction trans) {
+    DataBase(Transaction trans) {
       super(trans);
     }
 
-    public ChatConversation findExistingConversation(int empireID1, int empireID2) throws Exception {
+    ChatConversation findExistingConversation(int empireID1, int empireID2) throws Exception {
       Integer chatID = null;
       String sql = "SELECT chat_conversations.id, MAX(empire_id) AS empire_id_1, MIN(empire_id) AS empire_id_2, COUNT(*) AS num_empires" +
           " FROM chat_conversations" +
@@ -259,13 +277,13 @@ public class ChatController {
       return conversations.get(0);
     }
 
-    public ArrayList<ChatConversation> getConversationsForEmpire(int empireID) throws Exception {
+    ArrayList<ChatConversation> getConversationsForEmpire(int empireID) throws Exception {
       String whereClause = "chat_conversations.id IN (" +
           "SELECT conversation_id FROM chat_conversation_participants WHERE empire_id = " + empireID + ")";
       return getConversations(whereClause);
     }
 
-    public ArrayList<ChatConversation> getConversations(String whereClause) throws Exception {
+    ArrayList<ChatConversation> getConversations(String whereClause) throws Exception {
       Map<Integer, ChatConversation> conversations = new HashMap<Integer, ChatConversation>();
       String sql = "SELECT chat_conversations.id, chat_conversation_participants.empire_id, chat_conversation_participants.is_muted" +
           " FROM chat_conversations" +
@@ -283,10 +301,10 @@ public class ChatController {
           conversation.addParticipant(res.getInt(2), res.getInt(3) != 0);
         }
       }
-      return new ArrayList<ChatConversation>(conversations.values());
+      return new ArrayList<>(conversations.values());
     }
 
-    public ChatConversation getConversation(int id) throws Exception {
+    ChatConversation getConversation(int id) throws Exception {
       ArrayList<ChatConversation> conversations = getConversations("chat_conversations.id = " + id);
       if (conversations.size() == 1) {
         return conversations.get(0);
@@ -294,7 +312,7 @@ public class ChatController {
       return null;
     }
 
-    public void addParticipant(int conversationID, int empireID) throws Exception {
+    void addParticipant(int conversationID, int empireID) throws Exception {
       String sql = "INSERT INTO chat_conversation_participants (conversation_id, empire_id, is_muted) VALUES" +
           " (?, ?, 0)";
       try (SqlStmt stmt = prepare(sql)) {
@@ -304,7 +322,7 @@ public class ChatController {
       }
     }
 
-    public void removeParticipant(int conversationID, int empireID) throws Exception {
+    void removeParticipant(int conversationID, int empireID) throws Exception {
       String sql = "DELETE FROM chat_conversation_participants WHERE conversation_id = ? AND empire_id = ?";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, conversationID);
@@ -313,7 +331,7 @@ public class ChatController {
       }
     }
 
-    public ChatConversation createConversation(int empireID1, int empireID2) throws Exception {
+    ChatConversation createConversation(int empireID1, int empireID2) throws Exception {
       ChatConversation conversation;
 
       String sql = "INSERT INTO chat_conversations DEFAULT VALUES";
@@ -342,6 +360,31 @@ public class ChatController {
         conversation.addParticipant(empireID2, false);
       }
       return conversation;
+    }
+
+    List<ChatBlock> getBlocksForEmpire(int empireID) throws Exception {
+      String sql = "SELECT * FROM chat_blocked WHERE empire_id = ?";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, empireID);
+        SqlResult result = stmt.select();
+
+        ArrayList<ChatBlock> chatBlocks = new ArrayList<>();
+        while (result.next()) {
+          chatBlocks.add(new ChatBlock(result));
+        }
+        return chatBlocks;
+      }
+    }
+
+    void addBlock(ChatBlock block) throws Exception {
+      String sql = "INSERT INTO chat_blocked (empire_id, blocked_empire_id, created_date)" +
+          " VALUES (?, ?, ?)";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, block.getEmpireID());
+        stmt.setInt(2, block.getBlockedEmpireID());
+        stmt.setDateTime(3, block.getBlockTime());
+        stmt.update();
+      }
     }
   }
 }
