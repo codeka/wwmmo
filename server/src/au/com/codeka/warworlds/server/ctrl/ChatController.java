@@ -3,9 +3,11 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 
@@ -78,9 +80,25 @@ public class ChatController {
     }
   }
 
+  /**
+   * Gets a list of all the empires the given empire has blocked. Not to be confused with
+   * {@link #getBlockingEmpires(int)}.
+   */
   public List<ChatBlock> getBlocksForEmpire(int empireID) throws RequestException {
     try {
       return db.getBlocksForEmpire(empireID);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
+  /**
+   * Gets a list of all empires that have the given empire blocked. Not to be confused with
+   * {@link #getBlocksForEmpire(int)}.
+   */
+  public List<ChatBlock> getBlockingEmpires(int empireID) throws RequestException {
+    try {
+      return db.getBlockingEmpires(empireID);
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -162,15 +180,23 @@ public class ChatController {
 
         String encoded = getEncodedMessage(chatmsg);
         try {
+          Set<Integer> exclusions = new HashSet<>();
+          if (msg.getEmpireID() != null) {
+            List<ChatBlock> blocking = getBlockingEmpires(msg.getEmpireID());
+            for (ChatBlock block : blocking) {
+              exclusions.add(block.getEmpireID());
+            }
+          }
+
           if (chat_msg_pb.hasConversationId()) {
             new NotificationController().sendNotificationToConversation(
                 chat_msg_pb.getConversationId(), "chat", encoded);
           } else if (chat_msg_pb.hasAllianceKey()) {
             new NotificationController().sendNotificationToOnlineAlliance(
-                Integer.parseInt(chat_msg_pb.getAllianceKey()), "chat", encoded);
+                Integer.parseInt(chat_msg_pb.getAllianceKey()), "chat", encoded, exclusions);
           } else {
             new NotificationController().sendNotificationToAllOnline(
-                "chat", encoded);
+                "chat", encoded, exclusions);
           }
         } catch (RequestException e) {
           log.error("Error sending notification.");
@@ -364,6 +390,20 @@ public class ChatController {
 
     List<ChatBlock> getBlocksForEmpire(int empireID) throws Exception {
       String sql = "SELECT * FROM chat_blocked WHERE empire_id = ?";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, empireID);
+        SqlResult result = stmt.select();
+
+        ArrayList<ChatBlock> chatBlocks = new ArrayList<>();
+        while (result.next()) {
+          chatBlocks.add(new ChatBlock(result));
+        }
+        return chatBlocks;
+      }
+    }
+
+    List<ChatBlock> getBlockingEmpires(int empireID) throws Exception {
+      String sql = "SELECT * FROM chat_blocked WHERE blocked_empire_id = ?";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, empireID);
         SqlResult result = stmt.select();

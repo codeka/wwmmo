@@ -14,6 +14,7 @@ import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.GlobalOptions;
+import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
@@ -48,6 +49,8 @@ public class ChatManager {
    */
   public void setup() {
     BackgroundDetector.eventBus.register(eventHandler);
+
+    recentMessages.clear();
 
     conversations.clear();
     conversations.append(GLOBAL_CONVERSATION_ID, new ChatConversation(GLOBAL_CONVERSATION_ID));
@@ -91,8 +94,8 @@ public class ChatManager {
   }
 
   public void addMessage(ChatConversation conv, ChatMessage msg) {
-    conv.addMessage(msg);
     if (recentMessages.addMessage(msg)) {
+      conv.addMessage(msg);
       ChatManager.eventBus.publish(new ChatManager.MessageAddedEvent(conv, msg));
     }
   }
@@ -147,7 +150,7 @@ public class ChatManager {
             .setEmpireId(Integer.parseInt(empire.getKey()))
             .build();
 
-    String url = String.format("chat/conversations/%d/participants", conversation.getID());
+    String url = String.format(Locale.ENGLISH, "chat/conversations/%d/participants", conversation.getID());
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST")
         .body(participantPb)
         .completeCallback(new ApiRequest.CompleteCallback() {
@@ -313,8 +316,10 @@ public class ChatManager {
           @Override
           public void onRequestComplete(ApiRequest request) {
             Messages.ChatConversations pb = request.body(Messages.ChatConversations.class);
-            // this comes back most recent first, but we work in the
-            // opposite order...
+            if (pb == null) {
+              return;
+            }
+            // this comes back most recent first, but we work in the opposite order...
             for (Messages.ChatConversation conversation_pb : pb.getConversationsList()) {
               ChatConversation conversation = new ChatConversation(conversation_pb.getId());
               conversation.fromProtocolBuffer(conversation_pb);
@@ -394,6 +399,9 @@ public class ChatManager {
           @Override
           public void onRequestComplete(ApiRequest request) {
             Messages.ChatMessages pb = request.body(Messages.ChatMessages.class);
+            if (pb == null) {
+              return;
+            }
             ArrayList<ChatMessage> msgs = new ArrayList<>();
 
             // these comes back most recent first, but we work in the opposite order...

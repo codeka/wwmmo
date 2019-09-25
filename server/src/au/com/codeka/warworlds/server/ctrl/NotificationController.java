@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +12,6 @@ import org.joda.time.DateTime;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
-import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -22,11 +20,11 @@ import au.com.codeka.warworlds.server.handlers.NotificationHandler;
 import au.com.codeka.warworlds.server.model.ChatConversation;
 import au.com.codeka.warworlds.server.model.ChatConversationParticipant;
 
-import com.google.android.gcm.server.Constants;
 import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.Result;
-import com.google.android.gcm.server.Sender;
 import com.google.common.collect.Lists;
+
+import javax.annotation.Nullable;
 
 public class NotificationController {
   private final Log log = new Log("NotificationController");
@@ -44,7 +42,7 @@ public class NotificationController {
     }
 
     ArrayList<ChatConversationParticipant> participants =
-        new ArrayList<ChatConversationParticipant>();
+        new ArrayList<>();
     for (BaseChatConversationParticipant participant : conversation.getParticipants()) {
       participants.add((ChatConversationParticipant) participant);
     }
@@ -71,24 +69,26 @@ public class NotificationController {
   }
 
   /** Send a notification to all empires in the given alliance who are currently online. */
-  public void sendNotificationToOnlineAlliance(int allianceID, String name, String value)
+  public void sendNotificationToOnlineAlliance(
+      int allianceID, String name, String value, @Nullable Set<Integer> exclusions)
       throws RequestException {
     Notification notification = new Notification(name, value);
-    handlers.sendNotificationToAlliance(allianceID, notification);
+    handlers.sendNotificationToAlliance(allianceID, notification, exclusions);
   }
 
   /** Send a notification to all empires that are currently online. */
-  public void sendNotificationToAllOnline(String name, String value) throws RequestException {
-    TreeMap<String, String> values = new TreeMap<String, String>();
+  public void sendNotificationToAllOnline(
+      String name, String value, @Nullable Set<Integer> exclusions) {
+    TreeMap<String, String> values = new TreeMap<>();
     values.put(name, value);
     Notification notification = new Notification(name, value);
 
-    handlers.sendNotificationToAll(notification);
+    handlers.sendNotificationToAll(notification, exclusions);
   }
 
   /** Gets a list of all the recent notifications for the given empire. */
   public List<Map<String, String>> getRecentNotifications(int empireID) {
-    List<Map<String, String>> notifications = new ArrayList<Map<String, String>>();
+    List<Map<String, String>> notifications = new ArrayList<>();
     for (Notification n : recentNotifications.getRecentNotifications(empireID)) {
       if (n.isTooOld()) {
         continue;
@@ -318,7 +318,7 @@ public class NotificationController {
     private HashMap<Integer, List<NotificationHandler>> handlers;
 
     public NotificationHandlerCache() {
-      handlers = new HashMap<Integer, List<NotificationHandler>>();
+      handlers = new HashMap<>();
     }
 
     /** Returns {@code true} if the given empire is currently connected. */
@@ -339,7 +339,7 @@ public class NotificationController {
       synchronized (handlers) {
         List<NotificationHandler> empireHandlers = handlers.get(empireID);
         if (empireHandlers == null) {
-          empireHandlers = new ArrayList<NotificationHandler>();
+          empireHandlers = new ArrayList<>();
           handlers.put(empireID, empireHandlers);
         }
         empireHandlers.add(handler);
@@ -365,12 +365,15 @@ public class NotificationController {
     }
 
     /* Sends the given notification to all attached handlers at once. */
-    public void sendNotificationToAll(Notification notification) {
+    public void sendNotificationToAll(
+        Notification notification, @Nullable Set<Integer> exclusions) {
       synchronized (handlers) {
         for (List<NotificationHandler> empireHandlers : handlers.values()) {
           if (empireHandlers != null && empireHandlers.size() > 0) {
             for (NotificationHandler handler : empireHandlers) {
-              handler.sendNotification(notification);
+              if (exclusions == null || !exclusions.contains(handler.getEmpireID())) {
+                handler.sendNotification(notification);
+              }
             }
 
             // once a handler has processed a notification, it's finished and
@@ -385,13 +388,17 @@ public class NotificationController {
      * Sends the given notification to all attached handlers at once, as long as
      * they match the given alliance.
      */
-    public void sendNotificationToAlliance(int allianceID, Notification notification) {
+    public void sendNotificationToAlliance(
+        int allianceID, Notification notification, @Nullable Set<Integer> exclusions) {
       synchronized (handlers) {
         for (List<NotificationHandler> empireHandlers : handlers.values()) {
           if (empireHandlers != null && empireHandlers.size() > 0) {
             boolean sent = false;
             for (NotificationHandler handler : empireHandlers) {
               if (handler.getAllianceID() != allianceID) {
+                continue;
+              }
+              if (exclusions != null && exclusions.contains(handler.getEmpireID())) {
                 continue;
               }
               handler.sendNotification(notification);
@@ -415,7 +422,7 @@ public class NotificationController {
     public Map<String, String> values;
 
     public Notification(String name, String value) {
-      values = new TreeMap<String, String>();
+      values = new TreeMap<>();
       values.put(name, value);
       creation = DateTime.now();
     }

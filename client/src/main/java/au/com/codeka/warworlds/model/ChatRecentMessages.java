@@ -29,4 +29,8 @@ public class ChatRecentMessages {
   public List<ChatMessage> getMessages() {
     return messages;
   }
+
+  public void clear() {
+    messages.clear();
+  }
 }
