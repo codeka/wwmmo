@@ -17,54 +17,54 @@ import au.com.codeka.warworlds.server.model.ChatMessage;
  */
 public class ChatConversationParticipantsHandler extends RequestHandler {
 
-    @Override
-    protected void post() throws RequestException {
-        Messages.ChatConversationParticipant pb = getRequestBody(Messages.ChatConversationParticipant.class);
-        int conversationID = Integer.parseInt(getUrlParameter("conversationid"));
+  @Override
+  protected void post() throws RequestException {
+    Messages.ChatConversationParticipant pb = getRequestBody(Messages.ChatConversationParticipant.class);
+    int conversationID = Integer.parseInt(getUrlParameter("conversationid"));
 
-        try (Transaction t = DB.beginTransaction()) {
-            ChatConversation conversation = new ChatController(t).getConversation(conversationID);
-            if (conversation == null) {
-                throw new RequestException(404);
-            }
+    try (Transaction t = DB.beginTransaction()) {
+      ChatConversation conversation = new ChatController(t).getConversation(conversationID);
+      if (conversation == null) {
+        throw new RequestException(404);
+      }
 
-            boolean isThisEmpireInConversation = false;
-            boolean isNewEmpireInConversation = false;
-            for (BaseChatConversationParticipant baseParticipant : conversation.getParticipants()) {
-                ChatConversationParticipant participant = (ChatConversationParticipant) baseParticipant;
+      boolean isThisEmpireInConversation = false;
+      boolean isNewEmpireInConversation = false;
+      for (BaseChatConversationParticipant baseParticipant : conversation.getParticipants()) {
+        ChatConversationParticipant participant = (ChatConversationParticipant) baseParticipant;
 
-                if (participant.getEmpireID() == getSession().getEmpireID()) {
-                    isThisEmpireInConversation = true;
-                }
-                if (participant.getEmpireID() == pb.getEmpireId()) {
-                    isNewEmpireInConversation = true;
-                }
-            }
-
-            // you must already be a participant of this conversation to add somebody
-            if (!isThisEmpireInConversation) {
-                throw new RequestException(404);
-            }
-
-            // the empire you want to add can't already be there either...
-            if (isNewEmpireInConversation) {
-                throw new RequestException(400, Messages.GenericError.ErrorCode.EmpireAlreadyInConversation,
-                        "They're already part of this conversation.");
-            }
-
-            new ChatController(t).addParticipant(conversation, pb.getEmpireId());
-
-            t.commit();
-        } catch(Exception e) {
-            throw new RequestException(e);
+        if (participant.getEmpireID() == getSession().getEmpireID()) {
+          isThisEmpireInConversation = true;
         }
+        if (participant.getEmpireID() == pb.getEmpireId()) {
+          isNewEmpireInConversation = true;
+        }
+      }
 
-        // send a notification to the participants (including the new one!) that a new empire has been added.
-        ChatMessage msg = new ChatMessage(getSession().getEmpireID(),
-                                          Integer.toString(pb.getEmpireId()),
-                                          MessageAction.ParticipantAdded,
-                                          conversationID);
-        new ChatController().postMessage(msg);
+      // you must already be a participant of this conversation to add somebody
+      if (!isThisEmpireInConversation) {
+        throw new RequestException(404);
+      }
+
+      // the empire you want to add can't already be there either...
+      if (isNewEmpireInConversation) {
+        throw new RequestException(400, Messages.GenericError.ErrorCode.EmpireAlreadyInConversation,
+            "They're already part of this conversation.");
+      }
+
+      new ChatController(t).addParticipant(conversation, pb.getEmpireId());
+
+      t.commit();
+    } catch (Exception e) {
+      throw new RequestException(e);
     }
+
+    // send a notification to the participants (including the new one!) that a new empire has been added.
+    ChatMessage msg = new ChatMessage(getSession().getEmpireID(),
+        Integer.toString(pb.getEmpireId()),
+        MessageAction.ParticipantAdded,
+        conversationID);
+    new ChatController().postMessage(msg);
+  }
 
 }

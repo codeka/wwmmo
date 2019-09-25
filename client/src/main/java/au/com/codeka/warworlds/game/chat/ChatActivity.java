@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.game.chat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -20,6 +21,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
+import javax.annotation.Nonnull;
+
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
@@ -34,255 +38,256 @@ import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 public class ChatActivity extends BaseActivity {
-    private ChatPagerAdapter mChatPagerAdapter;
-    private ViewPager mViewPager;
-    private List<ChatConversation> mConversations;
-    private Handler mHandler;
-    private boolean mFirstRefresh;
+  private ChatPagerAdapter mChatPagerAdapter;
+  private ViewPager mViewPager;
+  private List<ChatConversation> mConversations;
+  private Handler mHandler;
+  private boolean mFirstRefresh;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.chat);
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.chat);
 
-        mChatPagerAdapter = new ChatPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mChatPagerAdapter);
-        mHandler = new Handler();
-        mFirstRefresh = true;
+    mChatPagerAdapter = new ChatPagerAdapter(getSupportFragmentManager());
+    mViewPager = findViewById(R.id.pager);
+    mViewPager.setAdapter(mChatPagerAdapter);
+    mHandler = new Handler();
+    mFirstRefresh = true;
 
-        final EditText chatMsg = (EditText) findViewById(R.id.chat_text);
-        chatMsg.setOnEditorActionListener(new OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_NULL) {
-                    sendCurrentChat();
-                    return true;
+    final EditText chatMsg = findViewById(R.id.chat_text);
+    chatMsg.setOnEditorActionListener(new OnEditorActionListener() {
+      @Override
+      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_NULL) {
+          sendCurrentChat();
+          return true;
+        }
+        return false;
+      }
+    });
+
+    Button send = findViewById(R.id.chat_send);
+    send.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        sendCurrentChat();
+      }
+    });
+  }
+
+  @Override
+  public void onResumeFragments() {
+    super.onResumeFragments();
+
+    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+      @Override
+      public void onHelloComplete(boolean success, ServerGreeting greeting) {
+        refreshConversations();
+
+        if (mFirstRefresh) {
+          mFirstRefresh = false;
+
+          Bundle extras = getIntent().getExtras();
+          if (extras != null) {
+            final int conversationID = extras.getInt("au.com.codeka.warworlds.ConversationID");
+            if (conversationID != 0) {
+              int position = 0;
+              for (; position < mConversations.size(); position++) {
+                if (mConversations.get(position).getID() == conversationID) {
+                  break;
                 }
-                return false;
+              }
+              if (position < mConversations.size()) {
+                final int finalPosition = position;
+                mHandler.post(new Runnable() {
+                  @Override
+                  public void run() {
+                    mViewPager.setCurrentItem(finalPosition);
+                  }
+                });
+              }
             }
-        });
 
-        Button send = (Button) findViewById(R.id.chat_send);
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendCurrentChat();
-            }
-        });
-    }
-
-    @Override
-    public void onResumeFragments() {
-        super.onResumeFragments();
-
-        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-            @Override
-            public void onHelloComplete(boolean success, ServerGreeting greeting) {
-                refreshConversations();
-
-                if (mFirstRefresh) {
-                    mFirstRefresh = false;
-
-                    Bundle extras = getIntent().getExtras();
-                    if (extras != null) {
-                        final int conversationID = extras.getInt("au.com.codeka.warworlds.ConversationID");
-                        if (conversationID != 0) {
-                            int position = 0;
-                            for (; position < mConversations.size(); position++) {
-                                if (mConversations.get(position).getID() == conversationID) {
-                                    break;
-                                }
-                            }
-                            if (position < mConversations.size()) {
-                                final int finalPosition = position;
-                                mHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mViewPager.setCurrentItem(finalPosition);
-                                    }
-                                });
-                            }
-                        }
-
-                        final String empireKey = extras.getString("au.com.codeka.warworlds.NewConversationEmpireKey");
-                        if (empireKey != null) {
-                            mHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ChatManager.i.startConversation(empireKey);
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        ChatManager.eventBus.register(mEventHandler);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        ChatManager.eventBus.unregister(mEventHandler);
-    }
-
-    public void moveToFirstUnreadConversation() {
-        for (int i = 0; i < mConversations.size(); i++) {
-            if (mConversations.get(i).getUnreadCount() > 0) {
-                mViewPager.setCurrentItem(i);
-                break;
-            }
-        }
-    }
-
-    private Object mEventHandler = new Object() {
-        @EventHandler
-        public void onConversationsRefreshed(ChatManager.ConversationsUpdatedEvent event) {
-            refreshConversations();
-        }
-
-        @EventHandler
-        public void onConversationsRefreshed(ChatManager.ConversationStartedEvent event) {
-            refreshConversations();
-
-            int index = mConversations.indexOf(event.conversation);
-            if (index >= 0) {
-                mViewPager.setCurrentItem(index);
-            }
-        }
-    };
-
-    private void refreshConversations() {
-        mConversations = ChatManager.i.getConversations();
-        // remove the recent conversation, we don't display it here
-        Iterator<ChatConversation> it = mConversations.iterator();
-        while (it.hasNext()) {
-            ChatConversation conversation = it.next();
-            if (conversation.getID() < 0 &&
-                    conversation.getID() != ChatManager.ALLIANCE_CONVERSATION_ID) {
-                it.remove();
-            }
-        }
-        if (EmpireManager.i.getEmpire().getAlliance() != null && mConversations.size() > 1) {
-            // swap alliance and global around...
-            ChatConversation globalConversation = mConversations.get(1);
-            mConversations.set(1, mConversations.get(0));
-            mConversations.set(0, globalConversation);
-        }
-
-        mChatPagerAdapter.refresh(mConversations);
-
-    }
-
-    public class ChatPagerAdapter extends FragmentStatePagerAdapter {
-        List<ChatConversation> mConversations;
-
-        public ChatPagerAdapter(FragmentManager fm) {
-            super(fm);
-            mConversations = new ArrayList<ChatConversation>();
-        }
-
-        public void refresh(List<ChatConversation> conversations) {
-            mConversations = conversations;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public Fragment getItem(int i) {
-            Fragment fragment = new ChatFragment();
-            Bundle args = new Bundle();
-            args.putInt("au.com.codeka.warworlds.ConversationID", mConversations.get(i).getID());
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public int getItemPosition(Object item) {
-            return POSITION_NONE;
-        }
-
-        @Override
-        public int getCount() {
-            return mConversations.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            ChatConversation conversation = mConversations.get(position);
-            return String.format("Chat #"+conversation.getID());
-        }
-
-        @Override
-        public void setPrimaryItem(ViewGroup container, int position, Object object) {
-            super.setPrimaryItem(container, position, object);
-
-            ChatConversation conversation = mConversations.get(position);
-            conversation.markAllRead();
-        }
-    }
-
-    private void sendCurrentChat() {
-        EditText chatMsg = (EditText) findViewById(R.id.chat_text);
-        if (chatMsg.getText().toString().equals("")) {
-            return;
-        }
-
-        String message = chatMsg.getText().toString();
-
-        ChatMessage msg = new ChatMessage();
-        msg.setMessage(message);
-        msg.setEmpireID(EmpireManager.i.getEmpire().getID());
-
-        ChatConversation conversation = mConversations.get(mViewPager.getCurrentItem());
-        msg.setConversation(conversation);
-
-        // if this is our first chat after the update ...
-        if (!Util.getSharedPreferences().getBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
-            // ... and this message is all in English ...
-            if (isEnglish(message)) {
-                // ... and they haven't already set the 'auto-translate' setting ...
-                if (!new GlobalOptions().autoTranslateChatMessages()) {
-                    // ... then ask whether they want to enable auto-translate
-                    showConfirmAutoTranslateDialog();
-                }
-            }
-        }
-
-        chatMsg.setText("");
-        ChatManager.i.postMessage(msg);
-    }
-
-    private void showConfirmAutoTranslateDialog() {
-        Util.getSharedPreferences().edit()
-            .putBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", true)
-            .commit();
-
-        new StyledDialog.Builder(this)
-            .setMessage("Do you want to enable auto-translation of chat message? If you enable this setting, then any chat messages that are not in English will be automatically translated to English for you.\r\n\r\nYou can adjust this setting later from the Options screen.")
-            .setTitle("Auto-translation")
-            .setPositiveButton("Enable", true, new DialogInterface.OnClickListener() {
+            final String empireKey = extras.getString("au.com.codeka.warworlds.NewConversationEmpireKey");
+            if (empireKey != null) {
+              mHandler.post(new Runnable() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    new GlobalOptions().autoTranslateChatMessages(true);
+                public void run() {
+                  ChatManager.i.startConversation(empireKey);
                 }
-            })
-            .setNegativeButton("Don't Enable", null)
-            .create().show();
+              });
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    ChatManager.eventBus.register(mEventHandler);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    ChatManager.eventBus.unregister(mEventHandler);
+  }
+
+  public void moveToFirstUnreadConversation() {
+    for (int i = 0; i < mConversations.size(); i++) {
+      if (mConversations.get(i).getUnreadCount() > 0) {
+        mViewPager.setCurrentItem(i);
+        break;
+      }
+    }
+  }
+
+  private Object mEventHandler = new Object() {
+    @EventHandler
+    public void onConversationsRefreshed(ChatManager.ConversationsUpdatedEvent event) {
+      refreshConversations();
     }
 
-    private static boolean isEnglish(String str) {
-        for (int i = 0; i < str.length(); i++) {
-            Character ch = str.charAt(i);
-            if (ch > 0x80) {
-                return false;
-            }
-        }
-        return true;
+    @EventHandler
+    public void onConversationsRefreshed(ChatManager.ConversationStartedEvent event) {
+      refreshConversations();
+
+      int index = mConversations.indexOf(event.conversation);
+      if (index >= 0) {
+        mViewPager.setCurrentItem(index);
+      }
     }
+  };
+
+  private void refreshConversations() {
+    mConversations = ChatManager.i.getConversations();
+    // remove the recent conversation, we don't display it here
+    Iterator<ChatConversation> it = mConversations.iterator();
+    while (it.hasNext()) {
+      ChatConversation conversation = it.next();
+      if (conversation.getID() < 0 &&
+          conversation.getID() != ChatManager.ALLIANCE_CONVERSATION_ID) {
+        it.remove();
+      }
+    }
+    if (EmpireManager.i.getEmpire().getAlliance() != null && mConversations.size() > 1) {
+      // swap alliance and global around...
+      ChatConversation globalConversation = mConversations.get(1);
+      mConversations.set(1, mConversations.get(0));
+      mConversations.set(0, globalConversation);
+    }
+
+    mChatPagerAdapter.refresh(mConversations);
+
+  }
+
+  public class ChatPagerAdapter extends FragmentStatePagerAdapter {
+    List<ChatConversation> mConversations;
+
+    ChatPagerAdapter(FragmentManager fm) {
+      super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+      mConversations = new ArrayList<>();
+    }
+
+    public void refresh(List<ChatConversation> conversations) {
+      mConversations = conversations;
+      notifyDataSetChanged();
+    }
+
+    @Override
+    @Nonnull
+    public Fragment getItem(int i) {
+      Fragment fragment = new ChatFragment();
+      Bundle args = new Bundle();
+      args.putInt("au.com.codeka.warworlds.ConversationID", mConversations.get(i).getID());
+      fragment.setArguments(args);
+      return fragment;
+    }
+
+    @Override
+    public int getItemPosition(@Nonnull Object item) {
+      return POSITION_NONE;
+    }
+
+    @Override
+    public int getCount() {
+      return mConversations.size();
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+      ChatConversation conversation = mConversations.get(position);
+      return String.format(Locale.ENGLISH, "Chat #%d", conversation.getID());
+    }
+
+    @Override
+    public void setPrimaryItem(@Nonnull ViewGroup container, int position, @Nonnull Object object) {
+      super.setPrimaryItem(container, position, object);
+
+      ChatConversation conversation = mConversations.get(position);
+      conversation.markAllRead();
+    }
+  }
+
+  private void sendCurrentChat() {
+    EditText chatMsg = findViewById(R.id.chat_text);
+    if (chatMsg.getText().toString().equals("")) {
+      return;
+    }
+
+    String message = chatMsg.getText().toString();
+
+    ChatMessage msg = new ChatMessage();
+    msg.setMessage(message);
+    msg.setEmpireID(EmpireManager.i.getEmpire().getID());
+
+    ChatConversation conversation = mConversations.get(mViewPager.getCurrentItem());
+    msg.setConversation(conversation);
+
+    // if this is our first chat after the update ...
+    if (!Util.getSharedPreferences().getBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
+      // ... and this message is all in English ...
+      if (isEnglish(message)) {
+        // ... and they haven't already set the 'auto-translate' setting ...
+        if (!new GlobalOptions().autoTranslateChatMessages()) {
+          // ... then ask whether they want to enable auto-translate
+          showConfirmAutoTranslateDialog();
+        }
+      }
+    }
+
+    chatMsg.setText("");
+    ChatManager.i.postMessage(msg);
+  }
+
+  private void showConfirmAutoTranslateDialog() {
+    Util.getSharedPreferences().edit()
+        .putBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", true)
+        .apply();
+
+    new StyledDialog.Builder(this)
+        .setMessage("Do you want to enable auto-translation of chat message? If you enable this setting, then any chat messages that are not in English will be automatically translated to English for you.\r\n\r\nYou can adjust this setting later from the Options screen.")
+        .setTitle("Auto-translation")
+        .setPositiveButton("Enable", true, new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            new GlobalOptions().autoTranslateChatMessages(true);
+          }
+        })
+        .setNegativeButton("Don't Enable", null)
+        .create().show();
+  }
+
+  private static boolean isEnglish(String str) {
+    for (int i = 0; i < str.length(); i++) {
+      char ch = str.charAt(i);
+      if (ch > 0x80) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

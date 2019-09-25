@@ -10,49 +10,51 @@ import au.com.codeka.warworlds.server.model.ChatConversation;
 
 public class ChatConversationsHandler extends RequestHandler {
 
-    /** Gets the list of conversations the current empire is part of. */
-    @Override
-    protected void get() throws RequestException {
-        int empireID = getSession().getEmpireID();
+  /**
+   * Gets the list of conversations the current empire is part of.
+   */
+  @Override
+  protected void get() throws RequestException {
+    int empireID = getSession().getEmpireID();
 
-        Messages.ChatConversations.Builder conversations_pb = Messages.ChatConversations.newBuilder();
-        for (ChatConversation conversation : new ChatController().getConversationsForEmpire(empireID)) {
-            Messages.ChatConversation.Builder conversation_pb = Messages.ChatConversation.newBuilder();
-            conversation.toProtocolBuffer(conversation_pb);
-            conversations_pb.addConversations(conversation_pb);
-        }
-        setResponseBody(conversations_pb.build());
+    Messages.ChatConversations.Builder conversations_pb = Messages.ChatConversations.newBuilder();
+    for (ChatConversation conversation : new ChatController().getConversationsForEmpire(empireID)) {
+      Messages.ChatConversation.Builder conversation_pb = Messages.ChatConversation.newBuilder();
+      conversation.toProtocolBuffer(conversation_pb);
+      conversations_pb.addConversations(conversation_pb);
+    }
+    setResponseBody(conversations_pb.build());
+  }
+
+  @Override
+  protected void post() throws RequestException {
+    Messages.ChatConversation pb = getRequestBody(Messages.ChatConversation.class);
+
+    int empireID1 = getSession().getEmpireID();
+    if (pb.getParticipantsCount() > 2 || pb.getParticipantsCount() < 1) {
+      throw new RequestException(400, Messages.GenericError.ErrorCode.InvalidConversation, "Cannot start new conversation.");
+    }
+    int empireID2 = 0;
+    if (pb.getParticipantsCount() > 1 && pb.getParticipants(0).getEmpireId() == empireID1) {
+      empireID2 = pb.getParticipants(1).getEmpireId();
+    } else if (pb.getParticipantsCount() > 1 && pb.getParticipants(1).getEmpireId() != empireID1) {
+      throw new RequestException(400, Messages.GenericError.ErrorCode.InvalidConversation, "Cannot start new conversation.");
+    } else {
+      empireID2 = pb.getParticipants(0).getEmpireId();
     }
 
-    @Override
-    protected void post() throws RequestException {
-        Messages.ChatConversation pb = getRequestBody(Messages.ChatConversation.class);
+    try (Transaction t = DB.beginTransaction()) {
 
-        int empireID1 = getSession().getEmpireID();
-        if (pb.getParticipantsCount() > 2 || pb.getParticipantsCount() < 1) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.InvalidConversation, "Cannot start new conversation.");
-        }
-        int empireID2 = 0;
-        if (pb.getParticipantsCount() > 1 && pb.getParticipants(0).getEmpireId() == empireID1) {
-            empireID2 = pb.getParticipants(1).getEmpireId();
-        } else if (pb.getParticipantsCount() > 1 && pb.getParticipants(1).getEmpireId() != empireID1) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.InvalidConversation, "Cannot start new conversation.");
-        } else {
-            empireID2 = pb.getParticipants(0).getEmpireId();
-        }
+      ChatConversation conversation = new ChatController(t).createConversation(empireID1, empireID2);
 
-        try (Transaction t = DB.beginTransaction()) {
+      Messages.ChatConversation.Builder conversation_pb = Messages.ChatConversation.newBuilder();
+      conversation.toProtocolBuffer(conversation_pb);
+      setResponseBody(conversation_pb.build());
 
-            ChatConversation conversation = new ChatController(t).createConversation(empireID1, empireID2);
-
-            Messages.ChatConversation.Builder conversation_pb = Messages.ChatConversation.newBuilder();
-            conversation.toProtocolBuffer(conversation_pb);
-            setResponseBody(conversation_pb.build());
-
-            t.commit();
-        } catch(Exception e) {
-            throw new RequestException(e);
-        }
+      t.commit();
+    } catch (Exception e) {
+      throw new RequestException(e);
     }
+  }
 
 }

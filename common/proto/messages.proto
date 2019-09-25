@@ -479,11 +479,10 @@ message ChatMessages {
   repeated ChatMessage messages = 1;
 }
 
-//
-// When you report a message for abuse, this is what you post to the server.
-//
-message ChatAbuseReport {
-  optional int32 chat_msg_id = 1;
+message ChatBlockRequest {
+  optional int32 empire_id = 1;
+  optional int32 blocked_empire_id = 2;
+  optional int64 block_time = 3;
 }
 
 //

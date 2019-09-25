@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
@@ -100,24 +101,25 @@ public class ChatManager {
     return recentMessages;
   }
 
-  public void reportMessageForAbuse(final Context context, final ChatMessage msg) {
-    Messages.ChatAbuseReport abuseReportPb = Messages.ChatAbuseReport.newBuilder()
-        .setChatMsgId(msg.getID())
-        .build();
-
-    String url = String.format("chat/%d/abuse-reports", msg.getID());
-    RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST")
-        .body(abuseReportPb)
+  public void blockEmpire(final Context context, final ChatMessage msg, final Runnable completeRunnable) {
+    RequestManager.i.sendRequest(new ApiRequest.Builder("chat/blocks", "POST")
+        .body(Messages.ChatBlockRequest.newBuilder().setBlockedEmpireId(msg.getEmpireID()).build())
         .errorCallback(new ApiRequest.ErrorCallback() {
           @Override
           public void onRequestError(ApiRequest request, Messages.GenericError error) {
             String msg = error.getErrorMessage();
             if (msg == null || msg.isEmpty()) {
-              msg = "An error occurred reporting this empire. Try again later.";
+              msg = "An error occurred blocking this empire. Try again later.";
             }
 
             new StyledDialog.Builder(context).setTitle("Error").setMessage(msg)
                 .setPositiveButton("OK", null).create().show();
+          }
+        })
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            completeRunnable.run();
           }
         }).build());
   }

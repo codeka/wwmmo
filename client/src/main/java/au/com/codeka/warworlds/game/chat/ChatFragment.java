@@ -73,7 +73,7 @@ public class ChatFragment extends Fragment {
       Bundle savedInstanceState) {
     View v = inflater.inflate(R.layout.chat_page, container, false);
 
-    FrameLayout header = (FrameLayout) v.findViewById(R.id.header);
+    FrameLayout header = v.findViewById(R.id.header);
     if (conversation.getID() == 0) {
       headerContent = inflater.inflate(R.layout.chat_header_global, header, false);
       setupGlobalChatHeader(headerContent);
@@ -87,10 +87,10 @@ public class ChatFragment extends Fragment {
     header.addView(headerContent);
 
     chatAdapter = new ChatAdapter();
-    chatOutput = (ListView) v.findViewById(R.id.chat_output);
+    chatOutput = v.findViewById(R.id.chat_output);
     chatOutput.setAdapter(chatAdapter);
 
-    unreadCountBtn = (Button) v.findViewById(R.id.unread_btn);
+    unreadCountBtn = v.findViewById(R.id.unread_btn);
     if (unreadCountBtn != null) {
       refreshUnreadCountButton();
       unreadCountBtn.setOnClickListener(new View.OnClickListener() {
@@ -339,12 +339,12 @@ public class ChatFragment extends Fragment {
           }
         });
       } else if (entry.date != null) {
-        TextView message = (TextView) view.findViewById(R.id.message);
+        TextView message = view.findViewById(R.id.message);
         message.setTextColor(Color.LTGRAY);
         message.setGravity(Gravity.END);
         message.setText(entry.date.toString("EE, dd MMM yyyy"));
       } else if (action != ChatMessage.MessageAction.Normal) {
-        TextView message = (TextView) view.findViewById(R.id.message);
+        TextView message = view.findViewById(R.id.message);
         message.setTextColor(Color.LTGRAY);
         message.setGravity(Gravity.START);
         Empire empire = null;
@@ -371,10 +371,10 @@ public class ChatFragment extends Fragment {
           }
         }
       } else if (entry.message.getEmpireKey() == null) {
-        ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
-        TextView empireName = (TextView) view.findViewById(R.id.empire_name);
-        TextView msgTime = (TextView) view.findViewById(R.id.msg_time);
-        TextView message = (TextView) view.findViewById(R.id.message);
+        ImageView empireIcon = view.findViewById(R.id.empire_icon);
+        TextView empireName = view.findViewById(R.id.empire_name);
+        TextView msgTime = view.findViewById(R.id.msg_time);
+        TextView message = view.findViewById(R.id.message);
 
         empireName.setText("");
         empireIcon.setImageBitmap(null);
@@ -388,10 +388,10 @@ public class ChatFragment extends Fragment {
           message.setMovementMethod(LinkMovementMethod.getInstance());
         }
       } else {
-        ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
-        TextView empireName = (TextView) view.findViewById(R.id.empire_name);
-        TextView msgTime = (TextView) view.findViewById(R.id.msg_time);
-        TextView message = (TextView) view.findViewById(R.id.message);
+        ImageView empireIcon = view.findViewById(R.id.empire_icon);
+        TextView empireName = view.findViewById(R.id.empire_name);
+        TextView msgTime = view.findViewById(R.id.msg_time);
+        TextView message = view.findViewById(R.id.message);
 
         Empire empire = EmpireManager.i.getEmpire(entry.message.getEmpireID());
         if (empire != null) {
@@ -433,7 +433,7 @@ public class ChatFragment extends Fragment {
   }
 
   private void setupGlobalChatHeader(View v) {
-    ImageButton settingsBtn = (ImageButton) v.findViewById(R.id.settings_btn);
+    ImageButton settingsBtn = v.findViewById(R.id.settings_btn);
     settingsBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -442,7 +442,7 @@ public class ChatFragment extends Fragment {
       }
     });
 
-    Button newGroupBtn = (Button) v.findViewById(R.id.new_group_btn);
+    Button newGroupBtn = v.findViewById(R.id.new_group_btn);
     newGroupBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -457,10 +457,10 @@ public class ChatFragment extends Fragment {
       return; // should never happen...
     }
 
-    TextView title = (TextView) v.findViewById(R.id.title);
+    TextView title = v.findViewById(R.id.title);
     title.setText(alliance.getName());
 
-    ImageView allianceIcon = (ImageView) v.findViewById(R.id.alliance_icon);
+    ImageView allianceIcon = v.findViewById(R.id.alliance_icon);
     allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(getActivity(), alliance));
   }
 
@@ -474,11 +474,11 @@ public class ChatFragment extends Fragment {
     }
 
     final LinearLayout empireIconContainer =
-        (LinearLayout) v.findViewById(R.id.empire_icon_container);
-    final TextView empireName = (TextView) v.findViewById(R.id.title);
+        v.findViewById(R.id.empire_icon_container);
+    final TextView empireName = v.findViewById(R.id.title);
     final double pixelScale = getActivity().getResources().getDisplayMetrics().density;
 
-    ImageButton settingsBtn = (ImageButton) v.findViewById(R.id.settings_btn);
+    ImageButton settingsBtn = v.findViewById(R.id.settings_btn);
     settingsBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -539,7 +539,7 @@ public class ChatFragment extends Fragment {
 
     if (numUnread > 0) {
       unreadCountBtn.setVisibility(View.VISIBLE);
-      unreadCountBtn.setText(String.format("  %d  ", numUnread));
+      unreadCountBtn.setText(String.format(Locale.ENGLISH, "  %d  ", numUnread));
     } else {
       unreadCountBtn.setVisibility(View.GONE);
     }
