@@ -92,7 +92,7 @@ public class RequestManager {
       apiRequest.handleResponse(resp);
       return resp;
     } catch (IOException e) {
-      log.error("Error in sendRequestSync.", e);
+      apiRequest.handleError(null, e);
       return null;
     }
   }

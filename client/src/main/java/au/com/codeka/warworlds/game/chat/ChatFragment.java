@@ -10,6 +10,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -439,6 +440,14 @@ public class ChatFragment extends Fragment {
       public void onClick(View v) {
         ChatGlobalSettingsDialog dialog = new ChatGlobalSettingsDialog();
         dialog.show(getActivity().getSupportFragmentManager(), "");
+      }
+    });
+
+    Button blockedBtn = v.findViewById(R.id.blocked_btn);
+    blockedBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        startActivity(new Intent(getActivity(), BlockedEmpiresActivity.class));
       }
     });
 

@@ -51,11 +51,12 @@ public class ApiRequest {
   @Nullable private Messages.GenericError error;
   @Nullable private Throwable exception;
   private boolean skipCache;
+  private boolean dontLogExceptions;
 
   private ApiRequest(String url, String method, @Nullable Message requestBody,
       boolean skipCache, @Nullable CompleteCallback completeCallback,
-      @Nullable ErrorCallback errorCallback,
-      boolean completeOnAnyThread) {
+      @Nullable ErrorCallback errorCallback, boolean completeOnAnyThread,
+      boolean dontLogExceptions) {
     this.timing = new Timing();
     this.url = url;
     this.method = method;
@@ -64,6 +65,7 @@ public class ApiRequest {
     this.completeCallback = completeCallback;
     this.errorCallback = errorCallback;
     this.completeOnAnyThread = completeOnAnyThread;
+    this.dontLogExceptions = dontLogExceptions;
   }
 
   /** Builds the OkHttp request for this request. */
@@ -135,6 +137,10 @@ public class ApiRequest {
     return exception;
   }
 
+  public boolean dontLogExceptions() {
+    return dontLogExceptions;
+  }
+
   /**
    * Returns the body of the response, as a {@link Bitmap}. If the Content-Type isn't image/*, then
    * null is returned instead.
@@ -180,7 +186,7 @@ public class ApiRequest {
     }
   }
 
-  void handleError(Response response, Throwable e) {
+  void handleError(@Nullable Response response, Throwable e) {
     if (response != null && response.body() != null) {
       try {
         responseBytes = response.body().bytes();
@@ -255,6 +261,7 @@ public class ApiRequest {
     @Nullable private CompleteCallback completeCallback;
     @Nullable private ErrorCallback errorCallback;
     private boolean completeOnAnyThread;
+    private boolean dontLogExceptions;
 
     public Builder(String url, String method) {
       this.url = url;
@@ -273,6 +280,14 @@ public class ApiRequest {
 
     public Builder skipCache(boolean skipCache) {
       this.skipCache = skipCache;
+      return this;
+    }
+
+    /**
+     * Sets whether or not to log exceptions. Default is to log them.
+     */
+    public Builder dontLogExceptions(boolean dontLog) {
+      this.dontLogExceptions = dontLog;
       return this;
     }
 
@@ -306,7 +321,7 @@ public class ApiRequest {
 
     public ApiRequest build() {
       return new ApiRequest(url, method, requestBody, skipCache, completeCallback, errorCallback,
-          completeOnAnyThread);
+          completeOnAnyThread, dontLogExceptions);
     }
   }
 

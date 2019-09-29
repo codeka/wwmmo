@@ -607,6 +607,9 @@ public class Notifications {
         try {
           ApiRequest apiRequest = new ApiRequest.Builder("notifications", "GET").build();
           RequestManager.i.sendRequestSync(apiRequest);
+          if (apiRequest.exception() != null) {
+            continue;
+          }
           Messages.Notifications notificationsPb = apiRequest.body(Messages.Notifications.class);
           if (notificationsPb == null) {
             continue;

@@ -107,6 +107,7 @@
       android:windowSoftInputMode="stateUnchanged" />
     <activity android:name=".game.alliance.AllianceDetailsActivity" />
     <activity android:name=".game.chat.ChatActivity" />
+    <activity android:name=".game.chat.BlockedEmpiresActivity" />
     <activity android:name=".game.wormhole.DestinationActivity" />
     <activity android:name=".game.SitrepActivity">
       <meta-data

@@ -38,22 +38,22 @@ import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 public class ChatActivity extends BaseActivity {
-  private ChatPagerAdapter mChatPagerAdapter;
-  private ViewPager mViewPager;
-  private List<ChatConversation> mConversations;
-  private Handler mHandler;
-  private boolean mFirstRefresh;
+  private ChatPagerAdapter chatPagerAdapter;
+  private ViewPager viewPager;
+  private List<ChatConversation> conversations;
+  private Handler handler;
+  private boolean firstRefresh;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.chat);
 
-    mChatPagerAdapter = new ChatPagerAdapter(getSupportFragmentManager());
-    mViewPager = findViewById(R.id.pager);
-    mViewPager.setAdapter(mChatPagerAdapter);
-    mHandler = new Handler();
-    mFirstRefresh = true;
+    chatPagerAdapter = new ChatPagerAdapter(getSupportFragmentManager());
+    viewPager = findViewById(R.id.pager);
+    viewPager.setAdapter(chatPagerAdapter);
+    handler = new Handler();
+    firstRefresh = true;
 
     final EditText chatMsg = findViewById(R.id.chat_text);
     chatMsg.setOnEditorActionListener(new OnEditorActionListener() {
@@ -85,25 +85,25 @@ public class ChatActivity extends BaseActivity {
       public void onHelloComplete(boolean success, ServerGreeting greeting) {
         refreshConversations();
 
-        if (mFirstRefresh) {
-          mFirstRefresh = false;
+        if (firstRefresh) {
+          firstRefresh = false;
 
           Bundle extras = getIntent().getExtras();
           if (extras != null) {
             final int conversationID = extras.getInt("au.com.codeka.warworlds.ConversationID");
             if (conversationID != 0) {
               int position = 0;
-              for (; position < mConversations.size(); position++) {
-                if (mConversations.get(position).getID() == conversationID) {
+              for (; position < conversations.size(); position++) {
+                if (conversations.get(position).getID() == conversationID) {
                   break;
                 }
               }
-              if (position < mConversations.size()) {
+              if (position < conversations.size()) {
                 final int finalPosition = position;
-                mHandler.post(new Runnable() {
+                handler.post(new Runnable() {
                   @Override
                   public void run() {
-                    mViewPager.setCurrentItem(finalPosition);
+                    viewPager.setCurrentItem(finalPosition);
                   }
                 });
               }
@@ -111,7 +111,7 @@ public class ChatActivity extends BaseActivity {
 
             final String empireKey = extras.getString("au.com.codeka.warworlds.NewConversationEmpireKey");
             if (empireKey != null) {
-              mHandler.post(new Runnable() {
+              handler.post(new Runnable() {
                 @Override
                 public void run() {
                   ChatManager.i.startConversation(empireKey);
@@ -127,25 +127,25 @@ public class ChatActivity extends BaseActivity {
   @Override
   public void onStart() {
     super.onStart();
-    ChatManager.eventBus.register(mEventHandler);
+    ChatManager.eventBus.register(eventHandler);
   }
 
   @Override
   public void onStop() {
     super.onStop();
-    ChatManager.eventBus.unregister(mEventHandler);
+    ChatManager.eventBus.unregister(eventHandler);
   }
 
   public void moveToFirstUnreadConversation() {
-    for (int i = 0; i < mConversations.size(); i++) {
-      if (mConversations.get(i).getUnreadCount() > 0) {
-        mViewPager.setCurrentItem(i);
+    for (int i = 0; i < conversations.size(); i++) {
+      if (conversations.get(i).getUnreadCount() > 0) {
+        viewPager.setCurrentItem(i);
         break;
       }
     }
   }
 
-  private Object mEventHandler = new Object() {
+  private Object eventHandler = new Object() {
     @EventHandler
     public void onConversationsRefreshed(ChatManager.ConversationsUpdatedEvent event) {
       refreshConversations();
@@ -155,17 +155,17 @@ public class ChatActivity extends BaseActivity {
     public void onConversationsRefreshed(ChatManager.ConversationStartedEvent event) {
       refreshConversations();
 
-      int index = mConversations.indexOf(event.conversation);
+      int index = conversations.indexOf(event.conversation);
       if (index >= 0) {
-        mViewPager.setCurrentItem(index);
+        viewPager.setCurrentItem(index);
       }
     }
   };
 
   private void refreshConversations() {
-    mConversations = ChatManager.i.getConversations();
+    conversations = ChatManager.i.getConversations();
     // remove the recent conversation, we don't display it here
-    Iterator<ChatConversation> it = mConversations.iterator();
+    Iterator<ChatConversation> it = conversations.iterator();
     while (it.hasNext()) {
       ChatConversation conversation = it.next();
       if (conversation.getID() < 0 &&
@@ -173,27 +173,26 @@ public class ChatActivity extends BaseActivity {
         it.remove();
       }
     }
-    if (EmpireManager.i.getEmpire().getAlliance() != null && mConversations.size() > 1) {
+    if (EmpireManager.i.getEmpire().getAlliance() != null && conversations.size() > 1) {
       // swap alliance and global around...
-      ChatConversation globalConversation = mConversations.get(1);
-      mConversations.set(1, mConversations.get(0));
-      mConversations.set(0, globalConversation);
+      ChatConversation globalConversation = conversations.get(1);
+      conversations.set(1, conversations.get(0));
+      conversations.set(0, globalConversation);
     }
 
-    mChatPagerAdapter.refresh(mConversations);
-
+    chatPagerAdapter.refresh(conversations);
   }
 
   public class ChatPagerAdapter extends FragmentStatePagerAdapter {
-    List<ChatConversation> mConversations;
+    List<ChatConversation> conversations;
 
     ChatPagerAdapter(FragmentManager fm) {
-      super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-      mConversations = new ArrayList<>();
+      super(fm, BEHAVIOR_SET_USER_VISIBLE_HINT);
+      conversations = new ArrayList<>();
     }
 
     public void refresh(List<ChatConversation> conversations) {
-      mConversations = conversations;
+      this.conversations = conversations;
       notifyDataSetChanged();
     }
 
@@ -202,7 +201,7 @@ public class ChatActivity extends BaseActivity {
     public Fragment getItem(int i) {
       Fragment fragment = new ChatFragment();
       Bundle args = new Bundle();
-      args.putInt("au.com.codeka.warworlds.ConversationID", mConversations.get(i).getID());
+      args.putInt("au.com.codeka.warworlds.ConversationID", conversations.get(i).getID());
       fragment.setArguments(args);
       return fragment;
     }
@@ -214,12 +213,12 @@ public class ChatActivity extends BaseActivity {
 
     @Override
     public int getCount() {
-      return mConversations.size();
+      return conversations.size();
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-      ChatConversation conversation = mConversations.get(position);
+      ChatConversation conversation = conversations.get(position);
       return String.format(Locale.ENGLISH, "Chat #%d", conversation.getID());
     }
 
@@ -227,7 +226,7 @@ public class ChatActivity extends BaseActivity {
     public void setPrimaryItem(@Nonnull ViewGroup container, int position, @Nonnull Object object) {
       super.setPrimaryItem(container, position, object);
 
-      ChatConversation conversation = mConversations.get(position);
+      ChatConversation conversation = conversations.get(position);
       conversation.markAllRead();
     }
   }
@@ -244,7 +243,7 @@ public class ChatActivity extends BaseActivity {
     msg.setMessage(message);
     msg.setEmpireID(EmpireManager.i.getEmpire().getID());
 
-    ChatConversation conversation = mConversations.get(mViewPager.getCurrentItem());
+    ChatConversation conversation = conversations.get(viewPager.getCurrentItem());
     msg.setConversation(conversation);
 
     // if this is our first chat after the update ...
