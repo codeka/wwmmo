@@ -174,15 +174,23 @@ public class ApiRequest {
     // Call the callback, if there is one, on the main thread
     if (completeCallback != null) {
       if (completeOnAnyThread) {
-        completeCallback.onRequestComplete(this);
+        runCompleteCallback();
       } else {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
           public void run() {
-            completeCallback.onRequestComplete(ApiRequest.this);
+            runCompleteCallback();
           }
         });
       }
+    }
+  }
+
+  private void runCompleteCallback() {
+    try {
+      completeCallback.onRequestComplete(this);
+    } catch (Exception e) {
+      log.error("Error in complete callback.", e);
     }
   }
 

@@ -17,6 +17,8 @@ import org.joda.time.DateTime;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Configuration;
@@ -48,6 +50,7 @@ public class EmpireController {
     db = new DataBase(trans);
   }
 
+  @Nullable
   public Empire getEmpire(int id) throws RequestException {
     try {
       Collection<Empire> empires = db.getEmpires(new int[] { id });

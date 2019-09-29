@@ -10,13 +10,39 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.ctrl.ChatController;
+import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.model.ChatBlock;
+import au.com.codeka.warworlds.server.model.Empire;
 
 /**
  * Handles requests for /chat/blocks, blocking empires from chat.
  */
 public class ChatBlocksHandler extends RequestHandler {
   private static final Log log = new Log("ChatBlocksHandler");
+
+  @Override
+  public void get() throws RequestException {
+    List<ChatBlock> blocks = new ChatController().getBlocksForEmpire(getSession().getEmpireID());
+
+    EmpireController empireController = new EmpireController();
+
+    Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
+
+    Messages.ChatBlocks.Builder chat_blocks_pb = Messages.ChatBlocks.newBuilder();
+    for (ChatBlock block : blocks) {
+      Empire empire = empireController.getEmpire(block.getBlockedEmpireID());
+      if (empire == null) {
+        continue;
+      }
+      empire.toProtocolBuffer(empire_pb, false);
+
+      chat_blocks_pb.addBlockedEmpire(Messages.ChatBlockedEmpire.newBuilder()
+          .setEmpire(empire_pb)
+          .setBlockTime(block.getBlockTime().getMillis() / 1000));
+    }
+
+    setResponseBody(chat_blocks_pb.build());
+  }
 
   @Override
   public void post() throws RequestException {

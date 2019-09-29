@@ -485,6 +485,15 @@ message ChatBlockRequest {
   optional int64 block_time = 3;
 }
 
+message ChatBlockedEmpire {
+  optional Empire empire = 1;
+  optional int64 block_time = 2;
+}
+
+message ChatBlocks {
+  repeated ChatBlockedEmpire blocked_empire = 1;
+}
+
 //
 // A conversation is a private chat between two or more participants.
 //
