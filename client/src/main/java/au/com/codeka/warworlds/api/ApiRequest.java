@@ -158,7 +158,7 @@ public class ApiRequest {
           if (responseContentType.type().equals("text")) {
             responseString = body.string();
           } else if (responseContentType.type().equals("image")) {
-            responseBitmap = BitmapFactory.decodeStream(response.body().byteStream());
+            responseBitmap = BitmapFactory.decodeStream(body.byteStream());
           } else {
             responseBytes = body.bytes();
           }
@@ -187,6 +187,9 @@ public class ApiRequest {
   }
 
   private void runCompleteCallback() {
+    if (completeCallback == null) {
+      return;
+    }
     try {
       completeCallback.onRequestComplete(this);
     } catch (Exception e) {
@@ -199,7 +202,7 @@ public class ApiRequest {
       try {
         responseBytes = response.body().bytes();
         error = body(Messages.GenericError.class);
-      } catch (IOException ex) {
+      } catch (Exception ex) {
         if (e == null) {
           error = convertToGenericError(ex);
         }

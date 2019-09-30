@@ -157,8 +157,10 @@ public class Notifications {
   private static void handleCashNotification(String value) {
     float newCash = Float.parseFloat(value);
     MyEmpire empire = EmpireManager.i.getEmpire();
-    empire.updateCash(newCash);
-    EmpireManager.eventBus.publish(empire);
+    if (empire != null) {
+      empire.updateCash(newCash);
+      EmpireManager.eventBus.publish(empire);
+    }
   }
 
   private static void displayNotification(final Context context,
