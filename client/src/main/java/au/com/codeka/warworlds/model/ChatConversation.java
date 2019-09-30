@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.RealmContext;
 public class ChatConversation extends BaseChatConversation {
   private final LinkedList<ChatMessage> messages = new LinkedList<>();
   private DateTime mostRecentMsg;
+  private DateTime lastReadDate;
   private boolean needUpdate;
 
   public ChatConversation(int id) {
@@ -131,7 +132,11 @@ public class ChatConversation extends BaseChatConversation {
       return 0;
     }
 
-    DateTime lastReadCount = new ChatStore().getLastReadDate(mID);
+    if (lastReadDate == null) {
+      lastReadDate = new ChatStore().getLastReadDate(mID);
+    }
+
+    DateTime lastReadCount = lastReadDate;
     if (lastReadCount == null) {
       return messages.size();
     }
@@ -146,6 +151,7 @@ public class ChatConversation extends BaseChatConversation {
   }
 
   public void markAllRead() {
+    lastReadDate = mostRecentMsg;
     new ChatStore().setLastReadDate(mID, mostRecentMsg);
     ChatManager.eventBus.publish(new ChatManager.UnreadMessageCountUpdatedEvent(0));
   }

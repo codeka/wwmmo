@@ -69,11 +69,11 @@ public class ChatManager {
           public void onRequestComplete(ApiRequest request) {
             ChatMessage respMsg = new ChatMessage();
             respMsg.fromProtocolBuffer(request.body(Messages.ChatMessage.class));
-            ChatConversation conv = getConversation(msg);
+            ChatConversation conv = getConversation(respMsg);
             if (conv != null) {
-              conv.addMessage(msg);
-              if (recentMessages.addMessage(msg)) {
-                eventBus.publish(new MessageAddedEvent(conv, msg));
+              if (recentMessages.addMessage(respMsg)) {
+                conv.addMessage(respMsg);
+                eventBus.publish(new MessageAddedEvent(conv, respMsg));
               }
             }
           }
