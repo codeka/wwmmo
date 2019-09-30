@@ -28,7 +28,6 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
-import au.com.codeka.warworlds.ctrl.BannerAdView;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -252,10 +251,6 @@ public class ServerGreeter {
             if (resp.hasEmpireResetReason() && resp.getEmpireResetReason().length() > 0) {
               resetReason = resp.getEmpireResetReason();
             }
-          }
-
-          if (resp.hasForceRemoveAds() && resp.getForceRemoveAds()) {
-            BannerAdView.removeAds();
           }
 
           if (resp.hasRequireGcmRegister() && resp.getRequireGcmRegister()) {

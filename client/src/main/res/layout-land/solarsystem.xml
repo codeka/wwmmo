@@ -1,61 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <au.com.codeka.warworlds.ctrl.BannerAdView
-        android:id="@+id/ad"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_toLeftOf="@+id/bottom_pane"
-        android:layout_alignParentTop="true" />
 
     <au.com.codeka.warworlds.game.solarsystem.SolarSystemSurfaceView
         android:id="@+id/solarsystem_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/ad"
         android:layout_above="@+id/infobar"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="-4px"
+        android:layout_marginEnd="-4px"
         android:layout_toLeftOf="@+id/bottom_pane"
-        android:layout_marginRight="-4px" />
+        android:layout_toStartOf="@+id/bottom_pane" />
 
-    <ProgressBar android:id="@+id/progress_bar"
-                 android:layout_width="50dp"
-                 android:layout_height="50dp"
-                 android:layout_alignTop="@+id/solarsystem_view"
-                 android:layout_toLeftOf="@+id/bottom_pane"
-                 android:layout_marginTop="50dp"
-                 android:layout_marginRight="100dp" />
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/solarsystem_view"
+        android:layout_marginTop="50dp"
+        android:layout_marginRight="100dp"
+        android:layout_marginEnd="100dp"
+        android:layout_toLeftOf="@+id/bottom_pane"
+        android:layout_toStartOf="@+id/bottom_pane" />
 
     <au.com.codeka.warworlds.ctrl.MiniChatView
         android:id="@+id/mini_chat"
-        android:layout_height="50dp"
         android:layout_width="fill_parent"
+        android:layout_height="50dp"
         android:layout_above="@+id/infobar"
+        android:layout_marginRight="-4px"
+        android:layout_marginEnd="-4px"
         android:layout_toLeftOf="@+id/bottom_pane"
-        android:layout_marginRight="-4px" />
+        android:layout_toStartOf="@+id/bottom_pane" />
 
     <au.com.codeka.warworlds.ctrl.InfobarView
         android:id="@+id/infobar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/bottom_pane" />
+        android:layout_toLeftOf="@+id/bottom_pane"
+        android:layout_toStartOf="@+id/bottom_pane" />
 
     <RelativeLayout
         android:id="@+id/bottom_pane"
         style="@style/RightPane"
         android:layout_width="200dp"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true" >
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true">
 
         <TextView
             android:id="@+id/planet_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="" />
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
             android:id="@+id/population_count"
@@ -63,64 +66,84 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/planet_name"
             android:layout_marginLeft="6dp"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="" />
+            android:layout_marginStart="6dp"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <Button android:id="@+id/empty_view_btn"
-                android:layout_width="92dp"
-                android:layout_height="30dp"
-                android:layout_below="@id/population_count"
-                android:layout_marginLeft="4dp"
-                android:layout_marginTop="4dp"
-                android:text="View"
-                android:visibility="gone" />
+        <Button
+            android:id="@+id/empty_view_btn"
+            android:layout_width="92dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/population_count"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:text="View"
+            android:visibility="gone" />
 
-        <Button android:id="@+id/enemy_empire_view"
-                android:layout_width="92dp"
-                android:layout_height="30dp"
-                android:layout_below="@id/population_count"
-                android:layout_marginLeft="4dp"
-                android:layout_marginTop="4dp"
-                android:text="View" />
+        <Button
+            android:id="@+id/enemy_empire_view"
+            android:layout_width="92dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/population_count"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:text="View" />
 
-        <Button android:id="@+id/sitrep_btn"
-                android:layout_width="92dp"
-                android:layout_height="30dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/population_count"
-                android:layout_marginRight="4dp"
-                android:layout_marginTop="4dp"
-                android:text="Sit. Rep." />
+        <Button
+            android:id="@+id/sitrep_btn"
+            android:layout_width="92dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/population_count"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginEnd="4dp"
+            android:text="Sit. Rep." />
 
-        <RelativeLayout android:id="@+id/enemy_colony_details"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/sitrep_btn"
-                        android:layout_marginTop="8dp"
-                        android:visibility="gone">
-            <ImageView android:id="@+id/enemy_empire_icon"
-                       android:layout_width="40dp"
-                       android:layout_height="40dp"
-                       android:layout_marginTop="6dp"
-                       android:layout_marginLeft="6dp" />
-            <TextView android:id="@+id/enemy_empire_name"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_toRightOf="@id/enemy_empire_icon"
-                      android:layout_marginTop="6dp"
-                      android:layout_marginLeft="6dp"
-                      android:textAppearance="?android:attr/textAppearanceSmall"
-                      android:singleLine="true"
-                      android:ellipsize="end"
-                      android:text="Empire Name" />
-            <TextView android:id="@+id/enemy_empire_defence"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_toRightOf="@id/enemy_empire_icon"
-                      android:layout_below="@id/enemy_empire_name"
-                      android:layout_marginLeft="6dp"
-                      android:textAppearance="?android:attr/textAppearanceSmall"
-                      android:text="Defence: 1234" />
+        <RelativeLayout
+            android:id="@+id/enemy_colony_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/sitrep_btn"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/enemy_empire_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="6dp" />
+
+            <TextView
+                android:id="@+id/enemy_empire_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_toRightOf="@id/enemy_empire_icon"
+                android:layout_toEndOf="@id/enemy_empire_icon"
+                android:ellipsize="end"
+                android:singleLine="true"
+                tools:text="Empire Name"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/enemy_empire_defence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/enemy_empire_name"
+                android:layout_marginLeft="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_toRightOf="@id/enemy_empire_icon"
+                android:layout_toEndOf="@id/enemy_empire_icon"
+                tools:text="Defence: 1234"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -132,10 +155,10 @@
             android:visibility="visible">
 
             <au.com.codeka.warworlds.ctrl.ColonyFocusView
-                    android:id="@+id/colony_focus_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true" />
+                android:id="@+id/colony_focus_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true" />
 
             <Button
                 android:id="@+id/solarsystem_colony_build"
@@ -143,7 +166,9 @@
                 android:layout_height="30dp"
                 android:layout_below="@id/colony_focus_view"
                 android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="4dp"
                 android:text="@string/build" />
 
@@ -153,20 +178,24 @@
                 android:layout_height="30dp"
                 android:layout_below="@id/colony_focus_view"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="4dp"
+                android:layout_alignParentEnd="true"
                 android:layout_marginTop="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginEnd="4dp"
                 android:text="@string/focus" />
         </RelativeLayout>
 
-        <ScrollView android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                      android:layout_below="@+id/solarsystem_colony_details">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/solarsystem_colony_details">
+
             <au.com.codeka.warworlds.ctrl.FleetListSimple
-                      android:id="@+id/fleet_list"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:layout_marginTop="4dp"
-                      android:orientation="vertical" />
+                android:id="@+id/fleet_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="vertical" />
         </ScrollView>
     </RelativeLayout>
 
@@ -180,7 +209,7 @@
         android:id="@+id/congeniality_container"
         android:layout_width="85dp"
         android:layout_height="34dp"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:visibility="gone">
 
         <ImageView
@@ -188,6 +217,7 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:src="@drawable/population_white" />
 
@@ -212,8 +242,11 @@
             android:layout_height="10dp"
             android:layout_alignParentTop="true"
             android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
             android:layout_marginRight="25dp"
-            android:layout_toRightOf="@+id/solarsystem_population_icon" />
+            android:layout_marginEnd="25dp"
+            android:layout_toRightOf="@+id/solarsystem_population_icon"
+            android:layout_toEndOf="@+id/solarsystem_population_icon" />
 
         <ProgressBar
             android:id="@+id/solarsystem_farming_congeniality"
@@ -222,8 +255,11 @@
             android:layout_height="10dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
             android:layout_marginRight="25dp"
-            android:layout_toRightOf="@+id/solarsystem_population_icon" />
+            android:layout_marginEnd="25dp"
+            android:layout_toRightOf="@+id/solarsystem_population_icon"
+            android:layout_toEndOf="@+id/solarsystem_population_icon" />
 
         <ProgressBar
             android:id="@+id/solarsystem_mining_congeniality"
@@ -232,16 +268,20 @@
             android:layout_height="10dp"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
             android:layout_marginRight="25dp"
+            android:layout_marginEnd="25dp"
             android:layout_toRightOf="@id/solarsystem_population_icon"
+            android:layout_toEndOf="@id/solarsystem_population_icon"
             android:paddingBottom="2dp" />
 
         <TextView
             android:id="@+id/solarsystem_population_congeniality_value"
             android:layout_width="25dp"
             android:layout_height="12dp"
-            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:gravity="center"
             android:text="999"
             android:textSize="10sp" />
@@ -251,6 +291,7 @@
             android:layout_width="25dp"
             android:layout_height="12dp"
             android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:gravity="center"
             android:text="999"
@@ -260,8 +301,9 @@
             android:id="@+id/solarsystem_mining_congeniality_value"
             android:layout_width="25dp"
             android:layout_height="12dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
             android:gravity="center"
             android:text="999"
             android:textSize="10sp" />
@@ -271,8 +313,9 @@
         android:id="@+id/stored_goods"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
+        android:layout_alignParentTop="true"
         android:layout_toLeftOf="@id/bottom_pane"
-        android:layout_below="@id/ad"
+        android:layout_toStartOf="@id/bottom_pane"
         android:background="#000"
         android:gravity="center|right"
         android:paddingLeft="10dp"
@@ -283,8 +326,9 @@
         android:id="@+id/delta_goods"
         android:layout_width="wrap_content"
         android:layout_height="12dp"
-        android:layout_alignRight="@+id/stored_goods"
         android:layout_below="@+id/stored_goods"
+        android:layout_alignRight="@+id/stored_goods"
+        android:layout_alignEnd="@+id/stored_goods"
         android:background="#000"
         android:gravity="center|right"
         android:textColor="#f00"
@@ -294,17 +338,18 @@
         android:id="@+id/stored_goods_icon"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:background="#000"
+        android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/stored_goods"
-        android:layout_below="@id/ad"
+        android:layout_toStartOf="@+id/stored_goods"
+        android:background="#000"
         android:src="@drawable/farming_white" />
 
     <TextView
         android:id="@+id/stored_minerals"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
+        android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/stored_goods_icon"
-        android:layout_below="@id/ad"
         android:background="#000"
         android:gravity="center|right"
         android:paddingLeft="10dp"
@@ -315,8 +360,8 @@
         android:id="@+id/delta_minerals"
         android:layout_width="wrap_content"
         android:layout_height="12dp"
-        android:layout_alignRight="@+id/stored_minerals"
         android:layout_below="@+id/stored_minerals"
+        android:layout_alignRight="@+id/stored_minerals"
         android:background="#000"
         android:gravity="center|right"
         android:textColor="#0f0"
@@ -326,8 +371,8 @@
         android:id="@+id/stored_minerals_icon"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/stored_minerals"
-        android:layout_below="@id/ad"
         android:src="@drawable/mining_white" />
 
 </RelativeLayout>

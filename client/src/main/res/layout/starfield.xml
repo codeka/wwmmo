@@ -8,12 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <au.com.codeka.warworlds.ctrl.BannerAdView
-        android:id="@+id/ad"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true" />
-
     <au.com.codeka.warworlds.ctrl.SelectionView
         android:id="@+id/selection"
         android:layout_width="40dp"

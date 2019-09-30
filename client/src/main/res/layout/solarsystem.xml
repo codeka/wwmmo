@@ -3,17 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <au.com.codeka.warworlds.ctrl.BannerAdView
-        android:id="@+id/ad"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true" />
-
     <au.com.codeka.warworlds.game.solarsystem.SolarSystemSurfaceView
         android:id="@+id/solarsystem_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:layout_above="@+id/bottom_pane"
         android:layout_marginBottom="-4px" />
 
@@ -222,7 +216,7 @@
         android:id="@+id/congeniality_container"
         android:layout_width="85dp"
         android:layout_height="34dp"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:visibility="gone">
 
         <ImageView
@@ -314,7 +308,7 @@
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:background="#000"
         android:gravity="center|right"
         android:paddingLeft="10dp"
@@ -338,7 +332,7 @@
         android:layout_height="20dp"
         android:background="#000"
         android:layout_toLeftOf="@+id/stored_goods"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:src="@drawable/farming_white" />
 
     <TextView
@@ -346,7 +340,7 @@
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_toLeftOf="@+id/stored_goods_icon"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:background="#000"
         android:gravity="center|right"
         android:paddingLeft="10dp"
@@ -369,7 +363,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_toLeftOf="@+id/stored_minerals"
-        android:layout_below="@id/ad"
+        android:layout_alignParentTop="true"
         android:src="@drawable/mining_white" />
 
 </RelativeLayout>
