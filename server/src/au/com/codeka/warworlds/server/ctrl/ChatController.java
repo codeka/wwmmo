@@ -112,6 +112,14 @@ public class ChatController {
     }
   }
 
+  public void removeBlock(ChatBlock block) throws RequestException {
+    try {
+      db.removeBlock(block);
+    } catch (Exception e) {
+      throw new RequestException(e, block);
+    }
+  }
+
   public void postMessage(ChatMessage msg) throws RequestException {
     if (msg.getMessage().length() > 8) {
       double emojiFraction =
@@ -423,6 +431,15 @@ public class ChatController {
         stmt.setInt(1, block.getEmpireID());
         stmt.setInt(2, block.getBlockedEmpireID());
         stmt.setDateTime(3, block.getBlockTime());
+        stmt.update();
+      }
+    }
+
+    void removeBlock(ChatBlock block) throws Exception {
+      String sql = "DELETE FROM chat_blocked WHERE empire_id = ? AND blocked_empire_id = ?";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, block.getEmpireID());
+        stmt.setInt(2, block.getBlockedEmpireID());
         stmt.update();
       }
     }

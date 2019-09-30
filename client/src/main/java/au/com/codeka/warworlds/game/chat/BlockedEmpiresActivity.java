@@ -1,11 +1,13 @@
 package au.com.codeka.warworlds.game.chat;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -20,12 +22,14 @@ import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
+import au.com.codeka.warworlds.model.ChatManager;
+import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.Empire;
-import au.com.codeka.warworlds.model.EmpireRank;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 
 public class BlockedEmpiresActivity extends BaseActivity {
@@ -48,12 +52,46 @@ public class BlockedEmpiresActivity extends BaseActivity {
 
     adapter = new EmpireAdapter();
     empiresList.setAdapter(adapter);
+
+    empiresList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        final Empire empire = adapter.getEmpire(position);
+
+        new StyledDialog.Builder(BlockedEmpiresActivity.this)
+            .setTitle("Unblock empire")
+            .setMessage("Do you want to unblock " + empire.getDisplayName() + "? You will"
+                + " see all messages they have posted in the past as well. You can always block"
+                + " then again later if you want.")
+            .setPositiveButton("Unblock", new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                doUnblock(empire);
+                dialog.dismiss();
+              }
+            }).setNegativeButton("Cancel", null)
+            .create().show();
+      }
+    });
+  }
+
+  private void doUnblock(final Empire empire) {
+    ChatManager.i.unblockEmpire(this, empire, new Runnable() {
+      @Override
+      public void run() {
+        refresh();
+      }
+    });
   }
 
   @Override
   public void onResume() {
     super.onResume();
 
+    refresh();
+  }
+
+  private void refresh() {
     loading.setVisibility(View.VISIBLE);
     noEmpiresView.setVisibility(View.GONE);
     empiresList.setVisibility(View.GONE);
@@ -102,6 +140,10 @@ public class BlockedEmpiresActivity extends BaseActivity {
       return rows.get(position);
     }
 
+    public Empire getEmpire(int position) {
+      return rows.get(position).empire;
+    }
+
     @Override
     public long getItemId(int position) {
       return rows.get(position).empire.getID();
@@ -145,7 +187,10 @@ public class BlockedEmpiresActivity extends BaseActivity {
       }
 
       TextView blockedSince = view.findViewById(R.id.blocked_since);
-      blockedSince.setText(TimeFormatter.create().format(rows.get(position).blockedTime));
+      blockedSince.setText(
+          String.format(
+              "Blocked: %s",
+              TimeFormatter.create().format(rows.get(position).blockedTime)));
 
       return view;
     }

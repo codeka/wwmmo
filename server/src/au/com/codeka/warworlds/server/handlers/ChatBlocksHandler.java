@@ -71,4 +71,18 @@ public class ChatBlocksHandler extends RequestHandler {
     block.fromProtocolBuffer(chat_block_request);
     new ChatController().addBlock(block);
   }
+
+  @Override
+  public void delete() throws RequestException {
+    Messages.ChatBlockRequest chat_block_request = getRequestBody(Messages.ChatBlockRequest.class);
+
+    Session session = getSession();
+    chat_block_request = chat_block_request.toBuilder()
+        .setEmpireId(session.getEmpireID())
+        .build();
+
+    ChatBlock block = new ChatBlock();
+    block.fromProtocolBuffer(chat_block_request);
+    new ChatController().removeBlock(block);
+  }
 }

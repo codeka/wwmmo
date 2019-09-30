@@ -50,21 +50,8 @@ public class ChatManager {
   public void setup() {
     BackgroundDetector.eventBus.register(eventHandler);
 
-    recentMessages.clear();
-
-    conversations.clear();
-    conversations.append(GLOBAL_CONVERSATION_ID, new ChatConversation(GLOBAL_CONVERSATION_ID));
-    if (EmpireManager.i.getEmpire().getAlliance() != null) {
-      conversations.append(ALLIANCE_CONVERSATION_ID, new ChatConversation
-          (ALLIANCE_CONVERSATION_ID));
-    }
-    refreshConversations();
-
+    clearCache();
     isSetup = true;
-
-    // fetch all chats from the last 24 hours
-    mostRecentMsg = (new DateTime()).minusDays(1);
-    requestMessages(mostRecentMsg);
   }
 
   /** Posts a message from us to the server. */
@@ -122,6 +109,31 @@ public class ChatManager {
         .completeCallback(new ApiRequest.CompleteCallback() {
           @Override
           public void onRequestComplete(ApiRequest request) {
+            clearCache();
+            completeRunnable.run();
+          }
+        }).build());
+  }
+
+  public void unblockEmpire(final Context context, Empire empire, final Runnable completeRunnable) {
+    RequestManager.i.sendRequest(new ApiRequest.Builder("chat/blocks", "DELETE")
+        .body(Messages.ChatBlockRequest.newBuilder().setBlockedEmpireId(empire.getID()).build())
+        .errorCallback(new ApiRequest.ErrorCallback() {
+          @Override
+          public void onRequestError(ApiRequest request, Messages.GenericError error) {
+            String msg = error.getErrorMessage();
+            if (msg == null || msg.isEmpty()) {
+              msg = "An error occurred unblocking this empire. Try again later.";
+            }
+
+            new StyledDialog.Builder(context).setTitle("Error").setMessage(msg)
+                .setPositiveButton("OK", null).create().show();
+          }
+        })
+        .completeCallback(new ApiRequest.CompleteCallback() {
+          @Override
+          public void onRequestComplete(ApiRequest request) {
+            clearCache();
             completeRunnable.run();
           }
         }).build());
@@ -304,6 +316,22 @@ public class ChatManager {
       }
     }
   };
+
+  private void clearCache() {
+    recentMessages.clear();
+
+    conversations.clear();
+    conversations.append(GLOBAL_CONVERSATION_ID, new ChatConversation(GLOBAL_CONVERSATION_ID));
+    if (EmpireManager.i.getEmpire().getAlliance() != null) {
+      conversations.append(ALLIANCE_CONVERSATION_ID, new ChatConversation
+          (ALLIANCE_CONVERSATION_ID));
+    }
+    refreshConversations();
+
+    // fetch all chats from the last 24 hours
+    mostRecentMsg = (new DateTime()).minusDays(1);
+    requestMessages(mostRecentMsg);
+  }
 
   private void refreshConversations() {
     if (isConversationsRefreshing) {
