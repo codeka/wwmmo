@@ -29,6 +29,7 @@ import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
+import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShieldManager;
@@ -172,7 +173,7 @@ public class EnemyPlanetActivity extends BaseActivity {
       if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP,
             fleet.getDesignID());
-        if (design.hasEffect("troopcarrier")) {
+        if (design.hasEffect("troopcarrier") && fleet.getState() == Fleet.State.IDLE) {
           attack += Math.ceil(fleet.getNumShips());
         }
       }
