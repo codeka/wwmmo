@@ -118,6 +118,14 @@ public class ColonyController {
 
       new BattleRankController().recordColonyDestroyed(empireID, colony.getPopulation());
 
+      try {
+        db.destroyColony(colony.getStarID(), colony.getID());
+      } catch (Exception e) {
+        log.error("Error destroying colony.", e);
+        throw new RequestException(e);
+      }
+      new StarController(db.getTransaction()).removeEmpirePresences(colony.getStarID());
+
       // Transfer the cash that results from this to the attacker.
       double cashTransferred = getAttackCashValue(empire, colony);
       log.info(String.format(Locale.US, " - transferring cash: %.2f", cashTransferred));
@@ -143,13 +151,6 @@ public class ColonyController {
           break;
         }
       }
-
-      try {
-        db.destroyColony(colony.getStarID(), colony.getID());
-      } catch (Exception e) {
-        throw new RequestException(e);
-      }
-      new StarController(db.getTransaction()).removeEmpirePresences(colony.getStarID());
 
       // Remove any build requests currently in progress in this colony.
       star.getBuildRequests().removeIf(
