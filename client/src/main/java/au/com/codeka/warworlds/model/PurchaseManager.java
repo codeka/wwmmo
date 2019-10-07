@@ -1,12 +1,17 @@
 package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseEmpire;
@@ -17,6 +22,8 @@ import au.com.codeka.warworlds.model.billing.IabHelper;
 import au.com.codeka.warworlds.model.billing.IabResult;
 import au.com.codeka.warworlds.model.billing.Inventory;
 import au.com.codeka.warworlds.model.billing.Purchase;
+
+import static androidx.core.util.Preconditions.checkNotNull;
 
 public class PurchaseManager {
   private static final Log log = new Log("PurchaseManager");
@@ -46,9 +53,11 @@ public class PurchaseManager {
     sAllSkus.add("decorate_empire");
   }
 
-  private IabHelper mHelper;
-  private IabResult mSetupResult;
-  private Inventory mInventory;
+  private IabHelper helper;
+  @Nullable private IabResult setupResult;
+  @Nullable private Inventory inventory;
+
+  private Set<PendingPurchase> pendingPurchases = new HashSet<>();
 
   public void setup() {
     // try to load the inventory from SharedPreferences first, so that we don't have to wait
@@ -57,29 +66,29 @@ public class PurchaseManager {
       SharedPreferences prefs = Util.getSharedPreferences();
       String json = prefs.getString("au.com.codeka.warworlds.PurchaseInventory", null);
       if (json != null) {
-        mInventory = Inventory.fromJson(json);
+        inventory = Inventory.fromJson(json);
         if (Util.isDebug()) {
-          mInventory.erasePurchase("remove_ads");
+          inventory.erasePurchase("remove_ads");
         }
       }
     } catch (JSONException e) {
       // ignore... for now
     }
 
-    mHelper = new IabHelper(App.i, sPublicKey);
-    mHelper.enableDebugLogging(true, "In-AppBilling");
-    mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+    helper = new IabHelper(App.i, sPublicKey);
+    helper.enableDebugLogging(true, "In-AppBilling");
+    helper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
       @Override
       public void onIabSetupFinished(IabResult result) {
-        mSetupResult = result;
-        if (mSetupResult.isSuccess()) {
-          mHelper.queryInventoryAsync(true, sAllSkus, new IabHelper.QueryInventoryFinishedListener() {
+        setupResult = result;
+        if (setupResult.isSuccess()) {
+          helper.queryInventoryAsync(true, sAllSkus, new IabHelper.QueryInventoryFinishedListener() {
             @Override
-            public void onQueryInventoryFinished(IabResult result, Inventory inv) {
+            public void onQueryInventoryFinished(IabResult result, @Nullable Inventory inv) {
               if (result.isSuccess()) {
-                mInventory = inv;
+                inventory = checkNotNull(inv);
                 if (Util.isDebug()) {
-                  mInventory.erasePurchase("remove_ads");
+                  inventory.erasePurchase("remove_ads");
                 }
 
                 try {
@@ -89,6 +98,15 @@ public class PurchaseManager {
                 } catch (JSONException e) {
                   // ignore... for now
                 }
+
+                for (PendingPurchase pending : pendingPurchases) {
+                  try {
+                    launchPurchaseFlow(pending.activity, pending.sku, pending.listener);
+                  } catch(IabException e) {
+                    log.error("Error launching pending purchase.", e);
+                  }
+                }
+                pendingPurchases.clear();
               }
             }
           });
@@ -102,7 +120,7 @@ public class PurchaseManager {
    */
   public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
     if (requestCode == REQUEST_CODE) {
-      mHelper.handleActivityResult(requestCode, resultCode, intent);
+      helper.handleActivityResult(requestCode, resultCode, intent);
       return true;
     }
 
@@ -110,13 +128,13 @@ public class PurchaseManager {
   }
 
   public Inventory getInventory() throws IabException {
-    if (mInventory != null) {
-      return mInventory;
+    if (inventory != null) {
+      return inventory;
     }
-    if (mSetupResult != null && !mSetupResult.isSuccess()) {
-      throw new IabException(mSetupResult);
+    if (setupResult != null && !setupResult.isSuccess()) {
+      throw new IabException(setupResult);
     }
-    return mInventory;
+    return inventory;
   }
 
   public void launchPurchaseFlow(
@@ -131,30 +149,34 @@ public class PurchaseManager {
       return;
     }
 
-    if (mSetupResult == null) {
+    if (setupResult == null) {
       waitForSetup(activity, sku, listener);
       return;
     }
 
-    if (!mSetupResult.isSuccess()) {
-      throw new IabException(mSetupResult);
+    if (!setupResult.isSuccess()) {
+      throw new IabException(setupResult);
     }
 
     String skuName = Util.getProperties().getProperty("iap." + sku);
 
     // check if we already own it
-    Purchase purchase = mInventory.getPurchase(skuName);
+    Purchase purchase = checkNotNull(inventory).getPurchase(skuName);
     if (purchase != null) {
       log.debug("Already purchased a '%s', not purchasing again.", skuName);
       listener.onIabPurchaseFinished(new IabResult(IabHelper.BILLING_RESPONSE_RESULT_OK, null), purchase);
     } else {
-      mHelper.launchPurchaseFlow(activity, skuName, REQUEST_CODE, listener);
+      helper.launchPurchaseFlow(activity, skuName, REQUEST_CODE, listener);
     }
   }
 
   private void waitForSetup(Activity activity, String sku,
                             IabHelper.OnIabPurchaseFinishedListener listener) throws IabException {
-    // TODO
+    if (setupResult != null) {
+      launchPurchaseFlow(activity, sku, listener);
+    }
+
+    pendingPurchases.add(new PendingPurchase(activity, sku, listener));
   }
 
   public void consume(Purchase purchase, final IabHelper.OnConsumeFinishedListener listener) {
@@ -165,17 +187,17 @@ public class PurchaseManager {
       return;
     }
 
-    mHelper.consumeAsync(purchase, new IabHelper.OnConsumeFinishedListener() {
+    helper.consumeAsync(purchase, new IabHelper.OnConsumeFinishedListener() {
       @Override
       public void onConsumeFinished(Purchase purchase, IabResult result) {
         listener.onConsumeFinished(purchase, result);
 
         // we'll want to refresh the inventory as well, now that we've consumed something
-        mHelper.queryInventoryAsync(true, sAllSkus, new IabHelper.QueryInventoryFinishedListener() {
+        helper.queryInventoryAsync(true, sAllSkus, new IabHelper.QueryInventoryFinishedListener() {
           @Override
           public void onQueryInventoryFinished(IabResult result, Inventory inv) {
             if (result.isSuccess()) {
-              mInventory = inv;
+              inventory = inv;
             }
           }
         });
@@ -184,8 +206,21 @@ public class PurchaseManager {
   }
 
   public void close() {
-    if (mHelper != null)
-      mHelper.dispose();
-    mHelper = null;
+    if (helper != null)
+      helper.dispose();
+    helper = null;
+  }
+
+  private static class PendingPurchase {
+    public Activity activity;
+    public String sku;
+    public IabHelper.OnIabPurchaseFinishedListener listener;
+
+    public PendingPurchase(
+        Activity activity, String sku, IabHelper.OnIabPurchaseFinishedListener listener) {
+      this.activity = activity;
+      this.sku = sku;
+      this.listener = listener;
+    }
   }
 }

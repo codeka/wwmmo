@@ -9,29 +9,30 @@ import au.com.codeka.warworlds.model.Realm;
  * from the \c RealmSelectActivity).
  */
 public class RealmContext {
-    public static RealmContext i = new RealmContext();
-    private ThreadLocal<Realm> mThreadRealms;
-    private Realm mGlobalRealm;
+  public static RealmContext i = new RealmContext();
+  private ThreadLocal<Realm> threadRealms;
+  private Realm globalRealm;
 
-    private RealmContext() {
-        mThreadRealms = new ThreadLocal<>();
-        mGlobalRealm = null;
+  private RealmContext() {
+    threadRealms = new ThreadLocal<>();
+    globalRealm = null;
+  }
+
+  public Realm getCurrentRealm() {
+    Realm realm = threadRealms.get();
+    if (realm == null) {
+      realm = globalRealm;
     }
 
-    public Realm getCurrentRealm() {
-        Realm realm = mThreadRealms.get();
-        if (realm == null) {
-            realm = mGlobalRealm;
-        }
+    return realm;
+  }
 
-        return realm;
-    }
+  public void setThreadRealm(Realm realm) {
+    threadRealms.set(realm);
+  }
 
-    public void setThreadRealm(Realm realm) {
-        mThreadRealms.set(realm);
-    }
-
-    public void setGlobalRealm(Realm realm) {
-        mGlobalRealm = realm;
-    }
+  public void setGlobalRealm(Realm realm) {
+    globalRealm = realm;
+    globalRealm.update();
+  }
 }

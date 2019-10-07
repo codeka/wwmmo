@@ -168,6 +168,9 @@ public class GlobalOptionsActivity extends BaseActivity {
         p.setSummary("Use generic star and planet images");
       }
 
+      p = findPreference("GlobalOptions.NonSecureServerConnection");
+      p.setSummary("Not recommended, only try this if secure connection does not work.");
+
       p = findPreference("GlobalOptions.AutoTranslateChatMessages");
       if (opts.autoTranslateChatMessages()) {
         p.setSummary("Auto-translate non-English chat messages to English.");

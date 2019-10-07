@@ -6,14 +6,15 @@ import java.util.List;
 
 import android.content.SharedPreferences;
 
+import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.Util;
 
 public class RealmManager {
   public static RealmManager i = new RealmManager();
 
-  private List<Realm> mRealms;
-  private final ArrayList<RealmChangedHandler> mRealmChangedHandlers;
+  private List<Realm> realms;
+  private final ArrayList<RealmChangedHandler> realmChangedHandlers;
 
   // The IDs for the realms can NEVER change, once set
   public static final int DEBUG_REALM_ID = 1000;
@@ -23,23 +24,23 @@ public class RealmManager {
   public static final int BLITZ_REALM_ID = 10;
 
   private RealmManager() {
-    mRealmChangedHandlers = new ArrayList<>();
+    realmChangedHandlers = new ArrayList<>();
 
-    mRealms = new ArrayList<>();
+    realms = new ArrayList<>();
     try {
       if (Util.isDebug()) {
-        mRealms.add(new Realm(DEBUG_REALM_ID, "http://127.0.0.1:8080/realms/beta/",
+        realms.add(new Realm(DEBUG_REALM_ID, "http://127.0.0.1:8080/realms/beta/",
             "Debug",
             "The debug realm runs on my local dev box for testing."));
       }
-      mRealms.add(new Realm(DEF_REALM_ID, "https://game.war-worlds.com/realms/def/",
+      realms.add(new Realm(DEF_REALM_ID, "https://game.war-worlds.com/realms/def/",
           "Default",
           "The default realm. If you're new to War Worlds, you should join this realm."));
-      mRealms.add(new Realm(BETA_REALM_ID, "https://game.war-worlds.com/realms/beta/",
+      realms.add(new Realm(BETA_REALM_ID, "https://game.war-worlds.com/realms/beta/",
           "Beta",
           "The old beta realm. Currently down, please choose Default."));
       if (Util.isDebug()) {
-        mRealms.add(new Realm(BLITZ_REALM_ID, "https://game.war-worlds.com/realms/blitz/",
+        realms.add(new Realm(BLITZ_REALM_ID, "https://game.war-worlds.com/realms/blitz/",
             "Blitz",
             "The goal of Blitz is to build as big an empire as you can in 1 month. Each month, the universe is reset and the winner is the one with the highest total population."));
       }
@@ -56,31 +57,31 @@ public class RealmManager {
   }
 
   public void addRealmChangedHandler(RealmChangedHandler handler) {
-    synchronized (mRealmChangedHandlers) {
-      mRealmChangedHandlers.add(handler);
+    synchronized (realmChangedHandlers) {
+      realmChangedHandlers.add(handler);
     }
   }
 
   public void removeRealmChangedHandler(RealmChangedHandler handler) {
-    synchronized (mRealmChangedHandlers) {
-      mRealmChangedHandlers.remove(handler);
+    synchronized (realmChangedHandlers) {
+      realmChangedHandlers.remove(handler);
     }
   }
 
   protected void fireRealmChangedHandler(Realm newRealm) {
-    synchronized (mRealmChangedHandlers) {
-      for (RealmChangedHandler handler : mRealmChangedHandlers) {
+    synchronized (realmChangedHandlers) {
+      for (RealmChangedHandler handler : realmChangedHandlers) {
         handler.onRealmChanged(newRealm);
       }
     }
   }
 
   public List<Realm> getRealms() {
-    return mRealms;
+    return realms;
   }
 
   public Realm getRealmByName(String name) {
-    for (Realm realm : mRealms) {
+    for (Realm realm : realms) {
       if (realm.getDisplayName().equalsIgnoreCase(name)) {
         return realm;
       }
@@ -97,7 +98,7 @@ public class RealmManager {
   }
 
   private void selectRealm(String realmName, boolean saveSelection) {
-    for (Realm realm : mRealms) {
+    for (Realm realm : realms) {
       if (realm.getDisplayName().equalsIgnoreCase(realmName)) {
         selectRealm(realm.getID(), saveSelection);
         return;
@@ -112,7 +113,7 @@ public class RealmManager {
     if (realmID <= 0) {
       RealmContext.i.setGlobalRealm(null);
     } else {
-      for (Realm realm : mRealms) {
+      for (Realm realm : realms) {
         if (realm.getID() == realmID) {
           currentRealm = realm;
           realm.getAuthenticator().logout();

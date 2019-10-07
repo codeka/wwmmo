@@ -36,6 +36,7 @@ import android.util.Log;
 
 import com.android.vending.billing.IInAppBillingService;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Null;
 
@@ -259,6 +260,9 @@ public class IabHelper {
     SkuDetails sku;
     try {
       sku = PurchaseManager.i.getInventory().getSkuDetails(skuName);
+      if (sku == null) {
+        throw new RuntimeException("No sku found: " + skuName);
+      }
     } catch (IabException e) {
       return null; // can this happen?
     }
@@ -304,7 +308,7 @@ public class IabHelper {
      * @param info   The purchase information (null if purchase failed, or if you're not required
      *               to make purchases.)
      */
-    public void onIabPurchaseFinished(IabResult result, @Nullable Purchase info);
+    void onIabPurchaseFinished(IabResult result, @Nullable Purchase info);
   }
 
   // The listener registered on launchPurchaseFlow, which we have to call back when the purchase
@@ -530,7 +534,7 @@ public class IabHelper {
      * @param result The result of the operation.
      * @param inv    The inventory.
      */
-    public void onQueryInventoryFinished(IabResult result, Inventory inv);
+    public void onQueryInventoryFinished(IabResult result, @Nullable Inventory inv);
   }
 
 

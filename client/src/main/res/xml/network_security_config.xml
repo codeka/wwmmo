@@ -6,5 +6,7 @@
         <domain includeSubdomains="true">10.0.0.15</domain>
         <!-- Allow cleartext traffic to www.war-worlds.com, which is where we get the MOTD. -->
         <domain includeSubdomains="true">www.war-worlds.com</domain>
+        <!-- This would be needed for when you have 'use insecure connection' set. -->
+        <domain includeSubdomains="true">game.war-worlds.com</domain>
     </domain-config>
 </network-security-config>

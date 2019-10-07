@@ -186,11 +186,10 @@ public class MyEmpire extends Empire {
       @NotNull final RunnableArg<Boolean> onComplete) {
     String url = "empires/" + getKey() + "/display-name";
 
-
     Messages.EmpireRenameRequest renameRequestPb = Messages.EmpireRenameRequest.newBuilder()
         .setKey(getKey())
         .setNewName(newName)
-        .setPurchaseInfo(IabHelper.toProtobuf("empire_rename", purchaseInfo))
+        .setPurchaseInfo(IabHelper.toProtobuf("rename_empire", purchaseInfo))
         .build();
 
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "PUT")

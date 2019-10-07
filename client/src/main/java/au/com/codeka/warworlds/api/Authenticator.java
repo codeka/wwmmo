@@ -55,6 +55,8 @@ public class Authenticator {
     }
     authenticating = true;
 
+    realm.update();
+
     SharedPreferences prefs = Util.getSharedPreferences();
     final String accountName = prefs.getString("AccountName", null);
     if (accountName == null) {
