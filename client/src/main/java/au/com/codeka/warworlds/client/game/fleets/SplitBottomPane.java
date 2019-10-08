@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
+import java.util.Locale;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -103,10 +105,10 @@ public class SplitBottomPane extends RelativeLayout {
 
   private void update(int leftCount, int rightCount) {
     ignoreEdits = true;
-    splitLeft.setText(Integer.toString(leftCount));
-    splitRight.setText(Integer.toString(rightCount));
-    splitRatio.setMax(leftCount + rightCount);
-    splitRatio.setProgress(leftCount);
+    splitLeft.setText(String.format(Locale.ENGLISH, "%d", leftCount));
+    splitRight.setText(String.format(Locale.ENGLISH, "%d", rightCount));
+    splitRatio.setMax(leftCount + rightCount - 1);
+    splitRatio.setProgress(leftCount - 1);
     ignoreEdits = false;
   }
 
@@ -139,13 +141,26 @@ public class SplitBottomPane extends RelativeLayout {
         return;
       }
 
+      if (editable.toString().isEmpty()) {
+        // You've deleted the whole text. No biggie.
+        return;
+      }
+
+      int n;
+      try {
+        n = Integer.parseInt(editable.toString());
+      } catch (NumberFormatException e) {
+        // Invalid number format, just ignore for now.
+        return;
+      }
+
       int leftCount;
       int rightCount;
       if (isLeft) {
-        leftCount = Integer.parseInt(editable.toString());
+        leftCount = n;
         rightCount = (int) Math.floor(fleet.num_ships) - leftCount;
       } else {
-        rightCount = Integer.parseInt(editable.toString());
+        rightCount = n;
         leftCount = (int) Math.floor(fleet.num_ships) - rightCount;
       }
       update(leftCount, rightCount);

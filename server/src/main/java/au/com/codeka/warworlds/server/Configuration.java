@@ -13,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 import javax.annotation.Nullable;
@@ -82,7 +83,7 @@ public class Configuration {
       if (firebaseCredentials == null) {
         try {
           firebaseCredentials = GoogleCredentials.fromStream(
-              new ByteArrayInputStream(firebase.toString().getBytes("utf-8")))
+              new ByteArrayInputStream(firebase.toString().getBytes(StandardCharsets.UTF_8)))
               .createScoped(FIREBASE_SCOPES);
         } catch (UnsupportedEncodingException e) {
           // Should never happen.
