@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.common.sim;
 
+import com.squareup.wire.Wire;
+
 import java.util.Locale;
 
 import javax.annotation.Nullable;
@@ -32,7 +34,7 @@ public class StarHelper {
     float delta = 0.0f;
     EmpireStorage storage = getStorage(star, empireId);
     if (storage != null) {
-      delta += storage.minerals_delta_per_hour;
+      delta += Wire.get(storage.minerals_delta_per_hour, 0.0f);
     }
     for (Planet planet : star.planets) {
       if (planet.colony != null

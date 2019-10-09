@@ -1,0 +1,54 @@
+{% extends "skeleton.html" %}
+{% block "title" %}Moving fleets{% end %}
+{% block "head" %}
+<link rel="stylesheet" href="/admin/css/star.css">
+<script type="text/javascript" src="/admin/js/tmpl.js"></script>
+<script type="text/javascript" src="/admin/js/time.js"></script>
+<script type="text/javascript" src="/admin/js/designs.js"></script>
+<script type="text/javascript" src="/admin/js/empirestore.js"></script>
+<style>
+  .fleet-small img {
+    vertical-align: middle;
+  }
+</style>
+{% end %}
+{% block "content" %}
+<h1>Moving fleets</h1>
+<table>
+  <tr>
+    <th></th>
+    <th>Fleet</th>
+    <th>Source</th>
+    <th>Destination</th>
+    <th>ETA</th>
+    <th></th>
+  </tr>
+  {% for fleet in fleets %}
+  <tr>
+    <td>1</td>
+    <td>{% include "inc/fleet_name.html" star=fleet_stars.get(fleet.id) %}</td>
+    <td>{% include "inc/star_name.html" star=fleet_stars.get(fleet.id) %}</td>
+    <td>{% include "inc/star_name.html" star=stars.get(fleet.destination_star_id) %}</td>
+    <td><time timestamp="{{ fleet.eta }}" class="timer"></td>
+    <td><a href="javascript:forceComplete({{ fleet_stars.get(fleet.id).id }}, {{ fleet.id }});">Force complete</a></td>
+  </tr>
+  {% end %}
+</table>
+
+<script>
+  function forceComplete(starId, fleetId) {
+    $.ajax({
+      url: "/admin/ajax/starfield",
+      data: {
+        "action": "forceMoveComplete",
+        "id": starId,
+        "fleetId": fleetId
+      },
+      method: "POST",
+      success: function(data) {
+        window.location.reload();
+      }
+    });
+  }
+</script>
+{% end %}

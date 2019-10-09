@@ -56,6 +56,11 @@ public class AjaxStarfieldHandler extends AjaxHandler {
         starId = Long.parseLong(getRequest().getParameter("id"));
         handleClearNativesRequest(starId);
         break;
+      case "forceMoveComplete":
+        starId = Long.parseLong(getRequest().getParameter("id"));
+        long fleetId = Long.parseLong(getRequest().getParameter("fleetId"));
+        handleForceMoveComplete(starId, fleetId);
+        break;
       default:
         throw new RequestException(400, "Unknown action: " + getRequest().getParameter("action"));
     }
@@ -88,6 +93,31 @@ public class AjaxStarfieldHandler extends AjaxHandler {
     modifyAndSimulate(starId, new StarModification.Builder()
         .type(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
         .build());
+  }
+
+  private void handleForceMoveComplete(long starId, long fleetId) throws RequestException {
+    log.debug("force move complete (star: %d, fleet: %d", starId, fleetId);
+
+    WatchableObject<Star> starWo = StarManager.i.getStar(starId);
+    if (starWo == null) {
+      return;
+    }
+
+    synchronized (starWo.lock) {
+      Star.Builder star = starWo.get().newBuilder();
+      for (int i = 0; i < star.fleets.size(); i++) {
+        if (star.fleets.get(i).id.equals(fleetId)) {
+          // Set the ETA well in the past, so that the star manager thinks it should have arrived.
+          star.fleets.set(i, star.fleets.get(i).newBuilder()
+              .eta(100L)
+              .build());
+        }
+      }
+      starWo.set(star.build());
+    }
+
+    // Now just simulate to make sure it processes it.
+    modifyAndSimulate(starId, null);
   }
 
   private SimulateResponse modifyAndSimulate(long starId, @Nullable StarModification modification)

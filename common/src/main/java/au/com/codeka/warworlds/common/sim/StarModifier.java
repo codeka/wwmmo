@@ -232,12 +232,15 @@ public class StarModifier {
       }
     }
     if (!hasStorage) {
-      star.empire_stores.add(new EmpireStorage.Builder()
-          .empire_id(modification.empire_id)
-          .total_goods(100.0f).total_minerals(100.0f).total_energy(1000.0f)
-          .max_goods(1000.0f).max_minerals(1000.0f).max_energy(1000.0f)
-          .build());
+      star.empire_stores.add(createDefaultStorage(modification.empire_id).build());
     }
+  }
+
+  private EmpireStorage.Builder createDefaultStorage(Long empireId) {
+    return new EmpireStorage.Builder()
+        .empire_id(empireId)
+        .total_goods(100.0f).total_minerals(100.0f).total_energy(1000.0f)
+        .max_goods(1000.0f).max_minerals(1000.0f).max_energy(1000.0f);
   }
 
   private void applyCreateFleet(
@@ -286,10 +289,20 @@ public class StarModifier {
 
       if (modification.empire_id != null) {
         int storageIndex = StarHelper.getStorageIndex(star, modification.empire_id);
-        EmpireStorage.Builder empireStorage = star.empire_stores.get(storageIndex).newBuilder();
+        EmpireStorage.Builder empireStorage;
+        if (storageIndex < 0) {
+          // it doesn't have an empire storage yet.
+          empireStorage = createDefaultStorage(modification.empire_id);
+        } else {
+          empireStorage = star.empire_stores.get(storageIndex).newBuilder();
+        }
         fuelAmount = Math.min(fuelAmount, empireStorage.total_energy);
         empireStorage.total_energy(empireStorage.total_energy - fuelAmount);
-        star.empire_stores.set(storageIndex, empireStorage.build());
+        if (storageIndex < 0) {
+          star.empire_stores.add(empireStorage.build());
+        } else {
+          star.empire_stores.set(storageIndex, empireStorage.build());
+        }
       }
     }
 

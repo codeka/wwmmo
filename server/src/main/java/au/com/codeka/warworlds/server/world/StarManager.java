@@ -280,6 +280,17 @@ public class StarManager {
 
       // First, grab the destination star and add it there.
       WatchableObject<Star> destStar = getStar(fleet.destination_star_id);
+      if (destStar == null) {
+        // The star doesn't exist?! Just reset it to not-moving.
+        starBuilder.fleets.set(
+            i,
+            fleet.newBuilder()
+                .state(Fleet.FLEET_STATE.IDLE)
+                .destination_star_id(null)
+                .eta(null)
+                .build());
+        continue;
+      }
       synchronized (destStar.lock) { // TODO: this could deadlock, need to lock in the same order
         Star.Builder destStarBuilder = destStar.get().newBuilder();
         starModifier.modifyStar(
