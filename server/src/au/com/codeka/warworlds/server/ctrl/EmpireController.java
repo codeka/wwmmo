@@ -41,6 +41,7 @@ public class EmpireController {
   private DataBase db;
 
   public static final double STARTING_CASH_BONUS = 250000;
+  public static final double RESET_CASH_BONUS = 50000;
 
   public EmpireController() {
     db = new DataBase();
@@ -490,14 +491,20 @@ public class EmpireController {
 
     public void createEmpire(Empire empire, String validatedName) throws RequestException {
       String sql;
+      boolean isReset = false;
       if (empire.getKey() == null || empire.getID() == 0) {
         sql = "INSERT INTO empires (name, cash, home_star_id, user_email, signup_date) VALUES (?, ?, ?, ?, NOW())";
       } else {
         sql = "UPDATE empires SET name = ?, cash = ?, home_star_id = ?, user_email = ? WHERE id = ?";
+        isReset = true;
       }
       try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
         stmt.setString(1, validatedName);
-        stmt.setDouble(2, STARTING_CASH_BONUS);
+        if (isReset) {
+          stmt.setDouble(2, RESET_CASH_BONUS);
+        } else {
+          stmt.setDouble(2, STARTING_CASH_BONUS);
+        }
         stmt.setInt(3, ((Star) empire.getHomeStar()).getID());
         stmt.setString(4, empire.getEmailAddr());
         if (empire.getKey() != null && empire.getID() != 0) {
@@ -509,11 +516,9 @@ public class EmpireController {
         }
       } catch (SQLException e) {
         if (SqlStateTranslater.isConstraintViolation(e)) {
-          // this can actually be one of two things, either the empire name is
-          // already taken,
-          // or the user's email address is not actually unique. The former is
-          // far more likey
-          // than the latter, though
+          // this can actually be one of two things, either the empire name is already taken, or the
+          // user's email address is not actually unique. The former is far more likely than the
+          // latter, though
           throw new RequestException(
               400,
               Messages.GenericError.ErrorCode.EmpireNameExists,
