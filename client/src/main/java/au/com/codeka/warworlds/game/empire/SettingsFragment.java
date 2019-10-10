@@ -26,6 +26,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+
+import javax.annotation.Nonnull;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpire;
@@ -196,12 +199,13 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
       public void onClick(View v) {
         new StyledDialog.Builder(getActivity()).setMessage(Html.fromHtml(
             "Are you sure you want to reset your empire? This operation is <b>permanent and "
-                + "non-reversible</b>!"))
+                + "non-reversible</b>!<br/><br/>Note: when you reset, your cash will be reset "
+                + "as well (and you <em>will not</em> get the extra bonus starting cash)"))
             .setTitle("Reset Empire")
             .setPositiveButton("Reset Empire", new DialogInterface.OnClickListener() {
               @Override
               public void onClick(DialogInterface dialog, int which) {
-                onResetEmpireClick();
+                onResetEmpireClick(dialog);
               }
             }).setNegativeButton("Cancel", null).create().show();
       }
@@ -347,7 +351,7 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
     }
   }
 
-  private void onResetEmpireClick() {
+  private void onResetEmpireClick(final DialogInterface dialog) {
     final Activity activity = new Activity();
     final Button empireResetBtn = view.findViewById(R.id.reset_empire_btn);
     empireResetBtn.setEnabled(false);
@@ -368,7 +372,12 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
         }
 
         if (numStarsWithColonies < 5) {
-          doEmpireReset(null, null, null);
+          doEmpireReset(null, null, new Runnable() {
+            @Override
+            public void run() {
+              dialog.dismiss();
+            }
+          });
         } else {
           String skuName = "reset_empire_small";
           if (numStarsWithColonies > 10) {
@@ -394,6 +403,8 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
                       doEmpireReset(finalSkuName, info, new Runnable() {
                         @Override
                         public void run() {
+                          dialog.dismiss();
+
                           new StyledDialog.Builder(activity)
                               .setMessage("Your empire has been reset.")
                               .setPositiveButton("Close", null).create().show();
@@ -416,23 +427,40 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
             log.error("Couldn't get SKU details!", e);
             return;
           }
-
         }
       }
     });
   }
 
-  private void doEmpireReset(String skuName, Purchase purchaseInfo, final Runnable runnable) {
+  private void doEmpireReset(
+      String skuName,
+      Purchase purchaseInfo,
+      @Nonnull final Runnable runnable) {
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
     myEmpire.resetEmpire(skuName, purchaseInfo, new MyEmpire.EmpireResetCompleteHandler() {
       @Override
       public void onEmpireReset() {
-        // redirect you to the
+        runnable.run();
         ServerGreeter.clearHello();
+
+        // redirect you to the main page.
         startActivity(new Intent(getActivity(), WarWorldsActivity.class));
-        if (runnable != null) {
-          runnable.run();
+      }
+
+      @Override
+      public void onResetFail(String reason) {
+        runnable.run();
+
+        Activity activity = getActivity();
+        if (activity == null) {
+          return;
         }
+        new StyledDialog.Builder(activity)
+            .setTitle("Error")
+            .setMessage(reason)
+            .setPositiveButton("OK", null)
+            .create().show();
+
       }
     });
   }

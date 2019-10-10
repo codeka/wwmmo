@@ -270,30 +270,37 @@ public class MyEmpire extends Empire {
           public void onRequestComplete(ApiRequest request) {
             handler.onEmpireReset();
           }
+        })
+        .errorCallback(new ApiRequest.ErrorCallback() {
+          @Override
+          public void onRequestError(ApiRequest request, Messages.GenericError error) {
+            handler.onResetFail(error.getErrorMessage());
+          }
         }).build());
   }
 
-  public static interface ColonizeCompleteHandler {
-    public void onColonizeComplete(Colony colony);
+  public interface ColonizeCompleteHandler {
+    void onColonizeComplete(Colony colony);
   }
 
-  public static interface FetchScoutReportCompleteHandler {
-    public void onComplete(List<ScoutReport> reports);
+  public interface FetchScoutReportCompleteHandler {
+    void onComplete(List<ScoutReport> reports);
   }
 
-  public static interface FetchCombatReportCompleteHandler {
-    public void onComplete(CombatReport report);
+  public interface FetchCombatReportCompleteHandler {
+    void onComplete(CombatReport report);
   }
 
-  public static interface FetchStarsCompleteHandler {
-    public void onComplete(List<Star> stars);
+  public interface FetchStarsCompleteHandler {
+    void onComplete(List<Star> stars);
   }
 
-  public static interface AttackColonyCompleteHandler {
-    public void onComplete();
+  public interface AttackColonyCompleteHandler {
+    void onComplete();
   }
 
-  public static interface EmpireResetCompleteHandler {
-    public void onEmpireReset();
+  public interface EmpireResetCompleteHandler {
+    void onEmpireReset();
+    void onResetFail(String reason);
   }
 }

@@ -10,22 +10,22 @@ import au.com.codeka.warworlds.server.ctrl.EmpireController;
  */
 public class AdminActionsResetEmpireHandler extends AdminGenericHandler {
 
-    @Override
-    protected void post() throws RequestException {
-        int empireID = Integer.parseInt(getRequest().getParameter("empire_id"));
-        String reason = getRequest().getParameter("reason");
+  @Override
+  protected void post() throws RequestException {
+    int empireID = Integer.parseInt(getRequest().getParameter("empire_id"));
+    String reason = getRequest().getParameter("reason");
 
-        TreeMap<String, Object> data = new TreeMap<>();
-        data.put("complete", true);
+    TreeMap<String, Object> data = new TreeMap<>();
+    data.put("complete", true);
 
-        try {
-            new EmpireController().resetEmpire(empireID, reason);
-            data.put("success", true);
-        } catch (RequestException e) {
-            data.put("success", false);
-            data.put("msg", e.getMessage());
-        }
-
-        render("admin/actions/reset-empire.html", data);
+    try {
+      new EmpireController().resetEmpire(empireID, reason, true);
+      data.put("success", true);
+    } catch (RequestException e) {
+      data.put("success", false);
+      data.put("msg", e.getMessage());
     }
+
+    render("admin/actions/reset-empire.html", data);
+  }
 }

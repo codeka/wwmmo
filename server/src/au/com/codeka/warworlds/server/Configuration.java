@@ -35,8 +35,8 @@ public class Configuration {
   @Expose private int listenPort;
   @Expose private Integer numStarSimulationThreads;
   @Expose private DatabaseConfiguration database;
-  @Expose private SinbinConfiguration sinbin;
   @Expose private LimitsConfiguration limits;
+  @Expose private ResetsConfig resets;
   @Expose private PatreonConfig patreon;
 
   public Configuration() {
@@ -66,8 +66,8 @@ public class Configuration {
     return database;
   }
 
-  public SinbinConfiguration getSinbinConfig() {
-    return sinbin;
+  public ResetsConfig getResets() {
+    return resets;
   }
 
   public LimitsConfiguration getLimits() {
@@ -111,29 +111,6 @@ public class Configuration {
     }
   }
 
-  public static class SinbinConfiguration {
-    @Expose private boolean enabled;
-    @Expose private int uniqueEmpireVotes;
-    @Expose private int voteTimeSeconds;
-    @Expose private int maxVotesPerDay;
-
-    public boolean isEnabled() {
-      return enabled;
-    }
-
-    public int getUniqueEmpireVotes() {
-      return uniqueEmpireVotes;
-    }
-
-    public int getVoteTimeSeconds() {
-      return voteTimeSeconds;
-    }
-
-    public int getMaxVotesPerDay() {
-      return maxVotesPerDay;
-    }
-  }
-
   public static class LimitsConfiguration {
     @Expose private int maxEmpireNameLength;
     @Expose private int maxAllianceNameLength;
@@ -161,6 +138,19 @@ public class Configuration {
 
     public double getMaxEmojiRatio() {
       return maxEmojiRatio;
+    }
+  }
+
+  public static class ResetsConfig {
+    @Expose private int resetPeriodDays;
+    @Expose private int maxResetsPerPeriod;
+
+    public int getResetPeriodDays() {
+      return resetPeriodDays;
+    }
+
+    public int getMaxResetsPerPeriod() {
+      return maxResetsPerPeriod;
     }
   }
 

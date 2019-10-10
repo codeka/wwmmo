@@ -53,6 +53,6 @@ public class EmpiresResetHandler extends RequestHandler {
       }
     }
 
-    new EmpireController().resetEmpire(empireID, "as-requested");
+    new EmpireController().resetEmpire(empireID, "as-requested", false);
   }
 }

@@ -54,6 +54,7 @@ message GenericError {
     NetworkError = 35;
     AuthenticationError = 36;
     NotAnonymous = 37;
+    CannotReset = 38;
   }
 }
 

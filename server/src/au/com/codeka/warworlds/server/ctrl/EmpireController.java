@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Configuration;
@@ -38,6 +39,7 @@ import au.com.codeka.warworlds.server.model.Star;
 import au.com.codeka.warworlds.server.utils.NameValidator;
 
 public class EmpireController {
+  private static final Log log = new Log("EmpireController");
   private DataBase db;
 
   public static final double STARTING_CASH_BONUS = 250000;
@@ -360,8 +362,49 @@ public class EmpireController {
 
   /**
    * Resets the given empire. This is obviously fairly destructive, so be careful!
+   *
+   * @param empireID The ID of the empire to reset.
+   * @param resetReason The string reason to give the empire when we reset them.
+   * @param ignoreLimits If true, ignore the number of times the empire has been reset recently.
    */
-  public void resetEmpire(int empireID, String resetReason) throws RequestException {
+  public void resetEmpire(
+      int empireID,
+      String resetReason,
+      boolean ignoreLimits) throws RequestException {
+
+    if (!ignoreLimits) {
+      Configuration.ResetsConfig config = Configuration.i.getResets();
+
+      String sql = "SELECT * FROM empire_resets WHERE empire_id = ? ORDER BY reset_date DESC";
+      int numAllowed = config.getMaxResetsPerPeriod();
+      DateTime minTime = DateTime.now().minusDays(config.getResetPeriodDays());
+      try (SqlStmt stmt = DB.prepare(sql)) {
+        stmt.setInt(1, empireID);
+        SqlResult res = stmt.select();
+
+        while (res.next() && numAllowed > 0) {
+          DateTime dt = res.getDateTime("reset_date");
+          if (dt.isBefore(minTime)) {
+            break;
+          }
+          log.debug("decrementing numAllowed (currently: %d", numAllowed);
+          numAllowed --;
+        }
+
+        if (numAllowed == 0) {
+
+          throw new RequestException(
+              400,
+              Messages.GenericError.ErrorCode.CannotReset,
+              "You cannot reset your empire now, too many recent resets. If you really need to reset, you can connect me on discord.");
+        }
+      } catch (Exception e) {
+        throw new RequestException(e);
+      }
+    } else {
+      log.info("Skipping reset limits checking.");
+    }
+
     String[] sqls = { "DELETE FROM alliance_join_requests WHERE empire_id = ?",
         "DELETE FROM build_requests WHERE empire_id = ?",
         "DELETE FROM buildings WHERE empire_id = ?",
@@ -384,6 +427,14 @@ public class EmpireController {
       try (SqlStmt stmt = t.prepare(sql)) {
         stmt.setString(1, resetReason);
         stmt.setInt(2, empireID);
+        stmt.update();
+      }
+
+      sql = "INSERT INTO empire_resets (empire_id, reset_reason, reset_date) VALUES (?, ?, ?)";
+      try (SqlStmt stmt = t.prepare(sql)) {
+        stmt.setInt(1, empireID);
+        stmt.setString(2, resetReason);
+        stmt.setDateTime(3, DateTime.now());
         stmt.update();
       }
 
