@@ -44,7 +44,7 @@
     <td>
       <a href="javascript:runJob({{ job.id }});">Run now</a>
       &bull;
-      <a href="javascript:editJob({{ job.id }}, '{{ job.className }}', '{{ job.parameters }}', '{{ job.schedule }}', {{ job.enabled }});">Edit</a>
+      <a href="javascript:editJob({{ job.id }}, '{{ job.className }}', '{{ job.parameters }}', '{{ job.schedule }}', {{ job.enabled }}, {{ job.runOnce }});">Edit</a>
       &bull;
       Delete
     </td>
@@ -74,6 +74,8 @@
       <dd><input type="text" name="schedule">
       <dt></dt>
       <dd><input type="checkbox" id="enabled" name="enabled" checked><label for="enabled">Enabled</label></dd>
+      <dt></dt>
+      <dd><input type="checkbox" id="run_once" name="run_once"><label for="run_once">Run once</label></dd>
     </dl>
     <div class="popup-buttons">
       <input type="submit" value="Save">
@@ -107,7 +109,7 @@
     });
   }
 
-  function editJob(id, className, params, schedule, enabled) {
+  function editJob(id, className, params, schedule, enabled, runOnce) {
     var container = $("#edit-cron");
     $("form", container).trigger("reset");
     $("form input[name=id]", container).val(id);
@@ -115,6 +117,7 @@
     $("form input[name=params]", container).val(params);
     $("form input[name=schedule]", container).val(schedule);
     $("form input[name=enabled]").prop("checked", enabled);
+    $("form input[name=run_once]").prop("checked", runOnce);
     container.popup();
   }
 </script>

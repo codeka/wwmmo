@@ -40,6 +40,12 @@ public class CronRunnerThread extends Thread {
     }
 
     jobDetails.setLastRunTime(DateTime.now());
+
+    // If it was a run-once then it's now disabled. Obviously.
+    if (jobDetails.getRunOnce()) {
+      log.info("Disabling run-once job now that's finished.");
+      jobDetails.setEnabled(false);
+    }
     try {
       new CronController().save(jobDetails);
     } catch (RequestException e) {
@@ -63,6 +69,10 @@ public class CronRunnerThread extends Thread {
         // Find the next job.
         CronJobDetails nextJob = null;
         for (CronJobDetails job : jobs) {
+          if (!job.getEnabled()) {
+            continue;
+          }
+
           if (nextJob == null || nextJob.getNextRunTime().isAfter(job.getNextRunTime())) {
             nextJob = job;
           }

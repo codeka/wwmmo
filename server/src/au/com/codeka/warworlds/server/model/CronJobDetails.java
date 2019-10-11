@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
@@ -21,6 +22,7 @@ public class CronJobDetails {
   private DateTime nextRunTime;
   private String lastStatus;
   private boolean enabled;
+  private boolean runOnce;
 
   public CronJobDetails() {
     id = 0;
@@ -36,6 +38,7 @@ public class CronJobDetails {
     nextRunTime = result.getDateTime("next_run_time");
     lastStatus = result.getString("last_status");
     enabled = result.getInt("enabled") != 0;
+    runOnce = result.getInt("run_once") != 0;
   }
 
   public void update(HttpServletRequest request) throws RequestException {
@@ -43,6 +46,7 @@ public class CronJobDetails {
     parameters = request.getParameter("params");
     schedule = request.getParameter("schedule");
     enabled = request.getParameterValues("enabled") != null;
+    runOnce = request.getParameterValues("run_once") != null;
   }
 
   public long getId() {
@@ -77,26 +81,35 @@ public class CronJobDetails {
     return lastStatus;
   }
 
-  public void setLastStatus(String status) {
-    lastStatus = status;
-  }
-
   @Nullable
   public DateTime getLastRunTime() {
     return lastRunTime;
-  }
-
-  public void setLastRunTime(@Nullable DateTime time) {
-    lastRunTime = time;
   }
 
   public DateTime getNextRunTime() {
     return nextRunTime;
   }
 
-  public void setNextRunTime(DateTime time) {
+  public boolean getRunOnce() {
+    return runOnce;
+  }
+
+  public void setLastStatus(String status) {
+    lastStatus = status;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  public void setLastRunTime(@Nullable DateTime time) {
+    lastRunTime = time;
+  }
+
+  public void setNextRunTime(@Nonnull DateTime time) {
     nextRunTime = time;
   }
+
 
   @SuppressWarnings("unchecked")
   private static Class<? extends AbstractCronJob> loadClass(String className)

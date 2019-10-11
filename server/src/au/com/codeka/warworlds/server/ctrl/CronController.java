@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +79,22 @@ public class CronController {
     return times;
   }
 
+  /**
+   * Parses a single date-time for a run-once job.
+   *
+   * @param runOnce The string to parse. Date must be of the form "yyyy-mm-dd HH:MM".
+   * @return The parsed {@link DateTime} or null if it could not be parsed.
+   */
+  @Nullable
+  public static DateTime parseRunOnce(String runOnce) {
+    DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
+    try {
+      return fmt.parseDateTime(runOnce);
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
+  }
+
   @Nullable
   private static List<Integer> expandNumber(String number, int range) {
     int interval = 0;
@@ -102,29 +120,36 @@ public class CronController {
   }
 
   public void save(CronJobDetails jobDetails) throws RequestException {
-    List<LocalTime> times = parseSchedule(jobDetails.getSchedule());
-    if (times == null) {
-      throw new RequestException(400, "Could not parse schedule.");
-    }
-    log.info("Got times: %s", times);
-
-    LocalTime nextTime = null;
-    DateTime now = DateTime.now();
-    for (LocalTime time : times) {
-      if (time.isAfter(now.toLocalTime())) {
-        nextTime = time;
-        break;
+    if (jobDetails.getRunOnce()) {
+      DateTime dt = parseRunOnce(jobDetails.getSchedule());
+      if (dt == null) {
+        throw new RequestException(400, "Could not parse run-once schedule.");
       }
-    }
-    if (nextTime != null) {
-      jobDetails.setNextRunTime(nextTime.toDateTimeToday());
+
+      jobDetails.setNextRunTime(dt);
     } else {
-      // No more times today, switch to the first time tomorrow.
-      jobDetails.setNextRunTime(times.get(0).toDateTimeToday().plusDays(1));
+      List<LocalTime> times = parseSchedule(jobDetails.getSchedule());
+      if (times == null) {
+        throw new RequestException(400, "Could not parse schedule.");
+      }
+
+      LocalTime nextTime = null;
+      DateTime now = DateTime.now();
+      for (LocalTime time : times) {
+        if (time.isAfter(now.toLocalTime())) {
+          nextTime = time;
+          break;
+        }
+      }
+      if (nextTime != null) {
+        jobDetails.setNextRunTime(nextTime.toDateTimeToday());
+      } else {
+        // No more times today, switch to the first time tomorrow.
+        jobDetails.setNextRunTime(times.get(0).toDateTimeToday().plusDays(1));
+      }
     }
 
     try {
-
       db.save(jobDetails);
     } catch(Exception e) {
       throw new RequestException(e);
@@ -163,10 +188,10 @@ public class CronController {
       String sql;
       if (jobDetails.getId() == 0) {
         sql = "INSERT INTO cron (class_name, params, schedule, last_run_time, next_run_time,"
-            + " enabled, last_status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            + " enabled, last_status, run_once) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
       } else {
         sql = "UPDATE cron SET class_name = ?, params = ?, schedule = ?, last_run_time = ?,"
-            + " next_run_time = ?, enabled = ?, last_status = ? "
+            + " next_run_time = ?, enabled = ?, last_status = ?, run_once = ? "
             + "WHERE job_id = ?";
       }
 
@@ -182,8 +207,9 @@ public class CronController {
         stmt.setDateTime(5, jobDetails.getNextRunTime());
         stmt.setInt(6, jobDetails.getEnabled() ? 1 : 0);
         stmt.setString(7, jobDetails.getLastStatus());
+        stmt.setInt(8, jobDetails.getRunOnce() ? 1 : 0);
         if (jobDetails.getId() != 0) {
-          stmt.setLong(8, jobDetails.getId());
+          stmt.setLong(9, jobDetails.getId());
         }
 
         stmt.update();
