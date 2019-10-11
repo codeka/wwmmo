@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.SystemClock;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.eventbus.EventBus;
 
@@ -39,6 +41,10 @@ public class BackgroundDetector {
   private String lastActivityName;
   private long startTimeMs;
   private long totalForegroundTimeMs;
+  private boolean needBackStackReset;
+
+  @Nullable
+  private Activity currentVisibleActivity;
 
   private BackgroundDetector() {
     isInBackground = true;
@@ -71,6 +77,21 @@ public class BackgroundDetector {
     eventBus.publish(new BackgroundChangeEvent(isInBackground));
   }
 
+  /**
+   * Called when something happens that means we need to reset the game back to the welcome screen
+   * (e.g. blitz reset). If we're currently foregrounded, we'll just do it immediately. If we're
+   * in the background, then we'll delay until we're back in the foreground again.
+   */
+  public void resetBackStack() {
+    if (currentVisibleActivity != null) {
+      currentVisibleActivity.startActivity(
+          new Intent(currentVisibleActivity, WarWorldsActivity.class));
+      needBackStackReset = false;
+    } else {
+      needBackStackReset = true;
+    }
+  }
+
   private void transitionToBackground() {
     if (isTransitioningToBackground) {
       return;
@@ -99,6 +120,10 @@ public class BackgroundDetector {
 
     isInBackground = false;
     onBackgroundStatusChange();
+
+    if (needBackStackReset) {
+      resetBackStack();
+    }
   }
 
   public void onActivityPause(long activityRunTimeMs) {
@@ -110,16 +135,18 @@ public class BackgroundDetector {
           && startingActivityPackage.startsWith("au.com.codeka.warworlds")) {
         // it's our activity that we're pausing for, don't transition to background.
       } else {
+        currentVisibleActivity = null;
         transitionToBackground();
       }
     }
   }
 
-  public void onActivityResume() {
+  public void onActivityResume(Activity activity) {
     if (startTimeMs == 0) {
       startTimeMs = SystemClock.elapsedRealtime();
     }
 
+    currentVisibleActivity = activity;
     numActiveActivities++;
     if (numActiveActivities == 1) {
       if (startingActivityPackage != null

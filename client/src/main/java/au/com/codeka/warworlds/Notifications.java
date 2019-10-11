@@ -33,6 +33,7 @@ import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.SitrepActivity;
+import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -72,6 +73,8 @@ public class Notifications {
   }
 
   public static void handleNotification(Context context, String name, String value) {
+    log.info("Got notification: %s %s", name, value);
+
     switch (name) {
       case "sitrep":
         handleSitrepNotification(context, value);
@@ -82,6 +85,11 @@ public class Notifications {
       case "cash":
         handleCashNotification(value);
         break;
+      case "blitz_reset":
+        handleBlitzResetNotification(context);
+        break;
+      default:
+        log.error("Unknown notification name: %s", name);
     }
   }
 
@@ -161,6 +169,12 @@ public class Notifications {
       empire.updateCash(newCash);
       EmpireManager.eventBus.publish(empire);
     }
+  }
+
+  private static void handleBlitzResetNotification(Context context) {
+    log.info("Blitz reset notification received.");
+    ServerGreeter.clearHello();
+    BackgroundDetector.i.resetBackStack();
   }
 
   private static void displayNotification(final Context context,

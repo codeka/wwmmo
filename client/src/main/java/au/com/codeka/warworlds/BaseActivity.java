@@ -94,7 +94,7 @@ public class BaseActivity extends AppCompatActivity {
             getWindowManager().addView(mDebugView, mDebugViewLayout);
         }
 
-        BackgroundDetector.i.onActivityResume();
+        BackgroundDetector.i.onActivityResume(this);
         super.onResumeFragments();
     }
 

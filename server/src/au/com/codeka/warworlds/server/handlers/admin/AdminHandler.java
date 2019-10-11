@@ -30,18 +30,6 @@ public class AdminHandler extends RenderingHandler {
     }
   }
 
-  @Override
-  protected void handleException(RequestException e) {
-    try {
-      TreeMap<String, Object> data = new TreeMap<>();
-      data.put("exception", e);
-      data.put("stack_trace", Throwables.getStackTraceAsString(e));
-      render("exception.html", data);
-    } catch (Exception e2) {
-      setResponseBody(e.getGenericError());
-    }
-  }
-
   protected void writeJson(JsonElement json) {
     getResponse().setContentType("text/json");
     getResponse().setHeader("Content-Type", "text/json; charset=utf-8");
