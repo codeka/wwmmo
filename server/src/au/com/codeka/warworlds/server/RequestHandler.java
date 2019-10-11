@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server;
 
-import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import com.google.gson.JsonObject;
@@ -73,7 +72,6 @@ public class RequestHandler {
     // start off with status 200, but the handler might change it
     this.response.setStatus(200);
 
-    RequestException lastException = null;
     for (int retries = 0; retries < 10; retries++) {
       try {
         onBeforeHandle();
@@ -100,7 +98,6 @@ public class RequestHandler {
             // Ignore.
           }
           log.warning("Retrying deadlock.", e);
-          lastException = e;
           continue;
         }
         if (e.getHttpErrorCode() < 500) {
@@ -118,17 +115,6 @@ public class RequestHandler {
         return;
       }
     }
-
-    // if we get here, it's because we exceeded the number of retries.
-    if (lastException != null) {
-      log.error("Too many retries: " + request.getRequestURI(), lastException);
-      lastException.populate(this.response);
-      handleException(lastException);
-    }
-  }
-
-  protected void handleException(RequestException e) {
-    setResponseBody(e.getGenericError());
   }
 
   /**
