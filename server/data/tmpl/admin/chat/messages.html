@@ -7,7 +7,7 @@
     section#messages {
       position: absolute;
       left: 0px;
-      right: 20%;
+      right: 30px;
       bottom: 50px;
       top: 70px;
       overflow-y: auto;
@@ -29,10 +29,6 @@
     form input[type=submit] {
       position: absolute;
       top: 0; right: 30px;
-    }
-    fieldset#sinbin {
-      position: absolute;
-      bottom: 50px; width: 20%; right: 0; top: 70px;
     }
     section#messages span.translated {
       font-style: italics;
@@ -57,14 +53,6 @@
     <div class="hack"><input type="text"></div>
     <input type="submit" value="Send">
   </form>
-  <fieldset id="sinbin">
-    <legend>Sinbin</legend>
-    <ul>
-      {% for empire in sinbin %}
-        <li>[{{empire.empire_id}}] {{empire.empireName}} until <script>document.write(new Date({{empire.expiry}}).toLocaleString());</script></li>
-      {% end %}
-    </ul>
-  </fieldset>
   <script>
     $("form input[type=text]").focus();
     $("form#sendmsg").on("click", "input[type=submit]", function(evnt) {

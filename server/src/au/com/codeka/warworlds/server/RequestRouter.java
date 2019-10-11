@@ -115,7 +115,6 @@ public class RequestRouter extends AbstractHandler {
         AdminAllianceRequestForceAcceptHandler.class));
     sRoutes.add(new Route("admin/chat", AdminChatHandler.class));
     sRoutes.add(new Route("admin/chat/profanity", AdminChatProfanityHandler.class));
-    sRoutes.add(new Route("admin/chat/sinbin", AdminChatSinbinHandler.class));
     sRoutes.add(new Route("admin/debug/purchases", AdminDebugPurchasesHandler.class, "admin/"));
     sRoutes.add(new Route(
         "admin/debug/error-reports", AdminDebugErrorReportsHandler.class, "admin/"));

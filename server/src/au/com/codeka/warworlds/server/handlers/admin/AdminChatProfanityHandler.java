@@ -29,7 +29,7 @@ public class AdminChatProfanityHandler extends AdminGenericHandler {
                 }
             }
         } catch(Exception e) {
-            log.error("Error fetching sinbin.", e);
+            log.error("Error fetching profane words list.", e);
             // TODO: handle errors
         }
 
