@@ -9,6 +9,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
+import au.com.codeka.warworlds.server.ctrl.GameHistoryController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.ctrl.StatisticsController;
 import au.com.codeka.warworlds.server.data.DB;
@@ -17,6 +18,7 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.EmpireStarStats;
+import au.com.codeka.warworlds.server.model.GameHistory;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class HelloHandler extends RequestHandler {
@@ -51,6 +53,15 @@ public class HelloHandler extends RequestHandler {
     // damn, this is why things should never be marked "required" in protobufs!
     hello_response_pb
         .setMotd(Messages.MessageOfTheDay.newBuilder().setMessage("").setLastUpdate(""));
+
+    GameHistory gameHistory = new GameHistoryController().getCurrent();
+    if (gameHistory == null) {
+      log.info("No game history, game is possibly currently resetting?");
+      throw new RequestException(
+          400,
+          Messages.GenericError.ErrorCode.ResetInProgress,
+          "Cannot log in yet, game is resetting.");
+    }
 
     // fetch the empire we're interested in
     Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
