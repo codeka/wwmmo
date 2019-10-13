@@ -9,8 +9,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * An implementation of the "event bus" pattern.
  *
  * <p/>Basically, you register objects with the event bus that include public methods annotated with
- * the {@link EventHandlerInfo} annotation, and when events are fired, the corresponding
- * implementation is called for you.
+ * the {@link EventHandler} annotation, and when events are fired, the corresponding implementation
+ * is called for you.
  *
  * <p/>A couple of features make this more interesting than just holding callbacks directly:
  * <ol>

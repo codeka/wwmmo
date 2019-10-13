@@ -16,6 +16,8 @@
   },
 
   // Firebase config stuff. Cut'n'paste from firebase console.
+  // https://console.firebase.google.com/u/0/project/<project>/settings/serviceaccounts/adminsdk
+  // Then "Generate new private key".
   "firebase": {},
 
   // Patreon config. Populate from https://www.patreon.com/portal/registration/register-clients
