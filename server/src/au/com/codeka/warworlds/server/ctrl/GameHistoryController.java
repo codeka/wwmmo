@@ -42,7 +42,7 @@ public class GameHistoryController {
     return currentHistory;
   }
 
-  public void markResetting() throws RequestException {
+  public GameHistory markResetting() throws RequestException {
     GameHistory current = getCurrent();
     if (current == null) {
       throw new RequestException(500, "Cannot mark resetting, no current game!");
@@ -54,6 +54,8 @@ public class GameHistoryController {
     } catch (Exception e) {
       throw new RequestException(e);
     }
+
+    return current;
   }
 
   public void startNewGame() throws RequestException {
@@ -94,11 +96,12 @@ public class GameHistoryController {
     }
 
     void markResetting(GameHistory game) throws Exception {
-      String sql = "UPDATE game_history SET state = ? WHERE id = ? AND state = ?";
+      String sql = "UPDATE game_history SET state = ?, date_finished = ? WHERE id = ? AND state = ?";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, GameHistory.State.RESETTING.getValue());
-        stmt.setLong(2, game.getId());
-        stmt.setInt(3, game.getState().getValue());
+        stmt.setDateTime(2, DateTime.now());
+        stmt.setLong(3, game.getId());
+        stmt.setInt(4, game.getState().getValue());
         if (stmt.update() != 1) {
           throw new RequestException(500, "No game to reset.");
         }
@@ -106,7 +109,16 @@ public class GameHistoryController {
     }
 
     void startNewGame() throws Exception {
-      String sql = "INSERT INTO game_history (date_created, state) VALUES (?, ?)";
+      String sql = "UPDATE game_history SET state = ? WHERE state = ?";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, GameHistory.State.FINISHED.getValue());
+        stmt.setInt(2, GameHistory.State.RESETTING.getValue());
+        if (stmt.update() != 1) {
+          throw new RequestException(500, "No game is resetting.");
+        }
+      }
+
+      sql = "INSERT INTO game_history (date_created, state) VALUES (?, ?)";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setDateTime(1, DateTime.now());
         stmt.setInt(2, GameHistory.State.NORMAL.getValue());

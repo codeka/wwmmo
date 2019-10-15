@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.server.data.SqlResult;
 public class GameHistory {
   private long id;
   private DateTime created;
+  private DateTime finished;
   private State state;
 
   public GameHistory() {
@@ -18,6 +19,7 @@ public class GameHistory {
   public GameHistory(SqlResult res) throws SQLException {
     id = res.getLong("id");
     created = res.getDateTime("date_created");
+    finished = res.getDateTime("date_finished");
     state = State.fromValue(res.getInt("state"));
   }
 
