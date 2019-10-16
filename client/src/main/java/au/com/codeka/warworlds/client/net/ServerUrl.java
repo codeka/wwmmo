@@ -12,18 +12,7 @@ import au.com.codeka.warworlds.client.util.Version;
  */
 public class ServerUrl {
   public static String getUrl() {
-    String serverUrl = GameSettings.i.getString(GameSettings.Key.SERVER);
-
-    if (BuildConfig.DEBUG && Version.isEmulator()) {
-      // In debug builds, on an emulator, we always want to connect to the host.
-      try {
-        URI uri = new URI(serverUrl);
-        serverUrl = serverUrl.replace(uri.getHost(), "10.0.2.2");
-      } catch (URISyntaxException e) {
-        return serverUrl;
-      }
-    }
-    return serverUrl;
+    return GameSettings.i.getString(GameSettings.Key.SERVER);
   }
 
   public static String getHost() {

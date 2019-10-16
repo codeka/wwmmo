@@ -19,6 +19,9 @@ message Sector {
 
   // the collection of stars in this sector.
   repeated Star stars = 3;
+
+  // the state of this sector, see SectorsStore.SectorState for possible values.
+  optional int32 state = 4;
 }
 
 message SectorCoord {

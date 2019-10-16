@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server;
 
+import org.joda.time.DateTime;
+
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +34,17 @@ public class LogImpl {
 
     @Override
     public void write(String tag, int level, String msg) {
+      // TODO: if debug
+      StringBuilder sb = new StringBuilder();
+      LogFormatter.DATE_TIME_FORMATTER.printTo(sb, DateTime.now());
+      sb.append(" ");
+      sb.append(LevelMap[level]);
+      sb.append(" ");
+      sb.append(tag);
+      sb.append(": ");
+      sb.append(msg);
+      System.out.println(sb.toString());
+
       log.log(LevelMap[level], tag + ": " + msg);
     }
   }

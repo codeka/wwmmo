@@ -14,7 +14,7 @@ import java.util.logging.LogRecord;
  * own custom class lets us do some extra stuff, too.
  */
 public class LogFormatter extends Formatter {
-  private static final DateTimeFormatter DATE_TIME_FORMATTER =
+  public static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
   public String format(LogRecord record) {

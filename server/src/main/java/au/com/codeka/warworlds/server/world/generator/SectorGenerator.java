@@ -1,8 +1,11 @@
 package au.com.codeka.warworlds.server.world.generator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+
+import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.PointCloud;
@@ -13,6 +16,7 @@ import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.DataStore;
 import au.com.codeka.warworlds.server.store.SectorsStore;
+import au.com.codeka.warworlds.server.util.Pair;
 import au.com.codeka.warworlds.server.world.SectorManager;
 
 /**
@@ -85,11 +89,22 @@ public class SectorGenerator {
           0.8,      2.0,      2.5,     0.1,       0.8,   1.0,   0.3,    0.5,   1.0
   };
 
-  public Sector generate(long x, long y) {
-    log.info("Generating sector (%d, %d)...", x, y);
-    random = new Random((x * 73649274L) ^ y ^ System.currentTimeMillis());
+  @Nullable
+  public Sector generate(Sector sector) {
+    if (sector.state != SectorsStore.SectorState.New.getValue()) {
+      return sector;
+    }
 
-    SectorCoord coord = new SectorCoord.Builder().x(x).y(y).build();
+    log.info("Generating sector (%d, %d)...", sector.x, sector.y);
+    SectorCoord coord = new SectorCoord.Builder().x(sector.x).y(sector.y).build();
+
+    if (!DataStore.i.sectors().updateSectorState(
+            coord, SectorsStore.SectorState.New, SectorsStore.SectorState.Generating)) {
+      log.warning("Could not update sector state to generating, assuming we can't generate there.");
+      return null;
+    }
+    random = new Random((sector.x * 73649274L) ^ sector.y ^ System.currentTimeMillis());
+
     ArrayList<Vector2> points = new PointCloud.PoissonGenerator()
         .generate(STAR_DENSITY, STAR_RANDOMNESS, random);
 
@@ -98,14 +113,17 @@ public class SectorGenerator {
       stars.add(generateStar(coord, point));
     }
 
-    Sector sector = new Sector.Builder()
-        .x(x)
-        .y(y)
-        .stars(stars)
-        .build();
-    DataStore.i.sectors().createSector(sector);
+    for (Star star : stars) {
+      DataStore.i.stars().put(star.id, star);
+    }
 
-    return sector;
+    DataStore.i.sectors().updateSectorState(
+            coord, SectorsStore.SectorState.Generating, SectorsStore.SectorState.Empty);
+
+    return sector.newBuilder()
+            .stars(stars)
+            .state(SectorsStore.SectorState.Empty.getValue())
+            .build();
   }
 
   /** Expands the universe by (at least) one sector. */
@@ -119,7 +137,11 @@ public class SectorGenerator {
     List<SectorCoord> coords =
         DataStore.i.sectors().findSectorsByState(SectorsStore.SectorState.New, numToGenerate);
     for (SectorCoord coord : coords) {
-      generate(coord.x, coord.y);
+      generate(new Sector.Builder()
+              .x(coord.x)
+              .y(coord.y)
+              .state(SectorsStore.SectorState.New.getValue())
+              .build());
       numToGenerate --;
     }
 

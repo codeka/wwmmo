@@ -156,8 +156,9 @@ public class EmpireManager {
     DataStore.i.empires().put(id, empire);
 
     DataStore.i.sectors().updateSectorState(
-        new SectorCoord.Builder().x(star.get().sector_x).y(star.get().sector_y).build(),
-        SectorsStore.SectorState.NonEmpty);
+            new SectorCoord.Builder().x(star.get().sector_x).y(star.get().sector_y).build(),
+            SectorsStore.SectorState.Empty,
+            SectorsStore.SectorState.NonEmpty);
 
     return watchEmpire(empire);
   }

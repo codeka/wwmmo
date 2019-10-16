@@ -8,9 +8,30 @@ $(function() {
   var currSectorX = 0;
   var currSectorY = 0;
 
+  // Describe the sector state, keep in sync with SectorsStore.SectorState.
+  function describeState(state) {
+    switch(state) {
+    case 0:
+      return "New";
+    case 1:
+      return "Empty";
+    case 2:
+      return "Non-empty";
+    case 3:
+      return "Abandoned";
+    default:
+      return "Unknown: " + state;
+    }
+  }
+
   function renderSector(sector) {
     var container = $("#starfield");
     container.empty();
+
+    var div = $("<div/>");
+    div.addClass("sector-state");
+    div.text(describeState(sector.state));
+    container.append(div);
 
     for (var index in sector.stars) {
       var star = sector.stars[index];

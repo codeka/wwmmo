@@ -77,7 +77,7 @@ public class Connection implements PacketDecoder.PacketHandler {
   @Override
   public void onDisconnect() {
     TaskRunner.i.runTask(player::onDisconnect, Threads.BACKGROUND);
-    manager.onDisconnect(empire.get().id, this);
+    manager.onDisconnect(empire.get().id);
   }
 
   private PacketEncoder.PacketHandler packetEncodeHandler = new PacketEncoder.PacketHandler() {

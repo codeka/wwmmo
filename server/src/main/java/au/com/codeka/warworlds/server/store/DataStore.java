@@ -55,6 +55,7 @@ public class DataStore {
 
   public void close() {
     try {
+      log.info("Closing data tables...");
       suspiciousEvents.close();
       stats.close();
       stars.close();

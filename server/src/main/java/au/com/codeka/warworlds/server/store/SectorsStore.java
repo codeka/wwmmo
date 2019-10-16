@@ -28,6 +28,9 @@ public class SectorsStore extends BaseStore {
     /** A brand new sector, hasn't even had stars generated for it yet. */
     New(0),
 
+    /** The sector is being generated, don't use yet (but also don't try to re-generate it) */
+    Generating(4),
+
     /** An empty sector, only stars with native colonies exist. */
     Empty(1),
 
@@ -62,31 +65,39 @@ public class SectorsStore extends BaseStore {
   }
 
   /**
-   * Gets the sector at the given x,y coordinates. Returns null if we don't have that sector stored
-   * yet.
+   * Gets the sector at the given x,y coordinates. Returns a blank sector in state "new" if we
+   * don't have one created yet.
    */
-  @Nullable
   public Sector getSector(long x, long y) {
-    ArrayList<Star> stars = DataStore.i.stars().getStarsForSector(x, y);
-    if (stars.isEmpty()) {
-      return null;
+    Sector.Builder sectorBuilder = new Sector.Builder();
+
+    try (QueryResult res = newReader()
+            .stmt("SELECT state FROM sectors WHERE x = ? AND y = ?")
+            .param(0, x)
+            .param(1, y)
+            .query()) {
+      if (res.next()) {
+        SectorState state = SectorState.fromValue(res.getInt(0));
+        log.info("Got sector state: %d", state.getValue());
+        sectorBuilder.state(state.getValue());
+      } else {
+        // No sector yet.
+        log.info("No sector at (%d, %d)", x, y);
+        sectorBuilder.state(SectorState.New.getValue());
+      }
+    } catch (Exception e) {
+      log.error("Unexpected error fetching sector state.", e);
+      throw new RuntimeException("Unexpected.", e);
     }
 
-    return new Sector.Builder().x(x).y(y).stars(stars).build();
-  }
-
-  /**
-   * Creates a new sector in the store. We assume the sector does not already exist, and if it does
-   * then an {@link IllegalStateException} will be thrown.
-   *
-   * TODO: make this a transaction. Can you even do that across databases?
-   */
-  public void createSector(Sector sector) {
-    for (Star star : sector.stars) {
-      DataStore.i.stars().put(star.id, star);
+    if (sectorBuilder.state != SectorState.New.getValue()) {
+      sectorBuilder.stars(DataStore.i.stars().getStarsForSector(x, y));
     }
 
-    updateSectorState(new SectorCoord.Builder().x(sector.x).y(sector.y).build(), SectorState.Empty);
+    return sectorBuilder
+            .x(x)
+            .y(y)
+            .build();
   }
 
   /**
@@ -131,17 +142,27 @@ public class SectorsStore extends BaseStore {
 
   /**
    * Update the given sector's state.
+   *
+   * @return true if the sector was updated, false if it was not (because the current state didn't
+   * match most likely).
    */
-  public void updateSectorState(SectorCoord coord, SectorState state) {
+  public boolean updateSectorState(SectorCoord coord, SectorState currState, SectorState newState) {
     try {
-      newWriter()
-          .stmt("UPDATE sectors SET state = ? WHERE x = ? AND y = ?")
-          .param(0, state.getValue())
+      int count = newWriter()
+          .stmt("UPDATE sectors SET state = ? WHERE x = ? AND y = ? AND state = ?")
+          .param(0, newState.getValue())
           .param(1, coord.x)
           .param(2, coord.y)
+          .param(3, currState.getValue())
           .execute();
+      if (count == 0 && currState == SectorState.New) {
+        insertNewSector(coord);
+        return true;
+      }
+      return count == 1;
     } catch (StoreException e) {
       log.error("Unexpected.", e);
+      return false;
     }
   }
 
@@ -206,19 +227,23 @@ public class SectorsStore extends BaseStore {
 
       // Now add all the new sectors.
       for (SectorCoord coord : missing) {
-        newWriter()
-            .stmt("INSERT INTO sectors (x, y, distance_to_centre, state) VALUES (?, ?, ?, ?)")
-            .param(0, coord.x)
-            .param(1, coord.y)
-            .param(2, Math.sqrt(coord.x * coord.x + coord.y * coord.y))
-            .param(3, SectorState.New.getValue())
-            .execute();
+        insertNewSector(coord);
       }
 
       trans.commit();
     } catch(Exception e) {
       log.error("Unexpected.", e);
     }
+  }
+
+  private void insertNewSector(SectorCoord coord) throws StoreException{
+    newWriter()
+            .stmt("INSERT INTO sectors (x, y, distance_to_centre, state) VALUES (?, ?, ?, ?)")
+            .param(0, coord.x)
+            .param(1, coord.y)
+            .param(2, Math.sqrt(coord.x * coord.x + coord.y * coord.y))
+            .param(3, SectorState.New.getValue())
+            .execute();
   }
 
   @Override

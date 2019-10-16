@@ -12,6 +12,7 @@ import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.world.generator.SectorGenerator;
 
 /**
@@ -29,8 +30,8 @@ public class SectorManager {
       WatchableObject<Sector> sector = sectors.get(coord);
       if (sector == null) {
         Sector s = DataStore.i.sectors().getSector(coord.x, coord.y);
-        if (s == null) {
-          s = new SectorGenerator().generate(coord.x, coord.y);
+        if (s.state == SectorsStore.SectorState.New.getValue()) {
+          s = new SectorGenerator().generate(s);
         }
         sector = new WatchableObject<>(s);
         sectors.put(coord, sector);
@@ -39,7 +40,9 @@ public class SectorManager {
         WatchableObject.Watcher<Star> watcher = new StarWatcher(coord);
         for (Star sectorStar : sector.get().stars) {
           WatchableObject<Star> star = StarManager.i.getStar(sectorStar.id);
-          star.addWatcher(watcher);
+          if (star != null) {
+            star.addWatcher(watcher);
+          }
         }
       }
       return sector;

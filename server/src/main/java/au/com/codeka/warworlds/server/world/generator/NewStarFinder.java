@@ -65,10 +65,6 @@ public class NewStarFinder {
       found = findStar();
     }
 
-    if (found) {
-      // Make sure the coord there isn't counted as being empty any more.
-      DataStore.i.sectors().updateSectorState(coord, SectorsStore.SectorState.NonEmpty);
-    }
     return found;
   }
 
@@ -129,6 +125,7 @@ public class NewStarFinder {
     Star star = findHighestScoreStar(sector.get());
     if (star == null) {
       log.debug("No stars found.");
+      // TODO: mark the sector as un-inhabitable.
       return false;
     }
 

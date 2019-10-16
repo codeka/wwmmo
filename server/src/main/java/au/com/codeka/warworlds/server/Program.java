@@ -53,18 +53,50 @@ public class Program {
       context.addServlet(new ServletHolder(AdminServlet.class), "/admin/*");
       context.addServlet(new ServletHolder(HtmlServlet.class), "/*");
 
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+        public void run() {
+          shutdown(server);
+        }
+      });
+
       server.start();
       log.info("Server started on http://localhost:%d/", port);
       server.join();
-
     } catch (Exception e) {
       log.error("Exception on main thread, aborting.", e);
-    } finally {
-      log.info("Shutting down.");
+    }
+  }
+
+  private static void shutdown(Server server) {
+    log.info("Shutdown initiatied.");
+    try {
+      server.stop();
+    } catch (Exception e) {
+      log.error("Error stopping HTTP server.", e);
+    }
+
+    try {
       ServerSocketManager.i.stop();
+    } catch (Exception e) {
+      log.error("Error shutting down server socket manager.", e);
+    }
+
+    try {
       StarSimulatorQueue.i.stop();
+    } catch (Exception e) {
+      log.error("Error shutting down star simulation queue.", e);
+    }
+
+    try {
       SmtpHelper.i.stop();
+    } catch (Exception e) {
+      log.error("Error shutting down SMTP helper.", e);
+    }
+
+    try {
       DataStore.i.close();
+    } catch (Exception e) {
+      log.error("Error shutting down data store.", e);
     }
   }
 }

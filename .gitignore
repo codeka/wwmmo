@@ -19,6 +19,7 @@ server/src/main/data/config-debug.json
 server/src/main/data/firebase.json
 client/signing.properties
 client/*.apk
+server/src/main/data/logs/
 
 # Android Studio/gradle files and directories
 .gradle

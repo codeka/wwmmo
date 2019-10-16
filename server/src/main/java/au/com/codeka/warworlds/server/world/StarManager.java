@@ -17,6 +17,7 @@ import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
+import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
@@ -26,6 +27,7 @@ import au.com.codeka.warworlds.common.sim.StarHelper;
 import au.com.codeka.warworlds.common.sim.StarModifier;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.store.DataStore;
+import au.com.codeka.warworlds.server.store.SectorsStore;
 import au.com.codeka.warworlds.server.store.StarsStore;
 
 /**
@@ -330,6 +332,28 @@ public class StarManager {
         } else {
           nextSimulateTime = fleet.eta;
         }
+      }
+    }
+
+    // If the star has at least one non-native colony, make sure the sector is marked non-empty
+    boolean nonEmpty = false;
+    for (Planet planet : star.get().planets) {
+      if (planet.colony != null && planet.colony.empire_id != null) {
+        nonEmpty = true;
+        break;
+      }
+    }
+    if (nonEmpty) {
+      SectorCoord coord =
+              new SectorCoord.Builder().x(star.get().sector_x).y(star.get().sector_y).build();
+      WatchableObject<Sector> sector = SectorManager.i.getSector(coord);
+      if (sector.get().state == SectorsStore.SectorState.Empty.getValue()) {
+        DataStore.i.sectors().updateSectorState(
+                coord, SectorsStore.SectorState.Empty,
+                SectorsStore.SectorState.NonEmpty);
+        sector.set(sector.get().newBuilder()
+                .state(SectorsStore.SectorState.NonEmpty.getValue())
+                .build());
       }
     }
 

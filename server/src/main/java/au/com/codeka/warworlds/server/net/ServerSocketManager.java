@@ -24,6 +24,7 @@ public class ServerSocketManager {
 
   private ServerSocket serverSocket;
   private Thread acceptThread;
+  private boolean closing;
 
   private final Map<Long, PendingConnection> pendingConnections = new TreeMap<>();
   private final Map<Long, Connection> connections = new TreeMap<>();
@@ -38,6 +39,7 @@ public class ServerSocketManager {
 
     acceptThread = new Thread(this::acceptThreadProc);
     acceptThread.start();
+    closing = false;
     return true;
   }
 
@@ -57,6 +59,7 @@ public class ServerSocketManager {
 
   public void stop() {
     log.info("Server socket stopping.");
+    closing = true;
 
     try {
       serverSocket.close();
@@ -74,7 +77,7 @@ public class ServerSocketManager {
   }
 
   /** Called by the {@link Connection} when it disconnects. */
-  void onDisconnect(Long empireId, Connection conn) {
+  void onDisconnect(Long empireId) {
     connections.remove(empireId);
   }
 
@@ -101,7 +104,7 @@ public class ServerSocketManager {
     private final Socket socket;
     private final OutputStream outs;
 
-    public PendingConnectionPacketHandler(Socket socket, OutputStream outs) {
+    PendingConnectionPacketHandler(Socket socket, OutputStream outs) {
       this.socket = socket;
       this.outs = outs;
     }
@@ -140,7 +143,9 @@ public class ServerSocketManager {
         log.debug("Socket accepted from %s", socket.getRemoteSocketAddress());
         handleConnection(socket);
       } catch (IOException e) {
-        log.error("Error accepting connection.", e);
+        if (!closing) {
+          log.error("Error accepting connection.", e);
+        }
         return;
       }
     }

@@ -13,10 +13,11 @@ public class StoreWriter extends StatementBuilder<StoreWriter> {
   }
 
   @Override
-  public void execute() throws StoreException {
-    super.execute();
+  public int execute() throws StoreException {
+    int count = super.execute();
     if (transaction == null) {
       close();
     }
+    return count;
   }
 }

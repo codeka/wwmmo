@@ -140,7 +140,10 @@ class StatementBuilder<T extends StatementBuilder> implements AutoCloseable {
     return (T) this;
   }
 
-  public void execute() throws StoreException {
+  /**
+   * Execute the current state and returns the number of rows affected, or -1 if this was a select.
+   */
+  public int execute() throws StoreException {
     if (e != null) {
       throw new StoreException(e);
     }
@@ -148,7 +151,11 @@ class StatementBuilder<T extends StatementBuilder> implements AutoCloseable {
     checkNotNull(stmt, "stmt() must be called before param()");
     long startTime = System.nanoTime();
     try {
-      stmt.execute();
+      if (!stmt.execute()) {
+        return stmt.getUpdateCount();
+      } else {
+        return -1;
+      }
     } catch (SQLException e) {
       throw new StoreException(e);
     } finally {
