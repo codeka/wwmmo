@@ -22,9 +22,7 @@ public class Runner {
       NameGenerator.setup();
 
       EventProcessor.i.ping();
-
-      StarSimulatorThreadManager starSimulatorThreadManager = new StarSimulatorThreadManager();
-      starSimulatorThreadManager.start();
+      StarSimulatorThreadManager.i.start();
 
       CronRunnerThread.setup();
 
@@ -35,7 +33,7 @@ public class Runner {
       log.info("Server started on http://localhost:%d/", port);
       server.join();
 
-      starSimulatorThreadManager.stop();
+      StarSimulatorThreadManager.i.stop();
 
     } catch (Exception e) {
       log.error("Exception on main thread, aborting.", e);

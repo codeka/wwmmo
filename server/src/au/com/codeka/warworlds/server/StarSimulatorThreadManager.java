@@ -12,6 +12,8 @@ import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class StarSimulatorThreadManager {
+  public static final StarSimulatorThreadManager i = new StarSimulatorThreadManager();
+
   private static final Log log = new Log("StarSimulatorThreadManager");
 
   private final ArrayList<StarSimulatorThread> threads = new ArrayList<>();
@@ -32,6 +34,7 @@ public class StarSimulatorThreadManager {
     for (StarSimulatorThread thread : threads) {
       thread.stop();
     }
+    starIDs.clear();
   }
 
   /** Returns the ID of the next star to simulate. */
