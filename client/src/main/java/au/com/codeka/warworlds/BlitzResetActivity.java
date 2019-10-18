@@ -18,8 +18,8 @@ import au.com.codeka.warworlds.model.RankHistoryManager;
  * show the final rankings before moving on.
  */
 public class BlitzResetActivity extends BaseActivity {
-  private Context mContext = this;
-  private EmpireRankList mEmpireList;
+  private Context context = this;
+  private EmpireRankList empireList;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -29,10 +29,10 @@ public class BlitzResetActivity extends BaseActivity {
     View rootView = findViewById(android.R.id.content);
     ActivityBackgroundGenerator.setBackground(rootView);
 
-    mEmpireList = findViewById(R.id.empire_rankings);
+    empireList = findViewById(R.id.empire_rankings);
     final ProgressBar progress = findViewById(R.id.progress_bar);
     progress.setVisibility(View.VISIBLE);
-    mEmpireList.setVisibility(View.GONE);
+    empireList.setVisibility(View.GONE);
 
     Button startBtn = findViewById(R.id.start_btn);
     startBtn.setOnClickListener(new View.OnClickListener() {
@@ -40,17 +40,17 @@ public class BlitzResetActivity extends BaseActivity {
       public void onClick(View v) {
         // now we can move to the WarWorlds activity again and get started.
         finish();
-        startActivity(new Intent(mContext, WarWorldsActivity.class));
+        startActivity(new Intent(context, WarWorldsActivity.class));
       }
     });
 
     RankHistoryManager.i.getRankHistory(DateTime.now().minusMonths(1), new RankHistoryManager.RankHistoryFetchedHandler() {
       @Override
       public void onRankHistoryFetched(RankHistory rankHistory) {
-        mEmpireList.setEmpireRanks(rankHistory.getRanks());
+        empireList.setEmpireRanks(rankHistory.getRanks());
 
         progress.setVisibility(View.GONE);
-        mEmpireList.setVisibility(View.VISIBLE);
+        empireList.setVisibility(View.VISIBLE);
       }
     });
   }

@@ -77,7 +77,7 @@
     <activity android:name=".EmpireSetupActivity" />
     <activity android:name=".RealmSelectActivity" />
     <activity android:name=".EmpireResetActivity" />
-    <activity android:name=".BlitzResetActivity" />
+    <activity android:name=".BlitzResetActivity" android:exported="true" />
     <activity android:name=".game.build.BuildActivity" />
     <activity
       android:name=".game.empire.EmpireActivity"

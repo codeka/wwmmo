@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -35,6 +36,8 @@ import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
 public class EmpireRankList extends ListView {
+  private static final Log log = new Log("DEANH EmpireRankList");
+
   private RankListAdapter rankListAdapter;
   private Context context;
 
@@ -55,8 +58,9 @@ public class EmpireRankList extends ListView {
     if (isInEditMode()) {
       return;
     }
-    ShieldManager.eventBus.register(mEventHandler);
-    EmpireManager.eventBus.register(mEventHandler);
+    log.info("onAttachedToWindow, registering.");
+    ShieldManager.eventBus.register(eventHandler);
+    EmpireManager.eventBus.register(eventHandler);
   }
 
   @Override
@@ -65,8 +69,9 @@ public class EmpireRankList extends ListView {
     if (isInEditMode()) {
       return;
     }
-    ShieldManager.eventBus.unregister(mEventHandler);
-    EmpireManager.eventBus.unregister(mEventHandler);
+    log.info("onDetachedToWindow, un-registering.");
+    ShieldManager.eventBus.unregister(eventHandler);
+    EmpireManager.eventBus.unregister(eventHandler);
   }
 
   public void setEmpires(List<Empire> empires, boolean addGaps) {
@@ -86,7 +91,7 @@ public class EmpireRankList extends ListView {
     return null;
   }
 
-  private Object mEventHandler = new Object() {
+  private Object eventHandler = new Object() {
     @EventHandler
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
       rankListAdapter.notifyDataSetChanged();
@@ -94,12 +99,13 @@ public class EmpireRankList extends ListView {
 
     @EventHandler
     public void onEmpireUpdated(Empire empire) {
+      log.info("onEmpireUpdated: " + empire.getDisplayName());
       rankListAdapter.onEmpireUpdated(empire);
     }
   };
 
   private class RankListAdapter extends BaseAdapter {
-    private ArrayList<ItemEntry> mEntries;
+    private ArrayList<ItemEntry> entries;
     private BackgroundRunner<ArrayList<ItemEntry>> mEmpireFetcher;
     private ArrayList<ItemEntry> mWaitingFetch;
 
@@ -126,32 +132,30 @@ public class EmpireRankList extends ListView {
       }
 
       setEntries(entries, addGaps);
-
     }
 
     public void onEmpireUpdated(Empire empire) {
-      if (mEntries == null) {
+      if (entries == null) {
         return;
       }
 
-      boolean refreshedAll = true;
-      for (ItemEntry entry : mEntries) {
+      boolean needRefresh = false;
+      for (ItemEntry entry : entries) {
         if (entry.getRank() != null && entry.getRank().getEmpireKey().equals(empire.getKey())) {
           entry.setEmpire(empire);
-        }
-        if (entry.getEmpire() == null) {
-          refreshedAll = false;
+
+          // TODO: only refresh if this entry is visible?
+          needRefresh = true;
         }
       }
 
-      // if we've fetched them all, then refresh the data set
-      if (refreshedAll) {
+      if (needRefresh) {
         notifyDataSetChanged();
       }
     }
 
     private void setEntries(List<ItemEntry> entries, boolean addGaps) {
-      mEntries = new ArrayList<>();
+      this.entries = new ArrayList<>();
 
       Collections.sort(entries, new Comparator<ItemEntry>() {
         @Override
@@ -176,10 +180,10 @@ public class EmpireRankList extends ListView {
           continue;
         }
         if (lastRank != 0 && entry.getRank().getRank() != lastRank + 1 && addGaps) {
-          mEntries.add(new ItemEntry());
+          this.entries.add(new ItemEntry());
         }
         lastRank = entry.getRank().getRank();
-        mEntries.add(entry);
+        this.entries.add(entry);
       }
 
       notifyDataSetChanged();
@@ -192,11 +196,11 @@ public class EmpireRankList extends ListView {
 
     @Override
     public int getItemViewType(int position) {
-      if (mEntries == null) {
+      if (entries == null) {
         return 0;
       }
 
-      if (mEntries.get(position).getEmpire() == null) {
+      if (entries.get(position).getEmpire() == null) {
         return 1;
       }
       return 0;
@@ -204,23 +208,23 @@ public class EmpireRankList extends ListView {
 
     @Override
     public boolean isEnabled(int position) {
-      return mEntries != null && mEntries.get(position).getEmpire() != null;
+      return entries != null && entries.get(position).getEmpire() != null;
     }
 
     @Override
     public int getCount() {
-      if (mEntries == null) {
+      if (entries == null) {
         return 0;
       }
-      return mEntries.size();
+      return entries.size();
     }
 
     @Override
     public Object getItem(int position) {
-      if (mEntries == null) {
+      if (entries == null) {
         return null;
       }
-      return mEntries.get(position);
+      return entries.get(position);
     }
 
     @Override
@@ -230,7 +234,7 @@ public class EmpireRankList extends ListView {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-      ItemEntry entry = mEntries.get(position);
+      ItemEntry entry = entries.get(position);
       View view = convertView;
 
       if (view == null) {

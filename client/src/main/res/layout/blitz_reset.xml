@@ -16,7 +16,7 @@
               android:layout_alignParentTop="true"
               android:layout_alignParentRight="true"
               android:layout_toRightOf="@+id/title_icon"
-              android:text="Blitz"
+              android:text="Reset"
               style="@style/TitleText" />
 
     <Button android:id="@+id/start_btn"
@@ -37,7 +37,7 @@
               android:layout_marginBottom="10dp"
               android:layout_marginLeft="@dimen/tablet_margin"
               android:layout_marginRight="@dimen/tablet_margin"
-              android:text="Blitz has been reset! See below for the final rankings (you can also see this from the &quot;Empire&quot; screen in the game). Good luck in this month's game!" />
+              android:text="The game has been reset! See below for the final rankings. Good luck in the next round!" />
 
     <au.com.codeka.warworlds.ctrl.EmpireRankList
         android:id="@+id/empire_rankings"

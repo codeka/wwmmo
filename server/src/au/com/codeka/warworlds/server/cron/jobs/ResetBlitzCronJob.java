@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.HashSet;
 
 import au.com.codeka.warworlds.server.RequestException;
-import au.com.codeka.warworlds.server.StarSimulatorThread;
 import au.com.codeka.warworlds.server.StarSimulatorThreadManager;
 import au.com.codeka.warworlds.server.cron.AbstractCronJob;
 import au.com.codeka.warworlds.server.cron.CronJob;
@@ -90,6 +89,9 @@ public class ResetBlitzCronJob extends AbstractCronJob {
 
     // Restart the star simulator thread
     StarSimulatorThreadManager.i.start();
+
+    // Re-calculate all of the ranks once more.
+    new UpdateRanksCronJob().run("");
 
     return "Success.";
   }
