@@ -472,12 +472,11 @@ public class EmpireController {
   }
 
   /**
-   * If your old home star has been destroyed, for example, this will find us a
-   * new one.
+   * If your old home star has been destroyed, for example, this will find us a new one.
    */
   public void findNewHomeStar(int empireID) throws RequestException {
     ArrayList<Integer> starIds = new ArrayList<>();
-    String sql = "SELECT DISTINCT star_id" + " FROM colonies" + " WHERE empire_id = ?";
+    String sql = "SELECT DISTINCT star_id FROM colonies WHERE empire_id = ?";
     try (SqlStmt stmt = DB.prepare(sql)) {
       stmt.setInt(1, empireID);
       SqlResult res = stmt.select();
@@ -775,7 +774,9 @@ public class EmpireController {
       HashSet<Integer> notOnlineEmpireIDs = new HashSet<>();
       DateTime now = DateTime.now();
       for (Empire empire : empires.values()) {
-        empire.setHomeStar(new StarController().getStar(empire.getHomeStarID()));
+        if (empire.getHomeStarID() != 0) {
+          empire.setHomeStar(new StarController().getStar(empire.getHomeStarID()));
+        }
         if (new NotificationController().isEmpireOnline(empire.getID())) {
           empire.setLastSeen(now);
         } else {
