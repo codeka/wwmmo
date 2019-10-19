@@ -7,11 +7,11 @@
       <p>You can have only one shipyard on your planet, but it's efficiency and the range of
       ships available to you can be upgraded with the building of supporting buildings.</p>
     ]]></description>
-    <cost minerals="300" time="2.4" />
+    <cost minerals="150" time="1.4" />
     <limits maxPerColony="1" />
     <upgrades>
       <upgrade level="2">
-        <cost minerals="300" time="2.4" />
+        <cost minerals="150" time="1.4" />
       </upgrade>
     </upgrades>
     <show inSolarSystem="true" />
@@ -26,31 +26,31 @@
       <p>A level 1 Silo adds 100 storage for minerals and goods. A level 2 Silo adds 210, level 3
       adds 330, a level 4 Silo adds 460, and a level 5 Silo adds 600.</p>
     ]]></description>
-    <cost credits="100" minerals="400" time="0.5" />
+    <cost credits="100" minerals="200" time="0.1" />
     <effects>
       <effect kind="storage" goods="100" minerals="100" />
     </effects>
     <upgrades>
       <upgrade level="2">
-        <cost minerals="400" time="0.5" />
+        <cost minerals="200" time="0.1" />
         <effects>
           <effect kind="storage" goods="210" minerals="210" />
         </effects>
       </upgrade>
       <upgrade level="3">
-        <cost minerals="400" time="0.5" />
+        <cost minerals="200" time="0.1" />
         <effects>
           <effect kind="storage" goods="330" minerals="330" />
         </effects>
       </upgrade>
       <upgrade level="4">
-        <cost minerals="400" time="0.5" />
+        <cost minerals="200" time="0.1" />
         <effects>
           <effect kind="storage" goods="460" minerals="460" />
         </effects>
       </upgrade>
       <upgrade level="5">
-        <cost minerals="400" time="0.5" />
+        <cost minerals="200" time="0.1" />
         <effects>
           <effect kind="storage" goods="600" minerals="600" />
         </effects>
@@ -64,7 +64,7 @@
       <p>Allows you to build more advanced ships and buildings. The higher the level of this
       building, the more advanced research becomes available.</p>
     ]]></description>
-    <cost minerals="1000" time="0.75" />
+    <cost minerals="750" time="0.15" />
     <upgrades>
       <upgrade level="2">
         <cost minerals="1500" time="1.2" />
@@ -80,13 +80,13 @@
       carrier. Your colony's base defence will be increased by 0.25 for each level
       of Ground Shield.
     ]]></description>
-    <cost minerals="350" time="1.2" />
+    <cost minerals="150" time="0.8" />
     <effects>
       <effect kind="defence" bonus="0.25" />
     </effects>
     <upgrades>
       <upgrade level="2">
-        <cost minerals="350" time="1.2" />
+        <cost minerals="150" time="0.8" />
         <effects>
           <effect kind="defence" bonus="0.5" />
         </effects>
@@ -95,7 +95,7 @@
         </dependencies>
       </upgrade>
       <upgrade level="3">
-        <cost minerals="350" time="1.2" />
+        <cost minerals="150" time="0.8" />
         <effects>
           <effect kind="defence" bonus="0.75" />
         </effects>
@@ -104,7 +104,7 @@
         </dependencies>
       </upgrade>
       <upgrade level="4">
-        <cost minerals="350" time="1.2" />
+        <cost minerals="150" time="0.8" />
         <effects>
           <effect kind="defence" bonus="1.0" />
         </effects>
@@ -113,7 +113,7 @@
         </dependencies>
       </upgrade>
       <upgrade level="5">
-        <cost minerals="350" time="1.2" />
+        <cost minerals="150" time="0.8" />
         <effects>
           <effect kind="defence" bonus="1.25" />
         </effects>
@@ -133,26 +133,26 @@
       congeniality. But each level of biosphere adds 100 or 15% (whichever is
       greater).</p>
     ]]></description>
-    <cost minerals="400" time="3.4" />
+    <cost minerals="200" time="1.4" />
     <effects>
       <effect kind="populationBoost" boost="0.15" min="100" />
     </effects>
     <limits maxPerColony="1" />
     <upgrades>
       <upgrade level="2">
-        <cost minerals="400" time="3.4" />
+        <cost minerals="200" time="1.4" />
         <effects>
           <effect kind="populationBoost" boost="0.3" min="200" />
         </effects>
       </upgrade>
       <upgrade level="3">
-        <cost minerals="400" time="3.4" />
+        <cost minerals="200" time="1.4" />
         <effects>
           <effect kind="populationBoost" boost="0.45" min="300" />
         </effects>
       </upgrade>
       <upgrade level="4">
-        <cost minerals="400" time="3.4" />
+        <cost minerals="200" time="1.4" />
         <effects>
           <effect kind="populationBoost" boost="0.60" min="400" />
         </effects>
@@ -292,11 +292,11 @@
     <effects>
       <effect kind="goodsBoost" boost="0.10" minBoost="5" />
     </effects>
-    <cost minerals="400" time="3.4" />
+    <cost minerals="200" time="1.4" />
     <limits maxPerColony="1" />
     <upgrades>
       <upgrade level="2">
-        <cost minerals="400" time="3.4" />
+        <cost minerals="200" time="1.4" />
         <effects>
           <effect kind="goodsBoost" boost="0.20" minBoost="10" />
         </effects>
@@ -305,7 +305,7 @@
         </dependencies>
       </upgrade>
       <upgrade level="3">
-        <cost minerals="400" time="3.4" />
+        <cost minerals="200" time="1.4" />
         <effects>
           <effect kind="goodsBoost" boost="0.30" minBoost="15" />
         </effects>
@@ -314,7 +314,7 @@
         </dependencies>
       </upgrade>
       <upgrade level="4">
-        <cost minerals="400" time="3.4" />
+        <cost minerals="200" time="1.4" />
         <effects>
           <effect kind="goodsBoost" boost="0.50" minBoost="20" />
         </effects>
@@ -323,7 +323,7 @@
         </dependencies>
       </upgrade>
       <upgrade level="5">
-        <cost minerals="400" time="3.4" />
+        <cost minerals="200" time="1.4" />
         <effects>
           <effect kind="goodsBoost" boost="0.75" minBoost="30" />
         </effects>

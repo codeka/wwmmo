@@ -483,7 +483,7 @@ public class Simulation {
             float populationIncrease;
             if (goodsEfficiency >= 1.0f) {
                 populationIncrease = Math.max(colony.getPopulation(), 10.0f);
-                populationIncrease *= colony.getPopulationFocus() * 0.5f;
+                populationIncrease *= colony.getPopulationFocus() * 0.75f;
             } else {
                 populationIncrease = Math.max(colony.getPopulation(), 10.0f);
                 populationIncrease *= (1.0f - colony.getPopulationFocus());

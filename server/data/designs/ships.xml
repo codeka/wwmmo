@@ -10,9 +10,9 @@
     <dependencies>
       <requires building="shipyard" level="1" />
     </dependencies>
-    <cost minerals="1000" time="4.0" maxCount="100" />
+    <cost minerals="1000" time="1.0" maxCount="100" />
     <fuel costPerParsec="35" />
-    <stats speed="1" baseAttack="1" baseDefence="1" combatPriority="100" />
+    <stats speed="15" baseAttack="1" baseDefence="1" combatPriority="100" />
     <effects>
       <effect kind="fighter" />
     </effects>
@@ -39,9 +39,9 @@
     <dependencies>
       <requires building="shipyard" level="1" />
     </dependencies>
-    <cost minerals="50" time="0.1667" maxCount="10000" />
+    <cost minerals="50" time="0.01667" maxCount="10000" />
     <fuel costPerParsec="0.1" />
-    <stats speed="23" baseAttack="1" baseDefence="1" combatPriority="100" />
+    <stats speed="150" baseAttack="1" baseDefence="1" combatPriority="100" />
     <effects>
       <effect kind="scout" />
       <effect kind="fighter" />
@@ -69,9 +69,9 @@
     <dependencies>
       <requires building="shipyard" level="1" />
     </dependencies>
-    <cost minerals="45" time="0.15" maxCount="50000" />
+    <cost minerals="10" time="0.075" maxCount="50000" />
     <fuel costPerParsec="0.2" />
-    <stats speed="10" baseAttack="5" baseDefence="15" combatPriority="10"  />
+    <stats speed="30" baseAttack="5" baseDefence="15" combatPriority="10"  />
     <effects>
       <effect kind="fighter" />
     </effects>
@@ -96,9 +96,9 @@
     <dependencies>
       <requires building="shipyard" level="1" />
     </dependencies>
-    <cost minerals="50" time="0.17" maxCount="50000" />
+    <cost minerals="12" time="0.075" maxCount="50000" />
     <fuel costPerParsec="0.2" />
-    <stats speed="10" baseAttack="1" baseDefence="1" combatPriority="50"  />
+    <stats speed="25" baseAttack="1" baseDefence="1" combatPriority="50"  />
     <effects>
       <effect kind="troopcarrier" />
       <effect kind="fighter" />
@@ -117,7 +117,7 @@
     </dependencies>
     <cost minerals="98000" time="128.0" maxCount="5" />
     <fuel costPerParsec="3096.2" />
-    <stats speed="0.6" baseAttack="1" baseDefence="1" combatPriority="99"  />
+    <stats speed="1" baseAttack="1" baseDefence="1" combatPriority="99"  />
     <effects>
       <effect kind="empty-space-mover">
         <star-distance min="12" />
