@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.designeffects;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet;
@@ -21,28 +22,30 @@ public class FighterShipEffect extends ShipEffect {
   private final Log log = new Log("FighterShipEffect");
 
   /**
-   * This is called when we arrive on a star. If there's anybody to attack, we'll switch to
-   * an attacking state.
+   * This is called when we arrive on a star. If there's anybody to attack, we'll switch to an
+   * attacking state.
    */
   @Override
   public void onArrived(BaseStar star, BaseFleet fleet) {
-    if (fleet.getStance() != Fleet.Stance.AGGRESSIVE) {
-      return;
-    }
-
     for (BaseFleet existingBaseFleet : star.getFleets()) {
       Fleet existingFleet = (Fleet) existingBaseFleet;
       if (existingFleet.getID() == ((Fleet) fleet).getID()) {
         continue;
       }
 
-      // if it's the friendly, then we're not going to attack it
+      // If it's already doing something, skip it.
+      if (existingFleet.getState() != BaseFleet.State.IDLE) {
+        continue;
+      }
+
+      // if it's friendly, then we're not going to attack it
       if (Simulation.isFriendly(existingFleet, fleet)) {
         continue;
       }
 
       // if it's not a fighter, then it's not combat-worthy
-      ShipDesign existingFleetShipDesign = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, existingFleet.getDesignID());
+      ShipDesign existingFleetShipDesign =
+          (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, existingFleet.getDesignID());
       if (!existingFleetShipDesign.hasEffect(FighterShipEffect.class)) {
         continue;
       }
@@ -52,10 +55,19 @@ public class FighterShipEffect extends ShipEffect {
         continue;
       }
 
-      log.info("Fleet #%s arrived at star #%s, found enemy fleet, switching to attack mode.",
-          fleet.getKey(), star.getKey());
-      ((Fleet) fleet).attack(DateTime.now());
-      break;
+      // Either us or the other fleet needs to be AGGRESSIVE to switch to attack mode.
+      if (fleet.getState() != BaseFleet.State.ATTACKING && fleet.getStance() == Stance.AGGRESSIVE) {
+        log.info("Fleet #%s arrived at star #%s, found enemy fleet, switching to attack mode.",
+            fleet.getKey(), star.getKey());
+        fleet.attack(DateTime.now());
+      }
+
+      if (existingFleet.getState() != BaseFleet.State.ATTACKING
+          && existingFleet.getStance() == Stance.AGGRESSIVE) {
+        log.info("Fleet #%s arrived at star #%s, an enemy fleet is switching to attack mode.",
+            fleet.getKey(), star.getKey());
+        existingFleet.attack(DateTime.now());
+      }
     }
   }
 
