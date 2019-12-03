@@ -2,6 +2,9 @@ package au.com.codeka.warworlds.server;
 
 import org.eclipse.jetty.server.Server;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.cron.CronRunnerThread;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
@@ -27,7 +30,7 @@ public class Runner {
       CronRunnerThread.setup();
 
       int port = Configuration.i.getListenPort();
-      Server server = new Server(port);
+      Server server = new Server(new InetSocketAddress(InetAddress.getLoopbackAddress(), port));
       server.setHandler(new RequestRouter());
       server.start();
       log.info("Server started on http://localhost:%d/", port);
