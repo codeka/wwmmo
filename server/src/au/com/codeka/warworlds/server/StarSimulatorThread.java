@@ -97,6 +97,11 @@ public class StarSimulatorThread {
 
       Star star = new StarController().getStar(starID);
       if (star.getLastSimulation().isAfter(DateTime.now().minusHours(1))) {
+        if (manager.hasMoreStarsToSimulate()) {
+          // if there's more cached stars, just try again immediately.
+          return 0;
+        }
+
         // how long would we have to wait (in seconds) before there WOULD HAVE been one hour since
         // it was last simulated?
         int seconds = Seconds
@@ -111,15 +116,14 @@ public class StarSimulatorThread {
 
       long endTime = System.currentTimeMillis();
       log.info(String.format(Locale.US,
-          "Simulated star (%d colonies, %d fleets) in %dms (%dms in DB): \"%s\" [%d]", star
-              .getColonies().size(), star.getFleets().size(), endTime - startTime, endTime
-              - simulateEndTime, star.getName(), star.getID()));
+          "Simulated star (%d colonies, %d fleets) in %dms (%dms in DB): \"%s\" [%d]",
+          star.getColonies().size(), star.getFleets().size(), endTime - startTime,
+          endTime - simulateEndTime, star.getName(), star.getID()));
       return WAIT_TIME_NORMAL;
     } catch (Exception e) {
       log.error("Exception caught simulating star!", e);
-      // TODO: if there are errors, it'll just keep reporting
-      // over and over... probably a good thing because we'll
-      // definitely need to fix it!
+      // TODO: if there are errors, it'll just keep reporting over and over... probably a good thing
+      // because we'll definitely need to fix it!
       return WAIT_TIME_ERROR;
     }
   }

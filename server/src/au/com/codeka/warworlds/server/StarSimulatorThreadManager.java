@@ -37,13 +37,19 @@ public class StarSimulatorThreadManager {
     starIDs.clear();
   }
 
+  public boolean hasMoreStarsToSimulate() {
+    synchronized (lock) {
+      return !starIDs.isEmpty();
+    }
+  }
+
   /** Returns the ID of the next star to simulate. */
   public int getNextStar() {
     synchronized(lock) {
       if (starIDs.isEmpty()) {
         // Grab 50 stars at a time, to save all those queries.
-        String sql = "SELECT id FROM stars" + " WHERE empire_count > 0"
-            + " ORDER BY last_simulation ASC LIMIT 50";
+        String sql =
+            "SELECT id FROM stars WHERE empire_count > 0 ORDER BY last_simulation ASC LIMIT 50";
         try (SqlStmt stmt = DB.prepare(sql)) {
           SqlResult res = stmt.select();
           while (res.next()) {
@@ -64,6 +70,7 @@ public class StarSimulatorThreadManager {
       }
 
       if (starIDs.isEmpty()) {
+        log.info("Got an empty set, no stars to simulate.");
         return 0;
       }
       int starID = starIDs.remove();

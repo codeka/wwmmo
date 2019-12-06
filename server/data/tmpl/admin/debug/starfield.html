@@ -111,7 +111,7 @@
             var $starKey = $("#star-simulate-form input[name=starKey]");
 
             $("#update-form textarea").val("");
-            var url = "/realms/beta/stars/"+$starKey.val()+"/simulate";
+            var url = "/realms/{{realm}}/stars/"+$starKey.val()+"/simulate";
             if ($("#star-simulate-update").prop("checked")) {
             	url += "?update=1";
             }
