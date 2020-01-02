@@ -15,6 +15,9 @@ import au.com.codeka.warworlds.server.model.DesignManager;
 public class Runner {
   private static final Log log = new Log("Runner");
 
+  private static int exitCode;
+  private static Server server;
+
   public static void main(String[] args) throws Exception {
     Configuration.loadConfig();
     LogImpl.setup();
@@ -30,16 +33,35 @@ public class Runner {
       CronRunnerThread.setup();
 
       int port = Configuration.i.getListenPort();
-      Server server = new Server(new InetSocketAddress(InetAddress.getLoopbackAddress(), port));
+      server = new Server(new InetSocketAddress(InetAddress.getLoopbackAddress(), port));
       server.setHandler(new RequestRouter());
       server.start();
       log.info("Server started on http://localhost:%d/", port);
       server.join();
 
+      log.info("Stopping star simulator thread");
       StarSimulatorThreadManager.i.stop();
 
+      log.info("Stopping cron thread");
+      CronRunnerThread.cleanup();
+
+      log.info("Server exiting with status code %d", exitCode);
+      System.exit(exitCode);
     } catch (Exception e) {
       log.error("Exception on main thread, aborting.", e);
+    }
+  }
+
+  public static void stop(int exitCode) {
+    Runner.exitCode = exitCode;
+
+    log.info("Server shutting down.");
+    try {
+      server.stop();
+    } catch(Exception e) {
+      log.error("Unexpected error stopping server.", e);
+      // If we get an error, we'll just System.exit() forcefully.
+      System.exit(exitCode);
     }
   }
 }

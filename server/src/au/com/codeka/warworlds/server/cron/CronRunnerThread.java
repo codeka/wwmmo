@@ -15,10 +15,25 @@ public class CronRunnerThread extends Thread {
   private static final Log log = new Log("CronRunnerThread");
 
   private static final CronRunnerThread thread = new CronRunnerThread();
+  private boolean stopped;
+  private final Object lock = new Object();
 
   /** Called at startup to begin the cron thread. */
   public static void setup() {
     thread.start();
+  }
+
+  public static void cleanup() {
+    synchronized (thread.lock) {
+      thread.stopped = true;
+      thread.lock.notify();
+    }
+
+    try {
+      thread.join();
+    } catch (InterruptedException e) {
+      log.error("Exception waiting for cron runner thread.", e);
+    }
   }
 
   public static synchronized void runNow(CronJobDetails jobDetails) {
@@ -62,7 +77,7 @@ public class CronRunnerThread extends Thread {
 
   @Override
   public void run() {
-    while (true) {
+    while (!stopped) {
       try {
         List<CronJobDetails> jobs = new CronController().list();
 
@@ -91,7 +106,13 @@ public class CronRunnerThread extends Thread {
         }
 
         try {
-          Thread.sleep(sleepTime);
+          synchronized (lock) {
+            if (sleepTime == 0) {
+              // As zero means "forever" in Java-land, we'll just wait 1 millisecond.
+              sleepTime = 1;
+            }
+            lock.wait(sleepTime);
+          }
         } catch(InterruptedException e) {
           log.info("Sleep interrupted, checking for new jobs.");
           continue;
@@ -104,5 +125,7 @@ public class CronRunnerThread extends Thread {
         log.error("Exception running cron job.", e);
       }
     }
+
+    log.info("Cron thread has stopped.");
   }
 }

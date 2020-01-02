@@ -13,11 +13,21 @@ pushd $ROOTPATH > /dev/null
 ./gradlew --daemon :server:installDist
 popd > /dev/null
 
-pushd $INSTALLPATH > /dev/null
-SERVER_OPTS=""
-SERVER_OPTS="$SERVER_OPTS -Dau.com.codeka.warworlds.server.ConfigFile=$INSTALLPATH/data/config-debug.json"
-SERVER_OPTS="$SERVER_OPTS -Djava.util.logging.config.file=logging-debug.properties"
-SERVER_OPTS="$SERVER_OPTS" exec ./bin/server $*
-popd > /dev/null
+function run_server()
+{
+  pushd $INSTALLPATH > /dev/null
+  SERVER_OPTS=""
+  SERVER_OPTS="$SERVER_OPTS -Dau.com.codeka.warworlds.server.ConfigFile=$INSTALLPATH/data/config-debug.json"
+  SERVER_OPTS="$SERVER_OPTS -Djava.util.logging.config.file=logging-debug.properties"
+  SERVER_OPTS="$SERVER_OPTS" ./bin/server $*
+  SERVER_STATUS=$?
+  popd > /dev/null
+  return $SERVER_STATUS
+}
 
+until run_server; do
+  echo "War Worlds exited prematurely with exit code $?. Restarting.." >&2
+  sleep 1
+done
+echo "War Worlds exited normally." >&2
 
