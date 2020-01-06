@@ -2,31 +2,31 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: '*.jar')
-    implementation fileTree(dir: '../jetty/lib', include: '*.jar')
-    implementation 'au.com.codeka:carrot:2.4.1'
-    implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'joda-time:joda-time:2.9.9'
-    implementation 'com.google.protobuf:protobuf-java:3.6.0'
-    implementation 'com.google.guava:guava:24.1-jre'
-    implementation 'com.patreon:patreon:0.4.2'
-    implementation 'org.reflections:reflections:0.9.11'
-    implementation project(':common')
+  implementation fileTree(dir: 'libs', include: '*.jar')
+  implementation fileTree(dir: '../jetty/lib', include: '*.jar')
+  implementation 'au.com.codeka:carrot:2.4.1'
+  implementation 'com.google.code.gson:gson:2.8.5'
+  implementation 'joda-time:joda-time:2.9.9'
+  implementation 'com.google.protobuf:protobuf-java:3.6.0'
+  implementation 'com.google.guava:guava:24.1-jre'
+  implementation 'com.patreon:patreon:0.4.2'
+  implementation 'org.reflections:reflections:0.9.11'
+  implementation project(':common')
 }
 
 sourceSets {
-    main {
-        java {
-            srcDir 'src'
-        }
+  main {
+    java {
+      srcDir 'src'
     }
+  }
 }
 
 mainClassName = "au.com.codeka.warworlds.server.Runner"
 
 applicationDistribution.from("data/") {
-    into "data"
+  into "data"
 }
 applicationDistribution.from("scripts/") {
-    into ""
+  into ""
 }

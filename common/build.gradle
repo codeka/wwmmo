@@ -1,23 +1,23 @@
 apply plugin: 'java'
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: '*.jar')
-    implementation 'com.google.guava:guava:24.1-android'
-    implementation 'com.google.code.gson:gson:2.8.2'
-    implementation 'joda-time:joda-time:2.9.9'
-    implementation 'com.google.protobuf:protobuf-java:3.6.0'
-    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+  implementation fileTree(dir: 'libs', include: '*.jar')
+  implementation 'com.google.guava:guava:24.1-android'
+  implementation 'com.google.code.gson:gson:2.8.5'
+  implementation 'joda-time:joda-time:2.9.9'
+  implementation 'com.google.protobuf:protobuf-java:3.6.0'
+  implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 tasks.withType(JavaCompile) {
-    sourceCompatibility = "1.7"
-    targetCompatibility = "1.7"
+  sourceCompatibility = "1.7"
+  targetCompatibility = "1.7"
 }
 
 sourceSets {
-    main {
-        java {
-            srcDir 'src'
-        }
+  main {
+    java {
+      srcDir 'src'
     }
+  }
 }
