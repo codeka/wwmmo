@@ -60,7 +60,7 @@ public class BuildQueueHandler extends RequestHandler {
         // This actually directly adds the building/fleet, skipping all the stuff that saves the
         // build request, simulates the star, finishes the request, simulates and save the star
         // again.
-        new BuildQueueController().ensureBuildAllowed(star, buildRequest);
+        new BuildQueueController(t).ensureBuildAllowed(star, buildRequest);
 
         // If we're accelerating immediately, skip all the build request stuff, just take their
         // cash an add the building/fleet.
@@ -72,7 +72,7 @@ public class BuildQueueHandler extends RequestHandler {
         audit_record_pb.setBuildDesignId(buildRequest.getDesignID());
         audit_record_pb.setBuildCount(buildRequest.getCount());
         audit_record_pb.setAccelerateAmount(1.0f);
-        if (!new EmpireController().withdrawCash(
+        if (!new EmpireController(t).withdrawCash(
             buildRequest.getEmpireID(), cost, audit_record_pb)) {
           throw new RequestException(400, Messages.GenericError.ErrorCode.InsufficientCash,
               "You don't have enough cash to accelerate this build.");
