@@ -1,14 +1,17 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.NewEmpireStarFinder;
 import au.com.codeka.warworlds.server.ctrl.StarController;
-import au.com.codeka.warworlds.server.ctrl.StarExportController;
 import au.com.codeka.warworlds.server.model.Star;
 
 /**
@@ -60,7 +63,15 @@ public class StarsHandler extends RequestHandler {
       }
       getResponse().setCharacterEncoding("utf-8");
       try {
-        new StarExportController().export(getResponse().getOutputStream());
+        String fileName =
+            new File(Configuration.i.getDataDirectory(), "export.csv").getAbsolutePath();
+        FileInputStream ins = new FileInputStream(fileName);
+        byte[] buffer = new byte[1024];
+        OutputStream outs = getResponse().getOutputStream();
+        int n;
+        while ((n = ins.read(buffer)) > 0) {
+          outs.write(buffer, 0, n);
+        }
       } catch (IOException e) {
         log.error("Error occurred exporting stars.", e);
       }
