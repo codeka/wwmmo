@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.monitor.RequestStatMonitor;
 
 import com.google.gson.JsonObject;
 
@@ -25,12 +26,12 @@ public class AdminDashboardHandler extends AdminHandler {
       return;
     }
 
-    TreeMap<String, Object> data = new TreeMap<String, Object>();
+    TreeMap<String, Object> data = new TreeMap<>();
 
     DateTime now = DateTime.now();
-    ArrayList<TreeMap<String, Object>> graphData = new ArrayList<TreeMap<String, Object>>();
+    ArrayList<TreeMap<String, Object>> graphData = new ArrayList<>();
     for (int i = 0; i < 60; i++) {
-      TreeMap<String, Object> graphEntry = new TreeMap<String, Object>();
+      TreeMap<String, Object> graphEntry = new TreeMap<>();
       DateTime dt = now.minusDays(i);
       Calendar c = Calendar.getInstance();
       c.setTime(dt.toDate());
@@ -62,6 +63,8 @@ public class AdminDashboardHandler extends AdminHandler {
       throw new RequestException(e);
     }
     data.put("graph_data", graphData);
+
+    data.put("debug", RequestStatMonitor.i.getCurrentHour().toString());
 
     render("admin/index.html", data);
   }

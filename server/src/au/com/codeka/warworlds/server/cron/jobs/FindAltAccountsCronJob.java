@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.server.cron.jobs;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
@@ -62,7 +63,7 @@ public class FindAltAccountsCronJob extends AbstractCronJob {
         }
 
         if (numFound > 0) {
-          log.info(String.format(
+          log.info(String.format(Locale.ENGLISH,
               "Found %d alts and %d devices for: %s", alt_acct_pb.getAltEmpireCount() - 1,
               alt_acct_pb.getDeviceCount(), emailAddress));
           alts.add(alt_acct_pb.build());

@@ -187,11 +187,13 @@ public class RequestRouter extends AbstractHandler {
       }
     }
 
+    long startTime = System.currentTimeMillis();
     try {
       monitorManager.onBeginRequest(session, request, response);
       handler.handle(matcher, route.extraOption, session, request, response);
     } finally {
-      monitorManager.onEndRequest(session, request, response);
+      monitorManager.onEndRequest(
+          session, request, response, System.currentTimeMillis() - startTime);
     }
   }
 

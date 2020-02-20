@@ -17,6 +17,6 @@ public abstract class Monitor {
 
   /** Called after the request was processed. */
   public void onEndRequest(Session session, HttpServletRequest request,
-      HttpServletResponse response) {
+      HttpServletResponse response, long processTimeMs) {
   }
 }
