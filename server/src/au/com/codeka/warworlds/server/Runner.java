@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.server.cron.CronRunnerThread;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
 import au.com.codeka.warworlds.server.data.SchemaUpdater;
 import au.com.codeka.warworlds.server.model.DesignManager;
+import au.com.codeka.warworlds.server.monitor.RequestStatMonitor;
 
 /** Main entry-point for the server. */
 public class Runner {
@@ -32,18 +33,14 @@ public class Runner {
 
       CronRunnerThread.setup();
 
+      Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
+
       int port = Configuration.i.getListenPort();
       server = new Server(new InetSocketAddress(InetAddress.getLoopbackAddress(), port));
       server.setHandler(new RequestRouter());
       server.start();
       log.info("Server started on http://localhost:%d/", port);
       server.join();
-
-      log.info("Stopping star simulator thread");
-      StarSimulatorThreadManager.i.stop();
-
-      log.info("Stopping cron thread");
-      CronRunnerThread.cleanup();
 
       log.info("Server exiting with status code %d", exitCode);
       System.exit(exitCode);
@@ -64,4 +61,15 @@ public class Runner {
       System.exit(exitCode);
     }
   }
+
+  private static final Runnable shutdownHook = () -> {
+    log.info("Stopping star simulator thread");
+    StarSimulatorThreadManager.i.stop();
+
+    log.info("Stopping cron thread");
+    CronRunnerThread.cleanup();
+
+    log.info("Cleaning up request stat monitor");
+    RequestStatMonitor.i.cleanup();
+  };
 }

@@ -2,6 +2,12 @@ package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
@@ -9,10 +15,13 @@ import org.joda.time.Days;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.monitor.RequestStatMonitor;
 
 import com.google.gson.JsonObject;
@@ -62,9 +71,62 @@ public class AdminDashboardHandler extends AdminHandler {
     } catch (Exception e) {
       throw new RequestException(e);
     }
-    data.put("graph_data", graphData);
+    data.put("active_empires_graph", graphData);
 
-    data.put("debug", RequestStatMonitor.i.getCurrentHour().toString());
+    ArrayList<Messages.RequestStatHour> stats = RequestStatMonitor.i.getLastHours(48);
+
+    // Figure out for each empire in the set the number of requests in total they've sent over
+    // the time period.
+    HashSet<Integer> allEmpires = new HashSet<>();
+    HashMap<Integer, Integer> topRequestingEmpires = new HashMap<>();
+    for (Messages.RequestStatHour stat : stats) {
+      for (Messages.RequestStatEmpireHour empireStat : stat.getEmpireList()) {
+        allEmpires.add(empireStat.getEmpireId());
+        Integer n = topRequestingEmpires.get(empireStat.getEmpireId());
+        if (n == null) {
+          n = 0;
+        }
+        n = n + empireStat.getTotalRequests();
+        topRequestingEmpires.put(empireStat.getEmpireId(), n);
+      }
+    }
+
+    // We just want the top 10 empires, by number of requests
+    int TOP = 10;
+    PriorityQueue<Integer> empiresPriorityQueue =
+        new PriorityQueue<>(
+            (lhs, rhs) -> topRequestingEmpires.get(rhs) - topRequestingEmpires.get(lhs));
+    empiresPriorityQueue.addAll(allEmpires);
+    HashMap<Integer, Empire> topEmpires = new HashMap<>();
+    for (Integer empireId : empiresPriorityQueue) {
+      Empire empire = new EmpireController().getEmpire(empireId);
+      topEmpires.put(empireId, empire);
+      if (topEmpires.size() >= TOP) {
+        break;
+      }
+    }
+
+    ArrayList<HashMap<Object, Object>> requestGraphData = new ArrayList<>();
+    for (int i = 0; i < stats.size(); i++) {
+      Messages.RequestStatHour stat = stats.get(i);
+      HashMap<Object, Object> graphEntry = new HashMap<>();
+      int year = stat.getDay() / 10000;
+      int month = (stat.getDay() - (year * 10000)) / 100;
+      int day = stat.getDay() - (year * 10000) - (month * 100);
+      int hour = stat.getHour();
+
+      graphEntry.put("date", new DateTime(year, month + 1, day, hour, 0, 0));
+      graphEntry.put("total", stat.getTotalRequests());
+      for (Messages.RequestStatEmpireHour empireHour : stat.getEmpireList()) {
+        Empire empire = topEmpires.get(empireHour.getEmpireId());
+        if (empire != null) {
+          graphEntry.put(empire.getID(), empireHour.getTotalRequests());
+        }
+      }
+      requestGraphData.add(graphEntry);
+    }
+    data.put("request_graph", requestGraphData);
+    data.put("top_request_empires", topEmpires);
 
     render("admin/index.html", data);
   }

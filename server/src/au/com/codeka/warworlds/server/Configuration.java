@@ -38,6 +38,7 @@ public class Configuration {
   @Expose private LimitsConfiguration limits;
   @Expose private ResetsConfig resets;
   @Expose private PatreonConfig patreon;
+  @Expose private String requestStatsDirectory;
 
   public Configuration() {
     limits = new LimitsConfiguration();
@@ -76,6 +77,10 @@ public class Configuration {
 
   public PatreonConfig getPatreon() {
     return patreon;
+  }
+
+  public String getRequestStatsDirectory() {
+    return requestStatsDirectory;
   }
 
   public static class DatabaseConfiguration {

@@ -7,6 +7,9 @@
   "realmName": "Blitz", // name of the realm we're accepting requests for
   "listenPort": 8080, // port to listen for HTTP connections on
 
+  // path to directory where we save request stats.
+  "requestStatsDirectory": "/path/to/request/stats/directory",
+
   // The number of star simulation threads to run, set to 0 to disable star simulations.
   "numStarSimulationThreads": 1,
 

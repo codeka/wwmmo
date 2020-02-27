@@ -1,13 +1,23 @@
 package au.com.codeka.warworlds.server.monitor;
 
+import org.joda.time.DateTime;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.Session;
 
 /**
@@ -15,11 +25,13 @@ import au.com.codeka.warworlds.server.Session;
  * who is making them, etc.
  */
 public class RequestStatMonitor extends Monitor {
+  private static final Log log = new Log("RequestStatMonitor");
   private final Object lock = new Object();
 
   public static final RequestStatMonitor i = new RequestStatMonitor();
 
   private RequestStatMonitor() {
+    loadCurrentHour();
   }
 
   private Messages.RequestStatHour.Builder currentHour;
@@ -49,8 +61,56 @@ public class RequestStatMonitor extends Monitor {
     }
   }
 
+  /**
+   * Called when we are shut down. We'll save our current hour's worth of stats so that we can
+   * start back up where we left off after restarting.
+   */
+  public void cleanup() {
+    saveCurrentHour();
+  }
+
   public Messages.RequestStatHour getCurrentHour() {
     return buildStats();
+  }
+
+  /**
+   * Returns an {@link ArrayList} of the last <c>num</c> hours of stats, including the current
+   * hour.
+   */
+  public ArrayList<Messages.RequestStatHour> getLastHours(int num) {
+    ArrayList<Messages.RequestStatHour> stats = new ArrayList<>();
+    stats.add(getCurrentHour());
+
+    File baseDir = new File(Configuration.i.getRequestStatsDirectory());
+    DateTime dt = DateTime.now().minusHours(1);
+    while (num >= 1) {
+      File file = new File(
+          baseDir,
+          String.format(
+              Locale.ENGLISH, "%04d/%02d/%04d-%02d-%02d-%02d.pb", dt.getYear(), dt.getMonthOfYear(),
+              dt.getYear(), dt.getMonthOfYear(), dt.getDayOfMonth(), dt.getHourOfDay()));
+      if (!file.exists()) {
+        int day = dt.getYear() * 10000 + dt.getMonthOfYear() * 100 + dt.getDayOfMonth();
+        int hour = dt.getHourOfDay();
+
+        stats.add(Messages.RequestStatHour.newBuilder()
+            .setDay(day)
+            .setHour(hour)
+            .build());
+      } else {
+        try {
+          FileInputStream ins = new FileInputStream(file);
+          stats.add(Messages.RequestStatHour.parseFrom(ins));
+        } catch (IOException e) {
+          log.warning("Error parsing proto from file: ", e);
+        }
+      }
+
+      dt = dt.minusHours(1);
+      num--;
+    }
+
+    return stats;
   }
 
   private Messages.RequestStatHour buildStats() {
@@ -58,7 +118,11 @@ public class RequestStatMonitor extends Monitor {
     Messages.RequestStatHour.Builder stats;
     synchronized (lock) {
       if (currentHour == null) {
-        return Messages.RequestStatHour.getDefaultInstance();
+        DateTime now = DateTime.now();
+        int day = now.getYear() * 10000 + now.getMonthOfYear() * 100 + now.getDayOfMonth();
+        int hour = now.getHourOfDay();
+
+        return Messages.RequestStatHour.newBuilder().setDay(day).setHour(hour).build();
       }
       stats = currentHour.clone();
     }
@@ -114,18 +178,66 @@ public class RequestStatMonitor extends Monitor {
     return stats.build();
   }
 
+  private void saveCurrentHour() {
+    Messages.RequestStatHour stats = buildStats();
+
+    File baseDir = new File(Configuration.i.getRequestStatsDirectory());
+
+    int year = stats.getDay() / 10000;
+    int month = (stats.getDay() - (year * 10000)) / 100;
+    int day = stats.getDay() - (year * 10000) - (month * 100);
+    int hour = stats.getHour();
+    File file = new File(
+        baseDir,
+        String.format(
+            Locale.ENGLISH, "%04d/%02d/%04d-%02d-%02d-%02d.pb", year, month, year, month,
+            day, hour));
+    File parent = file.getParentFile();
+    if (!parent.exists()) {
+      if (!parent.mkdirs()) {
+        log.warning("Couldn't create parent directory. This is probably going to fail.");
+      }
+    }
+
+    try {
+      FileOutputStream outs = new FileOutputStream(file);
+      outs.write(stats.toByteArray());
+      outs.close();
+    } catch (IOException e) {
+      log.error("Error writing stats.", e);
+    }
+  }
+
+  /** Attempt to load the current hour from disk, if there is one. */
+  private void loadCurrentHour() {
+    File baseDir = new File(Configuration.i.getRequestStatsDirectory());
+
+    DateTime dt = DateTime.now();
+    File file = new File(
+        baseDir,
+        String.format(
+            Locale.ENGLISH, "%04d/%02d/%04d-%02d-%02d-%02d.pb", dt.getYear(), dt.getMonthOfYear(),
+            dt.getYear(), dt.getMonthOfYear(), dt.getDayOfMonth(), dt.getHourOfDay()));
+    log.info("Attempting to load stats from: %s", file.getAbsolutePath());
+    if (file.exists()) {
+      try {
+        FileInputStream ins = new FileInputStream(file);
+        currentHour = Messages.RequestStatHour.parseFrom(ins).toBuilder();
+      } catch (IOException e) {
+        log.warning("Error parsing proto from file: ", e);
+      }
+    }
+  }
+
   private Messages.RequestStatHour.Builder ensureCurrentHour() {
     synchronized (lock) {
-      Calendar now = Calendar.getInstance();
-      int day = now.get(Calendar.YEAR) * 10000 + now.get(Calendar.MONTH) * 100 +
-          now.get(Calendar.DAY_OF_MONTH);
-      int hour = now.get(Calendar.HOUR_OF_DAY);
+      DateTime now = DateTime.now();
+      int day = now.getYear() * 10000 + now.getMonthOfYear() * 100 + now.getDayOfMonth();
+      int hour = now.getHourOfDay();
 
       if (currentHour == null || currentHour.getDay() != day || currentHour.getHour() != hour) {
         if (currentHour != null) {
-          Messages.RequestStatHour stats = buildStats();
-          // TODO: save to the database.
-
+          saveCurrentHour();
         }
 
         currentHour = Messages.RequestStatHour.newBuilder()
