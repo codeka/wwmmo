@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.monitor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.Session;
 
 /**
@@ -12,7 +13,7 @@ import au.com.codeka.warworlds.server.Session;
 public abstract class Monitor {
   /** Called before the request is processed. */
   public void onBeginRequest(Session session, HttpServletRequest request,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws RequestSuspendedException, RequestException {
   }
 
   /** Called after the request was processed. */

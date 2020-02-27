@@ -18,6 +18,7 @@ import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.handlers.*;
 import au.com.codeka.warworlds.server.handlers.admin.*;
 import au.com.codeka.warworlds.server.monitor.MonitorManager;
+import au.com.codeka.warworlds.server.monitor.RequestSuspendedException;
 
 public class RequestRouter extends AbstractHandler {
   private static final Log log = new Log("RequestRouter");
@@ -189,7 +190,15 @@ public class RequestRouter extends AbstractHandler {
 
     long startTime = System.currentTimeMillis();
     try {
-      monitorManager.onBeginRequest(session, request, response);
+      try {
+        monitorManager.onBeginRequest(session, request, response);
+      } catch (RequestException e) {
+        e.populate(response);
+        return;
+      } catch (RequestSuspendedException e) {
+        // request was suspended, just finish.
+        return;
+      }
       handler.handle(matcher, route.extraOption, session, request, response);
     } finally {
       monitorManager.onEndRequest(

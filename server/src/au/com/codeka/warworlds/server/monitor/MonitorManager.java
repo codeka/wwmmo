@@ -6,7 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.Session;
+import au.com.codeka.warworlds.server.monitor.ratelimit.RequestRateLimiter;
 
 /**
  * Monitors are used to monitor requests and responses. They're called at various points during the
@@ -19,15 +21,16 @@ public class MonitorManager {
   public MonitorManager() {
     monitors.add(new EmpireIpAddressMonitor());
     monitors.add(RequestStatMonitor.i);
+    monitors.add(new RequestRateLimiter());
   }
 
   /** Called before the request is processed. */
   public void onBeginRequest(Session session, HttpServletRequest request,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws RequestSuspendedException, RequestException {
     for (Monitor monitor : monitors) {
       try {
         monitor.onBeginRequest(session, request, response);
-      } catch (Exception e) {
+      } catch (RuntimeException e) {
         log.error("Unhandled error processing onBeginRequest.", e);
       }
     }
@@ -39,7 +42,7 @@ public class MonitorManager {
     for (Monitor monitor : monitors) {
       try {
         monitor.onEndRequest(session, request, response, processTimeMs);
-      } catch (Exception e) {
+      } catch (RuntimeException e) {
         log.error("Unhandled error processing onEndRequest.", e);
       }
     }
