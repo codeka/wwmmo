@@ -41,6 +41,9 @@ public class RequestRateLimiter extends Monitor {
   public void onBeginRequest(Session session, HttpServletRequest request,
                              HttpServletResponse response)
       throws RequestSuspendedException, RequestException {
+    if (session == null) {
+      return;
+    }
     Bucket bucket = buckets.get(session.getEmpireID());
     if (bucket == null) {
       // No rate-limit configured, good to go.

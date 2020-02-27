@@ -114,7 +114,7 @@
     <tr>
       <td><%= key %></td>
       <td><img src="/realms/{{realm}}/alliances/<%= key %>/shield?size=32" width="32" height="32" /></td>
-      <td><a href="javascript:;" class="alliance-name" data-id=<%= key %>><%= name %></a></td>
+      <td><a href="javascript:;" class="alliance-name" data-id=<%= key %>><% if (name == "") { %>[noname]<% } else { %><%= name %><% } %></a></td>
       <td style="text-align: right;"><%= num_members %></td>
       <td style="text-align: right;">$<%= formatNumber(bank_balance) %></td>
     </tr>

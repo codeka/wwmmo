@@ -16,7 +16,6 @@
 keystore.jks
 
 server/data/config-debug.json
-server/data/rate-limit.json
 client/signing.properties
 client/src/main/assets/warworlds.properties
 
