@@ -603,6 +603,9 @@ public class Notifications {
     private Handler handler;
     private boolean paused;
 
+    private long pollDelayMs;
+    private static final long MAX_POLL_DELAY_MS = 30000;
+
     public void start() {
       log.debug("Notification long-poll starting.");
       handler = new Handler();
@@ -624,15 +627,16 @@ public class Notifications {
           ApiRequest apiRequest = new ApiRequest.Builder("notifications", "GET").build();
           RequestManager.i.sendRequestSync(apiRequest);
           if (apiRequest.exception() != null) {
-            continue;
+            throw apiRequest.exception();
           }
           Messages.Notifications notificationsPb = apiRequest.body(Messages.Notifications.class);
           if (notificationsPb == null) {
-            continue;
+            throw new Exception("Didn't get a notification, HTTP error?");
           }
 
           log.info("Long-poll complete, got %d notifications.",
               notificationsPb.getNotificationsCount());
+          pollDelayMs = 0;
           for (Messages.Notification pb : notificationsPb.getNotificationsList()) {
             final String name = pb.getName();
             final String value = pb.getValue();
@@ -644,10 +648,19 @@ public class Notifications {
               }
             });
           }
-        } catch (Exception e) {
-          log.error("Exception caught in long-polling, waiting a bit then re-trying.", e);
+        } catch (Throwable e) {
+          if (pollDelayMs == 0) {
+            pollDelayMs = 100;
+          } else {
+            pollDelayMs *= 2;
+          }
+          if (pollDelayMs > MAX_POLL_DELAY_MS) {
+            pollDelayMs = MAX_POLL_DELAY_MS;
+          }
+          log.error("Exception caught in long-polling, waiting %dms re-trying.", pollDelayMs, e);
+
           try {
-            Thread.sleep(1000 + ((int) (Math.random() * 9000))); // wait from 1 to 10 seconds...
+            Thread.sleep(pollDelayMs);
           } catch (InterruptedException e1) {
             // Ignored, just try again.
           }
