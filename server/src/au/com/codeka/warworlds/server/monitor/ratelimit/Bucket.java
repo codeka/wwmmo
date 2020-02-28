@@ -4,6 +4,8 @@ import com.google.api.client.util.Objects;
 
 import org.joda.time.DateTime;
 
+import javax.servlet.http.HttpServletRequest;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 
@@ -82,7 +84,7 @@ public class Bucket {
    * @return Number of milliseconds to delay the request by, not 0 if no delay is required.
    * @throws RequestException If the request should be rejected outright.
    */
-  public long delayRequest() throws RequestException {
+  public long delayRequest(HttpServletRequest request) throws RequestException {
     synchronized (lock) {
       if (maxRequestsPerHour > 0) {
         DateTime hour = DateTime.now().withTime(DateTime.now().getHourOfDay(), 0, 0, 0);
@@ -106,11 +108,12 @@ public class Bucket {
       if (hardDeny) {
         // If it's a hard deny, throw an exception with a status code indicating as such.
         numHardDenies ++;
+        log.info("Hard deny %s %s for: %s", request.getMethod(), request.getPathInfo(), hard);
         throw new RequestException(429, "Rate limit exceeded.");
       }
       else if (softDeny) {
         numSoftDenies ++;
-        log.info("soft deny for limit: %s", soft);
+        log.info("Soft deny %s %s for: %s", request.getMethod(), request.getPathInfo(), hard);
         return delayMs;
       }
 
