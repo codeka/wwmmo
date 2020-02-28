@@ -4,6 +4,7 @@
 //
 {
   "dataDirectory": "/path/to/data", // path to the data directory
+  "configDirectory": "/path/to/config", // config files go here.
   "realmName": "Blitz", // name of the realm we're accepting requests for
   "listenPort": 8080, // port to listen for HTTP connections on
 

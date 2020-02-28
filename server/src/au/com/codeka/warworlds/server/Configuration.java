@@ -32,6 +32,7 @@ public class Configuration {
 
   @Expose private String realmName;
   @Expose private String dataDirectory;
+  @Expose private String configDirectory;
   @Expose private int listenPort;
   @Expose private Integer numStarSimulationThreads;
   @Expose private DatabaseConfiguration database;
@@ -51,6 +52,8 @@ public class Configuration {
   public File getDataDirectory() {
     return new File(dataDirectory);
   }
+
+  public File getConfigDirectory() { return new File(configDirectory); }
 
   public int getListenPort() {
     return listenPort;

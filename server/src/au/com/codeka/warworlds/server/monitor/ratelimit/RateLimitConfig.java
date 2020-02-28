@@ -17,7 +17,7 @@ public class RateLimitConfig {
   @Expose List<Bucket> buckets = new ArrayList<>();
 
   public static RateLimitConfig load() {
-    File file = new File(Configuration.i.getDataDirectory(), "rate-limit.json");
+    File file = new File(Configuration.i.getConfigDirectory(), "rate-limit.json");
     if (!file.exists()) {
       return new RateLimitConfig();
     }
@@ -38,26 +38,24 @@ public class RateLimitConfig {
 
   static class BucketLimit {
     @Expose double qps = 1.0;
-    @Expose long delayMs = 2000;
     @Expose int size = 10;
 
     public double getQps() {
       return qps;
     }
 
-    public long getDelayMs() {
-      return delayMs;
-    }
-
     public int getSize() {
       return size;
     }
+
   }
 
   static class Bucket {
     @Expose List<Integer> empireIds = new ArrayList<>();
     @Expose BucketLimit softLimit = new BucketLimit();
     @Expose BucketLimit hardLimit = new BucketLimit();
+    @Expose long delayMs = 2000;
+    @Expose int maxRequestsPerHour = 0;
 
     public List<Integer> getEmpireIds() {
       return empireIds;
@@ -69,6 +67,14 @@ public class RateLimitConfig {
 
     public BucketLimit getHardLimit() {
       return hardLimit;
+    }
+
+    public long getDelayMs() {
+      return delayMs;
+    }
+
+    public int getMaxRequestsPerHour() {
+      return maxRequestsPerHour;
     }
   }
 }

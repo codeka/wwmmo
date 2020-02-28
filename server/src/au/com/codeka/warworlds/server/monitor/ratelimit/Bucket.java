@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server.monitor.ratelimit;
 
 import com.google.api.client.util.Objects;
 
+import org.joda.time.DateTime;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 
@@ -18,12 +20,10 @@ public class Bucket {
     double qps;
     int maxSize;
     double size;
-    long delayMs;
 
     Limit(RateLimitConfig.BucketLimit config) {
       qps = config.getQps();
       maxSize = config.getSize();
-      delayMs = config.getDelayMs();
       size = maxSize;
     }
 
@@ -49,23 +49,29 @@ public class Bucket {
           .add("qps", qps)
           .add("maxSize", maxSize)
           .add("size", size)
-          .add("delayMs", delayMs)
           .toString();
     }
   }
 
   private long lastRequestTime;
+  private DateTime currentHour;
+  private int numRequestsThisHour;
+
   private final Limit hard;
   private final Limit soft;
+  private final long delayMs;
+  private final int maxRequestsPerHour;
 
   // Some stats we keep.
-  long numAllowedRequests;
-  long numSoftDenies;
-  long numHardDenies;
+  private long numAllowedRequests;
+  private long numSoftDenies;
+  private long numHardDenies;
 
   public Bucket(RateLimitConfig.Bucket config) {
     this.soft = new Limit(config.getSoftLimit());
     this.hard = new Limit(config.getHardLimit());
+    this.delayMs = config.getDelayMs();
+    this.maxRequestsPerHour = config.getMaxRequestsPerHour();
     this.lastRequestTime = System.currentTimeMillis();
   }
 
@@ -78,6 +84,20 @@ public class Bucket {
    */
   public long delayRequest() throws RequestException {
     synchronized (lock) {
+      if (maxRequestsPerHour > 0) {
+        DateTime hour = DateTime.now().withTime(DateTime.now().getHourOfDay(), 0, 0, 0);
+        if (currentHour == null || !currentHour.equals(hour)) {
+          currentHour = hour;
+          numRequestsThisHour = 0;
+        }
+        numRequestsThisHour++;
+        if (numRequestsThisHour > maxRequestsPerHour) {
+          // If you hit the max limit in one hour, you'll be locked out for the whole hour, even
+          // if you slow down.
+          throw new RequestException(429, "Rate limit exceeded.");
+        }
+      }
+
       long msSinceLastRequest = System.currentTimeMillis() - lastRequestTime;
       lastRequestTime = System.currentTimeMillis();
       boolean softDeny = !soft.allow(msSinceLastRequest);
@@ -91,7 +111,7 @@ public class Bucket {
       else if (softDeny) {
         numSoftDenies ++;
         log.info("soft deny for limit: %s", soft);
-        return soft.delayMs;
+        return delayMs;
       }
 
       numAllowedRequests ++;
