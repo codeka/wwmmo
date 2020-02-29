@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.monitor;
 
+import org.eclipse.jetty.continuation.Continuation;
+import org.eclipse.jetty.continuation.ContinuationSupport;
 import org.joda.time.DateTime;
 
 import java.io.File;
@@ -7,7 +9,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -44,6 +45,17 @@ public class RequestStatMonitor extends Monitor {
 
     // Ignore admin sessions, or sessions where we don't know the empire ID.
     if (session == null || session.isAdmin() || session.getEmpireID() == 0) {
+      return;
+    }
+
+    // Ignore requests that were rate-limited, as they don't really impact performance much.
+    if (response.getStatus() == 429) {
+      return;
+    }
+
+    // If this request is being suspended, then ignore it (we'll pick up the replay)
+    Continuation cont = ContinuationSupport.getContinuation(request);
+    if (cont.isSuspended()) {
       return;
     }
 

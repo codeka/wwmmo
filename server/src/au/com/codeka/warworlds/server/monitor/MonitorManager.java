@@ -20,8 +20,8 @@ public class MonitorManager {
 
   public MonitorManager() {
     monitors.add(new EmpireIpAddressMonitor());
-    monitors.add(RequestStatMonitor.i);
     monitors.add(new RequestRateLimiter());
+    monitors.add(RequestStatMonitor.i);
   }
 
   /** Called before the request is processed. */
