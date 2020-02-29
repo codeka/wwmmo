@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -20,15 +21,21 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
+import au.com.codeka.warworlds.server.model.Alliance;
 import au.com.codeka.warworlds.server.model.ChatBlock;
 import au.com.codeka.warworlds.server.model.ChatConversation;
 import au.com.codeka.warworlds.server.model.ChatMessage;
+import au.com.codeka.warworlds.server.model.Empire;
 
+import com.google.common.base.Strings;
 import com.google.common.io.BaseEncoding;
 
 public class ChatController {
   private final Log log = new Log("ChatController");
   private DataBase db;
+
+  // If true, we'll log all chat messages to the servers log as well.
+  private static final boolean LOG_CHAT_MSGS = true;
 
   public ChatController() {
     db = new DataBase();
@@ -137,6 +144,35 @@ public class ChatController {
     }
 
     int profanityLevel = ProfanityFilter.filter(msg_en == null ? msg_native : msg_en);
+
+    if (LOG_CHAT_MSGS) {
+      String empireName;
+      String convName = "";
+      if (msg.getEmpireID() != null) {
+        Empire empire = new EmpireController().getEmpire(msg.getEmpireID());
+        if (empire != null) {
+          empireName = String.format(Locale.ENGLISH, "[%d] %s", empire.getID(), empire.getDisplayName());
+        } else {
+          empireName = "[??] ???";
+        }
+
+        if (msg.getAllianceKey() != null) {
+          Alliance alliance = new AllianceController().getAlliance(msg.getAllianceID());
+          convName = String.format("{%s} ", alliance.getName());
+        }
+      } else {
+        empireName = "[SERVER]";
+      }
+
+      if (msg.getConversationID() != null && msg.getConversationID() > 0) {
+        convName = String.format(Locale.ENGLISH, "[private %d] ", msg.getConversationID());
+      }
+
+      log.info("%s > %s%s", empireName, convName, msg.getMessage());
+      if (!Strings.isNullOrEmpty(msg.getEnglishMessage())) {
+        log.info("%s > %s<%s>", empireName, convName, msg.getEnglishMessage());
+      }
+    }
 
     String sql = "INSERT INTO chat_messages (empire_id, alliance_id, message, message_en,"
         + " profanity_level, posted_date, conversation_id, action) VALUES"
