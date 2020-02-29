@@ -67,6 +67,10 @@ public class FighterShipEffect extends ShipEffect {
         log.debug("Fleet #%s arrived at star #%s, an enemy fleet is switching to attack mode.",
             fleet.getKey(), star.getKey());
         existingFleet.attack(DateTime.now());
+
+        // If they're attacking, we're also going to switch to attacking as well. Otherwise there's
+        // a very small window where they could attack a colony before our first hit lands.
+        fleet.attack(DateTime.now());
       }
     }
   }

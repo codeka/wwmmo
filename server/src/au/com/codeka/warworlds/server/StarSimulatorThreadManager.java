@@ -111,8 +111,9 @@ public class StarSimulatorThreadManager {
                 stats.currentStar.getID(),
                 stats.currentStar.getName(),
                 stats.currentStarProcessingTime);
-        log.info("[%d] %d stars, %dms total, %d in db, %s",
-            i, stats.numStars, stats.totalTimeMs, stats.dbTimeMs, currStarMsg);
+        log.info("[%d] %d stars, %dms avg, %d avg in db, %s",
+            i, stats.numStars, stats.totalTimeMs / stats.numStars, stats.dbTimeMs / stats.numStars,
+            currStarMsg);
 
         // TODO: if it appears currentStar is stuck, do something...
 
