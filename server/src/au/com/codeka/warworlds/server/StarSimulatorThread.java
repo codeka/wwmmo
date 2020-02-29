@@ -5,6 +5,8 @@ import org.joda.time.Seconds;
 
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.server.ctrl.StarController;
@@ -19,6 +21,9 @@ public class StarSimulatorThread {
   private Thread thread;
   private boolean stopped;
   private final StarSimulatorThreadManager manager;
+
+  private final Object statsLock = new Object();
+  private ProcessingStats stats = new ProcessingStats();
 
   private static final int WAIT_TIME_NO_STARS = 10 * 60 * 1000; // 10 minutes, after no stars found
   private static final int WAIT_TIME_ERROR = 60 * 1000; // 1 minute, in case of error
@@ -54,6 +59,23 @@ public class StarSimulatorThread {
     }
 
     thread = null;
+  }
+
+  /**
+   * Returns a snapshots of stats about what we've been doing since the last time you called this.
+   */
+  public ProcessingStats stats() {
+    synchronized (statsLock) {
+      ProcessingStats currStats = stats;
+      stats = new ProcessingStats();
+
+      if (currStats.currentStar != null) {
+        currStats.currentStarProcessingTime =
+            System.currentTimeMillis() - currStats.currentStarProcessingTime;
+      }
+
+      return currStats;
+    }
   }
 
   private void threadProc() {
@@ -96,6 +118,10 @@ public class StarSimulatorThread {
       long startTime = System.currentTimeMillis();
 
       Star star = new StarController().getStar(starID);
+      synchronized (statsLock) {
+        stats.currentStar = star;
+        stats.currentStarProcessingTime = System.currentTimeMillis();
+      }
       if (star.getLastSimulation().isAfter(DateTime.now().minusHours(1))) {
         if (manager.hasMoreStarsToSimulate()) {
           // if there's more cached stars, just try again immediately.
@@ -115,16 +141,39 @@ public class StarSimulatorThread {
       new StarController().update(star, false);
 
       long endTime = System.currentTimeMillis();
-      log.info(String.format(Locale.US,
-          "Simulated star (%d colonies, %d fleets) in %dms (%dms in DB): \"%s\" [%d]",
-          star.getColonies().size(), star.getFleets().size(), endTime - startTime,
-          endTime - simulateEndTime, star.getName(), star.getID()));
+      synchronized (statsLock) {
+        stats.numStars++;
+        stats.totalTimeMs += endTime - startTime;
+        stats.dbTimeMs += endTime - simulateEndTime;
+      }
       return WAIT_TIME_NORMAL;
     } catch (Exception e) {
       log.error("Exception caught simulating star!", e);
       // TODO: if there are errors, it'll just keep reporting over and over... probably a good thing
       // because we'll definitely need to fix it!
       return WAIT_TIME_ERROR;
+    } finally {
+      synchronized (statsLock) {
+        stats.currentStar = null;
+      }
     }
+  }
+
+  public static class ProcessingStats {
+    // The number of stars we've processed since the last stats call.
+    int numStars;
+
+    // The total amount of time we've spent processing stars since the last stats call.
+    long totalTimeMs;
+
+    // The total amount of time we've spent in the database since the last stats call.
+    long dbTimeMs;
+
+    // If not null, the star we're processing at the time you call the stats method.
+    @Nullable
+    Star currentStar;
+
+    // If currentStar is non-null, the amount of time we've been spending on currentStar so far.
+    long currentStarProcessingTime;
   }
 }
