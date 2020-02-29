@@ -61,13 +61,12 @@ public class RequestRateLimiter extends Monitor {
       return;
     }
 
-    long delayMs = bucket.delayRequest(request);
+    long delayMs = bucket.delayRequest(session, request);
     if (delayMs == 0) {
       // No delay needed, request is fine.
       return;
     }
 
-    log.info("Suspending request for %d ms.", delayMs);
     cont.setTimeout(delayMs);
     cont.suspend();
     throw new RequestSuspendedException();

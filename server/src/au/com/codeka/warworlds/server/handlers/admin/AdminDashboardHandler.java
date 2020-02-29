@@ -79,6 +79,7 @@ public class AdminDashboardHandler extends AdminHandler {
     // the time period.
     HashSet<Integer> allEmpires = new HashSet<>();
     HashMap<Integer, Integer> topRequestingEmpires = new HashMap<>();
+    int numStats = 10;
     for (Messages.RequestStatHour stat : stats) {
       for (Messages.RequestStatEmpireHour empireStat : stat.getEmpireList()) {
         allEmpires.add(empireStat.getEmpireId());
@@ -88,6 +89,10 @@ public class AdminDashboardHandler extends AdminHandler {
         }
         n = n + empireStat.getTotalRequests();
         topRequestingEmpires.put(empireStat.getEmpireId(), n);
+      }
+      numStats --;
+      if (numStats <= 0) {
+        break;
       }
     }
 
