@@ -15,67 +15,69 @@ import au.com.codeka.warworlds.server.ctrl.NotificationController;
  * clients.
  */
 public class NotificationHandler extends RequestHandler {
-    private static Log log = new Log("NotificationHandler");
-    private Continuation mContinuation;
-    private int mEmpireID;
-    private int mAllianceID;
+  private static Log log = new Log("NotificationHandler");
+  private Continuation mContinuation;
+  private int mEmpireID;
+  private int mAllianceID;
 
-    @Override
-    public void get() throws RequestException {
-        if (getSessionNoError() != null) {
-            mEmpireID = getSession().getEmpireID();
-            mAllianceID = getSession().getAllianceID();
-        }
-
-        mContinuation = ContinuationSupport.getContinuation(getRequest());
-        NotificationController.Notification notification = (NotificationController.Notification) mContinuation.getAttribute("notification");
-        if (notification != null) {
-            // if we get a notification message...
-
-            Messages.Notifications.Builder notifications_pb = Messages.Notifications.newBuilder();
-            for (String key : notification.values.keySet()) {
-                notifications_pb.addNotifications(Messages.Notification.newBuilder()
-                        .setName(key)
-                        .setValue(notification.values.get(key))
-                        .build());
-            }
-            setResponseBody(notifications_pb.build());
-            return;
-        }
-
-        if (mContinuation.isInitial()) {
-            // initial state, set a timeout and wait for a notification
-            mContinuation.setTimeout(20000);
-            mContinuation.suspend();
-            new NotificationController().addNotificationHandler(getSession().getEmpireID(), this);
-        } else {
-            // if we get here, it's because the continuation timed out, this
-            // will just cause an empty response to be sent
-            return;
-        }
+  @Override
+  public void get() throws RequestException {
+    if (getSessionNoError() != null) {
+      mEmpireID = getSession().getEmpireID();
+      mAllianceID = getSession().getAllianceID();
     }
 
-    public int getEmpireID() {
-        return mEmpireID;
-    }
-    public int getAllianceID() {
-        return mAllianceID;
+    mContinuation = ContinuationSupport.getContinuation(getRequest());
+    NotificationController.Notification notification =
+        (NotificationController.Notification) mContinuation.getAttribute("notification");
+    if (notification != null) {
+      // if we get a notification message...
+
+      Messages.Notifications.Builder notifications_pb = Messages.Notifications.newBuilder();
+      for (String key : notification.values.keySet()) {
+        notifications_pb.addNotifications(Messages.Notification.newBuilder()
+            .setName(key)
+            .setValue(notification.values.get(key))
+            .build());
+      }
+      setResponseBody(notifications_pb.build());
+      return;
     }
 
-    /**
-     * This is called by the notification controller when a notification is received.
-     */
-    public void sendNotification(NotificationController.Notification notification) {
-        if (mContinuation == null || !mContinuation.isSuspended()) {
-            return;
-        }
-        log.info("Sending notification via NotificationHandler for "+mEmpireID);
-        try {
-            mContinuation.setAttribute("notification", notification);
-            mContinuation.resume();
-        } catch (IllegalStateException e) {
-            // TODO: have to figure out why this happens
-            log.error("Got exception dispatching notification.", e);
-        }
+    if (mContinuation.isInitial()) {
+      // initial state, set a timeout and wait for a notification
+      mContinuation.setTimeout(20000);
+      mContinuation.suspend();
+      new NotificationController().addNotificationHandler(getSession().getEmpireID(), this);
+    } else {
+      // if we get here, it's because the continuation timed out, this
+      // will just cause an empty response to be sent
+      return;
     }
+  }
+
+  public int getEmpireID() {
+    return mEmpireID;
+  }
+
+  public int getAllianceID() {
+    return mAllianceID;
+  }
+
+  /**
+   * This is called by the notification controller when a notification is received.
+   */
+  public void sendNotification(NotificationController.Notification notification) {
+    if (mContinuation == null || !mContinuation.isSuspended()) {
+      return;
+    }
+    log.debug("Sending notification via NotificationHandler for " + mEmpireID);
+    try {
+      mContinuation.setAttribute("notification", notification);
+      mContinuation.resume();
+    } catch (IllegalStateException e) {
+      // TODO: have to figure out why this happens
+      log.error("Got exception dispatching notification.", e);
+    }
+  }
 }

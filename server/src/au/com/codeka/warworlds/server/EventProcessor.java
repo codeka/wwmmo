@@ -89,7 +89,7 @@ public class EventProcessor {
 
       if (lastEventDateTime == null
           || (nextEventDateTime.getMillis() / 1000) != (lastEventDateTime.getMillis() / 1000)) {
-        log.info(String.format("Next event is scheduled at %s", nextEventDateTime));
+        log.debug(String.format("Next event is scheduled at %s", nextEventDateTime));
         lastEventDateTime = nextEventDateTime;
       }
 

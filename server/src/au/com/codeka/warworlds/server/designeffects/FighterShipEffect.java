@@ -57,14 +57,14 @@ public class FighterShipEffect extends ShipEffect {
 
       // Either us or the other fleet needs to be AGGRESSIVE to switch to attack mode.
       if (fleet.getState() != BaseFleet.State.ATTACKING && fleet.getStance() == Stance.AGGRESSIVE) {
-        log.info("Fleet #%s arrived at star #%s, found enemy fleet, switching to attack mode.",
+        log.debug("Fleet #%s arrived at star #%s, found enemy fleet, switching to attack mode.",
             fleet.getKey(), star.getKey());
         fleet.attack(DateTime.now());
       }
 
       if (existingFleet.getState() != BaseFleet.State.ATTACKING
           && existingFleet.getStance() == Stance.AGGRESSIVE) {
-        log.info("Fleet #%s arrived at star #%s, an enemy fleet is switching to attack mode.",
+        log.debug("Fleet #%s arrived at star #%s, an enemy fleet is switching to attack mode.",
             fleet.getKey(), star.getKey());
         existingFleet.attack(DateTime.now());
       }
