@@ -69,7 +69,7 @@ public class AdminEmpireShieldsHandler extends AdminHandler {
         }
 
         // set our multi-part config
-        getRequest().setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+        getRequest().setAttribute(Request.MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
 
         int empireID;
         try {

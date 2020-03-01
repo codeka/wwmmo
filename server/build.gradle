@@ -3,7 +3,6 @@ apply plugin: 'application'
 
 dependencies {
   implementation fileTree(dir: 'libs', include: '*.jar')
-  implementation fileTree(dir: '../jetty/lib', include: '*.jar')
   implementation 'au.com.codeka:carrot:2.4.1'
   implementation 'com.google.code.gson:gson:2.8.5'
   implementation 'joda-time:joda-time:2.9.9'
@@ -11,6 +10,8 @@ dependencies {
   implementation 'com.google.guava:guava:24.1-jre'
   implementation 'com.patreon:patreon:0.4.2'
   implementation 'com.zaxxer:HikariCP:3.4.2'
+  implementation 'org.eclipse.jetty:jetty-server:9.4.27.v20200227'
+  implementation 'org.eclipse.jetty:jetty-continuation:9.4.27.v20200227'
   implementation 'org.postgresql:postgresql:42.2.10'
   implementation 'org.reflections:reflections:0.9.11'
   implementation project(':common')
