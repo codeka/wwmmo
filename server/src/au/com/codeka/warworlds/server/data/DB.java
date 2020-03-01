@@ -1,15 +1,14 @@
 package au.com.codeka.warworlds.server.data;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.Configuration;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.IConnectionCustomizer;
 
 /**
  * This is a wrapper class that helps us with connecting to the database.
@@ -19,26 +18,14 @@ public class DB {
   private static final HikariDataSource dataSource;
   private static final String schemaName;
 
-  private static final IConnectionCustomizer connectionCustomizer = new IConnectionCustomizer() {
-    @Override
-    public void customize(Connection connection) {
-      try {
-        CallableStatement stmt = connection.prepareCall(
-            String.format("SET search_path TO '%s'", schemaName));
-        stmt.execute();
-        log.debug("New connection created in schema: %s", schemaName);
-      } catch (SQLException e) {
-        log.error("Exception caught trying to set schema.", e);
-      }
-    }
-  };
-
   static {
     try {
       // Make sure the driver is loaded
       Class.forName("org.postgresql.Driver");
 
       Configuration.DatabaseConfiguration dbconfig = Configuration.i.getDatabaseConfig();
+      schemaName = dbconfig.getSchema();
+
       HikariConfig config = new HikariConfig();
       config.setMaximumPoolSize(40);
       config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
@@ -47,9 +34,8 @@ public class DB {
       config.addDataSourceProperty("serverName", dbconfig.getServer());
       config.addDataSourceProperty("portNumber", Integer.toString(dbconfig.getPort()));
       config.addDataSourceProperty("databaseName", dbconfig.getDatabase());
-      config.setConnectionCustomizer(connectionCustomizer);
+      config.setConnectionInitSql(String.format("SET search_path TO '%s'", schemaName));
       dataSource = new HikariDataSource(config);
-      schemaName = dbconfig.getSchema();
 
       log.info("Database configured: username=%s, password=%s, schema=%s",
           dbconfig.getUsername(), dbconfig.getPassword(), dbconfig.getSchema());

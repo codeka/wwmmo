@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.server;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.log.Logger;
+import org.slf4j.helpers.MessageFormatter;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -44,7 +46,7 @@ public class Runner {
 
       log.info("Server exiting with status code %d", exitCode);
       System.exit(exitCode);
-    } catch (Exception e) {
+    } catch (Throwable e) {
       log.error("Exception on main thread, aborting.", e);
     }
   }

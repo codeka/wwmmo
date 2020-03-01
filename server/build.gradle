@@ -10,6 +10,8 @@ dependencies {
   implementation 'com.google.protobuf:protobuf-java:3.6.0'
   implementation 'com.google.guava:guava:24.1-jre'
   implementation 'com.patreon:patreon:0.4.2'
+  implementation 'com.zaxxer:HikariCP:3.4.2'
+  implementation 'org.postgresql:postgresql:42.2.10'
   implementation 'org.reflections:reflections:0.9.11'
   implementation project(':common')
 }
