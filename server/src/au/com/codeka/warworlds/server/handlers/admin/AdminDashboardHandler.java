@@ -120,7 +120,7 @@ public class AdminDashboardHandler extends AdminHandler {
       int day = stat.getDay() - (year * 10000) - (month * 100);
       int hour = stat.getHour();
 
-      graphEntry.put("date", new DateTime(year, month + 1, day, hour, 0, 0));
+      graphEntry.put("date", new DateTime(year, month, day, hour, 0, 0));
       graphEntry.put("total", stat.getTotalRequests());
       for (Messages.RequestStatEmpireHour empireHour : stat.getEmpireList()) {
         Empire empire = topEmpires.get(empireHour.getEmpireId());
