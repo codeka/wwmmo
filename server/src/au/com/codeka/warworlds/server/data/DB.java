@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.Configuration;
+import au.com.codeka.warworlds.server.metrics.MetricsManager;
 
 /**
  * This is a wrapper class that helps us with connecting to the database.
@@ -27,7 +28,9 @@ public class DB {
       schemaName = dbconfig.getSchema();
 
       HikariConfig config = new HikariConfig();
-      config.setMaximumPoolSize(40);
+      config.setPoolName("main");
+      config.setMaximumPoolSize(100);
+      config.setMinimumIdle(8);
       config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
       config.setUsername(dbconfig.getUsername());
       config.setPassword(dbconfig.getPassword());
@@ -35,6 +38,7 @@ public class DB {
       config.addDataSourceProperty("portNumber", Integer.toString(dbconfig.getPort()));
       config.addDataSourceProperty("databaseName", dbconfig.getDatabase());
       config.setConnectionInitSql(String.format("SET search_path TO '%s'", schemaName));
+      config.setMetricRegistry(MetricsManager.i.getMetricsRegistry());
       dataSource = new HikariDataSource(config);
 
       log.info("Database configured: username=%s, password=%s, schema=%s",

@@ -11,6 +11,7 @@ import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.cron.CronRunnerThread;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
 import au.com.codeka.warworlds.server.data.SchemaUpdater;
+import au.com.codeka.warworlds.server.metrics.MetricsManager;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.monitor.RequestStatMonitor;
 
@@ -30,6 +31,7 @@ public class Runner {
       DesignManager.setup();
       NameGenerator.setup();
 
+      MetricsManager.i.start();
       EventProcessor.i.ping();
       StarSimulatorThreadManager.i.start();
 
@@ -73,5 +75,8 @@ public class Runner {
 
     log.info("Cleaning up request stat monitor");
     RequestStatMonitor.i.cleanup();
+
+    log.info("Stopping metrics manager.");
+    MetricsManager.i.stop();
   };
 }

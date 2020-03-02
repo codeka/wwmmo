@@ -128,6 +128,7 @@ public class RequestRouter extends AbstractHandler {
     sRoutes.add(new Route("admin/(?<path>empire/ban)", AdminEmpireBanHandler.class, "admin/"));
     sRoutes.add(new Route("admin/users", AdminUsersHandler.class, "admin/"));
     sRoutes.add(new Route("admin/(?<path>cron)", AdminCronHandler.class, "admin/"));
+    sRoutes.add(new Route("admin/metrics/json", AdminMetricsHandler.class));
     sRoutes.add(new Route("admin/(?<path>.+)", AdminGenericHandler.class, "admin/"));
     sRoutes.add(new Route("admin/?", AdminDashboardHandler.class));
 
