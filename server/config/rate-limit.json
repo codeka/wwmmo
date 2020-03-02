@@ -1,1 +1,8 @@
-{}
+{
+  "defaultBucket": {
+    "softLimit": {"qps": 1.5, "size": 30},
+    "hardLimit": {"qps": 5.0, "size": 50},
+    "delayMs": 3000,
+    "maxRequestsPerHour": 10000
+  }
+}

@@ -6,6 +6,7 @@ import org.eclipse.jetty.continuation.ContinuationSupport;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,6 +26,11 @@ public class RequestRateLimiter extends Monitor {
   // A mapping of empire IDs to the buckets they belong to.
   private Map<Integer, Bucket> buckets;
 
+  // If non-null, this is the config we'll use to create buckets for empires that don't already
+  // have a bucket configured.
+  @Nullable
+  private RateLimitConfig.Bucket defBucketConfig;
+
   public RequestRateLimiter() {
     RateLimitConfig config = RateLimitConfig.load();
 
@@ -35,6 +41,7 @@ public class RequestRateLimiter extends Monitor {
         buckets.put(empireId, bucket);
       }
     }
+    defBucketConfig = config.getDefaultBucket();
   }
 
   /** Called before the request is processed. */
@@ -46,12 +53,18 @@ public class RequestRateLimiter extends Monitor {
     }
     Bucket bucket = buckets.get(session.getEmpireID());
     if (bucket == null) {
-      // No rate-limit configured, good to go.
-      return;
+      if (defBucketConfig == null) {
+        // No rate-limit configured, good to go.
+        return;
+      }
+
+      log.info("Creating new bucket for empire %d", session.getEmpireID());
+      bucket = new Bucket(defBucketConfig);
+      buckets.put(session.getEmpireID(), bucket);
     }
 
     if (request.getPathInfo().contains("notifications")) {
-      // For now, we'll skip rate-limit the notifications request.
+      // For now, we'll skip rate-limiting the notifications request.
       return;
     }
 

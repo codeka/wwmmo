@@ -11,10 +11,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.server.Configuration;
 
 public class RateLimitConfig {
   @Expose List<Bucket> buckets = new ArrayList<>();
+  @Expose Bucket defaultBucket;
 
   public static RateLimitConfig load() {
     File file = new File(Configuration.i.getConfigDirectory(), "rate-limit.json");
@@ -34,6 +37,14 @@ public class RateLimitConfig {
 
   public List<Bucket> getBuckets() {
     return buckets;
+  }
+
+  /**
+   * Get the default bucket that we apply to everybody. Or null if none is configured.
+   */
+  @Nullable
+  public Bucket getDefaultBucket() {
+    return defaultBucket;
   }
 
   static class BucketLimit {
