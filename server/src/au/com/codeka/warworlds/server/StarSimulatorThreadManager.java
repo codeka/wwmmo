@@ -96,34 +96,38 @@ public class StarSimulatorThreadManager {
    */
   private void threadMonitor() {
     while (!stopped) {
-      int i = 0;
-      for (StarSimulatorThread thread : threads) {
-        StarSimulatorThread.ProcessingStats stats = thread.stats();
-        if (stats.numStars == 0 && stats.currentStar == null) {
-          // Nothing interesting to report.
-          continue;
+      try {
+        int i = 0;
+        for (StarSimulatorThread thread : threads) {
+          StarSimulatorThread.ProcessingStats stats = thread.stats();
+          if (stats.numStars == 0 && stats.currentStar == null) {
+            // Nothing interesting to report.
+            continue;
+          }
+
+          String currStarMsg = stats.currentStar == null
+              ? "(no current star)"
+              : String.format(Locale.ENGLISH,
+                  "current star: [%d] %s for %dms",
+                  stats.currentStar.getID(),
+                  stats.currentStar.getName(),
+                  stats.currentStarProcessingTime);
+          log.info("[%d] %d stars, %dms avg, %d avg in db, %s",
+              i, stats.numStars, stats.totalTimeMs / stats.numStars, stats.dbTimeMs / stats.numStars,
+              currStarMsg);
+
+          // TODO: if it appears currentStar is stuck, do something...
+
+          i++;
         }
 
-        String currStarMsg = stats.currentStar == null
-            ? "(no current star)"
-            : String.format(Locale.ENGLISH,
-                "current star: [%d] %s for %dms",
-                stats.currentStar.getID(),
-                stats.currentStar.getName(),
-                stats.currentStarProcessingTime);
-        log.info("[%d] %d stars, %dms avg, %d avg in db, %s",
-            i, stats.numStars, stats.totalTimeMs / stats.numStars, stats.dbTimeMs / stats.numStars,
-            currStarMsg);
-
-        // TODO: if it appears currentStar is stuck, do something...
-
-        i++;
-      }
-
-      try {
-        Thread.sleep(STATS_LOG_DELAY_MS);
-      } catch (InterruptedException e) {
-        // Ignore.
+        try {
+          Thread.sleep(STATS_LOG_DELAY_MS);
+        } catch (InterruptedException e) {
+          log.warning("Got InterruptedException waiting for next round.");
+        }
+      } catch (Throwable e) {
+        log.error("Error in monitor thread.", e);
       }
     }
   }
