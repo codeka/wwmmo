@@ -300,6 +300,28 @@ message EmpireStars {
   optional int32 total_stars = 2;
 }
 
+
+// Sent as part of the HelloRequest to log what accessibility services are enabled on the client.
+message AccessibilitySettingsInfo {
+  // If false, this device didn't support the APIs we needed.
+  optional bool supported = 2;
+
+  message AccessibilityService {
+    // The actual name of this service.
+    optional string name = 1;
+
+    // Package names this service is interested in.
+    repeated string package_names = 2;
+
+    // Capabilities this service has.
+    repeated string capability = 3;
+
+  }
+  repeated AccessibilityService service = 3;
+
+  reserved 1;
+}
+
 //
 // The "hello" request when you first join the game contains some info about yourself which we
 // record for posterity.
@@ -330,6 +352,8 @@ message HelloRequest {
   // If true, we'll NOT return the list of star_ids that you own. Newer clients don't need
   // it anymore, and it just wastes time/resources returning it.
   optional bool no_star_list = 7;
+
+  optional AccessibilitySettingsInfo accessibility_settings_info = 8;
 }
 
 //

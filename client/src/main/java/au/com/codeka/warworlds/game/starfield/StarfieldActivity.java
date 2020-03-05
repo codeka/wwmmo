@@ -1,12 +1,15 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.Button;
@@ -14,6 +17,7 @@ import android.widget.RelativeLayout;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import java.util.List;
 import java.util.Locale;
 
 import au.com.codeka.common.Log;
@@ -22,6 +26,7 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.BaseStar.StarType;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.AccessibilityServiceReporter;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;

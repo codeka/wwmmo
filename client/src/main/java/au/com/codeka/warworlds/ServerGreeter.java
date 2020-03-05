@@ -225,7 +225,10 @@ public class ServerGreeter {
                 .setDeviceManufacturer(android.os.Build.MANUFACTURER)
                 .setDeviceModel(android.os.Build.MODEL)
                 .setDeviceVersion(android.os.Build.VERSION.RELEASE).setMemoryClass(memoryClass)
-                .setAllowInlineNotfications(false).setNoStarList(true).build();
+                .setAllowInlineNotfications(false)
+                .setNoStarList(true)
+                .setAccessibilitySettingsInfo(AccessibilityServiceReporter.get(activity))
+                .build();
 
         String url = "hello/" + deviceRegistrationKey;
         ApiRequest request = new ApiRequest.Builder(url, "PUT").body(req).build();
