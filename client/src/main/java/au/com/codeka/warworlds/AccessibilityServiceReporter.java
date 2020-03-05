@@ -12,8 +12,6 @@ import java.util.List;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.model.Empire;
-import au.com.codeka.warworlds.model.EmpireManager;
 
 /**
  * A class that gathers info about active accessibility services, and reports them to the server.
@@ -35,37 +33,41 @@ public class AccessibilityServiceReporter {
     Messages.AccessibilitySettingsInfo.Builder builder =
         Messages.AccessibilitySettingsInfo.newBuilder();
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-      // This version doesn't support the APIs we need, so just ignore.
-      builder.setSupported(false);
-      return builder.build();
-    }
-    builder.setSupported(true);
+    try {
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+        // This version doesn't support the APIs we need, so just ignore.
+        builder.setSupported(false);
+        return builder.build();
+      }
+      builder.setSupported(true);
 
-    AccessibilityManager am =
-        (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
-    List<AccessibilityServiceInfo> enabledServices =
-        am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
+      AccessibilityManager am =
+          (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
+      List<AccessibilityServiceInfo> enabledServices =
+          am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
 
-    for (AccessibilityServiceInfo enabledService : enabledServices) {
-      Messages.AccessibilitySettingsInfo.AccessibilityService.Builder serviceBuilder =
-          Messages.AccessibilitySettingsInfo.AccessibilityService.newBuilder();
+      for (AccessibilityServiceInfo enabledService : enabledServices) {
+        Messages.AccessibilitySettingsInfo.AccessibilityService.Builder serviceBuilder =
+            Messages.AccessibilitySettingsInfo.AccessibilityService.newBuilder();
 
-      serviceBuilder.setName(enabledService.getId());
+        serviceBuilder.setName(enabledService.getId());
 
-      int capabilities = enabledService.getCapabilities();
-      for (int i = 0; i < ALL_CAPABILITIES.length; i++) {
-        if ((capabilities & ALL_CAPABILITIES[i]) != 0) {
-          serviceBuilder.addCapability(
-              AccessibilityServiceInfo.capabilityToString(ALL_CAPABILITIES[i]));
+        int capabilities = enabledService.getCapabilities();
+        for (int i = 0; i < ALL_CAPABILITIES.length; i++) {
+          if ((capabilities & ALL_CAPABILITIES[i]) != 0) {
+            serviceBuilder.addCapability(
+                AccessibilityServiceInfo.capabilityToString(ALL_CAPABILITIES[i]));
+          }
         }
-      }
 
-      if (enabledService.packageNames != null) {
-        serviceBuilder.addAllPackageNames(Lists.newArrayList(enabledService.packageNames));
-      }
+        if (enabledService.packageNames != null) {
+          serviceBuilder.addAllPackageNames(Lists.newArrayList(enabledService.packageNames));
+        }
 
-      builder.addService(serviceBuilder);
+        builder.addService(serviceBuilder);
+      }
+    } catch (Throwable e) {
+      log.error("Error getting accessibility services.", e);
     }
 
     return builder.build();
