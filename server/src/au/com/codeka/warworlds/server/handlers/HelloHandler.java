@@ -1,21 +1,24 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import java.util.ArrayList;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.GameHistoryController;
-import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.ctrl.StatisticsController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
-import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.EmpireStarStats;
 import au.com.codeka.warworlds.server.model.GameHistory;
@@ -23,6 +26,10 @@ import au.com.codeka.warworlds.server.model.Star;
 
 public class HelloHandler extends RequestHandler {
   private final Log log = new Log("HelloHandler");
+
+  // Our min-version, initialized on first request.
+  private static int[] minVersion = null;
+  private static String minVersionStr = null;
 
   @Override
   protected void get() throws RequestException {
@@ -53,6 +60,8 @@ public class HelloHandler extends RequestHandler {
     // damn, this is why things should never be marked "required" in protobufs!
     hello_response_pb
         .setMotd(Messages.MessageOfTheDay.newBuilder().setMessage("").setLastUpdate(""));
+
+    ensureMinVersion(getRequest().getHeader("User-Agent"));
 
     GameHistory gameHistory = new GameHistoryController().getCurrent();
     if (gameHistory == null) {
@@ -151,37 +160,71 @@ public class HelloHandler extends RequestHandler {
   }
 
   /**
-   * Goes through the given stars and looks for at least one colony. Returns true if one is
-   * found.
+   * Ensures the the User-Agent given specified a version for the client that we support.
+   *
+   * The client sends a User-Agent of the form "wwmmo/(version)" where version will be something
+   * like "1.2.345". We want to make sure that a) it's in the correct format and b) that it has
+   * a version number that's greater than what is specified in min-version.ini.
+   *
+   * @param userAgent A User-Agent string, in the form "wwmmo/a.b.c".
+   * @throws RequestException if the min version doesn't match.
    */
-  private boolean findColony(ArrayList<Integer> starIDs, int empireID) throws RequestException {
-    // do it in groups of 10 stars, since most of the time we'll find it in the first group
-    // and there's no point querying all, especially if they have a lot of stars.
-    for (int startIndex = 0; startIndex < starIDs.size(); startIndex++) {
-      int endIndex = startIndex + 10;
-      if (endIndex >= starIDs.size()) {
-        endIndex = starIDs.size() - 1;
-      }
-
-      List<Integer> sublist = starIDs.subList(startIndex, endIndex);
-      List<Star> stars = new StarController().getStars(sublist);
-      if (findColony(stars, empireID)) {
-        return true;
-      }
+  private void ensureMinVersion(String userAgent) throws RequestException {
+    String[] parts = userAgent.split("/");
+    if (parts.length != 2 && !parts[0].equals("wwmmo")) {
+      log.warning("User-Agent doesn't match expected format: %s", userAgent);
+      throw new RequestException(400, "Unsupported client");
     }
+    String version = parts[1];
 
-    return false;
-  }
-
-  private boolean findColony(List<Star> stars, int empireID) {
-    for (Star star : stars) {
-      for (BaseColony baseColony : star.getColonies()) {
-        Colony colony = (Colony) baseColony;
-        if (colony.getEmpireID() != null && empireID == colony.getEmpireID()) {
-          return true;
+    synchronized (HelloHandler.class) {
+      if (minVersion == null) {
+        try {
+          File minVersionFile = new File(Configuration.i.getConfigDirectory(), "min-version.ini");
+          List<String> lines = Files.readLines(minVersionFile, Charset.defaultCharset());
+          for (String line : lines) {
+            if (line.trim().length() > 0) {
+              minVersionStr = line.trim();
+              parts = line.trim().split("\\.");
+              minVersion = new int[parts.length];
+              for (int i = 0; i < parts.length; i++) {
+                minVersion[i] = Integer.parseInt(parts[i]);
+              }
+              log.debug("Parsed min-version.ini: '%s' %s", minVersionStr, minVersion.length);
+            }
+          }
+        } catch (IOException e) {
+          throw new RequestException(e);
         }
       }
     }
-    return false;
+
+    parts = version.split("\\.");
+    if (parts.length != minVersion.length) {
+      log.warning("User-Agent's version is not in the correct format: %s", userAgent);
+      throw new RequestException(400, "Incorrect version number");
+    }
+
+    // Go through the parts in order. Any number that's bigger than what's in min-version.ini means
+    // this client is an acceptable version.
+    for (int i = 0; i < parts.length; i++) {
+      int part;
+      try {
+        part = Integer.parseInt(parts[i]);
+      } catch (NumberFormatException e) {
+        log.warning("User-Agent's version contains non-numbers: %s", userAgent);
+        throw new RequestException(400, "Incorrect version number");
+      }
+
+      if (part < minVersion[i]) {
+        log.warning(
+            "User-Agent's version number is too low: %s (min-version: %s)",
+            userAgent,
+            minVersionStr);
+        throw new RequestException(410, "This version is not supported.");
+      }
+    }
+
+    log.debug("Supported version number: %s (min-version: %s)", userAgent, minVersionStr);
   }
 }
