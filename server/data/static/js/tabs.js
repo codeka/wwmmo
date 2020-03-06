@@ -29,7 +29,7 @@ $(function() {
 
   refreshVisibleTabs($(".tabs"));
 
-  $(".tabs a").click(function() {
+  $("body").on("click", ".tabs a", function() {
     $(this).parents(".tabs").find("a").removeClass("selected");
     $(this).addClass("selected");
     refreshVisibleTabs($(this).parents(".tabs"));

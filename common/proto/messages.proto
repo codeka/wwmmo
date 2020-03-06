@@ -322,6 +322,16 @@ message AccessibilitySettingsInfo {
   reserved 1;
 }
 
+message EmpireLoginInfo {
+  optional int32 empire_id = 1;
+  optional int64 date = 2;
+  optional string device_model = 3;
+  optional string device_manufacturer = 4;
+  optional string device_build = 5;
+  optional string device_version = 6;
+  optional AccessibilitySettingsInfo accessibility_settings = 7;
+}
+
 //
 // The "hello" request when you first join the game contains some info about yourself which we
 // record for posterity.

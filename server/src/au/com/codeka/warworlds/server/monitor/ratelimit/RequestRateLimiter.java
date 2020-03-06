@@ -51,6 +51,10 @@ public class RequestRateLimiter extends Monitor {
     if (session == null) {
       return;
     }
+    if (session.isAdmin()) {
+      // Don't rate-limit the admin user.
+      return;
+    }
     Bucket bucket = buckets.get(session.getEmpireID());
     if (bucket == null) {
       if (defBucketConfig == null) {

@@ -74,6 +74,14 @@ public class EmpireController {
     }
   }
 
+  public List<Messages.EmpireLoginInfo> getRecentLogins(int empireID) throws RequestException {
+    try {
+      return db.getRecentLogins(empireID, 25);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
   public Map<Integer, Double> getTaxCollectedPerHour(Collection<Integer> empireIDs)
       throws RequestException {
     try {
@@ -618,6 +626,36 @@ public class EmpireController {
       }
 
       return getEmpires(arrayIds);
+    }
+
+    public List<Messages.EmpireLoginInfo> getRecentLogins(int empireID, int limit) throws Exception {
+      String sql = "SELECT date, device_model, device_manufacturer, device_build, device_version," +
+          "accessibility_service_infos FROM empire_logins WHERE empire_id = ? " +
+          "ORDER BY date DESC LIMIT ?";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, empireID);
+        stmt.setInt(2, limit);
+        SqlResult res = stmt.select();
+
+        ArrayList<Messages.EmpireLoginInfo> empireLoginInfos = new ArrayList<>();
+        while (res.next()) {
+          Messages.EmpireLoginInfo.Builder empireLoginInfoBuilder =
+              Messages.EmpireLoginInfo.newBuilder()
+                  .setEmpireId(empireID)
+                  .setDate(res.getDateTime(1).getMillis())
+                  .setDeviceModel(res.getString(2))
+                  .setDeviceManufacturer(res.getString(3))
+                  .setDeviceBuild(res.getString(4))
+                  .setDeviceVersion(res.getString(5));
+          if (res.getBytes(6) != null) {
+            empireLoginInfoBuilder.setAccessibilitySettings(
+                Messages.AccessibilitySettingsInfo.parseFrom(res.getBytes(6)));
+          }
+          empireLoginInfos.add(empireLoginInfoBuilder.build());
+        }
+
+        return empireLoginInfos;
+      }
     }
 
     public Map<Integer, Double> getTaxCollectedPerHour(Collection<Integer> empireIDs)

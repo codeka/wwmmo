@@ -3,6 +3,8 @@
 {% block "head" %}
   <script src="/realms/{{realm}}/js/tmpl.js"></script>
   <script src="/realms/{{realm}}/js/hashparams.js"></script>
+  <script src="/realms/{{realm}}/js/tabs.js"></script>
+  <script src="/realms/{{realm}}/js/time.js"></script>
   <style>
     #search-results {
       position: absolute;
@@ -12,6 +14,8 @@
       bottom: 10pt;
       border: solid 1px #666;
       overflow-y: scroll;
+    }
+    #search-results.code {
       white-space: pre;
       font-family: monospace;
     }
@@ -125,7 +129,48 @@
       <td align="center"><% if (rank) { %><%=rank.rank%><% } %></td>
     </tr>
   </script>
+  <script type="text/html" id="empire-details">
+    <ul class="tabs">
+      <li><a href="javascript:;" data-tab="empire-details-tab" class="selected">Details</a>
+      <li><a href="javascript:;" data-tab="empire-logins-tab">Recent logins</a>
+    </ul>
+
+    <div id="empire-details-tab">
+      <h1>[# <%= key %>] <%= display_name %></h1>
+      <p><b>Email: </b> <%= email %></p>
+      <p><b>State: </b> <%= state %></p>
+      <p><b>Cash: </b> $<%= cash64 %></p>
+      <% if (rank) { %>
+        <p><b>Rank: </b> <b><%= rank.rank %></b>
+            Stars: <%= rank.total_stars %>
+            Colonies: <%= rank.total_colonies %>
+            Ships: <%= rank.total_ships %>
+            Building: <%= rank.total_buildings %>
+            Population: <%= rank.total_population %></p>
+      <% } %>
+
+      <p><b>Home star</b></p>
+      <% if (home_star) { %>
+        <p><%= home_star.name %></p>
+      <% } else { %>
+        <p><em>None</em></p>
+      <% } %>
+
+      <p><b>Alliance</b></p>
+      <% if (alliance) { %>
+        <p><%= alliance.name %></p>
+      <% } else { %>
+        <p><em>None</em></p>
+      <% } %>
+    </div>
+
+    <div id="empire-logins-tab" style="display: none;">
+      <a href="javascript:;" class="empire-logins-fetch" style="margin: 10pt;">Fetch</a>
+    </div>
+  </script>
   <script>
+    var currentEmpire = null;
+
     $("#find-byemailidname").on("submit", function(evnt) {
       evnt.preventDefault();
 
@@ -208,7 +253,7 @@
               }
               text += "\r\n";
             }
-            $("#search-results").html(text);
+            $("#search-results").addClass("code").html(text);
           },
           error: function(xhr, status, err) {
             alert("An error occured, check server logs: " + xhr.status);
@@ -221,10 +266,10 @@
           type: "GET",
           dataType: "json",
           success: function(data) {
-            $("#search-results").html(JSON.stringify(data, null, "  "));
+            $("#search-results").addClass("code").html(JSON.stringify(data, null, "  "));
           },
           error: function(xhr, status, err) {
-            alert("An error occured, check server logs: " + xhr.status);
+            alert("An error occurred, check server logs: " + xhr.status);
           }
         });
       }
@@ -243,13 +288,22 @@
           setTimeout(function() {
             $("#search-time").html("<b>Time:</b> "+xhr.elapsedMs+"ms");
           }, 10);
-          $("#search-results").html(JSON.stringify(data, null, "  "));
+          var tmpl = $("#empire-details");
+          var emp = data.empires[0];
+          if (!emp["home_star"]) {
+            emp.home_star = null;
+          }
+          if (!emp["alliance"]) {
+            emp.alliance = null;
+          }
+          currentEmpire = emp;
+          $("#search-results").removeClass("code").html(tmpl.applyTemplate(emp));
         },
         error: function(xhr, status, err) {
           if (xhr.status == 404) {
             $("#search-results").val("No empire!");
           } else {
-            alert("An error occured, check server logs: " + xhr.status);
+            alert("An error occurred, check server logs: " + xhr.status);
           }
         }
       });
@@ -293,6 +347,19 @@
       if ($("#search-value").val() == "") {
         fetchEmpireList("minRank=1&maxRank=50");
       }
+    });
+
+    $("body").on("click", ".empire-logins-fetch", function() {
+      if (currentEmpire == null) {
+        return;
+      }
+
+      $.ajax({
+          url: "/realms/{{realm}}/admin/empire/" + currentEmpire.key + "/logins",
+          success: function(data) {
+            $("#empire-logins-tab").html(data);
+          }
+      });
     });
   </script>
 {% end %}
