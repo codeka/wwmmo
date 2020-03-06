@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.api;
 
 import android.content.Context;
+import android.os.Handler;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Connection;
+import okhttp3.Dispatcher;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -35,7 +37,7 @@ public class RequestManager {
   private static final Log log = new Log("RequestManager");
   private static final boolean DBG = true;
 
-  private static final int MAX_INFLIGHT_REQUESTS = 32;
+  private static final int MAX_INFLIGHT_REQUESTS = 8;
   private static final int MAX_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
 
   private OkHttpClient httpClient;
@@ -44,6 +46,8 @@ public class RequestManager {
   // We use a stack because the most recent request is likely the most important (since it's usually
   // going to be in response to the most recent UI interaction).
   private final Stack<ApiRequest> waitingRequests = new Stack<>();
+
+  private Handler handler = new Handler();
 
   private final Object lock = new Object();
 
@@ -56,6 +60,7 @@ public class RequestManager {
     if (!cacheDir.mkdirs()) {
       // Ignore, directory (probably) already exists
     }
+
     httpClient = new OkHttpClient.Builder()
         .addInterceptor(new LoggingInterceptor())
         .connectTimeout(5, TimeUnit.SECONDS)
@@ -98,10 +103,10 @@ public class RequestManager {
   }
 
   private void handleResponse(ApiRequest request, Response response) {
-    requestComplete(request, response);
     if (!response.isSuccessful()) {
       handleFailure(request, response, null);
     } else {
+      requestComplete(request, response);
       request.handleResponse(response);
     }
   }
@@ -112,11 +117,24 @@ public class RequestManager {
    */
   private void handleFailure(ApiRequest request, @Nullable Response response,
       @Nullable IOException e) {
-    requestComplete(request, response);
     if (e != null) {
       log.error("Error in request: %s", request, e);
+      requestComplete(request, response);
     } else if (response != null) {
       log.warning("Error in response: %d %s", response.code(), response.message());
+
+      if (response.code() == 429) {
+        // If we've been rate-limited, instead of handing that off to the ApiRequest, we'll retry
+        // it internally (hence, keeping this request in the in-flight queue, and slowing down
+        // requests, until we can get back under the rate-limit.
+        if (DBG) log.info("-- %s 429 rate-limited timing=%s", request, request.getTiming());
+
+        // TODO: some kind of exponential back-off?
+        handler.postDelayed(() -> enqueueRequest(request), 3000);
+        return;
+      }
+
+      requestComplete(request, response);
     } else {
       throw new IllegalStateException("One of response or e should be non-null.");
     }

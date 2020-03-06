@@ -4,5 +4,11 @@
     "hardLimit": {"qps": 5.0, "size": 50},
     "delayMs": 3000,
     "maxRequestsPerHour": 10000
-  }
+  },
+  "buckets": [
+    {
+      "empireIds": [491],
+      "hardLimit": {"qps": 0.25, "size": 10}
+    }
+  ]
 }

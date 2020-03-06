@@ -4,6 +4,7 @@ import com.google.api.client.util.Objects;
 
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import au.com.codeka.common.Log;
@@ -60,8 +61,8 @@ public class Bucket {
   private DateTime currentHour;
   private int numRequestsThisHour;
 
-  private final Limit hard;
-  private final Limit soft;
+  @Nullable private final Limit hard;
+  @Nullable private final Limit soft;
   private final long delayMs;
   private final int maxRequestsPerHour;
 
@@ -71,8 +72,16 @@ public class Bucket {
   private long numHardDenies;
 
   public Bucket(RateLimitConfig.Bucket config) {
-    this.soft = new Limit(config.getSoftLimit());
-    this.hard = new Limit(config.getHardLimit());
+    if (config.getSoftLimit().qps > 0) {
+      this.soft = new Limit(config.getSoftLimit());
+    } else {
+      this.soft = null;
+    }
+    if (config.getHardLimit().qps > 0) {
+      this.hard = new Limit(config.getHardLimit());
+    } else {
+      this.hard = null;
+    }
     this.delayMs = config.getDelayMs();
     this.maxRequestsPerHour = config.getMaxRequestsPerHour();
     this.lastRequestTime = System.currentTimeMillis();
@@ -103,8 +112,8 @@ public class Bucket {
 
       long msSinceLastRequest = System.currentTimeMillis() - lastRequestTime;
       lastRequestTime = System.currentTimeMillis();
-      boolean softDeny = !soft.allow(msSinceLastRequest);
-      boolean hardDeny = !hard.allow(msSinceLastRequest);
+      boolean softDeny = soft != null && !soft.allow(msSinceLastRequest);
+      boolean hardDeny = hard != null && !hard.allow(msSinceLastRequest);
 
       if (hardDeny) {
         // If it's a hard deny, throw an exception with a status code indicating as such.
@@ -116,7 +125,7 @@ public class Bucket {
       else if (softDeny) {
         numSoftDenies ++;
         log.info("Soft deny %s %s for [%d]: %s",
-            request.getMethod(), request.getPathInfo(), session.getEmpireID(), hard);
+            request.getMethod(), request.getPathInfo(), session.getEmpireID(), soft);
         return delayMs;
       }
 

@@ -180,12 +180,7 @@ public class ApiRequest {
       if (completeOnAnyThread) {
         runCompleteCallback();
       } else {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-          @Override
-          public void run() {
-            runCompleteCallback();
-          }
-        });
+        new Handler(Looper.getMainLooper()).post(this::runCompleteCallback);
       }
     }
   }
@@ -225,12 +220,8 @@ public class ApiRequest {
     }
     exception = e;
     if (errorCallback != null) {
-      new Handler(Looper.getMainLooper()).post(new Runnable() {
-        @Override
-        public void run() {
-          errorCallback.onRequestError(ApiRequest.this, error);
-        }
-      });
+      new Handler(Looper.getMainLooper()).post(
+          () -> errorCallback.onRequestError(ApiRequest.this, error));
     }
   }
 

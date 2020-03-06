@@ -271,6 +271,7 @@ public class ServerGreeter {
           errorOccurred = false;
         } else {
           log.error("Error occurred in 'hello': %s", request.error().getErrorMessage());
+          giveUpReason = GiveUpReason.NONE;
 
           @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
           Throwable exception = request.exception();
