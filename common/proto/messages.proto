@@ -56,6 +56,7 @@ message GenericError {
     NotAnonymous = 37;
     CannotReset = 38;
     ResetInProgress = 39;
+    UpgradeRequired = 40;
   }
 }
 

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Debug;
 import android.os.Environment;
 import android.os.Handler;
@@ -34,6 +35,7 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
+import okhttp3.Response;
 
 /**
  * This class is used to make sure we're said "Hello" to the server and that we've got our
@@ -151,6 +153,7 @@ public class ServerGreeter {
       private boolean errorOccurred;
       private boolean needsReAuthenticate;
       private boolean wasEmpireReset;
+      private GiveUpReason giveUpReason;
       private String resetReason;
       private String toastMessage;
       private Intent intent;
@@ -221,10 +224,10 @@ public class ServerGreeter {
         int memoryClass = ((ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE))
             .getMemoryClass();
         Messages.HelloRequest req =
-            Messages.HelloRequest.newBuilder().setDeviceBuild(android.os.Build.DISPLAY)
-                .setDeviceManufacturer(android.os.Build.MANUFACTURER)
-                .setDeviceModel(android.os.Build.MODEL)
-                .setDeviceVersion(android.os.Build.VERSION.RELEASE).setMemoryClass(memoryClass)
+            Messages.HelloRequest.newBuilder().setDeviceBuild(Build.DISPLAY)
+                .setDeviceManufacturer(Build.MANUFACTURER)
+                .setDeviceModel(Build.MODEL)
+                .setDeviceVersion(Build.VERSION.RELEASE).setMemoryClass(memoryClass)
                 .setAllowInlineNotfications(false)
                 .setNoStarList(true)
                 .setAccessibilitySettingsInfo(AccessibilityServiceReporter.get(activity))
@@ -273,26 +276,31 @@ public class ServerGreeter {
           Throwable exception = request.exception();
           if (exception != null
                 && (exception.getCause() instanceof UserRecoverableAuthException)) {
-              message = "<p class=\"error\">Authentication failed.</p>";
-              errorOccurred = true;
-              needsReAuthenticate = true;
-              intent = ((UserRecoverableAuthException) exception.getCause()).getIntent();
+            message = "Authentication failed.";
+            errorOccurred = true;
+            needsReAuthenticate = true;
+            intent = ((UserRecoverableAuthException) exception.getCause()).getIntent();
           } else if (exception != null) {
             // if there's no status message, it likely means we were unable to connect
             // (i.e. a network error) just keep retrying until it works.
-            message = "<p class=\"error\">An error occurred talking to the server, check "
-                + "data connection.</p>";
+            message = "An error occurred talking to the server, check data connection.";
+            errorOccurred = true;
+            needsReAuthenticate = false;
+          } else if (request.error().getErrorCode()
+              == Messages.GenericError.ErrorCode.UpgradeRequired.getNumber()) {
+            message = "Upgrade required.\nPlease update from the Play Store.";
+            giveUpReason = GiveUpReason.UPGRADE_REQUIRED;
             errorOccurred = true;
             needsReAuthenticate = false;
           } else if (request.error().getErrorCode()
               == Messages.GenericError.ErrorCode.AuthenticationError.getNumber()) {
             // if it's an authentication problem, we'll want to re-authenticate
-            message = "<p class=\"error\">Authentication failed.</p>";
+            message = "Authentication failed.";
             errorOccurred = true;
             needsReAuthenticate = true;
           } else {
             // any other HTTP error, let's display that
-            message = "<p class=\"error\">AN ERROR OCCURRED.</p>";
+            message = "An unexpected error occurred:" + request.error().getErrorCode();
             errorOccurred = true;
             needsReAuthenticate = false;
           }
@@ -340,17 +348,30 @@ public class ServerGreeter {
               }
             }
             helloComplete = true;
-          } else {
+          } else if (giveUpReason != GiveUpReason.NONE) {
             synchronized (helloWatchers) {
               for (HelloWatcher watcher : helloWatchers) {
-                watcher.onRetry(retries + 1);
+                watcher.onFailed(result, giveUpReason);
+              }
+            }
+            helloComplete = true;
+          } else {
+            // otherwise, just try again
+            synchronized (helloWatchers) {
+              for (HelloWatcher watcher : helloWatchers) {
+                watcher.onFailed(result, GiveUpReason.NONE);
               }
             }
 
-            // otherwise, just try again
             handler.postDelayed(new Runnable() {
               @Override
               public void run() {
+                synchronized (helloWatchers) {
+                  for (HelloWatcher watcher : helloWatchers) {
+                    watcher.onRetry(retries + 1);
+                  }
+                }
+
                 sayHello(activity, retries + 1);
               }
             }, 3000);
@@ -463,6 +484,20 @@ public class ServerGreeter {
 
     void onConnecting();
 
+    /**
+     * Called when a failure occurs. If the GiveUpReason is NONE then we'll retry in a bit (and
+     * call {@link #onRetry(int)} when we do). Otherwise, we're giving up.
+     */
+    void onFailed(String message, GiveUpReason reason);
+
     void onRetry(int retries);
+  }
+
+  public enum GiveUpReason {
+    /** We're not giving up. */
+    NONE,
+
+    /** You need to upgrade your version of the game client. Link to the Play Store. */
+    UPGRADE_REQUIRED,
   }
 }

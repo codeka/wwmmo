@@ -221,7 +221,10 @@ public class HelloHandler extends RequestHandler {
             "User-Agent's version number is too low: %s (min-version: %s)",
             userAgent,
             minVersionStr);
-        throw new RequestException(410, "This version is not supported.");
+        throw new RequestException(
+            410,
+            Messages.GenericError.ErrorCode.UpgradeRequired,
+            "Unsupported version.");
       }
     }
 

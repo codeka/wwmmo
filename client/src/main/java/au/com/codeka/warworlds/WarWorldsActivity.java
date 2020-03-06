@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
@@ -52,6 +53,8 @@ public class WarWorldsActivity extends BaseActivity {
   private TextView connectionStatus;
   private HelloWatcher helloWatcher;
   private TextView realmName;
+
+  private boolean startGameToPlayStore;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -87,8 +90,16 @@ public class WarWorldsActivity extends BaseActivity {
 
     startGameButton.setOnClickListener(new OnClickListener() {
       public void onClick(View v) {
-        final Intent intent = new Intent(context, StarfieldActivity.class);
-        startActivity(intent);
+        if (startGameToPlayStore) {
+          Intent intent = new Intent(Intent.ACTION_VIEW);
+          intent.setData(Uri.parse(
+              "https://play.google.com/store/apps/details?id=au.com.codeka.warworlds"));
+          intent.setPackage("com.android.vending");
+          startActivity(intent);
+        } else {
+          final Intent intent = new Intent(context, StarfieldActivity.class);
+          startActivity(intent);
+        }
       }
     });
 
@@ -312,6 +323,7 @@ public class WarWorldsActivity extends BaseActivity {
     public void onRetry(final int retries) {
       numRetries = retries + 1;
       connectionStatus.setText(String.format(Locale.ENGLISH, "Retrying (#%d)...", numRetries));
+      connectionStatus.setTextColor(Color.WHITE);
     }
 
     @Override
@@ -328,6 +340,18 @@ public class WarWorldsActivity extends BaseActivity {
         return;
       }
       connectionStatus.setText("Connecting...");
+    }
+
+    @Override
+    public void onFailed(String msg, ServerGreeter.GiveUpReason reason) {
+      connectionStatus.setText(msg);
+      connectionStatus.setTextColor(Color.RED);
+
+      if (reason == ServerGreeter.GiveUpReason.UPGRADE_REQUIRED) {
+        startGameButton.setText("Get update");
+        startGameButton.setEnabled(true);
+        startGameToPlayStore = true;
+      }
     }
   }
 }

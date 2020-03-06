@@ -150,25 +150,29 @@ public class ApiRequest {
   }
 
   void handleResponse(Response response) {
-    try {
-      ResponseBody body = response.body();
-      if (body != null) {
-        responseContentType = body.contentType();
-        if (responseContentType != null) {
-          if (responseContentType.type().equals("text")) {
-            responseString = body.string();
-          } else if (responseContentType.type().equals("image")) {
-            responseBitmap = BitmapFactory.decodeStream(body.byteStream());
-          } else {
-            responseBytes = body.bytes();
+    if (response.code() > 399) {
+      handleError(response, null);
+    } else {
+      try {
+        ResponseBody body = response.body();
+        if (body != null) {
+          responseContentType = body.contentType();
+          if (responseContentType != null) {
+            if (responseContentType.type().equals("text")) {
+              responseString = body.string();
+            } else if (responseContentType.type().equals("image")) {
+              responseBitmap = BitmapFactory.decodeStream(body.byteStream());
+            } else {
+              responseBytes = body.bytes();
+            }
+            body.close();
           }
-          body.close();
         }
+      } catch (IOException e) {
+        log.error("Unexpected error decoding body.", e);
+        handleError(response, e);
+        return;
       }
-    } catch (IOException e) {
-      log.error("Unexpected error decoding body.", e);
-      handleError(response, e);
-      return;
     }
 
     // Call the callback, if there is one, on the main thread
@@ -202,7 +206,9 @@ public class ApiRequest {
       try {
         responseBytes = response.body().bytes();
         error = body(Messages.GenericError.class);
+        log.warning("Got error: %s", error);
       } catch (Exception ex) {
+        log.warning("Error parsing response.", ex);
         if (e == null) {
           error = convertToGenericError(ex);
         }
