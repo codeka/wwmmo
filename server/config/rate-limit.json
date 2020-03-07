@@ -8,7 +8,7 @@
   "buckets": [
     {
       "empireIds": [491],
-      "hardLimit": {"qps": 0.25, "size": 10}
+      "hardLimit": {"qps": 5.0, "size": 50}
     }
   ]
 }
