@@ -15,6 +15,8 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.GameHistoryController;
+import au.com.codeka.warworlds.server.ctrl.LoginController;
+import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.ctrl.StatisticsController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -79,6 +81,9 @@ public class HelloHandler extends RequestHandler {
       if (empire.getState() == Empire.State.ABANDONED) {
         new EmpireController().markActive(empire);
       }
+
+      // Make sure the session is up-to-date with things like the empire's alliance etc.
+      new LoginController().updateSession(getSession());
 
       // Make sure they haven't been wiped out.
       EmpireStarStats stats = new EmpireController().getEmpireStarStats(getSession().getEmpireID());
