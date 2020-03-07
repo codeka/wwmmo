@@ -129,8 +129,15 @@ public class RequestManager {
         // requests, until we can get back under the rate-limit.
         if (DBG) log.info("-- %s 429 rate-limited timing=%s", request, request.getTiming());
 
-        // TODO: some kind of exponential back-off?
-        handler.postDelayed(() -> enqueueRequest(request), 3000);
+        if (request.getTiming().getQueueTime() > 30000) {
+          // Queued for too long, give up.
+          requestComplete(request, response);
+          return;
+        }
+
+        // This will delay for the same time it's been queued already, which is a kind of
+        // exponential backoff.
+        handler.postDelayed(() -> enqueueRequest(request), request.getTiming().getQueueTime());
         return;
       }
 

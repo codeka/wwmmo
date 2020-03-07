@@ -340,6 +340,8 @@ public class ApiRequest {
 
     public Timing() {
       startTime = SystemClock.elapsedRealtime();
+      requestSentTime = startTime;
+      responseReceivedTime = startTime;
     }
 
     public void onRequestSent() {
@@ -348,6 +350,10 @@ public class ApiRequest {
 
     public void onResponseReceived() {
       responseReceivedTime = SystemClock.elapsedRealtime();
+    }
+
+    public long getQueueTime() {
+      return requestSentTime - startTime;
     }
 
     @Override
