@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game.wormhole;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TreeMap;
@@ -28,11 +29,9 @@ import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseGlFragment;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -65,6 +64,11 @@ public class WormholeFragment extends BaseGlFragment {
   private Handler handler;
   private View contentView;
 
+  private boolean refreshing = false;
+  private boolean needRefresh = false;
+
+  private HashMap<Integer, DisruptorStatus> disruptorStatusMap = new HashMap<>();
+
   @Override
   public void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -72,7 +76,6 @@ public class WormholeFragment extends BaseGlFragment {
     handler = new Handler();
 
     EmpireShieldManager.i.clearTextureCache();
-    StarManager.eventBus.register(eventHandler);
 
     Bundle extras = getArguments();
     int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
@@ -196,23 +199,24 @@ public class WormholeFragment extends BaseGlFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(getActivity(), new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeting greeting) {
-        Bundle extras = getArguments();
-        int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
+    ServerGreeter.waitForHello(getActivity(),
+        (ServerGreeter.HelloCompleteHandler) (success, greeting) -> {
+          Bundle extras = getArguments();
+          int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
 
-        star = StarManager.i.getStar(starID);
-        if (star != null) {
-          refreshStar();
-        }
-      }
-    });
+          star = StarManager.i.getStar(starID);
+          if (star != null) {
+            refreshStar();
+          }
+        });
+
+    StarManager.eventBus.register(eventHandler);
   }
 
   @Override
-  public void onDestroy() {
-    super.onDestroy();
+  public void onPause() {
+    super.onPause();
+
     StarManager.eventBus.unregister(eventHandler);
   }
 
@@ -298,18 +302,25 @@ public class WormholeFragment extends BaseGlFragment {
   }
 
   private void refreshStar() {
-    if (star.getWormholeExtra().getDestWormholeID() != 0 && (destStar == null || !destStar.getKey()
-        .equals(Integer.toString(star.getWormholeExtra().getDestWormholeID())))) {
+    if (refreshing) {
+      needRefresh = true;
+      return;
+    }
+    refreshing = true;
+
+    if (star.getWormholeExtra().getDestWormholeID() != 0 && (
+            destStar == null || destStar.getID() != star.getWormholeExtra().getDestWormholeID())) {
+      log.info("Fetching the destStar's details");
       destStar = StarManager.i.getStar(star.getWormholeExtra().getDestWormholeID());
     }
 
-    TextView starName = (TextView) contentView.findViewById(R.id.star_name);
-    TextView destinationName = (TextView) contentView.findViewById(R.id.destination_name);
-    FleetListWormhole fleetList = (FleetListWormhole) contentView.findViewById(R.id.fleet_list);
+    TextView starName = contentView.findViewById(R.id.star_name);
+    TextView destinationName = contentView.findViewById(R.id.destination_name);
+    FleetListWormhole fleetList = contentView.findViewById(R.id.fleet_list);
 
     starName.setText(star.getName());
 
-    TreeMap<String, Star> stars = new TreeMap<String, Star>();
+    TreeMap<String, Star> stars = new TreeMap<>();
     stars.put(star.getKey(), star);
     fleetList.refresh(star.getFleets(), stars);
 
@@ -335,12 +346,12 @@ public class WormholeFragment extends BaseGlFragment {
 
     Empire empire = EmpireManager.i.getEmpire(star.getWormholeExtra().getEmpireID());
     if (empire != null) {
-      TextView empireName = (TextView) contentView.findViewById(R.id.empire_name);
+      TextView empireName = contentView.findViewById(R.id.empire_name);
       empireName.setVisibility(View.VISIBLE);
       empireName.setText(empire.getDisplayName());
 
       Bitmap bmp = EmpireShieldManager.i.getShield(getActivity(), empire);
-      ImageView empireIcon = (ImageView) contentView.findViewById(R.id.empire_icon);
+      ImageView empireIcon = contentView.findViewById(R.id.empire_icon);
       empireIcon.setVisibility(View.VISIBLE);
       empireIcon.setImageBitmap(bmp);
     } else {
@@ -352,44 +363,33 @@ public class WormholeFragment extends BaseGlFragment {
     // require a nearby wormhole disruptor.
     contentView.findViewById(R.id.destroy_btn).setEnabled(false);
     contentView.findViewById(R.id.takeover_btn).setEnabled(false);
-    new BackgroundRunner<Boolean>() {
-      @Override
-      protected Boolean doInBackground() {
-        String url = "stars/" + star.getKey() + "/wormhole/disruptor-nearby";
-        try {
-          ApiClient.getString(url);
-          return true;
-        } catch (Exception e) {
-          return false;
-        }
-      }
+    checkDisruptorStatus(star.getID(), () -> {
+      contentView.findViewById(R.id.destroy_btn).setEnabled(true);
+      contentView.findViewById(R.id.takeover_btn).setEnabled(true);
+    });
 
-      @Override
-      protected void onComplete(Boolean found) {
-        contentView.findViewById(R.id.destroy_btn).setEnabled(found);
-        contentView.findViewById(R.id.takeover_btn).setEnabled(found);
-      }
-    }.execute();
+    refreshing = false;
+    if (needRefresh) {
+      // If we had a call to refresh while we were refreshing, then let's do it now, just
+      // to be on the safe side.
+      needRefresh = false;
+      handler.post(this::refreshStar);
+    }
   }
 
   private void updateTuningProgress() {
-    TextView tuningProgress = (TextView) contentView.findViewById(R.id.tuning_progress);
+    TextView tuningProgress = contentView.findViewById(R.id.tuning_progress);
     if (tuneCompleteTime == null && destStar != null) {
       tuningProgress.setText("");
 
       String str = String.format(Locale.ENGLISH, "→ %s", destStar.getName());
-      TextView destinationName = (TextView) contentView.findViewById(R.id.destination_name);
+      TextView destinationName = contentView.findViewById(R.id.destination_name);
       destinationName.setText(Html.fromHtml(str));
     } else if (tuneCompleteTime != null) {
       tuningProgress.setText(String.format(Locale.ENGLISH, "%s left",
           TimeFormatter.create().format(DateTime.now(), tuneCompleteTime)));
 
-      handler.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          updateTuningProgress();
-        }
-      }, 10000);
+      handler.postDelayed(this::updateTuningProgress, 10000);
     } else {
       tuningProgress.setText("");
     }
@@ -435,5 +435,52 @@ public class WormholeFragment extends BaseGlFragment {
   public void onStop() {
     super.onStop();
     wormhole.onStop();
+  }
+
+  /**
+   * Checks whether a disruptor is nearby, and calls the given callback if there is one. We'll cache
+   * the status for a little while to ensure that we don't hammer the server.
+   */
+  private void checkDisruptorStatus(int wormholeId, Runnable disruptorNearbyCallback) {
+    synchronized (disruptorStatusMap) {
+      DisruptorStatus status = disruptorStatusMap.get(wormholeId);
+      if (status == null || status.lastCheckTime.isBefore(DateTime.now().minusMinutes(5))) {
+        new BackgroundRunner<Boolean>() {
+          @Override
+          protected Boolean doInBackground() {
+            String url =
+                String.format(Locale.ENGLISH, "stars/%d/wormhole/disruptor-nearby", wormholeId);
+            try {
+              ApiClient.getString(url);
+              return true;
+            } catch (Exception e) {
+              return false;
+            }
+          }
+
+          @Override
+          protected void onComplete(Boolean found) {
+            synchronized (disruptorStatusMap) {
+              disruptorStatusMap.put(wormholeId, new DisruptorStatus(found));
+            }
+            if (found) {
+              disruptorNearbyCallback.run();
+            }
+          }
+        }.execute();
+      } else if (status.nearby) {
+        disruptorNearbyCallback.run();
+      }
+    }
+  }
+
+  private static class DisruptorStatus {
+    public boolean nearby;
+    public DateTime lastCheckTime;
+
+    public DisruptorStatus(boolean nearby) {
+      this.nearby = nearby;
+      this.lastCheckTime = DateTime.now();
+    }
   }
 }

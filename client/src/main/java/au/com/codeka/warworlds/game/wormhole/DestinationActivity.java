@@ -220,6 +220,7 @@ public class DestinationActivity extends BaseActivity {
 
   private void onTuneClicked() {
     if (destWormhole == null) {
+      log.warning("No wormhole selected, tuning unavailable.");
       return;
     }
 
@@ -236,6 +237,7 @@ public class DestinationActivity extends BaseActivity {
           star.fromProtocolBuffer(pb);
           return star;
         } catch (ApiException e) {
+          log.error("Error tuning.", e);
           return null;
         }
       }

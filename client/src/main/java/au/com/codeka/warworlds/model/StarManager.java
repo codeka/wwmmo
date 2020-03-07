@@ -14,10 +14,8 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventBus;
-import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.IabHelper;
 import au.com.codeka.warworlds.model.billing.Purchase;
-import au.com.codeka.warworlds.model.billing.SkuDetails;
 
 public class StarManager extends BaseManager {
   private static final Log log = new Log("StarManager");

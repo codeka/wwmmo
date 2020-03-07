@@ -456,7 +456,8 @@ public class SolarSystemActivity extends BaseActivity {
           }
         }
 
-        if (StarSimulationQueue.needsSimulation(star) || empirePresence == null) {
+        if (StarSimulationQueue.needsSimulation(star) || (
+            empirePresence == null && star.getWormholeExtra() == null)) {
           // if the star hasn't been simulated for > 5 minutes, schedule a simulation
           // now and just display ??? for the various parameters
           starGoodsDelta.setText("");
