@@ -4,7 +4,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -38,15 +37,11 @@ public abstract class BackgroundRunner<Result> {
     }
   };
 
-  private static final BlockingQueue<Runnable> sPoolWorkQueue = new LinkedBlockingQueue<Runnable>(
+  private static final BlockingQueue<Runnable> sPoolWorkQueue = new LinkedBlockingQueue<>(
       750 // Max queued items
   );
 
-  private static final Executor sExecutor = new ThreadPoolExecutor(
-      5, // core pool size
-      20, // max pool size
-      1, TimeUnit.SECONDS, // keep-alive time
-      sPoolWorkQueue, sThreadFactory);
+  private static final MyThreadPoolExecutor sExecutor = new MyThreadPoolExecutor();
 
   private static InternalHandler sHandler = new InternalHandler();
 
@@ -60,12 +55,15 @@ public abstract class BackgroundRunner<Result> {
       mCreatorStackTrace = Throwables.getStackTraceAsString(new Throwable());
     }
 
-    mWorker = new Callable<Result>() {
-      @Override
-      public Result call() throws Exception {
+    mWorker = () -> {
+      try {
         mTaskInvoked.set(true);
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-        return postResult(doInBackground());
+        Result r = postResult(doInBackground());
+        return r;
+      } catch (Throwable e) {
+        log.error("Exception in background task worker.", e);
+        return null;
       }
     };
 
@@ -76,11 +74,15 @@ public abstract class BackgroundRunner<Result> {
           postResultIfNotInvoked(get());
         } catch (InterruptedException e) {
           //ignore?
+          log.warning("Got InterruptedException.");
         } catch (ExecutionException e) {
-          throw new RuntimeException("An error occured while executing doInBackground()",
+          log.error("Error occurred in doInBackground.", e);
+          throw new RuntimeException("An error occurred while executing doInBackground()",
               e.getCause());
         } catch (CancellationException e) {
           postResultIfNotInvoked(null);
+        } catch (Throwable e) {
+          log.error("Unexpected error.", e);
         }
       }
     };
@@ -107,8 +109,7 @@ public abstract class BackgroundRunner<Result> {
 
   private Result postResult(Result result) {
     @SuppressWarnings("unchecked")
-    Message message = sHandler.obtainMessage(0,
-        new BackgroundRunnerResult<Result>(this, result));
+    Message message = sHandler.obtainMessage(0, new BackgroundRunnerResult<>(this, result));
 
     if (mCreatorStackTrace != null) {
       log.info("Posting message back to target from original stack trace:\r\n" + mCreatorStackTrace);
@@ -135,6 +136,24 @@ public abstract class BackgroundRunner<Result> {
     BackgroundRunnerResult(BackgroundRunner runner, Data... data) {
       mRunner = runner;
       mData = data;
+    }
+  }
+
+  private static class MyThreadPoolExecutor extends ThreadPoolExecutor {
+    public MyThreadPoolExecutor() {
+      super(
+          5, // core pool size
+          20, // max pool size
+          1, TimeUnit.SECONDS, // keep-alive time
+          sPoolWorkQueue, sThreadFactory);
+    }
+
+    @Override
+    public void beforeExecute(Thread t, Runnable r) {
+    }
+
+    @Override
+    public void afterExecute(Runnable r, Throwable t) {
     }
   }
 }

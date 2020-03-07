@@ -10,6 +10,7 @@ import java.util.concurrent.TimeoutException;
 import javax.validation.constraints.NotNull;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.common.protobuf.Messages;
 import okhttp3.Response;
 
 /**
@@ -24,12 +25,9 @@ public class ApiClient {
   public static String getString(String url) throws ApiException {
     final RequestFuture<String> future = new RequestFuture<>();
     RequestManager.i.sendRequest(
-        new ApiRequest.Builder(url, "GET").completeCallback(new ApiRequest.CompleteCallback() {
-          @Override
-          public void onRequestComplete(ApiRequest request) {
-            future.set(request.bodyString());
-          }
-        })
+        new ApiRequest.Builder(url, "GET")
+            .completeCallback(request -> future.set(request.bodyString()))
+            .errorCallback((request, error) -> future.set(""))
         .completeOnAnyThread(true)
         .build());
 

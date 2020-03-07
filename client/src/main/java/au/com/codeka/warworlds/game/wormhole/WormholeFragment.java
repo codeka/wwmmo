@@ -67,7 +67,7 @@ public class WormholeFragment extends BaseGlFragment {
   private boolean refreshing = false;
   private boolean needRefresh = false;
 
-  private HashMap<Integer, DisruptorStatus> disruptorStatusMap = new HashMap<>();
+  private final HashMap<Integer, DisruptorStatus> disruptorStatusMap = new HashMap<>();
 
   @Override
   public void onCreate(final Bundle savedInstanceState) {
@@ -442,35 +442,36 @@ public class WormholeFragment extends BaseGlFragment {
    * the status for a little while to ensure that we don't hammer the server.
    */
   private void checkDisruptorStatus(int wormholeId, Runnable disruptorNearbyCallback) {
+    DisruptorStatus status;
     synchronized (disruptorStatusMap) {
-      DisruptorStatus status = disruptorStatusMap.get(wormholeId);
-      if (status == null || status.lastCheckTime.isBefore(DateTime.now().minusMinutes(5))) {
-        new BackgroundRunner<Boolean>() {
-          @Override
-          protected Boolean doInBackground() {
-            String url =
-                String.format(Locale.ENGLISH, "stars/%d/wormhole/disruptor-nearby", wormholeId);
-            try {
-              ApiClient.getString(url);
-              return true;
-            } catch (Exception e) {
-              return false;
-            }
+      status = disruptorStatusMap.get(wormholeId);
+    }
+    if (status == null || status.lastCheckTime.isBefore(DateTime.now().minusMinutes(5))) {
+      new BackgroundRunner<Boolean>() {
+        @Override
+        protected Boolean doInBackground() {
+          String url =
+              String.format(Locale.ENGLISH, "stars/%d/wormhole/disruptor-nearby", wormholeId);
+          try {
+            ApiClient.getString(url);
+            return true;
+          } catch (Exception e) {
+            return false;
           }
+        }
 
-          @Override
-          protected void onComplete(Boolean found) {
-            synchronized (disruptorStatusMap) {
-              disruptorStatusMap.put(wormholeId, new DisruptorStatus(found));
-            }
-            if (found) {
-              disruptorNearbyCallback.run();
-            }
+        @Override
+        protected void onComplete(Boolean found) {
+          synchronized (disruptorStatusMap) {
+            disruptorStatusMap.put(wormholeId, new DisruptorStatus(found));
           }
-        }.execute();
-      } else if (status.nearby) {
-        disruptorNearbyCallback.run();
-      }
+          if (found) {
+            disruptorNearbyCallback.run();
+          }
+        }
+      }.execute();
+    } else if (status.nearby) {
+      disruptorNearbyCallback.run();
     }
   }
 

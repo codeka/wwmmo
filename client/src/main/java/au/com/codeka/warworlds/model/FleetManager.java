@@ -88,11 +88,14 @@ public class FleetManager {
       log.warning("Fleet state isn't IDLE, can't enter the wormhole.");
       return;
     }
+    log.info("HERE 1");
 
     new BackgroundRunner<Boolean>() {
       @Override
       protected Boolean doInBackground() {
+        log.info("HERE 2");
         String url = String.format("stars/%s/fleets/%s/orders", fleet.getStarKey(), fleet.getKey());
+        log.info(url);
         Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
             .setOrder(Messages.FleetOrder.FLEET_ORDER.ENTER_WORMHOLE)
             .build();
@@ -117,6 +120,8 @@ public class FleetManager {
           if (handler != null) {
             handler.onFleetEnteredWormhole(fleet);
           }
+        } else {
+          log.warning("Error entering wormhole.");
         }
       }
     }.execute();

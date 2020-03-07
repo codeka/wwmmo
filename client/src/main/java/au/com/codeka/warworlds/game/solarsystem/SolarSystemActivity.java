@@ -77,7 +77,7 @@ public class SolarSystemActivity extends BaseActivity {
     }
 
     setContentView(R.layout.solarsystem_activity);
-    drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+    drawerLayout = findViewById(R.id.drawer_layout);
     drawer = findViewById(R.id.drawer);
 
     // We have to offset the drawerLayout a bit because the action bar will be covering it.
@@ -87,17 +87,14 @@ public class SolarSystemActivity extends BaseActivity {
     styledAttributes.recycle();
     ((FrameLayout.LayoutParams) drawerLayout.getLayoutParams()).topMargin = actionBarHeight;
 
-    ListView searchList = (ListView) findViewById(R.id.search_result);
+    ListView searchList = findViewById(R.id.search_result);
     searchListAdapter = new SearchListAdapter(getLayoutInflater());
     searchList.setAdapter(searchListAdapter);
 
-    searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Star star = (Star) searchListAdapter.getItem(position);
-        if (star != null) {
-          showStar(star.getID());
-        }
+    searchList.setOnItemClickListener((parent, view, position, id) -> {
+      Star star = (Star) searchListAdapter.getItem(position);
+      if (star != null) {
+        showStar(star.getID());
       }
     });
 
@@ -120,25 +117,17 @@ public class SolarSystemActivity extends BaseActivity {
         };
     drawerLayout.setDrawerListener(drawerToggle);
 
-    final EditText searchBox = (EditText) findViewById(R.id.search_text);
-    searchBox.setOnEditorActionListener(new OnEditorActionListener() {
-      @Override
-      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-          performSearch(searchBox.getText().toString());
-          return true;
-        }
-        return false;
+    final EditText searchBox = findViewById(R.id.search_text);
+    searchBox.setOnEditorActionListener((v, actionId, event) -> {
+      if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+        performSearch(searchBox.getText().toString());
+        return true;
       }
+      return false;
     });
 
-    ImageButton searchBtn = (ImageButton) findViewById(R.id.search_button);
-    searchBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        performSearch(searchBox.getText().toString());
-      }
-    });
+    ImageButton searchBtn = findViewById(R.id.search_button);
+    searchBtn.setOnClickListener(v -> performSearch(searchBox.getText().toString()));
 
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setHomeButtonEnabled(true);
@@ -202,18 +191,15 @@ public class SolarSystemActivity extends BaseActivity {
 
     StarManager.eventBus.register(eventHandler);
 
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeting greeting) {
-        if (starID == null) {
-          Bundle extras = getIntent().getExtras();
-          String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-          if (starKey != null) {
-            showStar(Integer.parseInt(starKey));
-          }
-        } else {
-          showStar(starID);
+    ServerGreeter.waitForHello(this, (success, greeting) -> {
+      if (starID == null) {
+        Bundle extras = getIntent().getExtras();
+        String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+        if (starKey != null) {
+          showStar(Integer.parseInt(starKey));
         }
+      } else {
+        showStar(starID);
       }
     });
   }
@@ -419,16 +405,16 @@ public class SolarSystemActivity extends BaseActivity {
       }
 
       Star star = (Star) getItem(position);
-      ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
-      TextView starName = (TextView) view.findViewById(R.id.star_name);
-      TextView starType = (TextView) view.findViewById(R.id.star_type);
-      TextView starGoodsDelta = (TextView) view.findViewById(R.id.star_goods_delta);
-      TextView starGoodsTotal = (TextView) view.findViewById(R.id.star_goods_total);
-      TextView starMineralsDelta = (TextView) view.findViewById(R.id.star_minerals_delta);
-      TextView starMineralsTotal = (TextView) view.findViewById(R.id.star_minerals_total);
+      ImageView starIcon = view.findViewById(R.id.star_icon);
+      TextView starName = view.findViewById(R.id.star_name);
+      TextView starType = view.findViewById(R.id.star_type);
+      TextView starGoodsDelta = view.findViewById(R.id.star_goods_delta);
+      TextView starGoodsTotal = view.findViewById(R.id.star_goods_total);
+      TextView starMineralsDelta = view.findViewById(R.id.star_minerals_delta);
+      TextView starMineralsTotal = view.findViewById(R.id.star_minerals_total);
 
       if (starIcon == null) {
-        throw new RuntimeException(Integer.toString(position) + " " + view.toString());
+        throw new RuntimeException(position + " " + view.toString());
       }
 
       if (star == null) {
@@ -464,7 +450,7 @@ public class SolarSystemActivity extends BaseActivity {
           starGoodsTotal.setText("???");
           starMineralsDelta.setText("");
           starMineralsTotal.setText("???");
-          StarSimulationQueue.i.simulate((Star) star, false);
+          StarSimulationQueue.i.simulate(star, false);
         } else if (empirePresence != null) {
           starGoodsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
               empirePresence.getDeltaGoodsPerHour() < 0 ? "-" : "+",
