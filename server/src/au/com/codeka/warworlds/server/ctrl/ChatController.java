@@ -61,7 +61,7 @@ public class ChatController {
     }
   }
 
-  public ArrayList<ChatConversation> getAllConversation() throws RequestException {
+  public ArrayList<ChatConversation> getAllConversations() throws RequestException {
     try {
       return db.getConversations("1 = 1");
     } catch (Exception e) {

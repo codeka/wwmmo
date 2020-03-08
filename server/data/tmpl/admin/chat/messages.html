@@ -7,12 +7,24 @@
     section#messages {
       position: absolute;
       left: 0px;
-      right: 30px;
+      right: 340px;
       bottom: 50px;
       top: 70px;
       overflow-y: auto;
       margin-right: 30px;
       border: solid 1px #999;
+    }
+    section#conversations {
+      position: absolute;
+      right: 30px;
+      width: 300px;
+      bottom: 50px;
+      top: 70px;
+      overflow-y: auto;
+    }
+    section#conversations div.conv {
+      height: 30px;
+      line-height: 30px;
     }
     form {
       position: absolute;
@@ -53,7 +65,13 @@
     <div class="conv" data-convid="-1">All messages</div>
     <div class="conv" data-convid="0">Global chat</div>
     <div class="conv" data-convid="0">Alliance chat</div>
-
+    {% for conv in conversations %}
+      <div class="conv" data-convid="{{ conv.ID }}">
+        {% for participant in conv.participants %}
+          {{ empires[participant.empireID].displayName }},
+        {% end %}
+      </div>
+    {% end %}
   </section>
   <form id="sendmsg">
     <div class="hack"><input type="text"></div>
