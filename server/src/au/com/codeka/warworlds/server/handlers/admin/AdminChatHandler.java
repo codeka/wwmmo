@@ -15,7 +15,7 @@ public class AdminChatHandler extends AdminGenericHandler {
     }
     TreeMap<String, Object> data = new TreeMap<>();
 
-    new ChatController().getAllConversations()
+    //new ChatController().getAllConversations()
 
     render("admin/chat/messages.html", data);
   }
