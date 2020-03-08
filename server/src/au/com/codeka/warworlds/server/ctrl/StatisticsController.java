@@ -20,13 +20,20 @@ public class StatisticsController {
     db = new DataBase(trans);
   }
 
-  public void registerLogin(int empireID, Messages.HelloRequest hello_request_pb) throws RequestException {
+  public void registerLogin(
+      int empireID,
+      String userAgent,
+      Messages.HelloRequest hello_request_pb) throws RequestException {
+    String[] parts = userAgent.split("/");
+    String version = parts.length == 2 ? parts[1] : userAgent;
+
     try {
       db.registerLogin(empireID, hello_request_pb.getDeviceModel(),
           hello_request_pb.getDeviceManufacturer(),
           hello_request_pb.getDeviceBuild(),
           hello_request_pb.getDeviceVersion(),
-          hello_request_pb.getAccessibilitySettingsInfo());
+          hello_request_pb.getAccessibilitySettingsInfo(),
+          version);
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -43,10 +50,12 @@ public class StatisticsController {
 
     public void registerLogin(int empireID, String deviceModel, String deviceManufacturer,
         String deviceBuild, String deviceVersion,
-        @Nullable Messages.AccessibilitySettingsInfo accessibilitySettingsInfo) throws Exception {
-      String sql = "INSERT INTO empire_logins (empire_id, date, device_model, device_manufacturer," +
-          " device_build, device_version, num_accessibility_services, accessibility_service_infos)" +
-          " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        @Nullable Messages.AccessibilitySettingsInfo accessibilitySettingsInfo,
+        String version) throws Exception {
+      String sql = "INSERT INTO empire_logins (empire_id, date, device_model, " +
+          "device_manufacturer, device_build, device_version, num_accessibility_services, " +
+          "accessibility_service_infos, version)" +
+          " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, empireID);
         stmt.setDateTime(2, DateTime.now());
@@ -61,6 +70,7 @@ public class StatisticsController {
           stmt.setInt(7, accessibilitySettingsInfo.getServiceCount());
           stmt.setBytes(8, accessibilitySettingsInfo.toByteArray());
         }
+        stmt.setString(9, version);
         stmt.update();
       }
     }

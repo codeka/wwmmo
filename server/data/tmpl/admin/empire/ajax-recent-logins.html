@@ -5,11 +5,13 @@
   <tr>
     <th>Date</th>
     <th>Device</th>
+    <th>Version</th>
   </tr>
   {% for login in logins %}
     <tr>
       <td><time timestamp="{{ login.date / 1000 }}">{{ login.date }}</time></td>
       <td>{{ login.deviceManufacturer }} | {{ login.deviceModel }} | {{ login.deviceBuild }}</td>
+      <td>{{ login.version }}</td>
     </tr>
     {% if login.accessibilitySettings && login.accessibilitySettings.serviceList.size() > 0 %}
     <tr>
