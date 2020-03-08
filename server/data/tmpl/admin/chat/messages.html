@@ -49,6 +49,12 @@
 {% block "content" %}
   <h1>Chat</h1>
   <section id="messages"></section>
+  <section id="conversations">
+    <div class="conv" data-convid="-1">All messages</div>
+    <div class="conv" data-convid="0">Global chat</div>
+    <div class="conv" data-convid="0">Alliance chat</div>
+
+  </section>
   <form id="sendmsg">
     <div class="hack"><input type="text"></div>
     <input type="submit" value="Send">

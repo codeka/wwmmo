@@ -61,6 +61,14 @@ public class ChatController {
     }
   }
 
+  public ArrayList<ChatConversation> getAllConversation() throws RequestException {
+    try {
+      return db.getConversations("1 = 1");
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
   public void addParticipant(ChatConversation conversation, int empireID) throws RequestException {
     try {
       db.addParticipant(conversation.getID(), empireID);
@@ -355,10 +363,12 @@ public class ChatController {
 
     ArrayList<ChatConversation> getConversations(String whereClause) throws Exception {
       Map<Integer, ChatConversation> conversations = new HashMap<Integer, ChatConversation>();
-      String sql = "SELECT chat_conversations.id, chat_conversation_participants.empire_id, chat_conversation_participants.is_muted" +
-          " FROM chat_conversations" +
-          " INNER JOIN chat_conversation_participants ON conversation_id = chat_conversations.id" +
-          " WHERE " + whereClause;
+      String sql = "" +
+          "SELECT chat_conversations.id, chat_conversation_participants.empire_id," +
+          "       chat_conversation_participants.is_muted " +
+          "FROM chat_conversations " +
+          "INNER JOIN chat_conversation_participants ON conversation_id = chat_conversations.id " +
+          "WHERE " + whereClause;
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
         while (res.next()) {
