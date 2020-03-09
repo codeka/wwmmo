@@ -2,8 +2,6 @@ package au.com.codeka.warworlds.server.handlers;
 
 import java.io.IOException;
 
-import javax.servlet.http.Cookie;
-
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -26,12 +24,13 @@ public class LoginHandler extends RequestHandler {
 
   @Override
   protected void get() throws RequestException {
-    boolean isLoadTest = false;
-    if (isLoadTest) {
-      loadTestAuthenticate();
-      return;
+    // idTokens is the new way.
+    String idToken = getRequest().getParameter("idToken");
+    if (idToken != null) {
+      // TODO: authenticate
     }
 
+    // authToken is the old, soon to be unsupported way.
     String authToken = getRequest().getParameter("authToken");
     if (authToken == null || authToken.equals("null")) {
       throw new RequestException(400, "Bad login request.");
@@ -47,11 +46,12 @@ public class LoginHandler extends RequestHandler {
       log.info("Executing OAuth request...");
       Tokeninfo tokenInfo = oauth2.tokeninfo()
           .setAccessToken(getRequest().getParameter("authToken")).execute();
-      log.info("... done: %s", tokenInfo.getEmail());
+      log.info("... done: %s audience: %s", tokenInfo.getEmail(), tokenInfo.getAudience());
 
       String emailAddr = tokenInfo.getEmail();
       String impersonateUser = getRequest().getParameter("impersonate");
-      String cookie = new LoginController().generateCookie(emailAddr, false, impersonateUser);
+      String cookie = new LoginController().generateCookie(
+          emailAddr, tokenInfo.getAudience(), false, impersonateUser);
 
       getResponse().setContentType("text/plain");
       getResponse().getWriter().write(cookie);
@@ -60,17 +60,5 @@ public class LoginHandler extends RequestHandler {
     } catch (IOException e) {
       throw new RequestException(e);
     }
-  }
-
-  /**
-   * Authentication for load tests is just based on trust. You pass in the email address you
-   * want to use directly.
-   */
-  private void loadTestAuthenticate() throws RequestException {
-    String emailAddr = getRequest().getParameter("email");
-    String cookie = new LoginController().generateCookie(emailAddr, false, null);
-
-    getResponse().addCookie(new Cookie("SESSION", cookie));
-    getResponse().setStatus(200);
   }
 }

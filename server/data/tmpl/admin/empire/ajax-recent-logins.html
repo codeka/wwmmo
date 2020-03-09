@@ -12,6 +12,7 @@
       <td><time timestamp="{{ login.date / 1000 }}">{{ login.date }}</time></td>
       <td>{{ login.deviceManufacturer }} | {{ login.deviceModel }} | {{ login.deviceBuild }}</td>
       <td>{{ login.version }}</td>
+      <td>{{ clientIds[login.clientId] }}</td>
     </tr>
     {% if login.accessibilitySettings && login.accessibilitySettings.serviceList.size() > 0 %}
     <tr>

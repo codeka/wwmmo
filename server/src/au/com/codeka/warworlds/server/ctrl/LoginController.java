@@ -30,7 +30,8 @@ public class LoginController {
   /**
    * Generates a cookie, assuming we've just finished authenticating as the given email.
    */
-  public String generateCookie(String emailAddr, boolean doAdminTest, String impersonateUser)
+  public String generateCookie(
+      String emailAddr, String clientId, boolean doAdminTest, String impersonateUser)
       throws RequestException {
     // generate a random string for the session cookie
     SecureRandom rand = new SecureRandom();
@@ -59,7 +60,7 @@ public class LoginController {
       }
     }
 
-    createSession(cookie.toString(), emailAddr, impersonateUser, isAdmin);
+    createSession(cookie.toString(), emailAddr, clientId, impersonateUser, isAdmin);
     log.info("Authenticated: email=%s cookie=%s", emailAddr, cookie);
     return cookie.toString();
   }
@@ -67,6 +68,7 @@ public class LoginController {
   public Session createSession(
       String cookie,
       String emailAddr,
+      String clientId,
       @Nullable String impersonateUser,
       boolean isAdmin) throws RequestException {
     int empireID = 0;
@@ -101,7 +103,8 @@ public class LoginController {
           "You have been banned for misconduct.");
     }
 
-    Session session = new Session(cookie, emailAddr, DateTime.now(), empireID, allianceID, isAdmin);
+    Session session =
+        new Session(cookie, emailAddr, clientId, DateTime.now(), empireID, allianceID, isAdmin);
     new SessionController().saveSession(session);
 
     return session;
