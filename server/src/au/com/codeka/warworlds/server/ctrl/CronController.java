@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.server.ctrl;
 
 import org.joda.time.DateTime;
+import org.joda.time.IllegalFieldValueException;
+import org.joda.time.IllegalInstantException;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -141,11 +143,18 @@ public class CronController {
           break;
         }
       }
-      if (nextTime != null) {
-        jobDetails.setNextRunTime(nextTime.toDateTimeToday());
-      } else {
-        // No more times today, switch to the first time tomorrow.
-        jobDetails.setNextRunTime(times.get(0).toDateTimeToday().plusDays(1));
+      int plusDays = 0;
+      if (nextTime == null) {
+        nextTime = times.get(0);
+        plusDays = 1;
+      }
+      try {
+        jobDetails.setNextRunTime(nextTime.toDateTimeToday().plusDays(plusDays));
+      } catch (IllegalFieldValueException e) {
+        // This can happen if, for example, the time we calculate is a time that doesn't exist
+        // in the local timezone (due to daylight savings or whatever). Just try in an hour.
+        log.info("Adjusting next time due to IllegalFieldValueException (daylight savings time?)");
+        jobDetails.setNextRunTime(nextTime.plusHours(1).toDateTimeToday().plusDays(plusDays));
       }
     }
 
