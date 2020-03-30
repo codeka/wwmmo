@@ -74,7 +74,7 @@ public class AdminLoginHandler extends AdminHandler {
     }
     new AdminController().recordLogin(backendUser);
 
-    String cookieValue = new LoginController().generateCookie(emailAddr, true, null);
+    String cookieValue = new LoginController().generateCookie(emailAddr, "", true, null);
     log.info("Got cookie: %s", cookieValue);
 
     Cookie cookie = new Cookie("SESSION", cookieValue);

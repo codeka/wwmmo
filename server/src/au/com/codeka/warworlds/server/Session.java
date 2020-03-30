@@ -15,6 +15,7 @@ public class Session {
   private String cookie;
   private String actualEmail;
   private String email;
+  private String clientId;
   private DateTime loginTime;
   private int empireID;
   private Integer allianceID;
@@ -27,6 +28,7 @@ public class Session {
     cookie = res.getString("session_cookie");
     actualEmail = res.getString("user_email");
     email = actualEmail;
+    clientId = res.getString("client_id");
     loginTime = res.getDateTime("login_time");
     if (res.getInt("empire_id") == null) {
       empireID = 0;
@@ -47,11 +49,12 @@ public class Session {
     isAdmin = copy.isAdmin;
   }
 
-  public Session(String cookie, String email, DateTime loginTime, int empireID,
-                 Integer allianceID, boolean isAdmin) {
+  public Session(String cookie, String email, String clientId, DateTime loginTime, int empireID,
+      Integer allianceID, boolean isAdmin) {
     this.cookie = cookie;
     actualEmail = email;
     this.email = actualEmail;
+    this.clientId = clientId;
     this.loginTime = loginTime;
     this.empireID = empireID;
     this.allianceID = allianceID;
@@ -68,6 +71,11 @@ public class Session {
 
   public String getActualEmail() {
     return actualEmail;
+  }
+
+  /** Get the Client ID of the app that authenticated as this user. */
+  public String getClientId() {
+    return clientId;
   }
 
   public DateTime getLoginTime() {

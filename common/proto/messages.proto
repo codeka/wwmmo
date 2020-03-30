@@ -332,6 +332,7 @@ message EmpireLoginInfo {
   optional string device_version = 6;
   optional AccessibilitySettingsInfo accessibility_settings = 7;
   optional string version = 8;
+  optional string client_id = 9;
 }
 
 //

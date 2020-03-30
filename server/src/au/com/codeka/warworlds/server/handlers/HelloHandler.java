@@ -78,7 +78,7 @@ public class HelloHandler extends RequestHandler {
     Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
     if (empire != null) {
       new StatisticsController().registerLogin(
-          getSession().getEmpireID(), getRequest().getHeader("User-Agent"), hello_request_pb);
+          getSession(), getRequest().getHeader("User-Agent"), hello_request_pb);
       if (empire.getState() == Empire.State.ABANDONED) {
         new EmpireController().markActive(empire);
       }

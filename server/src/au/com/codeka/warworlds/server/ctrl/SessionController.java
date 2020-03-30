@@ -41,7 +41,7 @@ public class SessionController {
               // Anonymous cookies are OK, we always accept them.
               log.info("Session cookie indicates anonymous user: %s", cookie.replace('_', '@'));
               return new LoginController().createSession(
-                  cookie, cookie.replace('_', '@'), null, false);
+                  cookie, cookie.replace('_', '@'), "", null, false);
             }
 
             if (session != null) {
@@ -84,8 +84,8 @@ public class SessionController {
     }
 
     sql = "INSERT INTO sessions (session_cookie, user_email, login_time, empire_id," +
-        " alliance_id, is_admin, inline_notifications)" +
-        " VALUES (?, ?, ?, ?, ?, ?, 0)";
+        " alliance_id, is_admin, inline_notifications, client_id)" +
+        " VALUES (?, ?, ?, ?, ?, ?, 0, ?)";
     try (SqlStmt stmt = DB.prepare(sql)) {
       stmt.setString(1, session.getCookie());
       stmt.setString(2, session.getActualEmail());
@@ -101,6 +101,7 @@ public class SessionController {
         stmt.setInt(5, session.getAllianceID());
       }
       stmt.setInt(6, session.isAdmin() ? 1 : 0);
+      stmt.setString(7, session.getClientId());
       stmt.update();
     } catch (Exception e) {
       throw new RequestException(e);
