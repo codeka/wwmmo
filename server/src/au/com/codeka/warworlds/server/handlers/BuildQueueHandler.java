@@ -78,7 +78,7 @@ public class BuildQueueHandler extends RequestHandler {
               "You don't have enough cash to accelerate this build.");
         }
 
-        new BuildCompleteEvent().processImmediateBuildRequest(
+        new BuildCompleteEvent(t).processImmediateBuildRequest(
             star, colony, buildRequest.getEmpireID(), buildRequest.getDesign().getID(),
             buildRequest.getDesignKind(), buildRequest.getCount(), buildRequest.getNotes(),
             buildRequest.getExistingBuildingID(), buildRequest.getExistingFleetID(),
