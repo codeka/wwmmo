@@ -333,6 +333,7 @@ message EmpireLoginInfo {
   optional AccessibilitySettingsInfo accessibility_settings = 7;
   optional string version = 8;
   optional string client_id = 9;
+  optional string safetynet_attestation_statement = 10;
 }
 
 //

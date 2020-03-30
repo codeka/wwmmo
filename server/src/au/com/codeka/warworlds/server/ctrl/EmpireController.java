@@ -630,7 +630,8 @@ public class EmpireController {
 
     public List<Messages.EmpireLoginInfo> getRecentLogins(int empireID, int limit) throws Exception {
       String sql = "SELECT date, device_model, device_manufacturer, device_build, device_version," +
-          "accessibility_service_infos, version, client_id FROM empire_logins WHERE empire_id = ? " +
+          "accessibility_service_infos, version, client_id, safetynet_attestation_statement " +
+          "FROM empire_logins WHERE empire_id = ? " +
           "ORDER BY date DESC LIMIT ?";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, empireID);
@@ -656,6 +657,9 @@ public class EmpireController {
           }
           if (res.getString(8) != null) {
             empireLoginInfoBuilder.setClientId(res.getString(8));
+          }
+          if (res.getString(9) != null) {
+            empireLoginInfoBuilder.setSafetynetAttestationStatement(res.getString(9));
           }
           empireLoginInfos.add(empireLoginInfoBuilder.build());
         }

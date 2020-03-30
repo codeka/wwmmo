@@ -17,7 +17,7 @@
     </tr>
     {% if login.accessibilitySettings && login.accessibilitySettings.serviceList.size() > 0 %}
     <tr>
-      <td colspan="2">
+      <td colspan="4">
         <table>
           <tr>
             <th>&nbsp;</th>
@@ -32,6 +32,13 @@
             </tr>
           {% end %}
         </table>
+      </td>
+    </tr>
+    {% end %}
+    {% if login.safetynetAttestationStatement %}
+    <tr>
+      <td colspan="4">
+        SafetyNet: {{ login.safetynetAttestationStatement }}
       </td>
     </tr>
     {% end %}
