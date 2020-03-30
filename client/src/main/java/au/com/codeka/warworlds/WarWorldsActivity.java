@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,12 +27,14 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Html;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
@@ -64,6 +67,11 @@ public class WarWorldsActivity extends BaseActivity {
     setContentView(R.layout.welcome);
     Util.setup(context);
 
+    if (onBlueStacks()) {
+      Toast.makeText(this, "Sorry, this platform is not supported. Please use a supported platform.", Toast.LENGTH_LONG).show();
+      finish();
+    }
+
     View rootView = findViewById(android.R.id.content);
     ActivityBackgroundGenerator.setBackground(rootView);
 
@@ -81,52 +89,34 @@ public class WarWorldsActivity extends BaseActivity {
       }
     });
 
-    optionsButton.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        startActivity(new Intent(context, GlobalOptionsActivity.class));
+    optionsButton.setOnClickListener(v -> startActivity(new Intent(context, GlobalOptionsActivity.class)));
+
+    startGameButton.setOnClickListener(v -> {
+      if (startGameToPlayStore) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(
+            "https://play.google.com/store/apps/details?id=au.com.codeka.warworlds"));
+        intent.setPackage("com.android.vending");
+        startActivity(intent);
+      } else {
+        final Intent intent = new Intent(context, StarfieldActivity.class);
+        startActivity(intent);
       }
     });
 
-    startGameButton.setOnClickListener(new OnClickListener() {
-      public void onClick(View v) {
-        if (startGameToPlayStore) {
-          Intent intent = new Intent(Intent.ACTION_VIEW);
-          intent.setData(Uri.parse(
-              "https://play.google.com/store/apps/details?id=au.com.codeka.warworlds"));
-          intent.setPackage("com.android.vending");
-          startActivity(intent);
-        } else {
-          final Intent intent = new Intent(context, StarfieldActivity.class);
-          startActivity(intent);
-        }
-      }
+    findViewById(R.id.help_btn).setOnClickListener(v -> {
+      Intent i = new Intent(Intent.ACTION_VIEW);
+      i.setData(Uri.parse("https://war-worlds.wikia.com/wiki/War_Worlds_Wiki"));
+      startActivity(i);
     });
 
-    findViewById(R.id.help_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse("https://war-worlds.wikia.com/wiki/War_Worlds_Wiki"));
-        startActivity(i);
-      }
+    findViewById(R.id.website_btn).setOnClickListener(v -> {
+      Intent i = new Intent(Intent.ACTION_VIEW);
+      i.setData(Uri.parse("http://www.war-worlds.com/"));
+      startActivity(i);
     });
 
-    findViewById(R.id.website_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse("http://www.war-worlds.com/"));
-        startActivity(i);
-      }
-    });
-
-    findViewById(R.id.reauth_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onReauthClick();
-      }
-    });
+    findViewById(R.id.reauth_btn).setOnClickListener(v -> onReauthClick());
   }
 
   @Override
@@ -160,35 +150,32 @@ public class WarWorldsActivity extends BaseActivity {
 
     ShieldManager.eventBus.register(eventHandler);
 
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeter.ServerGreeting greeting) {
-        if (success) {
-          // we'll display a bit of debugging info along with the 'connected' message
-          long maxMemoryBytes = Runtime.getRuntime().maxMemory();
-          int memoryClass = ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getMemoryClass();
+    ServerGreeter.waitForHello(this, (success, greeting) -> {
+      if (success) {
+        // we'll display a bit of debugging info along with the 'connected' message
+        long maxMemoryBytes = Runtime.getRuntime().maxMemory();
+        int memoryClass = ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getMemoryClass();
 
-          DecimalFormat formatter = new DecimalFormat("#,##0");
-          String msg = String.format(Locale.ENGLISH,
-              "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s", memoryClass,
-              formatter.format(maxMemoryBytes), Util.getVersion(),
-              Util.isDebug() ? " (debug)" : " (rel)");
-          connectionStatus.setText(msg);
-          startGameButton.setEnabled(true);
+        DecimalFormat formatter = new DecimalFormat("#,##0");
+        String msg = String.format(Locale.ENGLISH,
+            "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s", memoryClass,
+            formatter.format(maxMemoryBytes), Util.getVersion(),
+            Util.isDebug() ? " (debug)" : " (rel)");
+        connectionStatus.setText(msg);
+        startGameButton.setEnabled(true);
 
-          MyEmpire empire = EmpireManager.i.getEmpire();
-          if (empire != null) {
-            empireName.setText(empire.getDisplayName());
-            empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
-          }
-
-          String currAccountName = prefs.getString("AccountName", null);
-          if (currAccountName != null && currAccountName.endsWith("@anon.war-worlds.com")) {
-            Button reauthButton = findViewById(R.id.reauth_btn);
-            reauthButton.setText("Sign in");
-          }
-          maybeShowSignInPrompt();
+        MyEmpire empire = EmpireManager.i.getEmpire();
+        if (empire != null) {
+          empireName.setText(empire.getDisplayName());
+          empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
         }
+
+        String currAccountName = prefs.getString("AccountName", null);
+        if (currAccountName != null && currAccountName.endsWith("@anon.war-worlds.com")) {
+          Button reauthButton = findViewById(R.id.reauth_btn);
+          reauthButton.setText("Sign in");
+        }
+        maybeShowSignInPrompt();
       }
     });
   }
@@ -353,5 +340,12 @@ public class WarWorldsActivity extends BaseActivity {
         startGameToPlayStore = true;
       }
     }
+  }
+
+
+  private boolean onBlueStacks() {
+    File sharedFolder = new File(
+        Environment.getExternalStorageDirectory(), "/windows/BstSharedFolder");
+    return sharedFolder.exists();
   }
 }
