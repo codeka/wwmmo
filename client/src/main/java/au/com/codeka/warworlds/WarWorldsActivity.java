@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -57,7 +58,8 @@ public class WarWorldsActivity extends BaseActivity {
   private HelloWatcher helloWatcher;
   private TextView realmName;
 
-  private boolean startGameToPlayStore;
+  @Nullable
+  private Intent startGameIntent;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -92,15 +94,11 @@ public class WarWorldsActivity extends BaseActivity {
     optionsButton.setOnClickListener(v -> startActivity(new Intent(context, GlobalOptionsActivity.class)));
 
     startGameButton.setOnClickListener(v -> {
-      if (startGameToPlayStore) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(
-            "https://play.google.com/store/apps/details?id=au.com.codeka.warworlds"));
-        intent.setPackage("com.android.vending");
-        startActivity(intent);
-      } else {
+      if (startGameIntent == null) {
         final Intent intent = new Intent(context, StarfieldActivity.class);
         startActivity(intent);
+      } else {
+        startActivity(startGameIntent);
       }
     });
 
@@ -334,14 +332,29 @@ public class WarWorldsActivity extends BaseActivity {
       connectionStatus.setText(msg);
       connectionStatus.setTextColor(Color.RED);
 
-      if (reason == ServerGreeter.GiveUpReason.UPGRADE_REQUIRED) {
-        startGameButton.setText("Get update");
-        startGameButton.setEnabled(true);
-        startGameToPlayStore = true;
+      Intent intent = new Intent(Intent.ACTION_VIEW);
+      intent.setPackage("com.android.vending");
+
+      switch (reason) {
+        case UPGRADE_REQUIRED:
+          startGameButton.setText("Get update");
+          startGameButton.setEnabled(true);
+
+          intent.setData(Uri.parse(
+              "https://play.google.com/store/apps/details?id=au.com.codeka.warworlds"));
+          startGameIntent = intent;
+          break;
+        case GOOGLE_PLAY_SERVICES:
+          startGameButton.setText("Get update");
+          startGameButton.setEnabled(true);
+
+          intent.setData(Uri.parse(
+              "https://play.google.com/store/apps/details?id=com.google.android.gms"));
+          startGameIntent = intent;
+          break;
       }
     }
   }
-
 
   private boolean onBlueStacks() {
     File sharedFolder = new File(

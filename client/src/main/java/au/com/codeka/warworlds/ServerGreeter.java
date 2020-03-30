@@ -15,16 +15,26 @@ import android.widget.Toast;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.safetynet.SafetyNet;
+import com.google.android.gms.safetynet.SafetyNetApi;
+import com.google.android.gms.safetynet.SafetyNetClient;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.protobuf.ByteString;
 
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.ErrorReporter;
 import au.com.codeka.common.Log;
+import au.com.codeka.common.nonce.NonceBuilder;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.api.ApiRequest;
@@ -50,16 +60,13 @@ public class ServerGreeter {
   private static boolean helloComplete;
   private static ServerGreeting serverGreeting;
 
+  private static final String SAFETYNET_CLIENT_API_KEY = "AIzaSyAulj6q4uq0fd7WnJpzSY769U0aMCthogg";
+
   /**
    * When we change realms, we'll want to make sure we say 'hello' again.
    */
   private static final RealmManager.RealmChangedHandler realmChangedHandler =
-      new RealmManager.RealmChangedHandler() {
-        @Override
-        public void onRealmChanged(Realm newRealm) {
-          clearHello();
-        }
-      };
+      newRealm -> clearHello();
 
   static {
     helloCompleteHandlers = new ArrayList<>();
@@ -124,15 +131,17 @@ public class ServerGreeter {
 
     PreferenceManager.setDefaultValues(activity, R.xml.global_options, false);
 
-    int memoryClass = ((ActivityManager) activity
-        .getSystemService(BaseActivity.ACTIVITY_SERVICE)).getMemoryClass();
-    if (memoryClass < 40) {
-      // on low memory devices, we want to make sure the background detail is always BLACK
-      // this is a bit of a hack, but should stop the worst of the memory issues (I hope!)
-      new GlobalOptions().setStarfieldDetail(GlobalOptions.StarfieldDetail.BLACK);
+    ActivityManager activityManager =
+        (ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE);
+    if (activityManager != null) {
+      int memoryClass = activityManager.getMemoryClass();
+      if (memoryClass < 40) {
+        // on low memory devices, we want to make sure the background detail is always BLACK
+        // this is a bit of a hack, but should stop the worst of the memory issues (I hope!)
+        new GlobalOptions().setStarfieldDetail(GlobalOptions.StarfieldDetail.BLACK);
+      }
     }
 
-    // if we've saved off the authentication cookie, cool!
     SharedPreferences prefs = Util.getSharedPreferences();
     String accountName = prefs.getString("AccountName", null);
     if (accountName == null) {
@@ -148,6 +157,16 @@ public class ServerGreeter {
 
     RequestManager.i.setup(activity);
 
+    // We'll start this now so it can go on in the background while we do some other stuff.
+    // TODO: should we do this every login, or maybe only max once a day or something (on this
+    // device anyway)?
+    byte[] nonce = new NonceBuilder()
+        .empireID(/* TODO? */ 0)
+        .build();
+    SafetyNetClient client = SafetyNet.getClient(activity);
+    Task<SafetyNetApi.AttestationResponse> task =
+        client.attest(nonce, SAFETYNET_CLIENT_API_KEY);
+
     new BackgroundRunner<String>() {
       private boolean needsEmpireSetup;
       private boolean errorOccurred;
@@ -160,16 +179,23 @@ public class ServerGreeter {
 
       @Override
       protected String doInBackground() {
-        handler.post(new Runnable() {
-          @Override
-          public void run() {
-            synchronized (helloWatchers) {
-              for (HelloWatcher watcher : helloWatchers) {
-                watcher.onAuthenticating();
-              }
+        handler.post(() -> {
+          synchronized (helloWatchers) {
+            for (HelloWatcher watcher : helloWatchers) {
+              watcher.onAuthenticating();
             }
           }
         });
+
+        // Check that you have a version of Google Play Services installed that we can use (in
+        // particular, for the SafetyNet API). Version 13.0 added support for restricted API keys,
+        // which we use, so make sure it's at least 13.0.
+        if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity, 13000000)
+            != ConnectionResult.SUCCESS) {
+          errorOccurred = true;
+          giveUpReason = GiveUpReason.GOOGLE_PLAY_SERVICES;
+          return "The version of Google Play Services you have needs to be updated.";
+        }
 
         Realm realm = RealmContext.i.getCurrentRealm();
         if (!realm.getAuthenticator().isAuthenticated()) {
@@ -208,29 +234,40 @@ public class ServerGreeter {
           }
         }
 
-        handler.post(new Runnable() {
-          @Override
-          public void run() {
-            synchronized (helloWatchers) {
-              for (HelloWatcher watcher : helloWatchers) {
-                watcher.onConnecting();
-              }
+        handler.post(() -> {
+          synchronized (helloWatchers) {
+            for (HelloWatcher watcher : helloWatchers) {
+              watcher.onConnecting();
             }
           }
         });
+
+        SafetyNetApi.AttestationResponse safetyNetAttestation;
+        try {
+          safetyNetAttestation = Tasks.await(task);
+        } catch (Exception e) {
+          // TODO: retry?
+          log.error("SafetyNet attestation error.", e);
+          errorOccurred = true;
+          return "An error with SafetyNet occurred, trying again.";
+        }
+        log.info("SafetyNet attestation: %s", safetyNetAttestation.getJwsResult());
 
         // say hello to the server
         String message;
         int memoryClass = ((ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE))
             .getMemoryClass();
         Messages.HelloRequest req =
-            Messages.HelloRequest.newBuilder().setDeviceBuild(Build.DISPLAY)
+            Messages.HelloRequest.newBuilder()
+                .setDeviceBuild(Build.DISPLAY)
                 .setDeviceManufacturer(Build.MANUFACTURER)
                 .setDeviceModel(Build.MODEL)
                 .setDeviceVersion(Build.VERSION.RELEASE).setMemoryClass(memoryClass)
                 .setAllowInlineNotfications(false)
                 .setNoStarList(true)
                 .setAccessibilitySettingsInfo(AccessibilityServiceReporter.get(activity))
+                .setSafetynetJwsResult(safetyNetAttestation.getJwsResult())
+                .setSafetynetNonce(ByteString.copyFrom(nonce))
                 .build();
 
         String url = "hello/" + deviceRegistrationKey;
@@ -500,5 +537,11 @@ public class ServerGreeter {
 
     /** You need to upgrade your version of the game client. Link to the Play Store. */
     UPGRADE_REQUIRED,
+
+    /** The version of Google Play Services that's installed is not one we are able to use. */
+    GOOGLE_PLAY_SERVICES,
+
+    /** This device failed SafetyNet attestation. */
+    SAFETYNET,
   }
 }

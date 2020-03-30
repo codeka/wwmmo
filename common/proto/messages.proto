@@ -367,6 +367,10 @@ message HelloRequest {
   optional bool no_star_list = 7;
 
   optional AccessibilitySettingsInfo accessibility_settings_info = 8;
+
+  // The results of a SafetyNet attestation.
+  optional string safetynet_jws_result = 9;
+  optional bytes safetynet_nonce = 10;
 }
 
 //

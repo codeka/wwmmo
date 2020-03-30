@@ -116,13 +116,8 @@ public class Authenticator {
     log.info("url: " + url);
 
     ApiRequest request = new ApiRequest.Builder(url, "GET")
-        .errorCallback(new ApiRequest.ErrorCallback() {
-          @Override
-          public void onRequestError(ApiRequest request, Messages.GenericError error) {
-            log.error("Got error from login request: %d %s",
-                error.getErrorCode(), error.getErrorMessage());
-          }
-        }).build();
+        .errorCallback((request1, error) -> log.error("Got error from login request: %d %s",
+            error.getErrorCode(), error.getErrorMessage())).build();
     Response resp = RequestManager.i.sendRequestSync(request);
     if (resp != null && !resp.isSuccessful()) {
       log.error("Got invalid response: " + resp.message());
