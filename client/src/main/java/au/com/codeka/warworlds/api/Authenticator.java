@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.Util;

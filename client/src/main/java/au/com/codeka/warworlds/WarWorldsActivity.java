@@ -332,6 +332,10 @@ public class WarWorldsActivity extends BaseActivity {
       connectionStatus.setText(msg);
       connectionStatus.setTextColor(Color.RED);
 
+      if (reason == null) {
+        return;
+      }
+
       Intent intent = new Intent(Intent.ACTION_VIEW);
       intent.setPackage("com.android.vending");
 
