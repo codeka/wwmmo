@@ -29,12 +29,11 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.ErrorReporter;
 import au.com.codeka.common.Log;
-import au.com.codeka.common.nonce.NonceBuilder;
+import au.com.codeka.common.safetynet.NonceBuilder;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.api.ApiRequest;
@@ -45,7 +44,6 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
-import okhttp3.Response;
 
 /**
  * This class is used to make sure we're said "Hello" to the server and that we've got our

@@ -1,22 +1,30 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import com.google.common.io.ByteStreams;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.json.webtoken.JsonWebSignature;
 import com.google.common.io.Files;
+
+import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
 import java.util.List;
+
+import javax.net.ssl.SSLException;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.safetynet.ValidationFailureException;
+import au.com.codeka.common.safetynet.ValidationFailureReason;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.GameHistoryController;
 import au.com.codeka.warworlds.server.ctrl.LoginController;
-import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.ctrl.StatisticsController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -25,9 +33,12 @@ import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.EmpireStarStats;
 import au.com.codeka.warworlds.server.model.GameHistory;
 import au.com.codeka.warworlds.server.model.Star;
+import au.com.codeka.warworlds.server.utils.SafetyNetAttestationStatement;
 
 public class HelloHandler extends RequestHandler {
   private final Log log = new Log("HelloHandler");
+
+  private static final DefaultHostnameVerifier hostnameVerifier = new DefaultHostnameVerifier();
 
   // Our min-version, initialized on first request.
   private static int[] minVersion = null;
@@ -74,11 +85,26 @@ public class HelloHandler extends RequestHandler {
           "Cannot log in yet, game is resetting.");
     }
 
+    SafetyNetAttestationStatement attestationStatement = null;
+    if (!hello_request_pb.hasSafetynetJwsResult()) {
+      // TODO: verify that it's OK for this client not to have a SafetyNet attestation.
+    } else {
+      try {
+        attestationStatement = validateSafetyNetJws(hello_request_pb);
+      } catch (ValidationFailureException e) {
+        // TODO: verify that it's OK for this client to fail SafetyNet attestation.
+        log.warning("SafetyNet attestation validation failed.", e);
+      }
+
+      log.info("SafetyNet attestation: %s", attestationStatement);
+    }
+
     // fetch the empire we're interested in
     Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
     if (empire != null) {
       new StatisticsController().registerLogin(
-          getSession(), getRequest().getHeader("User-Agent"), hello_request_pb);
+          getSession(), getRequest().getHeader("User-Agent"), hello_request_pb,
+          attestationStatement);
       if (empire.getState() == Empire.State.ABANDONED) {
         new EmpireController().markActive(empire);
       }
@@ -163,6 +189,43 @@ public class HelloHandler extends RequestHandler {
     }
 
     setResponseBody(hello_response_pb.build());
+  }
+
+  private SafetyNetAttestationStatement validateSafetyNetJws(
+      Messages.HelloRequest helloRequest) throws ValidationFailureException {
+    JsonWebSignature jws;
+    try {
+      jws = JsonWebSignature.parser(GsonFactory.getDefaultInstance())
+          .setPayloadClass(SafetyNetAttestationStatement.class)
+          .parse(helloRequest.getSafetynetJwsResult());
+    } catch (IOException e) {
+      log.error("Error parsing SafetyNet JWS.", e);
+      throw new ValidationFailureException(ValidationFailureReason.INVALID_JWS, e);
+    }
+
+    X509Certificate cert;
+    try {
+      cert = jws.verifySignature();
+    } catch (GeneralSecurityException e) {
+      log.error("Exception while verifying signature in SafetyNet JWS attestation.", e);
+      throw new ValidationFailureException(ValidationFailureReason.JWS_SIGNATURE_ERROR, e);
+    }
+
+    try {
+      // This throws an exception if the hostname doesn't match.
+      hostnameVerifier.verify("attest.android.com", cert);
+    } catch (SSLException e) {
+      log.error("Exception while verifying hostname of attestation", e);
+      throw new ValidationFailureException(
+          ValidationFailureReason.JWS_SIGNATURE_HOSTNAME_MISMATCH, e);
+    }
+
+    // Now that we have a valid attestation statement, verify the contents of it.
+    SafetyNetAttestationStatement attestationStatement =
+        (SafetyNetAttestationStatement) jws.getPayload();
+    // TODO: verify.
+
+    return attestationStatement;
   }
 
   /**

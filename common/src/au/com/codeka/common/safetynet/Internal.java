@@ -1,4 +1,4 @@
-package au.com.codeka.common.nonce;
+package au.com.codeka.common.safetynet;
 
 public class Internal {
   static final int VERSION = 1;

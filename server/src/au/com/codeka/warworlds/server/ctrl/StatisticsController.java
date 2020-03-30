@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
+import au.com.codeka.warworlds.server.utils.SafetyNetAttestationStatement;
 
 public class StatisticsController {
   private DataBase db;
@@ -24,9 +25,11 @@ public class StatisticsController {
   public void registerLogin(
       Session session,
       String userAgent,
-      Messages.HelloRequest hello_request_pb) throws RequestException {
+      Messages.HelloRequest hello_request_pb,
+      SafetyNetAttestationStatement safetyNetAttestationStatement) throws RequestException {
     String[] parts = userAgent.split("/");
     String version = parts.length == 2 ? parts[1] : userAgent;
+
 
     try {
       db.registerLogin(session.getEmpireID(),
@@ -36,7 +39,10 @@ public class StatisticsController {
           hello_request_pb.getDeviceBuild(),
           hello_request_pb.getDeviceVersion(),
           hello_request_pb.getAccessibilitySettingsInfo(),
-          version);
+          version,
+          safetyNetAttestationStatement.toString(),
+          safetyNetAttestationStatement.hasBasicIntegrity(),
+          safetyNetAttestationStatement.isCtsProfileMatch());
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -55,11 +61,13 @@ public class StatisticsController {
         int empireID, String clientId, String deviceModel, String deviceManufacturer,
         String deviceBuild, String deviceVersion,
         @Nullable Messages.AccessibilitySettingsInfo accessibilitySettingsInfo,
-        String version) throws Exception {
+        String version, String safetyNetAttestation, boolean safetyNetBasicProfile,
+        boolean safetyNetCtsProfileMatch) throws Exception {
       String sql = "INSERT INTO empire_logins (empire_id, date, device_model, " +
           "device_manufacturer, device_build, device_version, num_accessibility_services, " +
-          "accessibility_service_infos, version, client_id)" +
-          " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+          "accessibility_service_infos, version, client_id, safetynet_attestation_statement, " +
+          "safetynet_basic_integrity, safetynet_cts_profile)" +
+          " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, empireID);
         stmt.setDateTime(2, DateTime.now());
@@ -76,6 +84,9 @@ public class StatisticsController {
         }
         stmt.setString(9, version);
         stmt.setString(10, clientId);
+        stmt.setString(11, safetyNetAttestation);
+        stmt.setInt(12, safetyNetBasicProfile ? 1 : 0);
+        stmt.setInt(13, safetyNetCtsProfileMatch ? 1 : 0);
         stmt.update();
       }
     }
