@@ -1,0 +1,12 @@
+{% extends "admin/skeleton.html" %}
+{% block "title" %}Empires{% end %}
+{% block "head" %}
+  <script src="/realms/{{realm}}/js/tmpl.js"></script>
+  <script src="/realms/{{realm}}/js/hashparams.js"></script>
+  <script src="/realms/{{realm}}/js/tabs.js"></script>
+  <script src="/realms/{{realm}}/js/time.js"></script>
+{% end %}
+
+{% block "content" %}
+  {% include "admin/empire/ajax-recent-logins.html" show_empire=1 %}
+{% end %}

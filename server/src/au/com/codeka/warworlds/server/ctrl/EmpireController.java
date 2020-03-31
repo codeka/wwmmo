@@ -80,6 +80,14 @@ public class EmpireController {
     }
   }
 
+  public List<Messages.EmpireLoginInfo> getAllRecentLogins() throws RequestException {
+    try {
+      return db.getRecentLogins(0, 100);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
   public Map<Integer, Double> getTaxCollectedPerHour(Collection<Integer> empireIDs)
       throws RequestException {
     try {
@@ -628,37 +636,41 @@ public class EmpireController {
     }
 
     public List<Messages.EmpireLoginInfo> getRecentLogins(int empireID, int limit) throws Exception {
-      String sql = "SELECT date, device_model, device_manufacturer, device_build, device_version," +
+      String sql = "SELECT empire_id, date, device_model, device_manufacturer, device_build, device_version," +
           "accessibility_service_infos, version, client_id, safetynet_attestation_statement " +
-          "FROM empire_logins WHERE empire_id = ? " +
+          "FROM empire_logins " + (empireID == 0 ? "" : "WHERE empire_id = ? ") +
           "ORDER BY date DESC LIMIT ?";
       try (SqlStmt stmt = prepare(sql)) {
-        stmt.setInt(1, empireID);
-        stmt.setInt(2, limit);
+        if (empireID == 0) {
+          stmt.setInt(1, limit);
+        } else {
+          stmt.setInt(1, empireID);
+          stmt.setInt(2, limit);
+        }
         SqlResult res = stmt.select();
 
         ArrayList<Messages.EmpireLoginInfo> empireLoginInfos = new ArrayList<>();
         while (res.next()) {
           Messages.EmpireLoginInfo.Builder empireLoginInfoBuilder =
               Messages.EmpireLoginInfo.newBuilder()
-                  .setEmpireId(empireID)
-                  .setDate(res.getDateTime(1).getMillis())
-                  .setDeviceModel(res.getString(2))
-                  .setDeviceManufacturer(res.getString(3))
-                  .setDeviceBuild(res.getString(4))
-                  .setDeviceVersion(res.getString(5));
-          if (res.getBytes(6) != null) {
+                  .setEmpireId(res.getInt(1))
+                  .setDate(res.getDateTime(2).getMillis())
+                  .setDeviceModel(res.getString(3))
+                  .setDeviceManufacturer(res.getString(4))
+                  .setDeviceBuild(res.getString(5))
+                  .setDeviceVersion(res.getString(6));
+          if (res.getBytes(7) != null) {
             empireLoginInfoBuilder.setAccessibilitySettings(
-                Messages.AccessibilitySettingsInfo.parseFrom(res.getBytes(6)));
-          }
-          if (res.getString(7) != null) {
-            empireLoginInfoBuilder.setVersion(res.getString(7));
+                Messages.AccessibilitySettingsInfo.parseFrom(res.getBytes(7)));
           }
           if (res.getString(8) != null) {
-            empireLoginInfoBuilder.setClientId(res.getString(8));
+            empireLoginInfoBuilder.setVersion(res.getString(8));
           }
           if (res.getString(9) != null) {
-            empireLoginInfoBuilder.setSafetynetAttestationStatement(res.getString(9));
+            empireLoginInfoBuilder.setClientId(res.getString(9));
+          }
+          if (res.getString(10) != null) {
+            empireLoginInfoBuilder.setSafetynetAttestationStatement(res.getString(10));
           }
           empireLoginInfos.add(empireLoginInfoBuilder.build());
         }

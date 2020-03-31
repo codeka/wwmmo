@@ -1,9 +1,7 @@
-<p>Recent logins go here.</p>
-
-
 <table>
   <tr>
     <th>Date</th>
+    {% if show_empire %}<th>Empire</th>{% end %}
     <th>Device</th>
     <th>Version</th>
     <th>Client ID</th>
@@ -11,13 +9,14 @@
   {% for login in logins %}
     <tr>
       <td><time timestamp="{{ login.date / 1000 }}">{{ login.date }}</time></td>
-      <td>{{ login.deviceManufacturer }} | {{ login.deviceModel }} | {{ login.deviceBuild }}</td>
+      {% if show_empire %}<td>{{ empires.get(login.empireId).displayName }}</td>{% end %}
+      <td>{{ login.deviceManufacturer }} | {{ login.deviceModel }}</td>
       <td>{{ login.version }}</td>
       <td>{{ clientIds[login.clientId] }}</td>
     </tr>
     {% if login.accessibilitySettings && login.accessibilitySettings.serviceList.size() > 0 %}
     <tr>
-      <td colspan="4">
+      <td colspan="{% if show_empire %}5{% else %}4{% end %}">
         <table>
           <tr>
             <th>&nbsp;</th>
@@ -37,7 +36,7 @@
     {% end %}
     {% if login.safetynetAttestationStatement %}
     <tr>
-      <td colspan="4">
+      <td colspan="{% if show_empire %}5{% else %}4{% end %}">
         SafetyNet: {{ login.safetynetAttestationStatement }}
       </td>
     </tr>
