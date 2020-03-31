@@ -30,7 +30,6 @@ public class StatisticsController {
     String[] parts = userAgent.split("/");
     String version = parts.length == 2 ? parts[1] : userAgent;
 
-
     try {
       db.registerLogin(session.getEmpireID(),
           session.getClientId(),
@@ -40,9 +39,9 @@ public class StatisticsController {
           hello_request_pb.getDeviceVersion(),
           hello_request_pb.getAccessibilitySettingsInfo(),
           version,
-          safetyNetAttestationStatement.toString(),
-          safetyNetAttestationStatement.hasBasicIntegrity(),
-          safetyNetAttestationStatement.isCtsProfileMatch());
+          safetyNetAttestationStatement == null ? "" : safetyNetAttestationStatement.toString(),
+          safetyNetAttestationStatement != null && safetyNetAttestationStatement.hasBasicIntegrity(),
+          safetyNetAttestationStatement != null && safetyNetAttestationStatement.isCtsProfileMatch());
     } catch (Exception e) {
       throw new RequestException(e);
     }

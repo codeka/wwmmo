@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +34,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.EventProcessor;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlConcurrentModificationException;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
@@ -323,7 +325,7 @@ public class StarController {
       ArrayList<Star> stars = new ArrayList<>();
       final String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
           " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
-          " extra, last_simulation, time_emptied" +
+          " extra, last_simulation, time_emptied, mod_counter" +
           " FROM stars" +
           " INNER JOIN sectors ON stars.sector_id = sectors.id" +
           " WHERE stars.id IN " + buildInClause(ids);
@@ -370,7 +372,7 @@ public class StarController {
     public List<Star> getWormholesForAlliance(Alliance alliance) throws Exception {
       String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
           " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
-          " extra, last_simulation, time_emptied" +
+          " extra, last_simulation, time_emptied, mod_counter" +
           " FROM stars" +
           " INNER JOIN sectors ON stars.sector_id = sectors.id" +
           " WHERE star_type = " + Star.Type.Wormhole.ordinal();
@@ -401,7 +403,7 @@ public class StarController {
         int count) throws Exception {
       String sql = "SELECT stars.id, sector_id, stars.name, sectors.x AS sector_x," +
           " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets, extra," +
-          " last_simulation, time_emptied" +
+          " last_simulation, time_emptied, mod_counter" +
           " FROM stars" +
           " INNER JOIN sectors ON stars.sector_id = sectors.id" +
           " INNER JOIN empires ON stars.wormhole_empire_id = empires.id" +
@@ -468,8 +470,9 @@ public class StarController {
           " star_type = ?," +
           " empire_count = ?," +
           " extra = ?," +
-          " wormhole_empire_id = ?" +
-          " WHERE id = ?";
+          " wormhole_empire_id = ?," +
+          " mod_counter = mod_counter + 1" +
+          " WHERE id = ? AND mod_counter = ?";
       try (SqlStmt stmt = prepare(sql)) {
         DateTime lastSimulation = star.getLastSimulation();
         DateTime now = DateTime.now();
@@ -509,7 +512,10 @@ public class StarController {
         stmt.setInt(6, star.getWormholeEmpireID());
 
         stmt.setInt(7, star.getID());
-        stmt.update();
+        stmt.setInt(8, star.getModCounter());
+        if (stmt.update() != 1) {
+          throw new SqlConcurrentModificationException();
+        }
       }
 
       updateEmpires(star);

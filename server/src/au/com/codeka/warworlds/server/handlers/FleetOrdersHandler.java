@@ -42,6 +42,8 @@ public class FleetOrdersHandler extends RequestHandler {
       Star star = new StarController(t).getStar(Integer.parseInt(getUrlParameter("starid")));
       sim.simulate(star);
 
+      Thread.sleep(3000);
+
       int fleetID = Integer.parseInt(getUrlParameter("fleetid"));
       int empireID = getSession().getEmpireID();
       for (BaseFleet baseFleet : star.getFleets()) {

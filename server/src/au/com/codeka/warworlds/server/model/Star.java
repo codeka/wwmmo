@@ -21,6 +21,7 @@ public class Star extends BaseStar {
   private int mID;
   private int mSectorID;
   private ArrayList<ScoutReport> mScoutReports = new ArrayList<ScoutReport>();
+  private int modCounter;
 
   public Star() {
   }
@@ -37,6 +38,7 @@ public class Star extends BaseStar {
     mStarType = sStarTypes[starTypeID];
     mColonies = new ArrayList<>();
     mFleets = new ArrayList<>();
+    modCounter = 1;
   }
 
   public Star(SqlResult res) throws SQLException {
@@ -52,6 +54,7 @@ public class Star extends BaseStar {
     mStarType = sStarTypes[res.getInt("star_type")];
     mLastSimulation = res.getDateTime("last_simulation");
     mTimeEmptied = res.getDateTime("time_emptied");
+    modCounter = res.getInt("mod_counter");
 
     try {
       Messages.Planets planets_pb = Messages.Planets.parseFrom(res.getBytes("planets"));
@@ -129,6 +132,10 @@ public class Star extends BaseStar {
 
   public ArrayList<ScoutReport> getScoutReports() {
     return mScoutReports;
+  }
+
+  public int getModCounter() {
+    return modCounter;
   }
 
   @Override

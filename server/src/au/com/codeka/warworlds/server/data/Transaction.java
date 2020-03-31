@@ -3,39 +3,44 @@ package au.com.codeka.warworlds.server.data;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import au.com.codeka.common.Log;
+
 public class Transaction implements AutoCloseable {
-    private Connection mConnection;
-    private boolean mWasCommitted;
+  private static final Log log = new Log("Transaction");
 
-    public Transaction(Connection conn) throws SQLException {
-        mConnection = conn;
-        mConnection.setAutoCommit(false);
-    }
+  private Connection conn;
+  private boolean wasCommitted;
 
-    public SqlStmt prepare(String sql) throws SQLException {
-        return new SqlStmt(mConnection, sql, mConnection.prepareStatement(sql), false);
-    }
+  public Transaction(Connection conn) throws SQLException {
+    this.conn = conn;
+    this.conn.setAutoCommit(false);
+    log.info("Starting transaction with isolation level: %d", this.conn.getTransactionIsolation());
+  }
 
-    public SqlStmt prepare(String sql, int autoGenerateKeys) throws SQLException {
-        return new SqlStmt(mConnection, sql, mConnection.prepareStatement(sql, autoGenerateKeys), false);
-    }
+  public SqlStmt prepare(String sql) throws SQLException {
+    return new SqlStmt(conn, sql, conn.prepareStatement(sql), false);
+  }
 
-    public void commit() throws SQLException {
-        mConnection.commit();
-        mWasCommitted = true;
-    }
+  public SqlStmt prepare(String sql, int autoGenerateKeys) throws SQLException {
+    return new SqlStmt(conn, sql, conn.prepareStatement(sql, autoGenerateKeys), false);
+  }
 
-    public void rollback() throws SQLException {
-        mConnection.rollback();
-        mWasCommitted = true;
-    }
+  public void commit() throws SQLException {
+    conn.commit();
+    wasCommitted = true;
+  }
 
-    @Override
-    public void close() throws Exception {
-        if (!mWasCommitted) {
-            mConnection.rollback();
-        }
-        mConnection.setAutoCommit(true);
-        mConnection.close();
+  public void rollback() throws SQLException {
+    conn.rollback();
+    wasCommitted = true;
+  }
+
+  @Override
+  public void close() throws Exception {
+    if (!wasCommitted) {
+      conn.rollback();
     }
+    conn.setAutoCommit(true);
+    conn.close();
+  }
 }

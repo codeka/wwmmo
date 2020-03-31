@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.ctrl.AdminController;
+import au.com.codeka.warworlds.server.data.SqlConcurrentModificationException;
 import au.com.codeka.warworlds.server.data.SqlStateTranslater;
 import au.com.codeka.warworlds.server.model.BackendUser;
 
@@ -98,6 +99,15 @@ public class RequestHandler {
             // Ignore.
           }
           log.warning("Retrying deadlock.", e);
+          continue;
+        }
+        if (cause instanceof SqlConcurrentModificationException && supportsRetryOnDeadlock()) {
+          try {
+            Thread.sleep(50 + new Random().nextInt(100));
+          } catch (InterruptedException e1) {
+            // Ignore.
+          }
+          log.warning("Retrying concurrent modification.", e);
           continue;
         }
         if (e.getHttpErrorCode() < 500) {
