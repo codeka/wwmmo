@@ -30,7 +30,6 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Empire;
-import au.com.codeka.warworlds.server.model.EmpireStarStats;
 import au.com.codeka.warworlds.server.model.GameHistory;
 import au.com.codeka.warworlds.server.model.Star;
 import au.com.codeka.warworlds.server.utils.SafetyNetAttestationStatement;
@@ -113,12 +112,10 @@ public class HelloHandler extends RequestHandler {
       new LoginController().updateSession(getSession());
 
       // Make sure they haven't been wiped out.
-      EmpireStarStats stats = new EmpireController().getEmpireStarStats(getSession().getEmpireID());
-      if (stats.getNumColonies() == 0) {
+      if (!new EmpireController().hasAnyColonies(getSession().getEmpireID())) {
         log.info(
-            "Empire #%d [%s] has been wiped out (%d stars, %d colonies, %d fleets), resetting.",
-            empire.getID(), empire.getDisplayName(), stats.getNumStars(), stats.getNumColonies(),
-            stats.getNumFleets());
+            "Empire #%d [%s] has been wiped out, resetting.",
+            empire.getID(), empire.getDisplayName());
         new EmpireController().createEmpire(empire);
         hello_response_pb.setWasEmpireReset(true);
 
@@ -126,10 +123,6 @@ public class HelloHandler extends RequestHandler {
         if (resetReason != null) {
           hello_response_pb.setEmpireResetReason(resetReason);
         }
-      } else {
-        log.info("Empire #%d [%s] has %d stars, %d colonies, and %d fleets.", empire.getID(),
-            empire.getDisplayName(), stats.getNumStars(), stats.getNumColonies(),
-            stats.getNumFleets());
       }
 
       Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();

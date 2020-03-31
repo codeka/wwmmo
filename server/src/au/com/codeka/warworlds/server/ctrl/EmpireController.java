@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 
 import org.joda.time.DateTime;
 
@@ -33,7 +32,6 @@ import au.com.codeka.warworlds.server.model.AllianceRequest;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.EmpireBattleRank;
-import au.com.codeka.warworlds.server.model.EmpireStarStats;
 import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.Star;
 import au.com.codeka.warworlds.server.utils.NameValidator;
@@ -140,9 +138,10 @@ public class EmpireController {
     // TODO: remove the empire's stars from the "abandoned stars" list...
   }
 
-  public EmpireStarStats getEmpireStarStats(int empireID) throws RequestException {
+  /** Returns true if the given empire has any colonies at all, false if they've been wiped out. */
+  public boolean hasAnyColonies(int empireID) throws RequestException {
     try {
-      return db.getEmpireStarStats(empireID);
+      return db.hasAnyColonies(empireID);
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -846,21 +845,15 @@ public class EmpireController {
       }
     }
 
-    private EmpireStarStats getEmpireStarStats(int empireID) throws Exception {
-      String sql = "SELECT " + "? AS empire_id, "
-          + "(SELECT COUNT(*) FROM colonies WHERE empire_id = ?) AS num_colonies, "
-          + "(SELECT COUNT(*) FROM fleets WHERE empire_id = ?) AS num_fleets, "
-          + "(SELECT COUNT(*) FROM empire_presences WHERE empire_id = ?) AS num_stars ";
+    private boolean hasAnyColonies(int empireID) throws Exception {
+      String sql = "SELECT 1 FROM colonies WHERE empire_id=? LIMIT 1";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, empireID);
-        stmt.setInt(2, empireID);
-        stmt.setInt(3, empireID);
-        stmt.setInt(4, empireID);
         SqlResult result = stmt.select();
         if (result.next()) {
-          return new EmpireStarStats(result);
+          return true;
         }
-        return null;
+        return false;
       }
     }
 

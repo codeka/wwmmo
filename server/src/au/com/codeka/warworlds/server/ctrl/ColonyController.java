@@ -3,19 +3,15 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.function.Predicate;
 
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.model.Design;
-import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
@@ -23,11 +19,8 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.designeffects.TroopCarrierShipEffect;
-import au.com.codeka.warworlds.server.model.Building;
 import au.com.codeka.warworlds.server.model.Colony;
-import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Empire;
-import au.com.codeka.warworlds.server.model.EmpireStarStats;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -253,19 +246,27 @@ public class ColonyController {
       }
     }
 
-    EmpireStarStats stats = new EmpireController().getEmpireStarStats(empire.getID());
+    long numColonies = 1;
+    if (empire.getRank() != null) {
+      numColonies = empire.getRank().getTotalColonies();
+    }
     double totalCash = empire.getCash();
     totalCash -= EmpireController.STARTING_CASH_BONUS; // remove the starting bonus
     if (totalCash < 0) {
       return 0;
     }
 
+    // We'll never take all their cash, leave them about 3/4ths.
+    if (numColonies < 4) {
+      numColonies = 4;
+    }
+
     if (isHq) {
       return totalCash * 0.1;
     } else if (hasHqElsewhere) {
-      return (totalCash * 0.9) / stats.getNumColonies();
+      return (totalCash * 0.9) / numColonies;
     } else {
-      return totalCash / stats.getNumColonies();
+      return totalCash / numColonies;
     }
   }
 
