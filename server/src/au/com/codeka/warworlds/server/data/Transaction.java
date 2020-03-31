@@ -3,18 +3,13 @@ package au.com.codeka.warworlds.server.data;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import au.com.codeka.common.Log;
-
 public class Transaction implements AutoCloseable {
-  private static final Log log = new Log("Transaction");
-
   private Connection conn;
   private boolean wasCommitted;
 
   public Transaction(Connection conn) throws SQLException {
     this.conn = conn;
     this.conn.setAutoCommit(false);
-    log.info("Starting transaction with isolation level: %d", this.conn.getTransactionIsolation());
   }
 
   public SqlStmt prepare(String sql) throws SQLException {
