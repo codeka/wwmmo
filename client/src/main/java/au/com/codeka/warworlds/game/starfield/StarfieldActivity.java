@@ -94,73 +94,40 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       infobar.hideEmpireName();
     }
 
-    selectionDetailsView.setHandlers(new PlanetListSimple.PlanetSelectedHandler() {
-      @Override
-      public void onPlanetSelected(Planet planet) {
-          navigateToPlanet(selectedStar, planet, false);
+    // "Rename" button
+    // "View" button
+    // "Intel" button
+    selectionDetailsView.setHandlers(
+        planet -> navigateToPlanet(selectedStar, planet, false),
+        fleet -> {
+          if (selectedStar == null) {
+            return; //??
           }
-        }, new FleetListSimple.FleetSelectedHandler() {
-          @Override
-          public void onFleetSelected(Fleet fleet) {
-            if (selectedStar == null) {
-              return; //??
-            }
 
-            openEmpireActivityAtFleet(selectedStar, fleet);
+          openEmpireActivityAtFleet(selectedStar, fleet);
+        },
+        v -> onRenameClick(), v -> {
+          if (selectedStar == null) {
+            return;
           }
-        }, new View.OnClickListener() { // "Rename" button
-          @Override
-          public void onClick(View v) {
-            onRenameClick();
-          }
-        }, new View.OnClickListener() { // "View" button
-          @Override
-          public void onClick(View v) {
-            if (selectedStar == null) {
-              return;
-            }
 
-            Intent intent = new Intent(context, SolarSystemActivity.class);
-            intent.putExtra("au.com.codeka.warworlds.StarKey", selectedStar.getKey());
-            startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
+          Intent intent = new Intent(context, SolarSystemActivity.class);
+          intent.putExtra("au.com.codeka.warworlds.StarKey", selectedStar.getKey());
+          startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
+        }, v -> {
+          if (selectedStar != null) {
+            ScoutReportDialog dialog = new ScoutReportDialog();
+            dialog.setStar(selectedStar);
+            dialog.show(getSupportFragmentManager(), "");
           }
-        }, new View.OnClickListener() { // "Intel" button
-          @Override
-          public void onClick(View v) {
-            if (selectedStar != null) {
-              ScoutReportDialog dialog = new ScoutReportDialog();
-              dialog.setStar(selectedStar);
-              dialog.show(getSupportFragmentManager(), "");
-            }
-          }
-        }, new SelectionDetailsView.ZoomToStarHandler() {
-          @Override
-          public void onZoomToStar(Star star) {
-            starfield.scrollTo(star.getSectorX(), star.getSectorY(),
-                star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY());
-          }
-        });
+        }, star -> starfield.scrollTo(star.getSectorX(), star.getSectorY(),
+            star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY()));
 
-    findViewById(R.id.empire_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        openEmpireActivity();
-      }
-    });
-    findViewById(R.id.sitrep_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        openSitrepActivity();
-      }
-    });
+    findViewById(R.id.empire_btn).setOnClickListener((View.OnClickListener) v -> openEmpireActivity());
+    findViewById(R.id.sitrep_btn).setOnClickListener((View.OnClickListener) v -> openSitrepActivity());
 
     allianceBtn = (Button) findViewById(R.id.alliance_btn);
-    allianceBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onAllianceClick();
-      }
-    });
+    allianceBtn.setOnClickListener(v -> onAllianceClick());
 
     if (savedInstanceState != null) {
       Star selectedStar = null;
@@ -215,40 +182,37 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   public void onResumeFragments() {
     super.onResumeFragments();
 
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeter.ServerGreeting greeting) {
-        if (!success) {
-          return;
-        }
+    ServerGreeter.waitForHello(this, (ServerGreeter.HelloCompleteHandler) (success, greeting) -> {
+      if (!success) {
+        return;
+      }
 
-        if (starToSelect != null && starfield.getScene() != null) {
-          selectedStar = starToSelect;
-          starfield.getScene().selectStar(starToSelect.getKey());
-          starfield.scrollTo(starToSelect);
-          starToSelect = null;
-        }
+      if (starToSelect != null && starfield.getScene() != null) {
+        selectedStar = starToSelect;
+        starfield.getScene().selectStar(starToSelect.getKey());
+        starfield.scrollTo(starToSelect);
+        starToSelect = null;
+      }
 
-        if (fleetToSelect != null && starfield.getScene() != null) {
-          starfield.getScene().selectFleet(fleetToSelect.getKey());
-          fleetToSelect = null;
-        }
+      if (fleetToSelect != null && starfield.getScene() != null) {
+        starfield.getScene().selectFleet(fleetToSelect.getKey());
+        fleetToSelect = null;
+      }
 
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire == null) {
-          return;
-        }
+      MyEmpire myEmpire = EmpireManager.i.getEmpire();
+      if (myEmpire == null) {
+        return;
+      }
 
-        BaseStar homeStar = myEmpire.getHomeStar();
+      BaseStar homeStar = myEmpire.getHomeStar();
 
-        boolean doNotNavigateToHomeStar = processIntent();
-        if (homeStar != null && (
-            StarfieldActivity.this.homeStar == null || !StarfieldActivity.this.homeStar.getKey()
-            .equals(homeStar.getKey()))) {
-          StarfieldActivity.this.homeStar = (Star) homeStar;
-          if (!doNotNavigateToHomeStar) {
-            starfield.scrollTo(homeStar);
-          }
+      boolean doNotNavigateToHomeStar = processIntent();
+      if (homeStar != null && (
+          StarfieldActivity.this.homeStar == null || !StarfieldActivity.this.homeStar.getKey()
+          .equals(homeStar.getKey()))) {
+        StarfieldActivity.this.homeStar = (Star) homeStar;
+        if (!doNotNavigateToHomeStar) {
+          starfield.scrollTo(homeStar);
         }
       }
     });

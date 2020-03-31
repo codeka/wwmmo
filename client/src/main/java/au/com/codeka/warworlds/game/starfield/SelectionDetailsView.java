@@ -113,10 +113,10 @@ public class SelectionDetailsView extends FrameLayout {
     final View selectionLoadingContainer = findViewById(R.id.loading_container);
     final View selectedStarContainer = findViewById(R.id.selected_star);
     final View selectedFleetContainer = findViewById(R.id.selected_fleet);
-    final TextView starName = (TextView) findViewById(R.id.star_name);
-    final TextView starKind = (TextView) findViewById(R.id.star_kind);
-    final ImageView starIcon = (ImageView) findViewById(R.id.star_icon);
-    final Button renameButton = (Button) findViewById(R.id.rename_btn);
+    final TextView starName = findViewById(R.id.star_name);
+    final TextView starKind = findViewById(R.id.star_kind);
+    final ImageView starIcon = findViewById(R.id.star_icon);
+    final Button renameButton = findViewById(R.id.rename_btn);
 
     selectionLoadingContainer.setVisibility(View.GONE);
     selectedStarContainer.setVisibility(View.VISIBLE);

@@ -103,39 +103,40 @@ public class StarManager extends BaseManager {
       return false;
     }
 
+    ApiRequest apiRequest;
     synchronized (inProgress) {
       if (inProgress.get(starID) != null) {
         log.debug("Star is already being refreshed, not calling again.");
         return true;
       }
+
+      apiRequest = new ApiRequest.Builder(String.format("stars/%s", starID), "GET")
+          .completeCallback(requestCompleteCallback)
+          .skipCache(true)
+          .build();
+      inProgress.put(starID, apiRequest);
     }
 
-    RequestManager.i.sendRequest(new ApiRequest.Builder(String.format("stars/%s", starID), "GET")
-        .completeCallback(requestCompleteCallback)
-        .skipCache(true)
-        .build());
+    RequestManager.i.sendRequest(apiRequest);
     return true;
   }
 
   private final ApiRequest.CompleteCallback requestCompleteCallback =
-      new ApiRequest.CompleteCallback() {
-    @Override
-    public void onRequestComplete(ApiRequest request) {
-      Messages.Star starPb = request.body(Messages.Star.class);
-      if (starPb != null) {
-        Star star = new Star();
-        star.fromProtocolBuffer(starPb);
-        stars.put(star.getID(), star);
+      request -> {
+        Messages.Star starPb = request.body(Messages.Star.class);
+        if (starPb != null) {
+          Star star = new Star();
+          star.fromProtocolBuffer(starPb);
+          stars.put(star.getID(), star);
 
-        inProgress.remove(star.getID());
+          inProgress.remove(star.getID());
 
-        // Enqueue the star so that it get simulated, this will post to the event bus when
-        // simulation finishes, so we don't need to do that here.
-        log.debug("Star %d %s fetched from server, simulating...", star.getID(), star.getName());
-        StarSimulationQueue.i.simulate(star, true);
-      }
-    }
-  };
+          // Enqueue the star so that it get simulated, this will post to the event bus when
+          // simulation finishes, so we don't need to do that here.
+          log.debug("Star %d %s fetched from server, simulating...", star.getID(), star.getName());
+          StarSimulationQueue.i.simulate(star, true);
+        }
+      };
 
   public void renameStar(final Purchase purchase, final Star star, final String newName,
       final StarRenameCompleteHandler onCompleteHandler) {
@@ -149,20 +150,14 @@ public class StarManager extends BaseManager {
     ApiRequest request =
         new ApiRequest.Builder(String.format(Locale.ENGLISH, "stars/%d", star.getID()), "PUT")
             .body(pb.build())
-            .completeCallback(new ApiRequest.CompleteCallback() {
-              @Override
-              public void onRequestComplete(ApiRequest request) {
-                // if failure() {
-                //  onCompleteHandler.onStarRename(null, false, errorMessage);
-                // }
-                Messages.Star starPb = request.body(Messages.Star.class);
-                Star star = new Star();
-                star.fromProtocolBuffer(starPb);
+            .completeCallback(request1 -> {
+              Messages.Star starPb = request1.body(Messages.Star.class);
+              Star star1 = new Star();
+              star1.fromProtocolBuffer(starPb);
 
-                notifyStarUpdated(star);
-                if (onCompleteHandler != null) {
-                  onCompleteHandler.onStarRename(star, true, null);
-                }
+              notifyStarUpdated(star1);
+              if (onCompleteHandler != null) {
+                onCompleteHandler.onStarRename(star1, true, null);
               }
             })
             .build();
