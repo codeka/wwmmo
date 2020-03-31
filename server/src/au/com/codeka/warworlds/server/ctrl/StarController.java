@@ -437,8 +437,8 @@ public class StarController {
     }
 
     public int addStar(int sectorID, int x, int y, int size, String name, Star.Type starType, Planet[] planets) throws Exception {
-      String sql = "INSERT INTO stars (sector_id, x, y, size, name, star_type, planets, last_simulation, time_emptied)" +
-          " VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+      String sql = "INSERT INTO stars (sector_id, x, y, size, name, star_type, planets, last_simulation, time_emptied, mod_counter)" +
+          " VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), 1)";
       try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
         stmt.setInt(1, sectorID);
         stmt.setInt(2, x);
@@ -464,15 +464,20 @@ public class StarController {
     }
 
     public void updateStar(Star star) throws Exception {
-      final String sql = "UPDATE stars SET" +
+      String sql = "UPDATE stars SET" +
           " last_simulation = ?," +
           " name = ?," +
           " star_type = ?," +
           " empire_count = ?," +
           " extra = ?," +
           " wormhole_empire_id = ?," +
-          " mod_counter = mod_counter + 1" +
-          " WHERE id = ? AND mod_counter = ?";
+          " mod_counter = " + (star.getModCounter() == 0 ? "1" : "mod_counter + 1") +
+          " WHERE id = ? AND";
+      if (star.getModCounter() == 0) {
+        sql += " mod_counter is NULL";
+      } else {
+        sql += " mod_counter = ?";
+      }
       try (SqlStmt stmt = prepare(sql)) {
         DateTime lastSimulation = star.getLastSimulation();
         DateTime now = DateTime.now();
@@ -512,7 +517,9 @@ public class StarController {
         stmt.setInt(6, star.getWormholeEmpireID());
 
         stmt.setInt(7, star.getID());
-        stmt.setInt(8, star.getModCounter());
+        if (star.getModCounter() != 0) {
+          stmt.setInt(8, star.getModCounter());
+        }
         if (stmt.update() != 1) {
           throw new SqlConcurrentModificationException();
         }

@@ -183,7 +183,7 @@ public class SectorGenerator {
         String name = new NameGenerator().generate(mRandom);
         int size = mRandom.nextInt(8) + 16;
 
-        String sql = "INSERT INTO stars (sector_id, x, y, size, name, star_type, planets, last_simulation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO stars (sector_id, x, y, size, name, star_type, planets, last_simulation, mod_counter) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)";
         try (SqlStmt stmt = DB.prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
             Star star = new Star(sector, x, y, starTypeID, name, size);
 

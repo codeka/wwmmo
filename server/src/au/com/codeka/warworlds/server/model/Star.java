@@ -54,7 +54,12 @@ public class Star extends BaseStar {
     mStarType = sStarTypes[res.getInt("star_type")];
     mLastSimulation = res.getDateTime("last_simulation");
     mTimeEmptied = res.getDateTime("time_emptied");
-    modCounter = res.getInt("mod_counter");
+    Integer val = res.getInt("mod_counter");
+    if (val == null) {
+      modCounter = 0;
+    } else {
+      modCounter = val;
+    }
 
     try {
       Messages.Planets planets_pb = Messages.Planets.parseFrom(res.getBytes("planets"));
