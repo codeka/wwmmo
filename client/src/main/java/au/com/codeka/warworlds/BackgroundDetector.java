@@ -84,8 +84,11 @@ public class BackgroundDetector {
    */
   public void resetBackStack() {
     if (currentVisibleActivity != null) {
-      currentVisibleActivity.startActivity(
-          new Intent(currentVisibleActivity, WarWorldsActivity.class));
+      if (!(currentVisibleActivity instanceof WarWorldsActivity)) {
+        currentVisibleActivity.startActivity(
+            new Intent(currentVisibleActivity, WarWorldsActivity.class));
+        currentVisibleActivity.finish();
+      }
       needBackStackReset = false;
     } else {
       needBackStackReset = true;

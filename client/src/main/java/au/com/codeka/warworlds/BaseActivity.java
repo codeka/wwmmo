@@ -103,18 +103,6 @@ public class BaseActivity extends AppCompatActivity {
       getWindowManager().addView(debugView, debugViewLayout);
     }
 
-    if (EmpireManager.i.getEmpire() == null && !(this instanceof WarWorldsActivity)) {
-      log.info("My empire's null, switching back to WarWorldsActivity.");
-      // No empire, reset back to the home page.
-      Intent intent = new Intent(this, WarWorldsActivity.class);
-
-      // Make sure we clear the activity stack and start a new task, as we're totally resetting
-      // our state.
-      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-      startActivity(intent);
-      finish();
-    }
-
     BackgroundDetector.i.onActivityResume(this);
     isResumed = true;
     super.onResumeFragments();

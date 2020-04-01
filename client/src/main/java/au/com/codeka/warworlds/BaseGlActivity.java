@@ -93,7 +93,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
 
   @Override
   public Engine onCreateEngine(final EngineOptions engineOptions) {
-    Engine engine = null;
+    Engine engine;
     if (getNumCores() == 1) {
       log.info("Single-core device detected, using a Limited-FPS engine.");
       engine = new LimitedFPSEngine(engineOptions, 5);
@@ -162,19 +162,6 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
 
     if (mDebugView != null) {
       getWindowManager().addView(mDebugView, mDebugViewLayout);
-    }
-
-    if (EmpireManager.i.getEmpire() == null) {
-      log.info("My empire's null, switching back to WarWorldsActivity.");
-
-      // No empire, reset back to the home page.
-      Intent intent = new Intent(this, WarWorldsActivity.class);
-
-      // Make sure we clear the activity stack and start a new task, as we're totally resetting
-      // our state.
-      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-      startActivity(intent);
-      finish();
     }
 
     BackgroundDetector.i.onActivityResume(this);

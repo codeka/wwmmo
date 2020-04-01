@@ -657,7 +657,6 @@ public class Notifications {
           if (pollDelayMs > MAX_POLL_DELAY_MS) {
             pollDelayMs = MAX_POLL_DELAY_MS;
           }
-          log.error("Exception caught in long-polling, waiting %dms re-trying.", pollDelayMs, e);
 
           try {
             Thread.sleep(pollDelayMs);

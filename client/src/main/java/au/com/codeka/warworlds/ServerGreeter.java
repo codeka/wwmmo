@@ -56,7 +56,7 @@ public class ServerGreeter {
   private static Handler handler;
   private static boolean helloStarted;
   private static boolean helloComplete;
-  private static GiveUpReason giveUpReason;
+  private static boolean helloSuccessful;
   private static ServerGreeting serverGreeting;
 
   private static final String SAFETYNET_CLIENT_API_KEY = "AIzaSyAulj6q4uq0fd7WnJpzSY769U0aMCthogg";
@@ -96,12 +96,14 @@ public class ServerGreeter {
 
     // tell the empire manager that the "MyEmpire" it has cached will no longer be valid either.
     EmpireManager.i.clearEmpire();
+
+    BackgroundDetector.i.resetBackStack();
   }
 
   public static void waitForHello(Activity activity, HelloCompleteHandler handler) {
     if (helloComplete) {
       log.debug("Already said 'hello', not saying it again...");
-      handler.onHelloComplete(giveUpReason == GiveUpReason.NONE, serverGreeting);
+      handler.onHelloComplete(helloSuccessful, serverGreeting);
       return;
     }
     log.debug("Hello hasn't completed, waiting for hello.");
@@ -179,6 +181,7 @@ public class ServerGreeter {
       private boolean errorOccurred;
       private boolean needsReAuthenticate;
       private boolean wasEmpireReset;
+      private GiveUpReason giveUpReason;
       private String resetReason;
       private String toastMessage;
       private Intent intent;
@@ -365,6 +368,7 @@ public class ServerGreeter {
         if (needsEmpireSetup) {
           serverGreeting.mIntent = new Intent(activity, EmpireSetupActivity.class);
           helloComplete = true;
+          helloSuccessful = true;
         } else if (!errorOccurred) {
           Util.setup(activity);
           ChatManager.i.setup();
@@ -374,7 +378,10 @@ public class ServerGreeter {
           BackgroundDetector.i.onBackgroundStatusChange();
 
           helloComplete = true;
+          helloSuccessful = true;
         } else /* errorOccurred */ {
+          helloSuccessful = false;
+
           if (toastMessage != null && toastMessage.length() > 0) {
             Toast toast = Toast.makeText(App.i, toastMessage, Toast.LENGTH_LONG);
             toast.show();
