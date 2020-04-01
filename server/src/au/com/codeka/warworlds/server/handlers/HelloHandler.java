@@ -74,6 +74,7 @@ public class HelloHandler extends RequestHandler {
         .setMotd(Messages.MessageOfTheDay.newBuilder().setMessage("").setLastUpdate(""));
 
     ensureMinVersion(getRequest().getHeader("User-Agent"));
+    ensureNoClickers(hello_request_pb.getAccessibilitySettingsInfo());
 
     GameHistory gameHistory = new GameHistoryController().getCurrent();
     if (gameHistory == null) {
@@ -222,6 +223,40 @@ public class HelloHandler extends RequestHandler {
   }
 
   /**
+   * Check the list of accessibility services the client has provided us, and reject the request if
+   * any of them are in our configured list of unsupported ones.
+   */
+  private void ensureNoClickers(
+      Messages.AccessibilitySettingsInfo accessibilitySettingsInfo) throws RequestException {
+    if (!accessibilitySettingsInfo.getSupported()) {
+      log.debug("Client has no accessibility services enabled.");
+      return;
+    }
+
+    Configuration.ClickerConfig[] clickers = Configuration.i.getClickers();
+    if (clickers == null) {
+      log.debug("No clickers configured, nothing to check.");
+      return;
+    }
+
+    for (Messages.AccessibilitySettingsInfo.AccessibilityService service :
+        accessibilitySettingsInfo.getServiceList()) {
+      for (Configuration.ClickerConfig clicker : clickers) {
+        if (clicker.getName().equalsIgnoreCase(service.getName())) {
+          log.warning(
+              "User has unsupported accessibility service installed: %s",
+              clicker.getName());
+          throw new RequestException(
+              400,
+              Messages.GenericError.ErrorCode.AutoClickerDetected,
+              String.format("Cannot connect while you have '%s' installed. Please disable or " +
+                  "uninstall it and try again.", clicker.getAppName()));
+        }
+      }
+    }
+  }
+
+  /**
    * Ensures the the User-Agent given specified a version for the client that we support.
    *
    * The client sends a User-Agent of the form "wwmmo/(version)" where version will be something
@@ -284,7 +319,7 @@ public class HelloHandler extends RequestHandler {
             userAgent,
             minVersionStr);
         throw new RequestException(
-            410,
+            426,
             Messages.GenericError.ErrorCode.UpgradeRequired,
             "Unsupported version.");
       }

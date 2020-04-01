@@ -70,7 +70,10 @@ public class WarWorldsActivity extends BaseActivity {
     Util.setup(context);
 
     if (onBlueStacks()) {
-      Toast.makeText(this, "Sorry, this platform is not supported. Please use a supported platform.", Toast.LENGTH_LONG).show();
+      Toast.makeText(
+          this,
+          "Sorry, this platform is not supported. Please use a supported platform.",
+          Toast.LENGTH_LONG).show();
       finish();
     }
 
@@ -85,13 +88,10 @@ public class WarWorldsActivity extends BaseActivity {
 
     refreshWelcomeMessage();
 
-    realmSelectButton.setOnClickListener(new OnClickListener() {
-      public void onClick(View v) {
-        startActivity(new Intent(context, RealmSelectActivity.class));
-      }
-    });
-
-    optionsButton.setOnClickListener(v -> startActivity(new Intent(context, GlobalOptionsActivity.class)));
+    realmSelectButton.setOnClickListener(
+        v -> startActivity(new Intent(context, RealmSelectActivity.class)));
+    optionsButton.setOnClickListener(
+        v -> startActivity(new Intent(context, GlobalOptionsActivity.class)));
 
     startGameButton.setOnClickListener(v -> {
       if (startGameIntent == null) {
@@ -160,7 +160,9 @@ public class WarWorldsActivity extends BaseActivity {
             formatter.format(maxMemoryBytes), Util.getVersion(),
             Util.isDebug() ? " (debug)" : " (rel)");
         connectionStatus.setText(msg);
+        connectionStatus.setTextColor(Color.WHITE);
         startGameButton.setEnabled(true);
+        startGameIntent = null;
 
         MyEmpire empire = EmpireManager.i.getEmpire();
         if (empire != null) {

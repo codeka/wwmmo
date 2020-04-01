@@ -40,6 +40,7 @@ public class Configuration {
   @Expose private ResetsConfig resets;
   @Expose private PatreonConfig patreon;
   @Expose private String requestStatsDirectory;
+  @Expose private ClickerConfig[] clickers;
 
   public Configuration() {
     limits = new LimitsConfiguration();
@@ -84,6 +85,10 @@ public class Configuration {
 
   public String getRequestStatsDirectory() {
     return requestStatsDirectory;
+  }
+
+  public ClickerConfig[] getClickers() {
+    return clickers;
   }
 
   public static class DatabaseConfiguration {
@@ -177,6 +182,19 @@ public class Configuration {
 
     public String getRedirectUri() {
       return redirectUri;
+    }
+  }
+
+  public static class ClickerConfig {
+    @Expose private String name;
+    @Expose private String appName;
+
+    public String getName() {
+      return name;
+    }
+
+    public String getAppName() {
+      return appName;
     }
   }
 }

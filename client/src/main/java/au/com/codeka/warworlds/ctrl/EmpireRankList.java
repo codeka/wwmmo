@@ -36,8 +36,6 @@ import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
 public class EmpireRankList extends ListView {
-  private static final Log log = new Log("DEANH EmpireRankList");
-
   private RankListAdapter rankListAdapter;
   private Context context;
 
@@ -58,7 +56,6 @@ public class EmpireRankList extends ListView {
     if (isInEditMode()) {
       return;
     }
-    log.info("onAttachedToWindow, registering.");
     ShieldManager.eventBus.register(eventHandler);
     EmpireManager.eventBus.register(eventHandler);
   }
@@ -69,7 +66,6 @@ public class EmpireRankList extends ListView {
     if (isInEditMode()) {
       return;
     }
-    log.info("onDetachedToWindow, un-registering.");
     ShieldManager.eventBus.unregister(eventHandler);
     EmpireManager.eventBus.unregister(eventHandler);
   }
@@ -99,7 +95,6 @@ public class EmpireRankList extends ListView {
 
     @EventHandler
     public void onEmpireUpdated(Empire empire) {
-      log.info("onEmpireUpdated: " + empire.getDisplayName());
       rankListAdapter.onEmpireUpdated(empire);
     }
   };

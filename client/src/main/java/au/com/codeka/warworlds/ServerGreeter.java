@@ -56,6 +56,7 @@ public class ServerGreeter {
   private static Handler handler;
   private static boolean helloStarted;
   private static boolean helloComplete;
+  private static GiveUpReason giveUpReason;
   private static ServerGreeting serverGreeting;
 
   private static final String SAFETYNET_CLIENT_API_KEY = "AIzaSyAulj6q4uq0fd7WnJpzSY769U0aMCthogg";
@@ -100,9 +101,10 @@ public class ServerGreeter {
   public static void waitForHello(Activity activity, HelloCompleteHandler handler) {
     if (helloComplete) {
       log.debug("Already said 'hello', not saying it again...");
-      handler.onHelloComplete(true, serverGreeting);
+      handler.onHelloComplete(giveUpReason == GiveUpReason.NONE, serverGreeting);
       return;
     }
+    log.debug("Hello hasn't completed, waiting for hello.");
 
     synchronized (helloCompleteHandlers) {
       helloCompleteHandlers.add(handler);
@@ -155,6 +157,13 @@ public class ServerGreeter {
 
     RequestManager.i.setup(activity);
 
+    // Whenever an accessibility service is enabled or disabled, we'll want to clear the hello so
+    // that the server is able to verify that it's a supported/allowed service.
+    AccessibilityServiceReporter.watchForChanges(activity, () -> {
+      log.info("Got a change in accessibility services, clearing hello.");
+      clearHello();
+    });
+
     // We'll start this now so it can go on in the background while we do some other stuff.
     // TODO: should we do this every login, or maybe only max once a day or something (on this
     // device anyway)?
@@ -170,7 +179,6 @@ public class ServerGreeter {
       private boolean errorOccurred;
       private boolean needsReAuthenticate;
       private boolean wasEmpireReset;
-      private GiveUpReason giveUpReason;
       private String resetReason;
       private String toastMessage;
       private Intent intent;
@@ -334,6 +342,13 @@ public class ServerGreeter {
             message = "Authentication failed.";
             errorOccurred = true;
             needsReAuthenticate = true;
+          } else if (request.error().getErrorCode()
+              == Messages.GenericError.ErrorCode.AutoClickerDetected.getNumber()) {
+            // you have some kind of auto-clicker installed.
+            message = request.error().getErrorMessage();
+            giveUpReason = GiveUpReason.CLICKER;
+            errorOccurred = true;
+            needsReAuthenticate = false;
           } else {
             // any other HTTP error, let's display that
             message = "An unexpected error occurred:" + request.error().getErrorCode();
@@ -541,5 +556,8 @@ public class ServerGreeter {
 
     /** This device failed SafetyNet attestation. */
     SAFETYNET,
+
+    /** We've detected that have some kind of auto-clicker installed. */
+    CLICKER,
   }
 }

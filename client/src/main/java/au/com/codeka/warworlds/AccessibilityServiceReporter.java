@@ -43,6 +43,11 @@ public class AccessibilityServiceReporter {
 
       AccessibilityManager am =
           (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
+      if (am == null) {
+        builder.setSupported(false);
+        return builder.build();
+      }
+
       List<AccessibilityServiceInfo> enabledServices =
           am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
 
@@ -71,5 +76,53 @@ public class AccessibilityServiceReporter {
     }
 
     return builder.build();
+  }
+
+  /**
+   * Watches for changes in the number of accessibility services that are enabled on the devices
+   * and calls the given runnable when a service is enabled or disabled.
+   *
+   * We only call the callback once and then unregister ourselves. If you want to get multiple
+   * callbacks, you must re-register every time.
+   */
+  public static void watchForChanges(Context context, Runnable changeOccurredRunnable) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+      return;
+    }
+
+    AccessibilityManager am =
+        (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
+    if (am == null) {
+      return;
+    }
+
+    int numEnabledServices =
+        am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK).size();
+    am.addAccessibilityStateChangeListener(
+        new ChangeListener(am, numEnabledServices, changeOccurredRunnable));
+  }
+
+  private static final class ChangeListener
+      implements AccessibilityManager.AccessibilityStateChangeListener {
+    private final AccessibilityManager am;
+    private final Runnable callback;
+    private int numEnabledServices;
+
+    public ChangeListener(AccessibilityManager am, int numEnabledServices, Runnable callback) {
+      this.am = am;
+      this.callback = callback;
+      this.numEnabledServices = numEnabledServices;
+    }
+
+    @Override
+    public void onAccessibilityStateChanged(boolean b) {
+      int currentlyEnabledServices =
+          am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK).size();
+      if (currentlyEnabledServices != numEnabledServices) {
+        am.removeAccessibilityStateChangeListener(this);
+        callback.run();
+      }
+    }
+
   }
 }

@@ -192,6 +192,10 @@ public class SolarSystemActivity extends BaseActivity {
     StarManager.eventBus.register(eventHandler);
 
     ServerGreeter.waitForHello(this, (success, greeting) -> {
+      if (!isResumed) {
+        return;
+      }
+
       if (starID == null) {
         Bundle extras = getIntent().getExtras();
         String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
