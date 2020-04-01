@@ -42,7 +42,7 @@ public class ExportStarsCronJob extends AbstractCronJob {
     }
   }
 
-  public long export(OutputStream outs) throws Exception {
+  private long export(OutputStream outs) throws Exception {
     long numStars = 0;
     PrintStream ps = new PrintStream(outs);
     String sql = "" +
