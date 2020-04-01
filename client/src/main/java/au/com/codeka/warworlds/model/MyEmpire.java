@@ -216,9 +216,8 @@ public class MyEmpire extends Empire {
       @NotNull final RunnableArg<Boolean> onComplete) {
     String url = "empires/" + getKey() + "/shield";
 
-    SkuDetails sku;
     try {
-      sku = PurchaseManager.i.getInventory().getSkuDetails("rename_empire");
+      PurchaseManager.i.getInventory().getSkuDetails("decorate_empire");
     } catch (IabException e) {
       onComplete.run(false);
       return;
