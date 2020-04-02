@@ -65,6 +65,19 @@ public class StarSimulatorThread {
    * Returns a snapshots of stats about what we've been doing since the last time you called this.
    */
   public ProcessingStats stats() {
+    if (thread == null) {
+      log.error("Thread is null, attempting to restarting.");
+      start();
+    }
+
+    if (!thread.isAlive() || thread.isInterrupted()) {
+      log.error(
+          "Thread.isAlive()=%s thread.isInterrupted()=%s, attempting to restart.",
+          thread.isAlive(), thread.isInterrupted());
+      thread = null;
+      start();
+    }
+
     synchronized (statsLock) {
       ProcessingStats currStats = stats;
       stats = new ProcessingStats();
@@ -79,32 +92,37 @@ public class StarSimulatorThread {
   }
 
   private void threadProc() {
-    int numSimulatedSinceEventProcessorPinged = 0;
-    while (!stopped) {
-      int waitTimeMs = simulateOneStar();
-      numSimulatedSinceEventProcessorPinged++;
+    try {
+      int numSimulatedSinceEventProcessorPinged = 0;
+      while (!stopped) {
+        int waitTimeMs = simulateOneStar();
+        numSimulatedSinceEventProcessorPinged++;
 
-      if (numSimulatedSinceEventProcessorPinged >= 50) {
-        EventProcessor.i.ping();
-        numSimulatedSinceEventProcessorPinged = 0;
-      }
+        if (numSimulatedSinceEventProcessorPinged >= 50) {
+          EventProcessor.i.ping();
+          numSimulatedSinceEventProcessorPinged = 0;
+        }
 
-      if (waitTimeMs > 0) {
-        if (waitTimeMs > WAIT_TIME_ERROR) {
-          waitTimeMs = WAIT_TIME_ERROR;
+        if (waitTimeMs > 0) {
+          if (waitTimeMs > WAIT_TIME_ERROR) {
+            waitTimeMs = WAIT_TIME_ERROR;
+          }
+          log.info(String.format(
+              Locale.US,
+              "Waiting %d seconds before simulating next star.",
+              waitTimeMs / 1000));
+          try {
+            Thread.sleep(waitTimeMs);
+          } catch (InterruptedException e) {
+            // Ignore.
+          }
+        } else {
+          Thread.yield();
         }
-        log.info(String.format(
-            Locale.US,
-            "Waiting %d seconds before simulating next star.",
-            waitTimeMs / 1000));
-        try {
-          Thread.sleep(waitTimeMs);
-        } catch (InterruptedException e) {
-          // Ignore.
-        }
-      } else {
-        Thread.yield();
       }
+    } catch (Throwable e) {
+      log.error("Error in star simulation thread!");
+      thread = null;
     }
   }
 
@@ -147,7 +165,7 @@ public class StarSimulatorThread {
         stats.dbTimeMs += endTime - simulateEndTime;
       }
       return WAIT_TIME_NORMAL;
-    } catch (Exception e) {
+    } catch (Throwable e) {
       log.error("Exception caught simulating star!", e);
       // TODO: if there are errors, it'll just keep reporting over and over... probably a good thing
       // because we'll definitely need to fix it!

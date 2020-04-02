@@ -95,6 +95,7 @@ public class StarSimulatorThreadManager {
    * periodically log their status, and make sure they're not stuck.
    */
   private void threadMonitor() {
+    int nothingInterestingCounter = 0;
     while (!stopped) {
       try {
         int i = 0;
@@ -102,6 +103,11 @@ public class StarSimulatorThreadManager {
           StarSimulatorThread.ProcessingStats stats = thread.stats();
           if (stats.numStars == 0 && stats.currentStar == null) {
             // Nothing interesting to report.
+            if (nothingInterestingCounter > 10) {
+              log.info("Nothing to report.");
+              nothingInterestingCounter = 0;
+            }
+            nothingInterestingCounter ++;
             continue;
           }
 
