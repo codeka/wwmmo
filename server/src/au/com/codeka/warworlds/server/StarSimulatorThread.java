@@ -109,10 +109,13 @@ public class StarSimulatorThread {
           if (waitTimeMs > WAIT_TIME_ERROR) {
             waitTimeMs = WAIT_TIME_ERROR;
           }
-          log.info(String.format(
+          log.debug(String.format(
               Locale.US,
               "Waiting %d seconds before simulating next star.",
               waitTimeMs / 1000));
+          synchronized (statsLock) {
+            stats.idleTimeMs += waitTimeMs;
+          }
           try {
             Thread.sleep(waitTimeMs);
           } catch (InterruptedException e) {
@@ -183,7 +186,7 @@ public class StarSimulatorThread {
     }
   }
 
-  public static class ProcessingStats {
+  static class ProcessingStats {
     // The number of stars we've processed since the last stats call.
     int numStars;
 
@@ -192,6 +195,9 @@ public class StarSimulatorThread {
 
     // The total amount of time we've spent in the database since the last stats call.
     long dbTimeMs;
+
+    // Amount of time the thread was idle, in milliseconds.
+    long idleTimeMs;
 
     // If not null, the star we're processing at the time you call the stats method.
     @Nullable

@@ -18,7 +18,7 @@ public class StarSimulatorThreadManager {
   // Time, in milliseconds, between logs of the simulation stats.
   private static final long STATS_LOG_DELAY_MS = 10000;
 
-  private static final Log log = new Log("StarSimulatorThreadManager");
+  private static final Log log = new Log("SIM");
 
   private final ArrayList<StarSimulatorThread> threads = new ArrayList<>();
   private final Queue<Integer> starIDs = new ArrayDeque<>();
@@ -114,13 +114,14 @@ public class StarSimulatorThreadManager {
           String currStarMsg = stats.currentStar == null
               ? "(no current star)"
               : String.format(Locale.ENGLISH,
-                  "current star: [%d] %s for %dms",
+                  "([%d] %s for %dms)",
                   stats.currentStar.getID(),
                   stats.currentStar.getName(),
                   stats.currentStarProcessingTime);
-          log.info("[%d] %d stars, %dms avg, %d avg in db, %s",
+          log.info("[%d] %d stars, %dms avg, %d avg in db, %.0fs idle, %s",
               i, stats.numStars, stats.numStars == 0 ? 0 : stats.totalTimeMs / stats.numStars,
-              stats.numStars == 0 ? 0 : stats.dbTimeMs / stats.numStars, currStarMsg);
+              stats.numStars == 0 ? 0 : stats.dbTimeMs / stats.numStars,
+              (float) stats.idleTimeMs / 1000.0f, currStarMsg);
 
           // TODO: if it appears currentStar is stuck, do something...
 
