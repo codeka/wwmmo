@@ -41,6 +41,7 @@ public class Configuration {
   @Expose private PatreonConfig patreon;
   @Expose private String requestStatsDirectory;
   @Expose private ClickerConfig[] clickers;
+  @Expose private SafetyNetConfig safetyNet;
 
   public Configuration() {
     limits = new LimitsConfiguration();
@@ -89,6 +90,10 @@ public class Configuration {
 
   public ClickerConfig[] getClickers() {
     return clickers;
+  }
+
+  public SafetyNetConfig getSafetyNet() {
+    return safetyNet;
   }
 
   public static class DatabaseConfiguration {
@@ -195,6 +200,19 @@ public class Configuration {
 
     public String getAppName() {
       return appName;
+    }
+  }
+
+  public static class SafetyNetConfig {
+    @Expose boolean enabled;
+    @Expose int[] exemptedEmpires;
+
+    public boolean isEnabled() {
+      return enabled;
+    }
+
+    public int[] getExemptedEmpires() {
+      return exemptedEmpires;
     }
   }
 }

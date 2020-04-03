@@ -356,10 +356,11 @@ public class ServerGreeter {
             errorOccurred = true;
             needsReAuthenticate = true;
           } else if (request.error().getErrorCode()
-              == Messages.GenericError.ErrorCode.AutoClickerDetected.getNumber()) {
-            // you have some kind of auto-clicker installed.
+              == Messages.GenericError.ErrorCode.ClientDeviceRejected.getNumber()) {
+            // the client was rejected for some reason (e.g. auto-clicker installed, failed
+            // SafetyNet validation, etc).
             message = request.error().getErrorMessage();
-            giveUpReason = GiveUpReason.CLICKER;
+            giveUpReason = GiveUpReason.CLIENT_REJECTED;
             errorOccurred = true;
             needsReAuthenticate = false;
           } else {
@@ -571,10 +572,10 @@ public class ServerGreeter {
     /** The version of Google Play Services that's installed is not one we are able to use. */
     GOOGLE_PLAY_SERVICES,
 
-    /** This device failed SafetyNet attestation. */
-    SAFETYNET,
-
-    /** We've detected that have some kind of auto-clicker installed. */
-    CLICKER,
+    /**
+     * This device failed SafetyNet attestation, or a clicker was detected, or some other reason
+     * for rejecting the client.
+     */
+    CLIENT_REJECTED,
   }
 }

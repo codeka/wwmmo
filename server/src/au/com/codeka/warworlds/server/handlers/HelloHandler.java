@@ -17,6 +17,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.Manifest;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.SSLException;
 
 import au.com.codeka.common.Log;
@@ -94,13 +95,10 @@ public class HelloHandler extends RequestHandler {
     }
 
     SafetyNetAttestationStatement attestationStatement = null;
-    if (!hello_request_pb.hasSafetynetJwsResult()) {
-      // TODO: verify that it's OK for this client not to have a SafetyNet attestation.
-    } else {
+    if (hello_request_pb.hasSafetynetJwsResult()) {
       try {
         attestationStatement = validateSafetyNetJws(hello_request_pb);
       } catch (ValidationFailureException e) {
-        // TODO: verify that it's OK for this client to fail SafetyNet attestation.
         log.warning("SafetyNet attestation validation failed.", e);
       }
     }
@@ -108,6 +106,8 @@ public class HelloHandler extends RequestHandler {
     // fetch the empire we're interested in
     Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
     if (empire != null) {
+      ensureSafetyNetAttestation(empire.getID(), attestationStatement);
+
       new StatisticsController().registerLogin(
           getSession(), getRequest().getHeader("User-Agent"), hello_request_pb,
           attestationStatement);
@@ -238,6 +238,46 @@ public class HelloHandler extends RequestHandler {
   }
 
   /**
+   * Checks that either this empire is exempt from SafetyNet attestation, or that they pass.
+   */
+  private void ensureSafetyNetAttestation(
+      int empireId, @Nullable SafetyNetAttestationStatement attestationStatement)
+      throws RequestException {
+    Configuration.SafetyNetConfig config = Configuration.i.getSafetyNet();
+    if (config == null || !config.isEnabled()) {
+      log.debug("SafetyNet is disabled, not checking.");
+      return;
+    }
+
+    if (config.getExemptedEmpires() != null) {
+      for (int i = 0; i < config.getExemptedEmpires().length; i++) {
+        if (empireId == config.getExemptedEmpires()[i]) {
+          log.debug("Empire [%d] is exempt from SafetyNet.", empireId);
+          return;
+        }
+      }
+    }
+
+    boolean pass = true;
+    if (attestationStatement == null) {
+      log.warning("Not attestation statement for empire [%d], rejecting connection", empireId);
+      pass = false;
+    } else if (!attestationStatement.hasBasicIntegrity()) {
+      log.warning(
+          "SafetyNet attestation fails basic integrity check for empire [%d], rejecting connection",
+          empireId);
+      pass = false;
+    }
+
+    if (!pass) {
+      throw new RequestException(400, Messages.GenericError.ErrorCode.ClientDeviceRejected,
+          "You are running an unsupported device. If you believe this to be in error, please " +
+              "contact me via discord.")
+          .withSkipLog();
+    }
+  }
+
+  /**
    * Check the list of accessibility services the client has provided us, and reject the request if
    * any of them are in our configured list of unsupported ones.
    */
@@ -263,9 +303,10 @@ public class HelloHandler extends RequestHandler {
               clicker.getName());
           throw new RequestException(
               400,
-              Messages.GenericError.ErrorCode.AutoClickerDetected,
+              Messages.GenericError.ErrorCode.ClientDeviceRejected,
               String.format("Cannot connect while you have '%s' installed. Please disable or " +
-                  "uninstall it and try again.", clicker.getAppName()));
+                  "uninstall it and try again.", clicker.getAppName()))
+              .withLogMessageOnly();
         }
       }
     }

@@ -57,7 +57,7 @@ message GenericError {
     CannotReset = 38;
     ResetInProgress = 39;
     UpgradeRequired = 40;
-    AutoClickerDetected = 41;
+    ClientDeviceRejected = 41;
   }
 }
 
