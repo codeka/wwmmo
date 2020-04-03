@@ -118,13 +118,13 @@ public class Bucket {
       if (hardDeny) {
         // If it's a hard deny, throw an exception with a status code indicating as such.
         numHardDenies ++;
-        log.info("Hard deny %s %s for [%d]: %s",
+        log.debug("Hard deny %s %s for [%d]: %s",
             request.getMethod(), request.getPathInfo(), session.getEmpireID(), hard);
         throw new RequestException(429, "Rate limit exceeded.");
       }
       else if (softDeny) {
         numSoftDenies ++;
-        log.info("Soft deny %s %s for [%d]: %s",
+        log.debug("Soft deny %s %s for [%d]: %s",
             request.getMethod(), request.getPathInfo(), session.getEmpireID(), soft);
         return delayMs;
       }
