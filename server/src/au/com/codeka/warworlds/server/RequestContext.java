@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server;
 
+import com.google.common.base.Strings;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -57,10 +59,16 @@ public class RequestContext {
       empireId = session.getEmpireID();
     }
 
+    String remoteAddr = request.getRemoteAddr();
+    String realIp = request.getHeader("X-Real-IP");
+    if (!Strings.isNullOrEmpty(realIp)) {
+      remoteAddr = realIp;
+    }
+
     context.set(
         new Context(
             request.getRequestURI(),
-            request.getRemoteAddr(),
+            realIp,
             empireId,
             userAgent,
             request.getQueryString()));
