@@ -20,6 +20,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.safetynet.ValidationFailureException;
 import au.com.codeka.common.safetynet.ValidationFailureReason;
 import au.com.codeka.warworlds.server.Configuration;
+import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -68,12 +69,14 @@ public class HelloHandler extends RequestHandler {
 
   private void processHello(Messages.HelloRequest hello_request_pb) throws RequestException {
     Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder();
+    long startTime = System.currentTimeMillis();
 
     // damn, this is why things should never be marked "required" in protobufs!
     hello_response_pb
         .setMotd(Messages.MessageOfTheDay.newBuilder().setMessage("").setLastUpdate(""));
 
-    ensureMinVersion(getRequest().getHeader("User-Agent"));
+    final String userAgent = getRequest().getHeader("User-Agent");
+    ensureMinVersion(userAgent);
     ensureNoClickers(hello_request_pb.getAccessibilitySettingsInfo());
 
     GameHistory gameHistory = new GameHistoryController().getCurrent();
@@ -95,8 +98,6 @@ public class HelloHandler extends RequestHandler {
         // TODO: verify that it's OK for this client to fail SafetyNet attestation.
         log.warning("SafetyNet attestation validation failed.", e);
       }
-
-      log.info("SafetyNet attestation: %s", attestationStatement);
     }
 
     // fetch the empire we're interested in
@@ -111,6 +112,15 @@ public class HelloHandler extends RequestHandler {
 
       // Make sure the session is up-to-date with things like the empire's alliance etc.
       new LoginController().updateSession(getSession());
+
+      log.info("Login in %dms %d [%s] [%s] [%s] [%s]\nSafetyNet: %s",
+          System.currentTimeMillis() - startTime,
+          empire.getID(),
+          empire.getDisplayName(),
+          getSession().getEmail(),
+          RequestContext.i.getIpAddress(),
+          userAgent,
+          attestationStatement);
 
       // Make sure they haven't been wiped out.
       if (!new EmpireController().hasAnyColonies(getSession().getEmpireID())) {

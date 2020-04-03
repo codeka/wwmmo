@@ -61,7 +61,6 @@ public class LoginController {
     }
 
     createSession(cookie.toString(), emailAddr, clientId, impersonateUser, isAdmin);
-    log.info("Authenticated: email=%s cookie=%s", emailAddr, cookie);
     return cookie.toString();
   }
 

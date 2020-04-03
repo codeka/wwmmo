@@ -36,17 +36,19 @@ public class LoginHandler extends RequestHandler {
       throw new RequestException(400, "Bad login request.");
     }
 
-    log.info("Building OAuth credentials");
+    long startTime = System.currentTimeMillis();
+    log.debug("Building OAuth credentials");
     GoogleCredential credential = new GoogleCredential();
     Oauth2 oauth2 = new Oauth2.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
         .setApplicationName("wwmmo")
         .build();
 
     try {
-      log.info("Executing OAuth request...");
+      log.debug("Executing OAuth request...");
       Tokeninfo tokenInfo = oauth2.tokeninfo()
           .setAccessToken(getRequest().getParameter("authToken")).execute();
-      log.info("... done: %s audience: %s", tokenInfo.getEmail(), tokenInfo.getAudience());
+      log.info("OAuth complete in %dms: %s",
+          System.currentTimeMillis() - startTime, tokenInfo.getEmail());
 
       String emailAddr = tokenInfo.getEmail();
       String impersonateUser = getRequest().getParameter("impersonate");
