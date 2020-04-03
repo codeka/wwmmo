@@ -221,7 +221,7 @@ public class SqlStmt implements AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() throws SQLException {
     logStatement();
 
     for (SqlResult res : results) {

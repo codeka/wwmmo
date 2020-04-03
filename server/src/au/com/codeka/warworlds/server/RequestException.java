@@ -16,6 +16,8 @@ import au.com.codeka.common.protobuf.Messages;
 public class RequestException extends Exception {
   private static final long serialVersionUID = 1L;
 
+  private boolean skipLog;
+  private boolean logMessageOnly;
   private int httpErrorCode;
   private Messages.GenericError genericError;
   private List<Object> extraObjects;
@@ -70,6 +72,33 @@ public class RequestException extends Exception {
     }
     extraObjects.add(extraObject);
     return this;
+  }
+
+  /**
+   * Skip logging this exception entirely. Useful if you're going to log it in some other way.
+   */
+  public RequestException withSkipLog() {
+    this.skipLog = true;
+    return this;
+  }
+
+  /**
+   * When we log the exception, only log the message and not the whole stack trace, etc.
+   *
+   * Useful when you want to report an error to the client, but it's not necessarily a bug that
+   * needs to be traced and debugged.
+   */
+  public RequestException withLogMessageOnly() {
+    this.logMessageOnly = true;
+    return this;
+  }
+
+  boolean skipLog() {
+    return skipLog;
+  }
+
+  boolean logMessageOnly() {
+    return logMessageOnly;
   }
 
   private static String getExceptionDescription(Throwable e) {

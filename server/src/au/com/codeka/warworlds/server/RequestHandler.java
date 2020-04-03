@@ -110,11 +110,13 @@ public class RequestHandler {
           log.warning("Retrying concurrent modification.", e);
           continue;
         }
-        if (e.getHttpErrorCode() < 500) {
-          log.warning("Unhandled error in URL: " + request.getRequestURI(), e);
-        } else {
-          log.info("Request: " + getRequestDebugString(request));
-          log.error("Unhandled error in URL: " + request.getRequestURI(), e);
+        if (!e.skipLog()) {
+          if (e.logMessageOnly()) {
+            log.warning(
+                "%s %s: %s", request.getRequestURI(), getRequestDebugString(), e.getMessage());
+          } else {
+            log.error("%s %s", request.getRequestURI(), getRequestDebugString(), e);
+          }
         }
         e.populate(this.response);
         setResponseBody(e.getGenericError());
@@ -376,10 +378,8 @@ public class RequestHandler {
   /**
    * Get details about the given request as a string (for debugging).
    */
-  private String getRequestDebugString(HttpServletRequest request) {
-    return request.getRequestURI()
-        + "\nX-Real-IP: " + request.getHeader("X-Real-IP")
-        + "\nUser-Agent: " + request.getHeader("User-Agent")
-        + "\n";
+  private String getRequestDebugString() {
+    RequestContext ctx = RequestContext.i;
+    return String.format(Locale.ENGLISH, "[%d] [%s]", ctx.getEmpireId(), ctx.getIpAddress());
   }
 }

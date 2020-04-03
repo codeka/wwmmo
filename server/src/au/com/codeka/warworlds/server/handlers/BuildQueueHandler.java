@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server.handlers;
 
 import org.joda.time.DateTime;
 
+import java.sql.SQLException;
+
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
@@ -21,14 +23,10 @@ public class BuildQueueHandler extends RequestHandler {
   @Override
   protected void post() throws RequestException {
     Messages.BuildRequest build_request_pb = getRequestBody(Messages.BuildRequest.class);
-    try {
-      tryPost(build_request_pb);
-    } catch (Exception e) {
-      throw new RequestException(e);
-    }
+    tryPost(build_request_pb);
   }
 
-  private void tryPost(Messages.BuildRequest build_request_pb) throws Exception {
+  private void tryPost(Messages.BuildRequest build_request_pb) throws RequestException {
     try (Transaction t = DB.beginTransaction()) {
       Star star = new StarController(t).getStar(Integer.parseInt(build_request_pb.getStarKey()));
       if (star == null) {
@@ -75,7 +73,8 @@ public class BuildQueueHandler extends RequestHandler {
         if (!new EmpireController(t).withdrawCash(
             buildRequest.getEmpireID(), cost, audit_record_pb)) {
           throw new RequestException(400, Messages.GenericError.ErrorCode.InsufficientCash,
-              "You don't have enough cash to accelerate this build.");
+              "You don't have enough cash to accelerate this build.")
+              .withLogMessageOnly();
         }
 
         new BuildCompleteEvent(t).processImmediateBuildRequest(
@@ -98,6 +97,8 @@ public class BuildQueueHandler extends RequestHandler {
       Messages.BuildRequest.Builder build_request_pb_builder = Messages.BuildRequest.newBuilder();
       buildRequest.toProtocolBuffer(build_request_pb_builder);
       setResponseBody(build_request_pb_builder.build());
+    } catch (SQLException e) {
+      throw new RequestException(e);
     }
   }
 

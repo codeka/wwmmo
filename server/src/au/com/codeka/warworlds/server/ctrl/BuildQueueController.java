@@ -54,7 +54,8 @@ public class BuildQueueController {
         DesignManager.i.getDesign(buildRequest.getDesignKind(), buildRequest.getDesignID()));
 
     if (buildRequest.getCount() <= 0) {
-      throw new RequestException(400, "Cannot build negative count.");
+      log.warning("Cannot build a negative count.\n%s", buildRequest);
+      throw new RequestException(400, "Cannot build negative count.").withSkipLog();
     }
     if (buildRequest.getDesignKind() == DesignKind.SHIP
         && buildRequest.getCount() > design.getBuildCost().getMaxCount()
@@ -65,12 +66,14 @@ public class BuildQueueController {
     // check dependencies
     for (Design.Dependency dependency : design.getDependencies()) {
       if (!dependency.isMet(colony)) {
+        Design depDesign = DesignManager.i.getDesign(DesignKind.BUILDING, dependency.getDesignID());
         throw new RequestException(400,
             Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
             String.format("Cannot build %s as level %d %s is required.",
                 buildRequest.getDesign().getDisplayName(),
                 dependency.getLevel(),
-                design.getDisplayName()));
+                depDesign.getDisplayName()))
+            .withLogMessageOnly();
       }
     }
 
@@ -99,7 +102,8 @@ public class BuildQueueController {
           throw new RequestException(400,
               Messages.GenericError.ErrorCode.CannotBuildMaxPerColonyReached,
               String.format("Cannot build %s, maximum per colony reached.",
-                  buildRequest.getDesign().getDisplayName()));
+                  buildRequest.getDesign().getDisplayName()))
+              .withLogMessageOnly();
         }
       }
 
@@ -125,7 +129,8 @@ public class BuildQueueController {
             throw new RequestException(400,
                 Messages.GenericError.ErrorCode.CannotBuildMaxPerColonyReached,
                 String.format("Cannot build %s, maximum per empire reached.",
-                    buildRequest.getDesign().getDisplayName()));
+                    buildRequest.getDesign().getDisplayName()))
+                .withLogMessageOnly();
           }
         } catch (Exception e) {
           throw new RequestException(e);
@@ -147,7 +152,8 @@ public class BuildQueueController {
           throw new RequestException(400,
               Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
               String.format("Cannot upgrade %s, upgrade is already in progress.",
-                  buildRequest.getDesign().getDisplayName()));
+                  buildRequest.getDesign().getDisplayName()))
+              .withLogMessageOnly();
         }
       }
 
@@ -161,7 +167,8 @@ public class BuildQueueController {
         throw new RequestException(400,
             Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
             String.format("Cannot upgrade %s, original building no longer exists.",
-                buildRequest.getDesign().getDisplayName()));
+                buildRequest.getDesign().getDisplayName()))
+            .withLogMessageOnly();
       }
 
       // make sure the existing building isn't already at the maximum level
@@ -169,7 +176,8 @@ public class BuildQueueController {
         throw new RequestException(400,
             Messages.GenericError.ErrorCode.CannotBuildMaxLevelReached,
             String.format("Cannot update %s, already at maximum level.",
-                buildRequest.getDesign().getDisplayName()));
+                buildRequest.getDesign().getDisplayName()))
+            .withLogMessageOnly();
       }
 
       // check dependencies for this specific level
@@ -177,12 +185,15 @@ public class BuildQueueController {
           existingBuilding.getLevel() + 1);
       for (Design.Dependency dependency : dependencies) {
         if (!dependency.isMet(colony)) {
+          Design depDesign =
+              DesignManager.i.getDesign(DesignKind.BUILDING, dependency.getDesignID());
           throw new RequestException(400,
               Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
               String.format("Cannot upgrade %s as level %d %s is required.",
                   buildRequest.getDesign().getDisplayName(),
                   dependency.getLevel(),
-                  design.getDisplayName()));
+                  depDesign.getDisplayName()))
+              .withLogMessageOnly();
         }
       }
     }
@@ -190,7 +201,7 @@ public class BuildQueueController {
     if (buildRequest.getDesignKind() == DesignKind.SHIP
         && buildRequest.getExistingFleetID() != null) {
       ShipDesign shipDesign = (ShipDesign) design;
-      log.info(
+      log.debug(
           "BUILD : checking other upgrades for this ship. buildRequest.getExistingFleetID() = "
               + buildRequest.getExistingFleetID());
 
@@ -198,16 +209,17 @@ public class BuildQueueController {
       for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
         BuildRequest otherBuildRequest = (BuildRequest) baseBuildRequest;
         if (otherBuildRequest.getExistingFleetID() == null) {
-          log.info("BUILD : otherBuildRequest has existingFleetID == null");
+          log.debug("BUILD : otherBuildRequest has existingFleetID == null");
           continue;
         }
         if (otherBuildRequest.getExistingFleetID() == (int) buildRequest.getExistingFleetID()) {
           throw new RequestException(400,
               Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
               String.format("Cannot upgrade %s, upgrade is already in progress.",
-                  shipDesign.getDisplayName()));
+                  shipDesign.getDisplayName()))
+              .withLogMessageOnly();
         } else {
-          log.info(
+          log.debug(
               "BUILD : otherBuildRequest.getExistingFleetID() == "
                   + otherBuildRequest.getExistingFleetID());
         }
@@ -224,7 +236,8 @@ public class BuildQueueController {
         throw new RequestException(400,
             Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
             String.format("Cannot upgrade %s, original fleet no longer exists.",
-                shipDesign.getDisplayName()));
+                shipDesign.getDisplayName()))
+            .withLogMessageOnly();
       }
 
       // make sure the existing fleet doesn't already have the upgrade
@@ -232,7 +245,8 @@ public class BuildQueueController {
         throw new RequestException(400,
             Messages.GenericError.ErrorCode.CannotBuildMaxLevelReached,
             String.format("Cannot update %s, already has upgrade.",
-                shipDesign.getDisplayName()));
+                shipDesign.getDisplayName()))
+            .withLogMessageOnly();
       }
     }
   }

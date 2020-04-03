@@ -16,8 +16,8 @@ public class RequestContext {
   }
 
   /**
-   * Gets the current context "name", which will be the request URL for request handlers and the event details
-   * for event handlers.
+   * Gets the current context "name", which will be the request URL for request handlers and the
+   * event details for event handlers.
    */
   public String getContextName() {
     return getContext().name;
