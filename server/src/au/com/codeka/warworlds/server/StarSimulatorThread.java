@@ -10,6 +10,8 @@ import javax.annotation.Nullable;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.server.ctrl.StarController;
+import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.Star;
 
 /**
@@ -127,7 +129,7 @@ public class StarSimulatorThread {
   }
 
   private int simulateOneStar() {
-    try {
+    try (Transaction t = DB.beginTransaction()) {
       int starID = manager.getNextStar();
       if (starID == 0) {
         return WAIT_TIME_NO_STARS;
@@ -135,12 +137,14 @@ public class StarSimulatorThread {
       log.debug("Simulating star: " + starID);
       long startTime = System.currentTimeMillis();
 
-      Star star = new StarController().getStar(starID);
+      Star star = new StarController(t).getStar(starID);
       synchronized (statsLock) {
         stats.currentStar = star;
         stats.currentStarProcessingTime = System.currentTimeMillis();
       }
       if (star.getLastSimulation().isAfter(DateTime.now().minusHours(1))) {
+        t.commit();
+
         if (manager.hasMoreStarsToSimulate()) {
           // if there's more cached stars, just try again immediately.
           return 0;
@@ -156,7 +160,7 @@ public class StarSimulatorThread {
       new Simulation().simulate(star);
       long simulateEndTime = System.currentTimeMillis();
       // we don't ping event processor now, because we rather do it once every 50 stars or so.
-      new StarController().update(star, false);
+      new StarController(t).update(star, false);
 
       long endTime = System.currentTimeMillis();
       synchronized (statsLock) {
@@ -164,6 +168,8 @@ public class StarSimulatorThread {
         stats.totalTimeMs += endTime - startTime;
         stats.dbTimeMs += endTime - simulateEndTime;
       }
+
+      t.commit();
       return WAIT_TIME_NORMAL;
     } catch (Throwable e) {
       log.error("Exception caught simulating star!", e);
