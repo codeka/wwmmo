@@ -39,6 +39,7 @@ import android.widget.Toast;
 
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
@@ -154,11 +155,19 @@ public class WarWorldsActivity extends BaseActivity {
         long maxMemoryBytes = Runtime.getRuntime().maxMemory();
         int memoryClass = ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getMemoryClass();
 
+        String serverVersion = "?";
+        Messages.HelloResponse helloResponse = ServerGreeter.getHelloResponse();
+        if (helloResponse != null) {
+          serverVersion = helloResponse.getServerVersion();
+        }
         DecimalFormat formatter = new DecimalFormat("#,##0");
         String msg = String.format(Locale.ENGLISH,
-            "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s", memoryClass,
-            formatter.format(maxMemoryBytes), Util.getVersion(),
-            Util.isDebug() ? " (debug)" : " (rel)");
+            "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s Server: %s",
+            memoryClass,
+            formatter.format(maxMemoryBytes),
+            Util.getVersion(),
+            Util.isDebug() ? " (debug)" : "",
+            serverVersion);
         connectionStatus.setText(msg);
         connectionStatus.setTextColor(Color.WHITE);
         startGameButton.setEnabled(true);

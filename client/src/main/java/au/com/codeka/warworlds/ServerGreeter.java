@@ -30,6 +30,8 @@ import java.io.PrintStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.ErrorReporter;
 import au.com.codeka.common.Log;
@@ -58,6 +60,7 @@ public class ServerGreeter {
   private static boolean helloComplete;
   private static boolean helloSuccessful;
   private static ServerGreeting serverGreeting;
+  private static Messages.HelloResponse helloResponsePb;
 
   private static final String SAFETYNET_CLIENT_API_KEY = "AIzaSyAulj6q4uq0fd7WnJpzSY769U0aMCthogg";
 
@@ -98,6 +101,12 @@ public class ServerGreeter {
     EmpireManager.i.clearEmpire();
 
     BackgroundDetector.i.resetBackStack();
+  }
+
+  /** Gets the hello response we got from the server (or null if we haven't finished the hello). */
+  @Nullable
+  public static Messages.HelloResponse getHelloResponse() {
+    return helloResponsePb;
   }
 
   public static void waitForHello(Activity activity, HelloCompleteHandler handler) {
@@ -284,6 +293,7 @@ public class ServerGreeter {
         RequestManager.i.sendRequestSync(request);
         if (request.error() == null) {
           Messages.HelloResponse resp = request.body(Messages.HelloResponse.class);
+          helloResponsePb = resp;
           if (resp == null) {
             errorOccurred = true;
             return "Unknown error";

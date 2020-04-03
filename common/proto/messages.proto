@@ -415,6 +415,9 @@ message HelloResponse {
 
   // this is the list of all the stars this empire owns
   repeated int64 star_ids = 12;
+
+  // The version of the server.
+  optional string server_version = 13;
 }
 
 //

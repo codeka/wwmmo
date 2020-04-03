@@ -1,3 +1,16 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.ajoberstar.grgit:grgit-core:3.1.1'
+  }
+}
+
+import java.text.SimpleDateFormat
+import org.ajoberstar.grgit.Grgit
+
 apply plugin: 'java'
 apply plugin: 'application'
 
@@ -37,9 +50,26 @@ sourceSets {
 
 mainClassName = "au.com.codeka.warworlds.server.Runner"
 
+ext.buildDate = null
+compileJava.doLast {
+  buildDate = new Date()
+  jar.manifest {
+    attributes(
+        'Implementation-Version': '1.0.' + getVersionCodeFromGit() + '-' + new SimpleDateFormat("yyyyMMdd").format(project.buildDate)
+    )
+  }
+}
+tasks.jar.onlyIf { return project.buildDate != null}
+
 applicationDistribution.from("data/") {
   into "data"
 }
 applicationDistribution.from("scripts/") {
   into ""
+}
+
+def getVersionCodeFromGit() {
+  // Same as running:
+  // git rev-list <checked out branch name> | wc -l
+  return Grgit.open(dir: project.buildscript.sourceFile.parentFile.parent).log().size()
 }

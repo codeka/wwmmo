@@ -2,16 +2,20 @@ package au.com.codeka.warworlds.server.handlers;
 
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.json.webtoken.JsonWebSignature;
+import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.Manifest;
 
 import javax.net.ssl.SSLException;
 
@@ -44,6 +48,8 @@ public class HelloHandler extends RequestHandler {
   private static int[] minVersion = null;
   private static String minVersionStr = null;
 
+  private static String serverVersionStr = null;
+
   @Override
   protected void get() throws RequestException {
     // this is just used for testing, nothing more...
@@ -68,12 +74,11 @@ public class HelloHandler extends RequestHandler {
   }
 
   private void processHello(Messages.HelloRequest hello_request_pb) throws RequestException {
-    Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder();
     long startTime = System.currentTimeMillis();
 
-    // damn, this is why things should never be marked "required" in protobufs!
-    hello_response_pb
-        .setMotd(Messages.MessageOfTheDay.newBuilder().setMessage("").setLastUpdate(""));
+    Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder()
+        .setMotd(Messages.MessageOfTheDay.newBuilder().setMessage("").setLastUpdate(""))
+        .setServerVersion(getServerVersion());
 
     final String userAgent = getRequest().getHeader("User-Agent");
     ensureMinVersion(userAgent);
@@ -336,5 +341,12 @@ public class HelloHandler extends RequestHandler {
     }
 
     log.debug("Supported version number: %s (min-version: %s)", userAgent, minVersionStr);
+  }
+
+  private static String getServerVersion() {
+    if (serverVersionStr == null) {
+      serverVersionStr = HelloHandler.class.getPackage().getImplementationVersion();
+    }
+    return serverVersionStr;
   }
 }
