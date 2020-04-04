@@ -2,20 +2,16 @@ package au.com.codeka.warworlds.server.handlers;
 
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.json.webtoken.JsonWebSignature;
-import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.jar.Manifest;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLException;
@@ -28,6 +24,7 @@ import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.GameHistoryController;
 import au.com.codeka.warworlds.server.ctrl.LoginController;
@@ -106,6 +103,7 @@ public class HelloHandler extends RequestHandler {
     // fetch the empire we're interested in
     Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
     if (empire != null) {
+      ensureClientId(getSession());
       ensureSafetyNetAttestation(empire.getID(), attestationStatement);
 
       new StatisticsController().registerLogin(
@@ -200,6 +198,34 @@ public class HelloHandler extends RequestHandler {
     setResponseBody(hello_response_pb.build());
   }
 
+  private void ensureClientId(Session session) throws RequestException {
+    if (session.isAnonymous()) {
+      // Anonymous users don't log in, so we won't get the client ID.
+      return;
+    }
+
+    if (Configuration.i.getAllowNonProdClientLogins()) {
+      // We allow non-prod client to connect, so this one is OK.
+      return;
+    }
+
+    if (!session.getClientId().equals(Configuration.PROD_CLIENT_ID)) {
+      String clientId = session.getClientId();
+      if (clientId.equals(Configuration.DEV_CLIENT_ID)) {
+        clientId = "DEV";
+      }
+      log.warning("Connection from non-prod client (%s), rejecting.", clientId);
+      throw new RequestException(
+          400, Messages.GenericError.ErrorCode.UpgradeRequired,
+          "Please use the official app downloaded from the Play Store.");
+    }
+  }
+
+  /**
+   * Parses and validates the integrity of the SafetyNet attestation. This method doesn't verify
+   * the contents of the attestation (that's what
+   * {@link #ensureSafetyNetAttestation(int, SafetyNetAttestationStatement)} is for).
+   */
   private SafetyNetAttestationStatement validateSafetyNetJws(
       Messages.HelloRequest helloRequest) throws ValidationFailureException {
     JsonWebSignature jws;
@@ -271,7 +297,7 @@ public class HelloHandler extends RequestHandler {
 
     if (!pass) {
       throw new RequestException(400, Messages.GenericError.ErrorCode.ClientDeviceRejected,
-          "You are running an unsupported device. If you believe this to be in error, please " +
+          "You are running an unsupported device.\nIf you believe this to be in error, please " +
               "contact me via discord.")
           .withSkipLog();
     }
@@ -304,7 +330,7 @@ public class HelloHandler extends RequestHandler {
           throw new RequestException(
               400,
               Messages.GenericError.ErrorCode.ClientDeviceRejected,
-              String.format("Cannot connect while you have '%s' installed. Please disable or " +
+              String.format("Cannot connect while you have '%s' installed.\nPlease disable or " +
                   "uninstall it and try again.", clicker.getAppName()))
               .withLogMessageOnly();
         }
@@ -377,7 +403,7 @@ public class HelloHandler extends RequestHandler {
         throw new RequestException(
             426,
             Messages.GenericError.ErrorCode.UpgradeRequired,
-            "Unsupported version.");
+            "Upgrade required.\\nPlease update from the Play Store.");
       }
     }
 

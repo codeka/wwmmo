@@ -60,7 +60,8 @@ public class LoginController {
       }
     }
 
-    createSession(cookie.toString(), emailAddr, clientId, impersonateUser, isAdmin);
+    createSession(
+        cookie.toString(), emailAddr, clientId, impersonateUser, isAdmin, /* isAnonymous= */false);
     return cookie.toString();
   }
 
@@ -69,7 +70,8 @@ public class LoginController {
       String emailAddr,
       String clientId,
       @Nullable String impersonateUser,
-      boolean isAdmin) throws RequestException {
+      boolean isAdmin,
+      boolean isAnonymous) throws RequestException {
     int empireID = 0;
     int allianceID = 0;
     boolean banned = false;
@@ -103,7 +105,9 @@ public class LoginController {
     }
 
     Session session =
-        new Session(cookie, emailAddr, clientId, DateTime.now(), empireID, allianceID, isAdmin);
+        new Session(
+            cookie, emailAddr, clientId, DateTime.now(), empireID, allianceID, isAdmin,
+            isAnonymous);
     new SessionController().saveSession(session);
 
     return session;

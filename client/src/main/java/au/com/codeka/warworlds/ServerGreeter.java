@@ -345,7 +345,7 @@ public class ServerGreeter {
             needsReAuthenticate = false;
           } else if (request.error().getErrorCode()
               == Messages.GenericError.ErrorCode.UpgradeRequired.getNumber()) {
-            message = "Upgrade required.\nPlease update from the Play Store.";
+            message = request.error().getErrorMessage().replace("\\n", "\n");
             giveUpReason = GiveUpReason.UPGRADE_REQUIRED;
             errorOccurred = true;
             needsReAuthenticate = false;

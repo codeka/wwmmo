@@ -22,6 +22,7 @@ import okhttp3.Response;
 
 public class Authenticator {
   private static final Log log = new Log("Authenticator");
+
   private String authCookie;
   private boolean authenticating;
 

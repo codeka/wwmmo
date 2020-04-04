@@ -14,6 +14,10 @@
   // The number of star simulation threads to run, set to 0 to disable star simulations.
   "numStarSimulationThreads": 1,
 
+  // If true, we'll allow non-prod clients to log in. By default, only the prod client (from the
+  // Play Store) is allowed to log in.
+  "allowNonProdClientLogins": false,
+
   // Database configuration
   "database": {
     "server": "localhost",
@@ -55,5 +59,25 @@
     "clientId": "",
     "clientSecret": "",
     "redirectUri": ""
+  },
+
+  // A list of auto-clicker that, if the user has installed on their device, we will reject
+  // connections from.
+  "clickers": [
+    {
+      // Name is the component name of the clicker's accessibility service. appName is the name
+      // we display to the end user as the reason they've been kicked out.
+      "name": "simplehat.clicker/simplehat.automaticclicker.services.AccessibilityService",
+      "appName": "QuickTouch - Automatic Clicker"
+    }
+  ],
+
+  // Configration describing how we handle SafetyNet attestation.
+  "safetyNet": {
+    // If false, we ignore safetynet attestation entirely.
+    "enabled": false,
+
+    // A list of empires for which we allow to log in even if they fail attestation.
+    "exemptedEmpires": [322]
   }
 }

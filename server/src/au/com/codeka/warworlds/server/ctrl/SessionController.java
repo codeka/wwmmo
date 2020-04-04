@@ -41,7 +41,7 @@ public class SessionController {
               // Anonymous cookies are OK, we always accept them.
               log.info("Session cookie indicates anonymous user: %s", cookie.replace('_', '@'));
               return new LoginController().createSession(
-                  cookie, cookie.replace('_', '@'), "", null, false);
+                  cookie, cookie.replace('_', '@'), "", null, /* isAdmin= */false, /* isAnonymous= */true);
             }
 
             if (session != null) {

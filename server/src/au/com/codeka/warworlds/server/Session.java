@@ -20,6 +20,7 @@ public class Session {
   private int empireID;
   private Integer allianceID;
   private boolean isAdmin;
+  private boolean isAnonymous;
 
   public Session() {
   }
@@ -50,7 +51,7 @@ public class Session {
   }
 
   public Session(String cookie, String email, String clientId, DateTime loginTime, int empireID,
-      Integer allianceID, boolean isAdmin) {
+      Integer allianceID, boolean isAdmin, boolean isAnonymous) {
     this.cookie = cookie;
     actualEmail = email;
     this.email = actualEmail;
@@ -59,6 +60,7 @@ public class Session {
     this.empireID = empireID;
     this.allianceID = allianceID;
     this.isAdmin = isAdmin;
+    this.isAnonymous = isAnonymous;
   }
 
   public String getCookie() {
@@ -103,6 +105,10 @@ public class Session {
 
   public boolean isAdmin() {
     return isAdmin;
+  }
+
+  public boolean isAnonymous() {
+    return isAnonymous;
   }
 
   public Session impersonate(String email, int empireID) {

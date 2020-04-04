@@ -16,6 +16,11 @@ import com.google.gson.stream.JsonReader;
 public class Configuration {
   public static Configuration i;
 
+  public static final String PROD_CLIENT_ID =
+      "1021675369049-85dehn126ib087kkc270k0lko6ahv2h7.apps.googleusercontent.com";
+  public static final String DEV_CLIENT_ID =
+      "1021675369049-kh3j8g9m8ugkrqamllddh3v0coss7gc8.apps.googleusercontent.com";
+
   /** Loads the {@link Configuration} from the given file and sets it to {@code Configuration.i}. */
   public static void loadConfig() throws FileNotFoundException {
     String fileName = System.getProperty("au.com.codeka.warworlds.server.ConfigFile");
@@ -40,6 +45,7 @@ public class Configuration {
   @Expose private ResetsConfig resets;
   @Expose private PatreonConfig patreon;
   @Expose private String requestStatsDirectory;
+  @Expose private boolean allowNonProdClientLogins;
   @Expose private ClickerConfig[] clickers;
   @Expose private SafetyNetConfig safetyNet;
 
@@ -86,6 +92,11 @@ public class Configuration {
 
   public String getRequestStatsDirectory() {
     return requestStatsDirectory;
+  }
+
+  /** If true, we'll allow non-prod clients to log in. Default is false. */
+  public boolean getAllowNonProdClientLogins() {
+    return allowNonProdClientLogins;
   }
 
   public ClickerConfig[] getClickers() {
