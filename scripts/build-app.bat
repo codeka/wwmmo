@@ -7,11 +7,11 @@ CD ..
 SET ROOTPATH=%CD%
 POPD
 
-SET APKPATH=%ROOTPATH%\client\build\outputs\apk\release\client-release.apk
+SET APKPATH=%ROOTPATH%\client\build\outputs\bundle\release\client-release.aab
 
 PUSHD %ROOTPATH%
-CALL gradlew.bat --daemon :client:assembleRelease
+CALL gradlew.bat --daemon :client:bundleRelease
 POPD
 
-COPY %APKPATH% %ROOTPATH%\..\deploy\client\wwmmo-0.9.9999.apk
+COPY %APKPATH% %ROOTPATH%\..\deploy\client\wwmmo-0.9.9999.aab
 
