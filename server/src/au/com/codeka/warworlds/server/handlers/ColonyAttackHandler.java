@@ -31,12 +31,14 @@ public class ColonyAttackHandler extends RequestHandler {
       }
       if (colony == null) {
         throw new RequestException(404, Messages.GenericError.ErrorCode.CannotAttackColonyGone,
-            "No colony found on this planet.");
+            "No colony found on this planet.")
+            .withLogMessageOnly();
       }
 
       if (colony.getEmpireID() != null && colony.getEmpireID() == getSession().getEmpireID()) {
         throw new RequestException(400, Messages.GenericError.ErrorCode.CannotAttackOwnColony,
-            "Cannot attack your own colony.");
+            "Cannot attack your own colony.")
+            .withLogMessageOnly();
       }
 
       Simulation sim = new Simulation();

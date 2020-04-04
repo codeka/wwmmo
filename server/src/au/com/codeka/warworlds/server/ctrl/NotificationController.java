@@ -60,8 +60,7 @@ public class NotificationController {
   }
 
   /** Send a notification to the given empire, but only if they're currently online. */
-  public void sendNotificationToOnlineEmpire(int empireID, String name, String value)
-      throws RequestException {
+  public void sendNotificationToOnlineEmpire(int empireID, String name, String value) {
     Notification notification = new Notification(name, value);
     if (!handlers.sendNotification(empireID, notification)) {
       recentNotifications.addNotification(empireID, notification);
@@ -70,8 +69,7 @@ public class NotificationController {
 
   /** Send a notification to all empires in the given alliance who are currently online. */
   public void sendNotificationToOnlineAlliance(
-      int allianceID, String name, String value, @Nullable Set<Integer> exclusions)
-      throws RequestException {
+      int allianceID, String name, String value, @Nullable Set<Integer> exclusions) {
     Notification notification = new Notification(name, value);
     handlers.sendNotificationToAlliance(allianceID, notification, exclusions);
   }

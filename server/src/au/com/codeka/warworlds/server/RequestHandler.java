@@ -98,17 +98,27 @@ public class RequestHandler {
           } catch (InterruptedException e1) {
             // Ignore.
           }
-          log.warning("Retrying deadlock.", e);
+          log.warning(
+              "%s %s: deadlock, retrying",
+              request.getRequestURI(), getRequestDebugString());
           continue;
         }
-        if (cause instanceof SqlConcurrentModificationException && supportsRetryOnDeadlock()) {
-          try {
-            Thread.sleep(50 + new Random().nextInt(100));
-          } catch (InterruptedException e1) {
-            // Ignore.
+        if (cause instanceof SqlConcurrentModificationException) {
+          if (supportsRetryOnDeadlock()) {
+            try {
+              Thread.sleep(50 + new Random().nextInt(100));
+            } catch (InterruptedException e1) {
+              // Ignore.
+            }
+            log.warning(
+                "%s %s: concurrent modification, retrying",
+                request.getRequestURI(), getRequestDebugString());
+            continue;
           }
-          log.warning("Retrying concurrent modification.", e);
-          continue;
+
+          log.warning(
+              "%s %s: concurrent modification, aborting", request.getRequestURI(),
+              getRequestDebugString());
         }
         if (!e.skipLog()) {
           if (e.logMessageOnly()) {

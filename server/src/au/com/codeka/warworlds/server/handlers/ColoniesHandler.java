@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.sql.SQLException;
+
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Simulation;
@@ -40,7 +42,8 @@ public class ColoniesHandler extends RequestHandler {
         if (colony.getPlanetIndex() == planetIndex) {
           throw new RequestException(400,
               Messages.GenericError.ErrorCode.CannotColonizePlanetAlreadyHasColony,
-              "There is already a colony on this planet.");
+              "There is already a colony on this planet.")
+              .withLogMessageOnly();
         }
       }
 
@@ -97,7 +100,7 @@ public class ColoniesHandler extends RequestHandler {
       setResponseBody(colony_pb.build());
 
       t.commit();
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }

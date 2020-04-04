@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import au.com.codeka.warworlds.server.RequestException;
@@ -27,7 +28,7 @@ public class FleetController {
       db.createFleet(fleet);
       star.getFleets().add(fleet);
       return fleet;
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
@@ -62,7 +63,7 @@ public class FleetController {
         stmt.setInt(1, fleet.getID());
         stmt.update();
         star.getFleets().remove(fleet);
-      } catch (Exception e) {
+      } catch (SQLException e) {
         throw new RequestException(e);
       }
     } else {
@@ -72,7 +73,7 @@ public class FleetController {
         stmt.setInt(2, fleet.getID());
         stmt.update();
         fleet.setNumShips(fleet.getNumShips() - numShips);
-      } catch (Exception e) {
+      } catch (SQLException e) {
         throw new RequestException(e);
       }
     }
@@ -87,7 +88,7 @@ public class FleetController {
       super(trans);
     }
 
-    public void createFleet(Fleet fleet) throws Exception {
+    public void createFleet(Fleet fleet) throws SQLException {
       String sql = "INSERT INTO fleets (sector_id, star_id, design_id, empire_id," +
           " num_ships, stance, state, state_start_time, notes)" +
           " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -110,7 +111,7 @@ public class FleetController {
       }
     }
 
-    public void addUpgrade(FleetUpgrade upgrade) throws Exception {
+    public void addUpgrade(FleetUpgrade upgrade) throws SQLException {
       String sql = "INSERT INTO fleet_upgrades (star_id, fleet_id, upgrade_id) VALUES (?, ?, ?)";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, upgrade.getStarID());

@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -66,15 +68,23 @@ public class StarController {
   }
 
   public Star getStar(int id) throws RequestException {
-    List<Star> stars = db.getStars(new int[]{id});
-    if (stars.isEmpty()) {
-      throw new RequestException(404);
+    try {
+      List<Star> stars = db.getStars(new int[]{id});
+      if (stars.isEmpty()) {
+        throw new RequestException(404);
+      }
+      return stars.get(0);
+    } catch (SQLException e) {
+      throw new RequestException(e);
     }
-    return stars.get(0);
   }
 
   public List<Star> getStars(int[] ids) throws RequestException {
-    return db.getStars(ids);
+    try {
+      return db.getStars(ids);
+    } catch (SQLException e) {
+      throw new RequestException(e);
+    }
   }
 
   public List<Star> getStars(Collection<Integer> ids) throws RequestException {
@@ -83,7 +93,11 @@ public class StarController {
     for (Integer id : ids) {
       idArray[i++] = id;
     }
-    return db.getStars(idArray);
+    try {
+      return db.getStars(idArray);
+    } catch (SQLException e) {
+      throw new RequestException(e);
+    }
   }
 
   @Deprecated
@@ -91,7 +105,7 @@ public class StarController {
     Alliance alliance = new AllianceController().getAlliance(allianceID);
     try {
       return db.getWormholesForAlliance(alliance);
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
@@ -127,11 +141,7 @@ public class StarController {
   }
 
   public void update(Star star, boolean pingEventProcessor) throws RequestException {
-    try {
-      updateNoRetry(star);
-    } catch (Exception e) {
-      throw new RequestException(e, star);
-    }
+    updateNoRetry(star);
 
     if (pingEventProcessor) {
       // we may need to ping the event processor if a build time change, or whatever.
@@ -139,16 +149,21 @@ public class StarController {
     }
   }
 
-  private void updateNoRetry(Star star) throws Exception {
-    if (db.getTransaction() == null) {
-      updateNoRetryNewTransaction(star);
-      return;
+  private void updateNoRetry(Star star) throws RequestException {
+    try {
+      if (db.getTransaction() == null) {
+        updateNoRetryNewTransaction(star);
+        return;
+      }
+      db.updateStar(star);
+    } catch (SQLException | SqlConcurrentModificationException e) {
+      throw new RequestException(e);
     }
-    db.updateStar(star);
     removeEmpirePresences(star.getID());
   }
 
-  private void updateNoRetryNewTransaction(Star star) throws Exception {
+  private void updateNoRetryNewTransaction(Star star)
+      throws SQLException, RequestException, SqlConcurrentModificationException {
     try(Transaction t = DB.beginTransaction()) {
       DataBase tdb = new DataBase(t);
       tdb.updateStar(star);
@@ -169,16 +184,13 @@ public class StarController {
     try (SqlStmt stmt = db.prepare(sql)) {
       stmt.setInt(1, starID);
       stmt.update();
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
 
   /**
    * "Sanitizes" a star and removes all info specific to other empires.
-   *
-   * @param star
-   * @param myEmpireID
    */
   public void sanitizeStar(Star star, int myEmpireID,
                            ArrayList<BuildingPosition> buildings,
@@ -196,6 +208,7 @@ public class StarController {
       Fleet fleet = (Fleet) baseFleet;
       if (fleet.getEmpireID() != null && fleet.getEmpireID() == myEmpireID) {
         removeFleets = false;
+        break;
       }
     }
     // ... unless we have a radar on a nearby star
@@ -266,7 +279,7 @@ public class StarController {
       Fleet fleet = (Fleet) baseFleet;
       if (fleet.hasUpgrade("cloak") && fleet.getEmpireID() != myEmpireID) {
         if (fleetsToRemove == null) {
-          fleetsToRemove = new ArrayList<Fleet>();
+          fleetsToRemove = new ArrayList<>();
         }
         fleetsToRemove.add(fleet);
       }
@@ -277,7 +290,7 @@ public class StarController {
 
     // remove build requests that aren't ours
     if (star.getBuildRequests() != null) {
-      ArrayList<BaseBuildRequest> toRemove = new ArrayList<BaseBuildRequest>();
+      ArrayList<BaseBuildRequest> toRemove = new ArrayList<>();
       for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
         BuildRequest buildRequest = (BuildRequest) baseBuildRequest;
         if (buildRequest.getEmpireID() != myEmpireID) {
@@ -289,7 +302,7 @@ public class StarController {
 
     // remove all scout reports that aren't ours
     if (star.getScoutReports() != null) {
-      ArrayList<BaseScoutReport> toRemove = new ArrayList<BaseScoutReport>();
+      ArrayList<BaseScoutReport> toRemove = new ArrayList<>();
       for (BaseScoutReport baseScoutReport : star.getScoutReports()) {
         ScoutReport scoutReport = (ScoutReport) baseScoutReport;
         if (!scoutReport.getEmpireKey().equals(Integer.toString(myEmpireID))) {
@@ -317,7 +330,7 @@ public class StarController {
       super(trans);
     }
 
-    public List<Star> getStars(int[] ids) throws RequestException {
+    public List<Star> getStars(int[] ids) throws RequestException, SQLException {
       if (ids.length == 0) {
         return new ArrayList<>();
       }
@@ -339,8 +352,6 @@ public class StarController {
         if (stars.isEmpty()) {
           return stars;
         }
-      } catch (Exception e) {
-        throw new RequestException(e);
       }
 
       int[] starIds = new int[stars.size()];
@@ -354,22 +365,18 @@ public class StarController {
       }
 
       String inClause = buildInClause(starIds);
-      try {
-        populateEmpires(stars, inClause);
-        populateColonies(stars, inClause);
-        populateFleets(stars, inClause);
-        populateBuildings(stars, inClause);
-        populateBuildRequests(stars, inClause);
-        checkNativeColonies(stars);
-        populateCombatReports(stars, inClause);
-      } catch (Exception e) {
-        throw new RequestException(e);
-      }
+      populateEmpires(stars, inClause);
+      populateColonies(stars, inClause);
+      populateFleets(stars, inClause);
+      populateBuildings(stars, inClause);
+      populateBuildRequests(stars, inClause);
+      checkNativeColonies(stars);
+      populateCombatReports(stars, inClause);
       return stars;
     }
 
     @Deprecated
-    public List<Star> getWormholesForAlliance(Alliance alliance) throws Exception {
+    public List<Star> getWormholesForAlliance(Alliance alliance) throws SQLException {
       String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
           " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
           " extra, last_simulation, time_emptied, mod_counter" +
@@ -400,7 +407,7 @@ public class StarController {
         int empireId,
         @Nullable String name,
         int startIndex,
-        int count) throws Exception {
+        int count) throws SQLException {
       String sql = "SELECT stars.id, sector_id, stars.name, sectors.x AS sector_x," +
           " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets, extra," +
           " last_simulation, time_emptied, mod_counter" +
@@ -436,7 +443,7 @@ public class StarController {
       }
     }
 
-    public int addStar(int sectorID, int x, int y, int size, String name, Star.Type starType, Planet[] planets) throws Exception {
+    public int addStar(int sectorID, int x, int y, int size, String name, Star.Type starType, Planet[] planets) throws SQLException {
       String sql = "INSERT INTO stars (sector_id, x, y, size, name, star_type, planets, last_simulation, time_emptied, mod_counter)" +
           " VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), 1)";
       try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -463,7 +470,7 @@ public class StarController {
       }
     }
 
-    public void updateStar(Star star) throws Exception {
+    public void updateStar(Star star) throws SQLException, SqlConcurrentModificationException {
       String sql = "UPDATE stars SET" +
           " last_simulation = ?," +
           " name = ?," +
@@ -536,7 +543,7 @@ public class StarController {
       }
     }
 
-    private void updateEmpires(Star star) throws Exception {
+    private void updateEmpires(Star star) throws SQLException {
       final String sql = "UPDATE empire_presences SET" +
           " total_goods = ?," +
           " total_minerals = ?," +
@@ -555,7 +562,7 @@ public class StarController {
       }
     }
 
-    private void updateColonies(Star star) throws Exception {
+    private void updateColonies(Star star) throws SQLException {
       boolean needDelete = false;
 
       final float MIN_POPULATION = 0.0001f;
@@ -653,7 +660,7 @@ public class StarController {
       }
     }
 
-    private void updateFleets(Star star) throws Exception {
+    private void updateFleets(Star star) throws SQLException {
       boolean needInsert = false;
       boolean needDelete = false;
       DateTime now = DateTime.now();
@@ -673,8 +680,8 @@ public class StarController {
       try (SqlStmt stmt = prepare(sql)) {
         for (BaseFleet baseFleet : star.getFleets()) {
           if (baseFleet.getNumShips() < 0) {
-            throw new RequestException(500,
-                "Cannot have < 0 ships in a fleet. StarID=" + star.getID());
+            // Ignore fleets with negative ships.
+            continue;
           }
 
           if (baseFleet.getKey() == null) {
@@ -748,12 +755,10 @@ public class StarController {
               stmt.update();
             }
           }
-        } catch (Exception e) {
-          throw new RequestException(e);
         }
 
         sql = "DELETE FROM fleets WHERE id = ?";
-        ArrayList<BaseFleet> toRemove = new ArrayList<BaseFleet>();
+        ArrayList<BaseFleet> toRemove = new ArrayList<>();
         try (SqlStmt stmt = prepare(sql)) {
           for (BaseFleet baseFleet : star.getFleets()) {
             if (baseFleet.getTimeDestroyed() != null && baseFleet.getTimeDestroyed().isBefore(now)) {
@@ -765,13 +770,11 @@ public class StarController {
           }
 
           star.getFleets().removeAll(toRemove);
-        } catch (Exception e) {
-          throw new RequestException(e);
         }
       }
     }
 
-    private void updateFleetUpgrades(Star star) throws Exception {
+    private void updateFleetUpgrades(Star star) throws SQLException {
       String sql = "DELETE FROM fleet_upgrades WHERE star_id = ?";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, star.getID());
@@ -801,7 +804,7 @@ public class StarController {
       }
     }
 
-    private void updateBuildRequests(Star star) throws Exception {
+    private void updateBuildRequests(Star star) throws SQLException {
       String sql =
           "UPDATE build_requests " +
           "SET progress = ?," +
@@ -820,7 +823,7 @@ public class StarController {
       }
     }
 
-    private void updateCombatReport(Star star, CombatReport combatReport) throws Exception {
+    private void updateCombatReport(Star star, CombatReport combatReport) throws SQLException {
       Messages.CombatReport.Builder pb = Messages.CombatReport.newBuilder();
       combatReport.toProtocolBuffer(pb);
 
@@ -849,7 +852,7 @@ public class StarController {
       }
     }
 
-    private void populateColonies(List<Star> stars, String inClause) throws Exception {
+    private void populateColonies(List<Star> stars, String inClause) throws SQLException {
       String sql = "SELECT * FROM colonies WHERE star_id IN " + inClause;
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
@@ -870,7 +873,7 @@ public class StarController {
       }
     }
 
-    private void populateFleets(List<Star> stars, String inClause) throws Exception {
+    private void populateFleets(List<Star> stars, String inClause) throws SQLException {
       String sql = "SELECT fleets.*, empires.alliance_id" +
           " FROM fleets" +
           " LEFT OUTER JOIN empires ON empires.id = fleets.empire_id" +
@@ -909,7 +912,7 @@ public class StarController {
       }
     }
 
-    private void populateEmpires(List<Star> stars, String inClause) throws Exception {
+    private void populateEmpires(List<Star> stars, String inClause) throws SQLException {
       String sql = "SELECT * FROM empire_presences WHERE star_id IN " + inClause;
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
@@ -930,7 +933,7 @@ public class StarController {
       }
     }
 
-    private void populateBuildRequests(List<Star> stars, String inClause) throws Exception {
+    private void populateBuildRequests(List<Star> stars, String inClause) throws SQLException {
       String sql = "SELECT * FROM build_requests WHERE star_id IN " + inClause;
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
@@ -953,7 +956,7 @@ public class StarController {
       }
     }
 
-    private void populateBuildings(List<Star> stars, String inClause) throws Exception {
+    private void populateBuildings(List<Star> stars, String inClause) throws SQLException {
       String sql = "SELECT * FROM buildings WHERE star_id IN " + inClause;
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
@@ -977,7 +980,7 @@ public class StarController {
       }
     }
 
-    private void populateCombatReports(List<Star> stars, String inClause) throws Exception {
+    private void populateCombatReports(List<Star> stars, String inClause) throws SQLException {
       String sql = "SELECT star_id, rounds FROM combat_reports WHERE star_id IN " + inClause;
       sql += " AND end_time > ?";
       try (SqlStmt stmt = prepare(sql)) {
@@ -986,7 +989,13 @@ public class StarController {
 
         while (res.next()) {
           int starID = res.getInt(1);
-          Messages.CombatReport pb = Messages.CombatReport.parseFrom(res.getBytes(2));
+          Messages.CombatReport pb = null;
+          try {
+            pb = Messages.CombatReport.parseFrom(res.getBytes(2));
+          } catch (InvalidProtocolBufferException e) {
+            log.error("Unexpected.", e);
+            continue;
+          }
           CombatReport combatReport = new CombatReport();
           combatReport.fromProtocolBuffer(pb);
 
@@ -1004,7 +1013,7 @@ public class StarController {
      * Checks if any of the stars in the given list need native colonies added, and adds them
      * if so.
      */
-    private void checkNativeColonies(List<Star> stars) throws Exception {
+    private void checkNativeColonies(List<Star> stars) throws SQLException, RequestException {
       for (Star star : stars) {
         // marker and wormhole don't get colonies anyway
         if (star.getStarType().getType() == Star.Type.Marker ||
@@ -1027,8 +1036,8 @@ public class StarController {
       }
     }
 
-    private void addNativeColonies(Star star) throws Exception {
-      ArrayList<Planet> planets = new ArrayList<Planet>();
+    private void addNativeColonies(Star star) throws SQLException, RequestException {
+      ArrayList<Planet> planets = new ArrayList<>();
       for (int i = 0; i < star.getPlanets().length; i++) {
         planets.add((Planet) star.getPlanets()[i]);
       }
@@ -1051,7 +1060,8 @@ public class StarController {
       int numColonies = rand.nextInt(Math.min(3, planets.size() - 1)) + 1;
       for (int i = 0; i < numColonies; i++) {
         Planet planet = planets.get(i);
-        Colony colony = new ColonyController(getTransaction()).colonize(null, star, planet.getIndex(), 100.0f);
+        Colony colony = new ColonyController(getTransaction())
+            .colonize(null, star, planet.getIndex(), 100.0f);
         colony.setConstructionFocus(0.0f);
         colony.setPopulationFocus(0.5f);
         colony.setFarmingFocus(0.5f);
@@ -1070,7 +1080,11 @@ public class StarController {
       Simulation sim = new Simulation();
       sim.simulate(star);
 
-      updateStar(star);
+      try {
+        updateStar(star);
+      } catch (SqlConcurrentModificationException e) {
+        throw new RequestException(e);
+      }
     }
   }
 }
