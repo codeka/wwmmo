@@ -30,7 +30,7 @@ public class CronRunnerThread extends Thread {
     }
 
     try {
-      thread.join();
+      thread.join(TimeUnit.SECONDS.toMicros(20)); // Wait 20 seconds.
     } catch (InterruptedException e) {
       log.error("Exception waiting for cron runner thread.", e);
     }

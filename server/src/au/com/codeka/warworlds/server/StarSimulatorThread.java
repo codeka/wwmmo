@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -55,7 +56,7 @@ public class StarSimulatorThread {
     stopped = true;
     try {
       thread.interrupt();
-      thread.join();
+      thread.join(TimeUnit.SECONDS.toMicros(10)); // Wait up to 20 seconds.
     } catch (InterruptedException e) {
       // ignore
     }
