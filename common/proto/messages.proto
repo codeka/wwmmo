@@ -1482,3 +1482,69 @@ message RequestStatHour {
 
   repeated RequestStatSingle request = 6;
 }
+
+// A snapshot of the metrics at a single point in time.
+message MetricsSnapshot {
+  // The time this snapshot was generated.
+  optional int64 time = 1;
+
+  // A Gauge just counts "things", e.g. number of connected users, open connections and so on.
+  // Note that the metrics API separates gauges and counters, but we consolidate them here, since
+  // they are the same.
+  message Gauge {
+    optional int64 value = 1;
+  }
+
+  // A timer is a combination of a meter (for the rate of events) and a histogram of the timings
+  // of those events.
+  message Timer {
+    // A meter of the rate this timer has been fired.
+    optional Meter meter = 1;
+    // A histogram of the timings of this timer.
+    optional Histogram histogram = 2;
+  }
+
+  // A meter measures a rate, requests per second, errors per second etc.
+  message Meter {
+    optional int64 count = 1;
+    optional double mean_rate = 2;
+    optional double m1_rate = 3;
+    optional double m5_rate = 4;
+    optional double m15_rate = 5;
+
+  }
+
+  // A histogram is used when meaning disparate values. For example, response size, timings, etc.
+  message Histogram {
+    optional double min = 1;
+    optional double max = 2;
+    optional double mean = 3;
+    optional double median = 4;
+    optional double std_dev = 5;
+
+    optional double p75 = 6;
+    optional double p95 = 7;
+    optional double p98 = 8;
+    optional double p99 = 9;
+    optional double p999 = 10;
+  }
+
+  message Metric {
+    optional string name = 1;
+
+    oneof Type {
+      Gauge gauge = 2;
+      Timer timer = 3;
+      Meter meter = 4;
+      Histogram histogram = 5;
+    }
+  }
+  repeated Metric metric = 2;
+}
+
+// MetricsHistory just contains the last 48 hours of snapshots.
+message MetricsHistory {
+  // The snapshots. The first entry is the most recent one, the next one is from 5 minutes ago, the
+  // one after that is 10 minutes and so on.
+  repeated MetricsSnapshot snapshot = 1;
+}

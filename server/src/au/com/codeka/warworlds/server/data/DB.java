@@ -28,7 +28,7 @@ public class DB {
       schemaName = dbconfig.getSchema();
 
       HikariConfig config = new HikariConfig();
-      config.setPoolName("main");
+      config.setPoolName("db");
       config.setMaximumPoolSize(100);
       config.setMinimumIdle(8);
       config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");

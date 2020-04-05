@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jetty9.InstrumentedHandler;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -17,10 +20,11 @@ import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.handlers.*;
 import au.com.codeka.warworlds.server.handlers.admin.*;
+import au.com.codeka.warworlds.server.metrics.MetricsManager;
 import au.com.codeka.warworlds.server.monitor.MonitorManager;
 import au.com.codeka.warworlds.server.monitor.RequestSuspendedException;
 
-public class RequestRouter extends AbstractHandler {
+public class RequestRouter extends InstrumentedHandler {
   private static final Log log = new Log("RequestRouter");
   private static ArrayList<Route> sRoutes;
 
@@ -130,7 +134,7 @@ public class RequestRouter extends AbstractHandler {
     sRoutes.add(new Route("admin/(?<path>empire/ban)", AdminEmpireBanHandler.class, "admin/"));
     sRoutes.add(new Route("admin/users", AdminUsersHandler.class, "admin/"));
     sRoutes.add(new Route("admin/(?<path>cron)", AdminCronHandler.class, "admin/"));
-    sRoutes.add(new Route("admin/metrics/json", AdminMetricsHandler.class));
+    sRoutes.add(new Route("admin/metrics", AdminMetricsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/(?<path>.+)", AdminGenericHandler.class, "admin/"));
     sRoutes.add(new Route("admin/?", AdminDashboardHandler.class));
 
@@ -147,9 +151,15 @@ public class RequestRouter extends AbstractHandler {
     sRoutes.add(new Route("/(?<path>[^/]+)", true, StaticFileHandler.class, "/"));
   }
 
+  public RequestRouter() {
+    super(MetricsManager.i.getMetricsRegistry(), "handler");
+  }
+
   @Override
   public void handle(String target, Request baseRequest, HttpServletRequest request,
                      HttpServletResponse response) throws IOException, ServletException {
+    super.handle(target, baseRequest, request, response);
+
     for (Route route : sRoutes) {
       Matcher matcher = route.pattern.matcher(target);
       if (matcher.matches()) {

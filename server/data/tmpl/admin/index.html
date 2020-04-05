@@ -2,6 +2,7 @@
 {% block "title" %}Dashboard{% end %}
 {% block "head" %}
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript" src="/realms/{{realm}}/js/metrics.js"></script>
 {% end %}
 {% block "content" %}
   <h1>Active Empires</h1>
@@ -62,46 +63,7 @@
   </script>
 
 <h1>Requests</h1>
-<div id="requestsGraph" style="width: 100%; margin: 0 auto;"></div>
-<script type="text/javascript">
-    // keep the width/height ratio of the graph nice
-    var ratio = 0.2;
-    $("#requestsGraph").css("height", $("#requestsGraph").width() * ratio);
-
-    google.load("visualization", "1", {packages:["corechart"]});
-    google.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-      var dataTable = new google.visualization.DataTable();
-      dataTable.addColumn("datetime", "Date");
-      dataTable.addColumn("number", "Total requests");{% for id,emp in top_request_empires %}
-      dataTable.addColumn("number", "{{emp.displayName}}");
-      {% end %}
-      dataTable.addRows([
-      {% for entry in request_graph %}
-        [
-          new Date({{ entry.date.getMillis() }}),
-          {{entry.total}},
-          {% for id,emp in top_request_empires %}
-            {% if entry[emp.ID] %}{{ entry[emp.ID] }}{% else %}0{% end %},
-          {% end %}
-        ],
-      {% end %}
-      ]);
-
-      var dataView = new google.visualization.DataView(dataTable);
-
-      var width = $("#requestsGraph").width();
-      var height = $("#requestsGraph").height();
-      var options = {
-        "chartArea": {left: 50, top: 10, width: width - 200, height: height - 80},
-        "backgroundColor": {fill: "transparent"}
-      };
-
-      var chart = new google.visualization.LineChart(document.getElementById("requestsGraph"));
-      chart.draw(dataView, options);
-
-    }
-  </script>
+<div id="requestsGraph" class="metrics-graph" data-type="timer" data-name="handler.requests"
+     style="width: 50%; margin: 0 auto;"></div>
 
 {% end %}
