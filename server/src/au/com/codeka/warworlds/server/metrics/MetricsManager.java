@@ -24,10 +24,12 @@ public class MetricsManager {
   }
 
   public void start() {
+    store.start();
     reporter.start();
   }
 
   public void stop() {
     reporter.stop();
+    store.stop();
   }
 }

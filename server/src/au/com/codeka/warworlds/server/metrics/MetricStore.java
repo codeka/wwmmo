@@ -1,6 +1,16 @@
 package au.com.codeka.warworlds.server.metrics;
 
+import org.joda.time.DateTime;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Locale;
+
+import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 
 /**
  * A very simple in-memory store of the last 48 hours worth of metrics.
@@ -9,6 +19,7 @@ import au.com.codeka.common.protobuf.Messages;
  * it back later when the server starts up again.
  */
 class MetricStore {
+  private static final Log log = new Log("MetricStore");
   private final Object lock = new Object();
 
   // 5 minutes per snapshot * 576 entries = 2 days worth of data.
@@ -24,6 +35,59 @@ class MetricStore {
       entries[i] = new MetricSnapshot();
     }
     ptr = 0;
+  }
+
+  /** Start the store by loading saved values from disk. */
+  public void start() {
+    Messages.MetricsHistory metrics;
+
+    File baseDir = new File(Configuration.i.getRequestStatsDirectory());
+    File file = new File(baseDir, "metrics.pb");
+    log.info("Attempting to load metrics from: %s", file.getAbsolutePath());
+    if (file.exists()) {
+      try {
+        FileInputStream ins = new FileInputStream(file);
+        metrics = Messages.MetricsHistory.parseFrom(ins);
+      } catch (IOException e) {
+        log.warning("Error parsing proto from file: ", e);
+        return;
+      }
+    } else {
+      log.warning("No saved metrics, nothing to do.");
+      return;
+    }
+
+    for (Messages.MetricsSnapshot snapshot : metrics.getSnapshotList()) {
+      if (snapshot.getMetricCount() == 0) {
+        continue;
+      }
+
+      next().load(snapshot);
+    }
+
+    // Note: if the last snapshot was taken a while ago, there could be a large gap between the
+    // stats. For now, we're just going to live with that.
+  }
+
+  /** Stop the store by saving current values to disk. */
+  public void stop() {
+    File baseDir = new File(Configuration.i.getRequestStatsDirectory());
+    File file = new File(baseDir, "metrics.pb");
+    log.info("Saving metrics to: %s", file.getAbsolutePath());
+    File parent = file.getParentFile();
+    if (!parent.exists()) {
+      if (!parent.mkdirs()) {
+        log.warning("Couldn't create parent directory. This is probably going to fail.");
+      }
+    }
+
+    try {
+      FileOutputStream outs = new FileOutputStream(file);
+      outs.write(build().toByteArray());
+      outs.close();
+    } catch (IOException e) {
+      log.error("Error writing stats.", e);
+    }
   }
 
   /**

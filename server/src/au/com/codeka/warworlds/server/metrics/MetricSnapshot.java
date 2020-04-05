@@ -17,6 +17,10 @@ import au.com.codeka.common.protobuf.Messages;
 public class MetricSnapshot {
   private Messages.MetricsSnapshot.Builder pb = Messages.MetricsSnapshot.newBuilder();
 
+  public void load(Messages.MetricsSnapshot snapshot) {
+    pb.mergeFrom(snapshot);
+  }
+
   /**
    * Populate this {@link MetricSnapshot} with the current values stored in the given
    * {@link MetricRegistry}.

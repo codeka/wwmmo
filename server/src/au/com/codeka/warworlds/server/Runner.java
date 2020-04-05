@@ -67,16 +67,22 @@ public class Runner {
   }
 
   private static final Runnable shutdownHook = () -> {
-    log.info("Stopping star simulator thread");
-    StarSimulatorThreadManager.i.stop();
+    try {
+      log.info("Stopping star simulator thread");
+      StarSimulatorThreadManager.i.stop();
 
-    log.info("Stopping cron thread");
-    CronRunnerThread.cleanup();
+      log.info("Stopping cron thread");
+      CronRunnerThread.cleanup();
 
-    log.info("Cleaning up request stat monitor");
-    RequestStatMonitor.i.cleanup();
+      log.info("Cleaning up request stat monitor");
+      RequestStatMonitor.i.cleanup();
 
-    log.info("Stopping metrics manager.");
-    MetricsManager.i.stop();
+      log.info("Stopping metrics manager.");
+      MetricsManager.i.stop();
+
+      log.info("Everything is shut down.");
+    } catch (Exception e) {
+      log.error("Error caught during shut down", e);
+    }
   };
 }

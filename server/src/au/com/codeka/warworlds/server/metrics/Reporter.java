@@ -33,11 +33,12 @@ class Reporter {
   public void stop() {
     stopped = true;
     synchronized (stopLock) {
-      stopLock.notify();
+      log.info("Notifying the stopLock");
+      stopLock.notifyAll();
     }
 
     try {
-      thread.wait(10000);
+      thread.join(10000);
     } catch (InterruptedException e) {
       // Ignore
     }
@@ -51,9 +52,11 @@ class Reporter {
 
   private void threadProc() {
     // Wait 20 seconds before taking the first snapshot.
-    try {
-      Thread.sleep(20000);
-    } catch (InterruptedException e) { /* Ignore */}
+    synchronized (stopLock) {
+      try {
+        stopLock.wait(TimeUnit.SECONDS.toMillis(20));
+      } catch (InterruptedException e) { /* Ignore */ }
+    }
 
     while (!stopped) {
       report();
