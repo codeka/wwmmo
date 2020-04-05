@@ -243,7 +243,8 @@ public class RequestHandler {
   private void setResponseBodyText(String contentType, Message pb) {
     response.setContentType(contentType);
 
-    JsonFormat.Printer printer = JsonFormat.printer();
+    JsonFormat.Printer printer = JsonFormat.printer()
+        .preservingProtoFieldNames();
 
     // Make it so that you can put ?pretty=1 on the URL to make it print the JSON with some nice
     // formatting (otherwise we omit insignificant whitespace).

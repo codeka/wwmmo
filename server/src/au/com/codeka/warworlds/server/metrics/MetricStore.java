@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.metrics;
 
+import com.google.common.collect.Lists;
+
 import org.joda.time.DateTime;
 
 import java.io.File;
@@ -57,7 +59,7 @@ class MetricStore {
       return;
     }
 
-    for (Messages.MetricsSnapshot snapshot : metrics.getSnapshotList()) {
+    for (Messages.MetricsSnapshot snapshot : Lists.reverse(metrics.getSnapshotList())) {
       if (snapshot.getMetricCount() == 0) {
         continue;
       }

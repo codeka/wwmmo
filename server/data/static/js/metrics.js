@@ -38,8 +38,6 @@ var Metrics = (function($) {
       dataTable.addRows(rows);
       var dataView = new google.visualization.DataView(dataTable);
 
-      console.log(JSON.stringify(rows));
-
       var width = this.div.width();
       var height = this.div.height();
       var options = {
