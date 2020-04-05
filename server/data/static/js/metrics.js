@@ -30,8 +30,8 @@ var Metrics = (function($) {
         var metric = getMetric(snapshot, this.name);
         if (metric != null) {
           rows.push([
-            new Date(snapshot.time),
-            metric.timer.meter.count
+            new Date(parseInt(snapshot.time)),
+            metric.timer.meter.m5Rate
           ]);
         }
       }
@@ -63,7 +63,7 @@ var Metrics = (function($) {
         "refresh": TYPES[div.data("type")]
       });
 
-      div.css("height", div.width() * 0.2);
+      div.css("height", div.width() * 0.5);
     });
   }
 
