@@ -1,13 +1,13 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -85,7 +85,7 @@ public class AdminDebugPurchasesHandler extends AdminHandler {
   private static String getRenameEmpireSkuExtra(byte[] data) {
     try {
       Messages.EmpireRenameRequest pb = Messages.EmpireRenameRequest.parseFrom(data);
-      return PbFormatter.toJson(pb);
+      return JsonFormat.printer().print(pb);
     } catch (InvalidProtocolBufferException e) {
       return "<invalid>";
     }
@@ -94,7 +94,7 @@ public class AdminDebugPurchasesHandler extends AdminHandler {
   private static String getDecorateEmpireSkuExtra(byte[] data) {
     try {
       Messages.EmpireChangeShieldRequest pb = Messages.EmpireChangeShieldRequest.parseFrom(data);
-      return PbFormatter.toJson(pb);
+      return JsonFormat.printer().print(pb);
     } catch (InvalidProtocolBufferException e) {
       return "<invalid>";
     }
@@ -103,7 +103,7 @@ public class AdminDebugPurchasesHandler extends AdminHandler {
   private static String getStarRenameSkuExtra(byte[] data) {
     try {
       Messages.StarRenameRequest pb = Messages.StarRenameRequest.parseFrom(data);
-      return PbFormatter.toJson(pb);
+      return JsonFormat.printer().print(pb);
     } catch (InvalidProtocolBufferException e) {
       return "<invalid>";
     }

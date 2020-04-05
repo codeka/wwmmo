@@ -1,9 +1,11 @@
 package au.com.codeka.warworlds.server;
 
+import com.google.common.base.Strings;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import com.google.gson.JsonObject;
 import com.google.protobuf.Message;
+import com.google.protobuf.util.JsonFormat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.ctrl.AdminController;
 import au.com.codeka.warworlds.server.data.SqlConcurrentModificationException;
 import au.com.codeka.warworlds.server.data.SqlStateTranslater;
@@ -221,10 +222,10 @@ public class RequestHandler {
     if (request.getHeader("Accept") != null) {
       for (String acceptValue : request.getHeader("Accept").split(",")) {
         if (acceptValue.startsWith("text/")) {
-          setResponseBodyText(pb);
+          setResponseBodyText("text/plain", pb);
           return;
         } else if (acceptValue.startsWith("application/json")) {
-          setResponseBodyJson(pb);
+          setResponseBodyText("application/json", pb);
           return;
         }
       }
@@ -239,24 +240,20 @@ public class RequestHandler {
     }
   }
 
-  private void setResponseBodyText(Message pb) {
-    response.setContentType("text/plain");
-    response.setCharacterEncoding("utf-8");
-    try {
-      PrintWriter writer = response.getWriter();
-      writer.write(PbFormatter.toJson(pb));
-      writer.flush();
-    } catch (IOException e) {
-      // Ignore.
-    }
-  }
+  private void setResponseBodyText(String contentType, Message pb) {
+    response.setContentType(contentType);
 
-  private void setResponseBodyJson(Message pb) {
-    response.setContentType("application/json");
-    response.setCharacterEncoding("utf-8");
+    JsonFormat.Printer printer = JsonFormat.printer();
+
+    // Make it so that you can put ?pretty=1 on the URL to make it print the JSON with some nice
+    // formatting (otherwise we omit insignificant whitespace).
+    if (Strings.isNullOrEmpty(getRequest().getParameter("pretty"))) {
+      printer = printer.omittingInsignificantWhitespace();
+    }
+
     try {
       PrintWriter writer = response.getWriter();
-      writer.write(PbFormatter.toJson(pb));
+      writer.write(printer.print(pb));
       writer.flush();
     } catch (IOException e) {
       // Ignore.
@@ -378,7 +375,7 @@ public class RequestHandler {
       Method m = protoBuffFactory.getDeclaredMethod("newBuilder");
       Message.Builder builder = (Message.Builder) m.invoke(null);
 
-      PbFormatter.fromJson(json, builder);
+      JsonFormat.parser().merge(json, builder);
       return (T) builder.build();
     } catch (Exception e) {
       return null;
