@@ -22,7 +22,9 @@ var Metrics = (function($) {
 
       var dataTable = new google.visualization.DataTable();
       dataTable.addColumn("datetime", "Date");
-      dataTable.addColumn("number", this.name);
+      dataTable.addColumn("number", "QPS");
+      dataTable.addColumn("number", "Time 75%");
+      dataTable.addColumn("number", "Time 98%");
 
       var rows = [];
       for (var i in data) {
@@ -31,7 +33,9 @@ var Metrics = (function($) {
         if (metric != null) {
           rows.push([
             new Date(parseInt(snapshot.time)),
-            metric.timer.meter.m5Rate
+            metric.timer.meter.m5_rate,
+            metric.timer.histogram.p75 / 1000000.0,
+            metric.timer.histogram.p98 / 1000000.0
           ]);
         }
       }
@@ -41,8 +45,22 @@ var Metrics = (function($) {
       var width = this.div.width();
       var height = this.div.height();
       var options = {
-        "chartArea": {left: 50, top: 10, width: width - 200, height: height - 80},
-        "backgroundColor": {fill: "transparent"}
+        "chart": {
+          "title": this.name
+        },
+        "chartArea": {"left": 50, "top": 10, "width": width - 120, "height": height - 80},
+        "series": {
+          0: {"targetAxisIndex": 0},
+          1: {"targetAxisIndex": 1},
+          2: {"targetAxisIndex": 1}
+        },
+        "vAxes": {
+          0: {"title": "QPS", "minValue": 0},
+          1: {"title": "Time (ms)", "minValue": 0}
+        },
+     //  "curveType": "function",
+        "backgroundColor": {fill: "transparent"},
+        "legend": { "position": "bottom" }
       };
 
       var chart = new google.visualization.LineChart(document.getElementById(this.div.prop("id")));

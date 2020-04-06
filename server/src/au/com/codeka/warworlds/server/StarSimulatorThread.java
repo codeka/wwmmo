@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server;
 
+import com.codahale.metrics.Timer;
+
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
@@ -13,6 +15,7 @@ import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.Transaction;
+import au.com.codeka.warworlds.server.metrics.MetricsManager;
 import au.com.codeka.warworlds.server.model.Star;
 
 /**
@@ -28,12 +31,15 @@ public class StarSimulatorThread {
   private final Object statsLock = new Object();
   private ProcessingStats stats = new ProcessingStats();
 
+  private final Timer timer;
+
   private static final int WAIT_TIME_NO_STARS = 10 * 60 * 1000; // 10 minutes, after no stars found
   private static final int WAIT_TIME_ERROR = 60 * 1000; // 1 minute, in case of error
   private static final int WAIT_TIME_NORMAL = 0; // don't wait if there's more stars to simulate
 
   public StarSimulatorThread(StarSimulatorThreadManager manager) {
     this.manager = manager;
+    this.timer = MetricsManager.i.getMetricsRegistry().timer("star.simulator");
   }
 
   public void start() {
@@ -98,7 +104,7 @@ public class StarSimulatorThread {
     try {
       int numSimulatedSinceEventProcessorPinged = 0;
       while (!stopped) {
-        int waitTimeMs = simulateOneStar();
+        int waitTimeMs = timer.time(this::simulateOneStar);
         numSimulatedSinceEventProcessorPinged++;
 
         if (numSimulatedSinceEventProcessorPinged >= 50) {
