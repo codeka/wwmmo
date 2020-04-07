@@ -85,6 +85,7 @@ public class ColonyController {
     float remainingShips = totalTroopCarriers - colonyDefence;
     float remainingPopulation = colony.getPopulation()
         - (totalTroopCarriers * 4.0f / colony.getDefenceBoost());
+    colony.setPopulation(remainingPopulation);
 
     Messages.SituationReport.Builder sitrep_pb = null;
     if (colony.getEmpireID() != null) {
@@ -110,14 +111,6 @@ public class ColonyController {
       // Record the colony in the stats for the destroyer.
 
       new BattleRankController().recordColonyDestroyed(empireID, colony.getPopulation());
-
-      try {
-        db.destroyColony(colony.getStarID(), colony.getID());
-      } catch (Exception e) {
-        log.error("Error destroying colony.", e);
-        throw new RequestException(e);
-      }
-      new StarController(db.getTransaction()).removeEmpirePresences(colony.getStarID());
 
       // Transfer the cash that results from this to the attacker.
       double cashTransferred = getAttackCashValue(empire, colony);
@@ -149,15 +142,13 @@ public class ColonyController {
       star.getBuildRequests().removeIf(
           buildRequest -> buildRequest.getPlanetIndex() == colony.getPlanetIndex());
 
-      // Remove the colony itself.
-      star.getColonies().remove(colony);
-
       // If this is the last colony for this empire on this star, make sure the empire's home
       // star is reset.
       boolean anotherColonyExists = false;
       for (BaseColony baseColony : star.getColonies()) {
         if (baseColony.getEmpireKey() != null && colony.getEmpireKey() != null &&
-            baseColony.getEmpireKey().equals(colony.getEmpireKey())) {
+            baseColony.getEmpireKey().equals(colony.getEmpireKey()) &&
+            !baseColony.getKey().equals(colony.getKey())) {
           anotherColonyExists = true;
         }
       }
