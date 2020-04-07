@@ -132,6 +132,15 @@ public class EmpireController {
     }
   }
 
+  public boolean isDeviceAccessDenied(
+      int empireId, String deviceModel, String deviceBuild) throws RequestException {
+    try {
+      return db.isDeviceAccessDenied(empireId, deviceModel, deviceBuild);
+    } catch (SQLException e) {
+      throw new RequestException(e);
+    }
+  }
+
   /** Marks an empire active, that was previously marked abandoned. */
   public void markActive(Empire empire) throws RequestException {
     try (SqlStmt stmt = db.prepare("UPDATE empires SET state = ? WHERE id = ? AND state = ?")) {
@@ -920,6 +929,31 @@ public class EmpireController {
 
         return starIds;
       }
+    }
+
+    boolean isDeviceAccessDenied(
+        int empireId, String deviceModel, String deviceBuild) throws SQLException {
+      String sql =
+          "SELECT deny_access " +
+          "FROM def.devices " +
+          "INNER JOIN def.empires " +
+          "   ON devices.user_email = empires.user_email " +
+          "WHERE device_model = ? " +
+          "  AND device_build = ? " +
+          "  AND empires.id = ?";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setString(1, deviceModel);
+        stmt.setString(2, deviceBuild);
+        stmt.setInt(3, empireId);
+        SqlResult result = stmt.select();
+        while (result.next()) {
+          if (result.getInt(1) == 1) {
+            return true;
+          }
+        }
+      }
+
+      return false;
     }
   }
 

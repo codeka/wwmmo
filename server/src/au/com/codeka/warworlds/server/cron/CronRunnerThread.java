@@ -48,7 +48,11 @@ public class CronRunnerThread extends Thread {
     }
 
     try {
+      long startTime = System.currentTimeMillis();
       jobDetails.setLastStatus(job.run(jobDetails.getParameters()));
+      log.info(
+          "Job '%s' complete in %dms", jobDetails.getAnnotation().name(),
+          System.currentTimeMillis() - startTime);
     } catch (Exception e) {
       log.error("Error running job.", e);
       jobDetails.setLastStatus(e.toString());

@@ -105,6 +105,7 @@ public class HelloHandler extends RequestHandler {
     if (empire != null) {
       ensureClientId(getSession());
       ensureSafetyNetAttestation(empire.getID(), attestationStatement);
+      ensureDeviceDeniedStatus(empire.getID(), hello_request_pb);
 
       new StatisticsController().registerLogin(
           getSession(), getRequest().getHeader("User-Agent"), hello_request_pb,
@@ -335,6 +336,19 @@ public class HelloHandler extends RequestHandler {
               .withLogMessageOnly();
         }
       }
+    }
+  }
+
+  private void ensureDeviceDeniedStatus(
+      int empireId, Messages.HelloRequest hello_request_pb) throws RequestException {
+    if (new EmpireController().isDeviceAccessDenied(
+        empireId, hello_request_pb.getDeviceModel(), hello_request_pb.getDeviceBuild())) {
+      throw new RequestException(
+          400,
+          Messages.GenericError.ErrorCode.ClientDeviceRejected,
+          "You are running an unsupported device.\nIf you believe this to be in error, please " +
+              "contact me via discord.")
+          .withLogMessageOnly();
     }
   }
 
