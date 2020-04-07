@@ -5,6 +5,7 @@
     <th>Device</th>
     <th>Version</th>
     <th>Client ID</th>
+    <th>Success</th>
   </tr>
   {% for login in logins %}
     <tr>
@@ -13,10 +14,11 @@
       <td>{{ login.deviceManufacturer }} | {{ login.deviceModel }}</td>
       <td>{{ login.version }}</td>
       <td>{{ clientIds[login.clientId] }}</td>
+      <td>{% if login.success %}success{% else %}{{ login.failureReason }}{% end %}</td>
     </tr>
     {% if login.accessibilitySettings && login.accessibilitySettings.serviceList.size() > 0 %}
     <tr>
-      <td colspan="{% if show_empire %}5{% else %}4{% end %}">
+      <td colspan="{% if show_empire %}6{% else %}5{% end %}">
         <table>
           <tr>
             <th>&nbsp;</th>
@@ -36,8 +38,8 @@
     {% end %}
     {% if login.safetynetAttestationStatement %}
     <tr>
-      <td colspan="{% if show_empire %}5{% else %}4{% end %}">
-        SafetyNet: {{ login.safetynetAttestationStatement }}
+      <td colspan="{% if show_empire %}6{% else %}5{% end %}">
+        &nbsp;&nbsp;&nbsp;SafetyNet: {{ login.safetynetAttestationStatement }}
       </td>
     </tr>
     {% end %}

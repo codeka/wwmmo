@@ -41,7 +41,37 @@ public class StatisticsController {
           version,
           safetyNetAttestationStatement == null ? "" : safetyNetAttestationStatement.toString(),
           safetyNetAttestationStatement != null && safetyNetAttestationStatement.hasBasicIntegrity(),
-          safetyNetAttestationStatement != null && safetyNetAttestationStatement.isCtsProfileMatch());
+          safetyNetAttestationStatement != null && safetyNetAttestationStatement.isCtsProfileMatch(),
+          true,
+          null);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
+  public void registerFailedLogin(
+      Session session,
+      String userAgent,
+      Messages.HelloRequest hello_request_pb,
+      SafetyNetAttestationStatement safetyNetAttestationStatement,
+      String failureReason) throws RequestException {
+    String[] parts = userAgent.split("/");
+    String version = parts.length == 2 ? parts[1] : userAgent;
+
+    try {
+      db.registerLogin(session.getEmpireID(),
+          session.getClientId(),
+          hello_request_pb.getDeviceModel(),
+          hello_request_pb.getDeviceManufacturer(),
+          hello_request_pb.getDeviceBuild(),
+          hello_request_pb.getDeviceVersion(),
+          hello_request_pb.getAccessibilitySettingsInfo(),
+          version,
+          safetyNetAttestationStatement == null ? "" : safetyNetAttestationStatement.toString(),
+          safetyNetAttestationStatement != null && safetyNetAttestationStatement.hasBasicIntegrity(),
+          safetyNetAttestationStatement != null && safetyNetAttestationStatement.isCtsProfileMatch(),
+          false,
+          failureReason);
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -61,12 +91,13 @@ public class StatisticsController {
         String deviceBuild, String deviceVersion,
         @Nullable Messages.AccessibilitySettingsInfo accessibilitySettingsInfo,
         String version, String safetyNetAttestation, boolean safetyNetBasicProfile,
-        boolean safetyNetCtsProfileMatch) throws Exception {
+        boolean safetyNetCtsProfileMatch, boolean success, @Nullable String failureReason)
+        throws Exception {
       String sql = "INSERT INTO empire_logins (empire_id, date, device_model, " +
           "device_manufacturer, device_build, device_version, num_accessibility_services, " +
           "accessibility_service_infos, version, client_id, safetynet_attestation_statement, " +
-          "safetynet_basic_integrity, safetynet_cts_profile)" +
-          " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+          "safetynet_basic_integrity, safetynet_cts_profile, success, failure_reason)" +
+          " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, empireID);
         stmt.setDateTime(2, DateTime.now());
@@ -86,6 +117,8 @@ public class StatisticsController {
         stmt.setString(11, safetyNetAttestation);
         stmt.setInt(12, safetyNetBasicProfile ? 1 : 0);
         stmt.setInt(13, safetyNetCtsProfileMatch ? 1 : 0);
+        stmt.setInt(14, success ? 1 : 0);
+        stmt.setString(15, failureReason);
         stmt.update();
       }
     }

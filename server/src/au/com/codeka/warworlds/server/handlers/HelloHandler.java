@@ -79,8 +79,6 @@ public class HelloHandler extends RequestHandler {
         .setServerVersion(getServerVersion());
 
     final String userAgent = getRequest().getHeader("User-Agent");
-    ensureMinVersion(userAgent);
-    ensureNoClickers(hello_request_pb.getAccessibilitySettingsInfo());
 
     GameHistory gameHistory = new GameHistoryController().getCurrent();
     if (gameHistory == null) {
@@ -103,9 +101,19 @@ public class HelloHandler extends RequestHandler {
     // fetch the empire we're interested in
     Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
     if (empire != null) {
-      ensureClientId(getSession());
-      ensureSafetyNetAttestation(empire.getID(), attestationStatement);
-      ensureDeviceDeniedStatus(empire.getID(), hello_request_pb);
+      try {
+        ensureMinVersion(userAgent);
+        ensureNoClickers(hello_request_pb.getAccessibilitySettingsInfo());
+        ensureClientId(getSession());
+        ensureSafetyNetAttestation(empire.getID(), attestationStatement);
+        ensureDeviceDeniedStatus(empire.getID(), hello_request_pb);
+      } catch (RequestException e) {
+        log.error("Recording failed login");
+        new StatisticsController().registerFailedLogin(
+            getSession(), getRequest().getHeader("User-Agent"), hello_request_pb,
+            attestationStatement, e.getMessage());
+        throw e;
+      }
 
       new StatisticsController().registerLogin(
           getSession(), getRequest().getHeader("User-Agent"), hello_request_pb,

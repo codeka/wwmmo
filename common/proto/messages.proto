@@ -335,6 +335,8 @@ message EmpireLoginInfo {
   optional string version = 8;
   optional string client_id = 9;
   optional string safetynet_attestation_statement = 10;
+  optional bool success = 11;
+  optional string failure_reason = 12;
 }
 
 //
