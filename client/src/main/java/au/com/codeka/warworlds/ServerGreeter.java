@@ -260,16 +260,14 @@ public class ServerGreeter {
           }
         });
 
-        SafetyNetApi.AttestationResponse safetyNetAttestation;
+        SafetyNetApi.AttestationResponse safetyNetAttestation = null;
         try {
           safetyNetAttestation = Tasks.await(task);
+          log.info("SafetyNet attestation: %s", safetyNetAttestation.getJwsResult());
         } catch (Exception e) {
           // TODO: retry?
           log.error("SafetyNet attestation error.", e);
-          errorOccurred = true;
-          return "An error with SafetyNet occurred, trying again.";
         }
-        log.info("SafetyNet attestation: %s", safetyNetAttestation.getJwsResult());
 
         // say hello to the server
         String message;
@@ -284,7 +282,7 @@ public class ServerGreeter {
                 .setAllowInlineNotfications(false)
                 .setNoStarList(true)
                 .setAccessibilitySettingsInfo(AccessibilityServiceReporter.get(activity))
-                .setSafetynetJwsResult(safetyNetAttestation.getJwsResult())
+                .setSafetynetJwsResult(safetyNetAttestation == null ? "" : safetyNetAttestation.getJwsResult())
                 .setSafetynetNonce(ByteString.copyFrom(nonce))
                 .build();
 
