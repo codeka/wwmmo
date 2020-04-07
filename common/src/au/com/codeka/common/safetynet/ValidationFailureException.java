@@ -10,6 +10,11 @@ public class ValidationFailureException extends Exception {
     this.reason = reason;
   }
 
+  public ValidationFailureException(ValidationFailureReason reason, String message) {
+    super(message);
+    this.reason = reason;
+  }
+
   public ValidationFailureException(ValidationFailureReason reason, Throwable inner) {
     super("Validation failed", inner);
     this.reason = reason;

@@ -182,8 +182,7 @@ public class ServerGreeter {
         .empireID(/* TODO? */ 0)
         .build();
     SafetyNetClient client = SafetyNet.getClient(activity);
-    Task<SafetyNetApi.AttestationResponse> task =
-        client.attest(nonce, SAFETYNET_CLIENT_API_KEY);
+    Task<SafetyNetApi.AttestationResponse> task = client.attest(nonce, SAFETYNET_CLIENT_API_KEY);
 
     new BackgroundRunner<String>() {
       private boolean needsEmpireSetup;
@@ -260,13 +259,15 @@ public class ServerGreeter {
           }
         });
 
-        SafetyNetApi.AttestationResponse safetyNetAttestation = null;
+        String safetyNetAttestationJwsResult;
         try {
-          safetyNetAttestation = Tasks.await(task);
+          SafetyNetApi.AttestationResponse safetyNetAttestation = Tasks.await(task);
           log.info("SafetyNet attestation: %s", safetyNetAttestation.getJwsResult());
+          safetyNetAttestationJwsResult = safetyNetAttestation.getJwsResult();
         } catch (Exception e) {
           // TODO: retry?
           log.error("SafetyNet attestation error.", e);
+          safetyNetAttestationJwsResult = "ERROR:" + e.toString();
         }
 
         // say hello to the server
@@ -282,7 +283,7 @@ public class ServerGreeter {
                 .setAllowInlineNotfications(false)
                 .setNoStarList(true)
                 .setAccessibilitySettingsInfo(AccessibilityServiceReporter.get(activity))
-                .setSafetynetJwsResult(safetyNetAttestation == null ? "" : safetyNetAttestation.getJwsResult())
+                .setSafetynetJwsResult(safetyNetAttestationJwsResult)
                 .setSafetynetNonce(ByteString.copyFrom(nonce))
                 .build();
 

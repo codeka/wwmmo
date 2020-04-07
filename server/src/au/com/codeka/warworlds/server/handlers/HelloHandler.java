@@ -237,6 +237,17 @@ public class HelloHandler extends RequestHandler {
    */
   private SafetyNetAttestationStatement validateSafetyNetJws(
       Messages.HelloRequest helloRequest) throws ValidationFailureException {
+    if (!helloRequest.hasSafetynetJwsResult()) {
+      throw new ValidationFailureException(ValidationFailureReason.JSW_MISSING);
+    }
+    if (helloRequest.getSafetynetJwsResult().startsWith("ERROR:")) {
+      log.error(
+          "SafetyNet JSW results indicates a client-side error: %s",
+          helloRequest.getSafetynetJwsResult());
+      throw new ValidationFailureException(
+          ValidationFailureReason.JSW_MISSING, helloRequest.getSafetynetJwsResult());
+    }
+
     JsonWebSignature jws;
     try {
       jws = JsonWebSignature.parser(GsonFactory.getDefaultInstance())
