@@ -84,8 +84,8 @@ public class SessionController {
     }
 
     sql = "INSERT INTO sessions (session_cookie, user_email, login_time, empire_id," +
-        " alliance_id, is_admin, inline_notifications, client_id)" +
-        " VALUES (?, ?, ?, ?, ?, ?, 0, ?)";
+        " alliance_id, is_admin, inline_notifications, client_id, is_anonymous)" +
+        " VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)";
     try (SqlStmt stmt = DB.prepare(sql)) {
       stmt.setString(1, session.getCookie());
       stmt.setString(2, session.getActualEmail());
@@ -102,6 +102,7 @@ public class SessionController {
       }
       stmt.setInt(6, session.isAdmin() ? 1 : 0);
       stmt.setString(7, session.getClientId());
+      stmt.setInt(8, session.isAnonymous() ? 1 : 0);
       stmt.update();
     } catch (Exception e) {
       throw new RequestException(e);

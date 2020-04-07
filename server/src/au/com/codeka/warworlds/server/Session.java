@@ -38,6 +38,9 @@ public class Session {
     }
     allianceID = res.getInt("alliance_id");
     isAdmin = res.getInt("is_admin") == 1;
+    if (res.getInt("is_anonymous") != null) {
+      isAnonymous = res.getInt("is_anonymous") == 1;
+    }
   }
 
   public Session(Session copy) {
@@ -48,6 +51,7 @@ public class Session {
     empireID = copy.empireID;
     allianceID = copy.allianceID;
     isAdmin = copy.isAdmin;
+    isAnonymous = copy.isAnonymous;
   }
 
   public Session(String cookie, String email, String clientId, DateTime loginTime, int empireID,
