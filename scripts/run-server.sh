@@ -9,12 +9,12 @@ INSTALLPATH=$ROOTPATH/server/build/install/server
 
 adb reverse tcp:8080 tcp:8080 || true
 
-pushd $ROOTPATH > /dev/null
-./gradlew --daemon :server:installDist
-popd > /dev/null
-
-function run_server()
+function build_and_run_server()
 {
+  pushd $ROOTPATH > /dev/null
+  ./gradlew --daemon :server:installDist
+  popd > /dev/null
+
   pushd $INSTALLPATH > /dev/null
   SERVER_OPTS=""
   SERVER_OPTS="$SERVER_OPTS -Dau.com.codeka.warworlds.server.ConfigFile=$INSTALLPATH/data/config-debug.json"
@@ -25,7 +25,7 @@ function run_server()
   return $SERVER_STATUS
 }
 
-until run_server; do
+until build_and_run_server; do
   echo "War Worlds exited prematurely with exit code $?. Restarting.." >&2
   sleep 1
 done
