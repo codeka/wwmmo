@@ -31,8 +31,10 @@ public class FindNonCtsDevicesCronJob extends AbstractCronJob {
         "  AND devices.device_build = empire_logins.device_build " +
         "WHERE safetynet_basic_integrity=0 " +
         "  AND safetynet_attestation_statement is not null " +
-        "  AND safetynet_attestation_statement <> '' ";
+        "  AND safetynet_attestation_statement <> '' " +
+        "  AND empire_logins.date > ?";
     try (SqlStmt stmt = DB.prepare(sql)) {
+      stmt.setDateTime(1, DateTime.now().minusDays(1));
       SqlResult result = stmt.select();
       while (result.next()) {
         String deviceId = result.getString(1);
