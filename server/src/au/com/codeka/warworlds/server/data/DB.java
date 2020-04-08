@@ -37,7 +37,10 @@ public class DB {
       config.addDataSourceProperty("serverName", dbconfig.getServer());
       config.addDataSourceProperty("portNumber", Integer.toString(dbconfig.getPort()));
       config.addDataSourceProperty("databaseName", dbconfig.getDatabase());
-      config.setConnectionInitSql(String.format("SET search_path TO '%s'", schemaName));
+      config.setConnectionInitSql(String.format(
+          "SET search_path TO '%s';\n" +
+          "SET idle_in_transaction_session_timeout TO 30000",
+          schemaName));
       config.setMetricRegistry(MetricsManager.i.getMetricsRegistry());
       dataSource = new HikariDataSource(config);
 
