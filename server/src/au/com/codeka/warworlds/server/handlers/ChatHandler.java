@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server.handlers;
 
 import org.joda.time.DateTime;
 
+import java.util.List;
+
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -47,57 +49,34 @@ public class ChatHandler extends RequestHandler {
       conversationID = Integer.parseInt(getRequest().getParameter("conversation"));
     }
 
-    int max = 100;
-    if (getRequest().getParameter("max") != null) {
-      max = Integer.parseInt(getRequest().getParameter("max"));
-    }
-    if (max > 1000) {
-      max = 1000;
-    }
-
-    String sql = "SELECT * FROM chat_messages" +
-        " WHERE posted_date > ?" +
-        " AND posted_date <= ?" +
-        " AND empire_id NOT IN (SELECT blocked_empire_id FROM chat_blocked WHERE empire_id = ?)" +
-        " AND (conversation_id IN (SELECT conversation_id FROM chat_conversation_participants WHERE empire_id = ?)" +
-        " OR (conversation_id IS NULL" +
-        (getSession().isAdmin()
-            ? "" // admin can see all alliance chat
-            : " AND (alliance_id IS NULL OR alliance_id = ?)") +
-        "))" +
-        (conversationID != null && conversationID > 0 ? " AND conversation_id = ?" : "") +
-        (conversationID != null && conversationID == 0 ? " AND alliance_id IS NULL" : "") +
-        (conversationID != null && conversationID < 0 ? " AND alliance_id IS NOT NULL" : "") +
-        " ORDER BY posted_date DESC" +
-        " LIMIT " + max;
-    try (SqlStmt stmt = DB.prepare(sql)) {
-      int i = 1;
-      stmt.setDateTime(i++, after);
-      stmt.setDateTime(i++, before);
-      stmt.setInt(i++, getSession().getEmpireID());
-      if (!getSession().isAdmin()) {
-        stmt.setInt(i++, getSession().getEmpireID());
-        stmt.setInt(i++, getSession().getAllianceID());
+    List<ChatMessage> msgs;
+    if (conversationID != null && conversationID > 0) {
+      msgs = new ChatController()
+          .getMessagesForConversation(conversationID, getSession().getEmpireID(), after, before);
+    } else if (conversationID != null && conversationID < 0) {
+      msgs = new ChatController()
+          .getAllianceMessages(
+              getSession().getAllianceID(), getSession().getEmpireID(), after, before);
+    } else if (conversationID != null /* && conversationID == 0 */) {
+      // Explicitly asking for global chat
+      msgs = new ChatController().getGlobalMessages(getSession().getEmpireID(), after, before);
+    } else /* if (conversationID == null */ {
+      // If it's an admin, return all messages in all conversations
+      if (getSession().isAdmin()) {
+        msgs = new ChatController().getAllMessages(getSession().getEmpireID(), after, before);
       } else {
-        stmt.setInt(i++, 0); // TODO: admin won't see any private conversations...
+        msgs = new ChatController().getGlobalMessages(getSession().getEmpireID(), after, before);
       }
-      if (conversationID != null && conversationID > 0) {
-        stmt.setInt(i++, conversationID);
-      }
-      SqlResult res = stmt.select();
-
-      Messages.ChatMessages.Builder chat_msgs_pb = Messages.ChatMessages.newBuilder();
-      while (res.next()) {
-        ChatMessage msg = new ChatMessage(res);
-        Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
-        msg.toProtocolBuffer(chat_msg_pb, true);
-        chat_msgs_pb.addMessages(chat_msg_pb);
-      }
-
-      setResponseBody(chat_msgs_pb.build());
-    } catch (Exception e) {
-      throw new RequestException(e);
     }
+
+    Messages.ChatMessages.Builder chat_msgs_pb = Messages.ChatMessages.newBuilder();
+    for (ChatMessage msg : msgs) {
+      Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
+      msg.toProtocolBuffer(chat_msg_pb, true);
+      chat_msgs_pb.addMessages(chat_msg_pb);
+    }
+
+    setResponseBody(chat_msgs_pb.build());
   }
 
   @Override

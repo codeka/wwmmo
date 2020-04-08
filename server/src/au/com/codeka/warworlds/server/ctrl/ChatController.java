@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class ChatController {
   public ArrayList<ChatConversation> getConversationsForEmpire(int empireID) throws RequestException {
     try {
       return db.getConversationsForEmpire(empireID);
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
@@ -56,7 +57,7 @@ public class ChatController {
   public ChatConversation getConversation(int id) throws RequestException {
     try {
       return db.getConversation(id);
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
@@ -64,7 +65,7 @@ public class ChatController {
   public ArrayList<ChatConversation> getAllConversations() throws RequestException {
     try {
       return db.getConversations("1 = 1");
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
@@ -73,7 +74,7 @@ public class ChatController {
     try {
       db.addParticipant(conversation.getID(), empireID);
       conversation.addParticipant(empireID, false);
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
@@ -90,7 +91,7 @@ public class ChatController {
       if (index >= 0) {
         conversation.getParticipants().remove(index);
       }
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
@@ -102,7 +103,7 @@ public class ChatController {
   public List<ChatBlock> getBlocksForEmpire(int empireID) throws RequestException {
     try {
       return db.getBlocksForEmpire(empireID);
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
@@ -114,7 +115,7 @@ public class ChatController {
   public List<ChatBlock> getBlockingEmpires(int empireID) throws RequestException {
     try {
       return db.getBlockingEmpires(empireID);
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
@@ -122,7 +123,7 @@ public class ChatController {
   public void addBlock(ChatBlock block) throws RequestException {
     try {
       db.addBlock(block);
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e, block);
     }
   }
@@ -130,8 +131,45 @@ public class ChatController {
   public void removeBlock(ChatBlock block) throws RequestException {
     try {
       db.removeBlock(block);
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e, block);
+    }
+  }
+
+  public List<ChatMessage> getAllMessages(
+      int empireId, DateTime startTime, DateTime endTime) throws RequestException {
+    try {
+      return db.getAllMessages(empireId, startTime, endTime);
+    } catch (SQLException e) {
+      throw new RequestException(e);
+    }
+  }
+
+  public List<ChatMessage> getGlobalMessages(
+      int empireId, DateTime startTime, DateTime endTime) throws RequestException {
+    try {
+      return db.getGlobalMessages(empireId, startTime, endTime);
+    } catch (SQLException e) {
+      throw new RequestException(e);
+    }
+  }
+
+  public List<ChatMessage> getAllianceMessages(
+      int allianceID, int empireId, DateTime startTime, DateTime endTime) throws RequestException {
+    try {
+      return db.getAllianceMessages(allianceID, empireId, startTime, endTime);
+    } catch (SQLException e) {
+      throw new RequestException(e);
+    }
+  }
+
+  public List<ChatMessage> getMessagesForConversation(
+      int conversationID, int empireId, DateTime startTime, DateTime endTime)
+      throws RequestException {
+    try {
+      return db.getMessagesForConversation(conversationID, empireId, startTime, endTime);
+    } catch (SQLException e) {
+      throw new RequestException(e);
     }
   }
 
@@ -329,7 +367,7 @@ public class ChatController {
       super(trans);
     }
 
-    ChatConversation findExistingConversation(int empireID1, int empireID2) throws Exception {
+    ChatConversation findExistingConversation(int empireID1, int empireID2) throws SQLException {
       Integer chatID = null;
       String sql = "SELECT chat_conversations.id, MAX(empire_id) AS empire_id_1, MIN(empire_id) AS empire_id_2, COUNT(*) AS num_empires" +
           " FROM chat_conversations" +
@@ -355,13 +393,13 @@ public class ChatController {
       return conversations.get(0);
     }
 
-    ArrayList<ChatConversation> getConversationsForEmpire(int empireID) throws Exception {
+    ArrayList<ChatConversation> getConversationsForEmpire(int empireID) throws SQLException {
       String whereClause = "chat_conversations.id IN (" +
           "SELECT conversation_id FROM chat_conversation_participants WHERE empire_id = " + empireID + ")";
       return getConversations(whereClause);
     }
 
-    ArrayList<ChatConversation> getConversations(String whereClause) throws Exception {
+    ArrayList<ChatConversation> getConversations(String whereClause) throws SQLException {
       Map<Integer, ChatConversation> conversations = new HashMap<Integer, ChatConversation>();
       String sql = "" +
           "SELECT chat_conversations.id, chat_conversation_participants.empire_id," +
@@ -384,7 +422,7 @@ public class ChatController {
       return new ArrayList<>(conversations.values());
     }
 
-    ChatConversation getConversation(int id) throws Exception {
+    ChatConversation getConversation(int id) throws SQLException {
       ArrayList<ChatConversation> conversations = getConversations("chat_conversations.id = " + id);
       if (conversations.size() == 1) {
         return conversations.get(0);
@@ -392,7 +430,7 @@ public class ChatController {
       return null;
     }
 
-    void addParticipant(int conversationID, int empireID) throws Exception {
+    void addParticipant(int conversationID, int empireID) throws SQLException {
       String sql = "INSERT INTO chat_conversation_participants (conversation_id, empire_id, is_muted) VALUES" +
           " (?, ?, 0)";
       try (SqlStmt stmt = prepare(sql)) {
@@ -402,7 +440,7 @@ public class ChatController {
       }
     }
 
-    void removeParticipant(int conversationID, int empireID) throws Exception {
+    void removeParticipant(int conversationID, int empireID) throws SQLException {
       String sql = "DELETE FROM chat_conversation_participants WHERE conversation_id = ? AND empire_id = ?";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, conversationID);
@@ -411,7 +449,7 @@ public class ChatController {
       }
     }
 
-    ChatConversation createConversation(int empireID1, int empireID2) throws Exception {
+    ChatConversation createConversation(int empireID1, int empireID2) throws SQLException {
       ChatConversation conversation;
 
       String sql = "INSERT INTO chat_conversations DEFAULT VALUES";
@@ -442,7 +480,7 @@ public class ChatController {
       return conversation;
     }
 
-    List<ChatBlock> getBlocksForEmpire(int empireID) throws Exception {
+    List<ChatBlock> getBlocksForEmpire(int empireID) throws SQLException {
       String sql = "SELECT * FROM chat_blocked WHERE empire_id = ?";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, empireID);
@@ -456,7 +494,7 @@ public class ChatController {
       }
     }
 
-    List<ChatBlock> getBlockingEmpires(int empireID) throws Exception {
+    List<ChatBlock> getBlockingEmpires(int empireID) throws SQLException {
       String sql = "SELECT * FROM chat_blocked WHERE blocked_empire_id = ?";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, empireID);
@@ -470,7 +508,7 @@ public class ChatController {
       }
     }
 
-    void addBlock(ChatBlock block) throws Exception {
+    void addBlock(ChatBlock block) throws SQLException {
       String sql = "INSERT INTO chat_blocked (empire_id, blocked_empire_id, created_date)" +
           " VALUES (?, ?, ?)";
       try (SqlStmt stmt = prepare(sql)) {
@@ -481,12 +519,91 @@ public class ChatController {
       }
     }
 
-    void removeBlock(ChatBlock block) throws Exception {
+    void removeBlock(ChatBlock block) throws SQLException {
       String sql = "DELETE FROM chat_blocked WHERE empire_id = ? AND blocked_empire_id = ?";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, block.getEmpireID());
         stmt.setInt(2, block.getBlockedEmpireID());
         stmt.update();
+      }
+    }
+
+    private static List<ChatMessage> populateMessages(SqlResult res) throws SQLException {
+      List<ChatMessage> msgs = new ArrayList<>();
+      while (res.next()) {
+        ChatMessage msg = new ChatMessage(res);
+        Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
+        msg.toProtocolBuffer(chat_msg_pb, true);
+        msgs.add(msg);
+      }
+      return msgs;
+    }
+
+    public List<ChatMessage> getAllMessages(
+        int empireID, DateTime startTime, DateTime endTime) throws SQLException {
+      String sql = "SELECT * FROM chat_messages" +
+          " WHERE posted_date > ?" +
+          " AND posted_date <= ?" +
+          " AND empire_id NOT IN (SELECT blocked_empire_id FROM chat_blocked WHERE empire_id = ?)" +
+          " ORDER BY posted_date DESC";
+      try (SqlStmt stmt = DB.prepare(sql)) {
+        stmt.setDateTime(1, startTime);
+        stmt.setDateTime(2, endTime);
+        stmt.setInt(3, empireID);
+        return populateMessages(stmt.select());
+      }
+    }
+
+    public List<ChatMessage> getGlobalMessages(
+        int empireID, DateTime startTime, DateTime endTime) throws SQLException {
+      String sql = "SELECT * FROM chat_messages" +
+          " WHERE posted_date > ?" +
+          " AND posted_date <= ?" +
+          " AND empire_id NOT IN (SELECT blocked_empire_id FROM chat_blocked WHERE empire_id = ?)" +
+          " AND conversation_id IS NULL" +
+          " AND alliance_id IS NULL" +
+          " ORDER BY posted_date DESC";
+      try (SqlStmt stmt = DB.prepare(sql)) {
+        stmt.setDateTime(1, startTime);
+        stmt.setDateTime(2, endTime);
+        stmt.setInt(3, empireID);
+        return populateMessages(stmt.select());
+      }
+    }
+
+    public List<ChatMessage> getAllianceMessages(
+        int allianceID, int empireID, DateTime startTime, DateTime endTime) throws SQLException {
+      String sql = "SELECT * FROM chat_messages" +
+          " WHERE posted_date > ?" +
+          " AND posted_date <= ?" +
+          " AND empire_id NOT IN (SELECT blocked_empire_id FROM chat_blocked WHERE empire_id = ?)" +
+          " AND conversation_id IS NULL" +
+          " AND alliance_id = ?" +
+          " ORDER BY posted_date DESC";
+      try (SqlStmt stmt = DB.prepare(sql)) {
+        stmt.setDateTime(1, startTime);
+        stmt.setDateTime(2, endTime);
+        stmt.setInt(3, empireID);
+        stmt.setInt(4, allianceID);
+        return populateMessages(stmt.select());
+      }
+    }
+
+    public List<ChatMessage> getMessagesForConversation(
+        int conversationID, int empireID, DateTime startTime, DateTime endTime)
+        throws SQLException {
+      String sql = "SELECT * FROM chat_messages" +
+          " WHERE posted_date > ?" +
+          " AND posted_date <= ?" +
+          " AND empire_id NOT IN (SELECT blocked_empire_id FROM chat_blocked WHERE empire_id = ?)" +
+          " AND conversation_id = ?" +
+          " ORDER BY posted_date DESC";
+      try (SqlStmt stmt = DB.prepare(sql)) {
+        stmt.setDateTime(1, startTime);
+        stmt.setDateTime(2, endTime);
+        stmt.setInt(3, empireID);
+        stmt.setInt(4, conversationID);
+        return populateMessages(stmt.select());
       }
     }
   }

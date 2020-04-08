@@ -65,11 +65,19 @@
     <div class="conv" data-convid="-1">All messages</div>
     <div class="conv" data-convid="0">Global chat</div>
     <div class="conv" data-convid="0">Alliance chat</div>
+    <script>
+      var conversations = {};
+    </script>
     {% for conv in conversations %}
       <div class="conv" data-convid="{{ conv.ID }}">
         {% for participant in conv.participants %}
           {{ empires[participant.empireID].displayName }},
         {% end %}
+        <script>
+          var name = "{% for participant in conv.participants %}{{ empires[participant.empireID].displayName }}, {% end %}";
+          name = name.substr(0, name.length - 2);
+          conversations[{{conv.ID}}] = name;
+        </script>
       </div>
     {% end %}
   </section>
@@ -117,17 +125,30 @@
     function refreshMessages() {
       $("section#messages").empty();
       for (var i = 0; i < msgs.length; i++) {
-        var div = formatMessage(msgs[i]);
-        $("section#messages").append(div);
+        if (msgs[i].action) {
+          // TODO: this will be like "participant joined" or "participant left" etc.
+        } else {
+          var div = formatMessage(msgs[i]);
+          $("section#messages").append(div);
+        }
       }
     }
 
+    function refreshMessage(msg) {
+      var div = msg.div;
+      div.replaceWith(formatMessage(msg));
+    }
+
     function formatMessage(msg) {
+      msg.loaded = false;
       if (typeof msg.empire == "undefined") {
         if (msg.empire_key) {
           msg.empire = "Loading...";
           empireStore.getEmpire(msg.empire_key, function(empire) {
             msg.empire = empire;
+            if (msg.loaded) {
+              refreshMessage(msg);
+            }
           });
         } else {
           msg.empire = "[SERVER]";
@@ -167,6 +188,9 @@
         } else {
           msgstr += " : <em>Alliance</em>";
         }
+      } else if (msg.conversation_id) {
+        style += "background: #fcc;";
+        msgstr += " : <em>" + conversations[msg.conversation_id] + "</em>";
       } else {
         msgstr += " : <em>Global</em>";
       }
@@ -185,6 +209,8 @@
 
       var div = $("<div class=\"msg-header\" style=\""+style+"\">"+msgstr+"</div>");
       div.data("dt", msg.date_posted);
+      msg.div = div;
+      msg.loaded = true;
       return div;
     }
 
