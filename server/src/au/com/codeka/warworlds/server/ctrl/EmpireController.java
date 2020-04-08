@@ -430,12 +430,12 @@ public class EmpireController {
     }
 
     String[] sqls = { "DELETE FROM empire_presences WHERE empire_id = ?",
+        "DELETE FROM build_requests WHERE empire_id = ?",
+        "DELETE FROM buildings WHERE empire_id = ?",
         "DELETE FROM colonies WHERE empire_id = ?",
         "DELETE FROM fleets WHERE empire_id = ?",
         "DELETE FROM fleet_upgrades WHERE fleet_id IN (SELECT id FROM fleets WHERE empire_id = ?)",
-        "DELETE FROM build_requests WHERE empire_id = ?",
         "DELETE FROM alliance_join_requests WHERE empire_id = ?",
-        "DELETE FROM buildings WHERE empire_id = ?",
         "DELETE FROM scout_reports WHERE empire_id = ?",
         "DELETE FROM situation_reports WHERE empire_id = ?", };
 
