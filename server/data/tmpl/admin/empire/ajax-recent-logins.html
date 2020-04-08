@@ -3,6 +3,7 @@
     <th>Date</th>
     {% if show_empire %}<th>Empire</th>{% end %}
     <th>Device</th>
+    <th>IP Address</th>
     <th>Version</th>
     <th>Client ID</th>
     <th>Success</th>
@@ -12,6 +13,7 @@
       <td><time timestamp="{{ login.date / 1000 }}">{{ login.date }}</time></td>
       {% if show_empire %}<td>{{ empires.get(login.empireId).displayName }}</td>{% end %}
       <td>{{ login.deviceManufacturer }} | {{ login.deviceModel }}</td>
+      <td>{{ login.ipAddress}}</td>
       <td>{{ login.version }}</td>
       <td>{{ clientIds[login.clientId] }}</td>
       <td>{% if login.success %}success{% else %}{{ login.failureReason }}{% end %}</td>

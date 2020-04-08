@@ -2,9 +2,12 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import org.joda.time.DateTime;
 
+import java.sql.SQLException;
+
 import javax.annotation.Nullable;
 
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -43,7 +46,8 @@ public class StatisticsController {
           safetyNetAttestationStatement != null && safetyNetAttestationStatement.hasBasicIntegrity(),
           safetyNetAttestationStatement != null && safetyNetAttestationStatement.isCtsProfileMatch(),
           true,
-          null);
+          null,
+          RequestContext.i.getIpAddress());
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -71,8 +75,9 @@ public class StatisticsController {
           safetyNetAttestationStatement != null && safetyNetAttestationStatement.hasBasicIntegrity(),
           safetyNetAttestationStatement != null && safetyNetAttestationStatement.isCtsProfileMatch(),
           false,
-          failureReason);
-    } catch (Exception e) {
+          failureReason,
+          RequestContext.i.getIpAddress());
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
   }
@@ -91,13 +96,13 @@ public class StatisticsController {
         String deviceBuild, String deviceVersion,
         @Nullable Messages.AccessibilitySettingsInfo accessibilitySettingsInfo,
         String version, String safetyNetAttestation, boolean safetyNetBasicProfile,
-        boolean safetyNetCtsProfileMatch, boolean success, @Nullable String failureReason)
-        throws Exception {
+        boolean safetyNetCtsProfileMatch, boolean success, @Nullable String failureReason,
+        String ipAddress) throws SQLException {
       String sql = "INSERT INTO empire_logins (empire_id, date, device_model, " +
           "device_manufacturer, device_build, device_version, num_accessibility_services, " +
           "accessibility_service_infos, version, client_id, safetynet_attestation_statement, " +
-          "safetynet_basic_integrity, safetynet_cts_profile, success, failure_reason)" +
-          " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+          "safetynet_basic_integrity, safetynet_cts_profile, success, failure_reason, ip_address)" +
+          " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, empireID);
         stmt.setDateTime(2, DateTime.now());
@@ -119,6 +124,7 @@ public class StatisticsController {
         stmt.setInt(13, safetyNetCtsProfileMatch ? 1 : 0);
         stmt.setInt(14, success ? 1 : 0);
         stmt.setString(15, failureReason);
+        stmt.setString(16, ipAddress);
         stmt.update();
       }
     }

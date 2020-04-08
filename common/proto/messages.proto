@@ -337,6 +337,7 @@ message EmpireLoginInfo {
   optional string safetynet_attestation_statement = 10;
   optional bool success = 11;
   optional string failure_reason = 12;
+  optional string ip_address = 13;
 }
 
 //

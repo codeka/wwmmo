@@ -68,7 +68,7 @@ public class RequestContext {
     context.set(
         new Context(
             request.getRequestURI(),
-            realIp,
+            remoteAddr,
             empireId,
             userAgent,
             request.getQueryString()));

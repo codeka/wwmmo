@@ -648,7 +648,7 @@ public class EmpireController {
       String sql =
           "SELECT empire_id, date, device_model, device_manufacturer, device_build, " +
                  "device_version, accessibility_service_infos, version, client_id, " +
-                 "safetynet_attestation_statement, success, failure_reason " +
+                 "safetynet_attestation_statement, success, failure_reason, ip_address " +
           "FROM empire_logins " + (empireID == 0 ? "" : "WHERE empire_id = ? ") +
           "ORDER BY date DESC LIMIT ?";
       try (SqlStmt stmt = prepare(sql)) {
@@ -688,6 +688,9 @@ public class EmpireController {
           }
           if (res.getString(12) != null) {
             empireLoginInfoBuilder.setFailureReason(res.getString(12));
+          }
+          if (res.getString(13) != null) {
+            empireLoginInfoBuilder.setIpAddress(res.getString(13));
           }
           empireLoginInfos.add(empireLoginInfoBuilder.build());
         }
