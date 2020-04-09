@@ -145,11 +145,14 @@ public class AjaxStarfieldHandler extends AjaxHandler {
         }
 
         for (int j = 0; j < planet.colony.build_requests.size(); j++) {
-          BuildRequest buildRequest = planet.colony.build_requests.get(i);
+          BuildRequest buildRequest = planet.colony.build_requests.get(j);
           if (buildRequest.id.equals(buildRequestId)) {
             // Set the end time well in the past, so that the star manager think it's done.
             Colony.Builder colonyBuilder = planet.colony.newBuilder();
-            colonyBuilder.build_requests.set(j, buildRequest.newBuilder().end_time(100L).build());
+            colonyBuilder.build_requests.set(j, buildRequest.newBuilder()
+                .end_time(100L)
+                .progress(1.0f)
+                .build());
             star.planets.set(i, planet.newBuilder()
                 .colony(colonyBuilder.build())
                 .build());
@@ -158,6 +161,9 @@ public class AjaxStarfieldHandler extends AjaxHandler {
       }
       starWo.set(star.build());
     }
+
+    // Now just simulate to make sure it processes it.
+    modifyAndSimulate(starId, null);
   }
 
   private SimulateResponse modifyAndSimulate(long starId, @Nullable StarModification modification)
