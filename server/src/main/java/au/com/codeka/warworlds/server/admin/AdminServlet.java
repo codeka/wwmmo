@@ -23,6 +23,7 @@ import au.com.codeka.warworlds.server.admin.handlers.AjaxStarfieldHandler;
 import au.com.codeka.warworlds.server.admin.handlers.AjaxUsersHandler;
 import au.com.codeka.warworlds.server.admin.handlers.ChatHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DashboardHandler;
+import au.com.codeka.warworlds.server.admin.handlers.DebugBuildRequestsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DebugMovingFleetsHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DebugSimulationQueueHandler;
 import au.com.codeka.warworlds.server.admin.handlers.DebugSuspiciousEventsHandler;
@@ -53,6 +54,7 @@ public class AdminServlet extends HandlerServlet {
       new Route("/chat", ChatHandler.class),
       new Route("/debug/suspicious-events", DebugSuspiciousEventsHandler.class),
       new Route("/debug/simulation-queue", DebugSimulationQueueHandler.class),
+      new Route("/debug/build-requests", DebugBuildRequestsHandler.class),
       new Route("/debug/moving-fleets", DebugMovingFleetsHandler.class),
       new Route("/ajax/accounts", AjaxAccountsHandler.class),
       new Route("/ajax/chat", AjaxChatHandler.class),

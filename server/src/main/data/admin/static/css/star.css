@@ -30,6 +30,7 @@
   display: inline-block;
   width: 28px;
   height: 28px;
+  margin-right: 4px;
 }
 .star-small-container .star-small {
   margin: -18px 0 0 -18px;
@@ -37,4 +38,12 @@
 
 .star-small-label {
   vertical-align: super;
+}
+
+.design-details {
+  height: 64px;
+}
+.design-details span {
+  vertical-align: top;
+  line-height: 64px;
 }

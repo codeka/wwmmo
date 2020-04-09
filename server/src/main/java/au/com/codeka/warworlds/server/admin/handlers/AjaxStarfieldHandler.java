@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.proto.BuildRequest;
+import au.com.codeka.warworlds.common.proto.Colony;
+import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -61,6 +64,11 @@ public class AjaxStarfieldHandler extends AjaxHandler {
         long fleetId = Long.parseLong(getRequest().getParameter("fleetId"));
         handleForceMoveComplete(starId, fleetId);
         break;
+      case "forceBuildRequestComplete":
+        starId = Long.parseLong(getRequest().getParameter("id"));
+        long buildRequestId = Long.parseLong(getRequest().getParameter("reqId"));
+        handleForceBuildRequestComplete(starId, buildRequestId);
+        break;
       default:
         throw new RequestException(400, "Unknown action: " + getRequest().getParameter("action"));
     }
@@ -96,7 +104,7 @@ public class AjaxStarfieldHandler extends AjaxHandler {
   }
 
   private void handleForceMoveComplete(long starId, long fleetId) throws RequestException {
-    log.debug("force move complete (star: %d, fleet: %d", starId, fleetId);
+    log.debug("force move complete (star: %d, fleet: %d)", starId, fleetId);
 
     WatchableObject<Star> starWo = StarManager.i.getStar(starId);
     if (starWo == null) {
@@ -118,6 +126,38 @@ public class AjaxStarfieldHandler extends AjaxHandler {
 
     // Now just simulate to make sure it processes it.
     modifyAndSimulate(starId, null);
+  }
+
+  private void handleForceBuildRequestComplete(long starId, long buildRequestId) throws RequestException {
+    log.debug("force build request complete (star: %d, req: %d)", starId, buildRequestId);
+
+    WatchableObject<Star> starWo = StarManager.i.getStar(starId);
+    if (starWo == null) {
+      return;
+    }
+
+    synchronized (starWo.lock) {
+      Star.Builder star = starWo.get().newBuilder();
+      for (int i = 0; i < star.planets.size(); i++) {
+        Planet planet = star.planets.get(i);
+        if (planet.colony == null) {
+          continue;
+        }
+
+        for (int j = 0; j < planet.colony.build_requests.size(); j++) {
+          BuildRequest buildRequest = planet.colony.build_requests.get(i);
+          if (buildRequest.id.equals(buildRequestId)) {
+            // Set the end time well in the past, so that the star manager think it's done.
+            Colony.Builder colonyBuilder = planet.colony.newBuilder();
+            colonyBuilder.build_requests.set(j, buildRequest.newBuilder().end_time(100L).build());
+            star.planets.set(i, planet.newBuilder()
+                .colony(colonyBuilder.build())
+                .build());
+          }
+        }
+      }
+      starWo.set(star.build());
+    }
   }
 
   private SimulateResponse modifyAndSimulate(long starId, @Nullable StarModification modification)

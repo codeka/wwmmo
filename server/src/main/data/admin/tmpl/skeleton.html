@@ -4,7 +4,8 @@
     <title>War Worlds &bull; {% block "title" %}Backend{% endblock %}</title>
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="/admin/css/site.css">
-    <link rel="stylesheet" href="/admin/css/site-mobile.css" media="only screen and (max-width: 900px)" />
+    <link rel="stylesheet" href="/admin/css/site-mobile.css"
+          media="only screen and (max-width: 900px)" />
     <link rel="icon" href="/admin/favicon.ico" />
     <script src="/admin/js/jquery-2.2.3.min.js"></script>
     <script src="/admin/js/main.js"></script>
@@ -37,7 +38,6 @@
           <ul>
             <li><a href="/admin/chat">Messages</a>
             <li><a href="/admin/chat/profanity">Profanity Filter</a>
-            <li><a href="/admin/chat/sinbin">Sinbin</a>
           </ul>
         {% endif %}
         {% if Session.isInRole(session, "EMPIRE") %}
@@ -59,6 +59,7 @@
               <li><a href="/admin/debug/simulation-queue">Simulation queue</a>
               <li><a href="/admin/debug/suspicious-events">Suspicious events</a>
               <li><a href="/admin/debug/moving-fleets">Moving fleets</a></li>
+              <li><a href="/admin/debug/build-requests">Build requests</a>
             </ul>
         {% endif %}
       </ul>

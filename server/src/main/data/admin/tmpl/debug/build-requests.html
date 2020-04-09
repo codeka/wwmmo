@@ -1,0 +1,57 @@
+{% extends "skeleton.html" %}
+{% block "title" %}Build requests{% end %}
+{% block "head" %}
+<link rel="stylesheet" href="/admin/css/star.css">g307CC
+
+<script type="text/javascript" src="/admin/js/tmpl.js"></script>
+<script type="text/javascript" src="/admin/js/time.js"></script>
+<script type="text/javascript" src="/admin/js/designs.js"></script>
+<script type="text/javascript" src="/admin/js/empirestore.js"></script>
+<style>
+  .fleet-small img {
+    vertical-align: middle;
+  }
+</style>
+{% end %}
+{% block "content" %}
+<h1>Build requests</h1>
+<table>
+  <tr>
+    <th></th>
+    <th>Star</th>
+    <th>Design</th>
+    <th>Count</th>
+    <th>Progress</th>
+    <th>Time complete</th>
+    <th></th>
+  </tr>
+  {% for br in build_requests %}
+  <tr>
+    <td>{{ loop.index + 1 }}</td>
+    <td>{% include "inc/star_name.html" star=request_stars.get(br.id) %}</td>
+    <td>{% include "inc/design_name.html" design_type=br.design_type %}</td>
+    <td>{{ br.count }}</td>
+    <td>{{ br.progress }}</td>
+    <td><time timestamp="{{ br.end_time }}" class="timer"></time></td>
+    <td><a href="javascript:forceComplete({{ request_stars.get(br.id).id }}, {{ br.id }});">Force complete</a></td>
+  </tr>
+  {% end %}
+</table>
+
+<script>
+  function forceComplete(starId, reqId) {
+    $.ajax({
+      url: "/admin/ajax/starfield",
+      data: {
+        "action": "forceBuildRequestComplete",
+        "id": starId,
+        "reqId": reqId
+      },
+      method: "POST",
+      success: function(data) {
+        window.location.reload();
+      }
+    });
+  }
+</script>
+{% end %}

@@ -103,17 +103,11 @@ public class StarsStore extends BaseStore {
 
   @Nullable
   public Star nextStarForSimulate() {
-    try (
-        QueryResult res = newReader()
-            .stmt("SELECT star FROM stars WHERE next_simulation IS NOT NULL ORDER BY next_simulation ASC")
-            .query()) {
-      if (res.next()) {
-        return processStar(Star.ADAPTER.decode(res.getBytes(0)));
-      }
-    } catch (Exception e) {
-      log.error("Unexpected.", e);
+    ArrayList<Star> queue = fetchSimulationQueue(1);
+    if (queue.isEmpty()) {
+      return null;
     }
-    return null;
+    return queue.get(0);
   }
 
   /**
