@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 set -e
 
 SCRIPT=`realpath $0`
