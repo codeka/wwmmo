@@ -23,6 +23,7 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Class for handling modifications to a star.
@@ -178,7 +179,7 @@ public class StarModifier {
         Fleet fleet = star.fleets.get(i);
         if (fleet.design_type.equals(Design.DesignType.COLONY_SHIP)
             && fleet.empire_id.equals(modification.empire_id)) {
-          // TODO: check for cyrogenics
+          // TODO: check for cryogenics
           if (Math.ceil(fleet.num_ships) == 1.0f) {
             star.fleets.remove(i);
           } else {
@@ -284,10 +285,10 @@ public class StarModifier {
     } else {
       fuelAmount = design.fuel_size * numShips;
       if (modification.fleet != null) {
-        fuelAmount -= modification.fleet.fuel_amount;
+        fuelAmount = modification.fleet.fuel_amount;
       }
 
-      if (modification.empire_id != null) {
+      if (modification.empire_id != null && modification.fleet == null) {
         int storageIndex = StarHelper.getStorageIndex(star, modification.empire_id);
         EmpireStorage.Builder empireStorage;
         if (storageIndex < 0) {
@@ -669,6 +670,7 @@ public class StarModifier {
       throws SuspiciousModificationException{
     checkArgument(
         modification.type.equals(StarModification.MODIFICATION_TYPE.MOVE_FLEET));
+    checkNotNull(auxStars);
     logHandler.log("- moving fleet");
 
     Star targetStar = null;
