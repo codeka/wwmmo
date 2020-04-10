@@ -2,11 +2,12 @@ package au.com.codeka.warworlds.client.ui;
 
 import android.annotation.TargetApi;
 import android.os.Build;
-import android.transition.ChangeBounds;
-import android.transition.ChangeImageTransform;
-import android.transition.ChangeTransform;
-import android.transition.Fade;
-import android.transition.TransitionSet;
+
+import androidx.transition.ChangeBounds;
+import androidx.transition.ChangeImageTransform;
+import androidx.transition.ChangeTransform;
+import androidx.transition.Fade;
+import androidx.transition.TransitionSet;
 
 /**
  * Helper class for creating transitions between fragments.

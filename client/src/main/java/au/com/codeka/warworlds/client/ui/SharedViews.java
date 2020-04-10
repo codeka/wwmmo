@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.ui;
 
+import android.content.Context;
 import android.view.View;
 
 import com.google.common.base.Preconditions;
@@ -19,6 +20,20 @@ public class SharedViews {
 
   public ArrayList<SharedView> getSharedViews() {
     return sharedViews;
+  }
+
+  public String toDebugString(Context context) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < sharedViews.size(); i++) {
+      if (i == 0) {
+        sb.append("[");
+      } else {
+        sb.append(", ");
+      }
+      sb.append(sharedViews.get(i).toDebugString(context));
+    }
+    sb.append("]");
+    return sb.toString();
   }
 
   public static Builder builder() {
@@ -66,6 +81,22 @@ public class SharedViews {
 
     public int getToViewId() {
       return toViewId;
+    }
+
+    public String toDebugString(Context context) {
+      if (viewId != 0) {
+        return context.getResources().getResourceName(viewId);
+      } else {
+        String str;
+        if (fromView != null) {
+          str = fromView.toString();
+        } else {
+          str = context.getResources().getResourceName(fromViewId);
+        }
+        str += " -> ";
+        str += context.getResources().getResourceName(toViewId);
+        return str;
+      }
     }
   }
 

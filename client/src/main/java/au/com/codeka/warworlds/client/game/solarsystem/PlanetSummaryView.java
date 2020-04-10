@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.client.game.solarsystem;
 
 import android.content.Context;
 import android.text.Html;
-import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.transition.TransitionManager;
 
 import com.squareup.wire.Wire;
 

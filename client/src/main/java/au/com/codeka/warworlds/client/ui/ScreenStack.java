@@ -2,14 +2,13 @@ package au.com.codeka.warworlds.client.ui;
 
 import android.content.Intent;
 import android.os.Build;
-import android.transition.Scene;
-import android.transition.Transition;
-import android.transition.TransitionManager;
-import android.transition.TransitionSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.transition.Scene;
+import androidx.transition.Transition;
+import androidx.transition.TransitionManager;
+import androidx.transition.TransitionSet;
 
 import java.util.Random;
 import java.util.Stack;
@@ -63,8 +62,15 @@ public class ScreenStack {
       top.screen.onHide();
     }
 
-    if (screens.contains(screen)) {
-      // If the screen is already on the stack, we'll just remove everything up to that screen
+    boolean containsScreen = false;
+    for (ScreenHolder screenHolder : screens) {
+      if (screenHolder.screen == screen) {
+        containsScreen = true;
+        break;
+      }
+    }
+    if (containsScreen) {
+      // If the screen is already on the stack, we'll just remove everything up to that screen.
       while (screens.peek().screen != screen) {
         pop();
       }
@@ -94,10 +100,8 @@ public class ScreenStack {
    */
   public boolean backTo(Class<? extends Screen> homeScreen) {
     if (screens.size() == 1 && homeScreen.isInstance(screens.get(0).screen)) {
-      log.info("DEANH screens.size() == 1 && homeScreen.isInstance");
       return pop();
     } else if (screens.size() == 1) {
-      log.info("DEANH screens.size() == 1 && !homeScreen.isInstance");
       pop();
       try {
         push(homeScreen.newInstance());
@@ -108,7 +112,6 @@ public class ScreenStack {
       return true;
     }
 
-    log.info("DEANH just poppin'");
     return pop();
   }
 
@@ -131,12 +134,13 @@ public class ScreenStack {
       return false;
     }
 
+    SharedViews oldSharedViews = screenHolder.sharedViews;
     screenHolder.screen.onHide();
     screenHolder.screen.onDestroy();
 
     if (!screens.isEmpty()) {
       screenHolder = screens.peek();
-      performShow(screenHolder.screen, screenHolder.sharedViews, transition);
+      performShow(screenHolder.screen, oldSharedViews, transition);
       return true;
     }
     container.removeAllViews();
@@ -152,6 +156,12 @@ public class ScreenStack {
     View view = showInfo.getView();
     if (view != null) {
       if (transition && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        log.info(
+            "Performing show of '%s' with: %s",
+            screen.getClass().getSimpleName(),
+            sharedViews == null
+                ? "no transition"
+                : sharedViews.toDebugString(context.getActivity()));
         Scene scene = new Scene(container, view);
         TransitionSet mainTransition = new TransitionSet();
         Transition fadeTransition = Transitions.fade().clone();
@@ -165,7 +175,7 @@ public class ScreenStack {
               fadeTransition.excludeTarget(sharedView.getViewId(), true);
               transformTransition.addTarget(sharedView.getViewId());
             } else {
-              String name = "shared-" + Long.toString(RANDOM.nextLong());
+              String name = "shared-" + RANDOM.nextLong();
               if (sharedView.getFromViewId() != 0 && sharedView.getToViewId() != 0) {
                 container.findViewById(sharedView.getFromViewId()).setTransitionName(name);
                 view.findViewById(sharedView.getToViewId()).setTransitionName(name);

@@ -1,13 +1,13 @@
 package au.com.codeka.warworlds.client.game.build;
 
 import android.content.Context;
-import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.transition.TransitionManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.squareup.picasso.Picasso;

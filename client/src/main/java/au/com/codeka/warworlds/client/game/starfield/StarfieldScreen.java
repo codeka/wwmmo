@@ -66,7 +66,7 @@ public class StarfieldScreen extends Screen {
       public void onStarClicked(Star star, @Nullable Planet planet) {
         context.pushScreen(
             new SolarSystemScreen(star, -1 /* planetIndex */),
-            new SharedViews.Builder()
+            SharedViews.builder()
                 .addSharedView(R.id.top_pane)
                 .addSharedView(R.id.bottom_pane)
                 .build());
@@ -74,7 +74,12 @@ public class StarfieldScreen extends Screen {
 
       @Override
       public void onFleetClicked(Star star, Fleet fleet) {
-        context.pushScreen(new FleetsScreen(star, fleet.id), createSharedViews());
+        context.pushScreen(
+            new FleetsScreen(star, fleet.id),
+            SharedViews.builder()
+                .addSharedView(R.id.bottom_pane)
+                .addSharedView(R.id.top_pane)
+                .build());
       }
     });
 
@@ -86,13 +91,6 @@ public class StarfieldScreen extends Screen {
         context.getActivity(), star, fleet);
 
     layout.showBottomPane(fleetSelectedBottomPane, false /* instant */);
-  }
-
-  private SharedViews createSharedViews() {
-    return SharedViews.builder()
-        .addSharedView(R.id.bottom_pane)
-        .addSharedView(R.id.top_pane)
-        .build();
   }
 
   private final StarfieldManager.TapListener tapListener = new StarfieldManager.TapListener() {
