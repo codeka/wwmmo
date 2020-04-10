@@ -84,6 +84,16 @@ public class EmpireManager {
     return createEmpire(name, newStarFinder);
   }
 
+  private static StarModification createFleet(long empireId, Design.DesignType designType, int count) {
+    return new StarModification.Builder()
+        .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+        .empire_id(empireId)
+        .design_type(designType)
+        .count(count)
+        .full_fuel(true)
+        .build();
+  }
+
   /**
    * Create a new {@link Empire}, and return it as a {@link WatchableObject}.
    * @param name The name to give this new empire. We assume you've already confirmed that the name
@@ -108,34 +118,23 @@ public class EmpireManager {
           new StarModification.Builder()
               .type(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
               .build(),
-          new StarModification.Builder()
-              .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-              .empire_id(id)
-              .design_type(Design.DesignType.COLONY_SHIP)
-              .count(3) // note: one is destroyed by COLONIZE below
-              .full_fuel(true)
-              .build(),
-          new StarModification.Builder()
-              .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-              .empire_id(id)
-              .design_type(Design.DesignType.FIGHTER)
-              .count(50)
-              .full_fuel(true)
-              .build(),
-          new StarModification.Builder()
-              .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-              .empire_id(id)
-              .design_type(Design.DesignType.TROOP_CARRIER)
-              .count(200)
-              .full_fuel(true)
-              .build(),
-          new StarModification.Builder()
-              .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-              .empire_id(id)
-              .design_type(Design.DesignType.SCOUT)
-              .count(10)
-              .full_fuel(true)
-              .build(),
+          createFleet(id, Design.DesignType.COLONY_SHIP, 11),
+          createFleet(id, Design.DesignType.FIGHTER, 100),
+          createFleet(id, Design.DesignType.FIGHTER, 100),
+          createFleet(id, Design.DesignType.FIGHTER, 100),
+          createFleet(id, Design.DesignType.FIGHTER, 150),
+          createFleet(id, Design.DesignType.FIGHTER, 150),
+          createFleet(id, Design.DesignType.FIGHTER, 200),
+          createFleet(id, Design.DesignType.FIGHTER, 200),
+          createFleet(id, Design.DesignType.TROOP_CARRIER, 150),
+          createFleet(id, Design.DesignType.TROOP_CARRIER, 150),
+          createFleet(id, Design.DesignType.TROOP_CARRIER, 150),
+          createFleet(id, Design.DesignType.TROOP_CARRIER, 200),
+          createFleet(id, Design.DesignType.TROOP_CARRIER, 200),
+          createFleet(id, Design.DesignType.TROOP_CARRIER, 250),
+          createFleet(id, Design.DesignType.TROOP_CARRIER, 250),
+          createFleet(id, Design.DesignType.SCOUT, 20),
+          createFleet(id, Design.DesignType.SCOUT, 0),
           new StarModification.Builder()
               .empire_id(id)
               .type(StarModification.MODIFICATION_TYPE.COLONIZE)
