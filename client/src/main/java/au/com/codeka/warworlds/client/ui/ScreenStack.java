@@ -164,15 +164,19 @@ public class ScreenStack {
                 : sharedViews.toDebugString(context.getActivity()));
         Scene scene = new Scene(container, view);
         TransitionSet mainTransition = new TransitionSet();
-        Transition fadeTransition = Transitions.fade().clone();
-        mainTransition.addTransition(fadeTransition);
+
+        // TODO: sometimes this would crash (e.g. when adding/removing list items). I don't know
+        // why (why is it adding/remove list items from a list?) but we'll just disable the fade. It
+        // kind of looks better without the fade anyway.
+//        Transition fadeTransition = Transitions.fade().clone();
+//        mainTransition.addTransition(fadeTransition);
 
         if (sharedViews != null) {
           Transition transformTransition = Transitions.transform().clone();
           mainTransition.addTransition(transformTransition);
           for (SharedViews.SharedView sharedView : sharedViews.getSharedViews()) {
             if (sharedView.getViewId() != 0) {
-              fadeTransition.excludeTarget(sharedView.getViewId(), true);
+//              fadeTransition.excludeTarget(sharedView.getViewId(), true);
               transformTransition.addTarget(sharedView.getViewId());
             } else {
               String name = "shared-" + RANDOM.nextLong();
@@ -185,7 +189,7 @@ public class ScreenStack {
               } else {
                 log.error("Unexpected SharedView configuration.");
               }
-              fadeTransition.excludeTarget(name, true);
+//              fadeTransition.excludeTarget(name, true);
               transformTransition.addTarget(name);
             }
           }
