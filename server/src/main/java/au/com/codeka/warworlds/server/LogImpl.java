@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.server;
 
 import org.joda.time.DateTime;
 
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

@@ -645,7 +645,7 @@ public class Simulation {
    *
    * <p>If a fleet is destroyed by the attack, the remaining attack points are then used to target
    * another fleet in the same round until there's no more attack points left. This is so that you
-   * get an advantage by splitting up all your fleets.
+   * do not get an advantage by splitting up all your fleets.
    */
   private void simulateCombat(Star.Builder star, long now) {
     // if there's no fleets in ATTACKING mode, then there's nothing to do
@@ -742,7 +742,7 @@ public class Simulation {
           continue;
         }
 
-        if (damage - fleet.num_ships <= EPSILON) {
+        if (fleet.num_ships - damage <= EPSILON) {
           log("      Fleet=%d destroyed (num_ships=%.4f <= damage=%.4f).",
               fleet.id, fleet.num_ships, damage);
           star.fleets.set(i, fleet.newBuilder()
