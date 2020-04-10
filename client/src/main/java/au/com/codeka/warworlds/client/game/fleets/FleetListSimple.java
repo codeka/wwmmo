@@ -85,7 +85,6 @@ public class FleetListSimple extends LinearLayout {
     TextView row2 = view.findViewById(R.id.fleet_row2);
     ProgressBar fuelLevel = view.findViewById(R.id.fuel_level);
 
-
     int maxFuel = (int) (design.fuel_size * fleet.num_ships);
     int fuelAmount = fleet.fuel_amount == null ? 0 : (int) (float) fleet.fuel_amount;
     if (maxFuel == fuelAmount) {

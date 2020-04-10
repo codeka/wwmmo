@@ -185,7 +185,10 @@ public class ScreenStack {
                 view.findViewById(sharedView.getToViewId()).setTransitionName(name);
               } else if (sharedView.getFromView() != null && sharedView.getToViewId() != 0) {
                 sharedView.getFromView().setTransitionName(name);
-                view.findViewById(sharedView.getToViewId()).setTransitionName(name);
+                View toView = view.findViewById(sharedView.getToViewId());
+                if (toView != null) {
+                  toView.setTransitionName(name);
+                }
               } else {
                 log.error("Unexpected SharedView configuration.");
               }
