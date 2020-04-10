@@ -9,7 +9,7 @@ import okio.BufferedSource;
 import okio.Okio;
 
 /**
- * Decodes a stream of {@link Packet}s, as encoded by {@PacketEncoder}.
+ * Decodes a stream of {@link Packet}s, as encoded by {@link PacketEncoder}.
  */
 public class PacketDecoder {
   private static final Log log = new Log("PacketDecoder");
