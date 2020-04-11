@@ -1,0 +1,74 @@
+#search-results {
+  position: absolute;
+  top: 95pt;
+  left: 560pt;
+  right: 10pt;
+  bottom: 10pt;
+  border: solid 1px #666;
+  overflow-y: scroll;
+}
+#search-results.code {
+  white-space: pre;
+  font-family: monospace;
+}
+#search-time {
+    position: absolute;
+    top: 80pt;
+    left: 560pt;
+}
+form {
+  position: relative;
+  height: 28pt;
+  line-height: 28pt;
+  width: 555pt;
+}
+form input[type=submit] {
+  position: absolute;
+  right: 0;
+}
+form div.hack {
+  position: absolute;
+  top: 0; left: 60pt;
+  bottom: 4pt; right: 185pt;;
+}
+input[type=text] {
+  width: 98%;
+  height: 100%;
+  padding: 0;
+  padding-left: 1%;
+  border: solid 1px black;
+}
+form label {
+  display: block;
+  position: absolute;
+  left: 0; width: 60pt;
+  top: 0; bottom: 0;
+}
+form#find-byemailidname input[type=submit] {
+  right: 120pt;
+}
+
+form#empire-query input[value="Cash Audit"] {
+  position: absolute;
+  right: 100pt;
+}
+form#empire-query input[value="Building Stats"] {
+  position: absolute;
+  right: 0;
+}
+
+table {
+  width: 560pt;
+}
+div.spinner {
+}
+div.email-addr {
+  max-width: 600px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#refresh-ranks {
+  float: right;
+  margin: 10pt 10pt 0 0;
+}

@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import com.google.common.base.Strings;
+
 import org.joda.time.DateTime;
 
 import java.io.File;
@@ -54,8 +56,10 @@ public class RenderingHandler extends RequestHandler {
       data.put("num_backend_users", new AdminController().getNumBackendUsers());
     }
 
-    getResponse().setContentType("text/html");
-    getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
+    if (Strings.isNullOrEmpty(getResponse().getContentType())) {
+      getResponse().setContentType("text/html");
+      getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
+    }
     try {
       getResponse().getWriter().write(CARROT_ENGINE.process(path, new MapBindings(data)));
     } catch (CarrotException | IOException e) {

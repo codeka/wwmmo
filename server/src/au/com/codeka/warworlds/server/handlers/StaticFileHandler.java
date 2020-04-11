@@ -18,7 +18,7 @@ public class StaticFileHandler extends RequestHandler {
   protected void get() throws RequestException {
     String path = getExtraOption() + getUrlParameter("path");
 
-    String contentType = "text/plain";
+    String contentType;
     if (path.endsWith(".css")) {
       contentType = "text/css";
     } else if (path.endsWith(".js")) {
@@ -35,9 +35,12 @@ public class StaticFileHandler extends RequestHandler {
 
     try {
       OutputStream outs = getResponse().getOutputStream();
-      InputStream ins = new FileInputStream(new File(Configuration.i.getDataDirectory(),
-          "static/" + path));
+      File file = new File(Configuration.i.getDataDirectory(), "static/" + path);
+      if (!file.exists()) {
+        throw new RequestException(404, String.format("File '%s' not found.", path));
+      }
 
+      InputStream ins = new FileInputStream(file);
       byte[] buffer = new byte[1024];
       int bytes;
       while ((bytes = ins.read(buffer, 0, 1024)) > 0) {

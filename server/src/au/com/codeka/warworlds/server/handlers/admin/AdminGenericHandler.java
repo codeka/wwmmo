@@ -11,7 +11,21 @@ public class AdminGenericHandler extends AdminHandler {
       return;
     }
 
-    String path = getExtraOption() + getUrlParameter("path") + ".html";
+    String path = getUrlParameter("path");
+
+    String contentType;
+    if (path.endsWith(".css")) {
+      contentType = "text/css";
+    } else if (path.endsWith(".js")) {
+      contentType = "text/javascript";
+    } else {
+      path = path + ".html";
+      contentType = "text/html";
+    }
+    getResponse().setContentType(contentType);
+    getResponse().setHeader("Content-Type", contentType);
+
+    path = getExtraOption() + path;
     if (path.equals(getExtraOption() + ".html")) {
       path = getExtraOption() + "index.html";
     }
