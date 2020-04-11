@@ -47,7 +47,11 @@ public class SitReportsHandler extends RequestHandler {
 
     Integer empireID = getSession().getEmpireID();
     if (getSession().isAdmin()) {
-      empireID = null;
+      if (getRequest().getParameter("empireId") != null) {
+        empireID = Integer.parseInt(getRequest().getParameter("empireId"));
+      } else {
+        empireID = null;
+      }
     }
     List<Messages.SituationReport> sitreps = new SituationReportController().fetch(
         empireID, starID, before, after, filter, 50);

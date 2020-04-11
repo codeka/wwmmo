@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server;
 
-import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jetty9.InstrumentedHandler;
 
 import java.io.IOException;
@@ -14,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.ctrl.SessionController;

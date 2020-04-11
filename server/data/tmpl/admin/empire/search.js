@@ -190,3 +190,17 @@ $("body").on("click", ".empire-logins-fetch", function() {
       }
   });
 });
+
+$("body").on("click", ".empire-sitrep-fetch", function() {
+  if (currentEmpire == null) {
+    return;
+  }
+
+  $.ajax({
+       url: "/realms/{{realm}}/sit-reports?empireId=" + currentEmpire.key,
+       dataType: "json",
+       success: function(data) {
+         $("#empire-sitrep-tab").html("<code><pre>" + JSON.stringify(data, null, "  ") + "</pre></code>");
+       }
+  });
+});
