@@ -79,7 +79,7 @@ public class ImageHelper {
    * Bind an empire's shield image to the given {@link ImageView}.
    */
   public static void bindEmpireShield(ImageView view, @Nullable Empire empire) {
-    if (empire == null) {
+    if (empire == null)
       view.setImageDrawable(null);
       return;
     }

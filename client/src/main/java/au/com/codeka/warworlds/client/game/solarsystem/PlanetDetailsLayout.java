@@ -138,6 +138,8 @@ public class PlanetDetailsLayout extends RelativeLayout {
     ImageHelper.bindEmpireShield(empireIcon, empire);
     if (empire != null) {
       empireName.setText(empire.display_name);
+    } else if (planet.colony != null) {
+      empireName.setText(R.string.native_colony);
     } else {
       empireName.setText(R.string.uncolonized);
     }
@@ -145,9 +147,14 @@ public class PlanetDetailsLayout extends RelativeLayout {
 
     focusContainer.setVisibility(empire == null ? View.GONE : View.VISIBLE);
 
-    attackBtn.setVisibility(
-        empire != null && EmpireManager.i.isEnemy(empire) ? View.VISIBLE : View.GONE);
-    colonizeBtn.setVisibility(empire == null ? View.VISIBLE : View.GONE);
+    if (planet.colony != null) {
+      attackBtn.setVisibility(
+          (empire == null || EmpireManager.i.isEnemy(empire)) ? View.VISIBLE : View.GONE);
+      colonizeBtn.setVisibility(View.GONE);
+    } else {
+      attackBtn.setVisibility(View.GONE);
+      colonizeBtn.setVisibility(View.VISIBLE);
+    }
 
     if (planet.colony != null) {
       focusValues[FARMING_INDEX] = planet.colony.focus.farming;
