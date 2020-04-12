@@ -184,6 +184,7 @@ public class PlanetDetailsLayout extends RelativeLayout {
       fleetList.setStar(star, (fleet) -> fleet.design_type == Design.DesignType.TROOP_CARRIER);
       note.setText(
           fleetList.getNumFleets() > 0 ? R.string.attack_hint : R.string.attack_hint_no_ships);
+      attackBtn.setEnabled(fleetList.getNumFleets() > 0);
     } else {
       // It's uncolonized.
       focusContainer.setVisibility(View.GONE);
@@ -193,6 +194,7 @@ public class PlanetDetailsLayout extends RelativeLayout {
       fleetList.setStar(star, (fleet) -> fleet.design_type == Design.DesignType.COLONY_SHIP);
       note.setText(
           fleetList.getNumFleets() > 0 ? R.string.colonize_hint : R.string.colonize_hint_no_ships);
+      colonizeBtn.setEnabled(fleetList.getNumFleets() > 0);
     }
   }
 

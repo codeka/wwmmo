@@ -158,6 +158,9 @@ public class StarModifier {
       case UPGRADE_BUILDING:
         applyUpgradeBuilding(star, modification, logHandler);
         return;
+      case ATTACK_COLONY:
+        applyAttackColony(star, modification, logHandler);
+        return;
       default:
         logHandler.log("Unknown or unexpected modification type: " + modification.type);
         log.error("Unknown or unexpected modification type: %s", modification.type);
@@ -808,6 +811,66 @@ public class StarModifier {
 
         star.planets.set(i, star.planets.get(i).newBuilder().colony(colony.build()).build());
       }
+    }
+  }
+
+  private void applyAttackColony(
+      Star.Builder star,
+      StarModification modification,
+      Simulation.LogHandler logHandler)
+      throws SuspiciousModificationException {
+    checkArgument(
+        modification.type.equals(StarModification.MODIFICATION_TYPE.ATTACK_COLONY));
+    logHandler.log("- attacking colony");
+    boolean found = false;
+    for (int i = 0; i < star.planets.size(); i++) {
+      if (star.planets.get(i).colony != null
+          && star.planets.get(i).colony.id.equals(modification.colony_id)) {
+        Colony.Builder colony = star.planets.get(i).colony.newBuilder();
+        if (colony.empire_id != null && colony.empire_id.equals(modification.empire_id)) {
+          // Not suspicious, just dumb...
+          logHandler.log("- trying to attack your own colony, ignoring.");
+          return;
+        }
+
+        found = true;
+
+        for (int j = 0; j < star.fleets.size(); j++) {
+          Fleet fleet = star.fleets.get(j);
+          if (FleetHelper.isOwnedBy(fleet, modification.empire_id) &&
+              fleet.design_type.equals(Design.DesignType.TROOP_CARRIER)) {
+            // It's our troop carrier, so we reduce the colony's population by the requisite amount
+            float numShips = fleet.num_ships / colony.defence_bonus;
+            if (colony.population < numShips) {
+              final float fraction = colony.population / numShips;
+
+              // We've destroyed the colony. Figure out how many ships are left, and update the
+              // fleet according. Also, remove the colony itself.
+              star.planets.set(i, star.planets.get(i).newBuilder().colony(null).build());
+              star.fleets.set(
+                  j,
+                  fleet.newBuilder()
+                      .num_ships(fleet.num_ships - (fleet.num_ships * fraction))
+                      .build());
+            } else {
+              // We haven't destroyed the colony yet, but this fleet is destroyed.
+              star.planets.set(
+                  i,
+                  star.planets.get(i).newBuilder()
+                      .colony(colony.population(colony.population - numShips).build())
+                      .build());
+              star.fleets.set(j, fleet.newBuilder().num_ships(0f).build());
+            }
+          }
+        }
+      }
+    }
+
+    if (!found) {
+      throw new SuspiciousModificationException(
+          star.id,
+          modification,
+          "trying to attack a colony that doesn't exist (%d)", modification.colony_id);
     }
   }
 

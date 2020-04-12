@@ -16,6 +16,8 @@ import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Activity for interacting with enemy planets (note it's not necessarily an enemy, per se, it
  * could also be an ally or faction member).
@@ -66,51 +68,21 @@ public class PlanetDetailsScreen extends Screen {
 
     @Override
     public void onAttackClick() {
-      log.info("Attack!");
-    /*
-    int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
+      if (planet.colony == null) {
+        return;
+      }
 
-    final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-    int attack = 0;
-    for (BaseFleet fleet : star.getFleets()) {
-      if (fleet.getEmpireKey() == null) {
-        continue;
-      }
-      if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
-        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP,
-            fleet.getDesignID());
-        if (design.hasEffect("troopcarrier")) {
-          attack += Math.ceil(fleet.getNumShips());
-        }
-      }
-    }
-
-    StyledDialog.Builder b = new StyledDialog.Builder(this);
-    b.setMessage(Html.fromHtml(String.format(Locale.ENGLISH,
-        "<p>Do you want to attack this %s colony?</p>"
-            + "<p><b>Colony defence:</b> %d<br />"
-            + "   <b>Your attack capability:</b> %d</p>", colonyEmpire.getDisplayName(), defence,
-        attack)));
-    b.setPositiveButton("Attack!", new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(final DialogInterface dialog, int which) {
-        myEmpire.attackColony(star, colony, new MyEmpire.AttackColonyCompleteHandler() {
-          @Override
-          public void onComplete() {
-            dialog.dismiss();
-            finish();
-          }
-        });
-      }
-    });
-    b.setNegativeButton("Cancel", null);
-    b.create().show();
-  */
+      Empire myEmpire = checkNotNull(EmpireManager.i.getMyEmpire());
+      StarManager.i.updateStar(star, new StarModification.Builder()
+          .type(StarModification.MODIFICATION_TYPE.ATTACK_COLONY)
+          .empire_id(myEmpire.id)
+          .colony_id(planet.colony.id));
+      context.popScreen();
     }
 
     @Override
     public void onColonizeClick() {
-      Empire myEmpire = Preconditions.checkNotNull(EmpireManager.i.getMyEmpire());
+      Empire myEmpire = checkNotNull(EmpireManager.i.getMyEmpire());
       StarManager.i.updateStar(star, new StarModification.Builder()
           .type(StarModification.MODIFICATION_TYPE.COLONIZE)
           .empire_id(myEmpire.id)

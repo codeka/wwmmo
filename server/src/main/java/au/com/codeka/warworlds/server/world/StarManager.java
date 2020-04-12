@@ -309,6 +309,7 @@ public class StarManager {
 
       // Then remove it from our star.
       starBuilder.fleets.remove(i);
+      i--;
     }
 
     // Any fleets that have been destroyed, destroy them.

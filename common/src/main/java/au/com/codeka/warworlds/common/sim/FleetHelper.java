@@ -29,4 +29,18 @@ public class FleetHelper {
   public static boolean isFriendly(Fleet fleet1, Fleet fleet2) {
     return isFriendly(fleet1, fleet2.empire_id);
   }
+
+  public static boolean isOwnedBy(Fleet fleet, Empire empire) {
+    return isOwnedBy(fleet, empire == null ? null : empire.id);
+  }
+
+  public static boolean isOwnedBy(Fleet fleet, Long empireId) {
+    if (fleet.empire_id == null && empireId == null) {
+      return true;
+    }
+    if (fleet.empire_id == null || empireId == null) {
+      return false;
+    }
+    return fleet.empire_id.equals(empireId);
+  }
 }
