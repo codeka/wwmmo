@@ -67,6 +67,12 @@
   <string name="create_empire_switch_account_btn">I already have an empire</string>
 
   <string name="focus_hint">Drag the sliders to adjust focus.</string>
+  <string name="attack_hint">These are the ships you have available to attack. Tap "Attack" to
+      destroy this colony.</string>
+  <string name="attack_hint_no_ships">You don\'t have any ships available top attack this colony.</string>
+  <string name="colonize_hint">These are the ships you have available to colonize. Tap "Colonize" to
+      begin colonising this planet.</string>
+  <string name="colonize_hint_no_ships">You don\'t have any ships available to colonize this planet.</string>
 
   <string name="no_more_upgrades">No more upgrades</string>
 

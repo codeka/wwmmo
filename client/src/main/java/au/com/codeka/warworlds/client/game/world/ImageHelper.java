@@ -52,11 +52,12 @@ public class ImageHelper {
   }
 
   public static String getEmpireImageUrl(
-      Context context, Empire empire, int width, int height) {
+      Context context, @Nullable Empire empire, int width, int height) {
     String dpi = getDensityName(context.getResources().getDisplayMetrics().densityDpi);
 
     return String.format(Locale.ENGLISH, "%srender/empire/%d/%dx%d/%s.png",
-        ServerUrl.getUrl(), empire.id == null ? 0 : empire.id, width, height, dpi);
+        ServerUrl.getUrl(), (empire == null || empire.id == null) ? 0 : empire.id, width, height,
+        dpi);
   }
 
   /** Gets the URL for fetching an empire's logo, with exact pixel dimensions (a.k.a. mdpi). */
@@ -79,11 +80,6 @@ public class ImageHelper {
    * Bind an empire's shield image to the given {@link ImageView}.
    */
   public static void bindEmpireShield(ImageView view, @Nullable Empire empire) {
-    if (empire == null)
-      view.setImageDrawable(null);
-      return;
-    }
-
     DimensionResolver resolver = new DimensionResolver(view.getContext());
     int width = (int) resolver.px2dp(view.getLayoutParams().width);
     int height = (int) resolver.px2dp(view.getLayoutParams().height);

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
   <FrameLayout
@@ -34,7 +35,8 @@
                android:layout_width="40dp"
                android:layout_height="40dp"
                android:layout_marginTop="6dp"
-               android:layout_marginStart="6dp" />
+               android:layout_marginStart="6dp"
+               tools:src="@drawable/shield" />
     <TextView android:id="@+id/empire_name"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -43,46 +45,52 @@
               android:layout_marginStart="6dp"
               android:textAppearance="?android:attr/textAppearanceSmall"
               android:singleLine="true"
-              android:ellipsize="end" />
+              android:ellipsize="end"
+              tools:text="Empire name" />
     <TextView android:id="@+id/empire_defence"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_toEndOf="@id/empire_icon"
               android:layout_below="@id/empire_name"
               android:layout_marginStart="6dp"
+              tools:text="Defence: 12"
               android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView android:id="@+id/note"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@id/empire_icon"
+              android:layout_alignParentStart="true"
+              android:layout_margin="10dp"
+              tools:text="@string/focus_hint" />
+
+    <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
+        android:id="@+id/fleet_list"
+        android:layout_below="@id/note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10pt"/>
+
     <Button android:id="@+id/attack_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/empire_icon"
-            android:layout_alignStart="@id/empire_icon"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_width="50pt"
+            android:layout_height="18pt"
+            android:layout_below="@id/fleet_list"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
             android:text="@string/attack" />
     <Button android:id="@+id/colonize_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/empire_icon"
-            android:layout_alignStart="@id/empire_icon"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+        android:layout_width="50pt"
+        android:layout_height="18pt"
+            android:layout_below="@id/fleet_list"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
             android:text="@string/colonize"/>
 
     <RelativeLayout android:id="@+id/focus_container"
                     android:layout_width="match_parent"
-                    android:layout_below="@id/empire_defence"
+                    android:layout_below="@id/note"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp">
-
-      <TextView android:id="@+id/note"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true"
-                android:layout_margin="10dp"
-                android:text="@string/focus_hint" />
 
       <SeekBar android:id="@+id/focus_farming"
                android:layout_width="match_parent"
@@ -91,7 +99,7 @@
                android:layout_marginStart="10dp"
                android:layout_marginEnd="60dp"
                android:layout_alignParentEnd="true"
-               android:layout_below="@+id/note"
+               android:layout_alignParentTop="true"
                android:layout_toEndOf="@+id/focus_farming_plus_btn"
                android:layout_toStartOf="@+id/focus_farming_value"
                android:max="1000" />

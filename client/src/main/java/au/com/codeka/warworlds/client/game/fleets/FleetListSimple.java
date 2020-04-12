@@ -9,6 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +27,15 @@ import au.com.codeka.warworlds.common.sim.DesignHelper;
 public class FleetListSimple extends LinearLayout {
   private Context context;
   private Star star;
-  private List<Fleet> fleets;
+  @Nullable private List<Fleet> fleets;
+  @Nullable private FleetFilter filter;
   private FleetSelectedHandler fleetSelectedHandler;
   private View.OnClickListener onClickListener;
+
+  /** An interface you can implement to filter the list of fleets we display in the list. */
+  public interface FleetFilter {
+    boolean showFleet(Fleet fleet);
+  }
 
   public FleetListSimple(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -45,7 +53,18 @@ public class FleetListSimple extends LinearLayout {
 
   public void setStar(Star s) {
     star = s;
+    filter = null;
     refresh();
+  }
+
+  public void setStar(Star s, FleetFilter f) {
+    star = s;
+    filter = f;
+    refresh();
+  }
+
+  public int getNumFleets() {
+    return fleets == null ? 0 : fleets.size();
   }
 
   private void refresh() {
@@ -61,7 +80,8 @@ public class FleetListSimple extends LinearLayout {
     fleets = new ArrayList<>();
     if (star.fleets != null) {
       for (Fleet f : star.fleets) {
-        if (!f.state.equals(Fleet.FLEET_STATE.MOVING) && f.num_ships > 0.01f) {
+        if (!f.state.equals(Fleet.FLEET_STATE.MOVING) && f.num_ships > 0.01f &&
+            (filter == null || filter.showFleet(f))) {
           fleets.add(f);
         }
       }
@@ -70,6 +90,10 @@ public class FleetListSimple extends LinearLayout {
     removeAllViews();
     LayoutInflater inflater =
         (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    if (inflater == null) {
+      // TODO: huh?
+      return;
+    }
     for (Fleet fleet : fleets) {
       View rowView = getRowView(inflater, fleet);
       addView(rowView);

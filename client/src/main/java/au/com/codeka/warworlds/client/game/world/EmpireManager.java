@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket;
 import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.common.proto.RequestEmpirePacket;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /** Manages empires. */
@@ -78,6 +79,16 @@ public class EmpireManager {
     return myEmpire;
   }
 
+  /** @return true if the given empire is mine. */
+  public boolean isMyEmpire(@Nullable Empire empire) {
+    if (empire == null || empire.id == null) {
+      return false;
+    }
+
+    return empire.id.equals(getMyEmpire().id);
+  }
+
+  /** @return true if the given empire is an enemy of us. */
   public boolean isEnemy(@Nullable Empire empire) {
     if (empire == null) {
       return false;

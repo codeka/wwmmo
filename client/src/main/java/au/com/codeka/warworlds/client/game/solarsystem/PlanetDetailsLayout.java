@@ -9,12 +9,16 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import au.com.codeka.warworlds.client.R;
+import au.com.codeka.warworlds.client.game.fleets.FleetListSimple;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.util.NumberFormatter;
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -52,6 +56,9 @@ public class PlanetDetailsLayout extends RelativeLayout {
   private final Button[] focusPlusButtons;
   private final ImageButton[] focusLockButtons;
   private final TextView empireName;
+  private final TextView empireDefence;
+  private final TextView note;
+  private final FleetListSimple fleetList;
   private final Button attackBtn;
   private final Button colonizeBtn;
 
@@ -65,7 +72,10 @@ public class PlanetDetailsLayout extends RelativeLayout {
     congeniality = findViewById(R.id.congeniality);
     planetIcon = findViewById(R.id.planet_icon);
     empireIcon = findViewById(R.id.empire_icon);
+    empireDefence = findViewById(R.id.empire_defence);
     focusContainer = findViewById(R.id.focus_container);
+    note = findViewById(R.id.note);
+    fleetList = findViewById(R.id.fleet_list);
     focusSeekBars = new SeekBar[] {
         findViewById(R.id.focus_farming),
         findViewById(R.id.focus_mining),
@@ -145,24 +155,45 @@ public class PlanetDetailsLayout extends RelativeLayout {
     }
     congeniality.setPlanet(planet);
 
-    focusContainer.setVisibility(empire == null ? View.GONE : View.VISIBLE);
-
     if (planet.colony != null) {
-      attackBtn.setVisibility(
-          (empire == null || EmpireManager.i.isEnemy(empire)) ? View.VISIBLE : View.GONE);
-      colonizeBtn.setVisibility(View.GONE);
-    } else {
-      attackBtn.setVisibility(View.GONE);
-      colonizeBtn.setVisibility(View.VISIBLE);
+      empireDefence.setText(
+          String.format(
+              Locale.ENGLISH,
+              "Defence: %.0f",
+              planet.colony.defence_bonus * planet.colony.population));
     }
 
-    if (planet.colony != null) {
+    if (EmpireManager.i.isMyEmpire(empire)) {
+      // It's our colony.
+      focusContainer.setVisibility(View.VISIBLE);
+      attackBtn.setVisibility(View.GONE);
+      colonizeBtn.setVisibility(View.GONE);
+      note.setText(R.string.focus_hint);
+
       focusValues[FARMING_INDEX] = planet.colony.focus.farming;
       focusValues[MINING_INDEX] = planet.colony.focus.mining;
       focusValues[ENERGY_INDEX] = planet.colony.focus.energy;
       focusValues[CONSTRUCTION_INDEX] = planet.colony.focus.construction;
+      refreshFocus();
+    } else if (planet.colony != null) {
+      // It's an enemy colony (could be native or another player).
+      focusContainer.setVisibility(View.GONE);
+      attackBtn.setVisibility(View.VISIBLE);
+      colonizeBtn.setVisibility(View.GONE);
+
+      fleetList.setStar(star, (fleet) -> fleet.design_type == Design.DesignType.TROOP_CARRIER);
+      note.setText(
+          fleetList.getNumFleets() > 0 ? R.string.attack_hint : R.string.attack_hint_no_ships);
+    } else {
+      // It's uncolonized.
+      focusContainer.setVisibility(View.GONE);
+      attackBtn.setVisibility(View.GONE);
+      colonizeBtn.setVisibility(View.VISIBLE);
+
+      fleetList.setStar(star, (fleet) -> fleet.design_type == Design.DesignType.COLONY_SHIP);
+      note.setText(
+          fleetList.getNumFleets() > 0 ? R.string.colonize_hint : R.string.colonize_hint_no_ships);
     }
-    refreshFocus();
   }
 
   private void refreshFocus() {
