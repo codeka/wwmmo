@@ -67,8 +67,14 @@ public class RequestRateLimiter extends Monitor {
       buckets.put(session.getEmpireID(), bucket);
     }
 
-    if (request.getPathInfo().contains("notifications")) {
-      // For now, we'll skip rate-limiting the notifications request.
+    String path = request.getPathInfo();
+    if (path.contains("notifications") || path.contains("login") || path.contains("hello")) {
+      // For now, we'll skip rate-limiting the notifications request, login and hello.
+      return;
+    }
+
+    if (request.getMethod().equalsIgnoreCase("get")) {
+      // We'll also skip rate-limit GET requests.
       return;
     }
 
