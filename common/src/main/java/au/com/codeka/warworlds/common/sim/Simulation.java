@@ -242,9 +242,9 @@ public class Simulation {
       return;
     }
 
-    storage.max_goods = 1000.0f;
-    storage.max_energy = 1000.0f;
-    storage.max_minerals = 1000.0f;
+    storage.max_goods = 5000.0f;
+    storage.max_energy = 5000.0f;
+    storage.max_minerals = 5000.0f;
 
     float dt = Time.toHours(STEP_TIME);
     float goodsDeltaPerHour = 0.0f;
@@ -301,7 +301,7 @@ public class Simulation {
 
       // Calculate the output from farming this turn and add it to the star global
       float goods =
-          colony.population * colony.focus.farming * (planet.farming_congeniality / 100.0f);
+          colony.population * colony.focus.farming * (planet.farming_congeniality / 10.0f);
       colony.delta_goods(goods);
       storage.total_goods(Math.max(0, storage.total_goods + goods * dt));
       goodsDeltaPerHour += goods;
@@ -310,7 +310,7 @@ public class Simulation {
 
       // calculate the output from mining this turn and add it to the star global
       float mineralsPerHour =
-          colony.population * colony.focus.mining * (planet.mining_congeniality / 100.0f);
+          colony.population * colony.focus.mining * (planet.mining_congeniality / 10.0f);
       colony.delta_minerals(mineralsPerHour);
       storage.total_minerals(Math.max(0, storage.total_minerals + mineralsPerHour * dt));
       mineralsDeltaPerHour += mineralsPerHour;
@@ -319,7 +319,7 @@ public class Simulation {
 
       // calculate the output from energy this turn and add it to the star global
       float energy =
-          colony.population * colony.focus.energy * (planet.energy_congeniality / 100.0f);
+          colony.population * colony.focus.energy * (planet.energy_congeniality / 10.0f);
       colony.delta_energy(energy);
       storage.total_energy(Math.max(0, storage.total_energy + energy * dt));
       energyDeltaPerHour += energy;

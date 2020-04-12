@@ -69,22 +69,29 @@
         android:layout_below="@id/note"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/action_button_container"
         android:layout_marginTop="10pt"/>
 
-    <Button android:id="@+id/attack_btn"
-            android:layout_width="50pt"
-            android:layout_height="18pt"
-            android:layout_below="@id/fleet_list"
-            android:layout_marginTop="20dp"
-            android:layout_centerHorizontal="true"
-            android:text="@string/attack" />
-    <Button android:id="@+id/colonize_btn"
-        android:layout_width="50pt"
-        android:layout_height="18pt"
-            android:layout_below="@id/fleet_list"
-            android:layout_marginTop="20dp"
-            android:layout_centerHorizontal="true"
-            android:text="@string/colonize"/>
+    <FrameLayout
+        android:id="@+id/action_button_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+      <Button android:id="@+id/attack_btn"
+              android:layout_width="50pt"
+              android:layout_height="18pt"
+              android:layout_marginTop="20dp"
+              android:layout_marginBottom="20dp"
+              android:layout_gravity="center"
+              android:text="@string/attack" />
+      <Button android:id="@+id/colonize_btn"
+              android:layout_width="50pt"
+              android:layout_height="18pt"
+              android:layout_marginTop="20dp"
+              android:layout_marginBottom="20dp"
+              android:layout_gravity="center"
+              android:text="@string/colonize"/>
+    </FrameLayout>
 
     <RelativeLayout android:id="@+id/focus_container"
                     android:layout_width="match_parent"
