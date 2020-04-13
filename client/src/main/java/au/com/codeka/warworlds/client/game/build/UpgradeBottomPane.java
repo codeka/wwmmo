@@ -81,11 +81,22 @@ public class UpgradeBottomPane extends RelativeLayout implements BottomPaneConte
     BuildViewHelper.setDesignIcon(design, buildIcon);
     buildName.setText(design.display_name);
     buildDescription.setText(Html.fromHtml(design.description));
+
+    updateBuildTime();
   }
 
   @Override
   public void refresh(Star star) {
 
+  }
+
+  private void updateBuildTime() {
+    new BuildTimeCalculator(star, colony).calculateUpgradeTime(design, building,
+        (time, minerals, mineralsColor) -> {
+          buildTime.setText(time);
+          buildMinerals.setText(minerals);
+          buildMinerals.setTextColor(mineralsColor);
+        });
   }
 
   private void upgrade() {

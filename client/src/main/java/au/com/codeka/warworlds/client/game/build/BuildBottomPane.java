@@ -137,60 +137,23 @@ public class BuildBottomPane extends RelativeLayout implements BottomPaneContent
     updateBuildTime();
   }
 
+  private void updateBuildTime() {
+    int count = 1;
+    if (design.design_kind == Design.DesignKind.SHIP) {
+      count = Integer.parseInt(buildCount.getText().toString());
+    }
+
+    new BuildTimeCalculator(star, colony).calculateBuildTime(design, count,
+        (time, minerals, mineralsColor) -> {
+          buildTime.setText(time);
+          buildMinerals.setText(minerals);
+          buildMinerals.setTextColor(mineralsColor);
+        });
+  }
+
   @Override
   public void refresh(Star star) {
     // TODO
-  }
-
-  private void updateBuildTime() {
-    App.i.getTaskRunner().runTask(() -> {
-      // Add the build request to a temporary copy of the star, simulate it and figure out the
-      // build time.
-      Star.Builder starBuilder = star.newBuilder();
-
-      int count = 1;
-      if (design.design_kind == Design.DesignKind.SHIP) {
-        count = Integer.parseInt(buildCount.getText().toString());
-      }
-
-      Empire myEmpire = EmpireManager.i.getMyEmpire();
-      try {
-        new StarModifier(() -> 0).modifyStar(starBuilder,
-            new StarModification.Builder()
-                .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
-                .empire_id(myEmpire.id)
-                .colony_id(colony.id)
-                .count(count)
-                .design_type(design.type)
-                // TODO: upgrades?
-                .build());
-      } catch (SuspiciousModificationException e) {
-        log.error("Suspicious modification?", e);
-        return;
-      }
-      // find the build request with ID 0, that's our guy
-
-      Star updatedStar = starBuilder.build();
-      for (BuildRequest buildRequest : BuildHelper.getBuildRequests(updatedStar)) {
-        if (buildRequest.id == 0) {
-          App.i.getTaskRunner().runTask(() -> {
-            buildTime.setText(BuildHelper.formatTimeRemaining(buildRequest));
-            EmpireStorage newEmpireStorage = BuildHelper.getEmpireStorage(updatedStar, myEmpire.id);
-            EmpireStorage oldEmpireStorage = BuildHelper.getEmpireStorage(star, myEmpire.id);
-            if (newEmpireStorage != null && oldEmpireStorage != null) {
-              float mineralsDelta = newEmpireStorage.minerals_delta_per_hour
-                  - oldEmpireStorage.minerals_delta_per_hour;
-              buildMinerals.setText(String.format(Locale.US, "%s%.1f/hr",
-                  mineralsDelta < 0 ? "-" : "+", Math.abs(mineralsDelta)));
-              buildMinerals.setTextColor(mineralsDelta < 0 ? Color.RED : Color.GREEN);
-            } else {
-              buildMinerals.setText("");
-            }
-          }, Threads.UI);
-          break;
-        }
-      }
-    }, Threads.BACKGROUND);
   }
 
   /** Start building the thing we currently have showing. */
@@ -209,5 +172,4 @@ public class BuildBottomPane extends RelativeLayout implements BottomPaneContent
 
     callback.onBuild(design.type, count);
   }
-
 }
