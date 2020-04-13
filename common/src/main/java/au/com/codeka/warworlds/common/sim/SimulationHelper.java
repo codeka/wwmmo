@@ -10,4 +10,9 @@ public class SimulationHelper {
   public static long trimTimeToStep(long time) {
     return (time / STEP_TIME) * STEP_TIME;
   }
+
+  /** Return true if the given value is invalid: NaN or infinite. */
+  public static boolean isInvalid(float n) {
+    return Float.isNaN(n) || Float.isInfinite(n);
+  }
 }

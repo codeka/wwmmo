@@ -86,10 +86,10 @@ public class Simulation {
       }
     }
 
-    // We'll simulate in "prediction mode" for an extra bit of time so that we can get a
-    // more accurate estimate of the end time for builds. We won't *record* the population
-    // growth and such, just the end time of builds. We'll also record the time that the
-    // population drops below a certain threshold so that we can warn the player.
+    // We'll simulate in "prediction mode" for an extra bit of time so that we can get a more
+    // accurate estimate of the end time for builds. We won't *record* the population growth and
+    // such, just the end time of builds. We'll also record the time that the population drops below
+    // a certain threshold so that we can warn the player.
     long predictionTime = endTime + Time.DAY;
     Star.Builder predictionStar = null;
     long now = startTime;
@@ -153,7 +153,12 @@ public class Simulation {
   private void copyDeltas(Star.Builder star, Star.Builder predictionStar) {
     ArrayList<EmpireStorage> stores = new ArrayList<>();
     for (int i = 0; i < star.empire_stores.size(); i++) {
-      stores.add(predictionStar.empire_stores.get(i).newBuilder().build());
+      EmpireStorage predictionStore = predictionStar.empire_stores.get(i);
+      stores.add(star.empire_stores.get(i).newBuilder()
+          .goods_delta_per_hour(predictionStore.goods_delta_per_hour)
+          .minerals_delta_per_hour(predictionStore.minerals_delta_per_hour)
+          .energy_delta_per_hour(predictionStore.energy_delta_per_hour)
+          .build());
     }
     star.empire_stores(stores);
 
@@ -196,11 +201,13 @@ public class Simulation {
       for (Planet planet : star.planets) {
         if (planet.colony != null && planet.colony.empire_id != null) {
           onlyNativeColonies = false;
+          break;
         }
       }
       for (Fleet fleet : star.fleets) {
         if (fleet.empire_id != null) {
           onlyNativeColonies = false;
+          break;
         }
       }
       if (onlyNativeColonies) {
@@ -279,20 +286,19 @@ public class Simulation {
       }
 
       // Some sanity checks.
-      if (Float.isNaN(storage.total_energy) || Float.isInfinite(storage.total_energy)) {
+      if (SimulationHelper.isInvalid(storage.total_energy)) {
         storage.total_energy = 0.0f;
       }
-      if (Float.isNaN(storage.total_goods) || Float.isInfinite(storage.total_goods)) {
+      if (SimulationHelper.isInvalid(storage.total_goods)) {
         storage.total_goods = 0.0f;
       }
-      if (Float.isNaN(storage.total_minerals) || Float.isInfinite(storage.total_minerals)) {
+      if (SimulationHelper.isInvalid(storage.total_minerals)) {
         storage.total_minerals = 0.0f;
       }
-
-      if (Float.isNaN(colony.focus.construction) || Float.isInfinite(colony.focus.construction) ||
-          Float.isNaN(colony.focus.farming) || Float.isInfinite(colony.focus.farming) ||
-          Float.isNaN(colony.focus.mining) || Float.isInfinite(colony.focus.mining) ||
-          Float.isNaN(colony.focus.energy) || Float.isInfinite(colony.focus.energy)) {
+      if (SimulationHelper.isInvalid(colony.focus.construction) ||
+          SimulationHelper.isInvalid(colony.focus.farming) ||
+          SimulationHelper.isInvalid(colony.focus.mining) ||
+          SimulationHelper.isInvalid(colony.focus.energy)) {
         colony.focus(colony.focus.newBuilder()
             .construction(0.25f).energy(0.25f).farming(0.25f).mining(0.25f).build());
       }
@@ -378,7 +384,7 @@ public class Simulation {
         for (int j = 0; j < colony.build_requests.size(); j++) {
           BuildRequest.Builder br = colony.build_requests.get(j).newBuilder();
           // Sanity check.
-          if (Float.isNaN(br.progress)) {
+          if (SimulationHelper.isInvalid(br.progress)) {
             br.progress(0.0f);
           }
           Design design = DesignHelper.getDesign(br.design_type);
@@ -450,6 +456,7 @@ public class Simulation {
           }
           storage.total_minerals(Math.max(0, storage.total_minerals - mineralsUsedThisTurn));
           br.delta_minerals_per_hour(-mineralsUsedThisTurn * STEP_TIME / Time.HOUR);
+          mineralsDeltaPerHour -= mineralsUsedThisTurn * STEP_TIME / Time.HOUR;
           log("     Used: [minerals=%.4f]", mineralsUsedThisTurn);
 
           // what is the current amount of time we have now as a percentage of the total build
@@ -490,11 +497,10 @@ public class Simulation {
               timeForMineralsSteps,
               timeForPopulationHours,
               timeForPopulationSteps);
-          br.end_time(now +
-              Math.round(Math.max(timeForMineralsHours, timeForPopulationHours) * Time.HOUR));
-          log("     Finish time: %d (now=%d)",
-              now + Math.round(Math.max(timeForMineralsHours, timeForPopulationHours) * Time.HOUR),
-              now);
+          final long endTime =
+              now + Math.round(Math.max(timeForMineralsHours, timeForPopulationHours) * Time.HOUR);
+          br.end_time(endTime);
+          log("     Finish time: %d (now=%d)", endTime, now);
           br.progress(br.progress + progressThisTurn);
           br.progress_per_step(progressThisTurn);
 
@@ -633,6 +639,12 @@ public class Simulation {
     storage.minerals_delta_per_hour(mineralsDeltaPerHour);
     storage.energy_delta_per_hour(energyDeltaPerHour);
     star.empire_stores.set(storageIndex, storage.build());
+
+    log(String.format(Locale.ENGLISH,
+        "-- Store: goods=%.2f (%.2f/hr) minerals=%.2f (%.2f/hr) energy=%.2f (%.2f/h)",
+        storage.total_goods, storage.goods_delta_per_hour,
+        storage.total_minerals, storage.minerals_delta_per_hour,
+        storage.total_energy, storage.energy_delta_per_hour));
   }
 
   /**
