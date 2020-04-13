@@ -35,11 +35,11 @@ import static com.google.common.base.Preconditions.checkState;
  * Bottom pane of the build fragment for when we're building something new.
  */
 public class BuildBottomPane extends RelativeLayout implements BottomPaneContentView {
+  private final static Log log = new Log("BuildBottomPane");
+
   public interface Callback {
     void onBuild(Design.DesignType designType, int count);
   }
-
-  private final static Log log = new Log("BuildBottomPane");
 
   private final Star star;
   private final Colony colony;
@@ -98,6 +98,25 @@ public class BuildBottomPane extends RelativeLayout implements BottomPaneContent
     buildCountSeek = findViewById(R.id.build_count_seek);
     buildCount = findViewById(R.id.build_count_edit);
     buildCountSeek.setMax(1000);
+    SeekBar.OnSeekBarChangeListener buildCountSeekBarChangeListener =
+        new SeekBar.OnSeekBarChangeListener() {
+          @Override
+          public void onProgressChanged(SeekBar seekBar, int progress, boolean userInitiated) {
+            if (!userInitiated) {
+              return;
+            }
+            buildCount.setText(String.format(Locale.US, "%d", progress));
+            updateBuildTime();
+          }
+
+          @Override
+          public void onStartTrackingTouch(SeekBar seekBar) {
+          }
+
+          @Override
+          public void onStopTrackingTouch(SeekBar seekBar) {
+          }
+        };
     buildCountSeek.setOnSeekBarChangeListener(buildCountSeekBarChangeListener);
 
     findViewById(R.id.build_button).setOnClickListener(v -> build());
@@ -139,6 +158,7 @@ public class BuildBottomPane extends RelativeLayout implements BottomPaneContent
         new StarModifier(() -> 0).modifyStar(starBuilder,
             new StarModification.Builder()
                 .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
+                .empire_id(myEmpire.id)
                 .colony_id(colony.id)
                 .count(count)
                 .design_type(design.type)
@@ -167,6 +187,7 @@ public class BuildBottomPane extends RelativeLayout implements BottomPaneContent
               buildMinerals.setText("");
             }
           }, Threads.UI);
+          break;
         }
       }
     }, Threads.BACKGROUND);
@@ -189,23 +210,4 @@ public class BuildBottomPane extends RelativeLayout implements BottomPaneContent
     callback.onBuild(design.type, count);
   }
 
-  private final SeekBar.OnSeekBarChangeListener buildCountSeekBarChangeListener =
-      new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean userInitiated) {
-          if (!userInitiated) {
-            return;
-          }
-          buildCount.setText(String.format(Locale.US, "%d", progress));
-          updateBuildTime();
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-        }
-      };
 }

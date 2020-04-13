@@ -420,9 +420,11 @@ public class StarModifier {
         throw new SuspiciousModificationException(
             star.id,
             modification,
-            "Attempt to add build request on colony that does belong to you. colony_id=%d empire_id=%d",
+            "Attempt to add build request on colony that does belong to you. colony_id=%d " +
+                "empire_id=%d modification_empire_id=%d",
             modification.colony_id,
-            colonyBuilder.empire_id);
+            colonyBuilder.empire_id,
+            modification.empire_id);
       }
 
       // If the build request is for a ship and this colony doesn't have a shipyard, you can't
