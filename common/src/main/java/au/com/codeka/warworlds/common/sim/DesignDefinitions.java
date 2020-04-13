@@ -253,7 +253,7 @@ public class DesignDefinitions {
           .effect(Lists.newArrayList(
               new Design.Effect.Builder()
                   .type(Design.EffectType.STORAGE)
-                  .goods(1000)
+                  .goods(100)
                   .minerals(1000)
                   .energy(1000)
                   .build()
@@ -267,7 +267,7 @@ public class DesignDefinitions {
                   .effects(Lists.newArrayList(
                       new Design.Effect.Builder()
                           .type(Design.EffectType.STORAGE)
-                          .goods(2100)
+                          .goods(210)
                           .minerals(2100)
                           .energy(2100)
                           .build()
@@ -281,7 +281,7 @@ public class DesignDefinitions {
                   .effects(Lists.newArrayList(
                       new Design.Effect.Builder()
                           .type(Design.EffectType.STORAGE)
-                          .goods(3300)
+                          .goods(330)
                           .minerals(3300)
                           .energy(3300)
                           .build()
@@ -295,7 +295,7 @@ public class DesignDefinitions {
                   .effects(Lists.newArrayList(
                       new Design.Effect.Builder()
                           .type(Design.EffectType.STORAGE)
-                          .goods(4600)
+                          .goods(460)
                           .minerals(4600)
                           .energy(4600)
                           .build()
@@ -309,7 +309,7 @@ public class DesignDefinitions {
                   .effects(Lists.newArrayList(
                       new Design.Effect.Builder()
                           .type(Design.EffectType.STORAGE)
-                          .goods(6000)
+                          .goods(600)
                           .minerals(6000)
                           .energy(6000)
                           .build()

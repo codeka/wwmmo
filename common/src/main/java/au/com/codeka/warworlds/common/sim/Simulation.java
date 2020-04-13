@@ -249,7 +249,7 @@ public class Simulation {
       return;
     }
 
-    storage.max_goods = 5000.0f;
+    storage.max_goods = 200.0f;
     storage.max_energy = 5000.0f;
     storage.max_minerals = 5000.0f;
 
@@ -307,7 +307,7 @@ public class Simulation {
 
       // Calculate the output from farming this turn and add it to the star global
       float goods =
-          colony.population * colony.focus.farming * (planet.farming_congeniality / 10.0f);
+          colony.population * colony.focus.farming * (planet.farming_congeniality / 100.0f);
       colony.delta_goods(goods);
       storage.total_goods(Math.max(0, storage.total_goods + goods * dt));
       goodsDeltaPerHour += goods;
