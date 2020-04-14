@@ -56,19 +56,20 @@ public class DesignHelper {
    */
   // TODO: localize this string
   public static String getDependenciesHtml(Colony colony, Design design, int level) {
-    String required = "Required: ";
+    StringBuilder required = new StringBuilder();
+    required.append("Required: ");
     List<Design.Dependency> dependencies = design.dependencies;
     if (level > 1) {
       dependencies = design.upgrades.get(level - 2).dependencies;
     }
 
     if (dependencies == null || dependencies.size() == 0) {
-      required += "none";
+      required.append("none");
     } else {
       int n = 0;
       for (Design.Dependency dep : dependencies) {
         if (n > 0) {
-          required += ", ";
+          required.append(", ");
         }
 
         boolean isMet = false;
@@ -80,16 +81,19 @@ public class DesignHelper {
         }
 
         Design dependentDesign = getDesign(dep.type);
-        required += "<font color=\""+(isMet ? "green" : "red")+"\">";
-        required += dependentDesign.display_name;
+        required.append("<font color=\"");
+        required.append(isMet ? "green" : "red");
+        required.append("\">");
+        required.append(dependentDesign.display_name);
         if (dep.level > 1) {
-          required += " lvl " + dep.level;
+          required.append(" lvl ");
+          required.append(dep.level);
         }
-        required += "</font>";
+        required.append("</font>");
         n++;
       }
     }
 
-    return required;
+    return required.toString();
   }
 }
