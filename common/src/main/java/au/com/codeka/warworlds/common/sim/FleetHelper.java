@@ -1,7 +1,10 @@
 package au.com.codeka.warworlds.common.sim;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
+import au.com.codeka.warworlds.common.proto.Star;
 
 /**
  * Some helper methods for working with fleets.
@@ -42,5 +45,15 @@ public class FleetHelper {
       return false;
     }
     return fleet.empire_id.equals(empireId);
+  }
+
+  @Nullable
+  public static Fleet findFleet(Star star, long fleetId) {
+    for (Fleet fleet : star.fleets) {
+      if (fleet.id.equals(fleetId)) {
+        return fleet;
+      }
+    }
+    return null;
   }
 }

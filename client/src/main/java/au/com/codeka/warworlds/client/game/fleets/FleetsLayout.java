@@ -14,6 +14,8 @@ import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.client.game.world.StarCollection;
 import au.com.codeka.warworlds.common.proto.Star;
+import au.com.codeka.warworlds.common.sim.FleetHelper;
+import au.com.codeka.warworlds.common.sim.StarHelper;
 
 /**
  * Layout for the {@link FleetsScreen}.
@@ -51,14 +53,16 @@ public class FleetsLayout extends RelativeLayout {
 
   /**
    * Select the given fleet. This is expensive and should be avoided except when there's only
-   * one (or a small, finite number of) star.
+   * one (or a small, finite number of) stars.
    */
   public void selectFleet(long fleetId) {
     for (int groupPosition = 0; groupPosition < starCollection.size(); groupPosition++) {
       Star star = starCollection.get(groupPosition);
-      listView.expandGroup(groupPosition);
-      adapter.setSelectedFleetId(star, fleetId);
-      break;
+      if (FleetHelper.findFleet(star, fleetId) != null) {
+        listView.expandGroup(groupPosition);
+        adapter.setSelectedFleetId(star, fleetId);
+        break;
+      }
     }
   }
 
