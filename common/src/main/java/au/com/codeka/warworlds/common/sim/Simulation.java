@@ -274,7 +274,8 @@ public class Simulation {
         Design design = DesignHelper.getDesign(building.design_type);
         List<Design.Effect> effects = design.effect;
         if (building.level != null && building.level > 1) {
-          effects = design.upgrades.get(building.level - 1).effects;
+          // Level will be 2 for the first upgrade, 3 for the second and so on.
+          effects = design.upgrades.get(building.level - 2).effects;
         }
         for (Design.Effect effect : effects) {
           if (effect.type == Design.EffectType.STORAGE) {
