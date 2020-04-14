@@ -11,6 +11,7 @@ import java.util.Locale;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.server.Configuration;
+import au.com.codeka.warworlds.server.StarSimulatorThreadManager;
 import au.com.codeka.warworlds.server.cron.AbstractCronJob;
 import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.ctrl.BaseDataBase;
@@ -35,9 +36,14 @@ public class ExportStarsCronJob extends AbstractCronJob {
     log.info("Exporting stars to: %s", fileName);
     OutputStream outs =  new FileOutputStream(fileName);
     try {
+      // Pause simulating stars while we do this...
+      StarSimulatorThreadManager.i.pause();
+
       long n = export(outs);
       return String.format(Locale.ENGLISH, "Exported %d stars to: %s", n, fileName);
     } finally {
+      StarSimulatorThreadManager.i.resume();
+
       outs.close();
     }
   }

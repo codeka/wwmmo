@@ -25,6 +25,7 @@ public class StarSimulatorThreadManager {
   private final Set<Integer> lastStarIDs = new HashSet<>();
   private final Object lock = new Object();
   private boolean stopped;
+  private boolean paused;
   private final Thread monitorThread = new Thread(this::threadMonitor);
 
   public void start() {
@@ -36,6 +37,21 @@ public class StarSimulatorThreadManager {
     }
     monitorThread.start();
     log.info("Started %d star simulation threads.", threads.size());
+  }
+
+  /**
+   * Pause the {@link StarSimulatorThread}s. Note the threads will take at least 10 minutes before
+   * the restart after being paused, so only pause if it's intended to be for a reasonably long time
+   * anyway.
+   */
+  public void pause() {
+    log.info("Pausing star simulations.");
+    paused = true;
+  }
+
+  public void resume() {
+    log.info("Resuming star simulations.");
+    paused = false;
   }
 
   public void stop() {
@@ -57,6 +73,10 @@ public class StarSimulatorThreadManager {
   /** Returns the ID of the next star to simulate. */
   public int getNextStar() {
     synchronized(lock) {
+      if (paused) {
+        return 0;
+      }
+
       if (starIDs.isEmpty()) {
         // Grab 50 stars at a time, to save all those queries.
         String sql =
@@ -104,7 +124,7 @@ public class StarSimulatorThreadManager {
           if (stats.numStars == 0 && stats.currentStar == null) {
             // Nothing interesting to report.
             if (nothingInterestingCounter > 10) {
-              log.info("Nothing to report.");
+              log.info("Nothing to report.%s", paused ? " (simulations paused)" : "");
               nothingInterestingCounter = 0;
             }
             nothingInterestingCounter ++;
