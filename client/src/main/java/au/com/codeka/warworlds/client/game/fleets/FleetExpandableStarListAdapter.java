@@ -120,9 +120,7 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
     selectedStar = star;
 
     if (multiSelect) {
-      if (!selectedFleetIds.contains(fleetId)) {
-        selectedFleetIds.add(fleetId);
-      }
+      selectedFleetIds.add(fleetId);
     } else {
       selectedFleetIds.clear();
       selectedFleetIds.add(fleetId);
@@ -250,7 +248,7 @@ public class FleetExpandableStarListAdapter extends ExpandableStarListAdapter<Fl
       Fleet fleet = getChild(star, index);
       if (fleet != null) {
         FleetListHelper.populateFleetRow(
-            (ViewGroup) view,star, fleet, DesignHelper.getDesign(fleet.design_type));
+            (ViewGroup) view, fleet, DesignHelper.getDesign(fleet.design_type));
 
         if (disabledFleetIds.contains(fleet.id)) {
           view.setBackgroundResource(R.color.list_item_disabled);

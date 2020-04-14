@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.game.fleets;
 
+import android.content.Context;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.view.ViewGroup;
@@ -13,7 +14,11 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.build.BuildViewHelper;
+import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
+import au.com.codeka.warworlds.client.util.Callback;
+import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.TimeFormatter;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
@@ -21,11 +26,22 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 
 public class FleetListHelper {
-  public static void populateFleetRow(ViewGroup row, Star star, Fleet fleet, Design design) {
+  private static final Log log = new Log("FleetListHelper");
+
+  public static void populateFleetRow(ViewGroup row, Fleet fleet, Design design) {
+    TextView destinationView = row.findViewById(R.id.fleet_row3);
+    CharSequence destination =
+        getFleetDestination(row.getContext(), fleet, true, (ssb) -> {
+          // We have to set the text to something different, then set it back again for it to
+          // actually notice that it's changed.
+          destinationView.setText("");
+          destinationView.setText(ssb);
+        });
+    destinationView.setText(destination);
+
     BuildViewHelper.setDesignIcon(design, row.findViewById(R.id.fleet_icon));
     ((TextView) row.findViewById(R.id.fleet_row1)).setText(getFleetName(fleet, design));
     ((TextView) row.findViewById(R.id.fleet_row2)).setText(getFleetStance(fleet));
-    ((TextView) row.findViewById(R.id.fleet_row3)).setText(getFleetDestination(star, fleet, true));
   }
 
   /**
@@ -63,7 +79,7 @@ public class FleetListHelper {
       ssb.append(text);
     } else /*if (upgrades.size() == 0) */ {
       String text = String.format(Locale.ENGLISH, "%d × %s",
-          count, DesignHelper.getDesignName(design, count > 1 /* plural */));
+          count, DesignHelper.getDesignName(design, true /* plural */));
       ssb.append(text);
     } /*else {
       String text = String.format(Locale.ENGLISH, "%d ×", (int) Math.ceil(fleet.getNumShips()));
@@ -81,45 +97,48 @@ public class FleetListHelper {
 
   /** Gets the destination text for the given fleet, or null if the fleet is not moving. */
   @Nullable
-  public static CharSequence getFleetDestination(Star srcStar, Fleet fleet, boolean includeEta) {
+  public static CharSequence getFleetDestination(
+      Context context, Fleet fleet, boolean includeEta,
+      @Nullable Callback<SpannableStringBuilder> needRedrawCallback) {
     if (fleet.destination_star_id == null) {
       return null;
     }
 
     Star destStar = StarManager.i.getStar(fleet.destination_star_id);
-    if (srcStar != null && destStar != null) {
-      return getFleetDestination(fleet, srcStar, destStar, includeEta);
+    if (destStar != null) {
+      return getFleetDestination(context, fleet, destStar, includeEta, needRedrawCallback);
     }
 
     return null;
   }
 
   private static CharSequence getFleetDestination(
-      Fleet fleet, Star src, Star dest, boolean includeEta) {
+      Context context, Fleet fleet, Star dest, boolean includeEta,
+      @Nullable Callback<SpannableStringBuilder> needRedrawCallback) {
     SpannableStringBuilder ssb = new SpannableStringBuilder();
-    /*float timeRemainingInHours = fleet.getTimeToDestination();
-    Sprite sprite = StarImageManager.getInstance().getSprite(dest, -1, true);
-    String eta = TimeFormatter.create().format(timeRemainingInHours);*/
+    String eta = TimeFormatter.create().format(fleet.eta - System.currentTimeMillis());
 
-    float marginHorz = 0;
-    float marginVert = 0;
-    //if (dest.getStarType().getImageScale() > 2.5) {
-    //  marginHorz = -(float) (sprite.getWidth() / dest.getStarType().getImageScale());
-    //  marginVert = -(float) (sprite.getHeight() / dest.getStarType().getImageScale());
-    //}
+//    float marginHorz = 0;
+//    float marginVert = 0;
+//    if (dest.classification.getImageScale() > 2.5) {
+//      marginHorz = -(float) (sprite.getWidth() / dest.getStarType().getImageScale());
+//      marginVert = -(float) (sprite.getHeight() / dest.getStarType().getImageScale());
+//    }
 
-    //BoostFleetUpgrade boostUpgrade = (BoostFleetUpgrade) fleet.getUpgrade("boost");
-    //if (boostUpgrade != null && boostUpgrade.isBoosting()) {
-    //  addTextToRow(context, row, "→", 0);
-    //}
-    ssb.append("→");
-    //addImageToRow(context, row, sprite, marginHorz, marginVert, 0);
+//    BoostFleetUpgrade boostUpgrade = (BoostFleetUpgrade) fleet.getUpgrade("boost");
+//    if (boostUpgrade != null && boostUpgrade.isBoosting()) {
+//      addTextToRow(context, row, "→", 0);
+//    }
+
+    ssb.append("→ ○ ");
+    ImageHelper.bindStarIcon(
+        ssb, ssb.length() - 2, ssb.length() - 1, context, dest, needRedrawCallback);
     String name = dest.name;
     if (dest.classification == Star.CLASSIFICATION.MARKER) {
       name = "<i>Empty Space</i>";
     }
     if (includeEta) {
-      String text = String.format("%s <b>ETA:</b> %s", name, "eta"/*eta*/);
+      String text = String.format("%s <b>ETA:</b> %s", name, eta);
       ssb.append(Html.fromHtml(text));
     } else {
       ssb.append(Html.fromHtml(name));

@@ -1,10 +1,17 @@
 package au.com.codeka.warworlds.client.game.world;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
 import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.Locale;
 
@@ -12,6 +19,8 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.warworlds.client.net.ServerUrl;
 import au.com.codeka.warworlds.client.opengl.DimensionResolver;
+import au.com.codeka.warworlds.client.util.Callback;
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -20,6 +29,8 @@ import au.com.codeka.warworlds.common.proto.Star;
  * Helper class to get the URL for the various images (stars, planets, empire shields, etc).
  */
 public class ImageHelper {
+  private static final Log log = new Log("ImageHelper");
+
   private static String getDensityName(int densityDpi) {
     if (densityDpi > DisplayMetrics.DENSITY_XXHIGH) {
       return "xxxhdpi";
@@ -74,6 +85,40 @@ public class ImageHelper {
     Picasso.get()
         .load(imageUrl)
         .into(view);
+  }
+
+  /** Bind the given star icon to the given span in a {@link SpannableStringBuilder}. */
+  public static void bindStarIcon(
+      SpannableStringBuilder ssb, int startIndex, int endIndex, Context context,
+      @Nullable Star star, @Nullable Callback<SpannableStringBuilder> imageLoadedCallback) {
+    if (star == null) {
+      return;
+    }
+
+    Picasso.get()
+        .load(getStarImageUrl(context, star, 16, 16))
+        .into(new Target() {
+          @Override
+          public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            log.info("DEANH: onBitmapLoaded");
+            ssb.setSpan(
+                new ImageSpan(context, bitmap), startIndex, endIndex,
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            if (imageLoadedCallback != null) {
+              imageLoadedCallback.run(ssb);
+            }
+          }
+
+          @Override
+          public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+            // TODO: handle
+            log.info("DEANH: onBitmapFailed", e);
+          }
+
+          @Override
+          public void onPrepareLoad(Drawable placeHolderDrawable) {
+          }
+        });
   }
 
   /**

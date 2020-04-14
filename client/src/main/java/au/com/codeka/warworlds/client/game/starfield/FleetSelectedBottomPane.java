@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.client.game.starfield;
 import android.content.Context;
 import android.os.Handler;
 import android.text.Html;
-import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -13,8 +12,6 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.Locale;
-
-import javax.annotation.Nonnull;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.build.BuildViewHelper;
@@ -71,7 +68,13 @@ public class FleetSelectedBottomPane extends FrameLayout {
     }
 
     fleetDesign.setText(FleetListHelper.getFleetName(fleet, design/*, 18.0f*/));
-    fleetDestination.setText(FleetListHelper.getFleetDestination(star, fleet, false));
+    CharSequence destination =
+        FleetListHelper.getFleetDestination(
+            getContext(), fleet, true, (ssb) -> {
+              fleetDestination.setText("");
+              fleetDestination.setText(ssb);
+            });
+    fleetDestination.setText(destination);
     BuildViewHelper.setDesignIcon(design, fleetIcon);
 
     //FleetUpgrade.BoostFleetUpgrade fleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");

@@ -93,10 +93,7 @@ public class SplitBottomPane extends RelativeLayout {
     this.fleet = fleet;
 
     FleetListHelper.populateFleetRow(
-        fleetDetails,
-        star,
-        fleet,
-        DesignHelper.getDesign(fleet.design_type));
+        fleetDetails, fleet, DesignHelper.getDesign(fleet.design_type));
 
     int leftCount = (int) Math.floor(fleet.num_ships) / 2;
     int rightCount = (int) Math.floor(fleet.num_ships) - leftCount;
