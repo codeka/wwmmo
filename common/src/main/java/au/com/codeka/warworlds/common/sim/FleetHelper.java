@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.common.sim;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -55,5 +56,15 @@ public class FleetHelper {
       }
     }
     return null;
+  }
+
+  public static boolean hasEffect(Fleet fleet, Design.EffectType effectType) {
+    Design design = DesignHelper.getDesign(fleet.design_type);
+    for (Design.Effect effect : design.effect) {
+      if (effect.type == effectType) {
+        return true;
+      }
+    }
+    return false;
   }
 }

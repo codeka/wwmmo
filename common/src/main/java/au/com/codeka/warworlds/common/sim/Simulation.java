@@ -101,6 +101,10 @@ public class Simulation {
         // can run, and then we can do the first prediction once combat has completed.
         simulateCombat(star, now);
 
+        // Also, this is the time to empty any tankers. They can be refilled if you have energy
+        // production on this star.
+        simulateEnergyTransports(star, now);
+
         // We always predict at least one more step, so that we can put the deltas from the next
         // step in (since they'll take into account things like focus changes, new builds, etc that
         // the user has applied in THIS step).
@@ -834,6 +838,77 @@ public class Simulation {
     }
 
     return target;
+  }
+
+  /**
+   * Simulates energy transports. We only do this once, when we finish simulating before we go
+   * into the prediction phase. If there's any energy transports on the star, transfer their energy
+   * to non-energy transport fleets of the same empire.
+   */
+  private void simulateEnergyTransports(Star.Builder star, long now) {
+    // Find all the energy transport fleets. If there's none we'll try to avoid allocating any extra
+    // memory.
+    List<Integer> energyTransportIndices = null;
+    for (int i = 0; i < star.fleets.size(); i++) {
+      Fleet fleet = star.fleets.get(i);
+      if (FleetHelper.hasEffect(fleet, Design.EffectType.ENERGY_TRANSPORT)) {
+        if (energyTransportIndices == null) {
+          energyTransportIndices = new ArrayList<>();
+        }
+        energyTransportIndices.add(i);
+      }
+    }
+
+    // No energy transports.
+    if (energyTransportIndices == null) {
+      return;
+    }
+    log("Refueling");
+
+    for (Integer energyTransportIndex : energyTransportIndices) {
+      Fleet energyTransportFleet = star.fleets.get(energyTransportIndex);
+      for (int i = 0; i < star.fleets.size(); i++) {
+        Fleet fleet = star.fleets.get(i);
+        if (FleetHelper.hasEffect(fleet, Design.EffectType.ENERGY_TRANSPORT)) {
+          continue;
+        }
+
+        if (!FleetHelper.isFriendly(fleet, energyTransportFleet)) {
+          continue;
+        }
+
+        Design design = DesignHelper.getDesign(fleet.design_type);
+        float requiredEnergy = (design.fuel_size * fleet.num_ships) - fleet.fuel_amount;
+        if (requiredEnergy <= 0) {
+          continue;
+        }
+
+        float availableEnergy = energyTransportFleet.fuel_amount;
+        if (availableEnergy > requiredEnergy) {
+          log(" - filling fleet %d (%d required) from energy transport %d: %d fuel left in "
+              + "transport",
+              fleet.id, requiredEnergy, energyTransportFleet.id,
+              energyTransportFleet.fuel_amount - requiredEnergy);
+          energyTransportFleet = energyTransportFleet.newBuilder()
+              .fuel_amount(availableEnergy - requiredEnergy)
+              .build();
+          star.fleets.set(energyTransportIndex, energyTransportFleet);
+          star.fleets.set(
+              i,
+              fleet.newBuilder().fuel_amount(fleet.fuel_amount + requiredEnergy).build());
+        } else {
+          log(" - filling fleet %d (with %d fuel, %d required) from now-empty energy transport %d",
+              fleet.id, availableEnergy, requiredEnergy, energyTransportFleet.id);
+          star.fleets.set(
+              energyTransportIndex, energyTransportFleet.newBuilder().fuel_amount(0f).build());
+          star.fleets.set(
+              i, fleet.newBuilder().fuel_amount(fleet.fuel_amount + availableEnergy).build());
+
+          // No point continuing, we're empty.
+          break;
+        }
+      }
+    }
   }
 
   private static boolean equalEmpire(Long one, Long two) {
