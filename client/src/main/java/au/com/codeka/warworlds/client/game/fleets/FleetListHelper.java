@@ -20,7 +20,6 @@ import au.com.codeka.warworlds.client.game.build.BuildViewHelper;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.util.Callback;
-import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.TimeFormatter;
 import au.com.codeka.warworlds.common.proto.BuildRequest;
 import au.com.codeka.warworlds.common.proto.Design;
@@ -29,8 +28,6 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.sim.DesignHelper;
 
 public class FleetListHelper {
-  private static final Log log = new Log("FleetListHelper");
-
   public static void populateFleetRow(ViewGroup row, Fleet fleet, Design design) {
     TextView destinationView = row.findViewById(R.id.fleet_row3);
     CharSequence destination =

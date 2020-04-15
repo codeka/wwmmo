@@ -175,6 +175,32 @@ public class DesignDefinitions {
           .build(),
 
       new Design.Builder()
+          .type(Design.DesignType.TANKER)
+          .design_kind(Design.DesignKind.SHIP)
+          .display_name("Tanker")
+          .description(
+              "<p>The Tanker will transport a large amount of energy from one star to another,"
+              + " where you might have waiting ships but no infrastructure set up to refuel"
+              + " them.</p>")
+          .dependencies(Lists.newArrayList(
+              new Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
+          .build_cost(new Design.BuildCost.Builder()
+              .minerals(50)
+              .population(2)
+              .max_count(500)
+              .build())
+          .base_attack(0.1f)
+          .base_defence(1.0f)
+          .combat_priority(50)
+          .effect(Lists.newArrayList(
+              new Design.Effect.Builder().type(Design.EffectType.ENERGY_TRANSPORT).build()))
+          .fuel_cost_per_px(0.005f)
+          .fuel_size(250)
+          .image_url("tanker.png")
+          .speed_px_per_hour(1432.0f)
+          .build(),
+
+      new Design.Builder()
           .type(Design.DesignType.WORMHOLE_GENERATOR)
           .design_kind(Design.DesignKind.SHIP)
           .display_name("Wormhole Generator")

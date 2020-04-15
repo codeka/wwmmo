@@ -12,6 +12,7 @@ message Design {
     FIGHTER = 3;
     TROOP_CARRIER = 4;
     WORMHOLE_GENERATOR = 5;
+    TANKER = 6;
 
     SHIPYARD = 101;
     SILO = 102;
@@ -69,6 +70,7 @@ message Design {
     FIGHTER_SHIP = 1;
     SCOUT_SHIP = 2;
     EMPTY_SPACE_MOVER = 4;
+    ENERGY_TRANSPORT = 5;
 
     STORAGE = 101;
     DEFENCE = 102;

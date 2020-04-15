@@ -701,6 +701,7 @@ public class StarfieldManager {
   }
 
   private String getFleetTexture(Fleet fleet) {
+    // TODO: why have this switch, we already have the sprites?
     switch (fleet.design_type) {
       case COLONY_SHIP:
         return "sprites/colony.png";
@@ -712,6 +713,8 @@ public class StarfieldManager {
         return "sprites/troopcarrier.png";
       case WORMHOLE_GENERATOR:
         return "sprites/wormhole-generator.png";
+      case TANKER:
+        return "sprites/tanker.png";
       case UNKNOWN_DESIGN:
       default:
         // Shouldn't happen, the rest are reserved for buildings.
