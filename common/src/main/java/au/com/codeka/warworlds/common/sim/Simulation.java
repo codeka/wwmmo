@@ -153,7 +153,13 @@ public class Simulation {
   private void copyDeltas(Star.Builder star, Star.Builder predictionStar) {
     ArrayList<EmpireStorage> stores = new ArrayList<>();
     for (int i = 0; i < star.empire_stores.size(); i++) {
-      EmpireStorage predictionStore = predictionStar.empire_stores.get(i);
+      EmpireStorage.Builder predictionStore =
+          EmpireHelper.getStore(predictionStar, star.empire_stores.get(i).empire_id);
+      if (predictionStore == null) {
+        // The empire has been wiped out or something, just ignore.
+        continue;
+      }
+
       stores.add(star.empire_stores.get(i).newBuilder()
           .goods_delta_per_hour(predictionStore.goods_delta_per_hour)
           .minerals_delta_per_hour(predictionStore.minerals_delta_per_hour)
@@ -230,24 +236,25 @@ public class Simulation {
       log(String.format("-- Empire [%s]", empireId == null ? "Native" : empireId));
       simulateStep(now, star, empireId);
     }
+
+    // Remove stores for any empires that don't exist anymore.
+    for (int i = 0; i < star.empire_stores.size(); i++) {
+      if (!empireIds.contains(star.empire_stores.get(i).empire_id)) {
+        star.empire_stores.remove(i);
+        i--;
+      }
+    }
   }
 
   private void simulateStep(long now, Star.Builder star, @Nullable Long empireId) {
     float totalPopulation = 0.0f;
 
-    EmpireStorage.Builder storage = null;
-    int storageIndex = -1;
-    for (int i = 0; i < star.empire_stores.size(); i++) {
-      if (!equalEmpire(star.empire_stores.get(i).empire_id, empireId)) {
-        continue;
-      }
-      storageIndex = i;
-      storage = star.empire_stores.get(i).newBuilder();
-    }
-    if (storage == null) {
+    int storageIndex = EmpireHelper.getStoreIndex(star, empireId);
+    if (storageIndex < 0) {
       log("No storage found for this empire!");
       return;
     }
+    EmpireStorage.Builder storage = star.empire_stores.get(storageIndex).newBuilder();
 
     storage.max_goods = 200.0f;
     storage.max_energy = 5000.0f;
