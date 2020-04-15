@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+       xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
        android:layout_width="match_parent"
        android:layout_height="wrap_content">
 
@@ -7,41 +9,69 @@
       android:id="@+id/fleet_icon"
       android:layout_width="48dp"
       android:layout_height="48dp"
-      android:layout_alignParentLeft="true"
       android:layout_alignParentStart="true"
       android:layout_alignParentTop="true"
-      android:layout_marginRight="4dp"
-      android:layout_marginEnd="4dp" />
+      android:layout_marginEnd="4dp"
+      tools:src="@drawable/ship_fighter" />
+
+  <ProgressBar
+      android:id="@+id/fuel_level"
+      style="@style/WarWorlds.ProgressBar.Vertical"
+      android:layout_width="10dp"
+      android:layout_height="match_parent"
+      android:layout_alignTop="@+id/fleet_row1"
+      android:layout_alignBottom="@+id/fleet_row3"
+      android:layout_alignParentEnd="true" />
+
+  <TextView
+      android:id="@+id/fuel_level_text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toStartOf="@+id/fuel_level"
+      android:layout_alignParentTop="true"
+      android:layout_marginEnd="4pt"
+      tools:text="234/500" />
+
+  <ImageView
+      android:id="@+id/fuel_level_icon"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toStartOf="@+id/fuel_level_text"
+      android:layout_alignBottom="@+id/fuel_level_text"
+      android:layout_marginEnd="2pt"
+      android:src="@drawable/energy" />
 
   <TextView
       android:id="@+id/fleet_row1"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:layout_toStartOf="@+id/fuel_level"
       android:layout_alignParentTop="true"
-      android:layout_toRightOf="@+id/fleet_icon"
-      android:layout_toEndOf="@+id/fleet_icon" />
+      android:layout_toEndOf="@+id/fleet_icon"
+      tools:text="100 x Fighters" />
 
   <TextView
       android:id="@+id/fleet_row2"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_below="@id/fleet_row1"
-      android:layout_toRightOf="@+id/fleet_icon"
-      android:layout_toEndOf="@+id/fleet_icon" />
+      android:layout_toStartOf="@+id/fuel_level"
+      android:layout_toEndOf="@+id/fleet_icon"
+      tools:text="Idle (stance: Aggressive)" />
 
   <TextView
       android:id="@+id/fleet_row3"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_toRightOf="@+id/fleet_icon"
       android:layout_toEndOf="@+id/fleet_icon"
-      android:layout_below="@id/fleet_row2" />
+      android:layout_toStartOf="@+id/fuel_level"
+      android:layout_below="@id/fleet_row2"
+      tools:text="-> O Some star" />
 
   <TextView
       android:id="@+id/notes"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_alignParentLeft="true"
       android:layout_alignParentStart="true"
       android:layout_below="@id/fleet_icon"
       android:layout_margin="8dp"

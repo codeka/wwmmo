@@ -3,7 +3,10 @@ package au.com.codeka.warworlds.client.game.fleets;
 import android.content.Context;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.common.base.CaseFormat;
@@ -42,6 +45,28 @@ public class FleetListHelper {
     BuildViewHelper.setDesignIcon(design, row.findViewById(R.id.fleet_icon));
     ((TextView) row.findViewById(R.id.fleet_row1)).setText(getFleetName(fleet, design));
     ((TextView) row.findViewById(R.id.fleet_row2)).setText(getFleetStance(fleet));
+
+    ImageView fuelLevelIcon = row.findViewById(R.id.fuel_level_icon);
+    TextView fuelLevelText = row.findViewById(R.id.fuel_level_text);
+    ProgressBar fuelLevel = row.findViewById(R.id.fuel_level);
+    if (fuelLevel != null && fuelLevelText != null && fuelLevelIcon != null) {
+      if (fleet.fuel_amount >= design.fuel_size * fleet.num_ships) {
+        fuelLevel.setVisibility(View.GONE);
+        fuelLevelText.setVisibility(View.GONE);
+        fuelLevelIcon.setVisibility(View.GONE);
+      } else {
+        fuelLevel.setVisibility(View.VISIBLE);
+        fuelLevelText.setVisibility(View.VISIBLE);
+        fuelLevelIcon.setVisibility(View.VISIBLE);
+
+        float fuelPercent = 100 * fleet.fuel_amount / (design.fuel_size * fleet.num_ships);
+        fuelLevel.setProgress(Math.round(fuelPercent));
+        fuelLevelText.setText(
+            String.format(
+                Locale.ENGLISH, "%.0f / %.0f", fleet.fuel_amount,
+                design.fuel_size * fleet.num_ships));
+      }
+    }
   }
 
   /**
