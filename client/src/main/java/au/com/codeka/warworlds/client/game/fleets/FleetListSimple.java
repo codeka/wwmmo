@@ -16,6 +16,7 @@ import java.util.List;
 
 import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.game.build.BuildViewHelper;
+import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Star;
@@ -25,6 +26,8 @@ import au.com.codeka.warworlds.common.sim.DesignHelper;
  * Represents a simple list of fleets, shown inside a {@link LinearLayout}.
  */
 public class FleetListSimple extends LinearLayout {
+  private static final Log log = new Log("FleetListSimple");
+
   private Context context;
   private Star star;
   @Nullable private List<Fleet> fleets;
@@ -40,11 +43,13 @@ public class FleetListSimple extends LinearLayout {
   public FleetListSimple(Context context, AttributeSet attrs) {
     super(context, attrs);
     this.context = context;
+    setOrientation(LinearLayout.VERTICAL);
   }
 
   public FleetListSimple(Context context) {
     super(context);
     this.context = context;
+    setOrientation(LinearLayout.VERTICAL);
   }
 
   public void setFleetSelectedHandler(FleetSelectedHandler handler) {
@@ -110,13 +115,12 @@ public class FleetListSimple extends LinearLayout {
     ProgressBar fuelLevel = view.findViewById(R.id.fuel_level);
 
     int maxFuel = (int) (design.fuel_size * fleet.num_ships);
-    int fuelAmount = fleet.fuel_amount == null ? 0 : (int) (float) fleet.fuel_amount;
-    if (maxFuel == fuelAmount) {
+    if (fleet.fuel_amount >= maxFuel) {
       fuelLevel.setVisibility(View.GONE);
     } else {
       fuelLevel.setVisibility(View.VISIBLE);
       fuelLevel.setMax(maxFuel);
-      fuelLevel.setProgress(fuelAmount);
+      fuelLevel.setProgress(Math.round(fleet.fuel_amount));
     }
 
     BuildViewHelper.setDesignIcon(design, icon);

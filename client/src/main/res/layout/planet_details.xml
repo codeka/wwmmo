@@ -68,7 +68,7 @@
         android:id="@+id/fleet_list"
         android:layout_below="@id/note"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@+id/action_button_container"
         android:layout_marginTop="10pt"/>
 

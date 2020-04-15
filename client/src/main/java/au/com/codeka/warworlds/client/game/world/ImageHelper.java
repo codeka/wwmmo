@@ -100,7 +100,6 @@ public class ImageHelper {
         .into(new Target() {
           @Override
           public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            log.info("DEANH: onBitmapLoaded");
             ssb.setSpan(
                 new ImageSpan(context, bitmap), startIndex, endIndex,
                 Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -112,7 +111,6 @@ public class ImageHelper {
           @Override
           public void onBitmapFailed(Exception e, Drawable errorDrawable) {
             // TODO: handle
-            log.info("DEANH: onBitmapFailed", e);
           }
 
           @Override

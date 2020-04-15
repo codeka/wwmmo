@@ -95,8 +95,7 @@
           <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
               android:id="@+id/fleet_list"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical" />
+              android:layout_height="wrap_content" />
         </ScrollView>
       </RelativeLayout>
     </LinearLayout>
