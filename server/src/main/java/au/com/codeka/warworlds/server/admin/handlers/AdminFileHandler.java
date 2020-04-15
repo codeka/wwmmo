@@ -8,7 +8,6 @@ import java.util.regex.Matcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.AdminRole;
 import au.com.codeka.warworlds.server.admin.Session;
 import au.com.codeka.warworlds.server.handlers.FileHandler;
@@ -16,8 +15,6 @@ import au.com.codeka.warworlds.server.handlers.RequestException;
 
 /** Simple handler for handling static files (and 'templated' HTML files with no templated data). */
 public class AdminFileHandler extends AdminHandler {
-  private final Log log = new Log("AdminGenericHandler");
-
   private final FileHandler fileHandler;
 
   public AdminFileHandler() {
@@ -44,6 +41,22 @@ public class AdminFileHandler extends AdminHandler {
 
   @Override
   public void handle() throws RequestException {
-    fileHandler.handle();
+    if (fileHandler.canHandle()) {
+      fileHandler.handle();
+      return;
+    }
+
+    super.handle();
+  }
+
+  @Override
+  public void get() throws RequestException {
+    String path = getExtraOption();
+    if (path == null) {
+      path = "";
+    }
+    path += getUrlParameter("path");
+
+    render(path, null);
   }
 }

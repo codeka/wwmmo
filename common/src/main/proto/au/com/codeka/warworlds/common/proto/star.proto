@@ -198,7 +198,8 @@ message StarModification {
 
     // Create a new fleet, ignored if sent from client.
     // empire_id and either (design_type and count) or (fleet) are required. If fleet is specified,
-    // the new fleet will be a copy of the given fleet.
+    // the new fleet will be a copy of the given fleet. If full_fuel is specified, the new fleet
+    // will be given a full fuel tank at no cost to energy storage.
     CREATE_FLEET = 3;
 
     // Add a build request, start building it.
@@ -259,8 +260,5 @@ message StarModification {
   optional int64 star_id = 9;
   optional Fleet fleet = 10;
   repeated int64 additional_fleet_ids = 11;
-
-  // If true, the fleet that's created will have a full fuel tank. This is ignored in modifications
-  // requests sent from the client.
   optional bool full_fuel = 14;
 }

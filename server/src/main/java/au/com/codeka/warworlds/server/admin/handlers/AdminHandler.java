@@ -79,11 +79,11 @@ public class AdminHandler extends RequestHandler {
         authenticate();
         return false;
       } else {
-        boolean inRoles = false;
+        boolean allowed = requiredRoles.isEmpty(); // if requiredRoles is empty, they're OK.
         for (AdminRole role : requiredRoles) {
-          inRoles = inRoles || session.isInRole(role);
+          allowed = allowed || session.isInRole(role);
         }
-        if (!inRoles) {
+        if (!allowed) {
           // you're not in a required role.
           log.warning("User '%s' is not in any required role: %s",
               session.getEmail(), requiredRoles);
@@ -131,8 +131,18 @@ public class AdminHandler extends RequestHandler {
     }
     data.put("num_backend_users", DataStore.i.adminUsers().count());
 
-    getResponse().setContentType("text/html");
-    getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
+    String contentType;
+    if (path.endsWith(".css")) {
+      contentType = "text/css";
+    } else if (path.endsWith(".js")) {
+      contentType = "text/javascript";
+    } else if (path.endsWith(".html")) {
+      contentType = "text/html";
+    } else {
+      contentType = "text/plain";
+    }
+    getResponse().setContentType(contentType);
+    getResponse().setHeader("Content-Type", contentType);
     try {
       getResponse().getWriter().write(CARROT.process(path, new MapBindings(data)));
     } catch (CarrotException | IOException e) {

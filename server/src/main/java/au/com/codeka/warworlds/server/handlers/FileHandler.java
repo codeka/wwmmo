@@ -21,13 +21,14 @@ public class FileHandler extends RequestHandler {
     this.basePath = basePath;
   }
 
+  public boolean canHandle() {
+    File file = new File(basePath + getPath());
+    return file.exists();
+  }
+
   @Override
   protected void get() throws RequestException {
-    String path = getExtraOption();
-    if (path == null) {
-      path = "";
-    }
-    path += getUrlParameter("path");
+    String path = getPath();
 
     String contentType;
     if (path.endsWith(".css")) {
@@ -59,11 +60,15 @@ public class FileHandler extends RequestHandler {
 
   @Override
   public void post() throws RequestException {
+    throw new RequestException(405, getPath());
+  }
+
+  private String getPath() {
     String path = getExtraOption();
     if (path == null) {
       path = "";
     }
     path += getUrlParameter("path");
-    throw new RequestException(405, path);
+    return path;
   }
 }

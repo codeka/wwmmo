@@ -42,6 +42,7 @@ import au.com.codeka.warworlds.server.handlers.Route;
  */
 public class AdminServlet extends HandlerServlet {
   private static final Log log = new Log("AdminServlet");
+
   private static final ArrayList<Route> ROUTES = Lists.newArrayList(
       new Route("/", DashboardHandler.class),
       new Route("/login", AdminLoginHandler.class),

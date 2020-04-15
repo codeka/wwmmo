@@ -5,9 +5,9 @@
   <link rel="stylesheet" href="/admin/css/starfield.css">
   <script type="text/javascript" src="/admin/js/tmpl.js"></script>
   <script type="text/javascript" src="/admin/js/empirestore.js"></script>
-  <script type="text/javascript" src="/admin/js/starfield.js"></script>
   <script type="text/javascript" src="/admin/js/designs.js"></script>
   <script type="text/javascript" src="/admin/js/time.js"></script>
+  <script type="text/javascript" src="/admin/starfield/starfield.js"></script>
 {% end %}
 {% block "content" %}
   <h1>Starfield</h1>
@@ -217,6 +217,8 @@
           </select>
           <dt>Count
           <dd><input name="count" type="number" />
+          <dt>Full fuel
+          <dd><input type="checkbox" name="full_fuel" id="full_fuel"><label for="full_fuel">Full fuel</label>
           <dt>Additional fleets
           <dd><input name="additional_fleet_ids" type="text" />
         </dl>

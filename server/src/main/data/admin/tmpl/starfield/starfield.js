@@ -1,9 +1,5 @@
 
 $(function() {
-  var starHtmlTemplate = [
-    "<h1>{%= name %}</h1>",
-  ].join("\n");
-
   var currStar = null;
   var currSectorX = 0;
   var currSectorY = 0;
@@ -109,7 +105,7 @@ $(function() {
     var VISIBLE_FIELDS = {
       "COLONIZE": ["empire_id", "planet_index"],
       "ADJUST_FOCUS": [/*"empire_id", "colony_id", "focus"*/],
-      "CREATE_FLEET": ["empire_id", "design_type", "count"],
+      "CREATE_FLEET": ["empire_id", "design_type", "count", "full_fuel"],
       "ADD_BUILD_REQUEST": ["empire_id", "colony_id", "design_type", "count"],
       "CREATE_BUILDING": ["empire_id", "colony_id", "design_type"],
       "SPLIT_FLEET": ["empire_id", "fleet_id", "count"],
