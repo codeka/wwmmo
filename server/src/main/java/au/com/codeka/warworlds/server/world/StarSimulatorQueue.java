@@ -58,7 +58,7 @@ public class StarSimulatorQueue {
 
         long waitTime;
         if (star == null) {
-          log.warning("No stars to simulate, sleeping for a bit.");
+          log.info("No stars to simulate, sleeping for a bit.");
           waitTime = 10 * Time.MINUTE;
         } else {
           if (star.next_simulation == null) {
