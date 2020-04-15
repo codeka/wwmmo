@@ -177,7 +177,6 @@ public class StarModifier {
     // Destroy a colony ship, unless this is a native colony.
     if (modification.empire_id != null) {
       boolean found = false;
-      int population = 100;
       for (int i = 0; i < star.fleets.size(); i++) {
         Fleet fleet = star.fleets.get(i);
         if (fleet.design_type.equals(Design.DesignType.COLONY_SHIP)
@@ -243,8 +242,8 @@ public class StarModifier {
   private EmpireStorage.Builder createDefaultStorage(Long empireId) {
     return new EmpireStorage.Builder()
         .empire_id(empireId)
-        .total_goods(100.0f).total_minerals(100.0f).total_energy(1000.0f)
-        .max_goods(1000.0f).max_minerals(1000.0f).max_energy(1000.0f);
+        .total_goods(100.0f).total_minerals(0f).total_energy(0f)
+        .max_goods(200.0f).max_minerals(5000.0f).max_energy(5000.0f);
   }
 
   private void applyCreateFleet(

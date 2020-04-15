@@ -533,32 +533,6 @@ public class Simulation {
       }
     }
 
-    // Now loop through the fleets and see if there's any that needs more fuel. Fill 'em up if there
-    // is.
-    for (int i = 0; i < star.fleets.size(); i++) {
-      if (storage.total_energy < EPSILON) {
-        break;
-      }
-
-      Fleet.Builder fleet = star.fleets.get(i).newBuilder();
-      if (!equalEmpire(fleet.empire_id, empireId)) {
-        continue;
-      }
-
-      Design design = DesignHelper.getDesign(fleet.design_type);
-      float neededFuelTotal = (float) design.fuel_size * fleet.num_ships;
-      if (fleet.fuel_amount < neededFuelTotal) {
-        float neededFuelRemaining = neededFuelTotal - fleet.fuel_amount;
-        float actual = Math.min(neededFuelRemaining, storage.total_energy);
-        fleet.fuel_amount += actual;
-        storage.total_energy -= actual;
-        log("--- Fleet %d [%s x %.0f] re-fueling: %.2f",
-            fleet.id, design.display_name, fleet.num_ships, actual);
-      }
-
-      star.fleets.set(i, fleet.build());
-    }
-
     // Finally, update the population. The first thing we need to do is evenly distribute goods
     // between all of the colonies.
     float totalGoodsPerHour = Math.min(10.0f, totalPopulation / 10.0f);
@@ -840,6 +814,8 @@ public class Simulation {
    * to non-energy transport fleets of the same empire.
    */
   private void simulateEnergyTransports(Star.Builder star, long now) {
+    log("Refueling");
+
     // Find all the energy transport fleets. If there's none we'll try to avoid allocating any extra
     // memory.
     List<Integer> energyTransportIndices = null;
@@ -854,55 +830,81 @@ public class Simulation {
     }
 
     // No energy transports.
-    if (energyTransportIndices == null) {
-      return;
-    }
-    log("Refueling");
-    for (Integer energyTransportIndex : energyTransportIndices) {
-      Fleet energyTransportFleet = star.fleets.get(energyTransportIndex);
-      for (int i = 0; i < star.fleets.size(); i++) {
-        Fleet fleet = star.fleets.get(i);
-        if (FleetHelper.hasEffect(fleet, Design.EffectType.ENERGY_TRANSPORT)) {
-          continue;
-        }
+    if (energyTransportIndices != null) {
+      log(" - %d energy transports available, refueling from there first",
+          energyTransportIndices.size());
+      for (Integer energyTransportIndex : energyTransportIndices) {
+        Fleet energyTransportFleet = star.fleets.get(energyTransportIndex);
+        for (int i = 0; i < star.fleets.size(); i++) {
+          Fleet fleet = star.fleets.get(i);
+          if (FleetHelper.hasEffect(fleet, Design.EffectType.ENERGY_TRANSPORT)) {
+            continue;
+          }
 
-        if (!FleetHelper.isFriendly(fleet, energyTransportFleet)) {
-          continue;
-        }
+          if (!FleetHelper.isFriendly(fleet, energyTransportFleet)) {
+            continue;
+          }
 
-        Design design = DesignHelper.getDesign(fleet.design_type);
-        float requiredEnergy = (design.fuel_size * fleet.num_ships) - fleet.fuel_amount;
-        if (requiredEnergy <= 0) {
-          continue;
-        }
+          Design design = DesignHelper.getDesign(fleet.design_type);
+          float requiredEnergy = (design.fuel_size * fleet.num_ships) - fleet.fuel_amount;
+          if (requiredEnergy <= 0) {
+            continue;
+          }
 
-        float availableEnergy = energyTransportFleet.fuel_amount;
-        if (availableEnergy > requiredEnergy) {
-          log(" - filling fleet %d (%.2f required) from energy transport %d: %.2f fuel left in "
-              + "transport",
-              fleet.id, requiredEnergy, energyTransportFleet.id,
-              energyTransportFleet.fuel_amount - requiredEnergy);
-          energyTransportFleet = energyTransportFleet.newBuilder()
-              .fuel_amount(availableEnergy - requiredEnergy)
-              .build();
-          star.fleets.set(energyTransportIndex, energyTransportFleet);
-          star.fleets.set(
-              i,
-              fleet.newBuilder().fuel_amount(fleet.fuel_amount + requiredEnergy).build());
-        } else {
-          log(" - filling fleet %d (with %.2f fuel, %.2f required) from now-empty energy "
-              + "transport #%d",
-              fleet.id, availableEnergy, requiredEnergy, energyTransportFleet.id);
-          star.fleets.set(
-              energyTransportIndex, energyTransportFleet.newBuilder().fuel_amount(0f).build());
-          star.fleets.set(
-              i, fleet.newBuilder().fuel_amount(fleet.fuel_amount + availableEnergy).build());
+          float availableEnergy = energyTransportFleet.fuel_amount;
+          if (availableEnergy > requiredEnergy) {
+            log(" - filling fleet %d (%.2f required) from energy transport %d: %.2f fuel left in "
+                + "transport",
+                fleet.id, requiredEnergy, energyTransportFleet.id,
+                energyTransportFleet.fuel_amount - requiredEnergy);
+            energyTransportFleet = energyTransportFleet.newBuilder()
+                .fuel_amount(availableEnergy - requiredEnergy)
+                .build();
+            star.fleets.set(energyTransportIndex, energyTransportFleet);
+            star.fleets.set(
+                i,
+                fleet.newBuilder().fuel_amount(fleet.fuel_amount + requiredEnergy).build());
+          } else {
+            log(" - filling fleet %d (with %.2f fuel, %.2f required) from now-empty energy "
+                + "transport #%d",
+                fleet.id, availableEnergy, requiredEnergy, energyTransportFleet.id);
+            star.fleets.set(
+                energyTransportIndex, energyTransportFleet.newBuilder().fuel_amount(0f).build());
+            star.fleets.set(
+                i, fleet.newBuilder().fuel_amount(fleet.fuel_amount + availableEnergy).build());
 
-          // No point continuing, we're empty.
-          break;
+            // No point continuing, we're empty.
+            break;
+          }
         }
       }
     }
+
+    // Next, try to refuel everything from our storage(s).
+    for (int i = 0; i < star.fleets.size(); i++) {
+      Fleet.Builder fleet = star.fleets.get(i).newBuilder();
+      Design design = DesignHelper.getDesign(fleet.design_type);
+      float neededFuelTotal = (float) design.fuel_size * fleet.num_ships;
+      if (fleet.fuel_amount < neededFuelTotal) {
+        int storageIndex = EmpireHelper.getStoreIndex(star, fleet.empire_id);
+        if (storageIndex < 0) {
+          // No storages for this empire, nothing to do.
+          continue;
+        }
+
+        EmpireStorage.Builder storage = star.empire_stores.get(storageIndex).newBuilder();
+        float neededFuelRemaining = neededFuelTotal - fleet.fuel_amount;
+        float actual = Math.min(neededFuelRemaining, storage.total_energy);
+        star.fleets.set(i, fleet.fuel_amount(fleet.fuel_amount + actual).build());
+        star.empire_stores.set(
+            storageIndex, storage.total_energy(storage.total_energy - actual).build());
+        log("--- Fleet %d [%s x %.0f] re-fueling: %.2f",
+            fleet.id, design.display_name, fleet.num_ships, actual);
+      }
+
+      star.fleets.set(i, fleet.build());
+    }
+
   }
 
   private static boolean equalEmpire(Long one, Long two) {

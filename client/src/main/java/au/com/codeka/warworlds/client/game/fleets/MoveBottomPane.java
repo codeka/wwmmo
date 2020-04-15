@@ -137,8 +137,7 @@ public class MoveBottomPane extends RelativeLayout {
 
       String fontOpen = "";
       String fontClose = "";
-      EmpireStorage storage = StarHelper.getStorage(star, EmpireManager.i.getMyEmpire().id);
-      if (storage == null || estimatedFuel > actualFuel) {
+      if (estimatedFuel > actualFuel) {
         fontOpen = "<font color=\"#ff0000\">";
         fontClose = "</font>";
       }
