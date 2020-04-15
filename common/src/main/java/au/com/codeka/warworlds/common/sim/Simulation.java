@@ -536,19 +536,13 @@ public class Simulation {
     // Now loop through the fleets and see if there's any that needs more fuel. Fill 'em up if there
     // is.
     for (int i = 0; i < star.fleets.size(); i++) {
-      if (storage.total_energy < 0.001f) {
+      if (storage.total_energy < EPSILON) {
         break;
       }
 
       Fleet.Builder fleet = star.fleets.get(i).newBuilder();
       if (!equalEmpire(fleet.empire_id, empireId)) {
         continue;
-      }
-
-      // TODO: this shouldn't happen normally, it's just for fleets that we added before adding fuel
-      // to the game.
-      if (fleet.fuel_amount == null) {
-        fleet.fuel_amount(0.0f);
       }
 
       Design design = DesignHelper.getDesign(fleet.design_type);
@@ -864,7 +858,6 @@ public class Simulation {
       return;
     }
     log("Refueling");
-
     for (Integer energyTransportIndex : energyTransportIndices) {
       Fleet energyTransportFleet = star.fleets.get(energyTransportIndex);
       for (int i = 0; i < star.fleets.size(); i++) {
@@ -885,7 +878,7 @@ public class Simulation {
 
         float availableEnergy = energyTransportFleet.fuel_amount;
         if (availableEnergy > requiredEnergy) {
-          log(" - filling fleet %d (%d required) from energy transport %d: %d fuel left in "
+          log(" - filling fleet %d (%.2f required) from energy transport %d: %.2f fuel left in "
               + "transport",
               fleet.id, requiredEnergy, energyTransportFleet.id,
               energyTransportFleet.fuel_amount - requiredEnergy);
@@ -897,7 +890,8 @@ public class Simulation {
               i,
               fleet.newBuilder().fuel_amount(fleet.fuel_amount + requiredEnergy).build());
         } else {
-          log(" - filling fleet %d (with %d fuel, %d required) from now-empty energy transport %d",
+          log(" - filling fleet %d (with %.2f fuel, %.2f required) from now-empty energy "
+              + "transport #%d",
               fleet.id, availableEnergy, requiredEnergy, energyTransportFleet.id);
           star.fleets.set(
               energyTransportIndex, energyTransportFleet.newBuilder().fuel_amount(0f).build());

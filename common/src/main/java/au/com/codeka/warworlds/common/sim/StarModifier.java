@@ -286,34 +286,17 @@ public class StarModifier {
     if (modification.full_fuel != null && modification.full_fuel) {
       fuelAmount = design.fuel_size * numShips;
     } else {
-      fuelAmount = design.fuel_size * numShips;
+      // It'll be refueled when we simulate, if there's any energy on the star.
+      fuelAmount = 0;
       if (modification.fleet != null) {
         fuelAmount = modification.fleet.fuel_amount;
-      }
-
-      if (modification.empire_id != null && modification.fleet == null) {
-        int storageIndex = StarHelper.getStorageIndex(star, modification.empire_id);
-        EmpireStorage.Builder empireStorage;
-        if (storageIndex < 0) {
-          // it doesn't have an empire storage yet.
-          empireStorage = createDefaultStorage(modification.empire_id);
-        } else {
-          empireStorage = star.empire_stores.get(storageIndex).newBuilder();
-        }
-        fuelAmount = Math.min(fuelAmount, empireStorage.total_energy);
-        empireStorage.total_energy(empireStorage.total_energy - fuelAmount);
-        if (storageIndex < 0) {
-          star.empire_stores.add(empireStorage.build());
-        } else {
-          star.empire_stores.set(storageIndex, empireStorage.build());
-        }
       }
     }
 
     // Now add the fleet itself.
-    logHandler.log(String.format(Locale.US, "- creating fleet (%s) numAttacking=%d",
+    logHandler.log(String.format(Locale.US, "- creating fleet (%s) numAttacking=%d fuel=%.2f",
         attack ? "attacking" : "not attacking",
-        numAttacking));
+        numAttacking, fuelAmount));
     if (modification.fleet != null) {
       star.fleets.add(modification.fleet.newBuilder()
           .id(identifierGenerator.nextIdentifier())

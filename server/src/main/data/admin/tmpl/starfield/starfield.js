@@ -290,6 +290,7 @@ $(function() {
         // TODO star_id:
         // TODO fleet:
         additional_fleet_ids: additionalFleetIds,
+        full_fuel: $("#modify-popup input[name=full_fuel]").prop("checked"),
         build_request_id: parseInt($("#modify-popup select[name=build_request_id]").val())
       };
 
