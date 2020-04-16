@@ -12,6 +12,7 @@ import au.com.codeka.warworlds.common.proto.Building;
 import au.com.codeka.warworlds.common.proto.Colony;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
+import au.com.codeka.warworlds.common.proto.ScoutReport;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.server.store.base.BaseStore;
 import au.com.codeka.warworlds.server.store.base.QueryResult;
@@ -206,14 +207,19 @@ public class StarsStore extends BaseStore {
       newWriter()
           .stmt("CREATE TABLE star_empires (empire_id INTEGER, star_id INTEGER)")
           .execute();
-      newWriter()
-          .stmt("CREATE INDEX IX_star_empires ON star_empires (empire_id, star_id)");
-      newWriter()
-          .stmt("CREATE INDEX IX_empire_stars ON star_empires (star_id, empire_id)");
 
       diskVersion++;
     }
+    if (diskVersion == 1) {
+      newWriter()
+          .stmt("CREATE INDEX IX_star_empires ON star_empires (empire_id, star_id)")
+          .execute();
+      newWriter()
+          .stmt("CREATE INDEX IX_empire_stars ON star_empires (star_id, empire_id)")
+          .execute();
 
+      diskVersion++;
+    }
     return diskVersion;
   }
 }

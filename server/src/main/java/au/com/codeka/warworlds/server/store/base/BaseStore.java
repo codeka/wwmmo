@@ -123,7 +123,8 @@ public abstract class BaseStore {
     int newVersion = onOpen(currVersion);
     if (newVersion == 0 || newVersion < currVersion) {
       throw new StoreException(String.format(Locale.US,
-          "Version returned from onOpen must be > 0 and >= the previous value. newVersion=%d, currVersion=%d",
+          "Version returned from onOpen must be > 0 and >= the previous value. newVersion=%d, " +
+              "currVersion=%d",
           newVersion, currVersion));
     }
 
