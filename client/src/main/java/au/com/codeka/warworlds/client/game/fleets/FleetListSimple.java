@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -30,8 +31,7 @@ public class FleetListSimple extends LinearLayout {
 
   private Context context;
   private Star star;
-  @Nullable private List<Fleet> fleets;
-  @Nullable private FleetFilter filter;
+  private List<Fleet> fleets;
   private FleetSelectedHandler fleetSelectedHandler;
   private View.OnClickListener onClickListener;
 
@@ -57,14 +57,30 @@ public class FleetListSimple extends LinearLayout {
   }
 
   public void setStar(Star s) {
-    star = s;
-    filter = null;
-    refresh();
+    setStar(s, s.fleets, null);
   }
 
   public void setStar(Star s, FleetFilter f) {
+    setStar(s, s.fleets, f);
+  }
+
+  public void setStar(Star s, List<Fleet> f) {
+    setStar(s, f, null);
+  }
+
+  private void setStar(Star s, @NonNull List<Fleet> f, @Nullable FleetFilter filter) {
     star = s;
-    filter = f;
+
+    fleets = new ArrayList<>();
+    if (star.fleets != null) {
+      for (Fleet fleet : f) {
+        if (!fleet.state.equals(Fleet.FLEET_STATE.MOVING) && fleet.num_ships > 0.01f &&
+            (filter == null || filter.showFleet(fleet))) {
+          fleets.add(fleet);
+        }
+      }
+    }
+
     refresh();
   }
 
@@ -80,16 +96,6 @@ public class FleetListSimple extends LinearLayout {
           fleetSelectedHandler.onFleetSelected(fleet);
         }
       };
-    }
-
-    fleets = new ArrayList<>();
-    if (star.fleets != null) {
-      for (Fleet f : star.fleets) {
-        if (!f.state.equals(Fleet.FLEET_STATE.MOVING) && f.num_ships > 0.01f &&
-            (filter == null || filter.showFleet(f))) {
-          fleets.add(f);
-        }
-      }
     }
 
     removeAllViews();

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="RelativeLayout">
+
+    <ImageView
+        android:id="@+id/star_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        tools:src="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/star_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/star_icon"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        tools:text="Star name" />
+
+    <TextView
+        android:id="@+id/star_kind"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/star_name"
+        android:layout_toEndOf="@+id/star_icon"
+        android:textSize="12sp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="Blue" />
+
+    <TextView
+        android:id="@+id/report_date"
+        android:layout_width="wrap_content"
+        android:layout_height="16pt"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        tools:text="12 Dec 2020" />
+
+    <Button
+        android:id="@+id/back_btn"
+        style="@style/Button"
+        android:layout_width="75dp"
+        android:layout_height="16pt"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/report_date"
+        android:layout_marginTop="10dp"
+        android:text="@string/back" />
+
+    <LinearLayout
+        android:id="@+id/details"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@+id/star_icon"
+        android:layout_toStartOf="@+id/back_btn"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+        <ScrollView android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="100dp">
+            <au.com.codeka.warworlds.client.ctrl.PlanetListSimple
+                android:id="@+id/planet_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </ScrollView>
+
+        <ScrollView android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="100dp">
+            <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
+                android:id="@+id/fleet_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </ScrollView>
+    </LinearLayout>
+
+    <au.com.codeka.warworlds.client.ctrl.InfobarView
+        android:id="@+id/infobar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/details"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@id/alliance_btn" />
+
+</merge>

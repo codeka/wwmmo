@@ -19,6 +19,7 @@ import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.EmpireStorage;
 import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.Planet;
+import au.com.codeka.warworlds.common.proto.ScoutReport;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 
@@ -305,6 +306,11 @@ public class StarModifier {
           .destination_star_id(null)
           .eta(null)
           .build());
+
+      // If there's an existing fleet, and it has a SCOUT_SHIP effect, then generate a scout report.
+      if (FleetHelper.hasEffect(modification.fleet, Design.EffectType.SCOUT_SHIP)) {
+        generateScoutReport(star, modification, logHandler);
+      }
     } else {
       star.fleets.add(new Fleet.Builder()
           //TODO: .alliance_id()
@@ -317,6 +323,54 @@ public class StarModifier {
           .state(attack ? Fleet.FLEET_STATE.ATTACKING : Fleet.FLEET_STATE.IDLE)
           .state_start_time(System.currentTimeMillis())
           .build());
+    }
+  }
+
+  private void generateScoutReport(
+      Star.Builder star, StarModification modification, Simulation.LogHandler logHandler) {
+    ScoutReport.Builder scoutReport = new ScoutReport.Builder()
+        .report_time(System.currentTimeMillis()) // TODO: record a better time
+        .star_id(star.id)
+        .empire_id(modification.empire_id);
+
+    for (Fleet fleet : star.fleets) {
+      // Skip fleets that are moving, they're technically not "on" this star.
+      if (fleet.state == Fleet.FLEET_STATE.MOVING) {
+        continue;
+      }
+
+      Design design = DesignHelper.getDesign(fleet.design_type);
+      scoutReport.fleets.add(fleet.newBuilder()
+          // We'll put the fuel as max so even with a scout report, you can't tell.
+          .fuel_amount(design.fuel_size * fleet.num_ships)
+          .build());
+    }
+
+    for (Planet p : star.planets) {
+      Planet.Builder planet = p.newBuilder();
+      if (planet.colony != null) {
+        // Rebuild the colony with only the things we want.
+        planet.colony(new Colony.Builder()
+            .id(planet.colony.id)
+            .empire_id(planet.colony.empire_id)
+            .population(planet.colony.population)
+            .build());
+      }
+      scoutReport.planets.add(planet.build());
+    }
+
+    // Now check whether there's already a report for this empire and if there is we'll just replace
+    // that one with this one.
+    boolean existingReport = false;
+    for (int i = 0; i < star.scout_reports.size(); i++) {
+      if (EmpireHelper.isSameEmpire(star.scout_reports.get(i).empire_id, modification.empire_id)) {
+        existingReport = true;
+        star.scout_reports.set(i, scoutReport.build());
+        break;
+      }
+    }
+    if (!existingReport) {
+      star.scout_reports.add(scoutReport.build());
     }
   }
 

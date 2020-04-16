@@ -34,6 +34,7 @@ public class StarSelectedBottomPane extends FrameLayout {
   public interface Callback {
     void onStarClicked(Star star, @Nullable Planet planet);
     void onFleetClicked(Star star, Fleet fleet);
+    void onScoutReportClicked(Star star);
   }
 
   private final PlanetListSimple planetList;
@@ -42,6 +43,7 @@ public class StarSelectedBottomPane extends FrameLayout {
   private final TextView starKind;
   private final ImageView starIcon;
   private final Button renameButton;
+  private final Button scoutReportButton;
 
   private Star star;
 
@@ -58,6 +60,9 @@ public class StarSelectedBottomPane extends FrameLayout {
     starKind = findViewById(R.id.star_kind);
     starIcon = findViewById(R.id.star_icon);
     renameButton = findViewById(R.id.rename_btn);
+
+    scoutReportButton = findViewById(R.id.scout_report_btn);
+    scoutReportButton.setOnClickListener((v) -> callback.onScoutReportClicked(this.star));
 
     planetList.setPlanetSelectedHandler(planet -> callback.onStarClicked(this.star, planet));
 
@@ -120,6 +125,12 @@ public class StarSelectedBottomPane extends FrameLayout {
       renameButton.setVisibility(View.VISIBLE);
     } else {
       renameButton.setVisibility(View.GONE);
+    }
+
+    if (star.scout_reports.size() > 0) {
+      scoutReportButton.setEnabled(true);
+    } else {
+      scoutReportButton.setEnabled(false);
     }
 
     starName.setText(star.name);

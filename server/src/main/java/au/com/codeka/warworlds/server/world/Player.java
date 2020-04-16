@@ -22,12 +22,14 @@ import au.com.codeka.warworlds.common.proto.ModifyStarPacket;
 import au.com.codeka.warworlds.common.proto.Packet;
 import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.RequestEmpirePacket;
+import au.com.codeka.warworlds.common.proto.ScoutReport;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
 import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
+import au.com.codeka.warworlds.common.sim.EmpireHelper;
 import au.com.codeka.warworlds.common.sim.FleetHelper;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.concurrency.TaskRunner;
@@ -295,6 +297,13 @@ public class Player {
       }
     }
 
+    // If there's any non-us scout reports we'll need to do a partial sanitization.
+    for (ScoutReport scoutReport : star.scout_reports) {
+      if (scoutReport.empire_id != null && !scoutReport.empire_id.equals(myEmpireId)) {
+        needPartialSanitization = true;
+      }
+    }
+
     // TODO: if we have a radar nearby, then we get the full version of the star.
 
     // If we need neither full nor partial sanitization, we can save a bunch of time.
@@ -336,6 +345,19 @@ public class Player {
       // Even if we don't need full sanitization, we'll remove any fleets that have the cloaking
       // upgrade.
       // TODO: implement me
+    }
+
+    // Remove any scout reports that are not for us.
+    ScoutReport myScoutReport = null;
+    for (int i = 0; i < star.scout_reports.size(); i++) {
+      if (EmpireHelper.isSameEmpire(star.scout_reports.get(i).empire_id, myEmpireId)) {
+        myScoutReport = star.scout_reports.get(i);
+        break;
+      }
+    }
+    star.scout_reports.clear();;
+    if (myScoutReport != null) {
+      star.scout_reports.add(myScoutReport);
     }
 
     return starBuilder.build();

@@ -81,6 +81,11 @@ public class StarfieldScreen extends Screen {
                 .addSharedView(R.id.top_pane)
                 .build());
       }
+
+      @Override
+      public void onScoutReportClicked(Star star) {
+        showScoutReportBottomPane(star);
+      }
     });
 
     layout.showBottomPane(starSelectedBottomPane, false /* instant */);
@@ -91,6 +96,14 @@ public class StarfieldScreen extends Screen {
         context.getActivity(), star, fleet);
 
     layout.showBottomPane(fleetSelectedBottomPane, false /* instant */);
+  }
+
+  private void showScoutReportBottomPane(Star star) {
+    ScoutReportBottomPane scoutReportBottomPane =
+        new ScoutReportBottomPane(
+            context.getActivity(), star, () -> showStarSelectedBottomPane(star));
+
+    layout.showBottomPane(scoutReportBottomPane, false /* instant */);
   }
 
   private final StarfieldManager.TapListener tapListener = new StarfieldManager.TapListener() {

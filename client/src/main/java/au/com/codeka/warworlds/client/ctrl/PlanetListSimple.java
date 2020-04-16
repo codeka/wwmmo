@@ -31,17 +31,20 @@ public class PlanetListSimple extends LinearLayout {
   private Context context;
   private Star star;
   private List<Planet> planets;
+  private List<Fleet> fleets;
   private PlanetSelectedHandler planetSelectedHandler;
   private View.OnClickListener onClickListener;
 
   public PlanetListSimple(Context context, AttributeSet attrs) {
     super(context, attrs);
     this.context = context;
+    setOrientation(LinearLayout.VERTICAL);
   }
 
   public PlanetListSimple(Context context) {
     super(context);
     this.context = context;
+    setOrientation(LinearLayout.VERTICAL);
   }
 
   public void setPlanetSelectedHandler(PlanetSelectedHandler handler) {
@@ -50,6 +53,15 @@ public class PlanetListSimple extends LinearLayout {
 
   public void setStar(Star s) {
     star = s;
+    planets = new ArrayList<>(s.planets);
+    fleets = new ArrayList<>(s.fleets);
+    refresh();
+  }
+
+  public void setStar(Star s, List<Planet> p, List<Fleet> f) {
+    star = s;
+    planets = p;
+    fleets = f;
     refresh();
   }
 
@@ -63,15 +75,13 @@ public class PlanetListSimple extends LinearLayout {
       };
     }
 
-    planets = new ArrayList<>(star.planets);
-
     removeAllViews();
     LayoutInflater inflater =
         (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     Empire myEmpire = EmpireManager.i.getMyEmpire();
     HashSet<Long> empires = new HashSet<>();
-    for (Fleet fleet : star.fleets) {
+    for (Fleet fleet : fleets) {
       if (fleet.empire_id == null) {
         continue;
       }
@@ -83,7 +93,7 @@ public class PlanetListSimple extends LinearLayout {
       }
       empires.add(fleet.empire_id);
     }
-    for (Planet planet : star.planets) {
+    for (Planet planet : planets) {
       if (planet.colony == null) {
         continue;
       }
@@ -154,9 +164,9 @@ public class PlanetListSimple extends LinearLayout {
 
   private View getEmpireRowView(LayoutInflater inflater, long empireID) {
     final View view = inflater.inflate(R.layout.ctrl_planet_list_simple_row, this, false);
-    final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
-    final TextView empireName = (TextView) view.findViewById(R.id.starfield_planet_type);
-    final TextView allianceName = (TextView) view.findViewById(R.id.starfield_planet_colony);
+    final ImageView icon = view.findViewById(R.id.starfield_planet_icon);
+    final TextView empireName = view.findViewById(R.id.starfield_planet_type);
+    final TextView allianceName = view.findViewById(R.id.starfield_planet_colony);
 
     Empire empire = EmpireManager.i.getEmpire(empireID);
     if (empire != null) {
