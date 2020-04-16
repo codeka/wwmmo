@@ -349,15 +349,15 @@ public class Player {
 
     // Remove any scout reports that are not for us.
     ScoutReport myScoutReport = null;
-    for (int i = 0; i < star.scout_reports.size(); i++) {
-      if (EmpireHelper.isSameEmpire(star.scout_reports.get(i).empire_id, myEmpireId)) {
-        myScoutReport = star.scout_reports.get(i);
+    for (int i = 0; i < starBuilder.scout_reports.size(); i++) {
+      if (EmpireHelper.isSameEmpire(starBuilder.scout_reports.get(i).empire_id, myEmpireId)) {
+        myScoutReport = starBuilder.scout_reports.get(i);
         break;
       }
     }
-    star.scout_reports.clear();;
+    starBuilder.scout_reports.clear();
     if (myScoutReport != null) {
-      star.scout_reports.add(myScoutReport);
+      starBuilder.scout_reports.add(myScoutReport);
     }
 
     return starBuilder.build();
