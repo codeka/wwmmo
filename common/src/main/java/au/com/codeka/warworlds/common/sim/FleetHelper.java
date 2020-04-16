@@ -67,4 +67,9 @@ public class FleetHelper {
     }
     return false;
   }
+
+  public static boolean hasUpgrade(Fleet fleet, Design.UpgradeType upgradeType) {
+    // TODO: implement upgrades
+    return false;
+  }
 }

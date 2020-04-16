@@ -12,11 +12,15 @@ import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.debug.PacketDebug;
 import au.com.codeka.warworlds.common.proto.ChatMessage;
 import au.com.codeka.warworlds.common.proto.ChatMessagesPacket;
+import au.com.codeka.warworlds.common.proto.Colony;
+import au.com.codeka.warworlds.common.proto.Design;
 import au.com.codeka.warworlds.common.proto.Empire;
 import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket;
+import au.com.codeka.warworlds.common.proto.Fleet;
 import au.com.codeka.warworlds.common.proto.HelloPacket;
 import au.com.codeka.warworlds.common.proto.ModifyStarPacket;
 import au.com.codeka.warworlds.common.proto.Packet;
+import au.com.codeka.warworlds.common.proto.Planet;
 import au.com.codeka.warworlds.common.proto.RequestEmpirePacket;
 import au.com.codeka.warworlds.common.proto.Sector;
 import au.com.codeka.warworlds.common.proto.SectorCoord;
@@ -24,6 +28,7 @@ import au.com.codeka.warworlds.common.proto.Star;
 import au.com.codeka.warworlds.common.proto.StarModification;
 import au.com.codeka.warworlds.common.proto.StarUpdatedPacket;
 import au.com.codeka.warworlds.common.proto.WatchSectorsPacket;
+import au.com.codeka.warworlds.common.sim.FleetHelper;
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException;
 import au.com.codeka.warworlds.server.concurrency.TaskRunner;
 import au.com.codeka.warworlds.server.concurrency.Threads;
@@ -59,11 +64,7 @@ public class Player {
     this.connection = checkNotNull(connection);
     this.empire = checkNotNull(empire);
 
-    starWatcher = star -> connection.send(new Packet.Builder()
-        .star_updated(new StarUpdatedPacket.Builder()
-            .stars(Lists.newArrayList(star.get()))
-            .build())
-        .build());
+    starWatcher = star -> sendStarsUpdatedPacket(Lists.newArrayList(star.get()));
 
     TaskRunner.i.runTask(this::onPostConnect, Threads.BACKGROUND);
   }
@@ -104,11 +105,7 @@ public class Player {
     }
     if (!updatedStars.isEmpty()) {
       log.debug("%d updated stars, sending update packet.", updatedStars.size());
-      connection.send(new Packet.Builder()
-          .star_updated(new StarUpdatedPacket.Builder()
-              .stars(updatedStars)
-              .build())
-          .build());
+      sendStarsUpdatedPacket(updatedStars);
     } else {
       log.debug("No updated stars, not sending update packet.");
     }
@@ -149,11 +146,7 @@ public class Player {
       }
     }
 
-    connection.send(new Packet.Builder()
-        .star_updated(new StarUpdatedPacket.Builder()
-            .stars(stars)
-            .build())
-        .build());
+    sendStarsUpdatedPacket(stars);
 
     synchronized (watchedStars) {
       for (Star star : stars) {
@@ -244,6 +237,109 @@ public class Player {
           .build());
     }
   };
+
+  /**
+   * Send a {@link StarUpdatedPacket} with the given list of updated stars.
+   *
+   * <p>The most important function of this method is sanitizing the stars so that enemy fleets
+   * are not visible (unless we have a colony/fleet as well, or there's a radar nearby).
+   */
+  private void sendStarsUpdatedPacket(List<Star> updatedStars) {
+    for (int i = 0; i < updatedStars.size(); i++) {
+      updatedStars.set(i, sanitizeStar(updatedStars.get(i)));
+    }
+
+    connection.send(new Packet.Builder()
+        .star_updated(new StarUpdatedPacket.Builder()
+            .stars(updatedStars)
+            .build())
+        .build());
+  }
+
+  /**
+   * Sanitizes the given star. Removes enemy fleets, etc, unless we have a colony or fleet of our
+   * own on there, or there's a radar nearby.
+   */
+  // TODO: check for existence of radar buildings nearby
+  private Star sanitizeStar(Star star) {
+    // If the star is a wormhole, don't sanitize it -- a wormhole is basically fleets in transit
+    // anyway.
+    if (star.classification == Star.CLASSIFICATION.WORMHOLE) {
+      return star;
+    }
+
+    long myEmpireId = empire.get().id;
+
+    // Now, figure out if we need to sanitize this star at all. Full sanitization means we need
+    // to remove all fleets and simplify colonies (no population, etc). Partial sanitization means
+    // we need to remove some fleets that have the cloaking upgrade.
+    boolean needFullSanitization = true;
+    boolean needPartialSanitization = false;
+
+    for (Planet planet : star.planets) {
+      if (planet.colony != null && planet.colony.empire_id != null &&
+          planet.colony.empire_id.equals(myEmpireId)) {
+        // If we have a colony on here, then we get the full version of the star.
+        needFullSanitization = false;
+        break;
+      }
+    }
+
+    for (Fleet fleet : star.fleets) {
+      if (FleetHelper.isOwnedBy(fleet, myEmpireId)) {
+        // If we have a fleet on here, then we also get the full version.
+        needFullSanitization = false;
+      }
+      if (FleetHelper.hasUpgrade(fleet, Design.UpgradeType.CLOAK)) {
+        needPartialSanitization = true;
+      }
+    }
+
+    // TODO: if we have a radar nearby, then we get the full version of the star.
+
+    // If we need neither full nor partial sanitization, we can save a bunch of time.
+    if (!needFullSanitization && !needPartialSanitization) {
+      return star;
+    }
+
+    // OK, now we know we need to sanitize this star.
+    Star.Builder starBuilder = star.newBuilder();
+
+    // If need to do full sanitization, then do that.
+    if (needFullSanitization) {
+      for (int i = 0; i < starBuilder.fleets.size(); i++) {
+        // Only remove if non-moving. TODO: also remove moving fleets if there's no radar nearby
+        if (starBuilder.fleets.get(i).state != Fleet.FLEET_STATE.MOVING) {
+          starBuilder.fleets.remove(i);
+          i--;
+        }
+      }
+
+      for (int i = 0; i < starBuilder.planets.size(); i++) {
+        // Sanitize colonies. We can see that they exist, but we only get certain details.
+        if (starBuilder.planets.get(i).colony != null) {
+          Colony colony = starBuilder.planets.get(i).colony.newBuilder()
+              .population(0f)
+              .build_requests(new ArrayList<>())
+              .buildings(new ArrayList<>())
+              .defence_bonus(0f)
+              .delta_energy(0f)
+              .delta_goods(0f)
+              .delta_minerals(0f)
+              .delta_population(0f)
+              .build();
+          starBuilder.planets.set(
+              i, starBuilder.planets.get(i).newBuilder().colony(colony).build());
+        }
+      }
+    } else {
+      // Even if we don't need full sanitization, we'll remove any fleets that have the cloaking
+      // upgrade.
+      // TODO: implement me
+    }
+
+    return starBuilder.build();
+  }
 
   private void clearWatchedStars() {
     synchronized (watchedStars) {
