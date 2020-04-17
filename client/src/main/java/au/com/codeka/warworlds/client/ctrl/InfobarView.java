@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -13,6 +14,7 @@ import au.com.codeka.warworlds.client.R;
 import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.net.ServerPacketEvent;
+import au.com.codeka.warworlds.client.net.ServerStateEvent;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.proto.Empire;
 
@@ -27,7 +29,9 @@ public class InfobarView extends FrameLayout {
   private final Handler handler;
   private final TextView empireName;
   private final ProgressBar working;
+  private final ImageView disconnectedIcon;
 
+  private ServerStateEvent.ConnectionState lastConnectionState;
   private long lastPacketTime;
 
   public InfobarView(Context context, AttributeSet attrs) {
@@ -38,6 +42,7 @@ public class InfobarView extends FrameLayout {
     inflate(context, R.layout.ctrl_infobar_view, this);
     empireName = findViewById(R.id.empire_name);
     working = findViewById(R.id.working);
+    disconnectedIcon = findViewById(R.id.disconnected_icon);
   }
 
   public void hideEmpireName() {
@@ -48,6 +53,12 @@ public class InfobarView extends FrameLayout {
   private void refresh() {
     if (isInEditMode()) {
       return;
+    }
+
+    if (lastConnectionState == ServerStateEvent.ConnectionState.DISCONNECTED) {
+      disconnectedIcon.setVisibility(View.VISIBLE);
+    } else {
+      disconnectedIcon.setVisibility(View.GONE);
     }
 
     long now = System.currentTimeMillis();
@@ -99,6 +110,12 @@ public class InfobarView extends FrameLayout {
       lastPacketTime = System.currentTimeMillis();
       refresh();
       handler.postDelayed(() -> refresh(), PROGRESS_TIME_MS);
+    }
+
+    @EventHandler(thread = Threads.UI)
+    public void onServerState(ServerStateEvent event) {
+      lastConnectionState = event.getState();
+      refresh();
     }
   };
 }

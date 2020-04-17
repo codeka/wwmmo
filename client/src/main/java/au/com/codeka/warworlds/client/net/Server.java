@@ -172,8 +172,9 @@ public class Server {
         send(oldQueuedPackets.remove());
       }
 
-      ArrayList<Runnable> waitingForHello = this.waitingForHello;
+      ArrayList<Runnable> waitingForHello;
       synchronized (lock) {
+        waitingForHello = this.waitingForHello;
         this.waitingForHello = null;
       }
       if (waitingForHello != null) {
@@ -202,7 +203,7 @@ public class Server {
         try {
           packetEncoder.send(pkt);
         } catch (IOException e) {
-          // TODO: handle error
+          log.warning("Error encoding and sending packet.", e);
           disconnect();
         }
       }
@@ -259,7 +260,7 @@ public class Server {
 
         @Override
         public void onDisconnect() {
-          // TODO: disconnected
+          disconnect();
         }
       };
 
