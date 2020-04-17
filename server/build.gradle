@@ -1,4 +1,3 @@
-import groovy.io.FileType
 
 buildscript {
   repositories {
@@ -7,6 +6,10 @@ buildscript {
   dependencies {
     classpath 'org.hidetake:gradle-ssh-plugin:2.2.0'
   }
+}
+
+plugins {
+  id 'com.squareup.wire'
 }
 
 repositories {
@@ -26,7 +29,8 @@ dependencies {
   implementation 'com.google.code.gson:gson:2.8.6'
   implementation 'com.google.firebase:firebase-admin:6.5.0'
   implementation 'com.google.guava:guava:24.1-jre'
-  implementation 'com.squareup.wire:wire-gson-support:2.1.2'
+  implementation 'com.squareup.wire:wire-runtime:3.1.0'
+  implementation 'com.squareup.wire:wire-gson-support:3.1.0'
   implementation 'org.simplejavamail:simple-java-mail:4.2.1'
   implementation 'org.eclipse.jetty:jetty-server:9.4.27.v20200227'
   implementation 'org.eclipse.jetty.websocket:websocket-server:9.4.0.v20161208'
@@ -36,32 +40,17 @@ dependencies {
   implementation project(':planet-render')
 }
 
-def fixProtoPath(str) {
-  def prefix = projectDir.path + "/src/main/proto/".replace("/", File.separator)
-  return (str - prefix).replace(File.separator, "/")
-}
+wire {
+  sourcePath {
+    srcDir '../common/src/main/proto'
+  }
+  sourcePath {
+    srcDir 'src/main/proto'
+  }
 
-task buildProto() {
-  doLast {
-    def protos = []
-    new File(projectDir.path + "/src/main/proto").eachFileRecurse(FileType.FILES) { file ->
-      protos << fixProtoPath(file.absolutePath)
-    }
-
-    javaexec {
-      main = "-jar"
-      args = [
-         project(':common').projectDir.getAbsolutePath() + "/libs/wire-compiler-2.1.2-jar-with-dependencies.jar",
-         "--proto_path=src/main/proto",
-         "--proto_path=" + project(':common').projectDir.getAbsolutePath() + "/src/main/proto",
-         "--named_files_only",
-         "--java_out=src/main/java",
-      ] + protos
-    }
+  java {
   }
 }
-
-compileJava.dependsOn buildProto
 
 applicationDistribution.from("src/main/data") {
   into "data"
