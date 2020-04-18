@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.client.ui;
 
 import android.view.ViewGroup;
 
+import javax.annotation.Nullable;
+
 /**
  * A {@link Screen} is similar to a fragment, in that it's a place to keep the business logic
  * of a view.
@@ -29,5 +31,11 @@ public abstract class Screen {
   }
 
   public void onDestroy() {
+  }
+
+  /** Get the title we should display in the toolbar. */
+  @Nullable
+  public CharSequence getTitle() {
+    return null;
   }
 }

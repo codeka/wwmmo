@@ -13,6 +13,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.common.escape.CharEscaper;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -25,6 +26,7 @@ import au.com.codeka.warworlds.client.game.starfield.StarfieldScreen;
 import au.com.codeka.warworlds.client.game.starsearch.StarSearchScreen;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
+import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenStack;
 import au.com.codeka.warworlds.common.Log;
 
@@ -155,14 +157,22 @@ public class DrawerController {
     } else {
       drawerToggle.setDrawerIndicatorEnabled(true);
     }
+
+    refreshTitle();
   }
 
   private void refreshTitle() {
-    if (drawerLayout.isDrawerOpen(drawerContent)) {
-      actionBar.setTitle("Star Search");
-    } else {
-      actionBar.setTitle("War Worlds 2");
+    if (!drawerLayout.isDrawerOpen(drawerContent)) {
+      Screen screen = screenStack.peek();
+      if (screen != null) {
+        CharSequence title = screen.getTitle();
+        if (title != null) {
+          actionBar.setTitle(title);
+          return;
+        }
+      }
     }
-  }
 
+    actionBar.setTitle("War Worlds 2");
+  }
 }

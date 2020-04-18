@@ -1,14 +1,17 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
+import android.text.SpannableStringBuilder;
 import android.view.ViewGroup;
 
 import com.google.common.base.Preconditions;
 
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
+import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.ShowInfo;
+import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.ColonyFocus;
 import au.com.codeka.warworlds.common.proto.Empire;
@@ -45,6 +48,18 @@ public class PlanetDetailsScreen extends Screen {
   @Override
   public ShowInfo onShow() {
     return ShowInfo.builder().view(layout).build();
+  }
+
+  @Override
+  public CharSequence getTitle() {
+    SpannableStringBuilder ssb = new SpannableStringBuilder();
+    ssb.append("○ ");
+    ssb.append(star.name);
+    ssb.append(" ");
+    ssb.append(RomanNumeralFormatter.format(planet.index + 1));
+    ImageHelper.bindStarIcon(
+        ssb, 0, 1, context.getActivity(), star, 24, /* TODO: redraw callback */ null);
+    return ssb;
   }
 
   private final PlanetDetailsLayout.Callbacks layoutCallbacks = new PlanetDetailsLayout.Callbacks() {

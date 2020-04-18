@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.client.game.solarsystem;
 
+import android.text.Html;
+import android.text.SpannableStringBuilder;
 import android.view.ViewGroup;
 
 import au.com.codeka.warworlds.client.App;
@@ -8,6 +10,7 @@ import au.com.codeka.warworlds.client.concurrency.Threads;
 import au.com.codeka.warworlds.client.game.build.BuildScreen;
 import au.com.codeka.warworlds.client.game.fleets.FleetsScreen;
 import au.com.codeka.warworlds.client.game.starsearch.StarRecentHistoryManager;
+import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
@@ -15,6 +18,7 @@ import au.com.codeka.warworlds.client.ui.SharedViews;
 import au.com.codeka.warworlds.client.ui.ShowInfo;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.warworlds.common.TimeFormatter;
 import au.com.codeka.warworlds.common.proto.Star;
 
 /**
@@ -57,6 +61,16 @@ public class SolarSystemScreen extends Screen {
   public void onDestroy() {
     isCreated = false;
     App.i.getEventBus().unregister(eventHandler);
+  }
+
+  @Override
+  public CharSequence getTitle() {
+    SpannableStringBuilder ssb = new SpannableStringBuilder();
+    ssb.append("○ ");
+    ssb.append(star.name);
+    ImageHelper.bindStarIcon(
+        ssb, 0, 1, context.getActivity(), star, 24, /* TODO: redraw callback */ null);
+    return ssb;
   }
 
   private void refreshStar(Star star) {

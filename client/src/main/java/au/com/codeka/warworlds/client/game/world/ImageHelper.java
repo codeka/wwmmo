@@ -90,13 +90,14 @@ public class ImageHelper {
   /** Bind the given star icon to the given span in a {@link SpannableStringBuilder}. */
   public static void bindStarIcon(
       SpannableStringBuilder ssb, int startIndex, int endIndex, Context context,
-      @Nullable Star star, @Nullable Callback<SpannableStringBuilder> imageLoadedCallback) {
+      @Nullable Star star, int size,
+      @Nullable Callback<SpannableStringBuilder> imageLoadedCallback) {
     if (star == null) {
       return;
     }
 
     Picasso.get()
-        .load(getStarImageUrl(context, star, 16, 16))
+        .load(getStarImageUrl(context, star, size, size))
         .into(new Target() {
           @Override
           public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {

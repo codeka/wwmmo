@@ -102,6 +102,19 @@ public class ScreenStack {
   }
 
   /**
+   * Peek the top-most {@link Screen} and return a reference to it.
+   * @return The top-most {@link Screen}, or null if there's no screen (which should be very rare).
+   */
+  @Nullable
+  public Screen peek() {
+    if (screens.empty()) {
+      return null;
+    }
+
+    return screens.peek().screen;
+  }
+
+  /**
    * Implements "back" behaviour. This is basically "pop" but when we get to the last screen,
    * something a bit different happens: if the last screen is the "home" screen (of the passed-in
    * type), then we'll pop it and return false. Otherwise, the last screen will be replaced with

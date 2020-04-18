@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.game.build;
 
+import android.text.SpannableStringBuilder;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -7,10 +8,12 @@ import java.util.List;
 
 import au.com.codeka.warworlds.client.App;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
+import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.game.world.StarManager;
 import au.com.codeka.warworlds.client.ui.Screen;
 import au.com.codeka.warworlds.client.ui.ScreenContext;
 import au.com.codeka.warworlds.client.ui.ShowInfo;
+import au.com.codeka.warworlds.client.util.RomanNumeralFormatter;
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler;
 import au.com.codeka.warworlds.common.Log;
 import au.com.codeka.warworlds.common.proto.Colony;
@@ -28,6 +31,7 @@ public class BuildScreen extends Screen {
   /** We'll let the layout know to refresh progress and so on at this frequency. */
   private static final long REFRESH_DELAY_MS = 1000L;
 
+  private ScreenContext context;
   private Star star;
   private List<Colony> colonies;
   private Colony currColony;
@@ -46,6 +50,7 @@ public class BuildScreen extends Screen {
   @Override
   public void onCreate(ScreenContext context, ViewGroup parent) {
     super.onCreate(context, parent);
+    this.context = context;
 
     layout = new BuildLayout(context.getActivity(), star, colonies, colonies.indexOf(currColony));
     layout.refreshColonyDetails(currColony);
@@ -67,6 +72,17 @@ public class BuildScreen extends Screen {
   @Override
   public void onDestroy() {
     App.i.getEventBus().unregister(eventHandler);
+  }
+
+  @Override
+  public CharSequence getTitle() {
+    SpannableStringBuilder ssb = new SpannableStringBuilder();
+    ssb.append("○ ");
+    ssb.append(star.name);
+    ssb.append(" • Build");
+    ImageHelper.bindStarIcon(
+        ssb, 0, 1, context.getActivity(), star, 24, /* TODO: redraw callback */ null);
+    return ssb;
   }
 
   private final Object eventHandler = new Object() {
