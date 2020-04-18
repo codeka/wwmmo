@@ -136,11 +136,14 @@ public class DrawerController {
   }
 
   public void toggleDrawer() {
-    if (screenStack.depth() > 1) {
-      activity.onBackPressed();
-    } else if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+      // If the drawer is open, we'll close it.
       drawerLayout.closeDrawer(GravityCompat.START);
+    } else if (screenStack.depth() > 1) {
+      // If there's a screen under this screen, go back.
+      activity.onBackPressed();
     } else {
+      // Otherwise, we can open the drawer.
       drawerLayout.openDrawer(GravityCompat.START);
     }
   }
