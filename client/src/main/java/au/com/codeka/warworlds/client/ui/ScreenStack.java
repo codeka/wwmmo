@@ -10,7 +10,9 @@ import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 import androidx.transition.TransitionSet;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.annotation.Nullable;
@@ -29,6 +31,11 @@ public class ScreenStack {
   private static final Random RANDOM = new Random();
   private static final Log log = new Log("ScreenStack");
 
+  public interface ScreenStackStateUpdatedCallback {
+    void onStackChanged();
+  }
+
+  private final Set<ScreenStackStateUpdatedCallback> callbacks;
   private final MainActivity activity;
   private final ViewGroup container;
   private final Stack<ScreenHolder> screens = new Stack<>();
@@ -36,6 +43,7 @@ public class ScreenStack {
   public ScreenStack(MainActivity activity, ViewGroup container) {
     this.activity = activity;
     this.container = container;
+    callbacks = new HashSet<>();
   }
 
   /**
@@ -80,6 +88,7 @@ public class ScreenStack {
     }
 
     performShow(screen, sharedViews, true);
+    notifyStackChanged();
   }
 
   /**
@@ -124,6 +133,25 @@ public class ScreenStack {
     }
   }
 
+  /**
+   * Returns the depth of the screen stack. 1 means there's only one screen, etc.
+   */
+  public int depth() {
+    return screens.size();
+  }
+
+  public void addScreenStackStateUpdatedCallback(ScreenStackStateUpdatedCallback callback) {
+    synchronized (callbacks) {
+      callbacks.add(callback);
+    }
+  }
+
+  public void removeScreenStackStateUpdatedCallback(ScreenStackStateUpdatedCallback callback) {
+    synchronized (callbacks) {
+      callbacks.remove(callback);
+    }
+  }
+
   private boolean popInternal(boolean transition) {
     if (screens.empty()) {
       return false;
@@ -131,6 +159,7 @@ public class ScreenStack {
 
     ScreenHolder screenHolder = screens.pop();
     if (screenHolder == null) {
+      notifyStackChanged();
       return false;
     }
 
@@ -141,9 +170,11 @@ public class ScreenStack {
     if (!screens.isEmpty()) {
       screenHolder = screens.peek();
       performShow(screenHolder.screen, oldSharedViews, transition);
+      notifyStackChanged();
       return true;
     }
     container.removeAllViews();
+    notifyStackChanged();
     return false;
   }
 
@@ -207,6 +238,14 @@ public class ScreenStack {
     }
 
     activity.setToolbarVisible(showInfo.getToolbarVisible());
+  }
+
+  private void notifyStackChanged() {
+    synchronized (callbacks) {
+      for (ScreenStackStateUpdatedCallback callback : callbacks) {
+        callback.onStackChanged();
+      }
+    }
   }
 
   /** Contains info we need about a {@link Screen} while it's on the stack. */

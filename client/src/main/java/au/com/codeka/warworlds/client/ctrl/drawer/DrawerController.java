@@ -26,15 +26,20 @@ import au.com.codeka.warworlds.client.game.starsearch.StarSearchScreen;
 import au.com.codeka.warworlds.client.game.world.EmpireManager;
 import au.com.codeka.warworlds.client.game.world.ImageHelper;
 import au.com.codeka.warworlds.client.ui.ScreenStack;
+import au.com.codeka.warworlds.common.Log;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DrawerController {
+  private static final Log log = new Log("DrawerController");
+
+  private final MainActivity activity;
   private final ActionBar actionBar;
   private final DrawerLayout drawerLayout;
   private final FrameLayout drawerContent;
   private final NavigationView navigationView;
-
+  private final ScreenStack screenStack;
+  private final ActionBarDrawerToggle drawerToggle;
 
   public DrawerController(
       MainActivity activity,
@@ -42,15 +47,17 @@ public class DrawerController {
       ActionBar actionBar,
       DrawerLayout drawerLayout,
       FrameLayout drawerContent) {
+    this.activity = checkNotNull(activity);
     this.actionBar = checkNotNull(actionBar);
     this.drawerLayout = checkNotNull(drawerLayout);
     this.drawerContent = checkNotNull(drawerContent);
+    this.screenStack = checkNotNull(screenStack);
 
     actionBar.show();
     actionBar.setDisplayHomeAsUpEnabled(true);
     actionBar.setHomeButtonEnabled(true);
 
-    ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(
+    drawerToggle = new ActionBarDrawerToggle(
         activity, drawerLayout,
         R.string.drawer_open,
         R.string.drawer_close) {
@@ -69,6 +76,8 @@ public class DrawerController {
     };
     drawerLayout.addDrawerListener(drawerToggle);
     drawerToggle.syncState();
+
+    screenStack.addScreenStackStateUpdatedCallback(this::updateBackButton);
 
     navigationView = drawerContent.findViewById(R.id.navigation_view);
 
@@ -125,10 +134,26 @@ public class DrawerController {
   }
 
   public void toggleDrawer() {
-    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+    if (screenStack.depth() > 1) {
+      activity.onBackPressed();
+    } else if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
       drawerLayout.closeDrawer(GravityCompat.START);
     } else {
       drawerLayout.openDrawer(GravityCompat.START);
+    }
+  }
+
+  /**
+   * Called when the screen stack changed, we'll make sure the button is a back button when the
+   * screen stack is more than 1 deep.
+   */
+  private void updateBackButton() {
+    if (screenStack.depth() > 1) {
+      actionBar.setDisplayHomeAsUpEnabled(false);
+      drawerToggle.setDrawerIndicatorEnabled(false);
+      actionBar.setDisplayHomeAsUpEnabled(true);
+    } else {
+      drawerToggle.setDrawerIndicatorEnabled(true);
     }
   }
 
@@ -139,4 +164,5 @@ public class DrawerController {
       actionBar.setTitle("War Worlds 2");
     }
   }
+
 }
