@@ -1,0 +1,45 @@
+{% extends "skeleton.html" %}
+
+{% block header %}
+<style>
+      section.maincontent {
+        width: 880px;
+        padding: 10px;
+        margin: 0 auto;
+        background: #fff;
+      }
+
+      @media only screen and (max-width: 900px) {
+        section.maincontent {
+          width: auto;
+        }
+      }
+    </style>
+{% endblock %}
+
+{% block maincontent %}
+<section class="maincontent">
+  <h1>Rules</h1>
+  <p>War Worlds is not a game with a lot of rules. However, in the interest of ensuring everybody is
+    able to have as much fun as possible, you must abide by the rules set out here. <strong>Failure
+    to do so could result in your empire being reset, or banned.</strong>
+
+  <h2>1. Access the game only from actual Android phones and tablets</h2>
+  <p>That means no emulators and no scripts for automating your empire.
+
+  <h2>2. Do not make use of auto-clickers or other automation tools</h2>
+  <p>It's not fair for players who are trying to play the game the way it was intended if you're
+    using auto-clickers or auto-tappers to automate your play.
+
+  <h2>3. Bugs should be reported, not exploited</h2>
+  <p>Sometimes the game has bugs. Sometimes bugs allow you to do things that give you an unfair
+    advantage. I'm just one person, and I don't have a team of QA engineers testing the game and
+    making sure it's bug-free. So if you find a bug, please report it to me and do not exploit it
+    for your own benefit.
+
+  <h2>4. Do not grief or harass other players</h2>
+  <p>The game is a war game, obviously, so you're expected and even encouraged to attack other
+    players. However maliciously targeting particular players, harassment and other anti-social
+    behavior (including in chat) are not acceptable.
+</section>
+{% endblock %}
