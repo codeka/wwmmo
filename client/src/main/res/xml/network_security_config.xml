@@ -4,5 +4,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">127.0.0.1</domain>
         <domain includeSubdomains="true">codeka.com.au</domain>
+        <domain includeSubdomains="true">www.war-worlds.com</domain>
     </domain-config>
 </network-security-config>
