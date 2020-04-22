@@ -5,6 +5,7 @@ import android.os.Handler;
 
 import com.google.common.base.Preconditions;
 import com.google.firebase.FirebaseApp;
+import com.squareup.picasso.Picasso;
 
 import au.com.codeka.warworlds.client.concurrency.TaskRunner;
 import au.com.codeka.warworlds.client.concurrency.Threads;
@@ -41,6 +42,11 @@ public class App extends Application {
   public void onCreate() {
     super.onCreate();
     LogImpl.setup();
+
+    Picasso.setSingletonInstance(
+        new Picasso.Builder(this)
+            .loggingEnabled(true)
+            .build());
 
     Threads.UI.setThread(Thread.currentThread(), new Handler());
 
