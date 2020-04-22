@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.omg.CORBA.VM_NONE;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
@@ -119,6 +120,12 @@ public class AdminDashboardHandler extends AdminHandler {
       int month = (stat.getDay() - (year * 10000)) / 100;
       int day = stat.getDay() - (year * 10000) - (month * 100);
       int hour = stat.getHour();
+
+      if (month < 1 || month > 12 || year < 2000 || year > DateTime.now().getYear() || day < 1
+          || day > 31 || hour < 0 || hour > 24) {
+        log.warning("Invalid date? year=%d month=%d day=%d hour=%d", year, month, day, hour);
+        continue;
+      }
 
       graphEntry.put("date", new DateTime(year, month, day, hour, 0, 0));
       graphEntry.put("total", stat.getTotalRequests());
