@@ -67,14 +67,14 @@ abstract class ExpandableStarListAdapter<T>(private val stars: StarCollection):
     return getChildId(stars[groupPosition], childPosition)
   }
 
-  override fun getGroupView(groupPosition: Int, isExpanded: Boolean, convertView: View,
+  override fun getGroupView(groupPosition: Int, isExpanded: Boolean, convertView: View?,
                             parent: ViewGroup): View {
     val star = getStar(groupPosition)
     return getStarView(star, convertView, parent)
   }
 
   override fun getChildView(groupPosition: Int, childPosition: Int, isLastChild: Boolean,
-                            convertView: View, parent: ViewGroup): View {
+                            convertView: View?, parent: ViewGroup): View {
     val star = getStar(groupPosition)
     return getChildView(star, childPosition, convertView, parent)
   }

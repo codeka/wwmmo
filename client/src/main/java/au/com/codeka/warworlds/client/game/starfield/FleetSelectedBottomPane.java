@@ -67,9 +67,9 @@ public class FleetSelectedBottomPane extends FrameLayout {
           .into(empireIcon);
     }
 
-    fleetDesign.setText(FleetListHelper.getFleetName(fleet, design/*, 18.0f*/));
+    fleetDesign.setText(FleetListHelper.INSTANCE.getFleetName(fleet, design/*, 18.0f*/));
     CharSequence destination =
-        FleetListHelper.getFleetDestination(
+        FleetListHelper.INSTANCE.getFleetDestination(
             getContext(), fleet, true, (ssb) -> {
               fleetDestination.setText("");
               fleetDestination.setText(ssb);
