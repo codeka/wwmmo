@@ -1,23 +1,11 @@
-package au.com.codeka.warworlds.client.game.build;
+package au.com.codeka.warworlds.client.game.build
 
-import android.content.Context;
-import android.widget.ListView;
+import android.content.Context
+import android.widget.ListView
+import au.com.codeka.warworlds.common.proto.Colony
+import au.com.codeka.warworlds.common.proto.Star
 
-import au.com.codeka.warworlds.common.proto.Colony;
-import au.com.codeka.warworlds.common.proto.Star;
-
-public class QueueView extends ListView implements TabContentView {
-  private final Context context;
-  private final Star star;
-  private final Colony colony;
-
-  public QueueView(Context context, Star star, Colony colony) {
-    super(context);
-    this.context = context;
-    this.star = star;
-    this.colony = colony;
-
-    /*
+class QueueView /*
     final Star star = getStar();
     final Colony colony = getColony();
     if (star == null)
@@ -42,11 +30,8 @@ public class QueueView extends ListView implements TabContentView {
         dialog.show(getActivity().getSupportFragmentManager(), "");
       }
     });
-*/
-  }
-
-  @Override
-  public void refresh(Star star, Colony colony) {
+*/(context: Context, private val star: Star?, private val colony: Colony?) : ListView(context), TabContentView {
+  override fun refresh(star: Star?, colony: Colony?) {
     // TODO
   }
 
