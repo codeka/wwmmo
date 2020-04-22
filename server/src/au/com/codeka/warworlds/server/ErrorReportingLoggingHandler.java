@@ -19,12 +19,12 @@ import au.com.codeka.warworlds.server.ctrl.ErrorReportsController;
  * then writes errors to the database.
  */
 public class ErrorReportingLoggingHandler extends Handler {
-  private ArrayList<String> mLogBuffer;
-  private SimpleFormatter mSimpleFormatter;
+  private ArrayList<String> logBuffer;
+  private SimpleFormatter simpleFormatter;
 
   public ErrorReportingLoggingHandler() {
-    mLogBuffer = new ArrayList<>();
-    mSimpleFormatter = new SimpleFormatter();
+    logBuffer = new ArrayList<>();
+    simpleFormatter = new SimpleFormatter();
   }
 
   /**
@@ -42,13 +42,14 @@ public class ErrorReportingLoggingHandler extends Handler {
   @Override
   public void publish(LogRecord record) {
     // ignore anything below 'info' level...
-    if (record.getLevel() == Level.FINE || record.getLevel() == Level.FINER || record.getLevel() == Level.FINEST) {
+    if (record.getLevel() == Level.FINE || record.getLevel() == Level.FINER ||
+        record.getLevel() == Level.FINEST) {
       return;
     }
 
-    mLogBuffer.add(mSimpleFormatter.format(record));
-    if (mLogBuffer.size() > 10) {
-      mLogBuffer.remove(0);
+    logBuffer.add(simpleFormatter.format(record));
+    if (logBuffer.size() > 10) {
+      logBuffer.remove(0);
     }
 
     if (record.getLevel() == Level.SEVERE) {
@@ -61,11 +62,12 @@ public class ErrorReportingLoggingHandler extends Handler {
       Messages.ErrorReport.Builder error_report_pb = Messages.ErrorReport.newBuilder();
       error_report_pb.setContext(RequestContext.i.getContextName());
       Runtime rt = Runtime.getRuntime();
+      error_report_pb.setSource(Messages.ErrorReport.Source.SERVER);
       error_report_pb.setHeapSize(rt.totalMemory());
       error_report_pb.setHeapFree(rt.freeMemory());
       error_report_pb.setHeapAllocated(rt.totalMemory() - rt.freeMemory());
       StringBuilder sb = new StringBuilder();
-      for (String line : mLogBuffer) {
+      for (String line : logBuffer) {
         sb.append(line);
         sb.append("\r\n");
       }

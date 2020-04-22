@@ -1439,6 +1439,13 @@ message ErrorReport {
   optional string server_request_qs = 17;
   optional string server_request_user_agent = 18;
   optional string remote_addr = 19;
+
+  enum Source {
+    UNKNOWN_SOURCE = 0;
+    SERVER = 1;
+    CLIENT = 2;
+  }
+  optional Source source = 20;
 }
 
 message ErrorReports {

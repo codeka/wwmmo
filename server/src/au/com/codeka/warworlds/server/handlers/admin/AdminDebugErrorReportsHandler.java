@@ -31,14 +31,17 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
 
     ArrayList<String> parameters = new ArrayList<>();
 
-    String sql = "SELECT error_reports.*, empires.name AS empire_name, empires.user_email AS empire_email" +
+    String sql =
+        " SELECT" +
+        "   error_reports.*, empires.name AS empire_name, empires.user_email AS empire_email" +
         " FROM error_reports" +
         " LEFT JOIN empires ON error_reports.empire_id = empires.id" +
         " WHERE 1 = 1";
     if (cursor != 0) {
       sql += " AND report_date < to_timestamp(" + cursor + ")";
     }
-    if (getRequest().getParameter("empire") != null && !getRequest().getParameter("empire").equals("")) {
+    if (getRequest().getParameter("empire") != null &&
+        !getRequest().getParameter("empire").equals("")) {
       String empire = getRequest().getParameter("empire");
       data.put("curr_empire", empire);
       if (empire.matches("^[0-9]+$")) {
@@ -62,13 +65,15 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
       parameters.add("%" + q + "%");
       parameters.add("%" + q + "%");
     }
-    if (getRequest().getParameter("source") != null && getRequest().getParameter("source").equals("client")) {
+    if (getRequest().getParameter("source") != null &&
+        getRequest().getParameter("source").equals("client")) {
       data.put("curr_source", "client");
-      sql += " AND error_reports.empire_id IS NOT NULL";
+      sql += " AND error_reports.source = " + Messages.ErrorReport.Source.CLIENT.getNumber();
     }
-    if (getRequest().getParameter("source") != null && getRequest().getParameter("source").equals("server")) {
+    if (getRequest().getParameter("source") != null &&
+        getRequest().getParameter("source").equals("server")) {
       data.put("curr_source", "server");
-      sql += " AND error_reports.empire_id IS NULL";
+      sql += " AND error_reports.source = " + Messages.ErrorReport.Source.SERVER.getNumber();
     }
     sql += " ORDER BY report_date DESC" +
         " LIMIT 50";
