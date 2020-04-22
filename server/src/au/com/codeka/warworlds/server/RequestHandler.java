@@ -120,8 +120,7 @@ public class RequestHandler {
           log.warning(
               "%s %s: concurrent modification, aborting", request.getRequestURI(),
               getRequestDebugString());
-        }
-        if (!e.skipLog()) {
+        } else if (!e.skipLog()) {
           if (e.logMessageOnly()) {
             log.warning(
                 "%s %s: %s", request.getRequestURI(), getRequestDebugString(), e.getMessage());
@@ -292,7 +291,7 @@ public class RequestHandler {
 
   protected Session getSession() throws RequestException {
     if (session == null) {
-      throw new RequestException(403);
+      throw new RequestException(403, "No session found.").withLogMessageOnly();
     }
 
     return session;
