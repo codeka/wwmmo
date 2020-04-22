@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.net
 
 import android.os.Build
 import au.com.codeka.warworlds.client.App
+import au.com.codeka.warworlds.client.concurrency.RunnableTask
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.game.world.ChatManager
 import au.com.codeka.warworlds.client.game.world.EmpireManager
@@ -86,36 +87,38 @@ class Server {
   private fun login(cookie: String) {
     log.info("Fetching firebase instance ID...")
     App.i.taskRunner.runTask(FirebaseInstanceId.getInstance().instanceId)
-        .then({ instanceIdResult: InstanceIdResult ->
-          log.info("Logging in: %s", ServerUrl.getUrl("/login"))
-          val request = HttpRequest.Builder()
-              .url(ServerUrl.getUrl("/login"))
-              .method(HttpRequest.Method.POST)
-              .body(LoginRequest.Builder()
-                  .cookie(cookie)
-                  .device_info(populateDeviceInfo(instanceIdResult))
-                  .build().encode())
-              .build()
-          if (request.responseCode != 200) {
-            if (request.responseCode >= 401 && request.responseCode < 500) {
-              // Our cookie must not be valid, we'll clear it before trying again.
-              GameSettings.edit()
-                  .setString(GameSettings.Key.COOKIE, "")
-                  .commit()
-            }
-            log.error(
-                "Error logging in, will try again: %d",
-                request.responseCode,
-                request.exception)
-            disconnect()
-          } else {
-            val loginResponse = request.getBody(LoginResponse::class.java)
-            if (loginResponse!!.status != LoginStatus.SUCCESS) {
-              updateState(ServerStateEvent.ConnectionState.ERROR, loginResponse.status)
-              log.error("Error logging in, got login status: %s", loginResponse.status)
+        .then(object : RunnableTask.RunnableP<InstanceIdResult> {
+          override fun run(instanceIdResult: InstanceIdResult) {
+            log.info("Logging in: %s", ServerUrl.getUrl("/login"))
+            val request = HttpRequest.Builder()
+                .url(ServerUrl.getUrl("/login"))
+                .method(HttpRequest.Method.POST)
+                .body(LoginRequest.Builder()
+                    .cookie(cookie)
+                    .device_info(populateDeviceInfo(instanceIdResult))
+                    .build().encode())
+                .build()
+            if (request.responseCode != 200) {
+              if (request.responseCode >= 401 && request.responseCode < 500) {
+                // Our cookie must not be valid, we'll clear it before trying again.
+                GameSettings.edit()
+                    .setString(GameSettings.Key.COOKIE, "")
+                    .commit()
+              }
+              log.error(
+                  "Error logging in, will try again: %d",
+                  request.responseCode,
+                  request.exception)
               disconnect()
             } else {
-              connectGameSocket(loginResponse)
+              val loginResponse = request.getBody(LoginResponse::class.java)
+              if (loginResponse!!.status != LoginStatus.SUCCESS) {
+                updateState(ServerStateEvent.ConnectionState.ERROR, loginResponse.status)
+                log.error("Error logging in, got login status: %s", loginResponse.status)
+                disconnect()
+              } else {
+                connectGameSocket(loginResponse)
+              }
             }
           }
         }, Threads.BACKGROUND)
@@ -195,7 +198,7 @@ class Server {
     }
     if (currState.state != ServerStateEvent.ConnectionState.ERROR) {
       updateState(ServerStateEvent.ConnectionState.DISCONNECTED, null)
-      App.i.taskRunner.runTask({
+      App.i.taskRunner.runTask(Runnable {
         reconnectTimeMs *= 2
         if (reconnectTimeMs > MAX_RECONNECT_TIME_MS) {
           reconnectTimeMs = MAX_RECONNECT_TIME_MS
