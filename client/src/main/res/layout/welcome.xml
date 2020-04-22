@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="horizontal"
@@ -17,8 +18,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/title_icon"
+        android:layout_toEndOf="@+id/title_icon"
         android:text="War Worlds"
         style="@style/TitleText" />
 
@@ -34,9 +37,12 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginStart="@dimen/tablet_margin_5dp"
         android:layout_below="@+id/title_icon"
         android:layout_toLeftOf="@id/separator"
+        android:layout_toStartOf="@id/separator"
         android:text="How to Play" />
 
     <Button
@@ -45,30 +51,40 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginStart="@dimen/tablet_margin_5dp"
         android:layout_below="@+id/title_icon"
         android:layout_toRightOf="@id/separator"
+        android:layout_toEndOf="@id/separator"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:text="Website" />
 
-    <TextView
-        android:id="@+id/realm_name"
+    <Button
+        android:id="@+id/rules_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/help_btn"
         android:layout_toLeftOf="@+id/separator"
+        android:layout_toStartOf="@+id/separator"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
-        android:text="Realm: "
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_marginStart="@dimen/tablet_margin_5dp"
+        android:text="Rules" />
 
     <ImageView
         android:id="@+id/empire_icon"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_below="@id/website_btn"
-        android:layout_toRightOf="@id/separator" />
+        android:layout_toRightOf="@id/separator"
+        android:layout_toEndOf="@id/separator"
+        tools:src="@drawable/app_icon"/>
 
     <TextView
         android:id="@+id/empire_name"
@@ -76,8 +92,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/website_btn"
         android:layout_toRightOf="@+id/empire_icon"
+        android:layout_toEndOf="@+id/empire_icon"
         android:layout_marginLeft="5dp"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_marginStart="5dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        tools:text="Empire name"/>
 
     <Button
         android:id="@+id/realm_select_btn"
@@ -86,10 +105,14 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginStart="@dimen/tablet_margin_5dp"
         android:layout_toLeftOf="@+id/separator"
+        android:layout_toStartOf="@+id/separator"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/realm_name"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/rules_btn"
         android:text="Switch Realm" />
 
     <Button
@@ -98,10 +121,14 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginStart="@dimen/tablet_margin_5dp"
         android:layout_toRightOf="@+id/separator"
+        android:layout_toEndOf="@+id/separator"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_below="@id/empire_name"
         android:text="Switch User" />
 

@@ -57,7 +57,7 @@ public class WarWorldsActivity extends BaseActivity {
   private Button startGameButton;
   private TextView connectionStatus;
   private HelloWatcher helloWatcher;
-  private TextView realmName;
+  private Button realmSelectButton;
 
   @Nullable
   private Intent startGameIntent;
@@ -83,8 +83,7 @@ public class WarWorldsActivity extends BaseActivity {
 
     startGameButton = findViewById(R.id.start_game_btn);
     connectionStatus = findViewById(R.id.connection_status);
-    realmName = findViewById(R.id.realm_name);
-    final Button realmSelectButton = findViewById(R.id.realm_select_btn);
+    realmSelectButton = findViewById(R.id.realm_select_btn);
     final Button optionsButton = findViewById(R.id.options_btn);
 
     refreshWelcomeMessage();
@@ -115,6 +114,12 @@ public class WarWorldsActivity extends BaseActivity {
       startActivity(i);
     });
 
+    findViewById(R.id.rules_btn).setOnClickListener(v -> {
+      Intent i = new Intent(Intent.ACTION_VIEW);
+      i.setData(Uri.parse("http://www.war-worlds.com/rules"));
+      startActivity(i);
+    });
+
     findViewById(R.id.reauth_btn).setOnClickListener(v -> onReauthClick());
   }
 
@@ -136,7 +141,7 @@ public class WarWorldsActivity extends BaseActivity {
     }
 
     startGameButton.setEnabled(false);
-    realmName.setText(String
+    realmSelectButton.setText(String
         .format(Locale.ENGLISH, "Realm: %s", RealmContext.i.getCurrentRealm().getDisplayName()));
 
     final TextView empireName = findViewById(R.id.empire_name);
