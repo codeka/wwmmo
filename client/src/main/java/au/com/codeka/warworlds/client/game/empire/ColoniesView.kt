@@ -1,17 +1,13 @@
-package au.com.codeka.warworlds.client.game.empire;
+package au.com.codeka.warworlds.client.game.empire
 
-import android.content.Context;
-import android.widget.FrameLayout;
+import android.content.Context
+import android.widget.FrameLayout
 
 /**
  * ColoniesView shows a list of stars, which you can expand to see colonies that
  * belong to those stars.
  */
-public class ColoniesView extends FrameLayout {
-  public ColoniesView(Context context) {
-    super(context);
-  }
-/*
+class ColoniesView(context: Context?) /*
     private StarsListAdapter adapter;
     private EmpireStarsFetcher fetcher;
 
@@ -201,7 +197,7 @@ public class ColoniesView extends FrameLayout {
                     starGoodsTotal.setText(String.format(Locale.ENGLISH, "%d / %d",
                             Math.round(empirePresence.getTotalGoods()),
                             Math.round(empirePresence.getMaxGoods())));
-    
+
                     starMineralsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
                             empirePresence.getDeltaMineralsPerHour() < 0 ? "-" : "+",
                             Math.abs(Math.round(empirePresence.getDeltaMineralsPerHour()))));
@@ -257,5 +253,4 @@ public class ColoniesView extends FrameLayout {
 
             return view;
         }
-    }*/
-}
+    }*/ : FrameLayout(context!!)

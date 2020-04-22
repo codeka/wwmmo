@@ -1,14 +1,9 @@
-package au.com.codeka.warworlds.client.game.empire;
+package au.com.codeka.warworlds.client.game.empire
 
-import android.content.Context;
-import android.widget.FrameLayout;
+import android.content.Context
+import android.widget.FrameLayout
 
-public class OverviewView extends FrameLayout {
-  public OverviewView(Context context) {
-    super(context);
-  }
-
-  /*
+class OverviewView(context: Context?) /*
     private static final Log log = new Log("OverviewView");
     private View mView;
     private EmpireRankList mEmpireList;
@@ -162,5 +157,4 @@ public class OverviewView extends FrameLayout {
                     progress.setVisibility(View.GONE);
                 }
             });
-    }*/
-}
+    }*/ : FrameLayout(context!!)

@@ -1,13 +1,9 @@
-package au.com.codeka.warworlds.client.game.empire;
+package au.com.codeka.warworlds.client.game.empire
 
-import android.content.Context;
-import android.widget.FrameLayout;
+import android.content.Context
+import android.widget.FrameLayout
 
-public class BuildQueueView extends FrameLayout {
-  public BuildQueueView(Context context) {
-    super(context);
-  }
-/*
+class BuildQueueView(context: Context?) /*
     private BuildQueueStarsListAdapter adapter;
     private EmpireStarsFetcher fetcher;
     private BuildSelectionPanel buildSelectionPanel;
@@ -169,9 +165,9 @@ public class BuildQueueView extends FrameLayout {
                 int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
                 Sprite sprite = StarImageManager.getInstance().getSprite(star, imageSize, true);
                 starIcon.setImageDrawable(new SpriteDrawable(sprite));
-    
+
                 starName.setText(star.getName());
-    
+
                 MyEmpire myEmpire = EmpireManager.i.getEmpire();
                 EmpirePresence empirePresence = null;
                 for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
@@ -180,11 +176,11 @@ public class BuildQueueView extends FrameLayout {
                         break;
                     }
                 }
-    
+
                 if (empirePresence == null) {
                     return view;
                 }
-    
+
                 int numBuildings = 0;
                 int numShips = 0;
                 DateTime queueEmptyTime = null;
@@ -203,7 +199,7 @@ public class BuildQueueView extends FrameLayout {
                         }
                     }
                 }
-    
+
                 buildingCount.setText(String.format(Locale.ENGLISH, "%s",
                         NumberFormatter.format(numBuildings)));
                 shipCount.setText(String.format(Locale.ENGLISH, "%s",
@@ -316,5 +312,4 @@ public class BuildQueueView extends FrameLayout {
 
             progressBar.setProgress((int) buildRequest.getPercentComplete());
         }
-    }*/
-}
+    }*/ : FrameLayout(context!!)
