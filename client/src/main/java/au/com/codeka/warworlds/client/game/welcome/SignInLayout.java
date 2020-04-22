@@ -32,14 +32,14 @@ public class SignInLayout extends RelativeLayout {
   public SignInLayout(Context context, Callbacks callbacks) {
     super(context);
     inflate(context, R.layout.signin, this);
-    ViewBackgroundGenerator.setBackground(this);
+    ViewBackgroundGenerator.INSTANCE.setBackground(this);
 
     signInHelp = checkNotNull(findViewById(R.id.signin_help));
     signInError = checkNotNull(findViewById(R.id.signin_error));
     signInButton = checkNotNull(findViewById(R.id.signin_btn));
     cancelButton = checkNotNull(findViewById(R.id.cancel_btn));
     emailText = checkNotNull(findViewById(R.id.email));
-    if (GameSettings.i.getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
+    if (GameSettings.INSTANCE.getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
       signInButton.setText(R.string.next);
     } else {
       signInButton.setText(R.string.switch_user);

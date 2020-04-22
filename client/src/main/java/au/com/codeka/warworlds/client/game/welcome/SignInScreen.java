@@ -44,7 +44,7 @@ public class SignInScreen extends Screen {
     updateState(null);
 
     GameSettings.SignInState signInState =
-        GameSettings.i.getEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.class);
+        GameSettings.INSTANCE.getEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.class);
     if (signInState == GameSettings.SignInState.AWAITING_VERIFICATION) {
       checkVerificationStatus();
     }
@@ -56,13 +56,14 @@ public class SignInScreen extends Screen {
   private void updateState(@Nullable GameSettings.SignInState newState) {
     GameSettings.SignInState signInState;
     if (newState != null) {
-      GameSettings.i.edit()
+      GameSettings.INSTANCE.edit()
           .setEnum(GameSettings.Key.SIGN_IN_STATE, newState)
           .commit();
       signInState = newState;
     } else {
       signInState =
-          GameSettings.i.getEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.class);
+          GameSettings.INSTANCE.getEnum(
+              GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.class);
     }
 
     layout.setErrorMsg(null);
@@ -105,7 +106,7 @@ public class SignInScreen extends Screen {
       }
 
       GameSettings.SignInState signInState =
-          GameSettings.i.getEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.class);
+          GameSettings.INSTANCE.getEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.class);
       switch(signInState) {
         case ANONYMOUS:
           onSignInAnonymousState(emailAddr);
@@ -124,10 +125,10 @@ public class SignInScreen extends Screen {
     @Override
     public void onCancelClick() {
       GameSettings.SignInState signInState =
-          GameSettings.i.getEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.class);
+          GameSettings.INSTANCE.getEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.class);
       if (signInState != GameSettings.SignInState.VERIFIED) {
         // if you're not yet verified, go back to the anonymous state.
-        GameSettings.i.edit()
+        GameSettings.INSTANCE.edit()
             .setEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.ANONYMOUS)
             .commit();
       }
@@ -165,7 +166,7 @@ public class SignInScreen extends Screen {
           .method(HttpRequest.Method.POST)
           .header("Content-Type", "application/x-protobuf")
           .body(new AccountAssociateRequest.Builder()
-              .cookie(GameSettings.i.getString(GameSettings.Key.COOKIE))
+              .cookie(GameSettings.INSTANCE.getString(GameSettings.Key.COOKIE))
               .force(force)
               .email_addr(emailAddr)
               .build().encode())

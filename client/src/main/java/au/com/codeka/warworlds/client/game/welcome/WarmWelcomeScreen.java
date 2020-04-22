@@ -27,7 +27,7 @@ public class WarmWelcomeScreen extends Screen {
       @Override
       public void onStartClick() {
         // save the fact that we've finished the warm welcome
-        GameSettings.i.edit()
+        GameSettings.INSTANCE.edit()
             .setBoolean(GameSettings.Key.WARM_WELCOME_SEEN, true)
             .commit();
 

@@ -38,20 +38,20 @@ public class CongenialityView extends RelativeLayout {
   }
 
   public void setPlanet(Planet planet) {
-    populationTextView.setText(NumberFormatter.format(planet.population_congeniality));
+    populationTextView.setText(NumberFormatter.INSTANCE.format(planet.population_congeniality));
     populationProgressBar.setProgress(
         (int) (populationProgressBar.getMax()
             * (planet.population_congeniality / 1000.0)));
 
-    farmingTextView.setText(NumberFormatter.format(planet.farming_congeniality));
+    farmingTextView.setText(NumberFormatter.INSTANCE.format(planet.farming_congeniality));
     farmingProgressBar.setProgress(
         (int)(farmingProgressBar.getMax() * (planet.farming_congeniality / 100.0)));
 
-    miningTextView.setText(NumberFormatter.format(planet.mining_congeniality));
+    miningTextView.setText(NumberFormatter.INSTANCE.format(planet.mining_congeniality));
     miningProgressBar.setProgress(
         (int)(miningProgressBar.getMax() * (planet.mining_congeniality / 100.0)));
 
-    energyTextView.setText(NumberFormatter.format(planet.energy_congeniality));
+    energyTextView.setText(NumberFormatter.INSTANCE.format(planet.energy_congeniality));
     energyProgressBar.setProgress(
         (int)(miningProgressBar.getMax() * (planet.energy_congeniality / 100.0)));
   }

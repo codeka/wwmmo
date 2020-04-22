@@ -65,7 +65,8 @@ public class PlanetDetailsLayout extends RelativeLayout {
   public PlanetDetailsLayout(Context context, Star star, Planet planet, Callbacks callbacks) {
     super(context);
     inflate(context, R.layout.planet_details, this);
-    ViewBackgroundGenerator.setBackground(findViewById(R.id.planet_background), null, star.id);
+    ViewBackgroundGenerator.INSTANCE.setBackground(
+        findViewById(R.id.planet_background), null, star.id);
     this.star = star;
     this.planet = planet;
 
@@ -208,7 +209,8 @@ public class PlanetDetailsLayout extends RelativeLayout {
       focusLockButtons[i].setImageResource(
           focusLocks[i] ? R.drawable.lock_closed : R.drawable.lock_opened);
       focusSeekBars[i].setProgress((int)(focusValues[i] * 1000.0f));
-      focusTextViews[i].setText(NumberFormatter.format(Math.round(focusValues[i] * 100.0f)));
+      focusTextViews[i].setText(
+          NumberFormatter.INSTANCE.format(Math.round(focusValues[i] * 100.0f)));
     }
   }
 

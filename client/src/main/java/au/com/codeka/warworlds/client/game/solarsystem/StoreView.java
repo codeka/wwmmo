@@ -69,15 +69,15 @@ public class StoreView extends RelativeLayout {
       log.debug("storage is not null");
       setVisibility(View.VISIBLE);
 
-      storedGoods.setText(NumberFormatter.format(Math.round(storage.total_goods)));
+      storedGoods.setText(NumberFormatter.INSTANCE.format(Math.round(storage.total_goods)));
       totalGoods.setText(String.format(Locale.ENGLISH, "/ %s",
-          NumberFormatter.format(Math.round(storage.max_goods))));
-      storedMinerals.setText(NumberFormatter.format(Math.round(storage.total_minerals)));
+          NumberFormatter.INSTANCE.format(Math.round(storage.max_goods))));
+      storedMinerals.setText(NumberFormatter.INSTANCE.format(Math.round(storage.total_minerals)));
       totalMinerals.setText(String.format(Locale.ENGLISH, "/ %s",
-          NumberFormatter.format(Math.round(storage.max_minerals))));
-      storedEnergy.setText(NumberFormatter.format(Math.round(storage.total_energy)));
+          NumberFormatter.INSTANCE.format(Math.round(storage.max_minerals))));
+      storedEnergy.setText(NumberFormatter.INSTANCE.format(Math.round(storage.total_energy)));
       totalEnergy.setText(String.format(Locale.ENGLISH, "/ %s",
-          NumberFormatter.format(Math.round(storage.max_energy))));
+          NumberFormatter.INSTANCE.format(Math.round(storage.max_energy))));
 
       if (Wire.get(storage.goods_delta_per_hour, 0.0f) >= 0) {
         deltaGoods.setTextColor(Color.GREEN);

@@ -42,7 +42,7 @@ public class WelcomeLayout extends RelativeLayout {
     super(context, null);
     this.callbacks = callbacks;
     inflate(context, R.layout.welcome, this);
-    ViewBackgroundGenerator.setBackground(this);
+    ViewBackgroundGenerator.INSTANCE.setBackground(this);
 
     startButton = checkNotNull(findViewById(R.id.start_btn));
     signInButton = findViewById(R.id.signin_btn);

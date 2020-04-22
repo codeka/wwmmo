@@ -8,7 +8,7 @@ import java.net.URISyntaxException
 object ServerUrl {
   @JvmStatic
   val url: String
-    get() = GameSettings.i.getString(GameSettings.Key.SERVER)
+    get() = GameSettings.getString(GameSettings.Key.SERVER)
 
   val host: String?
     get() = try {

@@ -122,7 +122,7 @@ class HttpRequest private constructor(builder: Builder) {
       conn = url.openConnection() as HttpURLConnection
       conn!!.requestMethod = builder.method.toString()
       if (builder.authenticated) {
-        val cookie = GameSettings.i.getString(GameSettings.Key.COOKIE)
+        val cookie = GameSettings.getString(GameSettings.Key.COOKIE)
         conn!!.setRequestProperty("COOKIE", cookie)
       }
       for (key in builder.headers.keys) {

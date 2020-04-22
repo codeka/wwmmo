@@ -72,7 +72,7 @@ public class CreateEmpireScreen extends Screen {
 
   private void onRegisterSuccess(NewAccountResponse resp) {
     // Save the cookie.
-    GameSettings.i.edit()
+    GameSettings.INSTANCE.edit()
         .setString(GameSettings.Key.COOKIE, resp.cookie)
         .commit();
 

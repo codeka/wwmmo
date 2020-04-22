@@ -26,7 +26,7 @@ public class WarmWelcomeLayout extends RelativeLayout {
     inflate(context, R.layout.warm_welcome, this);
     this.callbacks = callbacks;
 
-    ViewBackgroundGenerator.setBackground(this);
+    ViewBackgroundGenerator.INSTANCE.setBackground(this);
 
     TransparentWebView welcome = findViewById(R.id.welcome);
     String msg = TransparentWebView.getHtmlFile(getContext(), "html/warm-welcome.html");

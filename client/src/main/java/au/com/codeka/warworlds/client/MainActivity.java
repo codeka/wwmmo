@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
     if (savedInstanceState != null) {
       // TODO: restore the view state?
     }
-    if (!GameSettings.i.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
+    if (!GameSettings.INSTANCE.getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
       screenStack.push(new WarmWelcomeScreen());
-    } else if (GameSettings.i.getString(GameSettings.Key.COOKIE).isEmpty()) {
+    } else if (GameSettings.INSTANCE.getString(GameSettings.Key.COOKIE).isEmpty()) {
       screenStack.push(new CreateEmpireScreen());
     } else {
       screenStack.push(new WelcomeScreen());

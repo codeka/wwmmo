@@ -70,7 +70,7 @@ public class WelcomeScreen extends Screen {
     //optionsButton.setOnClickListener(v ->
     //    getFragmentTransitionManager().replaceFragment(GameSettingsFragment.class));
 
-    if (GameSettings.i.getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
+    if (GameSettings.INSTANCE.getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
       welcomeLayout.setSignInText(R.string.signin);
     } else {
       welcomeLayout.setSignInText(R.string.switch_user);

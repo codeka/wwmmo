@@ -75,7 +75,7 @@ public class SunAndPlanetsView extends RelativeLayout {
       return;
     }
 
-    ViewBackgroundGenerator.setBackground(this, onBackgroundDrawHandler, star.id);
+    ViewBackgroundGenerator.INSTANCE.setBackground(this, onBackgroundDrawHandler, star.id);
     removeAllViews();
     addView(selectionIndicator);
 

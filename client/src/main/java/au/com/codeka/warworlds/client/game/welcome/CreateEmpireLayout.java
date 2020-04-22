@@ -27,7 +27,7 @@ public class CreateEmpireLayout extends RelativeLayout {
 
     empireName = findViewById(R.id.empire_name);
 
-    ViewBackgroundGenerator.setBackground(this);
+    ViewBackgroundGenerator.INSTANCE.setBackground(this);
     findViewById(R.id.next_btn).setOnClickListener(
         v -> callbacks.onDoneClick(empireName.getText().toString()));
   }

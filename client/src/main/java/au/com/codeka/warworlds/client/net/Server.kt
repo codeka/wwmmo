@@ -49,10 +49,10 @@ class Server {
 
   /** Connect to the server.  */
   fun connect() {
-    GameSettings.i.addSettingChangedHandler { key: GameSettings.Key ->
+    GameSettings.addSettingChangedHandler { key: GameSettings.Key ->
       if (key == GameSettings.Key.SERVER) {
         // If you change SERVER, we'll want to clear the cookie.
-        GameSettings.i.edit()
+        GameSettings.edit()
             .setString(GameSettings.Key.COOKIE, "")
             .commit()
       } else if (key == GameSettings.Key.COOKIE) {
@@ -60,7 +60,7 @@ class Server {
         disconnect()
       }
     }
-    val cookie = GameSettings.i.getString(GameSettings.Key.COOKIE)
+    val cookie = GameSettings.getString(GameSettings.Key.COOKIE)
     if (cookie.isEmpty()) {
       log.warning("No cookie yet, not connecting.")
       return
@@ -99,7 +99,7 @@ class Server {
           if (request.responseCode != 200) {
             if (request.responseCode >= 401 && request.responseCode < 500) {
               // Our cookie must not be valid, we'll clear it before trying again.
-              GameSettings.i.edit()
+              GameSettings.edit()
                   .setString(GameSettings.Key.COOKIE, "")
                   .commit()
             }
@@ -239,7 +239,7 @@ class Server {
     private fun populateDeviceInfo(instanceIdResult: InstanceIdResult): DeviceInfo {
       return DeviceInfo.Builder()
           .device_build(Build.ID)
-          .device_id(GameSettings.i.getString(GameSettings.Key.INSTANCE_ID))
+          .device_id(GameSettings.getString(GameSettings.Key.INSTANCE_ID))
           .device_manufacturer(Build.MANUFACTURER)
           .device_model(Build.MODEL)
           .device_version(Build.VERSION.RELEASE)

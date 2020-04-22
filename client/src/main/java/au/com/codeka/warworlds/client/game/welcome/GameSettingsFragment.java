@@ -135,13 +135,13 @@ implements SharedPreferences.OnSharedPreferenceChangeListener {
 
   private void refreshPreferenceSummaries() {
     Preference p = findPreference(GameSettings.Key.CHAT_PROFANITY_FILTER.name());
-    GameSettings.ChatProfanityFilter filter = GameSettings.i.getEnum(
+    GameSettings.ChatProfanityFilter filter = GameSettings.INSTANCE.getEnum(
         GameSettings.Key.CHAT_PROFANITY_FILTER, GameSettings.ChatProfanityFilter.class);
     p.setSummary(CHAT_PROFANITY_FILTER_DISPLAY.get(filter));
 
     if (BuildConfig.DEBUG) {
       p = findPreference(GameSettings.Key.SERVER.name());
-      p.setSummary(GameSettings.i.getString(GameSettings.Key.SERVER));
+      p.setSummary(GameSettings.INSTANCE.getString(GameSettings.Key.SERVER));
     }
   }
 }
