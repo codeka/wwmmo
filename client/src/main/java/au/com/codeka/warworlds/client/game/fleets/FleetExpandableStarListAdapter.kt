@@ -173,7 +173,7 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
           .into(starIcon)
       starName.text = star.name
       starType.text = star.classification.toString()
-      val myEmpire = Preconditions.checkNotNull(EmpireManager.i.myEmpire)
+      val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
       var numFighters = 0.0f
       var numNonFighters = 0.0f
       for (fleet in star.fleets) {
@@ -215,6 +215,6 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
   }
 
   init {
-    myEmpireId = Preconditions.checkNotNull(EmpireManager.i.myEmpire).id
+    myEmpireId = Preconditions.checkNotNull(EmpireManager.getMyEmpire()).id
   }
 }

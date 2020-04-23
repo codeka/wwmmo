@@ -12,8 +12,8 @@ class CompleteStarCollection : StarCollection {
     return 0
   }
 
-  override fun get(index: Int): Star? {
-    return null
+  override fun get(index: Int): Star {
+    throw NotImplementedError()
   }
 
   override fun indexOf(starId: Long): Int {

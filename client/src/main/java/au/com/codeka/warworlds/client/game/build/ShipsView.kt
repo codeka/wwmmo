@@ -30,7 +30,7 @@ class ShipsView(
   private val shipListAdapter: ShipListAdapter
 
   override fun refresh(star: Star?, colony: Colony?) {
-    val myEmpire = Preconditions.checkNotNull(EmpireManager.i.myEmpire)
+    val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
     val fleets = ArrayList<Fleet>()
     for (fleet in star!!.fleets) {
       if (fleet.empire_id != null && myEmpire.id == fleet.empire_id) {

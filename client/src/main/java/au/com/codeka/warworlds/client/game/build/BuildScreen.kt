@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.client.ui.Screen
 import au.com.codeka.warworlds.client.ui.ScreenContext
 import au.com.codeka.warworlds.client.ui.ShowInfo
 import au.com.codeka.warworlds.client.ui.ShowInfo.Companion.builder
+import au.com.codeka.warworlds.client.util.Callback
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Colony
@@ -57,7 +58,11 @@ class BuildScreen(private var star: Star?, planetIndex: Int) : Screen() {
       ssb.append(star!!.name)
       ssb.append(" • Build")
       ImageHelper.bindStarIcon(
-          ssb, 0, 1, context!!.activity, star, 24,  /* TODO: redraw callback */null)
+          ssb, 0, 1, context!!.activity, star, 24, object : Callback<SpannableStringBuilder> {
+        override fun run(param: SpannableStringBuilder) {
+          // TODO: handle this
+        }
+      })
       return ssb
     }
 
@@ -76,7 +81,7 @@ class BuildScreen(private var star: Star?, planetIndex: Int) : Screen() {
     star = s
     extractColonies(star, -1)
     if (oldColony != null) {
-      for (colony in colonies!!) {
+      for (colony in colonies) {
         if (colony!!.id == oldColony.id) {
           currColony = colony
         }
@@ -86,7 +91,7 @@ class BuildScreen(private var star: Star?, planetIndex: Int) : Screen() {
   }
 
   private fun extractColonies(star: Star?, planetIndex: Int) {
-    val myEmpire = EmpireManager.i.myEmpire
+    val myEmpire = EmpireManager.getMyEmpire()
     colonies.clear()
     currColony = null
     for (planet in star!!.planets) {
@@ -105,7 +110,7 @@ class BuildScreen(private var star: Star?, planetIndex: Int) : Screen() {
       refreshCount++
       if (refreshCount % 10 == 0) {
         // Every tenth refresh, we'll re-simulate the star
-        StarManager.i.queueSimulateStar(star)
+        StarManager.queueSimulateStar(star!!)
       } else {
         layout!!.refresh(star, colonies)
       }

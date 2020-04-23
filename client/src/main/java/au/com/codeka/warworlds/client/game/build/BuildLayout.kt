@@ -49,7 +49,7 @@ class BuildLayout(context: Context, private var star: Star?, private var colonie
     bottomPaneContentView = BuildBottomPane(
         context, star, colony, design!!, object : BuildBottomPane.Callback {
       override fun onBuild(designType: DesignType?, count: Int) {
-        StarManager.i.updateStar(star, StarModification.Builder()
+        StarManager.updateStar(star!!, StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
             .colony_id(colony.id)
             .design_type(designType)
@@ -73,7 +73,7 @@ class BuildLayout(context: Context, private var star: Star?, private var colonie
     bottomPaneContentView = UpgradeBottomPane(
         context, star, colony, design, building, object : UpgradeBottomPane.Callback {
       override fun onUpgrade(building: Building?) {
-        StarManager.i.updateStar(star, StarModification.Builder()
+        StarManager.updateStar(star!!, StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
             .colony_id(colony!!.id)
             .building_id(building?.id)
@@ -96,7 +96,7 @@ class BuildLayout(context: Context, private var star: Star?, private var colonie
     bottomPaneContentView = ProgressBottomPane(context, buildRequest, object : ProgressBottomPane.Callback {
       override fun onCancelBuild() {
         // "Cancel" has been clicked.
-        StarManager.i.updateStar(star, StarModification.Builder()
+        StarManager.updateStar(star!!, StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST)
             .build_request_id(buildRequest!!.id))
         hideBottomSheet()
@@ -124,7 +124,7 @@ class BuildLayout(context: Context, private var star: Star?, private var colonie
     }
     Preconditions.checkNotNull(planet)
     Picasso.get()
-        .load(ImageHelper.getPlanetImageUrl(context, star, planet!!.index, 64, 64))
+        .load(ImageHelper.getPlanetImageUrl(context, star!!, planet!!.index, 64, 64))
         .into(planetIcon)
     planetName.text = String.format(Locale.US, "%s %s", star!!.name,
         format(planet.index + 1))

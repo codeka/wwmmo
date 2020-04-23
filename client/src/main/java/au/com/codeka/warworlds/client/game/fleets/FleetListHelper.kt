@@ -113,17 +113,17 @@ object FleetListHelper {
   /** Gets the destination text for the given fleet, or null if the fleet is not moving.  */
   fun getFleetDestination(
       context: Context, fleet: Fleet, includeEta: Boolean,
-      needRedrawCallback: Callback<SpannableStringBuilder>?): CharSequence? {
+      needRedrawCallback: Callback<SpannableStringBuilder>): CharSequence? {
     if (fleet.destination_star_id == null) {
       return null
     }
-    val destStar = StarManager.i.getStar(fleet.destination_star_id)
+    val destStar = StarManager.getStar(fleet.destination_star_id)
     return destStar?.let { getFleetDestination(context, fleet, it, includeEta, needRedrawCallback) }
   }
 
   private fun getFleetDestination(
       context: Context, fleet: Fleet, dest: Star, includeEta: Boolean,
-      needRedrawCallback: Callback<SpannableStringBuilder>?): CharSequence {
+      needRedrawCallback: Callback<SpannableStringBuilder>): CharSequence {
     val ssb = SpannableStringBuilder()
     val eta = TimeFormatter.create().format(fleet.eta - System.currentTimeMillis())
 

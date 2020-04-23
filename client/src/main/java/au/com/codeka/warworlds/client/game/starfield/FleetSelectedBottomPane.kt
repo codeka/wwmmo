@@ -42,7 +42,7 @@ class FleetSelectedBottomPane(
     }
     val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
     val progressText = findViewById<TextView>(R.id.progress_text)
-    val destStar = StarManager.i.getStar(fleet.destination_star_id)
+    val destStar = StarManager.getStar(fleet.destination_star_id)
     if (destStar != null) {
       val distanceInParsecs = StarHelper.distanceBetween(star, destStar)
       val startTime = fleet.state_start_time
@@ -75,7 +75,7 @@ class FleetSelectedBottomPane(
     empireName.text = ""
     empireIcon.setImageBitmap(null)
     val design = DesignHelper.getDesign(fleet.design_type)
-    val empire = EmpireManager.i.getEmpire(fleet.empire_id)
+    val empire = EmpireManager.getEmpire(fleet.empire_id)
     if (empire != null) {
       empireName.text = empire.display_name
       Picasso.get()

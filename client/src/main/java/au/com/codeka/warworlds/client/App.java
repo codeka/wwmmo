@@ -52,7 +52,7 @@ public class App extends Application {
 
     server.connect();
     dataStore.open(this);
-    StarManager.i.create();
+    StarManager.INSTANCE.create();
     ChatManager.i.create();
 
     log.info("App.onCreate() complete.");

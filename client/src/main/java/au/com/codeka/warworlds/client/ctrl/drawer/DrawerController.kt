@@ -147,7 +147,7 @@ class DrawerController(
     val empireMenuItem = navigationView.menu.findItem(R.id.nav_empire)
     App.i.server.waitForHello(Runnable {
       App.i.taskRunner.runTask(Runnable {
-        val url = ImageHelper.getEmpireImageUrl(activity, EmpireManager.i.myEmpire, 48, 48)
+        val url = ImageHelper.getEmpireImageUrl(activity, EmpireManager.getMyEmpire(), 48, 48)
         val target: Target = object : Target {
           override fun onBitmapLoaded(bitmap: Bitmap, from: LoadedFrom) {
             empireMenuItem.icon = BitmapDrawable(activity.resources, bitmap)

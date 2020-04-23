@@ -139,11 +139,11 @@ class Server {
       send(Packet.Builder()
           .hello(HelloPacket.Builder()
               .empire_id(loginResponse.empire.id)
-              .our_star_last_simulation(StarManager.i.lastSimulationOfOurStar)
+              .our_star_last_simulation(StarManager.lastSimulationOfOurStar)
               .last_chat_time(ChatManager.i.lastChatTime)
               .build())
           .build())
-      EmpireManager.i.onHello(loginResponse.empire)
+      EmpireManager.onHello(loginResponse.empire)
       reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS
       updateState(ServerStateEvent.ConnectionState.CONNECTED, loginResponse.status)
       while (oldQueuedPackets != null && !oldQueuedPackets.isEmpty()) {

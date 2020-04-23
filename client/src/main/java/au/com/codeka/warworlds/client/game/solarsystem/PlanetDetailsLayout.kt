@@ -48,7 +48,7 @@ class PlanetDetailsLayout(context: Context?, star: Star, planet: Planet, callbac
   private fun refresh() {
     var empire: Empire? = null
     if (planet.colony != null && planet.colony.empire_id != null) {
-      empire = EmpireManager.i.getEmpire(planet.colony.empire_id)
+      empire = EmpireManager.getEmpire(planet.colony.empire_id)
     }
     ImageHelper.bindPlanetIcon(planetIcon, star, planet)
     ImageHelper.bindEmpireShield(empireIcon, empire)
@@ -66,7 +66,7 @@ class PlanetDetailsLayout(context: Context?, star: Star, planet: Planet, callbac
           "Defence: %.0f",
           planet.colony.defence_bonus * planet.colony.population)
     }
-    if (EmpireManager.i.isMyEmpire(empire)) {
+    if (EmpireManager.isMyEmpire(empire)) {
       // It's our colony.
       focusContainer.visibility = View.VISIBLE
       attackBtn.visibility = View.GONE

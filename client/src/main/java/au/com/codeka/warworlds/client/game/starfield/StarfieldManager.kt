@@ -263,7 +263,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     initialized = true
 
     // Shouldn't be null after we're connected to the server.
-    val myEmpire = Preconditions.checkNotNull(EmpireManager.i.myEmpire)
+    val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
     warpTo(myEmpire.home_star)
   }
 
@@ -403,7 +403,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       if (planet.colony == null || planet.colony.empire_id == null) {
         continue
       }
-      val empire = EmpireManager.i.getEmpire(planet.colony.empire_id)
+      val empire = EmpireManager.getEmpire(planet.colony.empire_id)
       if (empire != null) {
         var iconInfo = empires[empire.id]
         if (iconInfo == null) {
@@ -418,7 +418,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         // Ignore native fleets, and moving fleets, which we'll draw them separately.
         continue
       }
-      val empire = EmpireManager.i.getEmpire(fleet.empire_id)
+      val empire = EmpireManager.getEmpire(fleet.empire_id)
       if (empire != null) {
         var iconInfo = empires[empire.id]
         if (iconInfo == null) {
@@ -476,7 +476,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   }
 
   private fun attachMovingFleet(star: Star, fleet: Fleet) {
-    val destStar = StarManager.i.getStar(fleet.destination_star_id)
+    val destStar = StarManager.getStar(fleet.destination_star_id)
     if (destStar == null) {
       log.warning("Cannot attach moving fleet, destination star is null.")
       return

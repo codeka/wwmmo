@@ -22,7 +22,7 @@ import java.util.*
  * around the star.
  */
 class PlanetListSimple : LinearLayout {
-  private var star: Star? = null
+  private lateinit var star: Star
   private var planets: List<Planet>? = null
   private var fleets: List<Fleet>? = null
   private var planetSelectedHandler: PlanetSelectedHandler? = null
@@ -47,7 +47,7 @@ class PlanetListSimple : LinearLayout {
     refresh()
   }
 
-  fun setStar(s: Star?, p: List<Planet>?, f: List<Fleet>?) {
+  fun setStar(s: Star, p: List<Planet>?, f: List<Fleet>?) {
     star = s
     planets = p
     fleets = f
@@ -65,7 +65,7 @@ class PlanetListSimple : LinearLayout {
     }
     removeAllViews()
     val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    val myEmpire = EmpireManager.i.myEmpire
+    val myEmpire = EmpireManager.getMyEmpire()
     val empires = HashSet<Long>()
     for (fleet in fleets!!) {
       if (fleet.empire_id == null) {
@@ -118,7 +118,7 @@ class PlanetListSimple : LinearLayout {
     val view = inflater.inflate(R.layout.ctrl_planet_list_simple_row, this, false)
     val icon = view.findViewById<View>(R.id.starfield_planet_icon) as ImageView
     Picasso.get()
-        .load(ImageHelper.getPlanetImageUrl(getContext(), star, planetIndex, 32, 32))
+        .load(ImageHelper.getPlanetImageUrl(context, star, planetIndex, 32, 32))
         .into(icon)
     val planetTypeTextView = view.findViewById<View>(R.id.starfield_planet_type) as TextView
     planetTypeTextView.text = planet.planet_type.toString()
@@ -128,7 +128,7 @@ class PlanetListSimple : LinearLayout {
       if (colony.empire_id == null) {
         colonyTextView.text = getContext().getString(R.string.native_colony)
       } else {
-        val empire = EmpireManager.i.getEmpire(colony.empire_id)
+        val empire = EmpireManager.getEmpire(colony.empire_id)
         if (empire != null) {
           colonyTextView.text = empire.display_name
         } else {
@@ -149,7 +149,7 @@ class PlanetListSimple : LinearLayout {
     val icon = view.findViewById<ImageView>(R.id.starfield_planet_icon)
     val empireName = view.findViewById<TextView>(R.id.starfield_planet_type)
     val allianceName = view.findViewById<TextView>(R.id.starfield_planet_colony)
-    val empire = EmpireManager.i.getEmpire(empireID)
+    val empire = EmpireManager.getEmpire(empireID)
     if (empire != null) {
       Picasso.get()
           .load(ImageHelper.getEmpireImageUrl(context, empire, 32, 32))

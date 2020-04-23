@@ -96,7 +96,7 @@ class StarSelectedBottomPane(context: Context?, private var star: Star?, callbac
       planetList.setStar(star!!)
     }
     fleetList.setStar(star!!)
-    val myEmpire = Preconditions.checkNotNull(EmpireManager.i.myEmpire)
+    val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
     var numMyEmpire = 0
     var numOtherEmpire = 0
     for (planet in star!!.planets) {
@@ -123,7 +123,7 @@ class StarSelectedBottomPane(context: Context?, private var star: Star?, callbac
     starKind.text = String.format(Locale.ENGLISH, "%s %s", star!!.classification,
         StarHelper.getCoordinateString(star))
     Picasso.get()
-        .load(ImageHelper.getStarImageUrl(context, star, 40, 40))
+        .load(ImageHelper.getStarImageUrl(context, star!!, 40, 40))
         .into(starIcon)
   }
 

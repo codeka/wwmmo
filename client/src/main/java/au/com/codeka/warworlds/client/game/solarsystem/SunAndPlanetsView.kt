@@ -147,7 +147,7 @@ class SunAndPlanetsView(context: Context?, attrs: AttributeSet?) : RelativeLayou
       ViewCompat.setTransitionName(planetInfo.imageView!!, "planet_icon_$i")
       addView(planetInfo.imageView)
       Picasso.get()
-          .load(ImageHelper.getPlanetImageUrl(context, star, i, 64, 64))
+          .load(ImageHelper.getPlanetImageUrl(context, star!!, i, 64, 64))
           .into(planetInfo.imageView)
       if (planetInfo.planet!!.colony != null) {
         for (building in planetInfo.planet!!.colony.buildings) {
@@ -164,8 +164,8 @@ class SunAndPlanetsView(context: Context?, attrs: AttributeSet?) : RelativeLayou
         planetInfo.colonyImageView = ImageView(context)
         planetInfo.colonyImageView!!.layoutParams = lpColony
         ImageHelper.bindEmpireShield(
-            planetInfo.colonyImageView,
-            EmpireManager.i.getEmpire(planetInfo.planet!!.colony.empire_id))
+            planetInfo.colonyImageView!!,
+            EmpireManager.getEmpire(planetInfo.planet!!.colony.empire_id))
         addView(planetInfo.colonyImageView)
       }
       if (!planetInfo.buildings.isEmpty()) {

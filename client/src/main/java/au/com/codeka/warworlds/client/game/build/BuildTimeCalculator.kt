@@ -30,7 +30,7 @@ class BuildTimeCalculator(private val star: Star?, private val colony: Colony?) 
       // Add the build request to a temporary copy of the star, simulate it and figure out the
       // build time.
       val starBuilder = star!!.newBuilder()
-      val myEmpire = EmpireManager.i.myEmpire
+      val myEmpire = EmpireManager.getMyEmpire()
       try {
         StarModifier(IdentifierGenerator { 0 }).modifyStar(starBuilder,
             StarModification.Builder()

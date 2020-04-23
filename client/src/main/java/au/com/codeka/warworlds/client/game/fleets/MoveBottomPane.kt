@@ -143,7 +143,7 @@ class MoveBottomPane(
     if (destStar == null) {
       return
     }
-    StarManager.i.updateStar(star, StarModification.Builder()
+    StarManager.updateStar(star!!, StarModification.Builder()
         .type(StarModification.MODIFICATION_TYPE.MOVE_FLEET)
         .fleet_id(fleet!!.id)
         .star_id(destStar!!.id))

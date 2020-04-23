@@ -32,7 +32,7 @@ class StoreView(context: Context?, attributeSet: AttributeSet?)
   private val totalEnergy: TextView
   private val deltaEnergy: TextView
   fun setStar(star: Star) {
-    val myEmpire = Preconditions.checkNotNull(EmpireManager.i.myEmpire)
+    val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
     var storage: EmpireStorage? = null
     for (s in star.empire_stores) {
       if (s.empire_id != null && s.empire_id == myEmpire.id) {

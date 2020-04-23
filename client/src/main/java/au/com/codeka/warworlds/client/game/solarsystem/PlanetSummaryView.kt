@@ -51,9 +51,9 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
         enemyColonyDetailsContainer.visibility = View.VISIBLE
         refreshNativeColonyDetails(planet)
       } else {
-        val colonyEmpire = EmpireManager.i.getEmpire(planet.colony.empire_id)
+        val colonyEmpire = EmpireManager.getEmpire(planet.colony.empire_id)
         if (colonyEmpire != null) {
-          val myEmpire = EmpireManager.i.myEmpire
+          val myEmpire = EmpireManager.getMyEmpire()
           if (myEmpire.id == colonyEmpire.id) {
             colonyDetailsContainer.visibility = View.VISIBLE
             refreshColonyDetails(star, planet)

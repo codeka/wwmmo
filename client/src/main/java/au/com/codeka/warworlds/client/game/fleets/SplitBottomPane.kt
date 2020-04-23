@@ -69,7 +69,7 @@ class SplitBottomPane(context: Context?, cancelCallback: () -> Unit) : RelativeL
     if (star == null || fleet == null) {
       return
     }
-    StarManager.i.updateStar(star, StarModification.Builder()
+    StarManager.updateStar(star!!, StarModification.Builder()
         .type(StarModification.MODIFICATION_TYPE.SPLIT_FLEET)
         .fleet_id(fleet!!.id)
         .count(splitRatio.max - splitRatio.progress))

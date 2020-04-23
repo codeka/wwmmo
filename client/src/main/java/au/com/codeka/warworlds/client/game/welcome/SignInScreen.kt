@@ -121,7 +121,7 @@ class SignInScreen : Screen() {
   }
 
   private fun doAssociate(emailAddr: String, force: Boolean) {
-    val myEmpire = EmpireManager.i.myEmpire
+    val myEmpire = EmpireManager.getMyEmpire()
     log.info("Associating email address '%s' with empire #%d %s (force=%s)...",
         emailAddr, myEmpire.id, myEmpire.display_name, if (force) "true" else "false")
     layout!!.updateState(
@@ -195,7 +195,7 @@ class SignInScreen : Screen() {
   }
 
   private fun checkVerificationStatus() {
-    val myEmpire = EmpireManager.i.myEmpire
+    val myEmpire = EmpireManager.getMyEmpire()
     App.i.taskRunner.runTask(Runnable {
       val request = HttpRequest.Builder()
           .url(url + "accounts/associate?id=" + myEmpire.id)

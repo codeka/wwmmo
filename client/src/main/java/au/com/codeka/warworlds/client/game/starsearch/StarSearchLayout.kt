@@ -24,7 +24,7 @@ class StarSearchLayout(context: Context, callback: Callback) : RelativeLayout(co
     val lv = findViewById<ListView>(R.id.search_result)
     adapter = StarSearchListAdapter(LayoutInflater.from(context))
     lv.adapter = adapter
-    adapter.setCursor(StarManager.i.myStars)
+    adapter.setCursor(StarManager.myStars)
     lv.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>?, view: View?, position: Int, l: Long ->
       val star = adapter.getStar(position)
       callback.onStarClick(star)

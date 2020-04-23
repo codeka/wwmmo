@@ -55,7 +55,7 @@ class InfobarView(context: Context?, attrs: AttributeSet?) : FrameLayout(context
       return
     }
     App.i.eventBus.register(eventHandler)
-    refreshEmpire(EmpireManager.i.myEmpire)
+    refreshEmpire(EmpireManager.getMyEmpire())
   }
 
   public override fun onDetachedFromWindow() {
@@ -76,7 +76,7 @@ class InfobarView(context: Context?, attrs: AttributeSet?) : FrameLayout(context
   private val eventHandler: Any = object : Any() {
     @EventHandler
     fun onEmpireUpdated(empire: Empire) {
-      if (empire.id != null && empire.id == EmpireManager.i.myEmpire.id) {
+      if (empire.id != null && empire.id == EmpireManager.getMyEmpire().id) {
         refreshEmpire(empire)
       }
     }

@@ -60,8 +60,8 @@ class WelcomeScreen : Screen() {
   override fun onShow(): ShowInfo? {
     welcomeLayout!!.setConnectionStatus(false, null)
     updateServerState(App.i.server.currState)
-    if (EmpireManager.i.hasMyEmpire()) {
-      welcomeLayout!!.refreshEmpireDetails(EmpireManager.i.myEmpire)
+    if (EmpireManager.hasMyEmpire()) {
+      welcomeLayout!!.refreshEmpireDetails(EmpireManager.getMyEmpire())
     }
     if (motd != null) {
       welcomeLayout!!.updateWelcomeMessage(motd)
@@ -232,7 +232,7 @@ class WelcomeScreen : Screen() {
 
     @EventHandler
     fun onEmpireUpdated(empire: Empire) {
-      val myEmpire = EmpireManager.i.myEmpire
+      val myEmpire = EmpireManager.getMyEmpire()
       if (myEmpire.id == empire.id && welcomeLayout != null) {
         welcomeLayout!!.refreshEmpireDetails(empire)
       }

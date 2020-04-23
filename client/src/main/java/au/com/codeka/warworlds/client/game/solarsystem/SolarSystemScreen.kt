@@ -15,6 +15,7 @@ import au.com.codeka.warworlds.client.ui.ScreenContext
 import au.com.codeka.warworlds.client.ui.SharedViews
 import au.com.codeka.warworlds.client.ui.ShowInfo
 import au.com.codeka.warworlds.client.ui.ShowInfo.Companion.builder
+import au.com.codeka.warworlds.client.util.Callback
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Star
@@ -53,7 +54,11 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
       ssb.append("○ ")
       ssb.append(star.name)
       ImageHelper.bindStarIcon(
-          ssb, 0, 1, context!!.activity, star, 24,  /* TODO: redraw callback */null)
+          ssb, 0, 1, context!!.activity, star, 24, object : Callback<SpannableStringBuilder> {
+            override fun run(param: SpannableStringBuilder) {
+              // TODO: handle this
+            }
+          })
       return ssb
     }
 
@@ -76,7 +81,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
    * energy, minerals, etc. We'll schedule it to run every 5 seconds we're on this screen.
    */
   private fun doRefresh() {
-    StarManager.i.simulateStarSync(star)
+    StarManager.simulateStarSync(star)
     if (isCreated) {
       App.i.taskRunner.runTask(Runnable { doRefresh() }, Threads.BACKGROUND, 5000)
     }

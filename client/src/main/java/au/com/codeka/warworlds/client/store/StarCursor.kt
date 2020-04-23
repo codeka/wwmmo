@@ -15,13 +15,9 @@ class StarCursor(private val cursor: Cursor) : Iterable<Star?>, AutoCloseable {
    * Gets the value at the given position, can return null if the position is invalid or the star
    * could not be deserialized.
    */
-  fun getValue(position: Int): Star? {
+  fun getValue(position: Int): Star {
     cursor.moveToPosition(position)
-    return try {
-      Star.ADAPTER.decode(cursor.getBlob(0))
-    } catch (e: IOException) {
-      null
-    }
+    return Star.ADAPTER.decode(cursor.getBlob(0))
   }
 
   override fun close() {

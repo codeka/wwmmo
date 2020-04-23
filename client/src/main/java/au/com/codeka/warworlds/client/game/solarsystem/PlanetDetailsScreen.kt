@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.client.ui.Screen
 import au.com.codeka.warworlds.client.ui.ScreenContext
 import au.com.codeka.warworlds.client.ui.ShowInfo
 import au.com.codeka.warworlds.client.ui.ShowInfo.Companion.builder
+import au.com.codeka.warworlds.client.util.Callback
 import au.com.codeka.warworlds.client.util.RomanNumeralFormatter
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.ColonyFocus
@@ -43,7 +44,11 @@ class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : 
       ssb.append(" ")
       ssb.append(RomanNumeralFormatter.format(planet.index + 1))
       ImageHelper.bindStarIcon(
-          ssb, 0, 1, context!!.activity, star, 24,  /* TODO: redraw callback */null)
+          ssb, 0, 1, context!!.activity, star, 24, object : Callback<SpannableStringBuilder> {
+            override fun run(param: SpannableStringBuilder) {
+              // TODO: handle this
+            }
+          })
       return ssb
     }
 
@@ -51,7 +56,7 @@ class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : 
     override fun onSaveFocusClick(
         farmingFocus: Float, miningFocus: Float, energyFocus: Float, constructionFocus: Float) {
       Preconditions.checkState(planet.colony != null && planet.colony.id != null)
-      StarManager.i.updateStar(star, StarModification.Builder()
+      StarManager.updateStar(star, StarModification.Builder()
           .type(StarModification.MODIFICATION_TYPE.ADJUST_FOCUS)
           .colony_id(planet.colony.id)
           .focus(ColonyFocus.Builder()
@@ -67,8 +72,8 @@ class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : 
       if (planet.colony == null) {
         return
       }
-      val myEmpire = Preconditions.checkNotNull(EmpireManager.i.myEmpire)
-      StarManager.i.updateStar(star, StarModification.Builder()
+      val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
+      StarManager.updateStar(star, StarModification.Builder()
           .type(StarModification.MODIFICATION_TYPE.ATTACK_COLONY)
           .empire_id(myEmpire.id)
           .colony_id(planet.colony.id))
@@ -76,8 +81,8 @@ class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : 
     }
 
     override fun onColonizeClick() {
-      val myEmpire = Preconditions.checkNotNull(EmpireManager.i.myEmpire)
-      StarManager.i.updateStar(star, StarModification.Builder()
+      val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
+      StarManager.updateStar(star, StarModification.Builder()
           .type(StarModification.MODIFICATION_TYPE.COLONIZE)
           .empire_id(myEmpire.id)
           .planet_index(planet.index))

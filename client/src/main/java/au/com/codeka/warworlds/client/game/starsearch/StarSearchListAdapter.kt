@@ -108,7 +108,7 @@ internal class StarSearchListAdapter(private val inflater: LayoutInflater) : Bas
           .into(starIcon)
       starName.text = star.name
       starType.text = star.classification.toString()
-      val myEmpire = EmpireManager.i.myEmpire
+      val myEmpire = EmpireManager.getMyEmpire()
       var storage: EmpireStorage? = null
       for (i in star.empire_stores.indices) {
         if (star.empire_stores[i].empire_id != null

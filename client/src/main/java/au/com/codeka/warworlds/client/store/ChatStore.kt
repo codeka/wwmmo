@@ -45,7 +45,7 @@ class ChatStore(private val name: String, private val helper: SQLiteOpenHelper) 
   }
 
   /** Gets count messages starting from startTime and going back in time.  */
-  fun getMessages(roomId: Long?, startTime: Long, count: Int): List<ChatMessage?> {
+  fun getMessages(roomId: Long?, startTime: Long, count: Int): List<ChatMessage> {
     var query: String
     query = if (roomId == null) {
       "room_id IS NULL"
@@ -59,7 +59,7 @@ class ChatStore(private val name: String, private val helper: SQLiteOpenHelper) 
       queryArgs[index++] = String.format(Locale.US, "%d", roomId)
     }
     queryArgs[index] = String.format(Locale.US, "%d", startTime)
-    val msgs = ArrayList<ChatMessage?>()
+    val msgs = ArrayList<ChatMessage>()
     val db = helper.readableDatabase
     try {
       db.query(
@@ -81,7 +81,7 @@ class ChatStore(private val name: String, private val helper: SQLiteOpenHelper) 
   }
 
   /** Gets count messages starting from startTime and going back in time.  */
-  fun getMessagesAfter(roomId: Long?, time: Long): List<ChatMessage?> {
+  fun getMessagesAfter(roomId: Long?, time: Long): List<ChatMessage> {
     var query: String
     query = if (roomId == null) {
       "room_id IS NULL"
@@ -95,7 +95,7 @@ class ChatStore(private val name: String, private val helper: SQLiteOpenHelper) 
       queryArgs[index++] = String.format(Locale.US, "%d", roomId)
     }
     queryArgs[index] = String.format(Locale.US, "%d", time)
-    val msgs = ArrayList<ChatMessage?>()
+    val msgs = ArrayList<ChatMessage>()
     val db = helper.readableDatabase
     try {
       db.query(
@@ -117,8 +117,8 @@ class ChatStore(private val name: String, private val helper: SQLiteOpenHelper) 
   }
 
   /** Gets all messages, regardless of room, from the given start time.  */
-  fun getMessages(time: Long, count: Int): List<ChatMessage?> {
-    val msgs = ArrayList<ChatMessage?>()
+  fun getMessages(time: Long, count: Int): List<ChatMessage> {
+    val msgs = ArrayList<ChatMessage>()
     val db = helper.readableDatabase
     try {
       db.query(

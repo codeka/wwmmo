@@ -41,7 +41,7 @@ class EmpireScreen : Screen() {
             .url(getUrl("/accounts/patreon-begin"))
             .authenticated()
             .body(PatreonBeginRequest.Builder()
-                .empire_id(EmpireManager.i.myEmpire.id)
+                .empire_id(EmpireManager.getMyEmpire().id)
                 .build().encode())
             .method(HttpRequest.Method.POST)
             .build()

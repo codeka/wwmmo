@@ -85,7 +85,7 @@ abstract class ExpandableStarListAdapter<T>(private val stars: StarCollection):
 
   private val eventListener: Any = object : Any() {
     @EventHandler(thread = Threads.UI)
-    fun onStarUpdated(star: Star?) {
+    fun onStarUpdated(star: Star) {
       if (stars.notifyStarModified(star)) {
         notifyDataSetChanged()
       }

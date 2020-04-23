@@ -67,7 +67,7 @@ class MergeBottomPane(
     val additionalFleetIds: List<Long?> = Lists.newArrayList(
         Iterables.filter(adapter.getSelectedFleetIds()) { fleetId: Long? -> selectedFleetId != fleetId })
     if (additionalFleetIds.isNotEmpty()) {
-      StarManager.i.updateStar(star, StarModification.Builder()
+      StarManager.updateStar(star!!, StarModification.Builder()
           .type(StarModification.MODIFICATION_TYPE.MERGE_FLEET)
           .fleet_id(fleet!!.id)
           .additional_fleet_ids(additionalFleetIds))
