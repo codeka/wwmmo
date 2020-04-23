@@ -33,7 +33,7 @@ class BuildScreen(private var star: Star?, planetIndex: Int) : Screen() {
     this.context = context
     layout = BuildLayout(context!!.activity, star, colonies, colonies.indexOf(currColony))
     layout!!.refreshColonyDetails(currColony)
-    App.i.eventBus.register(eventHandler)
+    App.eventBus.register(eventHandler)
   }
 
   override fun onShow(): ShowInfo? {
@@ -47,7 +47,7 @@ class BuildScreen(private var star: Star?, planetIndex: Int) : Screen() {
   }
 
   override fun onDestroy() {
-    App.i.eventBus.unregister(eventHandler)
+    App.eventBus.unregister(eventHandler)
   }
 
   /* TODO: redraw callback */

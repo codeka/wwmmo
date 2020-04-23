@@ -54,7 +54,7 @@ class InfobarView(context: Context?, attrs: AttributeSet?) : FrameLayout(context
     if (isInEditMode) {
       return
     }
-    App.i.eventBus.register(eventHandler)
+    App.eventBus.register(eventHandler)
     refreshEmpire(EmpireManager.getMyEmpire())
   }
 
@@ -63,7 +63,7 @@ class InfobarView(context: Context?, attrs: AttributeSet?) : FrameLayout(context
     if (isInEditMode) {
       return
     }
-    App.i.eventBus.unregister(eventHandler)
+    App.eventBus.unregister(eventHandler)
   }
 
   private fun refreshEmpire(empire: Empire) {

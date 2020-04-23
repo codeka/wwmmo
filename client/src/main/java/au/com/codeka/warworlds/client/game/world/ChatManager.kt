@@ -30,12 +30,12 @@ class ChatManager private constructor() {
   val lastChatTime: Long
     get() {
       val threeDaysAgo = System.currentTimeMillis() - 3 * Time.DAY
-      val lastChatTime = App.i.dataStore.chat().lastChatTime
+      val lastChatTime = App.dataStore.chat().lastChatTime
       if (lastChatTime == 0L) {
         return threeDaysAgo
       }
       if (lastChatTime < threeDaysAgo) {
-        App.i.dataStore.chat().removeHistory()
+        App.dataStore.chat().removeHistory()
         return threeDaysAgo
       }
       return lastChatTime
@@ -52,24 +52,24 @@ class ChatManager private constructor() {
   /** Gets count messages starting from startTime and going back in time.  */
   fun getMessages(room: ChatRoom, startTime: Long, count: Int): List<ChatMessage> {
     // TODO: if we don't have any, ask some from the server.
-    return App.i.dataStore.chat().getMessages(room.id, startTime, count)
+    return App.dataStore.chat().getMessages(room.id, startTime, count)
   }
 
   /** Gets all messages newer than time.  */
   fun getMessagesAfter(room: ChatRoom, time: Long): List<ChatMessage> {
     // TODO: if we don't have any, ask some from the server.
-    return App.i.dataStore.chat().getMessagesAfter(room.id, time)
+    return App.dataStore.chat().getMessagesAfter(room.id, time)
   }
 
   /** Gets all messages, regardless of room, from the given start time.  */
   fun getMessages(startTime: Long, count: Int): List<ChatMessage> {
-    return App.i.dataStore.chat().getMessages(startTime, count)
+    return App.dataStore.chat().getMessages(startTime, count)
   }
 
   /** Send the given [ChatMessage] to the server.  */
   fun sendMessage(msg: ChatMessage) {
-    App.i.taskRunner.runTask(Runnable {
-      App.i.server.send(Packet.Builder()
+    App.taskRunner.runTask(Runnable {
+      App.server.send(Packet.Builder()
           .chat_msgs(ChatMessagesPacket.Builder()
               .messages(Lists.newArrayList(msg))
               .build())
@@ -80,8 +80,8 @@ class ChatManager private constructor() {
   private val eventListener: Any = object : Any() {
     @EventHandler
     fun onChatMessagesPacket(pkt: ChatMessagesPacket) {
-      App.i.dataStore.chat().addMessages(pkt.messages)
-      App.i.eventBus.publish(ChatMessagesUpdatedEvent())
+      App.dataStore.chat().addMessages(pkt.messages)
+      App.eventBus.publish(ChatMessagesUpdatedEvent())
     }
   }
 
@@ -91,6 +91,6 @@ class ChatManager private constructor() {
   }
 
   init {
-    App.i.eventBus.register(eventListener)
+    App.eventBus.register(eventListener)
   }
 }

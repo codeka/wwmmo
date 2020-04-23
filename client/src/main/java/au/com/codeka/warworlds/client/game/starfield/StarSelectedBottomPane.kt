@@ -74,7 +74,7 @@ class StarSelectedBottomPane(context: Context?, private var star: Star?, callbac
     if (isInEditMode) {
       return
     }
-    App.i.eventBus.register(eventListener)
+    App.eventBus.register(eventListener)
   }
 
   public override fun onDetachedFromWindow() {
@@ -82,7 +82,7 @@ class StarSelectedBottomPane(context: Context?, private var star: Star?, callbac
     if (isInEditMode) {
       return
     }
-    App.i.eventBus.unregister(eventListener)
+    App.eventBus.unregister(eventListener)
   }
 
   private fun refresh() {

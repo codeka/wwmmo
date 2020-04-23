@@ -26,7 +26,7 @@ class BuildTimeCalculator(private val star: Star?, private val colony: Colony?) 
 
   private fun calculateTime(
       design: Design?, building: Building?, count: Int, callback: BuildTimeCalculatorCallback) {
-    App.i.taskRunner.runTask(Runnable {
+    App.taskRunner.runTask(Runnable {
       // Add the build request to a temporary copy of the star, simulate it and figure out the
       // build time.
       val starBuilder = star!!.newBuilder()
@@ -49,7 +49,7 @@ class BuildTimeCalculator(private val star: Star?, private val colony: Colony?) 
       val updatedStar = starBuilder.build()
       for (buildRequest in BuildHelper.getBuildRequests(updatedStar)) {
         if (buildRequest.id == 0L) {
-          App.i.taskRunner.runTask(Runnable {
+          App.taskRunner.runTask(Runnable {
             val buildTime = BuildHelper.formatTimeRemaining(buildRequest)
             val mineralsTime: String
             val mineralsColor: Int

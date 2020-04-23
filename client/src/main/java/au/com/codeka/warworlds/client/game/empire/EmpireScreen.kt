@@ -36,7 +36,7 @@ class EmpireScreen : Screen() {
   private inner class SettingsCallbacks : SettingsView.Callback {
     override fun onPatreonConnectClick(
         completeCallback: PatreonConnectCompleteCallback) {
-      App.i.taskRunner.runTask(Runnable {
+      App.taskRunner.runTask(Runnable {
         val req = HttpRequest.Builder()
             .url(getUrl("/accounts/patreon-begin"))
             .authenticated()
@@ -64,7 +64,7 @@ class EmpireScreen : Screen() {
             + "&redirect_uri=" + Uri.encode(resp.redirect_uri)
             + "&state=" + Uri.encode(resp.state))
         log.info("Opening URL: %s", uri)
-        App.i.taskRunner.runTask(Runnable {
+        App.taskRunner.runTask(Runnable {
           val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
           context!!.activity.startActivity(intent)
         }, Threads.UI)

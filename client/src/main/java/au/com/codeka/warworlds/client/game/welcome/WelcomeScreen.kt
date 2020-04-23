@@ -44,7 +44,7 @@ class WelcomeScreen : Screen() {
     super.onCreate(context, container)
     this.context = context
     welcomeLayout = WelcomeLayout(context!!.activity, layoutCallbacks)
-    App.i.eventBus.register(eventHandler)
+    App.eventBus.register(eventHandler)
     refreshWelcomeMessage()
 
     // TODO
@@ -59,7 +59,7 @@ class WelcomeScreen : Screen() {
 
   override fun onShow(): ShowInfo? {
     welcomeLayout!!.setConnectionStatus(false, null)
-    updateServerState(App.i.server.currState)
+    updateServerState(App.server.currState)
     if (EmpireManager.hasMyEmpire()) {
       welcomeLayout!!.refreshEmpireDetails(EmpireManager.getMyEmpire())
     }
@@ -80,7 +80,7 @@ class WelcomeScreen : Screen() {
   }
 
   override fun onDestroy() {
-    App.i.eventBus.unregister(eventHandler)
+    App.eventBus.unregister(eventHandler)
   }
 
   private fun maybeShowSignInPrompt() {
@@ -111,7 +111,7 @@ class WelcomeScreen : Screen() {
   }
 
   private fun refreshWelcomeMessage() {
-    App.i.taskRunner.runTask(Runnable {
+    App.taskRunner.runTask(Runnable {
       val ins: InputStream?
       ins = try {
         fetchStream(MOTD_RSS)
@@ -161,7 +161,7 @@ class WelcomeScreen : Screen() {
           motd.append("</a></div>")
         }
       }
-      App.i.taskRunner.runTask(Runnable {
+      App.taskRunner.runTask(Runnable {
         this.motd = motd.toString()
         if (welcomeLayout != null) {
           welcomeLayout!!.updateWelcomeMessage(motd.toString())
@@ -174,7 +174,7 @@ class WelcomeScreen : Screen() {
     Preconditions.checkNotNull(welcomeLayout)
     if (event.state === ServerStateEvent.ConnectionState.CONNECTED) {
       val maxMemoryBytes = Runtime.getRuntime().maxMemory()
-      val context = App.i.applicationContext
+      val context = App.applicationContext
       val activityManager = Preconditions.checkNotNull(context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
       val memoryClass = activityManager.memoryClass
       val formatter = DecimalFormat("#,##0")

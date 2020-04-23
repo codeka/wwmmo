@@ -40,7 +40,7 @@ class CreateEmpireScreen : Screen() {
   }
   private fun registerEmpire(empireName: String) {
     layout!!.showSpinner()
-    App.i.taskRunner.runTask(Runnable {
+    App.taskRunner.runTask(Runnable {
       val request = HttpRequest.Builder()
           .url(url + "accounts")
           .method(HttpRequest.Method.POST)
@@ -54,13 +54,13 @@ class CreateEmpireScreen : Screen() {
         // TODO: report the error to the server?
         log.error("Didn't get NewAccountResponse, as expected.", request.exception)
       } else if (resp.cookie == null) {
-        App.i.taskRunner.runTask(Runnable { layout!!.showError(resp.message) }, Threads.UI)
+        App.taskRunner.runTask(Runnable { layout!!.showError(resp.message) }, Threads.UI)
       } else {
         log.info(
             "New account response, cookie: %s, message: %s",
             resp.cookie,
             resp.message)
-        App.i.taskRunner.runTask(Runnable { onRegisterSuccess(resp) }, Threads.UI)
+        App.taskRunner.runTask(Runnable { onRegisterSuccess(resp) }, Threads.UI)
       }
     }, Threads.BACKGROUND)
   }
@@ -72,7 +72,7 @@ class CreateEmpireScreen : Screen() {
         .commit()
 
     // Tell the Server we can now connect.
-    App.i.server.connect()
+    App.server.connect()
     context!!.pushScreen(
         WelcomeScreen(),
         SharedViews.builder()

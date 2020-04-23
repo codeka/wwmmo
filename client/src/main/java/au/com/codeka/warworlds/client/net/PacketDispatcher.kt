@@ -15,7 +15,7 @@ class PacketDispatcher {
       try {
         val value = field[pkt]
         if (value != null) {
-          App.i.eventBus.publish(value)
+          App.eventBus.publish(value)
         }
       } catch (e: IllegalAccessException) {
         // Should never happen.

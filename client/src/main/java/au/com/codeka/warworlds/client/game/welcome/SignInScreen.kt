@@ -130,7 +130,7 @@ class SignInScreen : Screen() {
         R.string.signin,
         true /* isCancel */,
         false /* showEmailAddr */)
-    App.i.taskRunner.runTask(Runnable {
+    App.taskRunner.runTask(Runnable {
       val request = HttpRequest.Builder()
           .url(url + "accounts/associate")
           .method(HttpRequest.Method.POST)
@@ -145,17 +145,17 @@ class SignInScreen : Screen() {
       if (resp == null) {
         // TODO: report the error
         log.error("Didn't get AccountAssociateResponse, as expected.", request.exception)
-        App.i.taskRunner.runTask(Runnable {
+        App.taskRunner.runTask(Runnable {
           onSignInError(
               AccountAssociateStatus.STATUS_UNKNOWN,
               "An unknown error occurred.")
         },
             Threads.UI)
       } else if (resp.status != AccountAssociateStatus.SUCCESS) {
-        App.i.taskRunner.runTask(Runnable { onSignInError(resp.status, null) }, Threads.UI)
+        App.taskRunner.runTask(Runnable { onSignInError(resp.status, null) }, Threads.UI)
       } else {
         log.info("Associate successful, awaiting verification code")
-        App.i.taskRunner.runTask(
+        App.taskRunner.runTask(
             Runnable { updateState(SignInState.AWAITING_VERIFICATION) },
             Threads.UI)
       }
@@ -196,7 +196,7 @@ class SignInScreen : Screen() {
 
   private fun checkVerificationStatus() {
     val myEmpire = EmpireManager.getMyEmpire()
-    App.i.taskRunner.runTask(Runnable {
+    App.taskRunner.runTask(Runnable {
       val request = HttpRequest.Builder()
           .url(url + "accounts/associate?id=" + myEmpire.id)
           .method(HttpRequest.Method.GET)
@@ -205,7 +205,7 @@ class SignInScreen : Screen() {
       if (resp == null) {
         // TODO: report the error
         log.error("Didn't get AccountAssociateResponse, as expected.", request.exception)
-        App.i.taskRunner.runTask(Runnable {
+        App.taskRunner.runTask(Runnable {
           onSignInError(
               AccountAssociateStatus.STATUS_UNKNOWN,
               "An unknown error occurred.")
@@ -215,7 +215,7 @@ class SignInScreen : Screen() {
         // Just wait.
       } else {
         log.info("Associate successful, verification complete.")
-        App.i.taskRunner.runTask(
+        App.taskRunner.runTask(
             Runnable { updateState(SignInState.VERIFIED) },
             Threads.UI)
       }

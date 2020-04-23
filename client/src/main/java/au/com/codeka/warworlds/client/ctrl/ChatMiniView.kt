@@ -41,7 +41,7 @@ class ChatMiniView(context: Context?, attrs: AttributeSet?) : RelativeLayout(con
     if (this.isInEditMode) {
       return
     }
-    App.i.eventBus.register(eventHandler)
+    App.eventBus.register(eventHandler)
     refreshMessages()
   }
 
@@ -50,7 +50,7 @@ class ChatMiniView(context: Context?, attrs: AttributeSet?) : RelativeLayout(con
     if (this.isInEditMode) {
       return
     }
-    App.i.eventBus.unregister(eventHandler)
+    App.eventBus.unregister(eventHandler)
   }
 
   private fun refreshMessages() {

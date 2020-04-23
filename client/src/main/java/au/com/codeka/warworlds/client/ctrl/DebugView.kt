@@ -39,7 +39,7 @@ class DebugView @JvmOverloads constructor(context: Context?, attrs: AttributeSet
     super.onAttachedToWindow()
     if (!isInEditMode) {
       isAttached = true
-      App.i.eventBus.register(eventListener)
+      App.eventBus.register(eventListener)
       queueRefresh()
     }
   }
@@ -48,7 +48,7 @@ class DebugView @JvmOverloads constructor(context: Context?, attrs: AttributeSet
     super.onDetachedFromWindow()
     if (!isInEditMode) {
       isAttached = false
-      App.i.eventBus.unregister(eventListener)
+      App.eventBus.unregister(eventListener)
     }
   }
 

@@ -19,11 +19,11 @@ import java.util.*
  */
 object StarManager {
   private val log = Log("StarManager")
-  private val stars = App.i.dataStore.stars()
+  private val stars = App.dataStore.stars()
   private val starModifier = StarModifier(IdentifierGenerator { 0 })
 
   fun create() {
-    App.i.eventBus.register(eventListener)
+    App.eventBus.register(eventListener)
   }
 
   /** Gets the star with the given ID. Might return null if don't have that star cached yet.  */
@@ -52,8 +52,8 @@ object StarManager {
    * and will be posted to the event bus when complete.
    */
   fun queueSimulateStar(star: Star) {
-    // Something more scalable that just queuing them all to the background threadpool...
-    App.i.taskRunner.runTask(Runnable { simulateStarSync(star) }, Threads.BACKGROUND)
+    // Something more scalable that just queuing them all to the background thread pool...
+    App.taskRunner.runTask(Runnable { simulateStarSync(star) }, Threads.BACKGROUND)
   }
 
   /**
@@ -65,15 +65,15 @@ object StarManager {
 
     // No need to save the star, it's just a simulation, but publish it to the event bus so
     // clients can see it.
-    App.i.eventBus.publish(starBuilder.build())
+    App.eventBus.publish(starBuilder.build())
   }
 
   fun updateStar(star: Star, modificationBuilder: StarModification.Builder) {
     // Be sure to record our empire_id in the request.
     val modification = modificationBuilder
-        .empire_id(EmpireManager.getMyEmpire()!!.id)
+        .empire_id(EmpireManager.getMyEmpire().id)
         .build()
-    App.i.taskRunner.runTask(Runnable {
+    App.taskRunner.runTask(Runnable {
 
       // If there's any auxiliary stars, grab them now, too.
       var auxiliaryStars: MutableList<Star?>? = null
@@ -99,10 +99,10 @@ object StarManager {
       // Save the now-modified star.
       val newStar = starBuilder.build()
       stars.put(star.id, newStar, EmpireManager.getMyEmpire())
-      App.i.eventBus.publish(newStar)
+      App.eventBus.publish(newStar)
 
       // Send the modification to the server as well.
-      App.i.server.send(Packet.Builder()
+      App.server.send(Packet.Builder()
           .modify_star(ModifyStarPacket.Builder()
               .star_id(star.id)
               .modification(Lists.newArrayList(modification))
@@ -121,10 +121,10 @@ object StarManager {
       val startTime = System.nanoTime()
       val values: MutableMap<Long?, Star> = HashMap()
       for (star in pkt.stars) {
-        App.i.eventBus.publish(star)
+        App.eventBus.publish(star)
         values[star.id] = star
       }
-      stars.putAll(values, EmpireManager.getMyEmpire()!!)
+      stars.putAll(values, EmpireManager.getMyEmpire())
       val endTime = System.nanoTime()
       log.info("Updated %d stars in DB in %d ms", pkt.stars.size, (endTime - startTime) / 1000000L)
     }

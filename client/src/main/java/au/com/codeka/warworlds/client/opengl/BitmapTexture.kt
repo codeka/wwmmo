@@ -41,7 +41,7 @@ class BitmapTexture private constructor(loader: Loader) : Texture() {
 
     fun load() {
       if (fileName != null) {
-        App.i.taskRunner.runTask(Runnable {
+        App.taskRunner.runTask(Runnable {
           try {
             log.info("Loading resource: %s", fileName)
             val ins = context.assets.open(fileName)
@@ -51,9 +51,8 @@ class BitmapTexture private constructor(loader: Loader) : Texture() {
           }
         }, Threads.BACKGROUND)
       } else {
-        log.info("DEANH loading texture from url: %s", url)
-        App.i.taskRunner.runTask(
-            Runnable { log.info("DEANH picasso"); Picasso.get().load(url).into(picassoTarget) },
+        App.taskRunner.runTask(
+            Runnable { Picasso.get().load(url).into(picassoTarget) },
             Threads.UI)
       }
     }

@@ -24,7 +24,7 @@ object EmpireManager {
    */
   private const val EMPIRE_REQUEST_DELAY_MS: Long = 150
 
-  private val empires: ProtobufStore<Empire> = App.i.dataStore.empires()
+  private val empires: ProtobufStore<Empire> = App.dataStore.empires()
 
   /** The list of pending empire requests.  */
   private val pendingEmpireRequests: MutableSet<Long> = HashSet()
@@ -40,7 +40,7 @@ object EmpireManager {
 
   /** A placeholder [Empire] for native empires.  */
   private val nativeEmpire = Empire.Builder()
-      .display_name(App.i.getString(R.string.native_colony))
+      .display_name(App.getString(R.string.native_colony))
       .build()
 
   private val eventListener: Any = object : Any() {
@@ -49,7 +49,7 @@ object EmpireManager {
       for (empire in pkt.empires) {
         val startTime = System.nanoTime()
         empires.put(empire.id, empire)
-        App.i.eventBus.publish(empire)
+        App.eventBus.publish(empire)
         val endTime = System.nanoTime()
         log.debug("Refreshed empire %d [%s] in %dms.",
             empire.id, empire.display_name, (endTime - startTime) / 1000000L)
@@ -58,14 +58,14 @@ object EmpireManager {
   }
 
   init {
-    App.i.eventBus.register(eventListener)
+    App.eventBus.register(eventListener)
   }
 
   /** Called by the server when we get the 'hello', and lets us know the empire.  */
   fun onHello(empire: Empire) {
     empires.put(empire.id, empire)
     myEmpire = empire
-    App.i.eventBus.publish(empire)
+    App.eventBus.publish(empire)
   }
 
   /** Returns [true] if my empire has been set, or false if it's not ready yet.  */
@@ -127,7 +127,7 @@ object EmpireManager {
     synchronized(pendingRequestLock) {
       pendingEmpireRequests.add(id)
       if (!requestPending) {
-        App.i.taskRunner.runTask(Runnable { sendPendingEmpireRequests() },
+        App.taskRunner.runTask(Runnable { sendPendingEmpireRequests() },
             Threads.BACKGROUND,
             EMPIRE_REQUEST_DELAY_MS)
       }
@@ -142,7 +142,7 @@ object EmpireManager {
       pendingEmpireRequests.clear()
       requestPending = false
     }
-    App.i.server.send(Packet.Builder()
+    App.server.send(Packet.Builder()
         .request_empire(RequestEmpirePacket.Builder()
             .empire_id(empireIds)
             .build())

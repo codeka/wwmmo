@@ -86,7 +86,7 @@ class Server {
 
   private fun login(cookie: String) {
     log.info("Fetching firebase instance ID...")
-    App.i.taskRunner.runTask(FirebaseInstanceId.getInstance().instanceId)
+    App.taskRunner.runTask(FirebaseInstanceId.getInstance().instanceId)
         .then(object : RunnableTask.RunnableP<InstanceIdResult> {
           override fun run(instanceIdResult: InstanceIdResult) {
             log.info("Logging in: %s", ServerUrl.getUrl("/login"))
@@ -198,7 +198,7 @@ class Server {
     }
     if (currState.state != ServerStateEvent.ConnectionState.ERROR) {
       updateState(ServerStateEvent.ConnectionState.DISCONNECTED, null)
-      App.i.taskRunner.runTask(Runnable {
+      App.taskRunner.runTask(Runnable {
         reconnectTimeMs *= 2
         if (reconnectTimeMs > MAX_RECONNECT_TIME_MS) {
           reconnectTimeMs = MAX_RECONNECT_TIME_MS
@@ -210,14 +210,14 @@ class Server {
 
   private val packetEncodeHandler = PacketEncoder.PacketHandler { packet: Packet?, encodedSize: Int ->
     val packetDebug = PacketDebug.getPacketDebug(packet, encodedSize)
-    App.i.eventBus.publish(ServerPacketEvent(
+    App.eventBus.publish(ServerPacketEvent(
         packet, encodedSize, ServerPacketEvent.Direction.Sent, packetDebug))
     log.debug(">> %s", packetDebug)
   }
   private val packetDecodeHandler: PacketDecoder.PacketHandler = object : PacketDecoder.PacketHandler {
     override fun onPacket(decoder: PacketDecoder, pkt: Packet, encodedSize: Int) {
       val packetDebug = PacketDebug.getPacketDebug(pkt, encodedSize)
-      App.i.eventBus.publish(ServerPacketEvent(
+      App.eventBus.publish(ServerPacketEvent(
           pkt, encodedSize, ServerPacketEvent.Direction.Received, packetDebug))
       log.debug("<< %s", packetDebug)
       packetDispatcher.dispatch(pkt)
@@ -232,7 +232,7 @@ class Server {
       state: ServerStateEvent.ConnectionState,
       loginStatus: LoginStatus?) {
     currState = ServerStateEvent(ServerUrl.url, state, loginStatus)
-    App.i.eventBus.publish(currState)
+    App.eventBus.publish(currState)
   }
 
   companion object {

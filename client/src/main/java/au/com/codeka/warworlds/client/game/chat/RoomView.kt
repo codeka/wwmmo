@@ -39,13 +39,13 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
   private var newestMessageTime: Long = 0
   public override fun onAttachedToWindow() {
     super.onAttachedToWindow()
-    App.i.eventBus.register(eventHandler)
+    App.eventBus.register(eventHandler)
     refreshMessages()
   }
 
   public override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
-    App.i.eventBus.unregister(eventHandler)
+    App.eventBus.unregister(eventHandler)
   }
 
   private fun refreshMessages() {

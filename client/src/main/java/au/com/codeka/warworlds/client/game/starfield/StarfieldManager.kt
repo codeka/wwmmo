@@ -144,14 +144,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   }
 
   fun create() {
-    App.i.eventBus.register(eventListener)
-    if (App.i.server.currState.state === ServerStateEvent.ConnectionState.CONNECTED) {
+    App.eventBus.register(eventListener)
+    if (App.server.currState.state === ServerStateEvent.ConnectionState.CONNECTED) {
       // If we're already connected, then call onConnected now.
       onConnected()
     }
     camera.setCameraUpdateListener(cameraUpdateListener)
     gestureDetector.create()
-    App.i.taskRunner.runTask(
+    App.taskRunner.runTask(
         updateMovingFleetsRunnable,
         Threads.UI,
         UPDATE_MOVING_FLEETS_TIME_MS)
@@ -160,7 +160,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   fun destroy() {
     gestureDetector.destroy()
     camera.setCameraUpdateListener(null)
-    App.i.eventBus.unregister(eventListener)
+    App.eventBus.unregister(eventListener)
   }
 
   fun addTapListener(tapListener: TapListener) {
@@ -293,8 +293,8 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
 
     // Tell the server we want to watch these new sectors, it'll send us back all the stars we
     // don't have yet.
-    App.i.taskRunner.runTask(Runnable {
-      App.i.server.send(Packet.Builder()
+    App.taskRunner.runTask(Runnable {
+      App.server.send(Packet.Builder()
           .watch_sectors(WatchSectorsPacket.Builder()
               .top(top).left(left).bottom(bottom).right(right).build())
           .build())
@@ -542,7 +542,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private fun detachNonMovingFleet(fleet: Fleet, sceneObject: SceneObject) {
     // If you had it selected, we'll need to un-select it.
     if (selectedFleet != null && selectedFleet!!.id == fleet.id) {
-      App.i.taskRunner.runTask(Runnable { setSelectedFleet(null, null) }, Threads.UI)
+      App.taskRunner.runTask(Runnable { setSelectedFleet(null, null) }, Threads.UI)
     }
     synchronized(scene.lock) {
       sceneObject.parent!!.removeChild(sceneObject)
@@ -603,10 +603,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
           }
         }
       }
-      App.i.taskRunner.runTask(
-          this,
-          Threads.UI,
-          UPDATE_MOVING_FLEETS_TIME_MS)
+      App.taskRunner.runTask(this, Threads.UI, UPDATE_MOVING_FLEETS_TIME_MS)
     }
   }
 
@@ -725,7 +722,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
 
   private val cameraUpdateListener: CameraUpdateListener = object : CameraUpdateListener {
     override fun onCameraTranslate(x: Float, y: Float, dx: Float, dy: Float) {
-      App.i.taskRunner.runTask(
+      App.taskRunner.runTask(
           Runnable { onCameraTranslate(x, y) },
           Threads.BACKGROUND)
     }

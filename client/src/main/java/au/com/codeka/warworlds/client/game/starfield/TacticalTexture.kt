@@ -140,6 +140,6 @@ class TacticalTexture private constructor(sector: Sector) : Texture() {
   }
 
   init {
-    App.i.taskRunner.runTask(Runnable { bitmap = createBitmap(sector) }, Threads.BACKGROUND)
+    App.taskRunner.runTask(Runnable { bitmap = createBitmap(sector) }, Threads.BACKGROUND)
   }
 }

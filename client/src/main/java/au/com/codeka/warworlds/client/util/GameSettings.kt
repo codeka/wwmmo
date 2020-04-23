@@ -112,7 +112,7 @@ object GameSettings {
     }
   }
 
-  private var sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.i)
+  private var sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App)
   private val settingChangeHandlers = ArrayList<(Key) -> Unit>()
 
   private val onPrefChangedListener = object : SharedPreferences.OnSharedPreferenceChangeListener {
@@ -147,7 +147,7 @@ object GameSettings {
   }
 
   fun getBoolean(key: Key): Boolean {
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.i)
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App)
     Preconditions.checkArgument(key.valueType == ValueType.BOOLEAN)
     return sharedPreferences.getBoolean(key.toString(), key.defValue as Boolean)
   }

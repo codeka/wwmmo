@@ -23,7 +23,7 @@ abstract class ExpandableStarListAdapter<T>(private val stars: StarCollection):
    * bus when you're finished.
    */
   fun destroy() {
-    App.i.eventBus.unregister(eventListener)
+    App.eventBus.unregister(eventListener)
   }
 
   override fun hasStableIds(): Boolean {
@@ -93,6 +93,6 @@ abstract class ExpandableStarListAdapter<T>(private val stars: StarCollection):
   }
 
   init {
-    App.i.eventBus.register(eventListener)
+    App.eventBus.register(eventListener)
   }
 }

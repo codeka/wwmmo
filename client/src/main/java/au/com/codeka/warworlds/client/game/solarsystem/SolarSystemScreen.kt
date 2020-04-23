@@ -33,8 +33,8 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
     isCreated = true
     this.context = context
     layout = SolarSystemLayout(context!!.activity, layoutCallbacks, star, planetIndex)
-    App.i.taskRunner.runTask(Runnable { doRefresh() }, Threads.BACKGROUND, 100)
-    App.i.eventBus.register(eventHandler)
+    App.taskRunner.runTask(Runnable { doRefresh() }, Threads.BACKGROUND, 100)
+    App.eventBus.register(eventHandler)
   }
 
   override fun onShow(): ShowInfo? {
@@ -44,7 +44,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
 
   override fun onDestroy() {
     isCreated = false
-    App.i.eventBus.unregister(eventHandler)
+    App.eventBus.unregister(eventHandler)
   }
 
   /* TODO: redraw callback */
@@ -83,7 +83,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
   private fun doRefresh() {
     StarManager.simulateStarSync(star)
     if (isCreated) {
-      App.i.taskRunner.runTask(Runnable { doRefresh() }, Threads.BACKGROUND, 5000)
+      App.taskRunner.runTask(Runnable { doRefresh() }, Threads.BACKGROUND, 5000)
     }
   }
 
