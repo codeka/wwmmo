@@ -37,7 +37,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
   }
 
   override fun onShow(): ShowInfo? {
-    StarRecentHistoryManager.i.addToLastStars(star)
+    StarRecentHistoryManager.addToLastStars(star)
     return builder().view(layout).build()
   }
 
