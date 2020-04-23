@@ -68,8 +68,8 @@ class MoveBottomPane(
 
   /** Called when we've got a fleet and need to setup the starfield.  */
   private fun refreshStarfield() {
-    starfieldManager.warpTo(star)
-    starfieldManager.selectedStar = null
+    starfieldManager.warpTo(star!!)
+    starfieldManager.setSelectedStar(null)
     refreshMoveIndicator()
   }
 
@@ -107,7 +107,7 @@ class MoveBottomPane(
       (findViewById<View>(R.id.star_details_right) as TextView).text = Html.fromHtml(rightDetails)
     }
     val starSceneObject = starfieldManager.getStarSceneObject(star!!.id) ?: return
-    val fmi = starfieldManager.createFleetSprite(fleet)
+    val fmi = starfieldManager.createFleetSprite(fleet!!)
     fleetMoveIndicator = fmi
     fmi.setDrawRunnable(Runnable {
       Preconditions.checkNotNull(fleetMoveIndicator)
