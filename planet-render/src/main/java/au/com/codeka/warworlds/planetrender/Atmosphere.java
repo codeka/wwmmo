@@ -40,12 +40,12 @@ public class Atmosphere {
 
   public Colour getOuterPixelColour(double u, double v, Vector3 normal,
       double distanceToSurface, Vector3 sunDirection, Vector3 north) {
-    return new Colour(Colour.TRANSPARENT);
+    return new Colour(Colour.Companion.getTRANSPARENT());
   }
 
   public Colour getInnerPixelColour(double u, double v, Vector3 pt,
       Vector3 normal, Vector3 sunDirection, Vector3 north) {
-    return new Colour(Colour.TRANSPARENT);
+    return new Colour(Colour.Companion.getTRANSPARENT());
   }
 
   public void updateUv(Vector2 uv) {
@@ -117,27 +117,29 @@ public class Atmosphere {
     public Colour getInnerPixelColour(double u, double v, Vector3 pt, Vector3 normal,
         Vector3 sunDirection, Vector3 north) {
       if (colourGradient == null) {
-        return new Colour(Colour.TRANSPARENT);
+        return new Colour(Colour.Companion.getTRANSPARENT());
       }
 
       Vector3 cameraDirection = new Vector3(0, 0, 0);
       cameraDirection.subtract(pt);
       cameraDirection.normalize();
-      double dot = Vector3.dot(cameraDirection, normal);
+      double dot = Vector3.Companion.dot(cameraDirection, normal);
 
       Colour baseColour = colourGradient.getColour(1.0 - dot);
 
       // if we've on the dark side of the planet, we'll want to factor in the shadow
-      dot = Vector3.dot(normal, sunDirection);
+      dot = Vector3.Companion.dot(normal, sunDirection);
       double sunFactor = getSunShadowFactor(dot, sunStartShadow, sunShadowFactor);
-      baseColour.reset(baseColour.a * sunFactor, baseColour.r, baseColour.g, baseColour.b);
+      baseColour.reset(
+          baseColour.getA() * sunFactor, baseColour.getR(), baseColour.getG(), baseColour.getB());
 
       if (perlin != null) {
         double noiseFactor = getNoiseFactor(u, v, perlin, noisiness);
-        baseColour.reset(baseColour.a * noiseFactor,
-            baseColour.r * noiseFactor,
-            baseColour.g * noiseFactor,
-            baseColour.b * noiseFactor);
+        baseColour.reset(
+            baseColour.getA() * noiseFactor,
+            baseColour.getR() * noiseFactor,
+            baseColour.getR() * noiseFactor,
+            baseColour.getB() * noiseFactor);
       }
 
       return baseColour;
@@ -179,20 +181,21 @@ public class Atmosphere {
         double distanceToSurface, Vector3 sunDirection,
         Vector3 north) {
       if (colourGradient == null) {
-        return new Colour(Colour.TRANSPARENT);
+        return new Colour(Colour.Companion.getTRANSPARENT());
       }
 
       distanceToSurface /= atmosphereSize;
       Colour baseColour = colourGradient.getColour(distanceToSurface);
 
-      double dot = Vector3.dot(normal, sunDirection);
+      double dot = Vector3.Companion.dot(normal, sunDirection);
       double sunFactor = getSunShadowFactor(dot, sunStartShadow, sunShadowFactor);
-      baseColour.reset(baseColour.a * sunFactor, baseColour.r, baseColour.g, baseColour.b);
+      baseColour.reset(
+          baseColour.getA() * sunFactor, baseColour.getR(), baseColour.getG(), baseColour.getB());
 
       if (perlin != null) {
         double noiseFactor = getNoiseFactor(u, v, perlin, noisiness);
         baseColour.reset(
-            baseColour.a * noiseFactor, baseColour.r, baseColour.g, baseColour.b);
+            baseColour.getA() * noiseFactor, baseColour.getR(), baseColour.getG(), baseColour.getB());
       }
 
       return baseColour;
@@ -216,9 +219,9 @@ public class Atmosphere {
       Colour baseColour = super.getOuterPixelColour(
           u, v, normal, distanceToSurface, sunDirection, north);
 
-      normal.z = 0;
+      normal.setZ(0);
       normal.normalize();
-      double dot = Vector3.dot(north, normal);
+      double dot = Vector3.Companion.dot(north, normal);
       double angle = Math.acos(dot);
 
       double pointAngle = (Math.PI * 2.0) / (double) mNumPoints;
@@ -237,7 +240,8 @@ public class Atmosphere {
         distanceToPoint = 1.0;
 
       baseColour.reset(
-          baseColour.a * (1.0 - distanceToPoint), baseColour.r, baseColour.g, baseColour.b);
+          baseColour.getA() * (1.0 - distanceToPoint),
+          baseColour.getR(), baseColour.getG(), baseColour.getB());
       return baseColour;
     }
   }

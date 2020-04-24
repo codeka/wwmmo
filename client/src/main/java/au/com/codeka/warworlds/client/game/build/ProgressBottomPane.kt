@@ -16,24 +16,25 @@ import com.google.common.math.DoubleMath.roundToInt
 import java.math.RoundingMode
 import java.util.*
 import kotlin.math.round
+import kotlin.math.roundToInt
 
 /**
  * Bottom pane for an existing build. Shows the current progress, what we're blocked on (e.g. need
  * more minerals or population to go faster?) and allows you to cancel the build.
  */
 class ProgressBottomPane(
-    context: Context?,
-    buildRequest: BuildRequest?,
+    context: Context,
+    private var buildRequest: BuildRequest,
     callback: Callback) : RelativeLayout(context), BottomPaneContentView {
   interface Callback {
     fun onCancelBuild()
   }
 
-  private var buildRequest: BuildRequest?
   private val timeRemaining: TextView
   private val buildProgress: ProgressBar
   private val populationEfficiency: ProgressBar
   private val miningEfficiency: ProgressBar
+
   override fun refresh(star: Star?) {
     // Get an updated build request
     for (planet in star!!.planets) {
@@ -41,7 +42,7 @@ class ProgressBottomPane(
         continue
       }
       for (br in planet.colony.build_requests) {
-        if (br.id == buildRequest!!.id) {
+        if (br.id == buildRequest.id) {
           buildRequest = br
           break
         }
@@ -55,11 +56,11 @@ class ProgressBottomPane(
     buildProgress.progress = progress
 
     // These could be null if the star hasn't been simulated recently.
-    if (buildRequest!!.population_efficiency != null) {
-      populationEfficiency.progress = Math.round(buildRequest!!.population_efficiency * 100)
+    if (buildRequest.population_efficiency != null) {
+      populationEfficiency.progress = (buildRequest.population_efficiency * 100).roundToInt()
     }
-    if (buildRequest!!.minerals_efficiency != null) {
-      miningEfficiency.progress = Math.round(buildRequest!!.minerals_efficiency * 100)
+    if (buildRequest.minerals_efficiency != null) {
+      miningEfficiency.progress = (buildRequest.minerals_efficiency * 100).roundToInt()
     }
     val verb = "Building" // (buildRequest.build_request_id == null ? "Building" : "Upgrading");
     timeRemaining.text = Html.fromHtml(String.format(Locale.ENGLISH,
@@ -78,7 +79,7 @@ class ProgressBottomPane(
     populationEfficiency = findViewById(R.id.population_efficiency)
     miningEfficiency = findViewById(R.id.mining_efficiency)
     findViewById<View>(R.id.cancel).setOnClickListener { view: View? -> callback.onCancelBuild() }
-    val design = DesignHelper.getDesign(buildRequest!!.design_type)
+    val design = DesignHelper.getDesign(buildRequest.design_type)
     BuildViewHelper.setDesignIcon(design, buildIcon)
     buildName.text = DesignHelper.getDesignName(design, false)
     update()

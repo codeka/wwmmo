@@ -17,7 +17,7 @@ import au.com.codeka.warworlds.common.sim.DesignHelper
 import java.util.*
 
 class BuildingsView(
-    context: Context?, private var star: Star?, private var colony: Colony?,
+    context: Context?, private var star: Star, private var colony: Colony,
     buildLayout: BuildLayout)
   : ListView(context), TabContentView {
   companion object {
@@ -27,16 +27,18 @@ class BuildingsView(
   }
 
   private val adapter: BuildingListAdapter
+
   override fun refresh(star: Star?, colony: Colony?) {
-    this.star = star
-    this.colony = colony
+    this.star = star!!
+    this.colony = colony!!
     adapter.refresh(star, colony)
   }
 
   /** This adapter is used to populate a list of buildings in a list view.  */
   private inner class BuildingListAdapter : BaseAdapter() {
     private var entries: ArrayList<ItemEntry>? = null
-    fun refresh(star: Star?, colony: Colony?) {
+
+    fun refresh(star: Star, colony: Colony?) {
       checkOnThread(Threads.UI)
       entries = ArrayList()
       var buildings = colony!!.buildings
@@ -64,11 +66,11 @@ class BuildingsView(
           existingBuildingEntries.add(entry)
         }
       }
-      Collections.sort(existingBuildingEntries) { lhs: ItemEntry, rhs: ItemEntry ->
+      existingBuildingEntries.sortWith(Comparator { lhs: ItemEntry, rhs: ItemEntry ->
         val a = if (lhs.building != null) lhs.building!!.design_type else lhs.buildRequest!!.design_type
         val b = if (rhs.building != null) rhs.building!!.design_type else rhs.buildRequest!!.design_type
         a.compareTo(b)
-      }
+      })
       var title = ItemEntry()
       title.title = "New Buildings"
       entries!!.add(title)
@@ -216,7 +218,7 @@ class BuildingsView(
             row3.visibility = View.GONE
           }
         }
-        if (building != null && building.notes != null) {
+        if (building?.notes != null) {
           notes.text = building.notes
           notes.visibility = View.VISIBLE
         } /*else if (buildRequest != null && buildRequest.notes != null) {
@@ -265,7 +267,8 @@ class BuildingsView(
       } else if (entry.building != null && entry.buildRequest == null) {
         buildLayout.showUpgradeSheet(entry.building)
       } else {
-        buildLayout.showProgressSheet(null, entry.buildRequest)
+        // entry.buildRequest should not be null here.
+        buildLayout.showProgressSheet(null, entry.buildRequest!!)
       }
     }
   }

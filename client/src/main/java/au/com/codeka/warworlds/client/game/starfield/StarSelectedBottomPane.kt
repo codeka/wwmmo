@@ -27,11 +27,11 @@ import java.util.*
 /**
  * The bottom pane when you have a star selected.
  */
-class StarSelectedBottomPane(context: Context?, private var star: Star?, callback: Callback) : FrameLayout(context!!, null) {
+class StarSelectedBottomPane(context: Context, private var star: Star, callback: Callback) : FrameLayout(context!!, null) {
   interface Callback {
-    fun onStarClicked(star: Star?, planet: Planet?)
-    fun onFleetClicked(star: Star?, fleet: Fleet)
-    fun onScoutReportClicked(star: Star?)
+    fun onStarClicked(star: Star, planet: Planet?)
+    fun onFleetClicked(star: Star, fleet: Fleet)
+    fun onScoutReportClicked(star: Star)
   }
 
   private val planetList: PlanetListSimple
@@ -114,25 +114,18 @@ class StarSelectedBottomPane(context: Context?, private var star: Star?, callbac
     } else {
       renameButton.visibility = View.GONE
     }
-    if (star!!.scout_reports.size > 0) {
-      scoutReportButton.isEnabled = true
-    } else {
-      scoutReportButton.isEnabled = false
-    }
-    starName.text = star!!.name
-    starKind.text = String.format(Locale.ENGLISH, "%s %s", star!!.classification,
+    scoutReportButton.isEnabled = star.scout_reports.size > 0
+    starName.text = star.name
+    starKind.text = String.format(Locale.ENGLISH, "%s %s", star.classification,
         StarHelper.getCoordinateString(star))
     Picasso.get()
-        .load(ImageHelper.getStarImageUrl(context, star!!, 40, 40))
+        .load(ImageHelper.getStarImageUrl(context, star, 40, 40))
         .into(starIcon)
   }
 
   private val eventListener: Any = object : Any() {
     @EventHandler
     fun onStarUpdated(s: Star) {
-      if (s == null) {
-        return
-      }
       if (s.id == star!!.id) {
         star = s
       }
@@ -141,9 +134,6 @@ class StarSelectedBottomPane(context: Context?, private var star: Star?, callbac
 
     @EventHandler
     fun onEmpireUpdated(empire: Empire?) {
-      if (star == null) {
-        return
-      }
       refresh()
     }
   }

@@ -208,11 +208,13 @@ class Server {
     }
   }
 
-  private val packetEncodeHandler = PacketEncoder.PacketHandler { packet: Packet?, encodedSize: Int ->
-    val packetDebug = PacketDebug.getPacketDebug(packet, encodedSize)
-    App.eventBus.publish(ServerPacketEvent(
-        packet, encodedSize, ServerPacketEvent.Direction.Sent, packetDebug))
-    log.debug(">> %s", packetDebug)
+  private val packetEncodeHandler = object : PacketEncoder.PacketHandler {
+    override fun onPacket(packet: Packet, encodedSize: Int) {
+      val packetDebug = PacketDebug.getPacketDebug(packet, encodedSize)
+      App.eventBus.publish(ServerPacketEvent(
+          packet, encodedSize, ServerPacketEvent.Direction.Sent, packetDebug))
+      log.debug(">> %s", packetDebug)
+    }
   }
   private val packetDecodeHandler: PacketDecoder.PacketHandler = object : PacketDecoder.PacketHandler {
     override fun onPacket(decoder: PacketDecoder, pkt: Packet, encodedSize: Int) {

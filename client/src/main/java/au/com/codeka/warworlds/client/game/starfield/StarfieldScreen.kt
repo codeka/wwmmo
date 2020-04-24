@@ -21,28 +21,31 @@ import au.com.codeka.warworlds.common.proto.Star
  */
 class StarfieldScreen : Screen() {
   private val log = Log("StarfieldScreen")
-  private var starfieldManager: StarfieldManager? = null
+  private lateinit var starfieldManager: StarfieldManager
   private var context: ScreenContext? = null
   private var layout: StarfieldLayout? = null
+
   override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
     super.onCreate(context, container)
     this.context = context
     layout = StarfieldLayout(context!!.activity, layoutCallbacks)
     starfieldManager = context.activity.starfieldManager
-    if (starfieldManager!!.getSelectedStar() != null) {
-      showStarSelectedBottomPane(starfieldManager!!.getSelectedStar())
+
+    val selectedStar = starfieldManager.getSelectedStar()
+    if (selectedStar != null) {
+      showStarSelectedBottomPane(selectedStar)
     } else {
       showEmptyBottomPane(true)
     }
   }
 
   override fun onShow(): ShowInfo? {
-    starfieldManager!!.addTapListener(tapListener)
+    starfieldManager.addTapListener(tapListener)
     return ShowInfo.builder().view(layout).build()
   }
 
   override fun onHide() {
-    starfieldManager!!.removeTapListener(tapListener)
+    starfieldManager.removeTapListener(tapListener)
   }
 
   private fun showEmptyBottomPane(instant: Boolean) {
@@ -50,19 +53,19 @@ class StarfieldScreen : Screen() {
     layout!!.showBottomPane(emptyBottomPane, instant)
   }
 
-  private fun showStarSelectedBottomPane(star: Star?) {
+  private fun showStarSelectedBottomPane(star: Star) {
     val starSelectedBottomPane = StarSelectedBottomPane(
         context!!.activity, star, object : StarSelectedBottomPane.Callback {
-      override fun onStarClicked(star: Star?, planet: Planet?) {
+      override fun onStarClicked(star: Star, planet: Planet?) {
         context!!.pushScreen(
-            SolarSystemScreen(star!!, -1 /* planetIndex */),
+            SolarSystemScreen(star, -1 /* planetIndex */),
             SharedViews.builder()
                 .addSharedView(R.id.top_pane)
                 .addSharedView(R.id.bottom_pane)
                 .build())
       }
 
-      override fun onFleetClicked(star: Star?, fleet: Fleet) {
+      override fun onFleetClicked(star: Star, fleet: Fleet) {
         context!!.pushScreen(
             FleetsScreen(star, fleet.id),
             SharedViews.builder()
@@ -71,20 +74,20 @@ class StarfieldScreen : Screen() {
                 .build())
       }
 
-      override fun onScoutReportClicked(star: Star?) {
+      override fun onScoutReportClicked(star: Star) {
         showScoutReportBottomPane(star)
       }
     })
     layout!!.showBottomPane(starSelectedBottomPane, false /* instant */)
   }
 
-  private fun showFleetSelectedBottomPane(star: Star?, fleet: Fleet) {
+  private fun showFleetSelectedBottomPane(star: Star, fleet: Fleet) {
     val fleetSelectedBottomPane = FleetSelectedBottomPane(
         context!!.activity, star, fleet)
     layout!!.showBottomPane(fleetSelectedBottomPane, false /* instant */)
   }
 
-  private fun showScoutReportBottomPane(star: Star?) {
+  private fun showScoutReportBottomPane(star: Star) {
     val scoutReportBottomPane = ScoutReportBottomPane(
         context!!.activity, star, object : ScoutReportBottomPane.Callback {
       override fun onBackClicked() {
@@ -95,22 +98,19 @@ class StarfieldScreen : Screen() {
   }
 
   private val tapListener: TapListener = object : TapListener {
-    override fun onStarTapped(star: Star?) {
-      if (star == null) {
-        showEmptyBottomPane(false)
-      } else {
-        showStarSelectedBottomPane(star)
-      }
+    override fun onStarTapped(star: Star) {
+      showStarSelectedBottomPane(star)
     }
 
-    override fun onFleetTapped(star: Star?, fleet: Fleet?) {
-      if (fleet == null) {
-        showEmptyBottomPane(false)
-      } else {
-        showFleetSelectedBottomPane(star, fleet)
-      }
+    override fun onFleetTapped(star: Star, fleet: Fleet) {
+      showFleetSelectedBottomPane(star, fleet)
+    }
+
+    override fun onEmptySpaceTapped() {
+      showEmptyBottomPane(false)
     }
   }
+
   private val layoutCallbacks = object : StarfieldLayout.Callbacks {
     override fun onChatClick(roomId: Long?) {
       context!!.pushScreen(

@@ -3,13 +3,11 @@ package au.com.codeka.warworlds.client.game.world
 import au.com.codeka.warworlds.client.App
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.store.StarCursor
-import au.com.codeka.warworlds.client.store.StarStore
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.sim.Simulation
 import au.com.codeka.warworlds.common.sim.StarModifier
-import au.com.codeka.warworlds.common.sim.StarModifier.IdentifierGenerator
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
 import com.google.common.collect.Lists
 import java.util.*
@@ -20,7 +18,7 @@ import java.util.*
 object StarManager {
   private val log = Log("StarManager")
   private val stars = App.dataStore.stars()
-  private val starModifier = StarModifier(IdentifierGenerator { 0 })
+  private val starModifier = StarModifier { 0 }
 
   fun create() {
     App.eventBus.register(eventListener)
@@ -76,10 +74,13 @@ object StarManager {
     App.taskRunner.runTask(Runnable {
 
       // If there's any auxiliary stars, grab them now, too.
-      var auxiliaryStars: MutableList<Star?>? = null
+      var auxiliaryStars: MutableList<Star>? = null
       if (modification.star_id != null) {
         auxiliaryStars = ArrayList()
-        auxiliaryStars.add(stars[modification.star_id])
+        val s = stars[modification.star_id]
+        if (s != null) {
+          auxiliaryStars.add(s)
+        }
       }
 
       // Modify the star.

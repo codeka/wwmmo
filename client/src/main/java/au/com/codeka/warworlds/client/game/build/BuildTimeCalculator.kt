@@ -8,7 +8,6 @@ import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.sim.BuildHelper
 import au.com.codeka.warworlds.common.sim.StarModifier
-import au.com.codeka.warworlds.common.sim.StarModifier.IdentifierGenerator
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
 import java.util.*
 
@@ -32,7 +31,7 @@ class BuildTimeCalculator(private val star: Star?, private val colony: Colony?) 
       val starBuilder = star!!.newBuilder()
       val myEmpire = EmpireManager.getMyEmpire()
       try {
-        StarModifier(IdentifierGenerator { 0 }).modifyStar(starBuilder,
+        StarModifier { 0 }.modifyStar(starBuilder,
             StarModification.Builder()
                 .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
                 .empire_id(myEmpire.id)

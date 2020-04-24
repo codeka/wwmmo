@@ -27,10 +27,9 @@ class Connection internal constructor(
     private val encryptionKey: ByteArray?,
     private val socket: Socket,
     private val decoder: PacketDecoder,
-    outs: OutputStream?) : PacketDecoder.PacketHandler {
+    outs: OutputStream) : PacketDecoder.PacketHandler {
   private val encoder: PacketEncoder = PacketEncoder(outs)
   private val player: Player = Player(this, helloPacket, empire)
-
 
   init {
     decoder.setPacketHandler(this)
@@ -40,7 +39,7 @@ class Connection internal constructor(
     encoder.setPacketHandler(packetEncodeHandler)
   }
 
-  fun send(pkt: Packet?) {
+  fun send(pkt: Packet) {
     try {
       encoder.send(pkt)
     } catch (e: IOException) {
@@ -61,10 +60,12 @@ class Connection internal constructor(
     manager.onDisconnect(empire.get().id)
   }
 
-  private val packetEncodeHandler = PacketEncoder.PacketHandler { packet, encodedSize ->
-    if (log.isDebugEnabled) {
-      log.debug(">> [%d %s] %s", empire.get().id, empire.get().display_name,
-          PacketDebug.getPacketDebug(packet, encodedSize))
+  private val packetEncodeHandler = object : PacketEncoder.PacketHandler {
+    override fun onPacket(packet: Packet, encodedSize: Int) {
+      if (log.isDebugEnabled) {
+        log.debug(">> [%d %s] %s", empire.get().id, empire.get().display_name,
+            PacketDebug.getPacketDebug(packet, encodedSize))
+      }
     }
   }
 

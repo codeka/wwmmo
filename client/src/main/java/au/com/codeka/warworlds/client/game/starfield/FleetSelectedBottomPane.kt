@@ -26,11 +26,9 @@ import java.util.*
  * Bottom pane for when you have a fleet selected.
  */
 class FleetSelectedBottomPane(
-    context: Context?,
-    star: Star?,
-    fleet: Fleet) : FrameLayout(context!!, null) {
-  private val star: Star?
-  private val fleet: Fleet
+    context: Context,
+    private val star: Star,
+    private val fleet: Fleet) : FrameLayout(context, null) {
   public override fun onAttachedToWindow() {
     super.onAttachedToWindow()
     refreshFleet()
@@ -64,8 +62,6 @@ class FleetSelectedBottomPane(
 
   init {
     View.inflate(context, R.layout.starfield_bottom_pane_fleet, this)
-    this.fleet = fleet
-    this.star = star
     val fleetIcon = findViewById<ImageView>(R.id.fleet_icon)
     val empireIcon = findViewById<ImageView>(R.id.empire_icon)
     val fleetDesign = findViewById<TextView>(R.id.fleet_design)

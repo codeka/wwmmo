@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.common.sim.DesignHelper
 import au.com.codeka.warworlds.common.sim.StarHelper
 import com.google.common.base.Preconditions
 import java.util.*
+import kotlin.math.floor
 
 /**
  * Bottom pane of the fleets view that contains the "move" function.
@@ -31,8 +32,8 @@ class MoveBottomPane(
 
   private val callback: () -> Unit
   private val starfieldManager: StarfieldManager
-  private var star: Star? = null
-  private var fleet: Fleet? = null
+  private lateinit var star: Star
+  private lateinit var fleet: Fleet
   private var destStar: Star? = null
   private var fleetMoveIndicator: SceneObject? = null
   private var fleetMoveIndicatorFraction = 0f
@@ -54,9 +55,8 @@ class MoveBottomPane(
 
   public override fun onAttachedToWindow() {
     super.onAttachedToWindow()
-    if (star != null && fleet != null) {
-      refreshStarfield()
-    }
+    refreshStarfield()
+
     starfieldManager.addTapListener(tapListener)
   }
 
@@ -68,7 +68,7 @@ class MoveBottomPane(
 
   /** Called when we've got a fleet and need to setup the starfield.  */
   private fun refreshStarfield() {
-    starfieldManager.warpTo(star!!)
+    starfieldManager.warpTo(star)
     starfieldManager.setSelectedStar(null)
     refreshMoveIndicator()
   }
@@ -79,20 +79,18 @@ class MoveBottomPane(
    */
   private fun refreshMoveIndicator() {
     destroyFleetMoveIndicator()
-    if (star == null || fleet == null) {
-      return
-    }
+
     if (destStar != null) {
-      val distanceInParsecs = StarHelper.distanceBetween(star, destStar)
+      val distanceInParsecs = StarHelper.distanceBetween(star, destStar!!)
       val leftDetails = String.format(Locale.ENGLISH, "<b>Star:</b> %s<br /><b>Distance:</b> %.2f pc",
           destStar!!.name, distanceInParsecs)
       (findViewById<View>(R.id.star_details_left) as TextView).text = Html.fromHtml(leftDetails)
-      val design = DesignHelper.getDesign(fleet!!.design_type)
+      val design = DesignHelper.getDesign(fleet.design_type)
       val timeInHours = distanceInParsecs / design.speed_px_per_hour
-      val hrs = Math.floor(timeInHours).toInt()
-      val mins = Math.floor((timeInHours - hrs) * 60.0f).toInt()
-      val estimatedFuel = design.fuel_cost_per_px * distanceInParsecs * fleet!!.num_ships
-      val actualFuel: Double = if (fleet!!.fuel_amount == null) 0.0 else fleet!!.fuel_amount.toDouble()
+      val hrs = floor(timeInHours).toInt()
+      val mins = floor((timeInHours - hrs) * 60.0f).toInt()
+      val estimatedFuel = design.fuel_cost_per_px * distanceInParsecs * fleet.num_ships
+      val actualFuel: Double = if (fleet.fuel_amount == null) 0.0 else fleet.fuel_amount.toDouble()
       val fuel = String.format(Locale.US, "%.1f / %.1f", estimatedFuel, actualFuel)
       var fontOpen = ""
       var fontClose = ""
@@ -106,17 +104,16 @@ class MoveBottomPane(
           hrs, mins, fontOpen, fuel, fontClose)
       (findViewById<View>(R.id.star_details_right) as TextView).text = Html.fromHtml(rightDetails)
     }
-    val starSceneObject = starfieldManager.getStarSceneObject(star!!.id) ?: return
-    val fmi = starfieldManager.createFleetSprite(fleet!!)
+    val starSceneObject = starfieldManager.getStarSceneObject(star.id) ?: return
+    val fmi = starfieldManager.createFleetSprite(fleet)
     fleetMoveIndicator = fmi
     fmi.setDrawRunnable(Runnable {
-      Preconditions.checkNotNull(fleetMoveIndicator)
       if (destStar != null) {
         fleetMoveIndicatorFraction += 0.032f // TODO: pass in dt here?
         while (fleetMoveIndicatorFraction > 1.0f) {
           fleetMoveIndicatorFraction -= 1.0f
         }
-        val dir = StarHelper.directionBetween(star, destStar)
+        val dir = StarHelper.directionBetween(star, destStar!!)
         val dirUnit = Vector2(dir.x, dir.y)
         dirUnit.normalize()
         val angle = Vector2.angleBetween(dirUnit, Vector2(0.0, -1.0))
@@ -143,9 +140,9 @@ class MoveBottomPane(
     if (destStar == null) {
       return
     }
-    StarManager.updateStar(star!!, StarModification.Builder()
+    StarManager.updateStar(star, StarModification.Builder()
         .type(StarModification.MODIFICATION_TYPE.MOVE_FLEET)
-        .fleet_id(fleet!!.id)
+        .fleet_id(fleet.id)
         .star_id(destStar!!.id))
     callback()
   }
@@ -155,13 +152,8 @@ class MoveBottomPane(
   }
 
   private val tapListener: TapListener = object : TapListener {
-    override fun onStarTapped(star: Star?) {
-      if (star == null) {
-        destStar = null
-        refreshMoveIndicator()
-        return
-      }
-      if (this@MoveBottomPane.star != null && star.id == this@MoveBottomPane.star!!.id) {
+    override fun onStarTapped(star: Star) {
+      if (star.id == this@MoveBottomPane.star.id) {
         destStar = null
         refreshMoveIndicator()
         return
@@ -170,8 +162,13 @@ class MoveBottomPane(
       refreshMoveIndicator()
     }
 
-    override fun onFleetTapped(star: Star?, fleet: Fleet?) {
+    override fun onFleetTapped(star: Star, fleet: Fleet) {
       // TODO: indicate that we don't want to select this fleet.
+    }
+
+    override fun onEmptySpaceTapped() {
+      destStar = null
+      refreshMoveIndicator()
     }
   }
 

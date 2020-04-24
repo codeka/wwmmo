@@ -23,7 +23,7 @@ class PendingConnection(
       helloPacket: HelloPacket,
       socket: Socket,
       decoder: PacketDecoder,
-      outs: OutputStream?): Connection {
+      outs: OutputStream): Connection {
     val conn = Connection(
         manager,
         helloPacket,

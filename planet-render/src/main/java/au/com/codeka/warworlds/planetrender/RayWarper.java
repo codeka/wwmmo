@@ -40,12 +40,12 @@ public class RayWarper {
 
     protected void warp(Vector3 vec, double u, double v, double factor) {
       Vector3 warpVector = getValue(u, v);
-      warpVector.reset(warpVector.x * factor + (1.0 - factor),
-          warpVector.y * factor + (1.0 - factor),
-          warpVector.z * factor + (1.0 - factor));
-      vec.reset(vec.x * warpVector.x,
-          vec.y * warpVector.y,
-          vec.z * warpVector.z);
+      warpVector.reset(warpVector.getX() * factor + (1.0 - factor),
+          warpVector.getY() * factor + (1.0 - factor),
+          warpVector.getZ() * factor + (1.0 - factor));
+      vec.reset(vec.getX() * warpVector.getX(),
+          vec.getY() * warpVector.getY(),
+          vec.getZ() * warpVector.getZ());
     }
   }
 
@@ -70,7 +70,7 @@ public class RayWarper {
     protected void warp(Vector3 vec, double u, double v, double factor) {
       Vector2 uv = new Vector2(u, v);
       uv.rotate(factor * uv.length() * 2.0 * Math.PI * 2.0 / 360.0);
-      vec.reset(uv.x, -uv.y, 1.0);
+      vec.reset(uv.getX(), -uv.getY(), 1.0);
     }
   }
 }

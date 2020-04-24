@@ -23,7 +23,7 @@ public class SinglePlanetGenerator {
 
   public SinglePlanetGenerator(Template.PlanetTemplate tmpl, Random rand) {
     planetOrigin = new Vector3(tmpl.getOriginFrom());
-    Vector3.interpolate(planetOrigin, tmpl.getOriginTo(), rand.nextDouble());
+    Vector3.Companion.interpolate(planetOrigin, tmpl.getOriginTo(), rand.nextDouble());
 
     Template.WarpTemplate warpTemplate = tmpl.getParameter(Template.WarpTemplate.class);
     if (warpTemplate != null) {
@@ -49,7 +49,7 @@ public class SinglePlanetGenerator {
     }
 
     north = new Vector3(tmpl.getNorthFrom());
-    Vector3.interpolate(north, tmpl.getNorthTo(), rand.nextDouble());
+    Vector3.Companion.interpolate(north, tmpl.getNorthTo(), rand.nextDouble());
     north.normalize();
   }
 
@@ -80,7 +80,7 @@ public class SinglePlanetGenerator {
    * @return The colour at the given pixel.
    */
   public Colour getPixelColour(double x, double y) {
-    Colour c = new Colour(Colour.TRANSPARENT);
+    Colour c = new Colour(Colour.Companion.getTRANSPARENT());
 
     Vector3 ray = new Vector3(x, -y, 1.0);
     if (rayWarper != null) {
@@ -94,7 +94,7 @@ public class SinglePlanetGenerator {
       // on the planet.
       Colour t = queryTexture(intersection);
       double intensity = lightSphere(intersection);
-      c.reset(1.0, t.r * intensity, t.g * intensity, t.b * intensity);
+      c.reset(1.0, t.getR() * intensity, t.getG() * intensity, t.getB() * intensity);
 
       if (atmospheres != null) {
         Vector3 surfaceNormal = new Vector3(intersection);
@@ -119,11 +119,11 @@ public class SinglePlanetGenerator {
     } else if (atmospheres != null) {
       // if we're rendering an atmosphere, we need to work out the distance of this ray
       // to the planet's surface
-      double u = Vector3.dot(planetOrigin, ray);
+      double u = Vector3.Companion.dot(planetOrigin, ray);
       Vector3 closest = new Vector3(ray);
       closest.scale(u);
 
-      double distance = (Vector3.distanceBetween(closest, planetOrigin) - planetRadius);
+      double distance = (Vector3.Companion.distanceBetween(closest, planetOrigin) - planetRadius);
 
       Vector3 surfaceNormal = new Vector3(closest);
       surfaceNormal.subtract(planetOrigin);
@@ -151,13 +151,13 @@ public class SinglePlanetGenerator {
   private Colour blendAtmosphere(Atmosphere atmosphere, Colour imgColour, Colour atmosphereColour) {
     switch (atmosphere.getBlendMode()) {
       case Additive:
-        return Colour.add(imgColour, Colour.multiplyAlpha(atmosphereColour));
+        return Colour.Companion.add(imgColour, Colour.multiplyAlpha(atmosphereColour));
       case Alpha:
-        return Colour.blend(imgColour, atmosphereColour);
+        return Colour.Companion.blend(imgColour, atmosphereColour);
       case Multiply:
-        return Colour.multiply(imgColour, atmosphereColour);
+        return Colour.Companion.multiply(imgColour, atmosphereColour);
     }
-    return Colour.TRANSPARENT;
+    return Colour.Companion.getTRANSPARENT();
   }
 
   /**
@@ -166,8 +166,7 @@ public class SinglePlanetGenerator {
   private Colour queryTexture(Vector3 intersection) {
     Vector3 Vn = north;
 
-    @SuppressWarnings("SuspiciousNameCombination")
-    Vector3 Ve = new Vector3(Vn.y, -Vn.x, 0.0); // (AKA Vn.cross(0, 0, 1))
+    Vector3 Ve = new Vector3(Vn.getY(), -Vn.getX(), 0.0); // (AKA Vn.cross(0, 0, 1))
 
     Vector3 Vp = new Vector3(intersection);
     Vp.subtract(planetOrigin);
@@ -175,14 +174,14 @@ public class SinglePlanetGenerator {
     Ve.normalize();
     Vp.normalize();
 
-    double phi = Math.acos(-1.0 * Vector3.dot(Vn, Vp));
+    double phi = Math.acos(-1.0 * Vector3.Companion.dot(Vn, Vp));
     double v = phi / Math.PI;
 
-    double theta = (Math.acos(Vector3.dot(Vp, Ve) / Math.sin(phi))) / (Math.PI * 2.0);
+    double theta = (Math.acos(Vector3.Companion.dot(Vp, Ve) / Math.sin(phi))) / (Math.PI * 2.0);
     double u;
 
-    Vector3 c = Vector3.cross(Vn, Ve);
-    if (Vector3.dot(c, Vp) > 0) {
+    Vector3 c = Vector3.Companion.cross(Vn, Ve);
+    if (Vector3.Companion.dot(c, Vp) > 0) {
       u = theta;
     } else {
       u = 1.0 - theta;
@@ -218,7 +217,7 @@ public class SinglePlanetGenerator {
     Vector3 directionToLight = new Vector3(sunOrigin);
     directionToLight.subtract(point);
     directionToLight.normalize();
-    return Vector3.dot(normal, directionToLight);
+    return Vector3.Companion.dot(normal, directionToLight);
   }
 
   /**
@@ -230,11 +229,11 @@ public class SinglePlanetGenerator {
    */
   private Vector3 raytrace(Vector3 direction) {
     // intersection of a sphere and a line
-    final double a = Vector3.dot(direction, direction);
+    final double a = Vector3.Companion.dot(direction, direction);
     Vector3 tmp = new Vector3(planetOrigin);
     tmp.scale(-1);
-    final double b = 2.0 * Vector3.dot(direction, tmp);
-    final double c = Vector3.dot(planetOrigin, planetOrigin) - (planetRadius * planetRadius);
+    final double b = 2.0 * Vector3.Companion.dot(direction, tmp);
+    final double c = Vector3.Companion.dot(planetOrigin, planetOrigin) - (planetRadius * planetRadius);
     final double d = (b * b) - (4.0 * a * c);
 
     if (d > 0.0) {

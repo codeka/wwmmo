@@ -40,7 +40,11 @@ class AjaxSectorsHandler : AjaxHandler() {
       resp.sectorX = coord.x
       resp.sectorY = coord.y
     }
-    val newStarFinder = NewStarFinder(Log(LogHook { msg: String? -> resp.log(msg) }), coord)
+    val newStarFinder = NewStarFinder(Log(object : LogHook {
+      override fun write(msg: String?) {
+        resp.log(msg)
+      }
+    }), coord)
     if (!newStarFinder.findStarForNewEmpire()) {
       resp.log("No star found.")
       setResponseGson(resp)

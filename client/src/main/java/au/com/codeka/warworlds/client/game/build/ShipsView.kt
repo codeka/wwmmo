@@ -17,9 +17,10 @@ import au.com.codeka.warworlds.common.sim.BuildHelper
 import au.com.codeka.warworlds.common.sim.DesignHelper
 import com.google.common.base.Preconditions
 import java.util.*
+import kotlin.math.roundToInt
 
 class ShipsView(
-    context: Context, star: Star?, private val colony: Colony?, buildLayout: BuildLayout)
+    context: Context, star: Star, private val colony: Colony, buildLayout: BuildLayout)
   : ListView(context), TabContentView {
   companion object {
     private const val HEADING_TYPE = 0
@@ -157,7 +158,7 @@ class ShipsView(
               BuildHelper.formatTimeRemaining(buildRequest)))
           row3.visibility = View.GONE
           progress.visibility = View.VISIBLE
-          progress.progress = Math.round(buildRequest.progress * 100.0f)
+          progress.progress = (buildRequest.progress * 100.0f).roundToInt()
         } else {
           val upgrades = ""
           for (upgrade in design.upgrades) {
@@ -169,7 +170,7 @@ class ShipsView(
             //}
           }
           progress.visibility = View.GONE
-          if (upgrades.length == 0) {
+          if (upgrades.isEmpty()) {
             row2.text = Html.fromHtml("Upgrades: <i>none</i>")
           } else {
             row2.text = String.format(Locale.US, "Upgrades: %s", upgrades)
@@ -178,7 +179,7 @@ class ShipsView(
           row3.visibility = View.VISIBLE
           row3.text = Html.fromHtml(requiredHtml)
         }
-        if (fleet != null && fleet.notes != null) {
+        if (fleet?.notes != null) {
           notes.text = fleet.notes
           notes.visibility = View.VISIBLE
           //} else if (buildRequest != null && buildRequest.getNotes() != null) {
@@ -236,7 +237,7 @@ class ShipsView(
     shipListAdapter = ShipListAdapter()
     refresh(star, colony)
     adapter = shipListAdapter
-    onItemClickListener = OnItemClickListener { parent: AdapterView<*>?, view: View?, position: Int, id: Long ->
+    onItemClickListener = OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
       val entry = shipListAdapter.getItem(position) as ItemEntry
       if (entry.fleet == null && entry.buildRequest == null) {
         // It's a new fleet
@@ -245,10 +246,10 @@ class ShipsView(
         // TODO: upgrade
         buildLayout.showBuildSheet(entry.design)
       } else {
-        buildLayout.showProgressSheet(null, entry.buildRequest)
+        buildLayout.showProgressSheet(null, entry.buildRequest!!)
       }
     }
-    onItemLongClickListener = OnItemLongClickListener { adapterView: AdapterView<*>?, view: View?, position: Int, id: Long ->
+    onItemLongClickListener = OnItemLongClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
       val entry = shipListAdapter.getItem(position) as ItemEntry
       true
     }

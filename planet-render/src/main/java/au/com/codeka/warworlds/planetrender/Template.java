@@ -145,7 +145,7 @@ public class Template {
       public BaseTemplate parse(Element elem) throws TemplateException {
         PlanetsTemplate tmpl = new PlanetsTemplate();
 
-        for (Element child : XmlIterator.childElements(elem)) {
+        for (Element child : XmlIterator.INSTANCE.childElements(elem, null)) {
           tmpl.getParameters().add(parseElement(child));
         }
 
@@ -250,7 +250,7 @@ public class Template {
           tmpl.sunLocation.reset(other);
         }
 
-        for (Element child : XmlIterator.childElements(elem)) {
+        for (Element child : XmlIterator.INSTANCE.childElements(elem, null)) {
           tmpl.getParameters().add(parseElement(child));
         }
 
@@ -319,7 +319,7 @@ public class Template {
           tmpl.scaleY = Double.parseDouble(elem.getAttribute("scaleY"));
         }
 
-        for (Element child : XmlIterator.childElements(elem)) {
+        for (Element child : XmlIterator.INSTANCE.childElements(elem, null)) {
           tmpl.getParameters().add(parseElement(child));
         }
 
@@ -337,7 +337,7 @@ public class Template {
       public BaseTemplate parse(Element elem) throws TemplateException {
         VoronoiTemplate tmpl = new VoronoiTemplate();
 
-        for (Element child : XmlIterator.childElements(elem)) {
+        for (Element child : XmlIterator.INSTANCE.childElements(elem, null)) {
           tmpl.getParameters().add(parseElement(child));
         }
 
@@ -404,11 +404,11 @@ public class Template {
      */
     private static class ColourGradientTemplateFactory extends TemplateFactory {
       @Override
-      public BaseTemplate parse(Element elem) throws TemplateException {
+      public BaseTemplate parse(Element elem) {
         ColourGradientTemplate tmpl = new ColourGradientTemplate();
         tmpl.mColourGradient = new ColourGradient();
 
-        for (Element child : XmlIterator.childElements(elem, "node")) {
+        for (Element child : XmlIterator.INSTANCE.childElements(elem, "node")) {
           double n = Double.parseDouble(child.getAttribute("n"));
           int argb = (int) Long.parseLong(child.getAttribute("colour"), 16);
           tmpl.mColourGradient.addNode(n, new Colour(argb));
@@ -554,7 +554,7 @@ public class Template {
       public BaseTemplate parse(Element elem) throws TemplateException {
         AtmosphereTemplate tmpl = new AtmosphereTemplate();
 
-        for (Element child : XmlIterator.childElements(elem)) {
+        for (Element child : XmlIterator.INSTANCE.childElements(elem, null)) {
           if (child.getTagName().equals("inner")) {
             tmpl.innerTemplate = new InnerOuterTemplate();
             parseInnerOuterTemplate(tmpl.innerTemplate, child);
@@ -604,7 +604,7 @@ public class Template {
           tmpl.noisiness = Double.parseDouble(elem.getAttribute("noisiness"));
         }
 
-        for (Element child : XmlIterator.childElements(elem)) {
+        for (Element child : XmlIterator.INSTANCE.childElements(elem, null)) {
           tmpl.getParameters().add(parseElement(child));
         }
       }
@@ -669,7 +669,7 @@ public class Template {
           tmpl.warpFactor = Double.parseDouble(elem.getAttribute("factor"));
         }
 
-        for (Element child : XmlIterator.childElements(elem)) {
+        for (Element child : XmlIterator.INSTANCE.childElements(elem, null)) {
           tmpl.getParameters().add(parseElement(child));
         }
 

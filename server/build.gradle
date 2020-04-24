@@ -42,7 +42,7 @@ dependencies {
 }
 
 wire {
-  sourcePath {
+  protoPath {
     srcDir '../common/src/main/proto'
   }
   sourcePath {

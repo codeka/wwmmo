@@ -24,7 +24,11 @@ import java.util.*
 /**
  * Layout for [BuildScreen].
  */
-class BuildLayout(context: Context, private var star: Star?, private var colonies: List<Colony?>?, initialIndex: Int) : RelativeLayout(context) {
+class BuildLayout(
+    context: Context,
+    private var star: Star,
+    private var colonies: List<Colony>,
+    initialIndex: Int) : RelativeLayout(context) {
   private val colonyPagerAdapter: ColonyPagerAdapter
   private val viewPager: ViewPager
   private val planetIcon: ImageView
@@ -34,7 +38,7 @@ class BuildLayout(context: Context, private var star: Star?, private var colonie
   private var bottomPaneContentView: BottomPaneContentView? = null
 
   /** Called when the star is updated. We'll need to refresh our current view.  */
-  fun refresh(star: Star?, colonies: List<Colony?>?) {
+  fun refresh(star: Star, colonies: List<Colony>) {
     this.star = star
     this.colonies = colonies
     colonyPagerAdapter.refresh(star, colonies)
@@ -45,11 +49,11 @@ class BuildLayout(context: Context, private var star: Star?, private var colonie
 
   /** Show the "build" popup sheet for the given [Design].  */
   fun showBuildSheet(design: Design?) {
-    val colony = colonies!![viewPager.currentItem]!!
+    val colony = colonies[viewPager.currentItem]
     bottomPaneContentView = BuildBottomPane(
         context, star, colony, design!!, object : BuildBottomPane.Callback {
       override fun onBuild(designType: DesignType?, count: Int) {
-        StarManager.updateStar(star!!, StarModification.Builder()
+        StarManager.updateStar(star, StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
             .colony_id(colony.id)
             .design_type(designType)
@@ -68,14 +72,14 @@ class BuildLayout(context: Context, private var star: Star?, private var colonie
    * at max level, then nothing will happen.
    */
   fun showUpgradeSheet(building: Building?) {
-    val colony = Preconditions.checkNotNull(colonies!![viewPager.currentItem])
+    val colony = colonies[viewPager.currentItem]
     val design = DesignHelper.getDesign(building!!.design_type)
     bottomPaneContentView = UpgradeBottomPane(
         context, star, colony, design, building, object : UpgradeBottomPane.Callback {
       override fun onUpgrade(building: Building?) {
-        StarManager.updateStar(star!!, StarModification.Builder()
+        StarManager.updateStar(star, StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
-            .colony_id(colony!!.id)
+            .colony_id(colony.id)
             .building_id(building?.id)
             .design_type(building?.design_type))
         hideBottomSheet()
@@ -91,14 +95,13 @@ class BuildLayout(context: Context, private var star: Star?, private var colonie
    * Show the "progress" sheet for a currently-in progress fleet build. The fleet will be non-null
    * if we're upgrading.
    */
-  fun showProgressSheet(fleet: Fleet?, buildRequest: BuildRequest?) {
-    val colony = Preconditions.checkNotNull(colonies!![viewPager.currentItem])
+  fun showProgressSheet(fleet: Fleet?, buildRequest: BuildRequest) {
     bottomPaneContentView = ProgressBottomPane(context, buildRequest, object : ProgressBottomPane.Callback {
       override fun onCancelBuild() {
         // "Cancel" has been clicked.
-        StarManager.updateStar(star!!, StarModification.Builder()
+        StarManager.updateStar(star, StarModification.Builder()
             .type(StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST)
-            .build_request_id(buildRequest!!.id))
+            .build_request_id(buildRequest.id))
         hideBottomSheet()
       }
     })
@@ -117,16 +120,15 @@ class BuildLayout(context: Context, private var star: Star?, private var colonie
 
   fun refreshColonyDetails(colony: Colony?) {
     var planet: Planet? = null
-    for (p in star!!.planets) {
+    for (p in star.planets) {
       if (p.colony != null && p.colony.id == colony!!.id) {
         planet = p
       }
     }
-    Preconditions.checkNotNull(planet)
     Picasso.get()
-        .load(ImageHelper.getPlanetImageUrl(context, star!!, planet!!.index, 64, 64))
+        .load(ImageHelper.getPlanetImageUrl(context, star, planet!!.index, 64, 64))
         .into(planetIcon)
-    planetName.text = String.format(Locale.US, "%s %s", star!!.name,
+    planetName.text = String.format(Locale.US, "%s %s", star.name,
         format(planet.index + 1))
     val buildQueueLength = colony!!.build_requests.size
     if (buildQueueLength == 0) {
@@ -140,7 +142,7 @@ class BuildLayout(context: Context, private var star: Star?, private var colonie
   private val pageChangeListener: OnPageChangeListener = object : OnPageChangeListener {
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
     override fun onPageSelected(position: Int) {
-      refreshColonyDetails(colonies!![position])
+      refreshColonyDetails(colonies[position])
     }
 
     override fun onPageScrollStateChanged(state: Int) {}

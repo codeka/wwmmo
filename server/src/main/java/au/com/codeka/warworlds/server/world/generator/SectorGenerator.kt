@@ -18,7 +18,6 @@ import java.util.*
  * out for new players (or when a player creeps up on the edge of the universe).
  */
 class SectorGenerator {
-  private var random: Random? = null
   fun generate(sector: Sector?): Sector? {
     if (sector!!.state != SectorState.New.value) {
       return sector
@@ -30,17 +29,17 @@ class SectorGenerator {
       log.warning("Could not update sector state to generating, assuming we can't generate there.")
       return null
     }
-    random = Random(sector.x * 73649274L xor sector.y xor System.currentTimeMillis())
+    val random = Random(sector.x * 73649274L xor sector.y xor System.currentTimeMillis())
     val points = PoissonGenerator()
         .generate(STAR_DENSITY, STAR_RANDOMNESS, random)
     val stars = ArrayList<Star>()
     for (point in points) {
-      stars.add(generateStar(coord, point))
+      stars.add(generateStar(random, coord, point))
     }
     for (star in stars) {
-      DataStore.Companion.i.stars().put(star.id, star)
+      DataStore.i.stars().put(star.id, star)
     }
-    DataStore.Companion.i.sectors().updateSectorState(
+    DataStore.i.sectors().updateSectorState(
         coord, SectorState.Generating, SectorState.Empty)
     return sector.newBuilder()
         .stars(stars)
@@ -66,14 +65,14 @@ class SectorGenerator {
       numToGenerate--
     }
     if (numToGenerate > 0) {
-      DataStore.Companion.i.sectors().expandUniverse()
+      DataStore.i.sectors().expandUniverse()
       expandUniverse(numToGenerate)
     }
   }
 
-  private fun generateStar(sectorCoord: SectorCoord, point: Vector2): Star {
-    val classification = CLASSIFICATION.fromValue(select(STAR_TYPE_BONUSES))
-    val planets = generatePlanets(classification)
+  private fun generateStar(random: Random, sectorCoord: SectorCoord, point: Vector2): Star {
+    val classification = CLASSIFICATION.fromValue(select(random, STAR_TYPE_BONUSES))
+    val planets = generatePlanets(random, classification)
     return Star.Builder()
         .id(DataStore.i.seq().nextIdentifier())
         .classification(classification)
@@ -83,14 +82,14 @@ class SectorGenerator {
         .planets(planets)
         .sector_x(sectorCoord.x)
         .sector_y(sectorCoord.y)
-        .size(random!!.nextInt(8) + 16)
+        .size(random.nextInt(8) + 16)
         .build()
   }
 
-  private fun generatePlanets(classification: CLASSIFICATION): ArrayList<Planet> {
+  private fun generatePlanets(random: Random, classification: CLASSIFICATION): ArrayList<Planet> {
     var numPlanets = 0
     while (numPlanets < 2) {
-      numPlanets = select(PLANET_COUNT_BONUSES)
+      numPlanets = select(random, PLANET_COUNT_BONUSES)
     }
     val planets = ArrayList<Planet>()
     for (planetIndex in 0 until numPlanets) {
@@ -99,7 +98,7 @@ class SectorGenerator {
         bonuses[i] = PLANET_TYPE_SLOT_BONUSES[planetIndex][i] +
             PLANET_TYPE_STAR_BONUSES[classification.ordinal][i]
       }
-      val planetType = select(bonuses)
+      val planetType = select(random, bonuses)
       val populationMultiplier = PLANET_POPULATION_BONUSES[planetType]
       val farmingMultiplier = PLANET_FARMING_BONUSES[planetType]
       val miningMultiplier = PLANET_MINING_BONUSES[planetType]
@@ -107,10 +106,10 @@ class SectorGenerator {
       planets.add(Planet.Builder()
           .index(planetIndex)
           .planet_type(Planet.PLANET_TYPE.fromValue(planetType + 1))
-          .population_congeniality((normalRandom(1000) * populationMultiplier).toInt())
-          .farming_congeniality((normalRandom(100) * farmingMultiplier).toInt())
-          .mining_congeniality((normalRandom(100) * miningMultiplier).toInt())
-          .energy_congeniality((normalRandom(100) * energyMultipler).toInt())
+          .population_congeniality((normalRandom(random, 1000) * populationMultiplier).toInt())
+          .farming_congeniality((normalRandom(random, 100) * farmingMultiplier).toInt())
+          .mining_congeniality((normalRandom(random, 100) * miningMultiplier).toInt())
+          .energy_congeniality((normalRandom(random, 100) * energyMultipler).toInt())
           .build())
     }
     return planets
@@ -125,12 +124,12 @@ class SectorGenerator {
    * like [0,0,30] then the third item has a "bonus" of 30 and is hence 2 is a far more likely
    * result than 0 or 1.
    */
-  private fun select(bonuses: IntArray): Int {
+  private fun select(random: Random, bonuses: IntArray): Int {
     val values = IntArray(bonuses.size)
     var total = 0
     for (i in bonuses.indices) {
       val bonus = bonuses[i]
-      val n = bonus + normalRandom(100)
+      val n = bonus + normalRandom(random, 100)
       if (n > 0) {
         total += n
         values[i] = n
@@ -155,7 +154,7 @@ class SectorGenerator {
    * For example, if maxValue=100 then you'll most get values around 50 and only occasionally 0
    * or 100. Depending on the number of rounds, the tighter the distribution around the midpoint.
    */
-  private fun normalRandom(max: Int): Int {
+  private fun normalRandom(random: Random, max: Int): Int {
     val rounds = 5
     var n = 0
     val step = max / rounds

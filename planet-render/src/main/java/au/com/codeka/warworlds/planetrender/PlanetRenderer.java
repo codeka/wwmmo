@@ -60,7 +60,7 @@ public class PlanetRenderer {
             img.setRGB(x, y, c.toArgb());
           } else {
             Colour imgColour = new Colour(img.getRGB(x, y));
-            imgColour = Colour.blend(imgColour, c);
+            imgColour = Colour.Companion.blend(imgColour, c);
             img.setRGB(x, y, imgColour.toArgb());
           }
         }
@@ -69,4 +69,3 @@ public class PlanetRenderer {
     }
   }
 }
-

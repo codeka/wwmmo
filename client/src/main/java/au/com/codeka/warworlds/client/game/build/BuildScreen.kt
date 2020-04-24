@@ -22,11 +22,15 @@ import kotlin.collections.ArrayList
  * Shows buildings and ships on a planet. You can swipe left/right to switch between your colonies
  * in this star.
  */
-class BuildScreen(private var star: Star?, planetIndex: Int) : Screen() {
+class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
   private var context: ScreenContext? = null
-  private var colonies: MutableList<Colony?> = ArrayList()
-  private var currColony: Colony? = null
+  private var colonies: MutableList<Colony> = ArrayList()
+  private lateinit var currColony: Colony
   private var layout: BuildLayout? = null
+
+  init {
+    extractColonies(star, planetIndex)
+  }
 
   override fun onCreate(context: ScreenContext?, parent: ViewGroup?) {
     super.onCreate(context, parent)
@@ -93,7 +97,6 @@ class BuildScreen(private var star: Star?, planetIndex: Int) : Screen() {
   private fun extractColonies(star: Star?, planetIndex: Int) {
     val myEmpire = EmpireManager.getMyEmpire()
     colonies.clear()
-    currColony = null
     for (planet in star!!.planets) {
       if (planet.colony != null && planet.colony.empire_id != null && planet.colony.empire_id == myEmpire.id) {
         colonies.add(planet.colony)
@@ -125,11 +128,4 @@ class BuildScreen(private var star: Star?, planetIndex: Int) : Screen() {
     private const val REFRESH_DELAY_MS = 1000L
   }
 
-  init {
-    extractColonies(star, planetIndex)
-    if (currColony == null) {
-      // Shouldn't happen, but maybe we were given a bad planetIndex?
-      currColony = colonies!![0]
-    }
-  }
 }

@@ -80,9 +80,6 @@ public class TextureGenerator {
       Vector2 neighbour = null;
       double neighbourDistance2 = 1.0;
       List<Vector2> neighbours = voronoi.getNeighbours(pt);
-      if (neighbours == null) {
-        neighbours = new ArrayList<>();
-      }
 
       int num = neighbours.size();
       for (int i = 0; i < num; i++) {

@@ -15,10 +15,11 @@ import com.google.android.material.tabs.TabLayout
  * ships and the queue.
  */
 class ColonyView(
-    context: Context, private var star: Star?, private var colony: Colony?,
+    context: Context, private var star: Star, private var colony: Colony,
     private val buildLayout: BuildLayout): TabPlusContentView(context) {
   private var contentView: TabContentView? = null
-  fun refresh(star: Star?, colony: Colony?) {
+
+  fun refresh(star: Star, colony: Colony) {
     this.star = star
     this.colony = colony
     if (contentView != null) {

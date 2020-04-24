@@ -17,7 +17,7 @@ public class TemplatedPointCloud extends PointCloud {
       throw new RuntimeException("Unknown PointCloudGenerator: " + tmpl.getGenerator());
     }
 
-    points = g.generate(tmpl, rand);
+    setPoints(g.generate(tmpl, rand));
   }
 
   /**

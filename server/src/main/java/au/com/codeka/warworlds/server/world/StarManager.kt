@@ -6,7 +6,6 @@ import au.com.codeka.warworlds.common.Time
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.Design.DesignType
 import au.com.codeka.warworlds.common.sim.*
-import au.com.codeka.warworlds.common.sim.StarModifier.IdentifierGenerator
 import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.store.SectorsStore.SectorState
 import au.com.codeka.warworlds.server.store.StarsStore
@@ -20,7 +19,7 @@ class StarManager private constructor() {
   private val store: StarsStore = DataStore.i.stars()
   private val stars = HashMap<Long, WatchableObject<Star>>()
   private val starModifier: StarModifier =
-      StarModifier(IdentifierGenerator { DataStore.i.seq().nextIdentifier() })
+      StarModifier { DataStore.i.seq().nextIdentifier() }
 
   fun getStar(id: Long): WatchableObject<Star>? {
     var watchableStar: WatchableObject<Star>?

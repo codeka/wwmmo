@@ -30,8 +30,9 @@ import java.util.*
  */
 class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   interface TapListener {
-    fun onStarTapped(star: Star?)
-    fun onFleetTapped(star: Star?, fleet: Fleet?)
+    fun onStarTapped(star: Star)
+    fun onFleetTapped(star: Star, fleet: Fleet)
+    fun onEmptySpaceTapped()
   }
 
   private val scene: Scene = renderSurfaceView.createScene()
@@ -199,8 +200,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     }
     selectedFleet = null
     selectedStar = star
-    for (tapListener in tapListeners) {
-      tapListener.onStarTapped(star)
+    if (star != null) {
+      for (tapListener in tapListeners) {
+        tapListener.onStarTapped(star)
+      }
+    } else {
+      for (tapListener in tapListeners) {
+        tapListener.onEmptySpaceTapped()
+      }
     }
   }
 
@@ -231,8 +238,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     }
     selectedStar = star
     selectedFleet = fleet
-    for (tapListener in tapListeners) {
-      tapListener.onFleetTapped(star, fleet)
+    if (star != null && fleet != null) {
+      for (tapListener in tapListeners) {
+        tapListener.onFleetTapped(star, fleet)
+      }
+    } else {
+      for (tapListener in tapListeners) {
+        tapListener.onEmptySpaceTapped()
+      }
     }
   }
 

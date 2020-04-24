@@ -17,20 +17,21 @@ import au.com.codeka.warworlds.common.proto.Star
  */
 class ColonyPagerAdapter(
     private val context: Context,
-    private var star: Star?,
-    private var colonies: List<Colony?>?,
+    private var star: Star,
+    private var colonies: List<Colony>,
     private val buildLayout: BuildLayout) : PagerAdapter() {
   private val views = SparseArray<ColonyView>()
-  fun refresh(star: Star?, colonies: List<Colony?>?) {
-    this.star = star
 
+  fun refresh(star: Star, colonies: List<Colony>) {
+    this.star = star
     // TODO: what if the current list of colonies has changed?
     this.colonies = colonies
+
     notifyDataSetChanged()
     for (i in 0 until views.size()) {
       val position = views.keyAt(i)
       val view = views.valueAt(i)
-      view.refresh(star, colonies!![position])
+      view.refresh(star, colonies[position])
     }
   }
 
@@ -44,7 +45,7 @@ class ColonyPagerAdapter(
 
   override fun instantiateItem(parent: ViewGroup, position: Int): Any {
     log.info("instantiating item %d", position)
-    val colony = colonies!![position]
+    val colony = colonies[position]
     val view = ColonyView(context, star, colony, buildLayout)
     view.layoutParams = ViewPager.LayoutParams()
     parent.addView(view)
@@ -58,7 +59,7 @@ class ColonyPagerAdapter(
   }
 
   override fun getCount(): Int {
-    return colonies!!.size
+    return colonies.size
   }
 
   override fun isViewFromObject(view: View, `object`: Any): Boolean {
@@ -67,12 +68,12 @@ class ColonyPagerAdapter(
 
   override fun getPageTitle(position: Int): CharSequence? {
     var planetIndex = 0
-    for (planet in star!!.planets) {
-      if (planet.colony != null && planet.colony.id == colonies!![position]!!.id) {
+    for (planet in star.planets) {
+      if (planet.colony != null && planet.colony.id == colonies[position].id) {
         planetIndex = planet.index
       }
     }
-    return String.format("%s %s", star!!.name, format(planetIndex + 1))
+    return String.format("%s %s", star.name, format(planetIndex + 1))
   }
 
   companion object {

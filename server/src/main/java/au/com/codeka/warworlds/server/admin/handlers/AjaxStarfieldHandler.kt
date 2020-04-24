@@ -174,8 +174,9 @@ class AjaxStarfieldHandler : AjaxHandler() {
     return resp
   }
 
-  private class LogHandler internal constructor(private val logMessages: StringBuilder) : Simulation.LogHandler {
-    override fun setStarName(starName: String) {
+  private class LogHandler internal constructor(private val logMessages: StringBuilder)
+      : Simulation.LogHandler {
+    override fun setStarName(starName: String?) {
       // ignore.
     }
 
@@ -183,7 +184,6 @@ class AjaxStarfieldHandler : AjaxHandler() {
       logMessages.append(message)
       logMessages.append("\n")
     }
-
   }
 
   private class SimulateResponse {

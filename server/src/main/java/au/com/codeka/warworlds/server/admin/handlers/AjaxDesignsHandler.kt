@@ -10,6 +10,6 @@ import au.com.codeka.warworlds.server.handlers.RequestException
 class AjaxDesignsHandler : AdminHandler() {
   @Throws(RequestException::class)
   public override fun get() {
-    setResponseJson(Designs.Builder().designs(DesignHelper.getDesigns()).build())
+    setResponseJson(Designs.Builder().designs(DesignHelper.designs).build())
   }
 }

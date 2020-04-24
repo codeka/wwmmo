@@ -71,7 +71,7 @@ public class AppContent extends JPanel {
     }
 
     long startTime = System.nanoTime();
-    Image img = createBlankImage(Colour.TRANSPARENT);
+    Image img = createBlankImage(Colour.Companion.getTRANSPARENT());
     if (tmpl instanceof Template.PlanetTemplate) {
       PlanetRenderer pr = new PlanetRenderer((Template.PlanetTemplate) tmpl, getRandom());
       pr.render(img);
@@ -83,8 +83,8 @@ public class AppContent extends JPanel {
       texture.renderTexture(img);
     } else if (tmpl instanceof Template.VoronoiTemplate) {
       Voronoi v = new TemplatedVoronoi((Template.VoronoiTemplate) tmpl, getRandom());
-      v.renderDelaunay(img, Colour.GREEN);
-      v.renderVoronoi(img, Colour.BLUE);
+      v.renderDelaunay(img, Colour.Companion.getGREEN());
+      v.renderVoronoi(img, Colour.Companion.getBLUE());
     } else if (tmpl instanceof Template.PointCloudTemplate) {
       PointCloud pc = new TemplatedPointCloud((Template.PointCloudTemplate) tmpl, getRandom());
       pc.render(img);
@@ -189,10 +189,10 @@ public class AppContent extends JPanel {
           contentPanel.setBackgroundColour(null);
           break;
         case "Black":
-          contentPanel.setBackgroundColour(Colour.BLACK);
+          contentPanel.setBackgroundColour(Colour.Companion.getBLACK());
           break;
         case "White":
-          contentPanel.setBackgroundColour(Colour.WHITE);
+          contentPanel.setBackgroundColour(Colour.Companion.getWHITE());
           break;
       }
     });
