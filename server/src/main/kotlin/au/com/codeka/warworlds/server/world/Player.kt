@@ -126,7 +126,7 @@ class Player(private val connection: Connection,
 
   private fun onModifyStar(pkt: ModifyStarPacket) {
     val star = StarManager.i.getStar(pkt.star_id)
-    for (i in 0..pkt.modification.size) {
+    for (i in 0 until pkt.modification.size) {
       var modification = pkt.modification[i]
       if (modification.empire_id == null || modification.empire_id != empire.get().id) {
         // Update the modification's empire_id to be our own, since that's what'll be recorded

@@ -176,7 +176,7 @@ internal constructor(fileName: String) : BaseStore(fileName) {
           .stmt("SELECT empire FROM empires")
           .query()
       val empires = ArrayList<Empire>()
-      while (res!!.next()) {
+      while (res.next()) {
         try {
           empires.add(Empire.ADAPTER.decode(res.getBytes(0)))
         } catch (e: IOException) {
@@ -184,7 +184,7 @@ internal constructor(fileName: String) : BaseStore(fileName) {
         }
       }
       val seenNames = HashSet<String>()
-      for (i in 0 .. empires.size) {
+      for (i in 0 until empires.size) {
         var empire = empires[i]
         if (empire.display_name.trim { it <= ' ' } == "") {
           empire = empire.newBuilder().display_name("~").build()

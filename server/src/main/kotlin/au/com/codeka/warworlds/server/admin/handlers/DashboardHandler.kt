@@ -5,7 +5,6 @@ import au.com.codeka.warworlds.common.proto.AdminRole
 import au.com.codeka.warworlds.common.proto.Empire
 import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.proto.DailyStat
-import au.com.codeka.warworlds.server.proto.LoginEvent
 import au.com.codeka.warworlds.server.store.DataStore
 import org.joda.time.DateTime
 import java.util.*
