@@ -13,7 +13,7 @@ object DesignHelper {
     get() = DesignDefinitions.designs.designs
 
   /** Gets a list of all the [Design]s of the given [Design.DesignKind] we have.  */
-  fun getDesigns(kind: Design.DesignKind?): Iterable<Design> {
+  fun getDesigns(kind: Design.DesignKind): Iterable<Design> {
     return Iterables.filter(designs) {
       design -> design != null && design.design_kind == kind
     }

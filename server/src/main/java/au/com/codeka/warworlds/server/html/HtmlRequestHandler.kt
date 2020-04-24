@@ -14,19 +14,12 @@ import java.io.IOException
  * Handler for requests out of the html directory.
  */
 open class HtmlRequestHandler : RequestHandler() {
-  @Throws(RequestException::class)
   protected fun render(
       tmplName: String?,
       data: Map<String?, Any?>?) {
     response.contentType = "text/html"
     response.setHeader("Content-Type", "text/html; charset=utf-8")
-    try {
-      response.writer.write(CARROT.process(tmplName, MapBindings(data)))
-    } catch (e: CarrotException) {
-      throw RequestException(e)
-    } catch (e: IOException) {
-      throw RequestException(e)
-    }
+    response.writer.write(CARROT.process(tmplName, MapBindings(data)))
   }
 
   companion object {

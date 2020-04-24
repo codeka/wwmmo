@@ -22,7 +22,7 @@ class EmpireRendererHandler : RendererHandler() {
     var width = getUrlParameter("width")!!.toInt()
     var height = getUrlParameter("height")!!.toInt()
     val bucket = getUrlParameter("bucket")
-    val factor: Float? = BUCKET_FACTORS.get(bucket)
+    val factor: Float? = BUCKET_FACTORS[bucket]
     if (factor == null) {
       log.warning("Invalid bucket: %s", request.pathInfo)
       response.status = 404

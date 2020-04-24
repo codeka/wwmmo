@@ -12,12 +12,13 @@ import au.com.codeka.warworlds.server.concurrency.Threads
 import au.com.codeka.warworlds.server.net.Connection
 import au.com.codeka.warworlds.server.world.chat.ChatManager
 import au.com.codeka.warworlds.server.world.chat.Participant.OnlineCallback
-import com.google.common.base.Preconditions
 import com.google.common.collect.Lists
 import java.util.*
 
 /** Represents a currently-connected player.  */
-class Player(private val connection: Connection, private val helloPacket: HelloPacket, private val empire: WatchableObject<Empire>) {
+class Player(private val connection: Connection,
+             private val helloPacket: HelloPacket,
+             private val empire: WatchableObject<Empire>) {
   /** The list of [Sector]s this player is currently watching.  */
   private val watchedSectors = ArrayList<WatchableObject<Sector>>()
 
@@ -71,7 +72,7 @@ class Player(private val connection: Connection, private val helloPacket: HelloP
         updatedStars.add(star!!.get())
       }
     }
-    if (!updatedStars.isEmpty()) {
+    if (updatedStars.isNotEmpty()) {
       log.debug("%d updated stars, sending update packet.", updatedStars.size)
       sendStarsUpdatedPacket(updatedStars)
     } else {
@@ -79,14 +80,14 @@ class Player(private val connection: Connection, private val helloPacket: HelloP
     }
 
     // Register this player with the chat system so that we get notified of messages.
-    ChatManager.Companion.i.connectPlayer(empire.get().id, helloPacket.last_chat_time, chatCallback)
+    ChatManager.i.connectPlayer(empire.get().id, helloPacket.last_chat_time, chatCallback)
   }
 
   /**
    * Called when the client disconnects from us.
    */
   fun onDisconnect() {
-    ChatManager.Companion.i.disconnectPlayer(empire.get().id)
+    ChatManager.i.disconnectPlayer(empire.get().id)
     clearWatchedStars()
     synchronized(watchedSectors) { watchedSectors.clear() }
   }
@@ -101,8 +102,8 @@ class Player(private val connection: Connection, private val helloPacket: HelloP
       watchedSectors.clear()
       for (sectorY in pkt.top..pkt.bottom) {
         for (sectorX in pkt.left..pkt.right) {
-          val sector: WatchableObject<Sector> = SectorManager.i.getSector(SectorCoord.Builder().x(sectorX).y(sectorY).build())
-          SectorManager.Companion.i.verifyNativeColonies(sector)
+          val sector = SectorManager.i.getSector(SectorCoord.Builder().x(sectorX).y(sectorY).build())
+          SectorManager.i.verifyNativeColonies(sector)
           watchedSectors.add(sector)
           stars.addAll(sector.get().stars)
         }
@@ -111,7 +112,7 @@ class Player(private val connection: Connection, private val helloPacket: HelloP
     sendStarsUpdatedPacket(stars)
     synchronized(watchedStars) {
       for (star in stars) {
-        val watchableStar: WatchableObject<Star>? = StarManager.i.getStar(star!!.id)
+        val watchableStar = StarManager.i.getStar(star!!.id)
         if (watchableStar == null) {
           // Huh?
           log.warning("Got unexpected null star: %d", star.id)
@@ -124,7 +125,7 @@ class Player(private val connection: Connection, private val helloPacket: HelloP
   }
 
   private fun onModifyStar(pkt: ModifyStarPacket) {
-    val star: WatchableObject<Star>? = StarManager.i.getStar(pkt.star_id)
+    val star = StarManager.i.getStar(pkt.star_id)
     for (i in 0..pkt.modification.size) {
       var modification = pkt.modification[i]
       if (modification.empire_id == null || modification.empire_id != empire.get().id) {
@@ -177,9 +178,9 @@ class Player(private val connection: Connection, private val helloPacket: HelloP
       log.error("Didn't get the expected 1 chat message. Got %d.", pkt.messages.size)
       return
     }
-    ChatManager.Companion.i.send(null /* TODO */, pkt.messages[0].newBuilder()
+    ChatManager.i.send(null /* TODO */, pkt.messages[0].newBuilder()
         .date_posted(System.currentTimeMillis())
-        .empire_id(empire.get()!!.id)
+        .empire_id(empire.get().id)
         .action(ChatMessage.MessageAction.Normal)
         .room_id(null /* TODO */)
         .build())
@@ -224,7 +225,7 @@ class Player(private val connection: Connection, private val helloPacket: HelloP
     if (star!!.classification == CLASSIFICATION.WORMHOLE) {
       return star
     }
-    val myEmpireId = empire.get()!!.id
+    val myEmpireId = empire.get().id
 
     // Now, figure out if we need to sanitize this star at all. Full sanitization means we need
     // to remove all fleets and simplify colonies (no population, etc). Partial sanitization means

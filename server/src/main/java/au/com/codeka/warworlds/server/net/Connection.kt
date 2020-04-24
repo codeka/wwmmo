@@ -28,15 +28,18 @@ class Connection internal constructor(
     private val socket: Socket,
     private val decoder: PacketDecoder,
     outs: OutputStream) : PacketDecoder.PacketHandler {
-  private val encoder: PacketEncoder = PacketEncoder(outs)
+  private val encoder: PacketEncoder = PacketEncoder(outs, object : PacketEncoder.PacketHandler {
+    override fun onPacket(packet: Packet, encodedSize: Int) {
+      if (log.isDebugEnabled) {
+        log.debug(">> [%d %s] %s", empire.get().id, empire.get().display_name,
+            PacketDebug.getPacketDebug(packet, encodedSize))
+      }
+    }
+  })
   private val player: Player = Player(this, helloPacket, empire)
 
   init {
     decoder.setPacketHandler(this)
-  }
-
-  fun start() {
-    encoder.setPacketHandler(packetEncodeHandler)
   }
 
   fun send(pkt: Packet) {
@@ -47,26 +50,17 @@ class Connection internal constructor(
     }
   }
 
-  override fun onPacket(decoder: PacketDecoder, packet: Packet, encodedSize: Int) {
+  override fun onPacket(decoder: PacketDecoder, pkt: Packet, encodedSize: Int) {
     if (log.isDebugEnabled) {
       log.debug("<< [%d %s] %s", empire.get().id, empire.get().display_name,
-          PacketDebug.getPacketDebug(packet, encodedSize))
+          PacketDebug.getPacketDebug(pkt, encodedSize))
     }
-    TaskRunner.i.runTask(Runnable { player.onPacket(packet) }, Threads.BACKGROUND)
+    TaskRunner.i.runTask(Runnable { player.onPacket(pkt) }, Threads.BACKGROUND)
   }
 
   override fun onDisconnect() {
     TaskRunner.i.runTask(Runnable { player.onDisconnect() }, Threads.BACKGROUND)
     manager.onDisconnect(empire.get().id)
-  }
-
-  private val packetEncodeHandler = object : PacketEncoder.PacketHandler {
-    override fun onPacket(packet: Packet, encodedSize: Int) {
-      if (log.isDebugEnabled) {
-        log.debug(">> [%d %s] %s", empire.get().id, empire.get().display_name,
-            PacketDebug.getPacketDebug(packet, encodedSize))
-      }
-    }
   }
 
   companion object {

@@ -37,12 +37,12 @@ class Simulation @JvmOverloads constructor(
    */
   fun simulate(star: Star.Builder) {
     logHandler?.setStarName(star.name)
-    log("Begin simulation for '%s' @ %d", star.name, timeOverride)
+    log("Begin simulation for '${star.name}' @ $timeOverride")
 
     // figure out the start time, which is the oldest last_simulation time
     val startTime = getSimulateStartTime(star)
     val endTime = trimTimeToStep(timeOverride)
-    val empireIds = HashSet<Long>()
+    val empireIds = HashSet<Long?>()
     for (planet in star.planets) {
       if (planet.colony != null) {
         empireIds.add(planet.colony.empire_id)
@@ -113,10 +113,10 @@ class Simulation @JvmOverloads constructor(
    * deltas across to the main star. Also copy the build request efficiencies, since they're also
    * the ones we'll care about (i.e. the efficient for the *next* step).
    */
-  private fun copyDeltas(star: Star.Builder, predictionStar: Star.Builder?) {
+  private fun copyDeltas(star: Star.Builder, predictionStar: Star.Builder) {
     val stores = ArrayList<EmpireStorage>()
     for (i in star.empire_stores.indices) {
-      val predictionStore = getStore(predictionStar!!, star.empire_stores[i].empire_id)
+      val predictionStore = getStore(predictionStar, star.empire_stores[i].empire_id)
           ?: // The empire has been wiped out or something, just ignore.
           continue
       stores.add(star.empire_stores[i].newBuilder()
@@ -132,7 +132,7 @@ class Simulation @JvmOverloads constructor(
         val colonyBuilder = planetBuilder.colony.newBuilder()
         for (j in planetBuilder.colony.build_requests.indices) {
           val brBuilder = colonyBuilder.build_requests[j].newBuilder()
-          val predictionBuildRequest = predictionStar!!.planets[i].colony.build_requests[j]
+          val predictionBuildRequest = predictionStar.planets[i].colony.build_requests[j]
           brBuilder.minerals_efficiency(predictionBuildRequest.minerals_efficiency)
           brBuilder.population_efficiency(predictionBuildRequest.population_efficiency)
           brBuilder.progress_per_step(predictionBuildRequest.progress_per_step)
@@ -158,8 +158,7 @@ class Simulation @JvmOverloads constructor(
     // 24 hours ago. The native colonies will generally be in a steady state
     val oneDayAgo = timeOverride - Time.DAY
     if (lastSimulation != null && lastSimulation < oneDayAgo) {
-      log("Last simulation more than on day ago, checking whether there are any non-native "
-          + "colonies.")
+      log("Last simulation more than on day ago, checking whether there are any non-native colonies.")
       var onlyNativeColonies = true
       for (planet in star.planets) {
         if (planet.colony?.empire_id != null) {
@@ -185,7 +184,7 @@ class Simulation @JvmOverloads constructor(
     return trimTimeToStep(lastSimulation) + STEP_TIME
   }
 
-  private fun simulateStepForAllEmpires(now: Long, star: Star.Builder?, empireIds: Set<Long>) {
+  private fun simulateStepForAllEmpires(now: Long, star: Star.Builder, empireIds: Set<Long?>) {
     log("- Step [now=%d]", now)
     for (empireId in empireIds) {
       log(String.format("-- Empire [%s]", empireId ?: "Native"))
@@ -194,7 +193,7 @@ class Simulation @JvmOverloads constructor(
 
     // Remove stores for any empires that don't exist anymore.
     var i = 0
-    while (i < star!!.empire_stores.size) {
+    while (i < star.empire_stores.size) {
       if (!empireIds.contains(star.empire_stores[i].empire_id)) {
         star.empire_stores.removeAt(i)
         i--
@@ -203,9 +202,9 @@ class Simulation @JvmOverloads constructor(
     }
   }
 
-  private fun simulateStep(now: Long, star: Star.Builder?, empireId: Long?) {
+  private fun simulateStep(now: Long, star: Star.Builder, empireId: Long?) {
     var totalPopulation = 0.0f
-    val storageIndex = getStoreIndex(star!!, empireId)
+    val storageIndex = getStoreIndex(star, empireId)
     if (storageIndex < 0) {
       log("No storage found for this empire!")
       return
@@ -382,7 +381,9 @@ class Simulation @JvmOverloads constructor(
           // we have enough minerals) or based the min of population/minerals if we don't.
           val populationProgressThisTurn = workersPerBuildRequest / totalWorkersRequired
           val mineralsProgressThisTurn = mineralsPerBuildRequest / totalMineralsRequired
-          var progressThisTurn = if (mineralsProgressThisTurn >= 1.0) populationProgressThisTurn else populationProgressThisTurn.coerceAtMost(mineralsProgressThisTurn)
+          var progressThisTurn =
+              if (mineralsProgressThisTurn >= 1.0) populationProgressThisTurn
+              else populationProgressThisTurn.coerceAtMost(mineralsProgressThisTurn)
           log("     Progress: [this turn=%.4f (minerals=%.4f pop=%.4f] [total=%.4f]",
               progressThisTurn,
               mineralsProgressThisTurn,
@@ -427,8 +428,10 @@ class Simulation @JvmOverloads constructor(
           }
 
           // work hasn't finished yet, so lets estimate how long it will take now
-          val remainingWorkersRequired = buildCost.population * (1.0f - br.progress - progressThisTurn) * br.count
-          val remainingMineralsRequired = buildCost.minerals * (1.0f - br.progress - progressThisTurn) * br.count
+          val remainingWorkersRequired =
+              buildCost.population * (1.0f - br.progress - progressThisTurn) * br.count
+          val remainingMineralsRequired =
+              buildCost.minerals * (1.0f - br.progress - progressThisTurn) * br.count
           val timeForMineralsSteps = remainingMineralsRequired / mineralsPerBuildRequest
           val timeForPopulationSteps = remainingWorkersRequired / workersPerBuildRequest
           val timeForMineralsHours = timeForMineralsSteps * STEP_TIME / Time.HOUR
@@ -438,7 +441,9 @@ class Simulation @JvmOverloads constructor(
               timeForMineralsSteps,
               timeForPopulationHours,
               timeForPopulationSteps)
-          val endTime = now + (timeForMineralsHours.coerceAtLeast(timeForPopulationHours) * Time.HOUR).roundToInt()
+          val endTime =
+              now + (timeForMineralsHours.coerceAtLeast(timeForPopulationHours) * Time.HOUR)
+                  .roundToInt()
           br.end_time(endTime)
           log("     Finish time: %d (now=%d)", endTime, now)
           br.progress(br.progress + progressThisTurn)
@@ -461,7 +466,7 @@ class Simulation @JvmOverloads constructor(
 
     // Finally, update the population. The first thing we need to do is evenly distribute goods
     // between all of the colonies.
-    val totalGoodsPerHour = Math.min(10.0f, totalPopulation / 10.0f)
+    val totalGoodsPerHour = 10.0f.coerceAtMost(totalPopulation / 10.0f)
     val totalGoodsRequired = totalGoodsPerHour * dt
     goodsDeltaPerHour -= totalGoodsPerHour
 
@@ -546,14 +551,12 @@ class Simulation @JvmOverloads constructor(
   /**
    * Simulate combat on the star.
    *
-   *
-   * Combat runs in rounds, but rounds do not take any "time". Each round every fleet that is
+   * <p>Combat runs in rounds, but rounds do not take any "time". Each round every fleet that is
    * attacking find a target and attacks it. The number of fleets destroyed by the attack is
    * simply the attacking fleet's attack stat multiplied by the number of ships, divided by the
    * defending fleet's defense stat.
    *
-   *
-   * If a fleet is destroyed by the attack, the remaining attack points are then used to target
+   * <p>If a fleet is destroyed by the attack, the remaining attack points are then used to target
    * another fleet in the same round until there's no more attack points left. This is so that you
    * do not get an advantage by splitting up all your fleets.
    */
@@ -850,5 +853,4 @@ class Simulation @JvmOverloads constructor(
       } else one == two
     }
   }
-
 }

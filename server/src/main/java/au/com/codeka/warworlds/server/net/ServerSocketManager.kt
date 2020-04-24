@@ -17,11 +17,12 @@ import java.util.*
  * Manages the [ServerSocket] which is listening for clients to connect.
  */
 class ServerSocketManager {
-  private var serverSocket: ServerSocket? = null
-  private var acceptThread: Thread? = null
+  private lateinit var serverSocket: ServerSocket
+  private lateinit var acceptThread: Thread
   private var closing = false
   private val pendingConnections: MutableMap<Long, PendingConnection> = TreeMap()
   private val connections: MutableMap<Long, Connection?> = TreeMap()
+
   fun start(): Boolean {
     serverSocket = try {
       ServerSocket(8081) // TODO: configurable
@@ -30,7 +31,7 @@ class ServerSocketManager {
       return false
     }
     acceptThread = Thread(Runnable { acceptThreadProc() })
-    acceptThread!!.start()
+    acceptThread.start()
     closing = false
     return true
   }
@@ -52,17 +53,15 @@ class ServerSocketManager {
     log.info("Server socket stopping.")
     closing = true
     try {
-      serverSocket!!.close()
+      serverSocket.close()
     } catch (e: IOException) {
       log.error("Error stopping socket server.", e)
     }
-    serverSocket = null
     try {
-      acceptThread!!.join()
+      acceptThread.join()
     } catch (e: InterruptedException) {
       // ignore
     }
-    acceptThread = null
   }
 
   /** Called by the [Connection] when it disconnects.  */
@@ -88,7 +87,10 @@ class ServerSocketManager {
    * This class receives the first packet from a pending connection and then converts it to a
    * normal connection.
    */
-  private inner class PendingConnectionPacketHandler internal constructor(private val socket: Socket, private val outs: OutputStream) : PacketDecoder.PacketHandler {
+  private inner class PendingConnectionPacketHandler
+      internal constructor(private val socket: Socket,
+                           private val outs: OutputStream) : PacketDecoder.PacketHandler {
+
     override fun onPacket(decoder: PacketDecoder, pkt: Packet, encodedSize: Int) {
       if (pkt.hello == null) {
         log.error("Expected 'hello' packet, but didn't get it.")
@@ -108,13 +110,12 @@ class ServerSocketManager {
     override fun onDisconnect() {
       log.warning("Client disconnected while waiting for 'hello' packet.")
     }
-
   }
 
   private fun acceptThreadProc() {
     while (true) {
       try {
-        val socket = serverSocket!!.accept()
+        val socket = serverSocket.accept()
         log.debug("Socket accepted from %s", socket.remoteSocketAddress)
         handleConnection(socket)
       } catch (e: IOException) {

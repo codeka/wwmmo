@@ -4,9 +4,7 @@ import au.com.codeka.warworlds.common.proto.Colony
 import au.com.codeka.warworlds.common.proto.Design
 import au.com.codeka.warworlds.common.proto.Planet
 
-/**
- * Helper for accessing information about a [Colony].
- */
+/** Helper for accessing information about a [Colony]. */
 object ColonyHelper {
   fun getMaxPopulation(planet: Planet): Int {
     if (planet.colony == null) {

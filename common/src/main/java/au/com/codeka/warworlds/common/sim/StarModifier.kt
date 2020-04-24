@@ -13,6 +13,8 @@ import com.google.common.base.Preconditions
 import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
 import java.util.*
+import kotlin.math.ceil
+import kotlin.math.max
 
 /** Class for handling modifications to a star. */
 class StarModifier(private val identifierGenerator: () -> Long) {
@@ -25,7 +27,6 @@ class StarModifier(private val identifierGenerator: () -> Long) {
    * @throws SuspiciousModificationException when the modification seems suspicious, or isn't
    * otherwise allowed (e.g. you're trying to modify another empire's star, for example).
    */
-  @Throws(SuspiciousModificationException::class)
   fun modifyStar(star: Star.Builder, modification: StarModification) {
     modifyStar(star, null, Lists.newArrayList(modification), null)
   }
@@ -40,7 +41,6 @@ class StarModifier(private val identifierGenerator: () -> Long) {
    * @throws SuspiciousModificationException when the modification seems suspicious, or isn't
    *         otherwise allowed (e.g. you're trying to modify another empire's star, for example).
    */
-  @Throws(SuspiciousModificationException::class)
   fun modifyStar(
       star: Star.Builder,
       modification: StarModification,
@@ -54,92 +54,50 @@ class StarModifier(private val identifierGenerator: () -> Long) {
    * @param star The [Star.Builder] that we're modifying. The star is simulated before and
    *        after being modified.
    * @param auxStars A collection of auxiliary stars that we may need while modifying this star (for
-   *        example, MOVE_FLEET needs to know about the destination). These are not
-   *        simulated.
+   *        example, MOVE_FLEET needs to know about the destination). These are not simulated.
    * @param modifications The list of [StarModification]s to apply.
    * @param logHandler An optional [Simulation.LogHandler] that we'll pass through all log
    *        messages to.
    * @throws SuspiciousModificationException when the modification seems suspicious, or isn't
    *         otherwise allowed (e.g. you're trying to modify another empire's star, for example).
    */
-  @Throws(SuspiciousModificationException::class)
   fun modifyStar(
       star: Star.Builder,
       auxStars: Collection<Star>?,
       modifications: Collection<StarModification>,
       logHandler: Simulation.LogHandler?) {
-    var logHandler = logHandler
-    if (logHandler == null) {
-      logHandler = EMPTY_LOG_HANDLER
-    }
-    logHandler.log("Applying " + modifications.size + " modifications.")
-    if (modifications.size > 0) {
+    val log = logHandler ?: EMPTY_LOG_HANDLER
+    log.log("Applying " + modifications.size + " modifications.")
+    if (modifications.isNotEmpty()) {
       Simulation(false).simulate(star)
       for (modification in modifications) {
-        applyModification(star, auxStars, modification, logHandler)
+        applyModification(star, auxStars, modification, log)
       }
     }
-    Simulation(logHandler).simulate(star)
+    Simulation(log).simulate(star)
   }
 
-  @Throws(SuspiciousModificationException::class)
   private fun applyModification(
       star: Star.Builder,
       auxStars: Collection<Star>?,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
+      logHandler: Simulation.LogHandler) {
     when (modification.type) {
-      StarModification.MODIFICATION_TYPE.COLONIZE -> {
-        applyColonize(star, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.CREATE_FLEET -> {
-        applyCreateFleet(star, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.CREATE_BUILDING -> {
-        applyCreateBuilding(star, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.ADJUST_FOCUS -> {
-        applyAdjustFocus(star, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST -> {
-        applyAddBuildRequest(star, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST -> {
-        applyDeleteBuildRequest(star, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.SPLIT_FLEET -> {
-        applySplitFleet(star, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.MERGE_FLEET -> {
-        applyMergeFleet(star, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.MOVE_FLEET -> {
-        applyMoveFleet(star, auxStars, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.EMPTY_NATIVE -> {
-        applyEmptyNative(star, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING -> {
-        applyUpgradeBuilding(star, modification, logHandler)
-        return
-      }
-      StarModification.MODIFICATION_TYPE.ATTACK_COLONY -> {
-        applyAttackColony(star, modification, logHandler)
-        return
-      }
+      StarModification.MODIFICATION_TYPE.COLONIZE -> applyColonize(star, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.CREATE_FLEET -> applyCreateFleet(star, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.CREATE_BUILDING -> applyCreateBuilding(star, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.ADJUST_FOCUS -> applyAdjustFocus(star, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST -> applyAddBuildRequest(star, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST -> applyDeleteBuildRequest(star, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.SPLIT_FLEET -> applySplitFleet(star, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.MERGE_FLEET ->  applyMergeFleet(star, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.MOVE_FLEET -> applyMoveFleet(star, auxStars, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.EMPTY_NATIVE -> applyEmptyNative(star, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING -> applyUpgradeBuilding(star, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.ATTACK_COLONY -> applyAttackColony(star, modification, logHandler)
       else -> {
-        logHandler!!.log("Unknown or unexpected modification type: " + modification.type)
-        log.error("Unknown or unexpected modification type: %s", modification.type)
+        logHandler.log("Unknown or unexpected modification type: ${modification.type}")
+        log.error("Unknown or unexpected modification type: ${modification.type}")
       }
     }
   }
@@ -156,15 +114,16 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       var found = false
       for (i in star.fleets.indices) {
         val fleet = star.fleets[i]
-        if (fleet.design_type == Design.DesignType.COLONY_SHIP && fleet.empire_id == modification.empire_id) {
+        if (fleet.design_type == Design.DesignType.COLONY_SHIP &&
+            fleet.empire_id == modification.empire_id) {
           // TODO: check for cryogenics
-          if (Math.ceil(fleet.num_ships.toDouble()) == 1.0) {
+          if (ceil(fleet.num_ships.toDouble()) == 1.0) {
             star.fleets.removeAt(i)
           } else {
             // Make sure we don't have too much fuel.
             val design = getDesign(fleet.design_type)
             val maxFuelAmount = design.fuel_size * (fleet.num_ships - 1)
-            val fuelAmount = Math.max(fleet.fuel_amount, maxFuelAmount)
+            val fuelAmount = max(fleet.fuel_amount, maxFuelAmount)
             star.fleets[i] = fleet.newBuilder()
                 .num_ships(fleet.num_ships - 1)
                 .fuel_amount(fuelAmount)
@@ -303,7 +262,8 @@ class StarModifier(private val identifierGenerator: () -> Long) {
         continue
       }
       val design = getDesign(fleet.design_type)
-      scoutReport.fleets.add(fleet.newBuilder() // We'll put the fuel as max so even with a scout report, you can't tell.
+      // We'll put the fuel as max so even with a scout report, you can't tell.
+      scoutReport.fleets.add(fleet.newBuilder()
           .fuel_amount(design.fuel_size * fleet.num_ships)
           .build())
     }
@@ -339,7 +299,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
   private fun applyCreateBuilding(
       star: Star.Builder,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
+      logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
     val planet = getPlanetWithColony(star, modification.colony_id)
     if (planet != null) {
@@ -350,7 +310,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
             "Attempt to create building on planet for different empire. colony.empire_id=%d",
             planet.colony.empire_id)
       }
-      logHandler!!.log(String.format(Locale.US, "- creating building, colony_id=%d", modification.colony_id))
+      logHandler.log("- creating building, colony_id=${modification.colony_id}")
       val colony = planet.colony.newBuilder()
       colony.buildings.add(Building.Builder()
           .id(identifierGenerator())

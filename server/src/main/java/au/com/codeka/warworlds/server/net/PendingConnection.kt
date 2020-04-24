@@ -24,7 +24,7 @@ class PendingConnection(
       socket: Socket,
       decoder: PacketDecoder,
       outs: OutputStream): Connection {
-    val conn = Connection(
+    return Connection(
         manager,
         helloPacket,
         account,
@@ -33,8 +33,6 @@ class PendingConnection(
         socket,
         decoder,
         outs)
-    conn.start()
-    return conn
   }
 
 }

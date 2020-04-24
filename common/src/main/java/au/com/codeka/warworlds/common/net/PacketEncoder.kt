@@ -7,8 +7,7 @@ import okio.sink
 import java.io.OutputStream
 
 /** Encodes [Packet]s onto a stream so that [PacketDecoder] can decode them. */
-class PacketEncoder @JvmOverloads constructor(
-    outs: OutputStream, private var handler: PacketHandler? = null) {
+class PacketEncoder constructor(outs: OutputStream, private var handler: PacketHandler) {
   interface PacketHandler {
     fun onPacket(packet: Packet, encodedSize: Int)
   }
@@ -16,8 +15,7 @@ class PacketEncoder @JvmOverloads constructor(
   private val sink: BufferedSink = outs.sink().buffer()
   private val lock = Any()
 
-
-  fun setPacketHandler(handler: PacketHandler?) {
+  fun setPacketHandler(handler: PacketHandler) {
     this.handler = handler
   }
 
@@ -36,8 +34,6 @@ class PacketEncoder @JvmOverloads constructor(
       sink.write(bytes)
       sink.emit()
     }
-    if (handler != null) {
-      handler!!.onPacket(packet, bytes.size)
-    }
+    handler.onPacket(packet, bytes.size)
   }
 }
