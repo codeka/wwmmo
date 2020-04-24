@@ -6,6 +6,7 @@ import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.Star.CLASSIFICATION
 import au.com.codeka.warworlds.common.sim.EmpireHelper
 import au.com.codeka.warworlds.common.sim.FleetHelper
+import au.com.codeka.warworlds.common.sim.StarModifier
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
 import au.com.codeka.warworlds.server.concurrency.TaskRunner
 import au.com.codeka.warworlds.server.concurrency.Threads
@@ -39,16 +40,12 @@ class Player(private val connection: Connection,
   }
 
   fun onPacket(pkt: Packet) {
-    if (pkt.watch_sectors != null) {
-      onWatchSectorsPacket(pkt.watch_sectors)
-    } else if (pkt.modify_star != null) {
-      onModifyStar(pkt.modify_star)
-    } else if (pkt.request_empire != null) {
-      onRequestEmpire(pkt.request_empire)
-    } else if (pkt.chat_msgs != null) {
-      onChatMessages(pkt.chat_msgs)
-    } else {
-      log.error("Unknown/unexpected packet. %s", PacketDebug.getPacketDebug(pkt))
+    when {
+      pkt.watch_sectors != null -> onWatchSectorsPacket(pkt.watch_sectors)
+      pkt.modify_star != null -> onModifyStar(pkt.modify_star)
+      pkt.request_empire != null -> onRequestEmpire(pkt.request_empire)
+      pkt.chat_msgs != null -> onChatMessages(pkt.chat_msgs)
+      else -> log.error("Unknown/unexpected packet. %s", PacketDebug.getPacketDebug(pkt))
     }
   }
 
@@ -58,18 +55,18 @@ class Player(private val connection: Connection,
    */
   private fun onPostConnect() {
     val startTime = System.nanoTime()
-    val stars: ArrayList<WatchableObject<Star>?> = StarManager.i.getStarsForEmpire(empire.get().id)
+    val stars = StarManager.i.getStarsForEmpire(empire.get().id)
     log.debug("Fetched %d stars for empire %d in %dms", stars.size, empire.get().id,
         (System.nanoTime() - startTime) / 1000000L)
 
     // Of the player's stars, send them all the ones that have been updated since their
     // last_simulation.
-    val updatedStars = ArrayList<Star?>()
+    val updatedStars = ArrayList<Star>()
     for (star in stars) {
       if (helloPacket.our_star_last_simulation == null
-          || (star!!.get().last_simulation != null
+          || (star.get().last_simulation != null
               && star.get().last_simulation > helloPacket.our_star_last_simulation)) {
-        updatedStars.add(star!!.get())
+        updatedStars.add(star.get())
       }
     }
     if (updatedStars.isNotEmpty()) {
@@ -97,7 +94,7 @@ class Player(private val connection: Connection,
 
     // Remove all our current watched stars
     clearWatchedStars()
-    val stars: MutableList<Star?> = ArrayList()
+    val stars: MutableList<Star> = ArrayList()
     synchronized(watchedSectors) {
       watchedSectors.clear()
       for (sectorY in pkt.top..pkt.bottom) {
@@ -112,7 +109,7 @@ class Player(private val connection: Connection,
     sendStarsUpdatedPacket(stars)
     synchronized(watchedStars) {
       for (star in stars) {
-        val watchableStar = StarManager.i.getStar(star!!.id)
+        val watchableStar = StarManager.i.getStar(star.id)
         if (watchableStar == null) {
           // Huh?
           log.warning("Got unexpected null star: %d", star.id)
@@ -125,7 +122,7 @@ class Player(private val connection: Connection,
   }
 
   private fun onModifyStar(pkt: ModifyStarPacket) {
-    val star = StarManager.i.getStar(pkt.star_id)
+    val star = StarManager.i.getStarOrError(pkt.star_id)
     for (i in 0 until pkt.modification.size) {
       var modification = pkt.modification[i]
       if (modification.empire_id == null || modification.empire_id != empire.get().id) {
@@ -150,7 +147,7 @@ class Player(private val connection: Connection,
       }
     }
     try {
-      StarManager.i.modifyStar(star, pkt.modification, null /* logHandler */)
+      StarManager.i.modifyStar(star, pkt.modification, StarModifier.EMPTY_LOG_HANDLER)
     } catch (e: SuspiciousModificationException) {
       SuspiciousEventManager.i.addSuspiciousEvent(e)
       log.warning("Suspicious star modification.", e)
@@ -160,7 +157,7 @@ class Player(private val connection: Connection,
   private fun onRequestEmpire(pkt: RequestEmpirePacket) {
     val empires: MutableList<Empire?> = ArrayList()
     for (id in pkt.empire_id) {
-      val empire: WatchableObject<Empire>? = EmpireManager.i.getEmpire(id)
+      val empire = EmpireManager.i.getEmpire(id)
       if (empire != null) {
         empires.add(empire.get())
       }
@@ -203,7 +200,7 @@ class Player(private val connection: Connection,
    * The most important function of this method is sanitizing the stars so that enemy fleets
    * are not visible (unless we have a colony/fleet as well, or there's a radar nearby).
    */
-  private fun sendStarsUpdatedPacket(updatedStars: MutableList<Star?>) {
+  private fun sendStarsUpdatedPacket(updatedStars: MutableList<Star>) {
     for (i in updatedStars.indices) {
       updatedStars[i] = sanitizeStar(updatedStars[i])
     }
@@ -219,10 +216,10 @@ class Player(private val connection: Connection,
    * own on there, or there's a radar nearby.
    */
   // TODO: check for existence of radar buildings nearby
-  private fun sanitizeStar(star: Star?): Star? {
+  private fun sanitizeStar(star: Star): Star {
     // If the star is a wormhole, don't sanitize it -- a wormhole is basically fleets in transit
     // anyway.
-    if (star!!.classification == CLASSIFICATION.WORMHOLE) {
+    if (star.classification == CLASSIFICATION.WORMHOLE) {
       return star
     }
     val myEmpireId = empire.get().id

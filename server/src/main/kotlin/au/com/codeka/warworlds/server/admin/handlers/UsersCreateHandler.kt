@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.server.admin.handlers
 
 import au.com.codeka.warworlds.common.proto.AdminRole
 import au.com.codeka.warworlds.common.proto.AdminUser
-import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.store.DataStore
 import com.google.common.collect.ImmutableMap
 import java.util.*

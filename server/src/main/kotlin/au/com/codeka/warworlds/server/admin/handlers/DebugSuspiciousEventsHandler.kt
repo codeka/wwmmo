@@ -4,11 +4,9 @@ import au.com.codeka.warworlds.common.proto.AdminRole
 import au.com.codeka.warworlds.common.proto.Empire
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.server.handlers.RequestException
-import au.com.codeka.warworlds.server.proto.SuspiciousEvent
 import au.com.codeka.warworlds.server.world.EmpireManager
 import au.com.codeka.warworlds.server.world.StarManager
 import au.com.codeka.warworlds.server.world.SuspiciousEventManager
-import au.com.codeka.warworlds.server.world.WatchableObject
 import java.util.*
 
 /**

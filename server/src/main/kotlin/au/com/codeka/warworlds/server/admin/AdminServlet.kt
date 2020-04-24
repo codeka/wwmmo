@@ -30,8 +30,6 @@ class AdminServlet : HandlerServlet(ROUTES) {
   }
 
   companion object {
-    private val log = Log("AdminServlet")
-
     private val ROUTES = Lists.newArrayList(
         Route("/", DashboardHandler::class.java),
         Route("/login", AdminLoginHandler::class.java),
@@ -58,11 +56,9 @@ class AdminServlet : HandlerServlet(ROUTES) {
 
     private fun getSession(request: HttpServletRequest): Session? {
       if (request.cookies != null) {
-        var sessionCookieValue = ""
         for (cookie in request.cookies) {
           if (cookie.name == "SESSION") {
-            sessionCookieValue = cookie.value
-            return SessionManager.i.getSession(sessionCookieValue)
+            return SessionManager.i.getSession(cookie.value)
           }
         }
       }

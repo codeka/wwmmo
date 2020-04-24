@@ -18,7 +18,6 @@ import org.eclipse.jetty.servlet.ServletHolder
 object Program {
   private val log = Log("Runner")
 
-  @Throws(Exception::class)
   @JvmStatic
   fun main(args: Array<String>) {
     LogImpl.setup()
@@ -28,11 +27,13 @@ object Program {
     ServerSocketManager.i.start()
     SmtpHelper.i.start()
     NotificationManager.i.start()
+
     val options = FirebaseOptions.Builder()
         .setCredentials(Configuration.i.getFirebaseCredentials())
         .setDatabaseUrl("https://wwmmo-93bac.firebaseio.com")
         .build()
     FirebaseApp.initializeApp(options)
+
     log.info("FirebaseApp initialized.")
     try {
       val port: Int = Configuration.i.listenPort
@@ -45,11 +46,13 @@ object Program {
       server.handler = context
       context.addServlet(ServletHolder(AdminServlet::class.java), "/admin/*")
       context.addServlet(ServletHolder(HtmlServlet::class.java), "/*")
+
       Runtime.getRuntime().addShutdownHook(object : Thread() {
         override fun run() {
           shutdown(server)
         }
       })
+
       server.start()
       log.info("Server started on http://localhost:%d/", port)
       server.join()
@@ -60,26 +63,31 @@ object Program {
 
   private fun shutdown(server: Server) {
     log.info("Shutdown initiated.")
+
     try {
       server.stop()
     } catch (e: Exception) {
       log.error("Error stopping HTTP server.", e)
     }
+
     try {
       ServerSocketManager.i.stop()
     } catch (e: Exception) {
       log.error("Error shutting down server socket manager.", e)
     }
+
     try {
       StarSimulatorQueue.i.stop()
     } catch (e: Exception) {
       log.error("Error shutting down star simulation queue.", e)
     }
+
     try {
       SmtpHelper.i.stop()
     } catch (e: Exception) {
       log.error("Error shutting down SMTP helper.", e)
     }
+
     try {
       DataStore.i.close()
     } catch (e: Exception) {

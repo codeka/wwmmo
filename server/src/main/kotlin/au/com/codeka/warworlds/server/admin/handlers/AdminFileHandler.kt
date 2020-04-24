@@ -11,13 +11,13 @@ import javax.servlet.http.HttpServletResponse
 
 /** Simple handler for handling static files (and 'templated' HTML files with no templated data).  */
 class AdminFileHandler : AdminHandler() {
-  private val fileHandler: FileHandler
+  private val fileHandler: FileHandler = FileHandler("data/admin/static/")
 
   /**
    * Gets a collection of roles, one of which the current user must be in to access this handler.
    */
-  protected override val requiredRoles: Collection<AdminRole>?
-    protected get() = Lists.newArrayList()
+  override val requiredRoles: Collection<AdminRole>?
+    get() = Lists.newArrayList()
 
   override fun setup(
       routeMatcher: Matcher,
@@ -44,9 +44,5 @@ class AdminFileHandler : AdminHandler() {
     }
     path += getUrlParameter("path")
     render(path, null)
-  }
-
-  init {
-    fileHandler = FileHandler("data/admin/static/")
   }
 }

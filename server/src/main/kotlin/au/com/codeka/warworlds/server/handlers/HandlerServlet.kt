@@ -14,25 +14,25 @@ import javax.servlet.http.HttpServletResponse
 open class HandlerServlet protected constructor(private val routes: List<Route>)
   : GenericServlet() {
   private val log = Log("HandlerServlet")
+
   override fun service(request: ServletRequest, response: ServletResponse) {
+    val httpRequest = request as HttpServletRequest
+    val httpResponse = response as HttpServletResponse
+
     for (route in routes) {
-      val matcher = route.matches(request as HttpServletRequest)
+      val matcher = route.matches(httpRequest)
       if (matcher != null) {
-        handle(matcher, route, request, response as HttpServletResponse)
+        handle(matcher, route, httpRequest, httpResponse)
         return
       }
     }
-    log.info(String.format(
-        "Could not find handler for URL: %s",
-        (request as HttpServletRequest).pathInfo))
-    (response as HttpServletResponse).status = 404
+
+    log.info("Could not find handler for URL: ${httpRequest.pathInfo}")
+    httpResponse.status = 404
   }
 
   protected open fun handle(
-      matcher: Matcher,
-      route: Route,
-      request: HttpServletRequest,
-      response: HttpServletResponse) {
+      matcher: Matcher, route: Route, request: HttpServletRequest, response: HttpServletResponse) {
     try {
       val handler = route.createRequestHandler()
       handler.setup(matcher, route.extraOption, request, response)

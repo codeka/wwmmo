@@ -6,6 +6,7 @@ import au.com.codeka.warworlds.common.proto.Empire
 import au.com.codeka.warworlds.common.proto.SectorCoord
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.proto.StarModification
+import au.com.codeka.warworlds.common.sim.StarModifier
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
 import au.com.codeka.warworlds.server.proto.PatreonInfo
 import au.com.codeka.warworlds.server.store.DataStore
@@ -77,7 +78,7 @@ class EmpireManager private constructor() {
       return null
     }
     try {
-      StarManager.Companion.i.modifyStar(star, Lists.newArrayList(
+      StarManager.i.modifyStar(star, Lists.newArrayList(
           StarModification.Builder()
               .type(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
               .build(),
@@ -103,7 +104,7 @@ class EmpireManager private constructor() {
               .type(StarModification.MODIFICATION_TYPE.COLONIZE)
               .planet_index(newStarFinder.planetIndex)
               .build()
-      ), null /* logHandler */)
+      ), StarModifier.EMPTY_LOG_HANDLER)
     } catch (e: SuspiciousModificationException) {
       // Shouldn't happen, none of these should be suspicious...
       log.error("Unexpected suspicious modification.", e)

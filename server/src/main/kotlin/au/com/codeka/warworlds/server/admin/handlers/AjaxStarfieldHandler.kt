@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.server.admin.handlers
 
 import au.com.codeka.warworlds.common.Log
-import au.com.codeka.warworlds.common.proto.Sector
 import au.com.codeka.warworlds.common.proto.SectorCoord
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.proto.StarModification
@@ -16,7 +15,10 @@ import java.util.*
 
 /** Handler for /admin/ajax/starfield requests.  */
 class AjaxStarfieldHandler : AjaxHandler() {
-  @Throws(RequestException::class)
+  companion object {
+    private val log = Log("AjaxStarfieldHandler")
+  }
+
   public override fun get() {
     when (request.getParameter("action")) {
       "xy" -> {
@@ -24,42 +26,40 @@ class AjaxStarfieldHandler : AjaxHandler() {
         val y = request.getParameter("y").toLong()
         handleXyRequest(x, y)
       }
-      else -> throw RequestException(400, "Unknown action: " + request.getParameter("action"))
+      else -> throw RequestException(400, "Unknown action: ${request.getParameter("action")}")
     }
   }
 
-  @Throws(RequestException::class)
   public override fun post() {
-    val starId: Long
     when (request.getParameter("action")) {
       "simulate" -> {
-        starId = request.getParameter("id").toLong()
+        val starId = request.getParameter("id").toLong()
         handleSimulateRequest(starId)
       }
       "modify" -> {
-        starId = request.getParameter("id").toLong()
+        val starId = request.getParameter("id").toLong()
         val modifyJson = request.getParameter("modify")
         handleModifyRequest(starId, modifyJson)
       }
       "delete" -> {
-        starId = request.getParameter("id").toLong()
+        val starId = request.getParameter("id").toLong()
         handleDeleteRequest(starId)
       }
       "clearNatives" -> {
-        starId = request.getParameter("id").toLong()
+        val starId = request.getParameter("id").toLong()
         handleClearNativesRequest(starId)
       }
       "forceMoveComplete" -> {
-        starId = request.getParameter("id").toLong()
+        val starId = request.getParameter("id").toLong()
         val fleetId = request.getParameter("fleetId").toLong()
         handleForceMoveComplete(starId, fleetId)
       }
       "forceBuildRequestComplete" -> {
-        starId = request.getParameter("id").toLong()
+        val starId = request.getParameter("id").toLong()
         val buildRequestId = request.getParameter("reqId").toLong()
         handleForceBuildRequestComplete(starId, buildRequestId)
       }
-      else -> throw RequestException(400, "Unknown action: " + request.getParameter("action"))
+      else -> throw RequestException(400, "Unknown action: ${request.getParameter("action")}")
     }
   }
 
@@ -69,24 +69,20 @@ class AjaxStarfieldHandler : AjaxHandler() {
     setResponseJson(sector.get())
   }
 
-  @Throws(RequestException::class)
   private fun handleSimulateRequest(starId: Long) {
     setResponseGson(modifyAndSimulate(starId, null))
   }
 
-  @Throws(RequestException::class)
   private fun handleModifyRequest(starId: Long, modifyJson: String) {
     val modification = fromJson(modifyJson, StarModification::class.java)
-    log.debug("modify:\nJSON: %s\nproto: %s", modifyJson, modification)
     setResponseGson(modifyAndSimulate(starId, modification))
   }
 
   private fun handleDeleteRequest(starId: Long) {
     log.debug("delete star: %d", starId)
-    StarManager.Companion.i.deleteStar(starId)
+    StarManager.i.deleteStar(starId)
   }
 
-  @Throws(RequestException::class)
   private fun handleClearNativesRequest(starId: Long) {
     log.debug("delete star: %d", starId)
     modifyAndSimulate(starId, StarModification.Builder()
@@ -94,10 +90,9 @@ class AjaxStarfieldHandler : AjaxHandler() {
         .build())
   }
 
-  @Throws(RequestException::class)
   private fun handleForceMoveComplete(starId: Long, fleetId: Long) {
     log.debug("force move complete (star: %d, fleet: %d)", starId, fleetId)
-    val starWo: WatchableObject<Star> = StarManager.Companion.i.getStar(starId) ?: return
+    val starWo: WatchableObject<Star> = StarManager.i.getStar(starId) ?: return
     synchronized(starWo.lock) {
       val star = starWo.get().newBuilder()
       for (i in star.fleets.indices) {
@@ -115,10 +110,9 @@ class AjaxStarfieldHandler : AjaxHandler() {
     modifyAndSimulate(starId, null)
   }
 
-  @Throws(RequestException::class)
   private fun handleForceBuildRequestComplete(starId: Long, buildRequestId: Long) {
     log.debug("force build request complete (star: %d, req: %d)", starId, buildRequestId)
-    val starWo: WatchableObject<Star> = StarManager.Companion.i.getStar(starId) ?: return
+    val starWo: WatchableObject<Star> = StarManager.i.getStar(starId) ?: return
     synchronized(starWo.lock) {
       val star = starWo.get().newBuilder()
       for (i in star.planets.indices) {
@@ -148,26 +142,26 @@ class AjaxStarfieldHandler : AjaxHandler() {
     modifyAndSimulate(starId, null)
   }
 
-  @Throws(RequestException::class)
   private fun modifyAndSimulate(starId: Long, modification: StarModification?): SimulateResponse {
     val resp = SimulateResponse()
-    SimulateResponse()
     val startTime = System.nanoTime()
-    val star = StarManager.i.getStar(starId)
+    val star = StarManager.i.getStarOrError(starId)
     resp.loadTime = (System.nanoTime() - startTime) / 1000000L
     val logMessages = StringBuilder()
     val modifications = ArrayList<StarModification>()
     if (modification != null) {
       modifications.add(modification)
     }
+
     try {
-      StarManager.Companion.i.modifyStar(star, modifications, LogHandler(logMessages))
+      StarManager.i.modifyStar(star, modifications, LogHandler(logMessages))
     } catch (e: SuspiciousModificationException) {
       log.warning("Suspicious modification.", e)
       // We'll log it as well, even though technically it wasn't the empire who made it.
-      SuspiciousEventManager.Companion.i.addSuspiciousEvent(e)
+      SuspiciousEventManager.i.addSuspiciousEvent(e)
       throw RequestException(e)
     }
+
     val simulateTime = System.nanoTime()
     resp.simulateTime = (simulateTime - startTime) / 1000000L
     resp.logMessages = logMessages.toString()
@@ -190,9 +184,5 @@ class AjaxStarfieldHandler : AjaxHandler() {
     var loadTime: Long = 0
     var simulateTime: Long = 0
     var logMessages: String? = null
-  }
-
-  companion object {
-    private val log = Log("AjaxStarfieldHandler")
   }
 }

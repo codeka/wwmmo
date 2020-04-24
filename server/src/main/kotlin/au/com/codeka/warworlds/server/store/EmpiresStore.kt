@@ -12,6 +12,8 @@ import java.util.*
 /** Storage for empires.  */
 class EmpiresStore  /* package */
 internal constructor(fileName: String) : BaseStore(fileName) {
+  private val log = Log("EmpiresStore")
+
   operator fun get(id: Long): Empire? {
     try {
       newReader()
@@ -32,14 +34,14 @@ internal constructor(fileName: String) : BaseStore(fileName) {
     val empireIds = ArrayList<Long>()
     val reader = newReader()
     if (query == null) {
-      reader!!.stmt("SELECT id FROM empires")
+      reader.stmt("SELECT id FROM empires")
     } else {
       reader
           .stmt("SELECT id FROM empires WHERE empire_name LIKE ?")
           .param(0, "$query%")
     }
     try {
-      reader!!.query().use { res ->
+      reader.query().use { res ->
         while (res.next()) {
           empireIds.add(res.getLong(0))
         }
@@ -118,7 +120,7 @@ internal constructor(fileName: String) : BaseStore(fileName) {
           .stmt("SELECT patreon_info FROM patreon_info WHERE empire_id=?")
           .param(0, empireId)
           .query()
-      if (res!!.next()) {
+      if (res.next()) {
         PatreonInfo.ADAPTER.decode(res.getBytes(0))
       } else null
     } catch (e: Exception) {
@@ -127,19 +129,18 @@ internal constructor(fileName: String) : BaseStore(fileName) {
     }
   }
 
-  @Throws(StoreException::class)
   override fun onOpen(diskVersion: Int): Int {
-    var diskVersion = diskVersion
-    if (diskVersion == 0) {
+    var version = diskVersion
+    if (version == 0) {
       newWriter()
           .stmt(
               "CREATE TABLE empires (" +
                   "  id INTEGER PRIMARY KEY," +
                   "  empire BLOB)")
           .execute()
-      diskVersion++
+      version++
     }
-    if (diskVersion == 1) {
+    if (version == 1) {
       newWriter()
           .stmt(
               "CREATE TABLE devices (" +
@@ -150,9 +151,9 @@ internal constructor(fileName: String) : BaseStore(fileName) {
       newWriter()
           .stmt("CREATE UNIQUE INDEX IX_devices_empire_device ON devices (empire_id, device_id)")
           .execute()
-      diskVersion++
+      version++
     }
-    if (diskVersion == 2) {
+    if (version == 2) {
       newWriter()
           .stmt(
               "CREATE TABLE patreon_info (" +
@@ -160,9 +161,9 @@ internal constructor(fileName: String) : BaseStore(fileName) {
                   "  token_expiry_time INTEGER," +
                   "  patreon_info BLOB)")
           .execute()
-      diskVersion++
+      version++
     }
-    if (diskVersion == 3) {
+    if (version == 3) {
       newWriter()
           .stmt(
               "ALTER TABLE empires ADD COLUMN empire_name STRING")
@@ -200,12 +201,8 @@ internal constructor(fileName: String) : BaseStore(fileName) {
             .param(2, empire.id)
             .execute()
       }
-      diskVersion++
+      version++
     }
-    return diskVersion
-  }
-
-  companion object {
-    private val log = Log("EmpiresStore")
+    return version
   }
 }

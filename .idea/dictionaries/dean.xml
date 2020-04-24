@@ -2,8 +2,10 @@
   <dictionary name="dean">
     <words>
       <w>delaunay</w>
+      <w>gson</w>
       <w>infobar</w>
       <w>mins</w>
+      <w>pinger</w>
       <w>protobuf</w>
       <w>protobufs</w>
       <w>runnables</w>

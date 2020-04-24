@@ -12,10 +12,15 @@ import au.com.codeka.warworlds.server.store.StarsStore
 import com.google.common.collect.Lists
 import java.util.*
 
-/**
- * Manages stars and keeps the up-to-date in the data store.
- */
+/** Manages stars and keeps the up-to-date in the data store. */
 class StarManager private constructor() {
+  class StarNotFoundException(id: Long): Exception("Star not found: $id")
+
+  companion object {
+    private val log = Log("StarManager")
+    val i = StarManager()
+  }
+
   private val store: StarsStore = DataStore.i.stars()
   private val stars = HashMap<Long, WatchableObject<Star>>()
   private val starModifier: StarModifier =
@@ -35,6 +40,15 @@ class StarManager private constructor() {
     return watchableStar
   }
 
+  /**
+   * Gets the star with the given ID
+   *
+   * @throws StarNotFoundException if the star does not exist.
+   */
+  fun getStarOrError(id: Long): WatchableObject<Star> {
+    return getStar(id) ?: throw StarNotFoundException(id)
+  }
+
   fun deleteStar(id: Long) {
     val watchableStar = stars[id]
     val star: Star?
@@ -50,15 +64,15 @@ class StarManager private constructor() {
     val coord = SectorCoord.Builder().x(star.sector_x).y(star.sector_y).build()
     store.delete(id)
     synchronized(stars) { stars.remove(id) }
-    SectorManager.Companion.i.forgetSector(coord)
+    SectorManager.i.forgetSector(coord)
   }
 
   /**
    * Add native colonies to the star with the given ID. We assume it's already eligible for one.
    */
   fun addNativeColonies(id: Long) {
-    val star = getStar(id)
-    synchronized(star!!.lock) {
+    val star = getStarOrError(id)
+    synchronized(star.lock) {
       log.debug("Adding native colonies to star %d \"%s\"...", star.get().id, star.get().name)
 
       // OK, so basically any planet with a population congeniality > 500 will get a colony.
@@ -94,25 +108,24 @@ class StarManager private constructor() {
     }
   }
 
-  fun getStarsForEmpire(empireId: Long): ArrayList<WatchableObject<Star>?> {
-    val stars = ArrayList<WatchableObject<Star>?>()
+  fun getStarsForEmpire(empireId: Long): ArrayList<WatchableObject<Star>> {
+    val stars = ArrayList<WatchableObject<Star>>()
     for (id in store.getStarsForEmpire(empireId)) {
-      stars.add(getStar(id!!))
+      stars.add(getStarOrError(id))
     }
     return stars
   }
 
-  @Throws(SuspiciousModificationException::class)
   fun modifyStar(
-      star: WatchableObject<Star>?,
+      star: WatchableObject<Star>,
       modifications: Collection<StarModification>,
-      logHandler: Simulation.LogHandler?) {
-    var auxStars: MutableMap<Long?, Star>? = null
+      logHandler: Simulation.LogHandler = StarModifier.EMPTY_LOG_HANDLER) {
+    var auxStars: MutableMap<Long, Star>? = null
     for (modification in modifications) {
       if (modification.star_id != null) {
         auxStars = auxStars ?: TreeMap()
         if (!auxStars.containsKey(modification.star_id)) {
-          val auxStar = getStar(modification.star_id)!!.get()
+          val auxStar = getStarOrError(modification.star_id).get()
           auxStars[auxStar.id] = auxStar
         }
       }
@@ -120,13 +133,12 @@ class StarManager private constructor() {
     modifyStar(star, auxStars?.values, modifications, logHandler)
   }
 
-  @Throws(SuspiciousModificationException::class)
   private fun modifyStar(
-      star: WatchableObject<Star>?,
+      star: WatchableObject<Star>,
       auxStars: Collection<Star>?,
       modifications: Collection<StarModification>,
-      logHandler: Simulation.LogHandler?) {
-    synchronized(star!!.lock) {
+      logHandler: Simulation.LogHandler) {
+    synchronized(star.lock) {
       val starBuilder = star.get().newBuilder()
       starModifier.modifyStar(starBuilder, auxStars, modifications, logHandler)
       completeActions(star, starBuilder, logHandler)
@@ -143,11 +155,10 @@ class StarManager private constructor() {
    * through to. If null, we'll just do normal logging.
    * @throws SuspiciousModificationException if the
    */
-  @Throws(SuspiciousModificationException::class)
   private fun completeActions(
-      star: WatchableObject<Star>?,
+      star: WatchableObject<Star>,
       starBuilder: Star.Builder,
-      logHandler: Simulation.LogHandler?) {
+      logHandler: Simulation.LogHandler) {
     // For any builds/moves/etc that finish in the future, make sure we schedule a job to
     // re-simulate the star then.
     var nextSimulateTime: Long? = null
@@ -213,9 +224,8 @@ class StarManager private constructor() {
           if (minerals < 0) {
             minerals = 0f
           }
-          starBuilder.empire_stores[storageIndex] = starBuilder.empire_stores[storageIndex].newBuilder()
-              .total_minerals(minerals)
-              .build()
+          starBuilder.empire_stores[storageIndex] =
+              starBuilder.empire_stores[storageIndex].newBuilder().total_minerals(minerals).build()
 
           // TODO: add a sitrep as well
         } else {
@@ -304,7 +314,7 @@ class StarManager private constructor() {
 
     // If the star has at least one non-native colony, make sure the sector is marked non-empty
     var nonEmpty = false
-    for (planet in star!!.get().planets) {
+    for (planet in star.get().planets) {
       if (planet.colony != null && planet.colony.empire_id != null) {
         nonEmpty = true
         break
@@ -314,12 +324,8 @@ class StarManager private constructor() {
       val coord = SectorCoord.Builder().x(star.get().sector_x).y(star.get().sector_y).build()
       val sector: WatchableObject<Sector> = SectorManager.i.getSector(coord)
       if (sector.get().state == SectorState.Empty.value) {
-        DataStore.Companion.i.sectors().updateSectorState(
-            coord, SectorState.Empty,
-            SectorState.NonEmpty)
-        sector.set(sector.get().newBuilder()
-            .state(SectorState.NonEmpty.value)
-            .build())
+        DataStore.i.sectors().updateSectorState(coord, SectorState.Empty, SectorState.NonEmpty)
+        sector.set(sector.get().newBuilder().state(SectorState.NonEmpty.value).build())
       }
     }
     starBuilder.next_simulation(nextSimulateTime)
@@ -330,14 +336,9 @@ class StarManager private constructor() {
   }
 
   private val starWatcher: WatchableObject.Watcher<Star> = object : WatchableObject.Watcher<Star> {
-    override fun onUpdate(star: WatchableObject<Star>) {
-      log.debug("Saving star %d %s", star.get().id, star.get().name)
-      store.put(star.get().id, star.get())
+    override fun onUpdate(obj: WatchableObject<Star>) {
+      log.debug("Saving star %d %s", obj.get().id, obj.get().name)
+      store.put(obj.get().id, obj.get())
     }
-  }
-
-  companion object {
-    private val log = Log("StarManager")
-    val i = StarManager()
   }
 }

@@ -9,21 +9,18 @@ import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.world.NotificationManager
 import au.com.codeka.warworlds.server.world.StarManager
 import au.com.codeka.warworlds.server.world.WatchableObject
-import com.google.common.collect.ImmutableMap
 import java.util.*
 
 /**
  * Handler for /admin/empires/xxx which shows details about the empire with id xxx.
  */
 class EmpireDetailsHandler : AdminHandler() {
-  @Throws(RequestException::class)
   public override fun get() {
     val id = getUrlParameter("id")!!.toLong()
     val empire: Empire = DataStore.i.empires()[id] ?: throw RequestException(404)
     complete(empire, HashMap())
   }
 
-  @Throws(RequestException::class)
   public override fun post() {
     val id = getUrlParameter("id")!!.toLong()
     val empire: Empire = DataStore.i.empires()[id] ?: throw RequestException(404)

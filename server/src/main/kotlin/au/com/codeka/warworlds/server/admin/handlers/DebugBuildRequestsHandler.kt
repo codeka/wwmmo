@@ -2,12 +2,10 @@ package au.com.codeka.warworlds.server.admin.handlers
 
 import au.com.codeka.warworlds.common.proto.BuildRequest
 import au.com.codeka.warworlds.common.proto.Star
-import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.store.DataStore
 import java.util.*
 
 class DebugBuildRequestsHandler : AdminHandler() {
-  @Throws(RequestException::class)
   override fun get() {
     val data = TreeMap<String, Any>()
 
@@ -28,9 +26,7 @@ class DebugBuildRequestsHandler : AdminHandler() {
       }
     }
 
-    /*
-    </div>Designs.get(planets[i].colony.buildings[j].design_type);
-     */data["build_requests"] = buildRequests
+    data["build_requests"] = buildRequests
     data["request_stars"] = buildRequestStars
     render("debug/build-requests.html", data)
   }

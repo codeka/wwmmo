@@ -7,26 +7,26 @@ import java.util.*
  * in [Threads].
  */
 class TaskRunner private constructor() {
+  companion object {
+    var i = TaskRunner()
+  }
+
   private val timer: Timer
   fun runTask(runnable: Runnable, thread: Threads) {
     thread.runTask(runnable)
   }
 
   /** Run a task after the given delay.  */
-  fun runTask(runnable: Runnable, thread: Threads, delayMs: Int) {
-    if (delayMs == 0) {
+  fun runTask(runnable: Runnable, thread: Threads, delayMs: Long) {
+    if (delayMs == 0L) {
       runTask(runnable, thread)
     } else {
       timer.schedule(object : TimerTask() {
         override fun run() {
           runTask(runnable, thread)
         }
-      }, delayMs.toLong())
+      }, delayMs)
     }
-  }
-
-  companion object {
-    var i = TaskRunner()
   }
 
   init {

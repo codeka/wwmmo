@@ -12,6 +12,10 @@ import java.util.logging.LogRecord
  * own custom class lets us do some extra stuff, too.
  */
 class LogFormatter : Formatter() {
+  companion object {
+    val DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+  }
+
   override fun format(record: LogRecord): String {
     val sb = StringBuilder()
     DATE_TIME_FORMATTER.printTo(sb, record.millis)
@@ -37,9 +41,5 @@ class LogFormatter : Formatter() {
     }
     sb.append("\n")
     return sb.toString()
-  }
-
-  companion object {
-    val DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
   }
 }

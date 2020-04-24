@@ -41,7 +41,7 @@ class SessionManager {
     return sessions[cookie]
   }
 
-  /** Generates a cookie, which is basically just a long-ish string of random bytes.  */
+  /** Generates a cookie, which is basically just a long-ish string of random bytes. */
   private fun generateCookie(): String {
     // generate a random string for the session cookie
     val rand = SecureRandom()
@@ -55,7 +55,8 @@ class SessionManager {
   companion object {
     private val log = Log("SessionManager")
     val i = SessionManager()
-    private val COOKIE_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray()
+    private val COOKIE_CHARS =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray()
     private const val COOKIE_LENGTH = 40
   }
 }

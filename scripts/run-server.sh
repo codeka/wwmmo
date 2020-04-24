@@ -12,7 +12,12 @@ function build_and_run_server()
 {
   pushd $ROOTPATH > /dev/null
   ./gradlew --daemon :server:installDist
+  BUILD_STATUS=$?
   popd > /dev/null
+
+  if [ $BUILD_STATUS -ne 0 ]; then
+    return 0
+  fi
 
   # This is so the app running on the phone will be able to connect to us. 8080 for the normal
   # HTTP stuff, 8081 is our custom port for the long-lived connection. It's OK if these fail,
@@ -34,6 +39,4 @@ until build_and_run_server; do
   echo "War Worlds exited prematurely with exit code $?. Restarting.." >&2
   sleep 1
 done
-echo "War Worlds exited normally." >&2
-
 

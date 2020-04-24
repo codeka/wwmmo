@@ -819,7 +819,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     private val log = Log("StarModifier")
     private const val HOURS_MS = 3600000L
 
-    private val EMPTY_LOG_HANDLER: Simulation.LogHandler = object : Simulation.LogHandler {
+    val EMPTY_LOG_HANDLER: Simulation.LogHandler = object : Simulation.LogHandler {
       override fun setStarName(starName: String?) {}
       override fun log(message: String) {}
     }

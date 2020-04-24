@@ -9,7 +9,6 @@ import au.com.codeka.warworlds.server.world.chat.ChatManager
  * Handler for /admin/ajax/chat which lets us send messages from the special 'server' user.
  */
 class AjaxChatHandler : AjaxHandler() {
-  @Throws(RequestException::class)
   public override fun get() {
     when (request.getParameter("action")) {
       "recv" -> {
@@ -20,23 +19,22 @@ class AjaxChatHandler : AjaxHandler() {
         val lastMsgTime = request.getParameter("lastMsgTime").toLong()
         handleRecvRequest(roomId, lastMsgTime)
       }
-      else -> throw RequestException(400, "Unknown action: " + request.getParameter("action"))
+      else -> throw RequestException(400, "Unknown action: ${request.getParameter("action")}")
     }
   }
 
-  @Throws(RequestException::class)
   public override fun post() {
     when (request.getParameter("action")) {
       "send" -> {
         val msg = request.getParameter("msg")
         handleSendRequest(msg)
       }
-      else -> throw RequestException(400, "Unknown action: " + request.getParameter("action"))
+      else -> throw RequestException(400, "Unknown action: ${request.getParameter("action")}")
     }
   }
 
   private fun handleSendRequest(msg: String) {
-    ChatManager.Companion.i.send(null, ChatMessage.Builder()
+    ChatManager.i.send(null, ChatMessage.Builder()
         .action(ChatMessage.MessageAction.Normal)
         .message(msg)
         .build())

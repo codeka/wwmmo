@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.server.admin.handlers
 
 import au.com.codeka.carrot.CarrotEngine
-import au.com.codeka.carrot.CarrotException
 import au.com.codeka.carrot.Configuration
 import au.com.codeka.carrot.bindings.MapBindings
 import au.com.codeka.carrot.resource.FileResourceLocator
@@ -27,8 +26,15 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 open class AdminHandler : RequestHandler() {
-  protected var sessionNoError: Session? = null
-    private set
+  private var sessionNoError: Session? = null
+
+  /**
+   * Gets a collection of roles, one of which the current user must be in to access this handler.
+   *
+   * <p>Override this if you want to specify a different list of roles.
+   */
+  protected open val requiredRoles: Collection<AdminRole>?
+    get() = Lists.newArrayList(AdminRole.ADMINISTRATOR)
 
   /** Set up this [RequestHandler], must be called before any other methods.  */
   open fun setup(
@@ -78,12 +84,6 @@ open class AdminHandler : RequestHandler() {
     }
   }
 
-  /**
-   * Gets a collection of roles, one of which the current user must be in to access this handler.
-   */
-  protected open val requiredRoles: Collection<AdminRole>?
-    protected get() = Lists.newArrayList(AdminRole.ADMINISTRATOR)
-
   protected fun render(path: String, data: Map<String, Any>?) {
     val mutableData: MutableMap<String, Any> = when (data) {
       null -> TreeMap()
@@ -104,18 +104,10 @@ open class AdminHandler : RequestHandler() {
     }
     response.contentType = contentType
     response.setHeader("Content-Type", contentType)
-    try {
-      response.writer.write(CARROT.process(path, MapBindings(mutableData)))
-    } catch (e: CarrotException) {
-      log.error("Error rendering template!", e)
-      throw RequestException(e)
-    } catch (e: IOException) {
-      log.error("Error rendering template!", e)
-      throw RequestException(e)
-    }
+    response.writer.write(CARROT.process(path, MapBindings(mutableData)))
   }
 
-  protected fun write(text: String?) {
+  protected fun write(text: String) {
     response.contentType = "text/plain"
     response.setHeader("Content-Type", "text/plain; charset=utf-8")
     try {
@@ -123,23 +115,6 @@ open class AdminHandler : RequestHandler() {
     } catch (e: IOException) {
       log.error("Error writing output!", e)
     }
-  }
-
-  protected fun authenticate() {
-    val requestUrl: URI
-    requestUrl = try {
-      URI(super.requestUrl!!)
-    } catch (e: URISyntaxException) {
-      throw RuntimeException(e)
-    }
-    val finalUrl = requestUrl.path
-    var redirectUrl = requestUrl.resolve("/admin/login").toString()
-    try {
-      redirectUrl += "?continue=" + URLEncoder.encode(finalUrl, "utf-8")
-    } catch (e: UnsupportedEncodingException) {
-      // should never happen
-    }
-    redirect(redirectUrl)
   }
 
   protected fun getSession(): Session {
@@ -154,6 +129,23 @@ open class AdminHandler : RequestHandler() {
     return if (sessionNoError == null) {
       false
     } else sessionNoError!!.isInRole(role)
+  }
+
+  private fun authenticate() {
+    val requestUrl: URI
+    requestUrl = try {
+      URI(super.requestUrl)
+    } catch (e: URISyntaxException) {
+      throw RuntimeException(e)
+    }
+    val finalUrl = requestUrl.path
+    var redirectUrl = requestUrl.resolve("/admin/login").toString()
+    try {
+      redirectUrl += "?continue=" + URLEncoder.encode(finalUrl, "utf-8")
+    } catch (e: UnsupportedEncodingException) {
+      // should never happen
+    }
+    redirect(redirectUrl)
   }
 
   private class SessionHelper {

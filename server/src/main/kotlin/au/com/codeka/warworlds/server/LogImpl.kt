@@ -11,6 +11,7 @@ import java.util.logging.Logger
  */
 object LogImpl {
   private val log = Logger.getLogger("wwmmo")
+
   fun setup() {
     Log.setImpl(LogImplImpl())
   }
@@ -30,7 +31,7 @@ object LogImpl {
     override fun write(tag: String, level: Int, msg: String) {
       // TODO: if debug
       val sb = StringBuilder()
-      LogFormatter.Companion.DATE_TIME_FORMATTER.printTo(sb, DateTime.now())
+      LogFormatter.DATE_TIME_FORMATTER.printTo(sb, DateTime.now())
       sb.append(" ")
       sb.append(LevelMap[level])
       sb.append(" ")

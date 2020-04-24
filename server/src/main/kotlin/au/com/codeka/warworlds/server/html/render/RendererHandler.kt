@@ -6,6 +6,7 @@ import au.com.codeka.warworlds.planetrender.PlanetRenderer
 import au.com.codeka.warworlds.planetrender.Template
 import au.com.codeka.warworlds.planetrender.Template.PlanetTemplate
 import au.com.codeka.warworlds.planetrender.Template.PlanetsTemplate
+import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.handlers.RequestHandler
 import com.google.common.collect.ImmutableMap
 import com.google.common.io.ByteStreams
@@ -21,44 +22,56 @@ import kotlin.math.ceil
  * Base class for the handlers that render images.
  */
 open class RendererHandler : RequestHandler() {
-  private val log = Log("RendererHandler")
+  companion object {
+    private val log = Log("RendererHandler")
 
+    val BUCKET_FACTORS: Map<String?, Float> = ImmutableMap.builder<String?, Float>()
+        .put("ldpi", 0.75f)
+        .put("mdpi", 1.0f)
+        .put("hdpi", 1.5f)
+        .put("xhdpi", 2.0f)
+        .put("xxhdpi", 3.0f)
+        .put("xxxhdpi", 4.0f)
+        .build()
+  }
+
+  /**
+   * Generates an image for the given template to the given cache file.
+   *
+   * @throws RequestException if an error occurs generating the image.
+   * @throws IOException if there is an error writing the image.
+   */
   protected fun generateImage(
-      cacheFile: File, templateFile: File, sunDirection: Vector3?, width: Int, height: Int,
-      factor: Float, rand: Random): Boolean {
-    var width = width
-    var height = height
-    width = ceil(width * factor.toDouble()).toInt()
-    height = ceil(height * factor.toDouble()).toInt()
+      cacheFile: File, templateFile: File, sunDirection: Vector3?, w: Int, h: Int,
+      factor: Float, rand: Random) {
+    val width = ceil(w * factor.toDouble()).toInt()
+    val height = ceil(h * factor.toDouble()).toInt()
     val tmpl = FileInputStream(templateFile).use { ins -> Template.parse(ins) }
     val renderer: PlanetRenderer
-    if (tmpl.template is PlanetsTemplate) {
-      val planetsTemplate = tmpl.template as PlanetsTemplate
-      if (sunDirection != null) {
-        for (child in planetsTemplate.parameters) {
-          (child as PlanetTemplate).sunLocation = sunDirection
+    when (tmpl.template) {
+      is PlanetsTemplate -> {
+        val planetsTemplate = tmpl.template as PlanetsTemplate
+        if (sunDirection != null) {
+          for (child in planetsTemplate.parameters) {
+            (child as PlanetTemplate).sunLocation = sunDirection
+          }
         }
+        renderer = PlanetRenderer(planetsTemplate, rand)
       }
-      renderer = PlanetRenderer(planetsTemplate, rand)
-    } else if (tmpl.template is PlanetTemplate) {
-      val planetTemplate = tmpl.template as PlanetTemplate
-      if (sunDirection != null) {
-        planetTemplate.sunLocation = sunDirection
+      is PlanetTemplate -> {
+        val planetTemplate = tmpl.template as PlanetTemplate
+        if (sunDirection != null) {
+          planetTemplate.sunLocation = sunDirection
+        }
+        renderer = PlanetRenderer(planetTemplate, rand)
       }
-      renderer = PlanetRenderer(planetTemplate, rand)
-    } else {
-      log.warning("Unknown template: %s", tmpl.template.javaClass.simpleName)
-      return false
+      else -> {
+        throw RequestException(500, "Unknown template: ${tmpl.template.javaClass.simpleName}")
+      }
     }
     val img = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
     renderer.render(img)
-    try {
-      ImageIO.write(img, "png", cacheFile)
-    } catch (e: IOException) {
-      log.warning("Error writing image.", e)
-      return false
-    }
-    return true
+    ImageIO.write(img, "png", cacheFile)
   }
 
   protected fun serveCachedFile(file: File) {
@@ -74,30 +87,20 @@ open class RendererHandler : RequestHandler() {
    * @param rand A [Random] that we'll use to select from one of multiple possible templates.
    * @param type The type of the object (one of "star" or "planet").
    * @param classification The classification of the object ("blackhole", "swamp", etc).
-   * @return A [File] pointing to a template for rendering that object, or null if no template
-   * can be found (e.g. invalid type or classifcation, etc).
+   * @return A [File] pointing to a template for rendering that object
+   * @throws RequestException if the template file cannot be found.
    */
-  protected fun getTemplateFile(rand: Random, type: String, classification: String): File? {
+  protected fun getTemplateFile(rand: Random, type: String, classification: String): File {
     val parentDirectory = File(String.format("data/renderer/%s/%s",
-        type.toLowerCase(), classification.toLowerCase()))
+        type.toLowerCase(Locale.ENGLISH), classification.toLowerCase(Locale.ENGLISH)))
     if (!parentDirectory.exists()) {
-      log.warning("Could not load template for %s/%s: %s",
-          type, classification, parentDirectory.absolutePath)
-      return null
+      throw RequestException(
+          500,
+          "Could not load template for ${type}/${classification}: ${parentDirectory.absolutePath}")
     }
-    val files = parentDirectory.listFiles { dir: File?, name: String -> name.endsWith(".xml") }
-        ?: return null
+    val files = parentDirectory.listFiles { _: File?, name: String -> name.endsWith(".xml") }
+        ?: throw RequestException(
+            500, "Could not find any files ending in '.xml' in $parentDirectory")
     return files[rand.nextInt(files.size)]
-  }
-
-  companion object {
-    val BUCKET_FACTORS: Map<String?, Float> = ImmutableMap.builder<String?, Float>()
-        .put("ldpi", 0.75f)
-        .put("mdpi", 1.0f)
-        .put("hdpi", 1.5f)
-        .put("xhdpi", 2.0f)
-        .put("xxhdpi", 3.0f)
-        .put("xxxhdpi", 4.0f)
-        .build()
   }
 }

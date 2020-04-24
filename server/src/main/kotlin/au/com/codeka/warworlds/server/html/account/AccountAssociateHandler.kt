@@ -18,8 +18,11 @@ import com.google.common.base.Preconditions
  * address.
  */
 class AccountAssociateHandler : ProtobufRequestHandler() {
+  companion object {
+    private val log = Log("AccountAssociateHandler")
+  }
+
   /** Get is for checking whether the associate has succeeded.  */
-  @Throws(RequestException::class)
   public override fun get() {
     val empireId = request.getParameter("id").toLong()
     val account = AccountManager.i.getAccount(empireId)
@@ -42,7 +45,6 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
   }
 
   /** Post is to actually initiate an association.  */
-  @Throws(RequestException::class)
   public override fun post() {
     val req = readProtobuf(AccountAssociateRequest::class.java)
     val acc = DataStore.i.accounts()[req.cookie]
@@ -103,9 +105,5 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
     AccountManager.i.sendVerificationEmail(account.get())
     resp.status(AccountAssociateResponse.AccountAssociateStatus.SUCCESS)
     writeProtobuf(resp.build())
-  }
-
-  companion object {
-    private val log = Log("AccountAssociateHandler")
   }
 }

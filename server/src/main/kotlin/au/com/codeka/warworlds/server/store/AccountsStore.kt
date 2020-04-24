@@ -47,7 +47,7 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
     return null
   }
 
-  fun getByEmpireId(empireId: Long): Pair<String?, Account>? {
+  fun getByEmpireId(empireId: Long): Pair<String, Account>? {
     try {
       newReader()
           .stmt("SELECT cookie, account FROM accounts WHERE empire_id = ?")
@@ -63,19 +63,15 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
     return null
   }
 
-  fun getByVerificationCode(emailVerificationCode: String?): Pair<String?, Account>? {
-    try {
-      newReader()
-          .stmt("SELECT cookie, account FROM accounts WHERE email_verification_code = ?")
-          .param(0, emailVerificationCode)
-          .query().use { res ->
-            if (res.next()) {
-              return Pair(res.getString(0), Account.ADAPTER.decode(res.getBytes(1)))
-            }
+  fun getByVerificationCode(emailVerificationCode: String): Pair<String, Account>? {
+    newReader()
+        .stmt("SELECT cookie, account FROM accounts WHERE email_verification_code = ?")
+        .param(0, emailVerificationCode)
+        .query().use { res ->
+          if (res.next()) {
+            return Pair(res.getString(0), Account.ADAPTER.decode(res.getBytes(1)))
           }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
-    }
+        }
     return null
   }
 
@@ -115,8 +111,8 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
 
   @Throws(StoreException::class)
   override fun onOpen(diskVersion: Int): Int {
-    var diskVersion = diskVersion
-    if (diskVersion == 0) {
+    var version = diskVersion
+    if (version == 0) {
       newWriter()
           .stmt("CREATE TABLE accounts (email STRING, cookie STRING, account BLOB)")
           .execute()
@@ -126,25 +122,25 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
       newWriter()
           .stmt("CREATE UNIQUE INDEX UIX_accounts_email ON accounts (email)")
           .execute()
-      diskVersion++
+      version++
     }
-    if (diskVersion == 1) {
+    if (version == 1) {
       newWriter()
           .stmt("DROP INDEX IX_accounts_cookie")
           .execute()
       newWriter()
           .stmt("CREATE UNIQUE INDEX IX_accounts_cookie ON accounts (cookie)")
           .execute()
-      diskVersion++
+      version++
     }
-    if (diskVersion == 2) {
+    if (version == 2) {
       newWriter()
           .stmt("ALTER TABLE accounts ADD COLUMN empire_id INTEGER")
           .execute()
       updateAllAccounts()
-      diskVersion++
+      version++
     }
-    if (diskVersion == 3) {
+    if (version == 3) {
       newWriter()
           .stmt("ALTER TABLE accounts ADD COLUMN email_verification_code STRING")
           .execute()
@@ -154,9 +150,9 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
       newWriter()
           .stmt("CREATE UNIQUE INDEX IX_accounts_email_verification_code ON accounts (email_verification_code)")
           .execute()
-      diskVersion++
+      version++
     }
-    if (diskVersion == 4) {
+    if (version == 4) {
       // Email account needs to be non-unique (we could have unverified emails associated with
       // multiple accounts). Email + email_status=VERIFIED needs to be unique, but we can't really
       // do that with a simple index.
@@ -166,9 +162,9 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
       newWriter()
           .stmt("CREATE INDEX IX_accounts_email ON accounts (email)")
           .execute()
-      diskVersion++
+      version++
     }
-    return diskVersion
+    return version
   }
 
   /** Called by [.onOpen] when we need to re-save the accounts (after adding a column)  */
@@ -177,7 +173,7 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
     val res = newReader()
         .stmt("SELECT cookie, account FROM accounts")
         .query()
-    while (res!!.next()) {
+    while (res.next()) {
       try {
         val cookie = res.getString(0)
         val account = Account.ADAPTER.decode(res.getBytes(1))

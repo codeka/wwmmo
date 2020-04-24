@@ -8,13 +8,11 @@ import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.store.SectorsStore.SectorState
 import au.com.codeka.warworlds.server.world.EmpireManager
-import au.com.codeka.warworlds.server.world.WatchableObject
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder
 import java.util.*
 
 /** Handler for /admin/ajax/sectors requests.  */
 class AjaxSectorsHandler : AjaxHandler() {
-  @Throws(RequestException::class)
   public override fun get() {
     when (request.getParameter("action")) {
       "find-empty" -> handleFindEmptyRequest()
@@ -25,7 +23,10 @@ class AjaxSectorsHandler : AjaxHandler() {
   }
 
   private fun handleFindEmptyRequest() {
-    setResponseJson(DataStore.i.sectors().findSectorByState(SectorState.Empty))
+    val sectorCoord = DataStore.i.sectors().findSectorByState(SectorState.Empty)
+    if (sectorCoord != null) {
+      setResponseJson(sectorCoord)
+    }
   }
 
   private fun handleCreateEmpireRequest() {
@@ -62,7 +63,7 @@ class AjaxSectorsHandler : AjaxHandler() {
   }
 
   private fun handleExpandRequest() {
-    DataStore.Companion.i.sectors().expandUniverse()
+    DataStore.i.sectors().expandUniverse()
   }
 
   /** Class that's sent to the client via Gson-encoder.  */
@@ -75,9 +76,5 @@ class AjaxSectorsHandler : AjaxHandler() {
     fun log(msg: String?) {
       logs.add(msg)
     }
-  }
-
-  companion object {
-    private val log = Log("AjaxSectorsHandler")
   }
 }

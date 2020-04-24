@@ -13,7 +13,7 @@ class AjaxUsersHandler : AjaxHandler() {
         val emailAddr = request.getParameter("email_addr")
         handleDeleteRequest(emailAddr)
       }
-      else -> throw RequestException(400, "Unknown action: " + request.getParameter("action"))
+      else -> throw RequestException(400, "Unknown action: ${request.getParameter("action")}")
     }
   }
 

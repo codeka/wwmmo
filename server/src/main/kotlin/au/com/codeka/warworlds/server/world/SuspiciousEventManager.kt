@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.world
 
-import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
 import au.com.codeka.warworlds.server.concurrency.TaskRunner
 import au.com.codeka.warworlds.server.concurrency.Threads
@@ -14,11 +13,22 @@ import javax.annotation.concurrent.GuardedBy
  * A manager for managing the suspicious event store.
  */
 class SuspiciousEventManager {
+  companion object {
+    val i = SuspiciousEventManager()
+
+    /**
+     * Delay from receiving the first suspicious modification until we store it. To avoid
+     * overloading the store with lots of stores.
+     */
+    private const val STORE_DELAY_MS = 30000L
+  }
+
   /**
    * A queue of suspicious events that we're waiting to add to the store. The long in the pair is
    * for the timestamp of the event.
    */
-  private val suspiciousModificationExceptionQueue: Queue<Pair<Long, SuspiciousModificationException>> = ArrayDeque()
+  private val suspiciousModificationExceptionQueue =
+      ArrayDeque<Pair<Long, SuspiciousModificationException>>()
 
   @GuardedBy("suspiciousModificationExceptionQueue")
   private var storeTaskQueued = false
@@ -32,7 +42,7 @@ class SuspiciousEventManager {
     synchronized(suspiciousModificationExceptionQueue) {
       suspiciousModificationExceptionQueue.add(Pair(System.currentTimeMillis(), e))
       if (!storeTaskQueued) {
-        TaskRunner.Companion.i.runTask(storeQueuedTask, Threads.BACKGROUND, STORE_DELAY_MS)
+        TaskRunner.i.runTask(storeQueuedTask, Threads.BACKGROUND, STORE_DELAY_MS)
         storeTaskQueued = true
       }
     }
@@ -57,26 +67,15 @@ class SuspiciousEventManager {
     }
     val events: ArrayList<SuspiciousEvent> = ArrayList<SuspiciousEvent>()
     for (pair in exceptions) {
-      val timestamp = pair.one!!
+      val timestamp = pair.one
       val e = pair.two
       events.add(SuspiciousEvent.Builder()
           .timestamp(timestamp)
-          .star_id(e!!.starId)
+          .star_id(e.starId)
           .modification(e.modification)
           .message(e.message)
           .build())
     }
-    DataStore.Companion.i.suspiciousEvents().add(events)
-  }
-
-  companion object {
-    private val log = Log("SuspiciousEventManager")
-    val i = SuspiciousEventManager()
-
-    /**
-     * Delay from receiving the first suspicious modification until we store it. To avoid overloading
-     * the store with lots of stores.
-     */
-    private const val STORE_DELAY_MS = 30000
+    DataStore.i.suspiciousEvents().add(events)
   }
 }

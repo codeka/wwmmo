@@ -43,7 +43,7 @@ open class RequestHandler {
     this.response = response
   }
 
-  protected fun getUrlParameter(name: String?): String? {
+  protected fun getUrlParameter(name: String): String? {
     return try {
       routeMatcher.group(name)
     } catch (e: IllegalArgumentException) {
@@ -105,10 +105,6 @@ open class RequestHandler {
     throw RequestException(501)
   }
 
-  protected fun setCacheTime(hours: Float) {
-    setCacheTime(hours, null)
-  }
-
   /**
    * Sets the required headers so that the client will know this response can be cached for the
    * given number of hours. The default response includes no caching headers.
@@ -117,17 +113,19 @@ open class RequestHandler {
    * @param etag An optional value to include in the ETag header. This can be any string at all,
    * and we will hash and base-64 encode it for you.
    */
-  protected fun setCacheTime(hours: Float, etag: String?) {
-    var etag = etag
-    response.setHeader("Cache-Control", String.format(Locale.US, "private, max-age=%d", (hours * 3600).toInt()))
+  protected fun setCacheTime(hours: Float, etag: String? = null) {
+    response.setHeader(
+        "Cache-Control",
+        String.format(Locale.US, "private, max-age=%d", (hours * 3600).toInt()))
     if (etag != null) {
-      etag = BaseEncoding.base64().encode(
-          Hashing.sha256().hashString(etag, Charset.defaultCharset()).asBytes())
-      response.setHeader("ETag", String.format("\"%s\"", etag))
+      val encodedETag =
+          BaseEncoding.base64().encode(
+              Hashing.sha256().hashString(etag, Charset.defaultCharset()).asBytes())
+      response.setHeader("ETag", "\"${encodedETag}\"")
     }
   }
 
-  protected fun setResponseText(text: String?) {
+  protected fun setResponseText(text: String) {
     response.contentType = "text/plain"
     response.characterEncoding = "utf-8"
     try {
@@ -137,7 +135,7 @@ open class RequestHandler {
     }
   }
 
-  protected fun setResponseJson(pb: Message<*, *>?) {
+  protected fun setResponseJson(pb: Message<*, *>) {
     response.contentType = "application/json"
     response.characterEncoding = "utf-8"
     try {
@@ -161,7 +159,7 @@ open class RequestHandler {
     }
   }
 
-  protected fun setResponseGson(obj: Any?) {
+  protected fun setResponseGson(obj: Any) {
     response.contentType = "application/json"
     response.characterEncoding = "utf-8"
     try {
@@ -176,22 +174,14 @@ open class RequestHandler {
     }
   }
 
-  protected fun redirect(url: String?) {
+  protected fun redirect(url: String) {
     response.status = 302
     response.addHeader("Location", url)
   }
 
-  // should never happen!
-
-  // TODO(dean): is hard-coding the https part for game.war-worlds.com the best way? no...
-  protected val requestUrl: String?
-    protected get() {
-      val requestURI: URI
-      requestURI = try {
-        URI(request.requestURL.toString())
-      } catch (e: URISyntaxException) {
-        return null // should never happen!
-      }
+  protected val requestUrl: String
+    get() {
+      val requestURI = URI(request.requestURL.toString())
 
       // TODO(dean): is hard-coding the https part for game.war-worlds.com the best way? no...
       return if (requestURI.host == "game.war-worlds.com") {
@@ -201,28 +191,19 @@ open class RequestHandler {
       }
     }
 
-  private fun <T> getRequestJson(protoType: Class<T>): T? {
-    val json: String
-    json = try {
-      val scanner = Scanner(request.inputStream, request.characterEncoding)
-          .useDelimiter("\\A")
-      if (scanner.hasNext()) scanner.next() else ""
-    } catch (e: IOException) {
-      return null
-    }
+  private fun <T> getRequestJson(protoType: Class<T>): T {
+    val scanner = Scanner(request.inputStream, request.characterEncoding)
+        .useDelimiter("\\A")
+    val json = if (scanner.hasNext()) scanner.next() else ""
     return fromJson(json, protoType)
   }
 
-  protected fun <T> fromJson(json: String?, protoType: Class<T>?): T? {
-    return try {
-      val gson = GsonBuilder()
-          .registerTypeAdapterFactory(WireTypeAdapterFactory())
-          .disableHtmlEscaping()
-          .create()
-      gson.fromJson(json, protoType)
-    } catch (e: Exception) {
-      null
-    }
+  protected fun <T> fromJson(json: String, protoType: Class<T>): T {
+    val gson = GsonBuilder()
+        .registerTypeAdapterFactory(WireTypeAdapterFactory())
+        .disableHtmlEscaping()
+        .create()
+    return gson.fromJson(json, protoType)
   }
 
   /** Get details about the given request as a string (for debugging).  */
@@ -231,7 +212,6 @@ open class RequestHandler {
       ${request.requestURI}
       X-Real-IP: ${request.getHeader("X-Real-IP")}
       User-Agent: ${request.getHeader("User-Agent")}
-
       """.trimIndent()
   }
 }

@@ -43,12 +43,16 @@ enum class Threads {
     }
 
   fun runTask(runnable: Runnable) {
-    if (threadPool != null) {
-      threadPool!!.runTask(runnable)
-    } else if (taskQueue != null) {
-      taskQueue!!.postTask(runnable)
-    } else {
-      throw IllegalStateException("Cannot run task, no handler, taskQueue or threadPool!")
+    when {
+      threadPool != null -> {
+        threadPool!!.runTask(runnable)
+      }
+      taskQueue != null -> {
+        taskQueue!!.postTask(runnable)
+      }
+      else -> {
+        throw IllegalStateException("Cannot run task, no handler, taskQueue or threadPool!")
+      }
     }
   }
 

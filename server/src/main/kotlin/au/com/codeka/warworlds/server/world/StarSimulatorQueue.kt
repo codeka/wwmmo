@@ -2,8 +2,6 @@ package au.com.codeka.warworlds.server.world
 
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.Time
-import au.com.codeka.warworlds.common.proto.Star
-import au.com.codeka.warworlds.common.proto.StarModification
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
 import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.store.StarsStore
@@ -18,7 +16,7 @@ import kotlin.concurrent.withLock
  */
 class StarSimulatorQueue private constructor() {
   private val thread: Thread
-  private val stars: StarsStore
+  private val stars: StarsStore = DataStore.i.stars()
   private var running = false
   private val lock = ReentrantLock()
   private val pinger = lock.newCondition()
@@ -63,7 +61,7 @@ class StarSimulatorQueue private constructor() {
           }
         }
         if (waitTime <= 0) {
-          waitTime = 1 // 1 millisecond to ensure that we actually sleep at least a litte.
+          waitTime = 1 // 1 millisecond to ensure that we actually sleep at least a little.
         }
 
         // Don't sleep for more than 10 minutes, we'll just loop around and check again.
@@ -80,9 +78,9 @@ class StarSimulatorQueue private constructor() {
         }
         if (star != null) {
           val startTime = System.nanoTime()
-          val watchableStar = StarManager.i.getStar(star.id)
+          val watchableStar = StarManager.i.getStarOrError(star.id)
           try {
-            StarManager.i.modifyStar(watchableStar, Lists.newArrayList(), null /* logHandler */)
+            StarManager.i.modifyStar(watchableStar, Lists.newArrayList())
           } catch (e: SuspiciousModificationException) {
             // Shouldn't ever happen, as we're passing an empty list of modifications.
             log.warning("Unexpected suspicious modification.", e)
@@ -104,7 +102,6 @@ class StarSimulatorQueue private constructor() {
   }
 
   init {
-    stars = DataStore.Companion.i.stars()
     thread = Thread(Runnable { this.run() }, "StarSimulateQueue")
   }
 }

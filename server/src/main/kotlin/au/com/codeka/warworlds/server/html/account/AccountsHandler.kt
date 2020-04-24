@@ -69,13 +69,8 @@ class AccountsHandler : ProtobufRequestHandler() {
     }
 
     // Make a new account with all the details.
-    val acct = Account.Builder()
-        .empire_id(empire.get().id)
-        .build()
+    val acct = Account.Builder().empire_id(empire.get().id).build()
     DataStore.i.accounts().put(cookie, acct)
-    writeProtobuf(
-        NewAccountResponse.Builder()
-            .cookie(cookie)
-            .build())
+    writeProtobuf(NewAccountResponse.Builder().cookie(cookie).build())
   }
 }

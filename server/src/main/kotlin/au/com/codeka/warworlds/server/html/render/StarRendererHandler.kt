@@ -1,61 +1,37 @@
 package au.com.codeka.warworlds.server.html.render
 
 import au.com.codeka.warworlds.common.Log
-import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.world.StarManager
-import au.com.codeka.warworlds.server.world.WatchableObject
 import java.io.File
 import java.util.*
 
-/**
- * [RendererHandler] for rendering stars.
- */
+/** [RendererHandler] for rendering stars. */
 class StarRendererHandler : RendererHandler() {
-  @Throws(RequestException::class)
+  private val log = Log("StarRendererHandler")
+
   public override fun get() {
-    val starId = getUrlParameter("star")!!.toLong()
-    val width = getUrlParameter("width")!!.toInt()
-    val height = getUrlParameter("height")!!.toInt()
+    val starId = getUrlParameter("star")?.toLong() ?: throw RequestException(404, "Invalid star")
+    val width = getUrlParameter("width")?.toInt() ?: throw RequestException(404, "Invalid width")
+    val height = getUrlParameter("height")?.toInt() ?: throw RequestException(404, "Invalid height")
     val bucket = getUrlParameter("bucket")
-    val factor: Float? = BUCKET_FACTORS[bucket]
-    if (factor == null) {
-      log.warning("Invalid bucket: %s", request.pathInfo)
-      response.status = 404
-      return
-    }
-    val cacheFile = File(String.format(Locale.ENGLISH,
-        "data/cache/star/%d/%dx%d/%s.png", starId, width, height, bucket))
+    val factor = BUCKET_FACTORS[bucket] ?: throw RequestException(404, "Invalid bucket")
+
+    val cacheFile = File("data/cache/star/${starId}/${width}x${height}/${bucket}.png")
     if (cacheFile.exists()) {
       serveCachedFile(cacheFile)
       return
-    } else {
-      cacheFile.parentFile.mkdirs()
     }
+    cacheFile.parentFile.mkdirs()
+
+    val star = StarManager.i.getStarOrError(starId)
     val rand = Random(starId)
-    val star: WatchableObject<Star>? = StarManager.i.getStar(starId)
-    if (star == null) {
-      log.warning("Couldn't load star: %s", request.pathInfo)
-      response.status = 404
-      return
-    }
     val templateFile = getTemplateFile(rand, "star", star.get().classification.toString())
-    if (templateFile == null) {
-      response.status = 500
-      return
-    }
     val startTime = System.nanoTime()
-    if (!generateImage(cacheFile, templateFile, null, width, height, factor, rand)) {
-      response.status = 500
-      return
-    }
+    generateImage(cacheFile, templateFile, null, width, height, factor, rand)
     val endTime = System.nanoTime()
-    log.info("%dms to generate image for %s",
-        (endTime - startTime) / 1000000L, request.pathInfo)
+    log.info("%dms to generate image for %s", (endTime - startTime) / 1000000L, request.pathInfo)
     serveCachedFile(cacheFile)
   }
 
-  companion object {
-    private val log = Log("StarRendererHandler")
-  }
 }

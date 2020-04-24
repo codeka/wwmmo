@@ -7,7 +7,6 @@ import au.com.codeka.warworlds.server.store.DataStore
 import java.util.*
 
 class DebugMovingFleetsHandler : AdminHandler() {
-  @Throws(RequestException::class)
   override fun get() {
     val data = TreeMap<String, Any>()
 
@@ -17,7 +16,7 @@ class DebugMovingFleetsHandler : AdminHandler() {
     val stars = HashMap<Long, Star>()
     val fleetStars = HashMap<Long, Star>()
     val fleets = ArrayList<Fleet>()
-    for (star in DataStore.Companion.i.stars().fetchSimulationQueue(100)) {
+    for (star in DataStore.i.stars().fetchSimulationQueue(100)) {
       stars[star.id] = star
       for (fleet in star.fleets) {
         if (fleet.state == Fleet.FLEET_STATE.MOVING) {

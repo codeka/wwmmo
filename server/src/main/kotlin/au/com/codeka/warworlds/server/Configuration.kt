@@ -37,6 +37,7 @@ class Configuration private constructor() {
 
   @Expose
   val limits: LimitsConfig? = null
+
   private var firebaseCredentials: GoogleCredentials? = null
 
   /** Loads the [Configuration] from the given file and sets it to `Configuration.i`.  */
@@ -49,7 +50,9 @@ class Configuration private constructor() {
     }
     log.info("Loading config from: %s", fileName)
     val gson = GsonBuilder()
-        .registerTypeAdapter(Configuration::class.java, InstanceCreator { type: Type? -> i } as InstanceCreator<Configuration>)
+        .registerTypeAdapter(
+            Configuration::class.java,
+            InstanceCreator { i } as InstanceCreator<Configuration>)
         .create()
     val jsonReader = JsonReader(FileReader(fileName))
     jsonReader.isLenient = true // allow comments (and a few other things)
@@ -112,7 +115,8 @@ class Configuration private constructor() {
   companion object {
     val i = Configuration()
     private val log = Log("Configuration")
-    private val FIREBASE_SCOPES: Collection<String> = Lists.newArrayList("https://www.googleapis.com/auth/firebase.messaging")
+    private val FIREBASE_SCOPES: Collection<String> =
+        Lists.newArrayList("https://www.googleapis.com/auth/firebase.messaging")
   }
 
   init {

@@ -20,5 +20,4 @@ class Session(val cookie: String, private val adminUser: AdminUser?, val loginTi
     }
     return false
   }
-
 }

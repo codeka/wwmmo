@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.server.admin.handlers
 
 import au.com.codeka.warworlds.common.proto.Account
 import au.com.codeka.warworlds.common.proto.Empire
-import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.store.DataStore
 import com.google.common.collect.ImmutableMap
 import java.util.*
@@ -12,7 +11,6 @@ import java.util.*
  * accounts and then match them to the empire.
  */
 class EmpiresHandler : AdminHandler() {
-  @Throws(RequestException::class)
   public override fun get() {
     val accounts: ArrayList<Account> = DataStore.i.accounts().search()
     val empires = HashMap<Long, Empire?>()

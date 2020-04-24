@@ -3,9 +3,7 @@ package au.com.codeka.warworlds.server.handlers
 import java.util.*
 import javax.servlet.http.HttpServletResponse
 
-/**
- * This exception is thrown when you want to pass an error back to the client.
- */
+/** This exception is thrown when you want to pass an error back to the client. */
 class RequestException : Exception {
   var errorCode = 0
     private set
@@ -45,12 +43,13 @@ class RequestException : Exception {
     }
 
     private fun <T : Exception?> findInnerException(e: Throwable, exceptionType: Class<T>): T? {
-      var e: Throwable? = e
-      while (e != null) {
-        if (e.javaClass == exceptionType) {
-          return e as T
+      var inner: Throwable? = e
+      while (inner != null) {
+        if (inner.javaClass == exceptionType) {
+          @Suppress("UNCHECKED_CAST")
+          return inner as T
         }
-        e = e.cause
+        inner = inner.cause
       }
       return null
     }

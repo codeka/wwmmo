@@ -9,7 +9,6 @@ import au.com.codeka.warworlds.server.html.AuthenticatedRequestHandler
 import com.google.common.io.BaseEncoding
 
 class PatreonBeginHandler : AuthenticatedRequestHandler() {
-  @Throws(RequestException::class)
   public override fun post() {
     val req = readProtobuf(PatreonBeginRequest::class.java)
     if (req.empire_id != authenticatedEmpire!!.get().id) {
