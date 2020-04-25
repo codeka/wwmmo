@@ -1,4 +1,4 @@
-var currentEmpire = null;
+var currentEmpireID = null;
 
 $("#find-byemailidname").on("submit", function(evnt) {
   evnt.preventDefault();
@@ -105,38 +105,12 @@ $("#empire-query").on("click", ":submit", function(evnt) {
 });
 
 $("#empire-list").on("click", "a.empire-name", function() {
-  fetchEmpire($(this).data("id"));
+   currentEmpireID = $(this).data("id");
+   $("#search-results")
+       .removeClass("code")
+       .html($("#empire-details").applyTemplate({}));
+   tabs.refresh();
 });
-
-function fetchEmpire(id) {
-  $.ajax({
-    url: "/realms/{{realm}}/empires/search?ids="+id,
-    dataType: "json",
-    cache: false,
-    success: function (data, status, xhr) {
-      setTimeout(function() {
-        $("#search-time").html("<b>Time:</b> "+xhr.elapsedMs+"ms");
-      }, 10);
-      var tmpl = $("#empire-details");
-      var emp = data.empires[0];
-      if (!emp["home_star"]) {
-        emp.home_star = null;
-      }
-      if (!emp["alliance"]) {
-        emp.alliance = null;
-      }
-      currentEmpire = emp;
-      $("#search-results").removeClass("code").html(tmpl.applyTemplate(emp));
-    },
-    error: function(xhr, status, err) {
-      if (xhr.status == 404) {
-        $("#search-results").val("No empire!");
-      } else {
-        alert("An error occurred, check server logs: " + xhr.status);
-      }
-    }
-  });
-}
 
 function fetchEmpireList(query) {
   var $tbody = $("#empire-list tbody");
@@ -179,12 +153,12 @@ $(function() {
 });
 
 $("body").on("tab:show", "#empire-logins-tab", function() {
-  if (currentEmpire == null) {
+  if (currentEmpireID == null) {
     return;
   }
 
   $.ajax({
-      url: "/realms/{{realm}}/admin/empire/" + currentEmpire.key + "/logins",
+      url: "/realms/{{realm}}/admin/empire/" + currentEmpireID + "/logins",
       success: function(data) {
         $("#empire-logins-tab").html(data);
       }
@@ -192,15 +166,28 @@ $("body").on("tab:show", "#empire-logins-tab", function() {
 });
 
 $("body").on("tab:show", "#empire-sitrep-tab", function() {
-  if (currentEmpire == null) {
+  if (currentEmpireID == null) {
     return;
   }
 
   $.ajax({
-       url: "/realms/{{realm}}/sit-reports?empireId=" + currentEmpire.key,
+       url: "/realms/{{realm}}/sit-reports?empireId=" + currentEmpireID,
        dataType: "json",
        success: function(data) {
          $("#empire-sitrep-tab").html("<code><pre>" + JSON.stringify(data, null, "  ") + "</pre></code>");
+       }
+  });
+});
+
+$("body").on("tab:show", "#empire-details-tab", function() {
+  if (currentEmpireID == null) {
+    return;
+  }
+
+  $.ajax({
+       url: "/realms/{{realm}}/admin/empire/" + currentEmpireID + "/details",
+       success: function(data) {
+         $("#empire-details-tab").html(data);
        }
   });
 });

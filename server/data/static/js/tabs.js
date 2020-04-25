@@ -13,7 +13,7 @@
 // And makes the tabs clickable and stuff.
 //
 
-$(function() {
+var tabs = (function() {
  function refreshVisibleTabs(tabs) {
     $("a", tabs).each(function(i, tab) {
       var tabId = $(tab).data("tab");
@@ -30,11 +30,19 @@ $(function() {
     });
   }
 
-  refreshVisibleTabs($(".tabs"));
+  $(function() {
+    refreshVisibleTabs($(".tabs"));
 
-  $("body").on("click", ".tabs a", function() {
-    $(this).parents(".tabs").find("a").removeClass("selected");
-    $(this).addClass("selected");
-    refreshVisibleTabs($(this).parents(".tabs"));
+    $("body").on("click", ".tabs a", function() {
+      $(this).parents(".tabs").find("a").removeClass("selected");
+      $(this).addClass("selected");
+      refreshVisibleTabs($(this).parents(".tabs"));
+    });
   });
-});
+
+  return {
+    refresh: function() {
+      refreshVisibleTabs($(".tabs"));
+    }
+  }
+})();

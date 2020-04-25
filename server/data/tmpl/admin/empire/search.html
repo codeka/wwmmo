@@ -5,6 +5,7 @@
   <script src="/realms/{{realm}}/js/hashparams.js"></script>
   <script src="/realms/{{realm}}/js/tabs.js"></script>
   <script src="/realms/{{realm}}/js/time.js"></script>
+  <script src="https://www.google.com/jsapi"></script>
   <link rel="stylesheet" href="/realms/{{realm}}/admin/empire/search.css">
 {% end %}
 
@@ -61,39 +62,12 @@
       <li><a href="javascript:;" data-tab="empire-sitrep-tab">Sit. Reports</a>
     </ul>
 
-    <div id="empire-details-tab">
-      <h1>[# <%= key %>] <%= display_name %></h1>
-      <p><b>Email: </b> <%= email %></p>
-      <p><b>State: </b> <%= state %></p>
-      <p><b>Cash: </b> $<%= cash64 %></p>
-      <% if (rank) { %>
-        <p><b>Rank: </b> <b><%= rank.rank %></b>
-            Stars: <%= rank.total_stars %>
-            Colonies: <%= rank.total_colonies %>
-            Ships: <%= rank.total_ships %>
-            Building: <%= rank.total_buildings %>
-            Population: <%= rank.total_population %></p>
-      <% } %>
-
-      <p><b>Home star</b></p>
-      <% if (home_star) { %>
-        <p><%= home_star.name %></p>
-      <% } else { %>
-        <p><em>None</em></p>
-      <% } %>
-
-      <p><b>Alliance</b></p>
-      <% if (alliance) { %>
-        <p><%= alliance.name %></p>
-      <% } else { %>
-        <p><em>None</em></p>
-      <% } %>
+    <div id="empire-details-tab" style="display: none;">
+      <div class="spinner"></div>
     </div>
-
     <div id="empire-logins-tab" style="display: none;">
       <div class="spinner"></div>
     </div>
-
     <div id="empire-sitrep-tab" style="display: none;">
       <div class="spinner"></div>
     </div>
