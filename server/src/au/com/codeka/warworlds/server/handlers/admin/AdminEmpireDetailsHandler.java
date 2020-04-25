@@ -44,9 +44,15 @@ public class AdminEmpireDetailsHandler extends AdminHandler {
       graphEntry.put("date", new DateTime(year, month + 1, day, hour, 0, 0));
       graphEntry.put("total", stat.getTotalRequests());
       graphEntry.put("empireRequests", 0);
+      graphEntry.put("empireNotRateLimited", 0);
+      graphEntry.put("empireSoftRateLimited", 0);
+      graphEntry.put("empireHardRateLimited", 0);
       for (Messages.RequestStatEmpireHour empireHour : stat.getEmpireList()) {
         if (empireHour.getEmpireId() == empireID) {
           graphEntry.put("empireRequests", empireHour.getTotalRequests());
+          graphEntry.put("empireNotRateLimited", empireHour.getTotalNotRateLimited());
+          graphEntry.put("empireSoftRateLimited", empireHour.getTotalSoftRateLimited());
+          graphEntry.put("empireHardRateLimited", empireHour.getTotalHardRateLimited());
         }
       }
       requestGraphData.add(graphEntry);

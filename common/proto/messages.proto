@@ -1462,6 +1462,14 @@ message RequestStatSingle {
   optional int32 response_code = 6;
   optional string response_msg = 7;
   optional int64 processing_time_ms = 8;
+
+  enum RateLimit {
+    NOT_RATE_LIMITED = 0;
+    SOFT_RATE_LIMITED = 1;
+    HARD_RATE_LIMITED = 2;
+  }
+
+  optional RateLimit rate_limit = 9;
 }
 
 // The stats for a single empire in a given hour.
@@ -1469,6 +1477,9 @@ message RequestStatEmpireHour {
   optional int32 empire_id = 1;
 
   optional int32 total_requests = 2;
+  optional int32 total_not_rate_limited = 5;
+  optional int32 total_soft_rate_limited = 6;
+  optional int32 total_hard_rate_limited = 7;
   optional int64 avg_processing_time_ms = 3;
 
   message ResponseCodeStat {

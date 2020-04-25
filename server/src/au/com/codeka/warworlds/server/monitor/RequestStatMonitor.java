@@ -48,15 +48,18 @@ public class RequestStatMonitor extends Monitor {
       return;
     }
 
-    // Ignore requests that were rate-limited, as they don't really impact performance much.
+    Messages.RequestStatSingle.RateLimit rateLimit =
+        Messages.RequestStatSingle.RateLimit.NOT_RATE_LIMITED;
+
+    // Mark it hard-rate limited if we're returning status code 429.
     if (response.getStatus() == 429) {
-      return;
+      rateLimit = Messages.RequestStatSingle.RateLimit.HARD_RATE_LIMITED;
     }
 
-    // If this request is being suspended, then ignore it (we'll pick up the replay)
+    // Mark it soft-rate limited if we've suspended the request.
     Continuation cont = ContinuationSupport.getContinuation(request);
     if (cont.isSuspended()) {
-      return;
+      rateLimit = Messages.RequestStatSingle.RateLimit.SOFT_RATE_LIMITED;
     }
 
     synchronized (lock) {
@@ -68,8 +71,12 @@ public class RequestStatMonitor extends Monitor {
           .setMethod(request.getMethod())
           .setPath(request.getPathInfo())
           .setResponseCode(response.getStatus())
-          .setProcessingTimeMs(processTimeMs));
-      stat.setTotalRequests(stat.getTotalRequests() + 1);
+          .setProcessingTimeMs(processTimeMs)
+          .setRateLimit(rateLimit));
+      // Don't add rate-limited requests to the total
+      if (rateLimit == Messages.RequestStatSingle.RateLimit.NOT_RATE_LIMITED) {
+        stat.setTotalRequests(stat.getTotalRequests() + 1);
+      }
     }
   }
 
@@ -154,6 +161,17 @@ public class RequestStatMonitor extends Monitor {
 
       empireHourInfo.processingTimeMs += request.getProcessingTimeMs();
       empireHourInfo.totalRequests ++;
+      switch (request.getRateLimit()) {
+        case NOT_RATE_LIMITED:
+          empireHourInfo.totalNotRateLimited++;
+          break;
+        case SOFT_RATE_LIMITED:
+          empireHourInfo.totalSoftRateLimited++;
+          break;
+        case HARD_RATE_LIMITED:
+          empireHourInfo.totalHardRateLimited++;
+          break;
+      }
 
       EmpireHourResponseCodeInfo empireHourResponseCodeInfo =
           empireHourInfo.responseCodes.get(request.getResponseCode());
@@ -173,7 +191,10 @@ public class RequestStatMonitor extends Monitor {
               .setEmpireId(empireInfo.empireId)
               .setAvgProcessingTimeMs(
                   (long)(empireInfo.processingTimeMs / empireInfo.totalRequests))
-              .setTotalRequests(empireInfo.totalRequests);
+              .setTotalRequests(empireInfo.totalRequests)
+              .setTotalNotRateLimited(empireInfo.totalNotRateLimited)
+              .setTotalSoftRateLimited(empireInfo.totalSoftRateLimited)
+              .setTotalHardRateLimited(empireInfo.totalHardRateLimited);
 
       for (EmpireHourResponseCodeInfo responseCodeInfo : empireInfo.responseCodes.values()) {
         empireHourBuilder.addResponseCodes(
@@ -266,6 +287,9 @@ public class RequestStatMonitor extends Monitor {
     Map<Integer, EmpireHourResponseCodeInfo> responseCodes;
     double processingTimeMs;
     int totalRequests;
+    int totalHardRateLimited;
+    int totalSoftRateLimited;
+    int totalNotRateLimited;
 
     EmpireHourInfo(int empireId) {
       this.empireId = empireId;
