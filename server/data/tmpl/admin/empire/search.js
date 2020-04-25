@@ -178,7 +178,7 @@ $(function() {
   }
 });
 
-$("body").on("click", ".empire-logins-fetch", function() {
+$("body").on("tab:show", "#empire-logins-tab", function() {
   if (currentEmpire == null) {
     return;
   }
@@ -191,7 +191,7 @@ $("body").on("click", ".empire-logins-fetch", function() {
   });
 });
 
-$("body").on("click", ".empire-sitrep-fetch", function() {
+$("body").on("tab:show", "#empire-sitrep-tab", function() {
   if (currentEmpire == null) {
     return;
   }

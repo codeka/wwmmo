@@ -18,10 +18,13 @@ $(function() {
     $("a", tabs).each(function(i, tab) {
       var tabId = $(tab).data("tab");
       if (tabId) {
+        var tabContent = $("#" + tabId);
         if ($(tab).hasClass("selected")) {
-          $("#"+tabId).show();
+          tabContent.show();
+          tabContent.trigger("tab:show");
         } else {
-          $("#"+tabId).hide();
+          tabContent.hide();
+          tabContent.trigger("tab:hide");
         }
       }
     });
