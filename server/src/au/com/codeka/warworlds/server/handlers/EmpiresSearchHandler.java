@@ -60,8 +60,9 @@ public class EmpiresSearchHandler extends RequestHandler {
         maxRank = minRank + 5;
       }
 
-      str = getRequest().getParameter("noLeader");
       empires.addAll(ctrl.getEmpiresByRank(minRank, maxRank));
+
+      str = getRequest().getParameter("noLeader");
       if (minRank > 3 && (str == null || !str.equals("1"))) {
         empires.addAll(ctrl.getEmpiresByRank(1, 3));
       }
@@ -109,11 +110,7 @@ public class EmpiresSearchHandler extends RequestHandler {
       }
       Double taxRate = taxRates.get(empire.getID());
       if (taxRate != null) {
-        log.debug(
-            String.format(Locale.US, "Setting tax for empire %d to %f", empire.getID(), taxRate));
         empire_pb.setTaxesCollectedPerHour(taxRate);
-      } else {
-        log.debug(String.format(Locale.US, "No tax for empire %d", empire.getID()));
       }
       pb.addEmpires(empire_pb);
       etag.append(":");

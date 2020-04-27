@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -66,7 +67,7 @@ public class EmpireController {
 
   public List<Empire> getEmpires(int[] ids) throws RequestException {
     try {
-      return Lists.newArrayList(db.getEmpires(ids));
+      return db.getEmpires(ids);
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -108,7 +109,7 @@ public class EmpireController {
 
   public List<Empire> getEmpiresByName(String name, int limit) throws RequestException {
     try {
-      return Lists.newArrayList(db.getEmpiresByName(name, limit));
+      return db.getEmpiresByName(name, limit);
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -116,7 +117,7 @@ public class EmpireController {
 
   public List<Empire> getEmpiresByRank(int minRank, int maxRank) throws RequestException {
     try {
-      return Lists.newArrayList(db.getEmpiresByRank(minRank, maxRank));
+      return db.getEmpiresByRank(minRank, maxRank);
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -608,7 +609,7 @@ public class EmpireController {
       }
     }
 
-    public Collection<Empire> getEmpires(int[] ids) throws Exception {
+    public List<Empire> getEmpires(int[] ids) throws Exception {
       if (ids.length == 0) {
         return new ArrayList<>();
       }
@@ -625,7 +626,7 @@ public class EmpireController {
         }
 
         populateEmpires(empires);
-        return empires.values();
+        return sortEmpires(empires.values(), EmpiresSortBy.ID);
       }
     }
 
@@ -737,7 +738,7 @@ public class EmpireController {
       }
     }
 
-    public Collection<Empire> getEmpiresByName(String name, int limit) throws Exception {
+    public List<Empire> getEmpiresByName(String name, int limit) throws Exception {
       String sql = getSelectEmpire("empires.name ~* ?", false, limit);
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setString(1, name);
@@ -750,11 +751,11 @@ public class EmpireController {
         }
 
         populateEmpires(empires);
-        return empires.values();
+        return sortEmpires(empires.values(), EmpiresSortBy.NAME);
       }
     }
 
-    public Collection<Empire> getEmpiresByRank(int minRank, int maxRank) throws Exception {
+    public List<Empire> getEmpiresByRank(int minRank, int maxRank) throws Exception {
       String sql = getSelectEmpire(
           "empires.id IN (SELECT empire_id FROM empire_ranks WHERE rank BETWEEN ? AND ?)", false,
           null);
@@ -770,7 +771,7 @@ public class EmpireController {
         }
 
         populateEmpires(empires);
-        return empires.values();
+        return sortEmpires(empires.values(), EmpiresSortBy.RANK);
       }
     }
 
@@ -842,7 +843,6 @@ public class EmpireController {
         sql += "state != 2 AND ";
       }
       sql += whereClause;
-      sql += " ORDER BY empires.id DESC";
       if (limit != null) {
         sql += " LIMIT " + limit;
       }
@@ -875,6 +875,31 @@ public class EmpireController {
           }
         }
       }
+    }
+
+    enum EmpiresSortBy {
+      NAME,
+      RANK,
+      ID
+    }
+
+    private List<Empire> sortEmpires(Collection<Empire> empires, EmpiresSortBy sortBy) {
+      ArrayList<Empire> sorted = new ArrayList<>(empires);
+      sorted.sort((lhs, rhs) -> {
+        switch (sortBy) {
+          case NAME:
+            return lhs.getDisplayName().compareTo(rhs.getDisplayName());
+          case RANK:
+            if (lhs.getRank() != null && rhs.getRank() != null) {
+              return lhs.getRank().getRank() - rhs.getRank().getRank();
+            }
+            // fall through
+          case ID:
+          default:
+            return lhs.getID() - rhs.getID();
+        }
+      });
+      return sorted;
     }
 
     private boolean hasAnyColonies(int empireID) throws Exception {
