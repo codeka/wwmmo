@@ -5,6 +5,11 @@ import java.io.File
 
 /** Wraps our references to the various data store objects.  */
 class DataStore private constructor() {
+  companion object {
+    private val log = Log("DataStore")
+    val i = DataStore()
+  }
+
   private val accounts = AccountsStore("accounts.db")
   private val adminUsers = AdminUsersStore("admin.db")
   private val chat = ChatStore("chat.db")
@@ -14,6 +19,8 @@ class DataStore private constructor() {
   private val stars = StarsStore("stars.db")
   private val stats = StatsStore("stats.db")
   private val suspiciousEvents = SuspiciousEventStore("suss-events.db")
+  private val sitReports = SitReportsStore("sit-reports.db")
+
   fun open() {
     // Make sure we open the sqlite JDBC driver.
     try {
@@ -37,6 +44,7 @@ class DataStore private constructor() {
       stars.open()
       stats.open()
       suspiciousEvents.open()
+      sitReports.open()
     } catch (e: StoreException) {
       log.error("Error creating databases.", e)
       throw RuntimeException(e)
@@ -46,6 +54,7 @@ class DataStore private constructor() {
   fun close() {
     try {
       log.info("Closing data tables...")
+      sitReports.close()
       suspiciousEvents.close()
       stats.close()
       stars.close()
@@ -96,8 +105,7 @@ class DataStore private constructor() {
     return suspiciousEvents
   }
 
-  companion object {
-    private val log = Log("DataStore")
-    val i = DataStore()
+  fun sitReports(): SitReportsStore {
+    return sitReports
   }
 }

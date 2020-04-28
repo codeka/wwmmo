@@ -52,28 +52,18 @@ message SituationReport {
   }
   optional MoveCompleteRecord move_complete_record = 7;
 
-  // A record that's added when a fleet has been destroyed. If this is included with a move complete
-  // record, it means you moved your fleet to an enemy star and they destroyed you. If it's included
-  // with a build complete record, it means you built a fleet of ships while enemy ships were around
-  // your star. If there's no other record, it means another fleet arrived on your star and
-  // destroyed your fleet.
-  //
-  // There can be more than one of these if multiple fleets are destroyed.
-  message FleetDestroyedRecord {
-    // TODO: fill this in
+  // A record that's added when one or more of your fleets have been destroyed, or when they have
+  // destroyed another empire's fleet.
+  message FleetRecord {
+    optional Design.DesignType design_type = 1;
+    optional float num_ships = 2;
   }
-  repeated FleetDestroyedRecord fleet_destroyed_record = 8;
 
-  // A record that's added when your fleet successfully destroys an enemy fleet.
-  //
-  // There can be more than one of these if multiple enemy fleets are destroyed.
-  message FleetVictoriousRecord {
-    optional string fleet_key = 1;
-    optional string fleet_design_id = 2;
-    optional float num_ships = 3;
-    optional string combat_report_key = 4;
-  }
-  repeated FleetVictoriousRecord fleet_victorious_record = 9;
+  // There can be more than one of these if multiple fleets are destroyed/victorious. We don't keep
+  // track of individual fleets or anything, there will always be at most one per design, with the
+  // total number of all fleets combined.
+  repeated FleetRecord fleet_destroyed_record = 8;
+  repeated FleetRecord fleet_victorious_record = 9;
 
   message ColonyDestroyedRecord {
     optional string colony_key = 1;

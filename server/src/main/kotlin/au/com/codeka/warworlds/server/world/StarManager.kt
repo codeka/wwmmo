@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.store.SectorsStore.SectorState
 import au.com.codeka.warworlds.server.store.StarsStore
 import com.google.common.collect.Lists
+import com.google.common.collect.Maps
 import java.util.*
 
 /** Manages stars and keeps the up-to-date in the data store. */
@@ -140,7 +141,7 @@ class StarManager private constructor() {
       logHandler: Simulation.LogHandler) {
     synchronized(star.lock) {
       val starBuilder = star.get().newBuilder()
-      starModifier.modifyStar(starBuilder, auxStars, modifications, logHandler)
+      starModifier.modifyStar(starBuilder, modifications, auxStars, logHandler = logHandler)
       completeActions(star, starBuilder, logHandler)
     }
   }
@@ -178,42 +179,57 @@ class StarManager private constructor() {
         if (br.end_time <= now) {
           // It's finished. Add the actual thing it built.
           val design = DesignHelper.getDesign(br.design_type)
+
+          // Generate a sit report for the build-complete event.
+          val sitReport = SituationReport.Builder()
+              .empire_id(planet.colony.empire_id)
+              .planet_index(planet.index)
+              .star_id(starBuilder.id)
+              .report_time(System.currentTimeMillis())
+              .build_complete_record(SituationReport.BuildCompleteRecord.Builder()
+                  .count(br.count)
+                  .design_type(br.design_type)
+                  .upgrade(br.building_id != null)
+                  .build())
+          val sitReports: MutableMap<Long, SituationReport.Builder> = Maps.newHashMap()
+          sitReports[planet.colony.empire_id] = sitReport
+
           if (design.design_kind == Design.DesignKind.BUILDING) {
             if (br.building_id != null) {
               // It's an existing building that we're upgrading.
               starModifier.modifyStar(starBuilder,
-                  null,
-                  Lists.newArrayList(StarModification.Builder()
+                  StarModification.Builder()
                       .type(StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING)
                       .colony_id(planet.colony.id)
                       .empire_id(planet.colony.empire_id)
                       .building_id(br.building_id)
-                      .build()),
-                  logHandler)
+                      .build(),
+                  sitReports = sitReports,
+                  logHandler = logHandler)
             } else {
               // It's a new building that we're creating.
               starModifier.modifyStar(
                   starBuilder,
-                  null,
-                  Lists.newArrayList(StarModification.Builder()
+                  StarModification.Builder()
                       .type(StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
                       .colony_id(planet.colony.id)
                       .empire_id(planet.colony.empire_id)
                       .design_type(br.design_type)
-                      .build()),
-                  logHandler)
+                      .build(),
+                  sitReports = sitReports,
+                  logHandler = logHandler)
             }
           } else {
             starModifier.modifyStar(
                 starBuilder,
-                null,
-                Lists.newArrayList(StarModification.Builder()
+                StarModification.Builder()
                     .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
                     .empire_id(planet.colony.empire_id)
                     .design_type(br.design_type)
                     .count(br.count)
-                    .build()),
-                logHandler)
+                    .build(),
+                sitReports = sitReports,
+                logHandler = logHandler)
           }
 
           // Subtract the minerals it used last turn (since that won't have happening in the
@@ -227,7 +243,8 @@ class StarManager private constructor() {
           starBuilder.empire_stores[storageIndex] =
               starBuilder.empire_stores[storageIndex].newBuilder().total_minerals(minerals).build()
 
-          // TODO: add a sitrep as well
+          // Save the situation reports to the data store.
+          DataStore.i.sitReports().save(sitReports.values.map { sr -> sr.build() })
         } else {
           if (nextSimulateTime == null || nextSimulateTime > br.end_time) {
             nextSimulateTime = br.end_time
@@ -269,13 +286,12 @@ class StarManager private constructor() {
           val destStarBuilder = destStar.get().newBuilder()
           starModifier.modifyStar(
               destStarBuilder,
-              null,
-              Lists.newArrayList(StarModification.Builder()
+              StarModification.Builder()
                   .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
                   .empire_id(fleet.empire_id)
                   .fleet(fleet)
-                  .build()),
-              logHandler)
+                  .build(),
+              logHandler = logHandler)
           destStar.set(destStarBuilder.build())
         }
 

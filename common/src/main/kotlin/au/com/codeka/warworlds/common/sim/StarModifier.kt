@@ -18,34 +18,16 @@ import kotlin.math.max
 
 /** Class for handling modifications to a star. */
 class StarModifier(private val identifierGenerator: () -> Long) {
-
   /**
-   * Modify the given [Star.Builder] with the given [StarModification].
-   *
-   * @param star The star to modify.
-   * @param modification The modification to apply.
-   * @throws SuspiciousModificationException when the modification seems suspicious, or isn't
-   * otherwise allowed (e.g. you're trying to modify another empire's star, for example).
-   */
-  fun modifyStar(star: Star.Builder, modification: StarModification) {
-    modifyStar(star, null, Lists.newArrayList(modification), null)
-  }
-
-  /**
-   * Modify the given [Star.Builder] with the given [StarModification].
-   *
-   * @param star The star to modify.
-   * @param modification The modification to apply.
-   * @param logHandler A [Simulation.LogHandler] to write logs to. Can be null if you don't
-   *        want to log.
-   * @throws SuspiciousModificationException when the modification seems suspicious, or isn't
-   *         otherwise allowed (e.g. you're trying to modify another empire's star, for example).
+   * Modify a star, and possibly other auxiliary stars.
    */
   fun modifyStar(
       star: Star.Builder,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
-    modifyStar(star, null, Lists.newArrayList(modification), logHandler)
+      auxStars: Collection<Star>? = null,
+      sitReports: MutableMap<Long, SituationReport.Builder>? = null,
+      logHandler: Simulation.LogHandler? = null) {
+    modifyStar(star, Lists.newArrayList(modification), auxStars, sitReports, logHandler)
   }
 
   /**
@@ -56,6 +38,8 @@ class StarModifier(private val identifierGenerator: () -> Long) {
    * @param auxStars A collection of auxiliary stars that we may need while modifying this star (for
    *        example, MOVE_FLEET needs to know about the destination). These are not simulated.
    * @param modifications The list of [StarModification]s to apply.
+   * @param sitReports If specified, we'll populate the situation reports whenever something report-
+   *        worthy happens (usually combat).
    * @param logHandler An optional [Simulation.LogHandler] that we'll pass through all log
    *        messages to.
    * @throws SuspiciousModificationException when the modification seems suspicious, or isn't
@@ -63,9 +47,10 @@ class StarModifier(private val identifierGenerator: () -> Long) {
    */
   fun modifyStar(
       star: Star.Builder,
-      auxStars: Collection<Star>?,
       modifications: Collection<StarModification>,
-      logHandler: Simulation.LogHandler?) {
+      auxStars: Collection<Star>? = null,
+      sitReports: MutableMap<Long, SituationReport.Builder>? = null,
+      logHandler: Simulation.LogHandler? = null) {
     val log = logHandler ?: EMPTY_LOG_HANDLER
     log.log("Applying " + modifications.size + " modifications.")
     if (modifications.isNotEmpty()) {
@@ -74,7 +59,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
         applyModification(star, auxStars, modification, log)
       }
     }
-    Simulation(log).simulate(star)
+    Simulation(log).simulate(star, sitReports)
   }
 
   private fun applyModification(

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.store
 
-import au.com.codeka.warworlds.server.store.StoreException
 import au.com.codeka.warworlds.server.store.base.BaseStore
 
 /**

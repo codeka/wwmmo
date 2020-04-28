@@ -1,9 +1,7 @@
 package au.com.codeka.warworlds.server.store
 
-import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.ChatMessage
 import au.com.codeka.warworlds.common.proto.ChatRoom
-import au.com.codeka.warworlds.server.store.StoreException
 import au.com.codeka.warworlds.server.store.base.BaseStore
 import java.util.*
 
@@ -16,17 +14,13 @@ class ChatStore internal constructor(fileName: String) : BaseStore(fileName) {
    * history.
    */
   fun send(room: ChatRoom, msg: ChatMessage) {
-    try {
-      newWriter()
-          .stmt("INSERT INTO messages (id, room_id, date, msg) VALUES (?, ?, ?, ?)")
-          .param(0, msg.id)
-          .param(1, room.id)
-          .param(2, msg.date_posted)
-          .param(3, msg.encode())
-          .execute()
-    } catch (e: StoreException) {
-      log.error("Unexpected.", e)
-    }
+    newWriter()
+        .stmt("INSERT INTO messages (id, room_id, date, msg) VALUES (?, ?, ?, ?)")
+        .param(0, msg.id)
+        .param(1, room.id)
+        .param(2, msg.date_posted)
+        .param(3, msg.encode())
+        .execute()
   }
 
   /**
@@ -36,32 +30,27 @@ class ChatStore internal constructor(fileName: String) : BaseStore(fileName) {
   fun getMessages(roomId: Long?, startTime: Long, endTime: Long): List<ChatMessage> {
     val reader = newReader()
     if (roomId == null) {
-      reader!!.stmt("SELECT msg FROM messages WHERE room_id IS NULL AND date > ? AND date <= ?")
+      reader.stmt("SELECT msg FROM messages WHERE room_id IS NULL AND date > ? AND date <= ?")
           .param(0, startTime)
           .param(1, endTime)
     } else {
-      reader!!.stmt("SELECT msg FROM messages WHERE room_id = ? AND date > ? AND date <= ?")
+      reader.stmt("SELECT msg FROM messages WHERE room_id = ? AND date > ? AND date <= ?")
           .param(0, roomId)
           .param(1, startTime)
           .param(2, endTime)
     }
     val msgs = ArrayList<ChatMessage>()
-    try {
-      reader.query().use { res ->
-        while (res.next()) {
-          msgs.add(ChatMessage.ADAPTER.decode(res.getBytes(0)))
-        }
+    reader.query().use { res ->
+      while (res.next()) {
+        msgs.add(ChatMessage.ADAPTER.decode(res.getBytes(0)))
       }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
     }
     return msgs
   }
 
-  @Throws(StoreException::class)
   override fun onOpen(diskVersion: Int): Int {
-    var diskVersion = diskVersion
-    if (diskVersion == 0) {
+    var version = diskVersion
+    if (version == 0) {
       newWriter()
           .stmt("CREATE TABLE rooms (id INTEGER PRIMARY KEY, room BLOB)")
           .execute()
@@ -79,12 +68,8 @@ class ChatStore internal constructor(fileName: String) : BaseStore(fileName) {
           .execute()
       newWriter()
           .stmt("CREATE INDEX IX_messages_room ON messages (room_id)")
-      diskVersion++
+      version++
     }
-    return diskVersion
-  }
-
-  companion object {
-    private val log = Log("ChatStore")
+    return version
   }
 }

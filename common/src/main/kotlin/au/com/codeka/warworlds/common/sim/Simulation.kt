@@ -35,7 +35,9 @@ class Simulation @JvmOverloads constructor(
    * @param star The [Star.Builder] of the star to simulate. We modify the builder in-place
    * with the new values.
    */
-  fun simulate(star: Star.Builder) {
+  fun simulate(
+      star: Star.Builder,
+      sitReports: MutableMap<Long, SituationReport.Builder>? = null) {
     logHandler?.setStarName(star.name)
     log("Begin simulation for '${star.name}' @ $timeOverride")
 
@@ -62,7 +64,7 @@ class Simulation @JvmOverloads constructor(
       } else if (predictionStar == null) {
         // This is also the time to simulate combat. The star has been simulated up to "now", combat
         // can run, and then we can do the first prediction once combat has completed.
-        simulateCombat(star, now)
+        simulateCombat(star, now, sitReports)
 
         // Also, this is the time to empty any tankers. They can be refilled if you have energy
         // production on this star.
@@ -560,7 +562,10 @@ class Simulation @JvmOverloads constructor(
    * another fleet in the same round until there's no more attack points left. This is so that you
    * do not get an advantage by splitting up all your fleets.
    */
-  private fun simulateCombat(star: Star.Builder, now: Long) {
+  private fun simulateCombat(
+      star: Star.Builder,
+      now: Long,
+      sitReports: MutableMap<Long, SituationReport.Builder>?) {
     // if there's no fleets in ATTACKING mode, then there's nothing to do
     if (!anyFleetsAttacking(star)) {
       return
@@ -583,6 +588,64 @@ class Simulation @JvmOverloads constructor(
     star.combat_reports.add(0, combatReportBuilder.build())
     while (star.combat_reports.size > 10) {
       star.combat_reports.removeAt(star.combat_reports.size - 1)
+    }
+
+    if (sitReports != null) {
+      // Make sure we have all the empires set up in the situation report to begin with.
+      for (fleet in combatReportBuilder.fleets_before) {
+        if (sitReports[fleet.empire_id] == null) {
+          sitReports[fleet.empire_id] = SituationReport.Builder()
+              .empire_id(fleet.empire_id)
+              .star_id(star.id)
+              .report_time(System.currentTimeMillis())
+        }
+      }
+
+      // Now calculate the losses
+      val fleetsLost = HashMap<Long, EnumMap<Design.DesignType, Float>>()
+      for (fleetBefore in combatReportBuilder.fleets_before) {
+        var wasDestroyed = true
+        var numDestroyed = 0.0f
+        for (fleetAfter in combatReportBuilder.fleets_after) {
+          if (fleetAfter.id == fleetBefore.id) {
+            wasDestroyed = false
+            numDestroyed = fleetAfter.num_ships - fleetBefore.num_ships
+          }
+        }
+        if (wasDestroyed) {
+          numDestroyed = fleetBefore.num_ships
+        }
+
+        var thisFleetLost = fleetsLost[fleetBefore.empire_id]
+        if (thisFleetLost == null) {
+          thisFleetLost = EnumMap<Design.DesignType, Float>(Design.DesignType::class.java)
+          fleetsLost[fleetBefore.empire_id] = thisFleetLost
+        }
+        thisFleetLost[fleetBefore.design_type] =
+            (thisFleetLost[fleetBefore.design_type] ?: 0f) + numDestroyed
+      }
+
+      // Finally, populate all the sit reports. Each sit-report gets one copy of the losses.
+      for (entry in sitReports) {
+        val empireId = entry.key
+        val sitReport = entry.value
+
+        for (combatEntry in fleetsLost) {
+          val isEnemy = empireId != combatEntry.key
+
+          for (lossEntry in combatEntry.value) {
+            val fleetRecord = SituationReport.FleetRecord.Builder()
+                .design_type(lossEntry.key)
+                .num_ships(lossEntry.value)
+                .build()
+            if (isEnemy) {
+              sitReport.fleet_victorious_record.add(fleetRecord)
+            } else {
+              sitReport.fleet_destroyed_record.add(fleetRecord)
+            }
+          }
+        }
+      }
     }
   }
 

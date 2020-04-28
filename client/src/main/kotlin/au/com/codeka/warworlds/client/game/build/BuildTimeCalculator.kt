@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.sim.BuildHelper
 import au.com.codeka.warworlds.common.sim.StarModifier
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
+import com.google.common.collect.Lists;
 import java.util.*
 
 typealias BuildTimeCalculatorCallback = (buildTime: String?, buildMinerals: String?, mineralsColor: Int) -> Unit

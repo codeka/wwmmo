@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.server.store
 
-import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Star
-import au.com.codeka.warworlds.server.store.StoreException
 import au.com.codeka.warworlds.server.store.base.BaseStore
 import java.util.*
 
@@ -33,49 +31,40 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
         empireIds.add(planet.colony.empire_id)
       }
     }
-    try {
-      newTransaction().use { trans ->
-        newWriter(trans)
-            .stmt("INSERT OR REPLACE INTO stars (id, sector_x, sector_y, next_simulation, star) VALUES (?, ?, ?, ?, ?)")
-            .param(0, id)
-            .param(1, star.sector_x)
-            .param(2, star.sector_y)
-            .param(3, star.next_simulation)
-            .param(4, star.encode())
-            .execute()
-        newWriter(trans)
-            .stmt("DELETE FROM star_empires WHERE star_id = ?")
-            .param(0, id)
-            .execute()
-        val writer = newWriter(trans)
-            .stmt("INSERT INTO star_empires (empire_id, star_id) VALUES (?, ?)")
-            .param(1, id)
-        for (empireId in empireIds) {
-          writer!!.param(0, empireId)
-              .execute()
-        }
-        trans.commit()
+    newTransaction().use { trans ->
+      newWriter(trans)
+          .stmt("INSERT OR REPLACE INTO stars (id, sector_x, sector_y, next_simulation, star) VALUES (?, ?, ?, ?, ?)")
+          .param(0, id)
+          .param(1, star.sector_x)
+          .param(2, star.sector_y)
+          .param(3, star.next_simulation)
+          .param(4, star.encode())
+          .execute()
+      newWriter(trans)
+          .stmt("DELETE FROM star_empires WHERE star_id = ?")
+          .param(0, id)
+          .execute()
+      val writer = newWriter(trans)
+          .stmt("INSERT INTO star_empires (empire_id, star_id) VALUES (?, ?)")
+          .param(1, id)
+      for (empireId in empireIds) {
+        writer.param(0, empireId).execute()
       }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
+      trans.commit()
     }
   }
 
   fun delete(id: Long) {
-    try {
-      newTransaction().use { trans ->
-        newWriter(trans)
-            .stmt("DELETE FROM star_empires WHERE star_id = ?")
-            .param(0, id)
-            .execute()
-        newWriter(trans)
-            .stmt("DELETE FROM stars WHERE id = ?")
-            .param(0, id)
-            .execute()
-        trans.commit()
-      }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
+    newTransaction().use { trans ->
+      newWriter(trans)
+          .stmt("DELETE FROM star_empires WHERE star_id = ?")
+          .param(0, id)
+          .execute()
+      newWriter(trans)
+          .stmt("DELETE FROM stars WHERE id = ?")
+          .param(0, id)
+          .execute()
+      trans.commit()
     }
   }
 
@@ -91,39 +80,29 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
    * just return the first one.
    */
   fun fetchSimulationQueue(count: Int): ArrayList<Star> {
-    try {
-      newReader()
-          .stmt("SELECT star FROM stars WHERE next_simulation IS NOT NULL ORDER BY next_simulation ASC")
-          .query().use { res ->
-            val stars = ArrayList<Star>()
-            while (res.next() && stars.size < count) {
-              stars.add(processStar(Star.ADAPTER.decode(res.getBytes(0))))
-            }
-            return stars
+    newReader()
+        .stmt("SELECT star FROM stars WHERE next_simulation IS NOT NULL ORDER BY next_simulation ASC")
+        .query().use { res ->
+          val stars = ArrayList<Star>()
+          while (res.next() && stars.size < count) {
+            stars.add(processStar(Star.ADAPTER.decode(res.getBytes(0))))
           }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
-    }
-    return ArrayList()
+          return stars
+        }
   }
 
-  fun getStarsForSector(sectorX: Long, sectorY: Long): ArrayList<Star>? {
-    try {
-      newReader()
-          .stmt("SELECT star FROM stars WHERE sector_x = ? AND sector_y = ?")
-          .param(0, sectorX)
-          .param(1, sectorY)
-          .query().use { res ->
-            val stars = ArrayList<Star>()
-            while (res.next()) {
-              stars.add(processStar(Star.ADAPTER.decode(res.getBytes(0))))
-            }
-            return stars
+  fun getStarsForSector(sectorX: Long, sectorY: Long): ArrayList<Star> {
+    newReader()
+        .stmt("SELECT star FROM stars WHERE sector_x = ? AND sector_y = ?")
+        .param(0, sectorX)
+        .param(1, sectorY)
+        .query().use { res ->
+          val stars = ArrayList<Star>()
+          while (res.next()) {
+            stars.add(processStar(Star.ADAPTER.decode(res.getBytes(0))))
           }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
-      return null
-    }
+          return stars
+        }
   }
 
   /** Do some pre-processing on the star.  */
@@ -136,7 +115,7 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
         for (j in cb.buildings.indices) {
           val bb = cb.buildings[j].newBuilder()
           if (bb.id == null || bb.id == 0L) {
-            bb.id(DataStore.Companion.i.seq().nextIdentifier())
+            bb.id(DataStore.i.seq().nextIdentifier())
             cb.buildings[j] = bb.build()
           }
         }
@@ -147,27 +126,21 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
   }
 
   fun getStarsForEmpire(empireId: Long): ArrayList<Long> {
-    try {
-      newReader()
-          .stmt("SELECT star_id FROM star_empires WHERE empire_id = ?")
-          .param(0, empireId)
-          .query().use { res ->
-            val ids = ArrayList<Long>()
-            while (res.next()) {
-              ids.add(res.getLong(0))
-            }
-            return ids
+    newReader()
+        .stmt("SELECT star_id FROM star_empires WHERE empire_id = ?")
+        .param(0, empireId)
+        .query().use { res ->
+          val ids = ArrayList<Long>()
+          while (res.next()) {
+            ids.add(res.getLong(0))
           }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
-      return ArrayList()
-    }
+          return ids
+        }
   }
 
-  @Throws(StoreException::class)
   override fun onOpen(diskVersion: Int): Int {
-    var diskVersion = diskVersion
-    if (diskVersion == 0) {
+    var version = diskVersion
+    if (version == 0) {
       newWriter()
           .stmt(
               "CREATE TABLE stars (" +
@@ -186,21 +159,17 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
       newWriter()
           .stmt("CREATE TABLE star_empires (empire_id INTEGER, star_id INTEGER)")
           .execute()
-      diskVersion++
+      version++
     }
-    if (diskVersion == 1) {
+    if (version == 1) {
       newWriter()
           .stmt("CREATE INDEX IX_star_empires ON star_empires (empire_id, star_id)")
           .execute()
       newWriter()
           .stmt("CREATE INDEX IX_empire_stars ON star_empires (star_id, empire_id)")
           .execute()
-      diskVersion++
+      version++
     }
-    return diskVersion
-  }
-
-  companion object {
-    private val log = Log("StarsStore")
+    return version
   }
 }

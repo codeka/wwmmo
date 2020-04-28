@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.server.store
 
-import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Account
-import au.com.codeka.warworlds.server.store.StoreException
 import au.com.codeka.warworlds.server.store.base.BaseStore
 import au.com.codeka.warworlds.server.util.Pair
 import java.io.IOException
@@ -13,53 +11,41 @@ import java.util.*
  */
 class AccountsStore internal constructor(fileName: String) : BaseStore(fileName) {
   operator fun get(cookie: String?): Account? {
-    try {
-      newReader()
-          .stmt("SELECT account FROM accounts WHERE cookie = ?")
-          .param(0, cookie)
-          .query().use { res ->
-            if (res.next()) {
-              return Account.ADAPTER.decode(res.getBytes(0))
-            }
+    newReader()
+        .stmt("SELECT account FROM accounts WHERE cookie = ?")
+        .param(0, cookie)
+        .query().use { res ->
+          if (res.next()) {
+            return Account.ADAPTER.decode(res.getBytes(0))
           }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
-    }
+        }
     return null
   }
 
   fun getByVerifiedEmailAddr(emailAddr: String?): Account? {
-    try {
-      newReader()
-          .stmt("SELECT account FROM accounts WHERE email = ?")
-          .param(0, emailAddr)
-          .query().use { res ->
-            while (res.next()) {
-              val acct = Account.ADAPTER.decode(res.getBytes(0))
-              if (acct.email_status == Account.EmailStatus.VERIFIED) {
-                return acct
-              }
+    newReader()
+        .stmt("SELECT account FROM accounts WHERE email = ?")
+        .param(0, emailAddr)
+        .query().use { res ->
+          while (res.next()) {
+            val acct = Account.ADAPTER.decode(res.getBytes(0))
+            if (acct.email_status == Account.EmailStatus.VERIFIED) {
+              return acct
             }
           }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
-    }
+        }
     return null
   }
 
   fun getByEmpireId(empireId: Long): Pair<String, Account>? {
-    try {
-      newReader()
-          .stmt("SELECT cookie, account FROM accounts WHERE empire_id = ?")
-          .param(0, empireId)
-          .query().use { res ->
-            if (res.next()) {
-              return Pair(res.getString(0), Account.ADAPTER.decode(res.getBytes(1)))
-            }
+    newReader()
+        .stmt("SELECT cookie, account FROM accounts WHERE empire_id = ?")
+        .param(0, empireId)
+        .query().use { res ->
+          if (res.next()) {
+            return Pair(res.getString(0), Account.ADAPTER.decode(res.getBytes(1)))
           }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
-    }
+        }
     return null
   }
 
@@ -77,39 +63,30 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
 
   fun search( /* TODO: search string, pagination etc */): ArrayList<Account> {
     val accounts = ArrayList<Account>()
-    try {
-      newReader()
-          .stmt("SELECT account FROM accounts")
-          .query().use { res ->
-            while (res.next()) {
-              accounts.add(Account.ADAPTER.decode(res.getBytes(0)))
-            }
+    newReader()
+        .stmt("SELECT account FROM accounts")
+        .query().use { res ->
+          while (res.next()) {
+            accounts.add(Account.ADAPTER.decode(res.getBytes(0)))
           }
-    } catch (e: Exception) {
-      log.error("Unexpected.", e)
-    }
+        }
     return accounts
   }
 
-  fun put(cookie: String?, account: Account?) {
-    try {
-      newWriter()
-          .stmt("INSERT OR REPLACE INTO accounts ("
-              + " email, cookie, empire_id, email_verification_code, account"
-              + ") VALUES (?, ?, ?, ?, ?)")
-          .param(0,
-              if (account!!.email_status == Account.EmailStatus.VERIFIED) account.email_canonical else null)
-          .param(1, cookie)
-          .param(2, account.empire_id)
-          .param(3, account.email_verification_code)
-          .param(4, account.encode())
-          .execute()
-    } catch (e: StoreException) {
-      log.error("Unexpected.", e)
-    }
+  fun put(cookie: String, account: Account) {
+    newWriter()
+        .stmt("INSERT OR REPLACE INTO accounts ("
+            + " email, cookie, empire_id, email_verification_code, account"
+            + ") VALUES (?, ?, ?, ?, ?)")
+        .param(0,
+            if (account.email_status == Account.EmailStatus.VERIFIED) account.email_canonical else null)
+        .param(1, cookie)
+        .param(2, account.empire_id)
+        .param(3, account.email_verification_code)
+        .param(4, account.encode())
+        .execute()
   }
 
-  @Throws(StoreException::class)
   override fun onOpen(diskVersion: Int): Int {
     var version = diskVersion
     if (version == 0) {
@@ -168,7 +145,6 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
   }
 
   /** Called by [.onOpen] when we need to re-save the accounts (after adding a column)  */
-  @Throws(StoreException::class)
   private fun updateAllAccounts() {
     val res = newReader()
         .stmt("SELECT cookie, account FROM accounts")
@@ -182,9 +158,5 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
         throw StoreException(e)
       }
     }
-  }
-
-  companion object {
-    private val log = Log("AccountsStore")
   }
 }

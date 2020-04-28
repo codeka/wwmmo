@@ -86,11 +86,7 @@ object StarManager {
       // Modify the star.
       val starBuilder = star.newBuilder()
       try {
-        starModifier.modifyStar(
-            starBuilder,
-            auxiliaryStars,
-            Lists.newArrayList(modification),
-            null /* logHandler */)
+        starModifier.modifyStar(starBuilder, Lists.newArrayList(modification), auxiliaryStars)
       } catch (e: SuspiciousModificationException) {
         // Mostly we don't care about these on the client, but it'll be good to log them.
         log.error("Unexpected suspicious modification.", e)

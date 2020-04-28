@@ -5,7 +5,6 @@ import au.com.codeka.warworlds.server.world.EmpireManager
 
 /** Handler for /admin/ajax/empires/&lt;id&gt;  */
 class AjaxEmpireHandler : AdminHandler() {
-  @Throws(RequestException::class)
   public override fun get() {
     if (request.getParameter("id") != null) {
       val empireId = request.getParameter("id").toLong()

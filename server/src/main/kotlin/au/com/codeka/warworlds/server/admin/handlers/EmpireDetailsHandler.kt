@@ -39,8 +39,11 @@ class EmpireDetailsHandler : AdminHandler() {
     redirect("/admin/empires/$id")
   }
 
+  // TODO: most of these should be tabs and loaded on-demand rather than all at once (then we can
+  // page results and stuff too).
   private fun complete(empire: Empire, mapBuilder: HashMap<String, Any>) {
     mapBuilder["empire"] = empire
+
     val stars = ArrayList<Star?>()
     for (starId in DataStore.i.stars().getStarsForEmpire(empire.id)) {
       val star: WatchableObject<Star>? = StarManager.i.getStar(starId)
@@ -49,11 +52,16 @@ class EmpireDetailsHandler : AdminHandler() {
       }
     }
     mapBuilder["stars"] = stars
+
     mapBuilder["devices"] = DataStore.i.empires().getDevicesForEmpire(empire.id)
+
     val patreonInfo: PatreonInfo? = DataStore.i.empires().getPatreonInfo(empire.id)
     if (patreonInfo != null) {
       mapBuilder["patreon"] = patreonInfo
     }
+
+    mapBuilder["sitReports"] = DataStore.i.sitReports().getByEmpireId(empire.id, 50)
+
     render("empires/details.html", mapBuilder)
   }
 }
