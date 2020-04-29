@@ -87,7 +87,22 @@ class EmpireDetailsHandler : AdminHandler() {
   }
 
   private fun completeSitReportsTab(empire: Empire, data: HashMap<String, Any>) {
-    data["sitReports"] = DataStore.i.sitReports().getByEmpireId(empire.id, 50)
+    val sitReports = DataStore.i.sitReports().getByEmpireId(empire.id, 50)
+    data["sitReports"] = sitReports
+
+    val stars = HashMap<Long, Star>()
+    for (sitReport in sitReports) {
+      if (stars.containsKey(sitReport.star_id)) {
+        continue
+      }
+
+      val star = StarManager.i.getStar(sitReport.star_id)
+      if (star != null) {
+        stars[sitReport.star_id] = star.get()
+      }
+    }
+    data["stars"] = stars
+
     render("empires/details-sitreports.html", data)
   }
 }

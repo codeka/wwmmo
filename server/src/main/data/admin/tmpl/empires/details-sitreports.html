@@ -9,7 +9,7 @@
   {% for sitrep in sitReports %}
   <tr>
     <td><time timestamp="{{ sitrep.report_time }}"></time></td>
-    <td>TODO</td>
+    <td>{% include "inc/star_name.html" star=stars[sitrep.star_id] %}</td>
     <td>{{ sitrep }}</td>
   </tr>
   {% end %}
