@@ -32,7 +32,8 @@
           {{ account.email }} ({{ account.email_status }})
         </span>
         {% if account.email_status.name == "UNVERIFIED" %}
-          <a href="javascript:resendEmail();">Resend email</a>
+          <a href="javascript:resendEmail();">Resend email</a> &bull;
+          <a href="javascript:forceVerify();">Force verify</a>
         {% end %}
       {% else %}
         <em>none</em>
@@ -52,6 +53,25 @@
               alert(data);
             } else {
               alert("Verification email sent.");
+            }
+          }
+        });
+      }
+
+      function forceVerify() {
+        $.ajax({
+          url: "/admin/ajax/accounts",
+          data: {
+            "action": "force-verify",
+            "id": empire.id
+          },
+          method: "POST",
+          success: function(data) {
+            if (data != "success") {
+              alert(data);
+            } else {
+              alert("Verification complete.");
+              location.reload();
             }
           }
         });

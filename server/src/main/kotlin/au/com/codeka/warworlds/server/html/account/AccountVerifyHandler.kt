@@ -30,20 +30,7 @@ class AccountVerifyHandler : HtmlRequestHandler() {
       return
     }
 
-    // If there's already an associated account with this email address, mark it as abandoned now.
-    while (true) {
-      val existingAccount = DataStore.i.accounts().getByVerifiedEmailAddr(pair.two.email_canonical)
-      if (existingAccount != null) {
-        AccountManager.i.getAccount(existingAccount.empire_id)!!.set(
-            existingAccount.newBuilder().email_status(Account.EmailStatus.ABANDONED).build())
-      } else {
-        break
-      }
-    }
-    AccountManager.i.getAccount(pair.two.empire_id)!!.set(pair.two.newBuilder()
-        .email_status(Account.EmailStatus.VERIFIED)
-        .email_verification_code(null)
-        .build())
+    AccountManager.i.verifyAccount(pair.two)
     render("account/verified-success.html", null)
   }
 }

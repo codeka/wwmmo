@@ -64,6 +64,25 @@ class AccountManager private constructor() {
     SmtpHelper.i.send(email)
   }
 
+  fun verifyAccount(account: Account) {
+    // If there's already an associated account with this email address, mark it as abandoned now.
+    while (true) {
+      val existingAccount = DataStore.i.accounts().getByVerifiedEmailAddr(account.email_canonical)
+      if (existingAccount != null) {
+        getAccount(existingAccount.empire_id)!!.set(
+            existingAccount.newBuilder()
+                .email_status(Account.EmailStatus.ABANDONED)
+                .build())
+      } else {
+        break
+      }
+    }
+    getAccount(account.empire_id)!!.set(account.newBuilder()
+        .email_status(Account.EmailStatus.VERIFIED)
+        .email_verification_code(null)
+        .build())
+  }
+
   private fun watchAccount(cookie: String, account: Account)
       : Pair<String, WatchableObject<Account>> {
     synchronized(watchedAccounts) {
