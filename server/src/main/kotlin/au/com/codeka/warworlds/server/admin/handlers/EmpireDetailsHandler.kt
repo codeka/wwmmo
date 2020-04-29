@@ -18,7 +18,24 @@ class EmpireDetailsHandler : AdminHandler() {
   public override fun get() {
     val id = getUrlParameter("id")!!.toLong()
     val empire: Empire = DataStore.i.empires()[id] ?: throw RequestException(404)
-    complete(empire, HashMap())
+
+    val data = HashMap<String, Any>()
+    data["empire"] = empire
+
+    when (request.getParameter("tab")) {
+      "stars" -> {
+        completeStarsTab(empire, data)
+      }
+      "devices" -> {
+        completeDevicesTab(empire, data)
+      }
+      "sit-reports" -> {
+        completeSitReportsTab(empire, data)
+      }
+      else -> {
+        complete(empire, data)
+      }
+    }
   }
 
   public override fun post() {
@@ -27,6 +44,7 @@ class EmpireDetailsHandler : AdminHandler() {
     val msg = request.getParameter("msg")
     if (msg.isEmpty()) {
       val data = HashMap<String, Any>()
+      data["empire"] = empire
       data["error"] = "You need to specify a message."
       complete(empire, data)
       return
@@ -41,9 +59,16 @@ class EmpireDetailsHandler : AdminHandler() {
 
   // TODO: most of these should be tabs and loaded on-demand rather than all at once (then we can
   // page results and stuff too).
-  private fun complete(empire: Empire, mapBuilder: HashMap<String, Any>) {
-    mapBuilder["empire"] = empire
+  private fun complete(empire: Empire, data: HashMap<String, Any>) {
+    val patreonInfo: PatreonInfo? = DataStore.i.empires().getPatreonInfo(empire.id)
+    if (patreonInfo != null) {
+      data["patreon"] = patreonInfo
+    }
 
+    render("empires/details.html", data)
+  }
+
+  private fun completeStarsTab(empire: Empire, data: HashMap<String, Any>) {
     val stars = ArrayList<Star?>()
     for (starId in DataStore.i.stars().getStarsForEmpire(empire.id)) {
       val star: WatchableObject<Star>? = StarManager.i.getStar(starId)
@@ -51,17 +76,18 @@ class EmpireDetailsHandler : AdminHandler() {
         stars.add(star.get())
       }
     }
-    mapBuilder["stars"] = stars
+    data["stars"] = stars
 
-    mapBuilder["devices"] = DataStore.i.empires().getDevicesForEmpire(empire.id)
+    render("empires/details-stars.html", data)
+  }
 
-    val patreonInfo: PatreonInfo? = DataStore.i.empires().getPatreonInfo(empire.id)
-    if (patreonInfo != null) {
-      mapBuilder["patreon"] = patreonInfo
-    }
+  private fun completeDevicesTab(empire: Empire, data: HashMap<String, Any>) {
+    data["devices"] = DataStore.i.empires().getDevicesForEmpire(empire.id)
+    render("empires/details-devices.html", data)
+  }
 
-    mapBuilder["sitReports"] = DataStore.i.sitReports().getByEmpireId(empire.id, 50)
-
-    render("empires/details.html", mapBuilder)
+  private fun completeSitReportsTab(empire: Empire, data: HashMap<String, Any>) {
+    data["sitReports"] = DataStore.i.sitReports().getByEmpireId(empire.id, 50)
+    render("empires/details-sitreports.html", data)
   }
 }

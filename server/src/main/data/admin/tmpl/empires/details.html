@@ -2,77 +2,51 @@
 {% block "title" %}Empires{% end %}
 {% block "head" %}
   <link rel="stylesheet" href="/admin/css/star.css">
+  <script type="text/javascript" src="/admin/js/tabs.js"></script>
   <script type="text/javascript" src="/admin/js/tmpl.js"></script>
   <script type="text/javascript" src="/admin/js/time.js"></script>
+
+  <script>
+    const empire = {
+      "id": {{ empire.id }}
+    };
+  </script>
+  <script type="text/javascript" src="/admin/empires/details.js"></script>
 {% end %}
 {% block "content" %}
   <h1>{{ empire.display_name }}</h1>
 
-  <h2>Devices</h2>
-  <table>
-    <tr>
-      <th>ID</th>
-      <th>Model</th>
-      <th>Manufacturer</th>
-      <th>Build</th>
-      <th>Version</th>
-      <th>FCM token</th>
-    </tr>
-    {% for device in devices %}
-    <tr>
-      <td>{{ device.device_id }}</td>
-      <td>{{ device.device_model }}</td>
-      <td>{{ device.device_manufacturer }}</td>
-      <td>{{ device.device_build }}</td>
-      <td>{{ device.device_version }}</td>
-      <td>{{ String.trunc(device.fcm_device_info.token, 15) }}</td>
-    </tr>
-    {% end %}
-  </table>
-
-  <h2>Send message</h2>
-  <form method="post">
-    <input type="text" name="msg">
-    <input type="submit" value="Send">
-    {% if error %}
+  <ul class="tabs">
+    <li><a href="javascript:;" data-tab="overview" class="selected">Overview</a></li>
+    <li><a href="javascript:;" data-tab="stars">Stars</a>
+    <li><a href="javascript:;" data-tab="devices">Devices</a>
+    <li><a href="javascript:;" data-tab="sit-reports">Sit. Reports</a>
+  </ul>
+  <div id="overview">
+    <h2>Send message</h2>
+    <form method="post">
+      <input type="text" name="msg">
+      <input type="submit" value="Send">
+      {% if error %}
       <p class="error">{{ error }}</p>
-    {% end %}
-  </form>
+      {% end %}
+    </form>
 
-  {% if patreon %}
+    {% if patreon %}
     <h2>Patreon</h2>
     <textarea>
       {{ Gson.encode(patreon) }}
     </textarea>
-  {% end %}
-
-  <h2>Stars</h2>
-  <table>
-    <tr>
-      <th>#</th>
-      <th>Name</th>
-    </tr>
-    {% for star in stars %}
-      <tr>
-        <td>{{ star.id }}</td>
-        <td>{% include "inc/star_name.html" %}</td>
-      </tr>
     {% end %}
-  </table>
+  </div>
+  <div id="stars">
+    <div class="spinner"></div>
+  </div>
+  <div id="devices">
+    <div class="spinner"></div>
+  </div>
+  <div id="sit-reports">
+    <div class="spinner"></div>
+  </div>
 
-  <h2>Situation reports</h2>
-  <table>
-    <tr>
-      <th>Time</th>
-      <th>Star</th>
-      <th>Report</th>
-    </tr>
-    {% for sitrep in sitReports %}
-      <tr>
-        <td><time timestamp="{{ sitrep.report_time }}"></time></td>
-        <td>TODO</td>
-        <td>{{ sitrep }}</td>
-      </tr>
-    {% end %}
-  </table>
 {% end %}

@@ -13,25 +13,36 @@
 // And makes the tabs clickable and stuff.
 //
 
-$(function() {
+var tabs = (function() {
  function refreshVisibleTabs(tabs) {
     $("a", tabs).each(function(i, tab) {
       var tabId = $(tab).data("tab");
       if (tabId) {
+        var tabContent = $("#" + tabId);
         if ($(tab).hasClass("selected")) {
-          $("#"+tabId).show();
+          tabContent.show();
+          tabContent.trigger("tab:show");
         } else {
-          $("#"+tabId).hide();
+          tabContent.hide();
+          tabContent.trigger("tab:hide");
         }
       }
     });
   }
 
-  refreshVisibleTabs($(".tabs"));
+  $(function() {
+    refreshVisibleTabs($(".tabs"));
 
-  $(".tabs a").click(function() {
-    $(this).parents(".tabs").find("a").removeClass("selected");
-    $(this).addClass("selected");
-    refreshVisibleTabs($(this).parents(".tabs"));
+    $("body").on("click", ".tabs a", function() {
+      $(this).parents(".tabs").find("a").removeClass("selected");
+      $(this).addClass("selected");
+      refreshVisibleTabs($(this).parents(".tabs"));
+    });
   });
-});
+
+  return {
+    refresh: function() {
+      refreshVisibleTabs($(".tabs"));
+    }
+  }
+})();

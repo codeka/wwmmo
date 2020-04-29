@@ -1,0 +1,14 @@
+
+<h2>Stars</h2>
+<table>
+  <tr>
+    <th>#</th>
+    <th>Name</th>
+  </tr>
+  {% for star in stars %}
+  <tr>
+    <td>{{ star.id }}</td>
+    <td>{% include "inc/star_name.html" %}</td>
+  </tr>
+  {% end %}
+</table>
