@@ -1,6 +1,5 @@
 
 var time = {
-
   _MONTH_NAMES: [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ],
@@ -51,8 +50,10 @@ var time = {
       var dt = null;
       if ($(this).attr("datetime")) {
         dt = new Date($(this).attr("datetime")+" UTC");
-      } else {
+      } else if ($(this).attr("timestamp")) {
         dt = new Date(parseInt($(this).attr("timestamp")));
+      } else {
+        return;
       }
 
       var hours = dt.getHours();
