@@ -7,45 +7,28 @@
   </script>
 {% end %}
 {% block "content" %}
-  <h1>Accounts</h1>
+  <h1>Empires</h1>
+  <p>TODO: implement searching and stuff.</p>
   <table>
     <tr>
       <td>#</td>
       <td>Empire name</td>
       <td>Email address</td>
-      <td>Verified?</td>
-      <td></td>
     </tr>
     {% for account in accounts %}
     <tr>
       <td>{{ account.empire_id }}</td>
       <td>{% include "inc/empire_name.html" empire = empires[account.empire_id] %}</td>
-      <td><span title="Canonical: {{ account.email_canonical }}">{{ account.email }}</span></td>
-      <td><span title="{{ account.email_verification_code }}">{{ account.email_status }}</span></td>
-      <td>{% if account.email_status != null && account.email_status.toString() == "UNVERIFIED" %}
-        <a href="javascript:resendEmail( '{{ account.empire_id }}' );">Resend email</a>
-      {% end %}</td>
+      <td>
+        {% if account.email != null %}
+          <span title="Canonical: {{ account.email_canonical }}">
+            {{ account.email }} ({{ account.email_status }})
+          </span>
+        {% else %}
+          <em>none</em>
+        {% end %}
+      </td>
     </tr>
   {% end %}
   </table>
-
-  <script>
-    function resendEmail(empireId) {
-      $.ajax({
-        url: "/admin/ajax/accounts",
-        data: {
-          "action": "resend",
-          "id": empireId
-        },
-        method: "POST",
-        success: function(data) {
-          if (data != "success") {
-            alert(data);
-          } else {
-            alert("Verification email sent.");
-          }
-        }
-      });
-    }
-  </script>
 {% end %}

@@ -1,9 +1,6 @@
 package au.com.codeka.warworlds.server.admin.handlers
 
-import au.com.codeka.warworlds.common.proto.Design
-import au.com.codeka.warworlds.common.proto.Empire
-import au.com.codeka.warworlds.common.proto.Notification
-import au.com.codeka.warworlds.common.proto.Star
+import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.sim.DesignDefinitions
 import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.proto.PatreonInfo
@@ -35,7 +32,7 @@ class EmpireDetailsHandler : AdminHandler() {
         completeSitReportsTab(empire, data)
       }
       else -> {
-        complete(empire, data)
+        completeOverview(empire, data)
       }
     }
   }
@@ -48,7 +45,7 @@ class EmpireDetailsHandler : AdminHandler() {
       val data = HashMap<String, Any>()
       data["empire"] = empire
       data["error"] = "You need to specify a message."
-      complete(empire, data)
+      completeOverview(empire, data)
       return
     }
 
@@ -59,9 +56,9 @@ class EmpireDetailsHandler : AdminHandler() {
     redirect("/admin/empires/$id")
   }
 
-  // TODO: most of these should be tabs and loaded on-demand rather than all at once (then we can
-  // page results and stuff too).
-  private fun complete(empire: Empire, data: HashMap<String, Any>) {
+  private fun completeOverview(empire: Empire, data: HashMap<String, Any>) {
+    data["account"] = DataStore.i.accounts().getByEmpireId(empire.id)!!.two
+
     val patreonInfo: PatreonInfo? = DataStore.i.empires().getPatreonInfo(empire.id)
     if (patreonInfo != null) {
       data["patreon"] = patreonInfo

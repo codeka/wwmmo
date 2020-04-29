@@ -57,7 +57,7 @@ message Account {
   optional string email = 2;
 
   // We do some basic "canonicalization" of email address so that you can't just sign up with
-  // automtic aliases or something (e.g. in gmail foo@gmail.com and foo+bar@gmail.com are actually
+  // automatic aliases or something (e.g. in gmail foo@gmail.com and foo+bar@gmail.com are actually
   // the same account). This is only fairly basic, and not really meant to be totally secure.
   optional string email_canonical = 3;
 

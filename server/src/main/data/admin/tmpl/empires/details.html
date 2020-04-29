@@ -25,6 +25,39 @@
     <li><a href="javascript:;" data-tab="sit-reports">Sit. Reports</a>
   </ul>
   <div id="overview">
+    <p>
+      <b>Email:</b>
+      {% if account.email != null %}
+        <span title="Canonical: {{ account.email_canonical }}">
+          {{ account.email }} ({{ account.email_status }})
+        </span>
+        {% if account.email_status.name == "UNVERIFIED" %}
+          <a href="javascript:resendEmail();">Resend email</a>
+        {% end %}
+      {% else %}
+        <em>none</em>
+      {% end %}
+    </p>
+    <script>
+      function resendEmail() {
+        $.ajax({
+          url: "/admin/ajax/accounts",
+          data: {
+            "action": "resend",
+            "id": empire.id
+          },
+          method: "POST",
+          success: function(data) {
+            if (data != "success") {
+              alert(data);
+            } else {
+              alert("Verification email sent.");
+            }
+          }
+        });
+      }
+    </script>
+
     <h2>Send message</h2>
     <form method="post">
       <input type="text" name="msg">
