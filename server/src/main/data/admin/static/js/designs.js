@@ -42,6 +42,10 @@ var Designs = (function() {
   return {
     get: function(type) {
       return getDesign(type);
+    },
+
+    refreshAll: function() {
+      refreshDesigns();
     }
   };
 })();

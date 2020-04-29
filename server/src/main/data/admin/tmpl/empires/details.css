@@ -1,0 +1,32 @@
+
+
+div.sitrep-event {
+  display: inline-block;
+  height: 64px;
+}
+
+div.sitrep-event div.fleet-icon {
+  float: left;
+}
+
+div.sitrep-event div.sitrep-details {
+  padding-right: 16px;
+  height: 64px;
+  float: left;
+}
+
+div.sitrep-event h4 {
+  padding: 0;
+  margin: 0;
+}
+
+div.sitrep-event p {
+  padding: 0;
+  margin: 0;
+}
+
+span.separator {
+  line-height: 64px;
+  margin: 0 24px;
+  vertical-align: top;
+}

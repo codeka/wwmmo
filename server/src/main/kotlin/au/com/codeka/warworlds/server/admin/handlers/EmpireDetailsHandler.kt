@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.server.admin.handlers
 
+import au.com.codeka.warworlds.common.proto.Design
 import au.com.codeka.warworlds.common.proto.Empire
 import au.com.codeka.warworlds.common.proto.Notification
 import au.com.codeka.warworlds.common.proto.Star
+import au.com.codeka.warworlds.common.sim.DesignDefinitions
 import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.proto.PatreonInfo
 import au.com.codeka.warworlds.server.store.DataStore
@@ -89,6 +91,12 @@ class EmpireDetailsHandler : AdminHandler() {
   private fun completeSitReportsTab(empire: Empire, data: HashMap<String, Any>) {
     val sitReports = DataStore.i.sitReports().getByEmpireId(empire.id, 50)
     data["sitReports"] = sitReports
+
+    val designs = HashMap<String, Design>()
+    for (design in DesignDefinitions.designs.designs) {
+      designs[design.type.name] = design
+    }
+    data["designs"] = designs
 
     val stars = HashMap<Long, Star>()
     for (sitReport in sitReports) {
