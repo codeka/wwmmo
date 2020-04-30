@@ -26,7 +26,7 @@ class SequenceStore internal constructor(fileName: String) : BaseStore(fileName)
     synchronized(lock) {
       if (identifier == maxIdentifier) {
         try {
-          newReader().stmt("SELECT id FROM identifiers")!!.query().use { res ->
+          newReader().stmt("SELECT id FROM identifiers").query().use { res ->
             if (!res.next()) {
               throw RuntimeException("Expected at least one row in identifiers table.")
             }

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.html.render
 
-import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.Vector3
 import au.com.codeka.warworlds.planetrender.PlanetRenderer
 import au.com.codeka.warworlds.planetrender.Template
@@ -23,9 +22,7 @@ import kotlin.math.ceil
  */
 open class RendererHandler : RequestHandler() {
   companion object {
-    private val log = Log("RendererHandler")
-
-    val BUCKET_FACTORS: Map<String?, Float> = ImmutableMap.builder<String?, Float>()
+    val BUCKET_FACTORS: Map<String, Float> = ImmutableMap.builder<String, Float>()
         .put("ldpi", 0.75f)
         .put("mdpi", 1.0f)
         .put("hdpi", 1.5f)
@@ -66,7 +63,7 @@ open class RendererHandler : RequestHandler() {
         renderer = PlanetRenderer(planetTemplate, rand)
       }
       else -> {
-        throw RequestException(500, "Unknown template: ${tmpl.template.javaClass.simpleName}")
+        throw RequestException(500, "Unknown template: ${tmpl.template!!.javaClass.simpleName}")
       }
     }
     val img = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)

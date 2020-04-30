@@ -1,4 +1,11 @@
 apply plugin: 'java'
+apply plugin: 'kotlin'
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
 
 repositories {
   mavenCentral()
@@ -7,4 +14,5 @@ repositories {
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
   implementation project(':common')
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
