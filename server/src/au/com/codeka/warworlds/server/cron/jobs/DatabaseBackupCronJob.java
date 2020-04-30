@@ -31,7 +31,7 @@ public class DatabaseBackupCronJob extends AbstractCronJob {
     }
     log.info("Backing up into: %s", path.getAbsolutePath());
 
-    long oldestFileToKeep = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(21);
+    long oldestFileToKeep = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(4);
 
     File[] files = path.listFiles();
     if (files != null) {
