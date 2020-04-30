@@ -16,10 +16,12 @@ import au.com.codeka.warworlds.client.util.GameSettings.edit
  * to the website and stuff like that.
  */
 class WarmWelcomeScreen : Screen() {
-  private var layout: WarmWelcomeLayout? = null
-  override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
+  private lateinit var layout: WarmWelcomeLayout
+
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
-    layout = WarmWelcomeLayout(context!!.activity, object : WarmWelcomeLayout.Callbacks {
+
+    layout = WarmWelcomeLayout(context.activity, object : WarmWelcomeLayout.Callbacks {
       override fun onStartClick() {
         // save the fact that we've finished the warm welcome
         edit()

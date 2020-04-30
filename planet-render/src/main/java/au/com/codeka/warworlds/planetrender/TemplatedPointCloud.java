@@ -8,6 +8,8 @@ import java.util.Random;
 /** A {@link PointCloud} that takes it's parameters from a {@link Template}. */
 public class TemplatedPointCloud extends PointCloud {
   public TemplatedPointCloud(Template.PointCloudTemplate tmpl, Random rand) {
+    super(new ArrayList<>());
+
     Generator g;
     if (tmpl.getGenerator() == Template.PointCloudTemplate.Generator.Random) {
       g = new TemplatedRandomGenerator();
@@ -17,7 +19,7 @@ public class TemplatedPointCloud extends PointCloud {
       throw new RuntimeException("Unknown PointCloudGenerator: " + tmpl.getGenerator());
     }
 
-    setPoints(g.generate(tmpl, rand));
+    setPoints_(g.generate(tmpl, rand));
   }
 
   /**

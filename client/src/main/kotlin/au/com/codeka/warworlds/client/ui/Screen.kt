@@ -12,14 +12,11 @@ import android.view.ViewGroup
  * navigate the backstack, it might be hidden and then shown again).
  */
 abstract class Screen {
-  /**
-   * Called before anything else.
-   */
-  open fun onCreate(context: ScreenContext?, container: ViewGroup?) {}
+  /** Called before anything else. */
+  open fun onCreate(context: ScreenContext, container: ViewGroup) {}
 
   /**
-   * Called when the screen is shown. Returns the [ShowInfo] that describes what we should
-   * show.
+   * Called when the screen is shown. Returns the [ShowInfo] that describes what we should show.
    */
   open fun onShow(): ShowInfo? {
     return null

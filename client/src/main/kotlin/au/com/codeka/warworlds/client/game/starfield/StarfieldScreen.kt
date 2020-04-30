@@ -22,13 +22,13 @@ import au.com.codeka.warworlds.common.proto.Star
 class StarfieldScreen : Screen() {
   private val log = Log("StarfieldScreen")
   private lateinit var starfieldManager: StarfieldManager
-  private var context: ScreenContext? = null
-  private var layout: StarfieldLayout? = null
+  private lateinit var context: ScreenContext
+  private lateinit var layout: StarfieldLayout
 
-  override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
     this.context = context
-    layout = StarfieldLayout(context!!.activity, layoutCallbacks)
+    layout = StarfieldLayout(context.activity, layoutCallbacks)
     starfieldManager = context.activity.starfieldManager
 
     val selectedStar = starfieldManager.getSelectedStar()
@@ -49,15 +49,15 @@ class StarfieldScreen : Screen() {
   }
 
   private fun showEmptyBottomPane(instant: Boolean) {
-    val emptyBottomPane = EmptyBottomPane(context!!.activity)
-    layout!!.showBottomPane(emptyBottomPane, instant)
+    val emptyBottomPane = EmptyBottomPane(context.activity)
+    layout.showBottomPane(emptyBottomPane, instant)
   }
 
   private fun showStarSelectedBottomPane(star: Star) {
     val starSelectedBottomPane = StarSelectedBottomPane(
-        context!!.activity, star, object : StarSelectedBottomPane.Callback {
+        context.activity, star, object : StarSelectedBottomPane.Callback {
       override fun onStarClicked(star: Star, planet: Planet?) {
-        context!!.pushScreen(
+        context.pushScreen(
             SolarSystemScreen(star, -1 /* planetIndex */),
             SharedViews.builder()
                 .addSharedView(R.id.top_pane)
@@ -66,7 +66,7 @@ class StarfieldScreen : Screen() {
       }
 
       override fun onFleetClicked(star: Star, fleet: Fleet) {
-        context!!.pushScreen(
+        context.pushScreen(
             FleetsScreen(star, fleet.id),
             SharedViews.builder()
                 .addSharedView(R.id.bottom_pane)
@@ -78,23 +78,23 @@ class StarfieldScreen : Screen() {
         showScoutReportBottomPane(star)
       }
     })
-    layout!!.showBottomPane(starSelectedBottomPane, false /* instant */)
+    layout.showBottomPane(starSelectedBottomPane, false /* instant */)
   }
 
   private fun showFleetSelectedBottomPane(star: Star, fleet: Fleet) {
     val fleetSelectedBottomPane = FleetSelectedBottomPane(
-        context!!.activity, star, fleet)
-    layout!!.showBottomPane(fleetSelectedBottomPane, false /* instant */)
+        context.activity, star, fleet)
+    layout.showBottomPane(fleetSelectedBottomPane, false /* instant */)
   }
 
   private fun showScoutReportBottomPane(star: Star) {
     val scoutReportBottomPane = ScoutReportBottomPane(
-        context!!.activity, star, object : ScoutReportBottomPane.Callback {
+        context.activity, star, object : ScoutReportBottomPane.Callback {
       override fun onBackClicked() {
         showStarSelectedBottomPane(star)
       }
     })
-    layout!!.showBottomPane(scoutReportBottomPane, false /* instant */)
+    layout.showBottomPane(scoutReportBottomPane, false /* instant */)
   }
 
   private val tapListener: TapListener = object : TapListener {
@@ -113,7 +113,7 @@ class StarfieldScreen : Screen() {
 
   private val layoutCallbacks = object : StarfieldLayout.Callbacks {
     override fun onChatClick(roomId: Long?) {
-      context!!.pushScreen(
+      context.pushScreen(
           ChatScreen(),
           SharedViews.builder()
               .addSharedView(R.id.bottom_pane)

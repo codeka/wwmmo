@@ -9,26 +9,21 @@ import java.util.*
  * The points are always bound to the square (0,0), (1,1).
  */
 open class PointCloud {
-  protected var points: ArrayList<Vector2?>
+  protected var points_: ArrayList<Vector2>
 
-  constructor() {
-    points = ArrayList()
+  constructor(points: ArrayList<Vector2> = ArrayList()) {
+    points_ = points
   }
 
-  constructor(points: ArrayList<Vector2?>) {
-    this.points = points
-  }
-
-  fun getPoints(): MutableList<Vector2?> {
-    return points
-  }
+  val points: MutableList<Vector2>
+    get() = points_
 
   /**
    * Helper class to render this point cloud to the given \c Image (mostly for debugging).
    */
   fun render(img: Image) {
-    for (p in points) {
-      val x = (img.width * p!!.x).toInt()
+    for (p in points_) {
+      val x = (img.width * p.x).toInt()
       val y = (img.height * p.y).toInt()
       img.drawCircle(x, y, 5.0, Colour.RED)
     }

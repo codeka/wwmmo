@@ -9,11 +9,12 @@ import au.com.codeka.warworlds.client.ui.ShowInfo.Companion.builder
 import au.com.codeka.warworlds.common.proto.Star
 
 class StarSearchScreen : Screen() {
-  private var layout: StarSearchLayout? = null
-  override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
+  private lateinit var layout: StarSearchLayout
+
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
     layout = StarSearchLayout(
-        context!!.activity,
+        context.activity,
         object : StarSearchLayout.Callback {
           override fun onStarClick(star: Star?) {
             context.pushScreen(SolarSystemScreen(star!!, -1))

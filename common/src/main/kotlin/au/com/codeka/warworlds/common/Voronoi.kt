@@ -11,10 +11,10 @@ open class Voronoi(protected var pointCloud: PointCloud) {
   protected var triangles: ArrayList<Triangle>? = null
 
   // This mapping maps points in the point cloud to the triangles that share the point as a vertex.
-  protected var pointCloudToTriangles: HashMap<Vector2?, MutableList<Triangle>>? = null
+  protected var pointCloudToTriangles: HashMap<Vector2, MutableList<Triangle>>? = null
 
   // Maps from points to a list of the neighbouring points.
-  protected var pointNeighbours: HashMap<Vector2?, List<Vector2?>>? = null
+  protected var pointNeighbours: HashMap<Vector2, List<Vector2>>? = null
 
   /**
    * Constructs a [Voronoi] diagram from the given [PointCloud]. You must call [.generate] to
@@ -27,7 +27,7 @@ open class Voronoi(protected var pointCloud: PointCloud) {
   /** Generates the delaunay triangulation/voronoi diagram of the point cloud. */
   protected fun generate() {
     var newTriangles: MutableList<Triangle>? = ArrayList()
-    val points = pointCloud.getPoints()
+    val points = pointCloud.points
 
     // First, create a "super triangle" that encompasses the whole point cloud. This is easy because
     // the point cloud is confined to the range (0,0)-(1,1) so we just add two triangles to
@@ -35,7 +35,7 @@ open class Voronoi(protected var pointCloud: PointCloud) {
     val superTriangles = createSuperTriangles(points, newTriangles)
 
     // Go through the vertices and add them.
-    val size = points!!.size
+    val size = points.size
     for (i in 0 until size) {
       // Add this vertex to the triangulation.
       addVertex(points, newTriangles, i)
@@ -63,7 +63,7 @@ open class Voronoi(protected var pointCloud: PointCloud) {
 
     // Remove the super triangle points (they'll be the last four we added).
     for (i in 0..3) {
-      pointCloud.getPoints().removeAt(pointCloud.getPoints().size - 1)
+      pointCloud.points.removeAt(pointCloud.points.size - 1)
     }
 
     // Next, go through the list of triangles and populate pointCloudToTriangles.
@@ -84,7 +84,7 @@ open class Voronoi(protected var pointCloud: PointCloud) {
       val pt = points[i]
       newTriangles = pointCloudToTriangles!![pt]
       if (newTriangles != null) {
-        val neighbours: MutableSet<Vector2?> = HashSet()
+        val neighbours: MutableSet<Vector2> = HashSet()
         numTriangles = newTriangles.size
         for (j in 0 until numTriangles) {
           val t = newTriangles[j]
@@ -101,15 +101,15 @@ open class Voronoi(protected var pointCloud: PointCloud) {
   fun findClosestPoint(uv: Vector2): Vector2? {
     var closestPoint: Vector2? = null
     var closestDistance2 = 0.0
-    val points = pointCloud.getPoints()
+    val points = pointCloud.points
     val numPoints = points.size
     for (i in 0 until numPoints) {
       val pt = points[i]
       if (closestPoint == null) {
         closestPoint = pt
-        closestDistance2 = pt!!.distanceTo2(uv)
+        closestDistance2 = pt.distanceTo2(uv)
       } else {
-        val distance2 = pt!!.distanceTo2(uv)
+        val distance2 = pt.distanceTo2(uv)
         if (distance2 < closestDistance2) {
           closestDistance2 = distance2
           closestPoint = pt
@@ -120,8 +120,8 @@ open class Voronoi(protected var pointCloud: PointCloud) {
   }
 
   /** Gets the points that neighbour the given point. */
-  fun getNeighbours(pt: Vector2?): List<Vector2?> {
-    return pointNeighbours!![pt]!!
+  fun getNeighbours(pt: Vector2): List<Vector2>? {
+    return pointNeighbours!![pt]
   }
 
   /**
@@ -131,7 +131,7 @@ open class Voronoi(protected var pointCloud: PointCloud) {
    * point. This method does that.
    */
   private fun sortPointCloudToTrianglesMap() {
-    for (pt in pointCloud.getPoints()) {
+    for (pt in pointCloud.points) {
       val unsorted = pointCloudToTriangles!![pt] ?: continue
       val sorted = ArrayList<Triangle>()
       sorted.add(unsorted[0])
@@ -184,9 +184,9 @@ open class Voronoi(protected var pointCloud: PointCloud) {
    * given [Colour].
    */
   fun renderDelaunay(img: Image, c: Colour) {
-    val points = pointCloud.getPoints()
+    val points = pointCloud.points
     for (t in triangles!!) {
-      var p1 = points!![t.a]
+      var p1 = points[t.a]
       var p2 = points[t.b]
       drawLine(img, c, p1, p2)
       p1 = points[t.c]
@@ -201,7 +201,7 @@ open class Voronoi(protected var pointCloud: PointCloud) {
    * [Colour].
    */
   fun renderVoronoi(img: Image, c: Colour) {
-    for (pt in pointCloud.getPoints()) {
+    for (pt in pointCloud.points) {
       val triangles = pointCloudToTriangles!![pt]
           ?: // shouldn't happen, but just in case...
           continue
@@ -227,7 +227,7 @@ open class Voronoi(protected var pointCloud: PointCloud) {
     img.drawLine(x1, y1, x2, y2, c)
   }
 
-  private fun addTriangleToPointCloudToTrianglesMap(pt: Vector2?, t: Triangle) {
+  private fun addTriangleToPointCloudToTrianglesMap(pt: Vector2, t: Triangle) {
     var value = pointCloudToTriangles!![pt]
     if (value == null) {
       value = ArrayList()
@@ -282,13 +282,13 @@ open class Voronoi(protected var pointCloud: PointCloud) {
    * a vertex with these will need to be removed as well.
    */
   private fun createSuperTriangles(
-      points: MutableList<Vector2?>?, triangles: MutableList<Triangle>?): List<Triangle> {
+      points: MutableList<Vector2>, triangles: MutableList<Triangle>?): List<Triangle> {
     var minX = 1.0
     var minY = 1.0
     var maxX = 0.0
     var maxY = 0.0
-    for (pt in points!!) {
-      if (pt!!.x < minX) {
+    for (pt in points) {
+      if (pt.x < minX) {
         minX = pt.x
       }
       if (pt.x > maxX) {

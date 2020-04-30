@@ -25,14 +25,15 @@ import au.com.codeka.warworlds.common.proto.Star
  * for managing builds, planet focus, launching fleets and so on.
  */
 class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : Screen() {
-  private var context: ScreenContext? = null
-  private var layout: SolarSystemLayout? = null
+  private lateinit var context: ScreenContext
+  private lateinit var layout: SolarSystemLayout
   private var isCreated = false
-  override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
+
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
     isCreated = true
     this.context = context
-    layout = SolarSystemLayout(context!!.activity, layoutCallbacks, star, planetIndex)
+    layout = SolarSystemLayout(context.activity, layoutCallbacks, star, planetIndex)
     App.taskRunner.runTask(Runnable { doRefresh() }, Threads.BACKGROUND, 100)
     App.eventBus.register(eventHandler)
   }
@@ -63,7 +64,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
     }
 
   private fun refreshStar(star: Star) {
-    layout!!.refreshStar(star)
+    layout.refreshStar(star)
     this.star = star
   }
 
@@ -92,7 +93,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
       context!!.pushScreen(
           BuildScreen(star, planetIndex),
           SharedViews.Builder()
-              .addSharedView(layout!!.getPlanetView(planetIndex), R.id.planet_icon)
+              .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
               .addSharedView(R.id.bottom_pane)
               .build())
     }
@@ -102,7 +103,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
       context!!.pushScreen(
           PlanetDetailsScreen(star, star.planets[planetIndex]),
           SharedViews.Builder()
-              .addSharedView(layout!!.getPlanetView(planetIndex), R.id.planet_icon)
+              .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
               .addSharedView(R.id.bottom_pane)
               .build())
     }
@@ -112,7 +113,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
       context!!.pushScreen(
           PlanetDetailsScreen(star, star.planets[planetIndex]),
           SharedViews.Builder()
-              .addSharedView(layout!!.getPlanetView(planetIndex), R.id.planet_icon)
+              .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
               .addSharedView(R.id.bottom_pane)
               .build())
     }

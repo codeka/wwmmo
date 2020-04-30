@@ -13,12 +13,13 @@ import au.com.codeka.warworlds.common.proto.ChatRoom
 /** Main fragment for showing the chat system.  */
 class ChatScreen : Screen() {
   // private ChatPagerAdapter chatPagerAdapter;
-  private var layout: ChatLayout? = null
+  private lateinit var layout: ChatLayout
   private var rooms: List<ChatRoom>? = null
   private val handler: Handler? = null
-  override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
+
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
-    layout = ChatLayout(context!!.activity, layoutCallbacks)
+    layout = ChatLayout(context.activity, layoutCallbacks)
   }
 
   override fun onShow(): ShowInfo? {
@@ -83,7 +84,7 @@ class ChatScreen : Screen() {
 
   private fun refreshRooms() {
     rooms = ChatManager.i.rooms
-    layout!!.refresh(rooms)
+    layout.refresh(rooms)
   }
 
   private fun showConfirmAutoTranslateDialog() {

@@ -23,12 +23,13 @@ import com.google.common.base.Preconditions
  * could also be an ally or faction member).
  */
 class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : Screen() {
-  private var context: ScreenContext? = null
-  private var layout: PlanetDetailsLayout? = null
-  override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
+  private lateinit var context: ScreenContext
+  private lateinit var layout: PlanetDetailsLayout
+
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
     this.context = context
-    layout = PlanetDetailsLayout(context!!.activity, star, planet, layoutCallbacks)
+    layout = PlanetDetailsLayout(context.activity, star, planet, layoutCallbacks)
   }
 
   override fun onShow(): ShowInfo? {

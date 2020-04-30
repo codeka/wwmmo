@@ -37,13 +37,15 @@ import javax.xml.parsers.DocumentBuilderFactory
  * news, letting you change your empire and so on.
  */
 class WelcomeScreen : Screen() {
-  private var context: ScreenContext? = null
-  private var welcomeLayout: WelcomeLayout? = null
+  private lateinit var context: ScreenContext
+  private lateinit var welcomeLayout: WelcomeLayout
   private var motd: String? = null
-  override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
+
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
     this.context = context
-    welcomeLayout = WelcomeLayout(context!!.activity, layoutCallbacks)
+
+    welcomeLayout = WelcomeLayout(context.activity, layoutCallbacks)
     App.eventBus.register(eventHandler)
     refreshWelcomeMessage()
 
@@ -58,13 +60,13 @@ class WelcomeScreen : Screen() {
   }
 
   override fun onShow(): ShowInfo? {
-    welcomeLayout!!.setConnectionStatus(false, null)
+    welcomeLayout.setConnectionStatus(false, null)
     updateServerState(App.server.currState)
     if (EmpireManager.hasMyEmpire()) {
-      welcomeLayout!!.refreshEmpireDetails(EmpireManager.getMyEmpire())
+      welcomeLayout.refreshEmpireDetails(EmpireManager.getMyEmpire())
     }
     if (motd != null) {
-      welcomeLayout!!.updateWelcomeMessage(motd)
+      welcomeLayout.updateWelcomeMessage(motd)
     }
 
 /*
@@ -163,9 +165,7 @@ class WelcomeScreen : Screen() {
       }
       App.taskRunner.runTask(Runnable {
         this.motd = motd.toString()
-        if (welcomeLayout != null) {
-          welcomeLayout!!.updateWelcomeMessage(motd.toString())
-        }
+        welcomeLayout.updateWelcomeMessage(motd.toString())
       }, Threads.UI)
     }, Threads.BACKGROUND)
   }
@@ -204,24 +204,24 @@ class WelcomeScreen : Screen() {
 
   private val layoutCallbacks: WelcomeLayout.Callbacks = object : WelcomeLayout.Callbacks {
     override fun onStartClick() {
-      context!!.home()
-      context!!.pushScreen(StarfieldScreen())
+      context.home()
+      context.pushScreen(StarfieldScreen())
     }
 
     override fun onHelpClick() {
       val i = Intent(Intent.ACTION_VIEW)
       i.data = Uri.parse("http://www.war-worlds.com/doc/getting-started")
-      context!!.startActivity(i)
+      context.startActivity(i)
     }
 
     override fun onWebsiteClick() {
       val i = Intent(Intent.ACTION_VIEW)
       i.data = Uri.parse("http://www.war-worlds.com/")
-      context!!.startActivity(i)
+      context.startActivity(i)
     }
 
     override fun onSignInClick() {
-      context!!.pushScreen(SignInScreen())
+      context.pushScreen(SignInScreen())
     }
   }
   private val eventHandler: Any = object : Any() {

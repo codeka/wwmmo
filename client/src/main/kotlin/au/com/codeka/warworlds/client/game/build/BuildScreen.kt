@@ -26,28 +26,28 @@ class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
   private var context: ScreenContext? = null
   private var colonies: MutableList<Colony> = ArrayList()
   private lateinit var currColony: Colony
-  private var layout: BuildLayout? = null
+  private lateinit var layout: BuildLayout
 
   init {
     extractColonies(star, planetIndex)
   }
 
-  override fun onCreate(context: ScreenContext?, parent: ViewGroup?) {
+  override fun onCreate(context: ScreenContext, parent: ViewGroup) {
     super.onCreate(context, parent)
     this.context = context
-    layout = BuildLayout(context!!.activity, star, colonies, colonies.indexOf(currColony))
-    layout!!.refreshColonyDetails(currColony)
+    layout = BuildLayout(context.activity, star, colonies, colonies.indexOf(currColony))
+    layout.refreshColonyDetails(currColony)
     App.eventBus.register(eventHandler)
   }
 
   override fun onShow(): ShowInfo? {
     // Refresh immediately on show
-    layout!!.post(refreshRunnable)
+    layout.post(refreshRunnable)
     return builder().view(layout).build()
   }
 
   override fun onHide() {
-    layout!!.removeCallbacks(refreshRunnable)
+    layout.removeCallbacks(refreshRunnable)
   }
 
   override fun onDestroy() {
@@ -91,7 +91,7 @@ class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
         }
       }
     }
-    layout!!.refresh(star, colonies)
+    layout.refresh(star, colonies)
   }
 
   private fun extractColonies(star: Star?, planetIndex: Int) {
@@ -115,9 +115,9 @@ class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
         // Every tenth refresh, we'll re-simulate the star
         StarManager.queueSimulateStar(star!!)
       } else {
-        layout!!.refresh(star, colonies)
+        layout.refresh(star, colonies)
       }
-      layout!!.postDelayed(this, REFRESH_DELAY_MS)
+      layout.postDelayed(this, REFRESH_DELAY_MS)
     }
   }
 

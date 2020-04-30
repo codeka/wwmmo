@@ -25,15 +25,15 @@ import au.com.codeka.warworlds.common.proto.AccountAssociateResponse.AccountAsso
  * email account that you then have to type into the box.
  */
 class SignInScreen : Screen() {
-  private var layout: SignInLayout? = null
-  private var context: ScreenContext? = null
+  private lateinit var layout: SignInLayout
+  private lateinit var context: ScreenContext
 
   /** If we're tried to associate and got an error that can be fixed by forcing, this'll be true.  */
   private var askingToForce = false
-  override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
     this.context = context
-    layout = SignInLayout(context!!.activity, layoutCallbacks)
+    layout = SignInLayout(context.activity, layoutCallbacks)
   }
 
   override fun onShow(): ShowInfo? {

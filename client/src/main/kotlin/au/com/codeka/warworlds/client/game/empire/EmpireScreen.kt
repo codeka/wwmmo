@@ -21,12 +21,13 @@ import au.com.codeka.warworlds.common.proto.PatreonBeginResponse
  * This screen shows the status of the empire. You can see all your colonies, all your fleets, etc.
  */
 class EmpireScreen : Screen() {
-  private var context: ScreenContext? = null
-  private var layout: EmpireLayout? = null
-  override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
+  private lateinit var context: ScreenContext
+  private lateinit var layout: EmpireLayout
+
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
     this.context = context
-    layout = EmpireLayout(context!!.activity, SettingsCallbacks())
+    layout = EmpireLayout(context.activity, SettingsCallbacks())
   }
 
   override fun onShow(): ShowInfo? {

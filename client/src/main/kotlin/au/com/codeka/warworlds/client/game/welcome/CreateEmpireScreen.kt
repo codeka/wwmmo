@@ -21,12 +21,14 @@ import au.com.codeka.warworlds.common.proto.NewAccountResponse
  * a new empire, or sign in with an existing account (if you have one).
  */
 class CreateEmpireScreen : Screen() {
-  private var layout: CreateEmpireLayout? = null
-  private var context: ScreenContext? = null
-  override fun onCreate(context: ScreenContext?, container: ViewGroup?) {
+  private lateinit var layout: CreateEmpireLayout
+  private lateinit var context: ScreenContext
+
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
-    layout = CreateEmpireLayout(context!!.activity, layoutCallbacks)
+
     this.context = context
+    layout = CreateEmpireLayout(context.activity, layoutCallbacks)
   }
 
   override fun onShow(): ShowInfo? {
@@ -39,7 +41,7 @@ class CreateEmpireScreen : Screen() {
     }
   }
   private fun registerEmpire(empireName: String) {
-    layout!!.showSpinner()
+    layout.showSpinner()
     App.taskRunner.runTask(Runnable {
       val request = HttpRequest.Builder()
           .url(url + "accounts")
@@ -54,7 +56,7 @@ class CreateEmpireScreen : Screen() {
         // TODO: report the error to the server?
         log.error("Didn't get NewAccountResponse, as expected.", request.exception)
       } else if (resp.cookie == null) {
-        App.taskRunner.runTask(Runnable { layout!!.showError(resp.message) }, Threads.UI)
+        App.taskRunner.runTask(Runnable { layout.showError(resp.message) }, Threads.UI)
       } else {
         log.info(
             "New account response, cookie: %s, message: %s",

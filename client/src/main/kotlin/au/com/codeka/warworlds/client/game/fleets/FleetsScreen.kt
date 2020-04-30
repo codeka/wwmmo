@@ -16,14 +16,14 @@ import au.com.codeka.warworlds.common.proto.Star
  * merge, split, move, etc).
  */
 class FleetsScreen(star: Star?, private val initialFleetId: Long?) : Screen() {
-  private var starCollection: StarCollection? = null
-  private var layout: FleetsLayout? = null
+  private lateinit var starCollection: StarCollection
+  private lateinit var layout: FleetsLayout
 
-  override fun onCreate(context: ScreenContext?, parent: ViewGroup?) {
+  override fun onCreate(context: ScreenContext, parent: ViewGroup) {
     super.onCreate(context, parent)
-    layout = FleetsLayout(context!!.activity, starCollection)
+    layout = FleetsLayout(context.activity, starCollection)
     if (initialFleetId != null) {
-      layout!!.selectFleet(initialFleetId)
+      layout.selectFleet(initialFleetId)
     }
   }
 
