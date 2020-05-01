@@ -16,7 +16,7 @@ apply plugin: 'application'
 
 dependencies {
   implementation fileTree(dir: 'libs', include: '*.jar')
-  implementation 'au.com.codeka:carrot:2.4.1'
+  implementation 'au.com.codeka:carrot:2.4.4'
   implementation 'com.google.auth:google-auth-library-oauth2-http:0.20.0'
   implementation 'com.google.oauth-client:google-oauth-client:1.30.6'
   implementation 'com.google.api-client:google-api-client:1.30.9'
@@ -28,7 +28,7 @@ dependencies {
   implementation 'com.google.protobuf:protobuf-java:3.6.0'
   implementation 'com.google.protobuf:protobuf-java-util:3.6.0'
   implementation 'com.google.guava:guava:24.1-jre'
-  implementation 'com.patreon:patreon:0.4.2'
+  implementation 'com.squareup.okhttp3:okhttp:4.6.0'
   implementation 'com.zaxxer:HikariCP:3.4.2'
   implementation 'joda-time:joda-time:2.9.9'
   implementation 'io.dropwizard.metrics:metrics-core:4.1.2'

@@ -1,12 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import com.github.jasminb.jsonapi.JSONAPIDocument;
-import com.patreon.PatreonAPI;
-import com.patreon.resources.Pledge;
-import com.patreon.resources.User;
-
-import java.io.IOException;
-
 import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
@@ -16,6 +9,7 @@ import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.PatreonInfo;
+import au.com.codeka.warworlds.server.utils.PatreonApi;
 
 public class PatreonController {
   private static final Log log = new Log("PatreonController");
@@ -41,26 +35,18 @@ public class PatreonController {
   public void updatePatreonInfo(PatreonInfo patreonInfo) throws RequestException {
     log.info("Refreshing Patreon pledges for %d.", patreonInfo.getEmpireId());
 
-    PatreonAPI apiClient = new PatreonAPI(patreonInfo.getAccessToken());
-    User user;
-    try {
-      JSONAPIDocument<User> userJson = apiClient.fetchUser();
-      user = userJson.get();
-    } catch (IOException e) {
-      throw new RequestException(e);
-    }
+    PatreonApi api = new PatreonApi();
+    PatreonApi.UserResponse user = api.fetchUser(patreonInfo.getAccessToken());
 
     int maxPledge = 0;
-    if (user.getPledges() != null) {
-      for (Pledge pledge : user.getPledges()) {
-        if (pledge.getAmountCents() > maxPledge) {
-          maxPledge = pledge.getAmountCents();
-        }
+    for (PatreonApi.UserPledge pledge : user.getPledges()) {
+      if (pledge.getAmountCents() > maxPledge) {
+        maxPledge = pledge.getAmountCents();
       }
     }
 
     patreonInfo = patreonInfo.newBuilder()
-        .fullName(user.getFullName())
+        .fullName(user.getName())
         .about(user.getAbout())
         .discordId(user.getDiscordId())
         .patreonUrl(user.getUrl())

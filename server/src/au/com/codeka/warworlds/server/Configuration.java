@@ -187,6 +187,7 @@ public class Configuration {
     @Expose private String clientId;
     @Expose private String clientSecret;
     @Expose private String redirectUri;
+    @Expose private String refreshToken;
 
     public String getClientId() {
       return clientId;
@@ -198,6 +199,10 @@ public class Configuration {
 
     public String getRedirectUri() {
       return redirectUri;
+    }
+
+    public String getRefreshToken() {
+      return refreshToken;
     }
   }
 
