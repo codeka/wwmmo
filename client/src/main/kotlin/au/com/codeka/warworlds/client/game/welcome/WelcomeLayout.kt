@@ -17,7 +17,8 @@ import com.squareup.picasso.Picasso
 /**
  * Layout for the [WelcomeScreen].
  */
-class WelcomeLayout(context: Context?, private val callbacks: Callbacks) : RelativeLayout(context, null) {
+class WelcomeLayout(context: Context?, private val callbacks: Callbacks)
+  : RelativeLayout(context, null) {
   interface Callbacks {
     fun onStartClick()
     fun onHelpClick()

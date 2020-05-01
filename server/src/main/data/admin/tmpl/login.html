@@ -3,45 +3,26 @@
   <head>
     <title>War Worlds &bull; Login</title>
     <meta name="viewport" content="width=device-width" />
+    <meta name="google-signin-client_id" content="{{client_id}}">
 
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script>
-    (function() {
-       var po = document.createElement('script');
-       po.type = 'text/javascript'; po.async = true;
-       po.src = 'https://apis.google.com/js/client:plusone.js?onload=render';
-       var s = document.getElementsByTagName('script')[0];
-       s.parentNode.insertBefore(po, s);
-    })();
+    function complete(googleUser) {
+      var profile = googleUser.getBasicProfile();
+      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
 
-    function render() {
-      // Additional params including the callback, the rest of the params will
-      // come from the page-level configuration.
-      var args = {
-        "callback": complete,
-        "clientid": "{{client_id}}",
-        "scope": "email",
-        "cookiepolicy": "single_host_origin"
-      };
-      gapi.signin.render('customGPlusBtn', args);
-    }
-
-    function complete(authResult) {
-      if (authResult['status']['signed_in']) {
-        document.getElementById("auth-result").value = JSON.stringify(authResult);
-        document.getElementById("success").submit();
-      } else {
-        // Update the app to reflect a signed out user
-        // Possible error values:
-        //   "user_signed_out" - User is signed-out
-        //   "access_denied" - User denied access to your app
-        //   "immediate_failed" - Could not automatically log in the user
-        document.getElementById("error").innerHTML = authResult['error'];
-      }
+      document.getElementById("auth-result").value = JSON.stringify(googleUser.getAuthResponse());
+      document.getElementById("success").submit();
     }
     </script>
   </head>
   <body>
-    <div style="margin: 100pt auto; width: 112px;"><div id="customGPlusBtn"></div></div>
+    <div style="margin: 100pt auto; width: 112px; height: 24px; background: red;">
+      <div class="g-signin2" data-onsuccess="complete"></div>
+    </div>
     <div id="error" style="text-align: center;"></div>
     <form id="success" method="post">
       <input type="hidden" name="auth-result" id="auth-result">

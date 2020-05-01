@@ -38,7 +38,7 @@ class Server {
   /** The PacketDecoder we'll use to receive packets. Null if we're not connected.  */
   private var packetDecoder: PacketDecoder? = null
 
-  /** A queue for storing packets while we attempt to reconnect. Will be null if we're connected.  */
+  /** A queue for storing packets while we attempt to reconnect. Will be null if we're connected. */
   private var queuedPackets: Queue<Packet>? = null
 
   /** A list of callbacks waiting for hello to complete.  */
@@ -99,7 +99,7 @@ class Server {
                     .build().encode())
                 .build()
             if (request.responseCode != 200) {
-              if (request.responseCode >= 401 && request.responseCode < 500) {
+              if (request.responseCode in 401..499) {
                 // Our cookie must not be valid, we'll clear it before trying again.
                 GameSettings.edit()
                     .setString(GameSettings.Key.COOKIE, "")

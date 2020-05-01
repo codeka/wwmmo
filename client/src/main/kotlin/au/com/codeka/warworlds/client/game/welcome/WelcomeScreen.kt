@@ -53,9 +53,9 @@ class WelcomeScreen : Screen() {
     //optionsButton.setOnClickListener(v ->
     //    getFragmentTransitionManager().replaceFragment(GameSettingsFragment.class));
     if (getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
-      welcomeLayout!!.setSignInText(R.string.signin)
+      welcomeLayout.setSignInText(R.string.signin)
     } else {
-      welcomeLayout!!.setSignInText(R.string.switch_user)
+      welcomeLayout.setSignInText(R.string.switch_user)
     }
   }
 
@@ -175,19 +175,19 @@ class WelcomeScreen : Screen() {
     if (event.state === ServerStateEvent.ConnectionState.CONNECTED) {
       val maxMemoryBytes = Runtime.getRuntime().maxMemory()
       val context = App.applicationContext
-      val activityManager = Preconditions.checkNotNull(context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+      val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
       val memoryClass = activityManager.memoryClass
       val formatter = DecimalFormat("#,##0")
       val msg = String.format(Locale.ENGLISH,
           "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s", memoryClass,
           formatter.format(maxMemoryBytes), string())
-      welcomeLayout!!.setConnectionStatus(true, msg)
+      welcomeLayout.setConnectionStatus(true, msg)
     } else {
       if (event.state === ServerStateEvent.ConnectionState.ERROR) {
         handleConnectionError(event)
       }
       val msg = String.format("%s - %s", event.url, event.state)
-      welcomeLayout!!.setConnectionStatus(false, msg)
+      welcomeLayout.setConnectionStatus(false, msg)
     }
   }
 
@@ -234,7 +234,7 @@ class WelcomeScreen : Screen() {
     fun onEmpireUpdated(empire: Empire) {
       val myEmpire = EmpireManager.getMyEmpire()
       if (myEmpire.id == empire.id && welcomeLayout != null) {
-        welcomeLayout!!.refreshEmpireDetails(empire)
+        welcomeLayout.refreshEmpireDetails(empire)
       }
     }
   }

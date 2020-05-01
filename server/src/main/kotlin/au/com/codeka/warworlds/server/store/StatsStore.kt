@@ -40,7 +40,7 @@ class StatsStore internal constructor(fileName: String) : BaseStore(fileName) {
                 .timestamp(res.getLong(0))
                 .day(res.getInt(1))
                 .empire_id(res.getLong(2))
-                .email_addr(res.getString(3))
+                .email_addr(res.getStringOrNull(3))
                 .device_info(DeviceInfo.ADAPTER.decode(res.getBytes(4)))
                 .build())
             if (loginEvents.size >= num) {

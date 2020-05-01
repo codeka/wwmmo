@@ -18,7 +18,7 @@ class AdminLoginHandler : AdminHandler() {
   companion object {
     private val log = Log("AdminLoginHandler")
     private const val CLIENT_ID =
-        "1021675369049-sumlr2cihs72j4okvfl8hl72keognhsa.apps.googleusercontent.com"
+        "809181406384-obrefe4qb0hmaektbesqsc25rop0u72f.apps.googleusercontent.com"
   }
 
   /** We don't require any roles, because we're creating a session.  */
