@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server.store
 
 import au.com.codeka.warworlds.server.store.base.BaseStore
 
+const val DATA_STORE_INCREMENT_AMOUNT = 100L
+
 /**
  * A store for storing a sequence of unique IDs. To keep this performant, we only query/update the
  * actual data store in batches. Each time we increment the counter in the data store by
@@ -10,7 +12,6 @@ import au.com.codeka.warworlds.server.store.base.BaseStore
  */
 class SequenceStore internal constructor(fileName: String) : BaseStore(fileName) {
   private val lock = Any()
-  private val DATA_STORE_INCREMENT_AMOUNT = 100L
 
   /** The next identifier that we should return.  */
   private var identifier: Long = 0
@@ -52,18 +53,17 @@ class SequenceStore internal constructor(fileName: String) : BaseStore(fileName)
     }
   }
 
-  @Throws(StoreException::class)
   override fun onOpen(diskVersion: Int): Int {
-    var diskVersion = diskVersion
-    if (diskVersion == 0) {
+    var version = diskVersion
+    if (version == 0) {
       newWriter()
           .stmt("CREATE TABLE identifiers (id INTEGER PRIMARY KEY)")
           .execute()
       newWriter()
           .stmt("INSERT INTO identifiers (id) VALUES (100)")
           .execute()
-      diskVersion++
+      version++
     }
-    return diskVersion
+    return version
   }
 }

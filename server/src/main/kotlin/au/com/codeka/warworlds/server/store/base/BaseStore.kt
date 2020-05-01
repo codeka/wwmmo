@@ -80,16 +80,13 @@ abstract class BaseStore protected constructor(private val fileName: String) {
    * @return The new version to return as the on-disk version. Must be > 0 and >= the value passed
    * in as diskVersion.
    */
-  @Throws(StoreException::class)
   protected abstract fun onOpen(diskVersion: Int): Int
 
   /** Check that the version of the database on disk is the same as the version we expect.  */
-  @Throws(StoreException::class)
   private fun ensureVersion() {
     var currVersion = 0
-    var conn: PooledConnection? = null
-    conn = try {
-      dataSource!!.pooledConnection
+    val conn = try {
+      dataSource.pooledConnection
     } catch (e: SQLException) {
       return
     }
