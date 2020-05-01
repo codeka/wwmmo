@@ -21,9 +21,7 @@
       <td>{% include "inc/empire_name.html" empire = empires[account.empire_id] %}</td>
       <td>
         {% if account.email != null %}
-          <span title="Canonical: {{ account.email_canonical }}">
-            {{ account.email }} ({{ account.email_status }})
-          </span>
+          <span>{{ account.email }} ({{ account.email_status }})</span>
         {% else %}
           <em>none</em>
         {% end %}

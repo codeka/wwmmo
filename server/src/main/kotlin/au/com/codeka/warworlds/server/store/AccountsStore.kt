@@ -76,14 +76,13 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
   fun put(cookie: String, account: Account) {
     newWriter()
         .stmt("INSERT OR REPLACE INTO accounts ("
-            + " email, cookie, empire_id, email_verification_code, account"
-            + ") VALUES (?, ?, ?, ?, ?)")
+            + " email, cookie, empire_id, account"
+            + ") VALUES (?, ?, ?, ?)")
         .param(0,
-            if (account.email_status == Account.EmailStatus.VERIFIED) account.email_canonical else null)
+            if (account.email_status == Account.EmailStatus.VERIFIED) account.email else null)
         .param(1, cookie)
         .param(2, account.empire_id)
-        .param(3, account.email_verification_code)
-        .param(4, account.encode())
+        .param(3, account.encode())
         .execute()
   }
 

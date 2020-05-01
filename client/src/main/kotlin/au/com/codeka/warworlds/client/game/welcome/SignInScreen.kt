@@ -11,25 +11,24 @@ import au.com.codeka.warworlds.client.ui.Screen
 import au.com.codeka.warworlds.client.ui.ScreenContext
 import au.com.codeka.warworlds.client.ui.ShowInfo
 import au.com.codeka.warworlds.client.util.GameSettings
-import au.com.codeka.warworlds.client.util.GameSettings.SignInState
-import au.com.codeka.warworlds.client.util.GameSettings.edit
-import au.com.codeka.warworlds.client.util.GameSettings.getEnum
-import au.com.codeka.warworlds.client.util.GameSettings.getString
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.AccountAssociateRequest
 import au.com.codeka.warworlds.common.proto.AccountAssociateResponse
 import au.com.codeka.warworlds.common.proto.AccountAssociateResponse.AccountAssociateStatus
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 
 /**
- * This screen is used to associate your cookie with an email address. You'll get a code in your
- * email account that you then have to type into the box.
+ * This screen is used to associate your cookie with an email address. We use Google Auth to
+ * authenticate your email address with Google, then send it to the server for verification and
+ * to associate it with the empire.
  */
 class SignInScreen : Screen() {
   private lateinit var layout: SignInLayout
   private lateinit var context: ScreenContext
 
-  /** If we're tried to associate and got an error that can be fixed by forcing, this'll be true.  */
+  /** If we're tried to associate and got an error that can be fixed by forcing, this'll be true. */
   private var askingToForce = false
+
   override fun onCreate(context: ScreenContext, container: ViewGroup) {
     super.onCreate(context, container)
     this.context = context
@@ -38,128 +37,113 @@ class SignInScreen : Screen() {
 
   override fun onShow(): ShowInfo? {
     updateState(null)
-    val signInState = getEnum(GameSettings.Key.SIGN_IN_STATE, SignInState::class.java)
-    if (signInState === SignInState.AWAITING_VERIFICATION) {
-      checkVerificationStatus()
-    }
     return ShowInfo.builder().view(layout).toolbarVisible(false).build()
   }
 
   /** Updates the current state (or just refreshes the current state, if newState is null).  */
-  private fun updateState(newState: SignInState?) {
-    val signInState: SignInState
-    signInState = if (newState != null) {
-      edit()
+  private fun updateState(newState: GameSettings.SignInState?) {
+    val signInState = if (newState != null) {
+      GameSettings.edit()
           .setEnum(GameSettings.Key.SIGN_IN_STATE, newState)
           .commit()
       newState
     } else {
-      getEnum(
-          GameSettings.Key.SIGN_IN_STATE, SignInState::class.java)
+      GameSettings.getEnum(
+          GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState::class.java)
     }
-    layout!!.setErrorMsg(null as String?)
+    layout.setErrorMsg(null as String?)
     when (signInState) {
-      SignInState.ANONYMOUS -> layout!!.updateState(
+      GameSettings.SignInState.ANONYMOUS -> layout.updateState(
           R.string.signin_help,
           true /* signInEnabled */,
           R.string.signin,
-          true /* isCancel */,
-          true /* showEmailAddr */)
-      SignInState.AWAITING_VERIFICATION -> layout!!.updateState(
-          R.string.signin_code_help,
-          false /* signInEnabled */,
-          R.string.signin,
-          true /* isCancel */,
-          false /* showEmailAddr */)
-      SignInState.VERIFIED -> layout!!.updateState(
+          true /* isCancel */)
+
+      GameSettings.SignInState.VERIFIED -> layout.updateState(
           R.string.signin_complete_help,
           true /* signInEnabled */,
           R.string.switch_user,
-          false /* isCancel */,
-          false /* showEmailAddr */)
-      else -> throw IllegalStateException("Unexpected sign-in state: $signInState")
+          false /* isCancel */)
     }
   }
 
   private val layoutCallbacks: SignInLayout.Callbacks = object : SignInLayout.Callbacks {
-    override fun onSignInClick(emailAddr: String) {
-      if (askingToForce) {
-        onSignInForce(emailAddr)
-        return
-      }
-      val signInState = getEnum(GameSettings.Key.SIGN_IN_STATE, SignInState::class.java)
-      when (signInState) {
-        SignInState.ANONYMOUS -> onSignInAnonymousState(emailAddr)
-        SignInState.AWAITING_VERIFICATION -> {
+    override fun onSignInClick() {
+      val accountFuture = App.auth.explicitSignIn(context.activity)
+      GameSettings.edit()
+          .setEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.PENDING)
+          .commit()
+      App.taskRunner.runTask(Runnable {
+        val account = accountFuture.get()
+        if (account == null) {
+          // Go back to anonymous, but record the error.
+          GameSettings.edit()
+              .setEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.ANONYMOUS)
+              .commit()
+
+          // TODO: notify the user of whatever the error was.
+          return@Runnable
         }
-        SignInState.VERIFIED -> onSignInVerifiedState()
-        else -> throw IllegalStateException("Unexpected sign-in state: $signInState")
-      }
+
+        doAssociate(account, false)
+      }, Threads.BACKGROUND)
     }
 
     override fun onCancelClick() {
-      val signInState = getEnum(GameSettings.Key.SIGN_IN_STATE, SignInState::class.java)
-      if (signInState !== SignInState.VERIFIED) {
+      val signInState =
+          GameSettings.getEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState::class.java)
+      if (signInState !== GameSettings.SignInState.VERIFIED) {
         // if you're not yet verified, go back to the anonymous state.
-        edit()
-            .setEnum(GameSettings.Key.SIGN_IN_STATE, SignInState.ANONYMOUS)
+        GameSettings.edit()
+            .setEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.ANONYMOUS)
             .commit()
       }
-      layout!!.hideKeyboard()
 
       //TODO getFragmentManager().popBackStack();
-      context!!.popScreen()
+      context.popScreen()
     }
   }
 
-  private fun onSignInAnonymousState(emailAddr: String) {
-    doAssociate(emailAddr, false)
-  }
-
-  private fun onSignInForce(emailAddr: String) {
-    doAssociate(emailAddr, true)
-  }
-
-  private fun doAssociate(emailAddr: String, force: Boolean) {
+  private fun doAssociate(account: GoogleSignInAccount, force: Boolean) {
     val myEmpire = EmpireManager.getMyEmpire()
     log.info("Associating email address '%s' with empire #%d %s (force=%s)...",
-        emailAddr, myEmpire.id, myEmpire.display_name, if (force) "true" else "false")
-    layout!!.updateState(
-        R.string.signin_code_help,
-        false /* signInEnabled */,
-        R.string.signin,
-        true /* isCancel */,
-        false /* showEmailAddr */)
+        account.email, myEmpire.id, myEmpire.display_name, if (force) "true" else "false")
     App.taskRunner.runTask(Runnable {
-      val request = HttpRequest.Builder()
-          .url(url + "accounts/associate")
-          .method(HttpRequest.Method.POST)
-          .header("Content-Type", "application/x-protobuf")
-          .body(AccountAssociateRequest.Builder()
-              .cookie(getString(GameSettings.Key.COOKIE))
-              .force(force)
-              .email_addr(emailAddr)
-              .build().encode())
-          .build()
-      val resp = request.getBody(AccountAssociateResponse::class.java)
-      if (resp == null) {
-        // TODO: report the error
-        log.error("Didn't get AccountAssociateResponse, as expected.", request.exception)
-        App.taskRunner.runTask(Runnable {
-          onSignInError(
-              AccountAssociateStatus.STATUS_UNKNOWN,
-              "An unknown error occurred.")
-        },
-            Threads.UI)
-      } else if (resp.status != AccountAssociateStatus.SUCCESS) {
-        App.taskRunner.runTask(Runnable { onSignInError(resp.status, null) }, Threads.UI)
-      } else {
-        log.info("Associate successful, awaiting verification code")
-        App.taskRunner.runTask(
-            Runnable { updateState(SignInState.AWAITING_VERIFICATION) },
-            Threads.UI)
-      }
-    }, Threads.BACKGROUND)
+      layout.updateState(
+          R.string.signin_pending_help,
+          false /* signInEnabled */,
+          R.string.signin,
+          true /* isCancel */)
+    }, Threads.UI)
+
+    val request = HttpRequest.Builder()
+        .url(url + "accounts/associate")
+        .method(HttpRequest.Method.POST)
+        .header("Content-Type", "application/x-protobuf")
+        .body(AccountAssociateRequest.Builder()
+            .cookie(GameSettings.getString(GameSettings.Key.COOKIE))
+            .force(force)
+            .email_addr(account.email)
+            .id_token(account.idToken)
+            .build().encode())
+        .build()
+    val resp = request.getBody(AccountAssociateResponse::class.java)
+    if (resp == null) {
+      // TODO: report the error
+      log.error("Didn't get AccountAssociateResponse, as expected.", request.exception)
+      App.taskRunner.runTask(Runnable {
+        onSignInError(
+            AccountAssociateStatus.STATUS_UNKNOWN,
+            "An unknown error occurred.")
+      }, Threads.UI)
+    } else if (resp.status != AccountAssociateStatus.SUCCESS) {
+      App.taskRunner.runTask(Runnable { onSignInError(resp.status, null) }, Threads.UI)
+    } else {
+      log.info("Associate successful")
+      App.taskRunner.runTask(
+          Runnable { updateState(GameSettings.SignInState.VERIFIED) },
+          Threads.UI)
+    }
   }
 
   /** If you're verified, then hitting sign in again is for switching accounts.  */
@@ -173,24 +157,24 @@ class SignInScreen : Screen() {
     if (msg == null) {
       askingToForce = when (status) {
         AccountAssociateStatus.ACCOUNT_ALREADY_ASSOCIATED -> {
-          layout!!.setForceSignIn(R.string.signin_error_account_already_exists)
+          layout.setForceSignIn(R.string.signin_error_account_already_exists)
           true
         }
         AccountAssociateStatus.EMAIL_ALREADY_ASSOCIATED -> {
-          layout!!.setForceSignIn(R.string.signin_error_email_already_associated)
+          layout.setForceSignIn(R.string.signin_error_email_already_associated)
           true
         }
         AccountAssociateStatus.UNEXPECTED_ERROR -> {
-          layout!!.setErrorMsg(R.string.signin_error_unknown)
+          layout.setErrorMsg(R.string.signin_error_unknown)
           false
         }
         else -> {
-          layout!!.setErrorMsg(R.string.signin_error_unknown)
+          layout.setErrorMsg(R.string.signin_error_unknown)
           false
         }
       }
     } else {
-      layout!!.setErrorMsg(msg)
+      layout.setErrorMsg(msg)
     }
   }
 
@@ -216,7 +200,7 @@ class SignInScreen : Screen() {
       } else {
         log.info("Associate successful, verification complete.")
         App.taskRunner.runTask(
-            Runnable { updateState(SignInState.VERIFIED) },
+            Runnable { updateState(GameSettings.SignInState.VERIFIED) },
             Threads.UI)
       }
     }, Threads.BACKGROUND)

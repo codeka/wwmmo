@@ -2,12 +2,15 @@ package au.com.codeka.warworlds.client.concurrency
 
 import au.com.codeka.warworlds.client.concurrency.RunnableTask.*
 import java.util.*
+import java.util.concurrent.ThreadPoolExecutor
 
 /**
  * This is a class for running tasks on various threads. You can run a task on any thread defined
  * in [Threads].
  */
 class TaskRunner {
+  val backgroundExecutor: ThreadPoolExecutor
+
   private val timer: Timer
 
   /**
@@ -83,6 +86,7 @@ class TaskRunner {
         5 /* minThreads */,
         20 /* maxThreads */,
         1000 /* keepAliveMs */)
+    backgroundExecutor = backgroundThreadPool.executor
     Threads.BACKGROUND.setThreadPool(backgroundThreadPool)
     timer = Timer("Timer")
   }

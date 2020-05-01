@@ -1,50 +1,34 @@
 {
   "project_info": {
-    "project_number": "110304633160",
-    "firebase_url": "https://wwmmo-93bac.firebaseio.com",
-    "project_id": "wwmmo-93bac",
-    "storage_bucket": "wwmmo-93bac.appspot.com"
+    "project_number": "809181406384",
+    "firebase_url": "https://wwmmo-2.firebaseio.com",
+    "project_id": "wwmmo-2",
+    "storage_bucket": "wwmmo-2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:110304633160:android:5567f5b28f012608",
+        "mobilesdk_app_id": "1:809181406384:android:2bbc4237c000a1f444c775",
         "android_client_info": {
           "package_name": "au.com.codeka.warworlds2"
         }
       },
       "oauth_client": [
         {
-          "client_id": "110304633160-f81qr5lvsg0672ia93mmpmivs3088ljv.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "au.com.codeka.warworlds2",
-            "certificate_hash": "be6ffde6e562eb268f5e7dd7cfa0e497ba1a74ae"
-          }
-        },
-        {
-          "client_id": "110304633160-3rfdtgab2m1ovmi6que40r4gguhr30ha.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "au.com.codeka.warworlds2",
-            "certificate_hash": "a6a9a0972dccd5cf5e78dac1fd304169674c8621"
-          }
-        },
-        {
-          "client_id": "110304633160-tj811p2e5768vv6ps3t98hl9c9h4aaig.apps.googleusercontent.com",
+          "client_id": "809181406384-1uo6le381oo1k0og8udkphc9993re2ks.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA4Z3zzkeKyIlkPagNgAVNipPVSTD7oi4s"
+          "current_key": "AIzaSyCErGbCW-mq0McJAX4UYKMZrz90YM4hnX8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "110304633160-tj811p2e5768vv6ps3t98hl9c9h4aaig.apps.googleusercontent.com",
+              "client_id": "809181406384-1uo6le381oo1k0og8udkphc9993re2ks.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

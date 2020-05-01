@@ -1,6 +1,0 @@
-Hi {{ empire.display_name }},
-
-In order to verify your email address, please click the link below:
-
-{{ verification_url }}?code={{ account.email_verification_code }}
-

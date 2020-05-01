@@ -14,7 +14,6 @@ import com.google.common.collect.Lists
 class HtmlServlet : HandlerServlet(Lists.newArrayList(
     Route("/accounts", AccountsHandler::class.java),
     Route("/accounts/associate", AccountAssociateHandler::class.java),
-    Route("/accounts/verify", AccountVerifyHandler::class.java),
     Route("/accounts/patreon-begin", PatreonBeginHandler::class.java),
     Route("/accounts/connect-to-patreon", ConnectToPatreonHandler::class.java),
     Route("/login", LoginHandler::class.java),

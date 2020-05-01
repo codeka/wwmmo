@@ -28,9 +28,7 @@
     <p>
       <b>Email:</b>
       {% if account.email != null %}
-        <span title="Canonical: {{ account.email_canonical }}">
-          {{ account.email }} ({{ account.email_status }})
-        </span>
+        <span>{{ account.email }} ({{ account.email_status }})</span>
         {% if account.email_status.name == "UNVERIFIED" %}
           <a href="javascript:resendEmail();">Resend email</a> &bull;
           <a href="javascript:forceVerify();">Force verify</a>

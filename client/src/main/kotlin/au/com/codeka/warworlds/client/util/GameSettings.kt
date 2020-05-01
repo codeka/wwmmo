@@ -30,10 +30,10 @@ object GameSettings {
     /** The initial state: you're an 'anonymous' user, with no email address. */
     ANONYMOUS,
 
-    /** You've entered an email address, but we're currently awaiting your verification. */
-    AWAITING_VERIFICATION,
+    /** We're waiting for authentication or something to go through. */
+    PENDING,
 
-    /** You've verified your email address. */
+    /** You've logged in and we have your email address. */
     VERIFIED,
   }
 

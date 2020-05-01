@@ -10,8 +10,9 @@ class ThreadPool(
     minThreads: Int,
     maxThreads: Int,
     keepAliveMs: Long) {
-  private val executor: Executor
-  fun run(runnable: Runnable?) {
+  val executor: ThreadPoolExecutor
+
+  fun run(runnable: Runnable) {
     executor.execute(runnable)
   }
 

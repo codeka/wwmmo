@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.MenuItem
@@ -13,12 +14,17 @@ import au.com.codeka.warworlds.client.game.starfield.StarfieldScreen
 import au.com.codeka.warworlds.client.game.welcome.CreateEmpireScreen
 import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeScreen
 import au.com.codeka.warworlds.client.game.welcome.WelcomeScreen
+import au.com.codeka.warworlds.client.net.auth.SIGN_IN_COMPLETE_RESULT_CODE
 import au.com.codeka.warworlds.client.opengl.RenderSurfaceView
 import au.com.codeka.warworlds.client.ui.ScreenStack
 import au.com.codeka.warworlds.client.util.GameSettings
 import au.com.codeka.warworlds.client.util.GameSettings.getBoolean
 import au.com.codeka.warworlds.client.util.GameSettings.getString
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.tasks.Task
 import com.google.common.base.Preconditions
+
 
 class MainActivity : AppCompatActivity() {
   // Will be non-null between of onCreate/onDestroy.
@@ -32,19 +38,28 @@ class MainActivity : AppCompatActivity() {
   private var drawerController: DrawerController? = null
   private var fragmentContainer: FrameLayout? = null
   private var topPane: View? = null
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
     topPane = findViewById(R.id.top_pane)
     setSupportActionBar(findViewById(R.id.toolbar))
-    val renderSurfaceView = Preconditions.checkNotNull(findViewById<RenderSurfaceView>(R.id.render_surface))
+
+    App.auth.silentSignIn(this)
+
+    val renderSurfaceView = findViewById<RenderSurfaceView>(R.id.render_surface)
     renderSurfaceView.setRenderer()
+
     starfieldManager = StarfieldManager(renderSurfaceView)
     starfieldManager.create()
+
     val debugView = Preconditions.checkNotNull(findViewById<DebugView>(R.id.debug_view))
     debugView.setFrameCounter(renderSurfaceView.frameCounter)
+
     fragmentContainer = Preconditions.checkNotNull(findViewById(R.id.fragment_container))
+
     screenStack = ScreenStack(this, fragmentContainer!!)
+
     drawerController = DrawerController(
         this,
         screenStack!!,
@@ -54,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     if (savedInstanceState != null) {
       // TODO: restore the view state?
     }
+
     if (!getBoolean(GameSettings.Key.WARM_WELCOME_SEEN)) {
       screenStack!!.push(WarmWelcomeScreen())
     } else if (getString(GameSettings.Key.COOKIE).isEmpty()) {
@@ -84,6 +100,15 @@ class MainActivity : AppCompatActivity() {
       supportActionBar!!.hide()
     }
     (fragmentContainer!!.layoutParams as FrameLayout.LayoutParams).topMargin = marginSize
+  }
+
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+
+    if (requestCode == SIGN_IN_COMPLETE_RESULT_CODE) {
+      val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+      App.auth.handleSignInResult(task)
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

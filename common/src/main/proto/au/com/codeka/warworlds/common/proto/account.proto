@@ -19,10 +19,13 @@ message AccountAssociateRequest {
   optional string cookie = 1;
   optional string email_addr = 2;
 
+  // The idToken of the Google account that the above email_addr belongs to.
+  optional string id_token = 3;
+
   // If the email address is associated with another account, or the empire already has an email
   // associated with it, we'll return an error unless force is true, in which case we'll do it
   // anyway.
-  optional bool force = 3;
+  optional bool force = 4;
 }
 
 message AccountAssociateResponse {
@@ -56,24 +59,19 @@ message Account {
   // entered (and the one we should send email notifications to, etc.
   optional string email = 2;
 
-  // We do some basic "canonicalization" of email address so that you can't just sign up with
-  // automatic aliases or something (e.g. in gmail foo@gmail.com and foo+bar@gmail.com are actually
-  // the same account). This is only fairly basic, and not really meant to be totally secure.
-  optional string email_canonical = 3;
-
   // The status of the email address. Only verified email addresses "count".
   enum EmailStatus {
     EMAIL_STATUS_UNKNOWN = 0;
-    UNVERIFIED = 1;
     VERIFIED = 2;
 
     // The address used to be associated with this account, but it was abandoned for another.
     ABANDONED = 3;
+
+    reserved 1;
   }
   optional EmailStatus email_status = 4;
 
-  // The code we generated and sent the user to verify their email address.
-  optional string email_verification_code = 5;
+  reserved 3, 5;
 }
 
 // This is sent to the /login endpoint in order to log in to the server.
@@ -83,6 +81,9 @@ message LoginRequest {
 
   // The DeviceInfo of the device you're logging in from.
   optional DeviceInfo device_info = 2;
+
+  // If you're logged in, this will be the idToken of the Google account.
+  optional string id_token = 3;
 }
 
 // This is sent from the /login endpoing in response to a LoginRequest.

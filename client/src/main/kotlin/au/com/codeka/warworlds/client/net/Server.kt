@@ -89,6 +89,10 @@ class Server {
     App.taskRunner.runTask(FirebaseInstanceId.getInstance().instanceId)
         .then(object : RunnableTask.RunnableP<InstanceIdResult> {
           override fun run(instanceIdResult: InstanceIdResult) {
+            // Make sure we have the GoogleSignInAccount (if you've signed in) before sending it
+            // to the server.
+            val googleAccount = App.auth.futureAccount().get()
+
             log.info("Logging in: %s", ServerUrl.getUrl("/login"))
             val request = HttpRequest.Builder()
                 .url(ServerUrl.getUrl("/login"))
@@ -96,6 +100,7 @@ class Server {
                 .body(LoginRequest.Builder()
                     .cookie(cookie)
                     .device_info(populateDeviceInfo(instanceIdResult))
+                    .id_token(googleAccount?.idToken)
                     .build().encode())
                 .build()
             if (request.responseCode != 200) {

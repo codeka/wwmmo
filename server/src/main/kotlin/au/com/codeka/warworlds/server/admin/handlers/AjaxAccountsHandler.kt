@@ -17,14 +17,14 @@ class AjaxAccountsHandler : AjaxHandler() {
     }
     val account = pair.two
 
-    when (request.getParameter("action")) {
+    when (request.getParameter("action")) {/*
       "resend" -> {
         AccountManager.i.sendVerificationEmail(account)
       }
       "force-verify" -> {
         AccountManager.i.verifyAccount(account)
       }
-    }
+    */}
     setResponseText("success")
   }
 }

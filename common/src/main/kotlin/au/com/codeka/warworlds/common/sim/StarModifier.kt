@@ -154,7 +154,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     }
   }
 
-  private fun createDefaultStorage(empireId: Long): EmpireStorage.Builder {
+  private fun createDefaultStorage(empireId: Long?): EmpireStorage.Builder {
     return EmpireStorage.Builder()
         .empire_id(empireId)
         .total_goods(100.0f).total_minerals(0f).total_energy(0f)

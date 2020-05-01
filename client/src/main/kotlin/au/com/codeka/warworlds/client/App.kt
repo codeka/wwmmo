@@ -7,6 +7,7 @@ import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.game.world.ChatManager
 import au.com.codeka.warworlds.client.game.world.StarManager.create
 import au.com.codeka.warworlds.client.net.Server
+import au.com.codeka.warworlds.client.net.auth.AuthHelper
 import au.com.codeka.warworlds.client.store.DataStore
 import au.com.codeka.warworlds.client.util.eventbus.EventBus
 import au.com.codeka.warworlds.common.Log
@@ -20,6 +21,8 @@ class MyApp : Application() {
   val server: Server
   val dataStore: DataStore
   val eventBus: EventBus
+  val auth: AuthHelper
+
   override fun onCreate() {
     super.onCreate()
     LogImpl.setup()
@@ -45,6 +48,7 @@ class MyApp : Application() {
     server = Server()
     dataStore = DataStore()
     eventBus = EventBus()
+    auth = AuthHelper(this)
   }
 }
 
