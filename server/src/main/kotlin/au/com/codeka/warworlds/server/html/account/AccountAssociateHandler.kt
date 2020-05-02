@@ -7,6 +7,7 @@ import au.com.codeka.warworlds.common.proto.AccountAssociateResponse
 import au.com.codeka.warworlds.server.handlers.ProtobufRequestHandler
 import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.store.DataStore
+import au.com.codeka.warworlds.server.util.CookieHelper
 import au.com.codeka.warworlds.server.world.AccountManager
 
 /**
@@ -43,14 +44,6 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
   /** Post is to actually initiate an association.  */
   public override fun post() {
     val req = readProtobuf(AccountAssociateRequest::class.java)
-    val acc = DataStore.i.accounts()[req.cookie]
-    if (acc == null) {
-      log.warning("Could not associate account, no account for cookie: %s", req.cookie)
-      response.status = 401
-      return
-    }
-    val account = AccountManager.i.getAccount(acc.empire_id)
-        ?: throw RequestException(404, "Could not load account for empire.")
     val tokenInfo = TokenVerifier.verify(req.id_token)
     if (tokenInfo.email != req.email_addr) {
       log.warning("Email address from token is not the same as the one in the request " +
@@ -58,23 +51,43 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
       throw RequestException(400, "Invalid email address")
     }
 
+    val acc =
+      if (req.cookie == "") {
+        // If there's no cookie, that's OK: they probably haven't created any account yet and are
+        // just trying to log in with an existing account.
+        DataStore.i.accounts().getByVerifiedEmailAddr(req.email_addr)
+      } else {
+        DataStore.i.accounts()[req.cookie]
+      }
+    if (acc == null) {
+      log.warning("Could not sign in/associate account, no account for email=%s cookie=%s",
+          req.email_addr, req.cookie)
+      response.status = 401
+      return
+    }
+
+    val account = AccountManager.i.getAccount(acc.empire_id)
+        ?: throw RequestException(404, "Could not load account for empire.")
+
     val emailAddr = req.email_addr
     log.info(
-        "Attempting to associate empire #%d with '%s', name=%s audience: %s",
+        "Attempting to sign in/associate empire #%d with '%s', name=%s audience: %s",
         account.get().empire_id, emailAddr, tokenInfo.displayName, tokenInfo.audience)
     val resp = AccountAssociateResponse.Builder()
 
-    // See if there's already one associated with this email address.
-    val existingAccount = DataStore.i.accounts().getByVerifiedEmailAddr(emailAddr)
-    if (existingAccount != null) {
-      if (req.force != null && req.force) {
-        log.info("We're forcing this association (empire: #%d email=%s)...",
-            existingAccount.empire_id, existingAccount.email)
-      } else {
-        log.info("Returning EMAIL_ALREADY_ASSOCIATED")
-        resp.status(AccountAssociateResponse.AccountAssociateStatus.EMAIL_ALREADY_ASSOCIATED)
-        writeProtobuf(resp.build())
-        return
+    if (req.cookie != "") {
+      // See if there's already one associated with this email address.
+      val existingAccount = DataStore.i.accounts().getByVerifiedEmailAddr(emailAddr)
+      if (existingAccount != null) {
+        if (req.force != null && req.force) {
+          log.info("We're forcing this association (empire: #%d email=%s)...",
+              existingAccount.empire_id, existingAccount.email)
+        } else {
+          log.info("Returning EMAIL_ALREADY_ASSOCIATED")
+          resp.status(AccountAssociateResponse.AccountAssociateStatus.EMAIL_ALREADY_ASSOCIATED)
+          writeProtobuf(resp.build())
+          return
+        }
       }
     }
 
@@ -96,12 +109,24 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
       }
     }
 
+    if (req.cookie == "") {
+      // If they didn't have the cookie, they must be signing in from a new device. We'll give them
+      // a cookie now. This will invalidate any cookies they may have on other devices.
+      val cookie = CookieHelper.generateCookie()
+      log.info("Generating new cookie: $cookie")
+      AccountManager.i.updateCookie(account, cookie)
+      resp.cookie(cookie)
+    } else {
+      log.info("Request had a cookie, not changing.", req.cookie)
+    }
+
     log.info("Updating account with email address.")
     account.set(account.get().newBuilder()
         .email(emailAddr)
         .email_status(Account.EmailStatus.VERIFIED)
         .build())
     resp.status(AccountAssociateResponse.AccountAssociateStatus.SUCCESS)
+
     writeProtobuf(resp.build())
   }
 }

@@ -8,15 +8,16 @@ import android.widget.TextView
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator.setBackground
 
-/**
- * Layout for [CreateEmpireScreen].
- */
-class CreateEmpireLayout(context: Context?, private val callbacks: Callbacks) : RelativeLayout(context) {
+/** Layout for [CreateEmpireScreen]. */
+class CreateEmpireLayout(context: Context?, private val callbacks: Callbacks)
+    : RelativeLayout(context) {
   interface Callbacks {
+    fun onSwitchAccountClick()
     fun onDoneClick(empireName: String?)
   }
 
   private val empireName: EditText
+
   fun showSpinner() {
     findViewById<View>(R.id.empire_name).visibility = View.GONE
     findViewById<View>(R.id.switch_account_btn).visibility = View.GONE
@@ -35,6 +36,11 @@ class CreateEmpireLayout(context: Context?, private val callbacks: Callbacks) : 
     View.inflate(context, R.layout.create_empire, this)
     empireName = findViewById(R.id.empire_name)
     setBackground(this)
-    findViewById<View>(R.id.next_btn).setOnClickListener { v: View? -> callbacks.onDoneClick(empireName.text.toString()) }
+    findViewById<View>(R.id.next_btn).setOnClickListener {
+      callbacks.onDoneClick(empireName.text.toString())
+    }
+    findViewById<View>(R.id.switch_account_btn).setOnClickListener {
+      callbacks.onSwitchAccountClick()
+    }
   }
 }

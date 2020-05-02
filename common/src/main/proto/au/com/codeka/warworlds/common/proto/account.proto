@@ -48,6 +48,9 @@ message AccountAssociateResponse {
     NOT_VERIFIED = 5;
   }
   optional AccountAssociateStatus status = 1;
+
+  // If you didn't have a cookie in your request, we'll generate a new one for you here.
+  optional string cookie = 2;
 }
 
 // This is the account object that's stored in the data store. It links to your empire and other

@@ -39,7 +39,12 @@ class CreateEmpireScreen : Screen() {
     override fun onDoneClick(empireName: String?) {
       registerEmpire(empireName!!)
     }
+
+    override fun onSwitchAccountClick() {
+      context.pushScreen(SignInScreen())
+    }
   }
+
   private fun registerEmpire(empireName: String) {
     layout.showSpinner()
     App.taskRunner.runTask(Runnable {
@@ -75,7 +80,7 @@ class CreateEmpireScreen : Screen() {
 
     // Tell the Server we can now connect.
     App.server.connect()
-    context!!.pushScreen(
+    context.pushScreen(
         WelcomeScreen(),
         SharedViews.builder()
             .addSharedView(R.id.next_btn, R.id.start_btn)

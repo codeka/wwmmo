@@ -105,9 +105,9 @@ class SignInScreen : Screen() {
   }
 
   private fun doAssociate(account: GoogleSignInAccount, force: Boolean) {
-    val myEmpire = EmpireManager.getMyEmpire()
+    val myEmpire = if (EmpireManager.hasMyEmpire()) EmpireManager.getMyEmpire() else null
     log.info("Associating email address '%s' with empire #%d %s (force=%s)...",
-        account.email, myEmpire.id, myEmpire.display_name, if (force) "true" else "false")
+        account.email, myEmpire?.id, myEmpire?.display_name, if (force) "true" else "false")
     App.taskRunner.runTask(Runnable {
       layout.updateState(
           R.string.signin_pending_help,
@@ -141,7 +141,13 @@ class SignInScreen : Screen() {
     } else {
       log.info("Associate successful")
       App.taskRunner.runTask(
-          Runnable { updateState(GameSettings.SignInState.VERIFIED) },
+          Runnable {
+            if (resp.cookie != null && resp.cookie != "") {
+              log.info("Updating cookie: ${resp.cookie}")
+              GameSettings.edit().setString(GameSettings.Key.COOKIE, resp.cookie).commit()
+            }
+            updateState(GameSettings.SignInState.VERIFIED)
+          },
           Threads.UI)
     }
   }

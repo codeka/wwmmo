@@ -10,7 +10,7 @@ import java.util.*
  * Stores information about [Account]s, indexed by cookie.
  */
 class AccountsStore internal constructor(fileName: String) : BaseStore(fileName) {
-  operator fun get(cookie: String?): Account? {
+  operator fun get(cookie: String): Account? {
     newReader()
         .stmt("SELECT account FROM accounts WHERE cookie = ?")
         .param(0, cookie)
@@ -22,7 +22,7 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
     return null
   }
 
-  fun getByVerifiedEmailAddr(emailAddr: String?): Account? {
+  fun getByVerifiedEmailAddr(emailAddr: String): Account? {
     newReader()
         .stmt("SELECT account FROM accounts WHERE email = ?")
         .param(0, emailAddr)
@@ -49,18 +49,6 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
     return null
   }
 
-  fun getByVerificationCode(emailVerificationCode: String): Pair<String, Account>? {
-    newReader()
-        .stmt("SELECT cookie, account FROM accounts WHERE email_verification_code = ?")
-        .param(0, emailVerificationCode)
-        .query().use { res ->
-          if (res.next()) {
-            return Pair(res.getString(0), Account.ADAPTER.decode(res.getBytes(1)))
-          }
-        }
-    return null
-  }
-
   fun search( /* TODO: search string, pagination etc */): ArrayList<Account> {
     val accounts = ArrayList<Account>()
     newReader()
@@ -74,16 +62,36 @@ class AccountsStore internal constructor(fileName: String) : BaseStore(fileName)
   }
 
   fun put(cookie: String, account: Account) {
-    newWriter()
-        .stmt("INSERT OR REPLACE INTO accounts ("
-            + " email, cookie, empire_id, account"
-            + ") VALUES (?, ?, ?, ?)")
-        .param(0,
-            if (account.email_status == Account.EmailStatus.VERIFIED) account.email else null)
-        .param(1, cookie)
-        .param(2, account.empire_id)
-        .param(3, account.encode())
-        .execute()
+    newTransaction().use {
+      val query = newReader(it)
+          .stmt("SELECT COUNT(*) FROM accounts WHERE empire_id = ?")
+          .param(0, account.empire_id)
+          .query()
+      query.next()
+      if (query.getInt(0) == 1) {
+        newWriter(it)
+            .stmt("UPDATE accounts SET email=?, cookie=?, account=? WHERE empire_id=?")
+            .param(0,
+                if (account.email_status == Account.EmailStatus.VERIFIED) account.email else null)
+            .param(1, cookie)
+            .param(2, account.encode())
+            .param(3, account.empire_id)
+            .execute()
+      } else {
+        newWriter(it)
+            .stmt("INSERT INTO accounts ("
+                + " email, cookie, empire_id, account"
+                + ") VALUES (?, ?, ?, ?)")
+            .param(0,
+                if (account.email_status == Account.EmailStatus.VERIFIED) account.email else null)
+            .param(1, cookie)
+            .param(2, account.empire_id)
+            .param(3, account.encode())
+            .execute()
+      }
+
+      it.commit()
+    }
   }
 
   override fun onOpen(diskVersion: Int): Int {

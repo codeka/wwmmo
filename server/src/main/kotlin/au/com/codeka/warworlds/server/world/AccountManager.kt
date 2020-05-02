@@ -27,6 +27,13 @@ class AccountManager private constructor() {
     }
   }
 
+  fun updateCookie(account: WatchableObject<Account>, cookie: String) {
+    // Stop watching, update the cookie, then start watching again.
+    synchronized(watchedAccounts) {
+      watchedAccounts[account.get().empire_id] = Pair(cookie, account)
+    }
+  }
+
   private fun watchAccount(cookie: String, account: Account)
       : Pair<String, WatchableObject<Account>> {
     synchronized(watchedAccounts) {
