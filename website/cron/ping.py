@@ -17,7 +17,7 @@ import model.ping
 # This is the URL that we'll ping. It's the home star of the 'Hunters' test user.
 # This is a good URL to test because it does a bunch of reads and writes to the database,
 # and a bunch of CPU, so it should be a good well-rounded test of everything.
-PING_URL = "https://game.war-worlds.com/realms/beta/stars/268299/simulate?nolog=1&update=1"
+PING_URL = "https://game.war-worlds.com/realms/def/stars/212841/simulate?nolog=1&update=1"
 
 
 class BasePage(cron.BaseHandler):
