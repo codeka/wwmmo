@@ -1,3 +1,5 @@
+google.load("visualization", "1", {packages:["corechart"]});
+
 var currentEmpireID = null;
 
 $("#find-byemailidname").on("submit", function(evnt) {
@@ -133,6 +135,34 @@ function showEmpireList(empires) {
     var empire = empires[i];
     $tbody.append(rowTmpl.applyTemplate(empire));
   }
+}
+
+// Renders the given request graph (given in data) to the given div.
+function renderRequestGraph(div, data) {
+  // keep the width/height ratio of the graph nice
+  var ratio = 0.333;
+  $(div).css("height", $(div).width() * ratio);
+
+  var dataTable = new google.visualization.DataTable();
+  dataTable.addColumn("datetime", "Date");
+  dataTable.addColumn("number", "Total requests");
+  dataTable.addColumn("number", "{{empire.displayName}} Total");
+  dataTable.addColumn("number", "Not rate limited");
+  dataTable.addColumn("number", "Soft rate limited");
+  dataTable.addColumn("number", "Hard rate limited");
+  dataTable.addRows(data);
+
+  var dataView = new google.visualization.DataView(dataTable);
+
+  var width = $(div).width();
+  var height = $(div).height();
+  var options = {
+    "chartArea": {left: 50, top: 10, width: width - 200, height: height - 80},
+    "backgroundColor": {fill: "transparent"}
+  };
+
+  var chart = new google.visualization.LineChart(div);
+  chart.draw(dataView, options);
 }
 
 $(function() {
