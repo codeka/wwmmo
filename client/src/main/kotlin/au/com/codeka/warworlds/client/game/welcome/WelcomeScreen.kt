@@ -11,11 +11,10 @@ import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.game.starfield.StarfieldScreen
 import au.com.codeka.warworlds.client.game.world.EmpireManager
 import au.com.codeka.warworlds.client.net.ServerStateEvent
+import au.com.codeka.warworlds.client.net.auth.AuthAccountUpdate
 import au.com.codeka.warworlds.client.ui.Screen
 import au.com.codeka.warworlds.client.ui.ScreenContext
 import au.com.codeka.warworlds.client.ui.ShowInfo
-import au.com.codeka.warworlds.client.util.GameSettings
-import au.com.codeka.warworlds.client.util.GameSettings.getString
 import au.com.codeka.warworlds.client.util.UrlFetcher.fetchStream
 import au.com.codeka.warworlds.client.util.Version.string
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler
@@ -52,11 +51,6 @@ class WelcomeScreen : Screen() {
     // TODO
     //optionsButton.setOnClickListener(v ->
     //    getFragmentTransitionManager().replaceFragment(GameSettingsFragment.class));
-    if (getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
-      welcomeLayout.setSignInText(R.string.signin)
-    } else {
-      welcomeLayout.setSignInText(R.string.switch_user)
-    }
   }
 
   override fun onShow(): ShowInfo? {
@@ -78,6 +72,7 @@ class WelcomeScreen : Screen() {
     //        }
 //      }
 //    });
+
     return ShowInfo.builder().view(welcomeLayout).toolbarVisible(false).build()
   }
 
@@ -224,6 +219,7 @@ class WelcomeScreen : Screen() {
       context.pushScreen(SignInScreen())
     }
   }
+
   private val eventHandler: Any = object : Any() {
     @EventHandler
     fun onServerStateUpdated(event: ServerStateEvent) {
@@ -233,8 +229,17 @@ class WelcomeScreen : Screen() {
     @EventHandler
     fun onEmpireUpdated(empire: Empire) {
       val myEmpire = EmpireManager.getMyEmpire()
-      if (myEmpire.id == empire.id && welcomeLayout != null) {
+      if (myEmpire.id == empire.id) {
         welcomeLayout.refreshEmpireDetails(empire)
+      }
+    }
+
+    @EventHandler
+    fun onAuthUpdated(auth: AuthAccountUpdate) {
+      if (auth.account == null) {
+        welcomeLayout.setSignInText(R.string.signin)
+      } else {
+        welcomeLayout.setSignInText(R.string.switch_user)
       }
     }
   }

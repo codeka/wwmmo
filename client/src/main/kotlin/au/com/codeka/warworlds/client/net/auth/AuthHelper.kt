@@ -54,6 +54,9 @@ class AuthHelper(private val appContext: Context) {
     })
   }
 
+  val isSignedIn: Boolean
+    get() = account != null
+
   /**
    * Attempt to do a 'silent' sign-in. This should be called as early in app start-up time as
    * possible.
