@@ -25,18 +25,6 @@ object GameSettings {
     AllowNone,
   }
 
-  /** An enumeration for the current state of the sign in process. */
-  enum class SignInState {
-    /** The initial state: you're an 'anonymous' user, with no email address. */
-    ANONYMOUS,
-
-    /** We're waiting for authentication or something to go through. */
-    PENDING,
-
-    /** You've logged in and we have your email address. */
-    VERIFIED,
-  }
-
   enum class Key(
       val valueType: ValueType, val defValue: Any, val enumType: Class<out Enum<*>>? = null) {
     /** If true, we'll automatically translate chat messages to English. */
@@ -54,10 +42,6 @@ object GameSettings {
 
     /** A unique ID that's guaranteed to not change (as long as the user doesn't clear app data) */
     INSTANCE_ID(ValueType.STRING, ""),
-
-    /** Your current {@link SignInState}. */
-    SIGN_IN_STATE(
-        ValueType.ENUM, SignInState.ANONYMOUS, SignInState::class.java),
 
     /** The base URL of the server. */
     SERVER(ValueType.STRING, BuildConfig.DEFAULT_SERVER),

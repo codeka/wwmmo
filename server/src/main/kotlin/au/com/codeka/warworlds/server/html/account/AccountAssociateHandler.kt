@@ -78,7 +78,7 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
     if (req.cookie != "") {
       // See if there's already one associated with this email address.
       val existingAccount = DataStore.i.accounts().getByVerifiedEmailAddr(emailAddr)
-      if (existingAccount != null) {
+      if (existingAccount != null && existingAccount.email != emailAddr) {
         if (req.force != null && req.force) {
           log.info("We're forcing this association (empire: #%d email=%s)...",
               existingAccount.empire_id, existingAccount.email)
