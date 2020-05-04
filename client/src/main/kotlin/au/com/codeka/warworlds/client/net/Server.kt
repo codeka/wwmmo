@@ -22,7 +22,7 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.*
 
-/** Represents our connection to the server.  */
+/** Represents our connection to the server. */
 class Server {
   private val packetDispatcher = PacketDispatcher()
 
@@ -48,8 +48,7 @@ class Server {
   private val lock = Any()
   private var reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS
 
-  /** Connect to the server.  */
-  fun connect() {
+  fun setup() {
     GameSettings.addSettingChangedHandler { key: GameSettings.Key ->
       if (key == GameSettings.Key.SERVER) {
         // If you change SERVER, we'll want to clear the cookie.
@@ -61,13 +60,8 @@ class Server {
         disconnect()
       }
     }
-    val cookie = GameSettings.getString(GameSettings.Key.COOKIE)
-    if (cookie.isEmpty()) {
-      log.warning("No cookie yet, not connecting.")
-      return
-    }
-    updateState(ServerStateEvent.ConnectionState.CONNECTING, null)
-    login(cookie)
+
+    connect()
   }
 
   /**
@@ -82,6 +76,17 @@ class Server {
         waitingForHello!!.add(runnable)
       }
     }
+  }
+
+  /** Connect to the server.  */
+  private fun connect() {
+    val cookie = GameSettings.getString(GameSettings.Key.COOKIE)
+    if (cookie.isEmpty()) {
+      log.warning("No cookie yet, not connecting.")
+      return
+    }
+    updateState(ServerStateEvent.ConnectionState.CONNECTING, null)
+    login(cookie)
   }
 
   private fun login(cookie: String) {

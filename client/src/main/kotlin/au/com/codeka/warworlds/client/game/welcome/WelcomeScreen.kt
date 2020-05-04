@@ -216,7 +216,7 @@ class WelcomeScreen : Screen() {
     }
 
     override fun onSignInClick() {
-      context.pushScreen(SignInScreen())
+      context.pushScreen(SignInScreen(false /* immediate */))
     }
   }
 

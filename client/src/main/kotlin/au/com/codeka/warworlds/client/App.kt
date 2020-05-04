@@ -31,7 +31,7 @@ class MyApp : Application() {
             .loggingEnabled(true)
             .build())
     Threads.UI.setThread(Thread.currentThread(), Handler())
-    server.connect()
+    server.setup()
     dataStore.open(this)
     create()
     ChatManager.i.create()

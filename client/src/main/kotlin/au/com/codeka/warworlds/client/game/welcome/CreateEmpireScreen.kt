@@ -41,7 +41,7 @@ class CreateEmpireScreen : Screen() {
     }
 
     override fun onSwitchAccountClick() {
-      context.pushScreen(SignInScreen())
+      context.pushScreen(SignInScreen(true /* immediate */))
     }
   }
 
@@ -79,7 +79,6 @@ class CreateEmpireScreen : Screen() {
         .commit()
 
     // Tell the Server we can now connect.
-    App.server.connect()
     context.pushScreen(
         WelcomeScreen(),
         SharedViews.builder()

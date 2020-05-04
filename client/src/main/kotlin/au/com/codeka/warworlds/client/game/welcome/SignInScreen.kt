@@ -22,8 +22,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
  * This screen is used to associate your cookie with an email address. We use Google Auth to
  * authenticate your email address with Google, then send it to the server for verification and
  * to associate it with the empire.
+ *
+ * @param immediate if true, we'll assume you immediately clicked "sign in" to get started.
  */
-class SignInScreen : Screen() {
+class SignInScreen(private val immediate: Boolean) : Screen() {
   private lateinit var layout: SignInLayout
   private lateinit var context: ScreenContext
 
@@ -38,6 +40,11 @@ class SignInScreen : Screen() {
 
   override fun onShow(): ShowInfo? {
     updateState()
+
+    if (immediate) {
+      performExplicitSignIn()
+    }
+
     return ShowInfo.builder().view(layout).toolbarVisible(false).build()
   }
 
@@ -92,11 +99,6 @@ class SignInScreen : Screen() {
     }
   }
 
-  /** If we're switching accounts (instead of signing in), this will perform the login. */
-  private fun doLogin(account: GoogleSignInAccount) {
-
-  }
-
   /** Associate our account with the empire we're currently logged in as. */
   private fun doAssociate(account: GoogleSignInAccount, force: Boolean) {
     val myEmpire = if (EmpireManager.hasMyEmpire()) EmpireManager.getMyEmpire() else null
@@ -140,7 +142,10 @@ class SignInScreen : Screen() {
               log.info("Updating cookie: ${resp.cookie}")
               GameSettings.edit().setString(GameSettings.Key.COOKIE, resp.cookie).commit()
             }
-            updateState()
+
+            // After successfully associating, etc we'll go back to the welcome screen.
+            context.home()
+            context.pushScreen(WelcomeScreen())
           },
           Threads.UI)
     }
