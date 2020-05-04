@@ -10,6 +10,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.common.util.concurrent.Futures
 import java.util.concurrent.Callable
 import java.util.concurrent.Future
@@ -78,6 +79,14 @@ class AuthHelper(private val appContext: Context) {
     awaitingSignInComplete = false
     activity.startActivityForResult(client.signInIntent, SIGN_IN_COMPLETE_RESULT_CODE)
     return futureAccount()
+  }
+
+  /**
+   * Performs a sign out. This will block until actually signed out, so only call this on a
+   * background thread.
+   */
+  fun signOut() {
+    Tasks.await(client.signOut())
   }
 
   /**

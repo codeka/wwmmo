@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.client.game.welcome
 import android.view.ViewGroup
 import au.com.codeka.warworlds.client.App
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.concurrency.TaskRunner
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.game.world.EmpireManager
 import au.com.codeka.warworlds.client.net.HttpRequest
@@ -60,33 +61,45 @@ class SignInScreen : Screen() {
           true /* isCancel */)
 
       GameSettings.SignInState.VERIFIED -> layout.updateState(
-          R.string.signin_complete_help,
+          R.string.signin_switch_user_help,
           true /* signInEnabled */,
           R.string.switch_user,
           false /* isCancel */)
     }
   }
 
+  private fun performExplicitSignIn() {
+    val accountFuture = App.auth.explicitSignIn(context.activity)
+    GameSettings.edit()
+        .setEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.PENDING)
+        .commit()
+    App.taskRunner.runTask(Runnable {
+      val account = accountFuture.get()
+      if (account == null) {
+        // Go back to anonymous, but record the error.
+        GameSettings.edit()
+            .setEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.ANONYMOUS)
+            .commit()
+
+        // TODO: notify the user of whatever the error was.
+        return@Runnable
+      }
+
+      doAssociate(account, false)
+    }, Threads.BACKGROUND)
+  }
+
   private val layoutCallbacks: SignInLayout.Callbacks = object : SignInLayout.Callbacks {
     override fun onSignInClick() {
-      val accountFuture = App.auth.explicitSignIn(context.activity)
-      GameSettings.edit()
-          .setEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.PENDING)
-          .commit()
-      App.taskRunner.runTask(Runnable {
-        val account = accountFuture.get()
-        if (account == null) {
-          // Go back to anonymous, but record the error.
-          GameSettings.edit()
-              .setEnum(GameSettings.Key.SIGN_IN_STATE, GameSettings.SignInState.ANONYMOUS)
-              .commit()
-
-          // TODO: notify the user of whatever the error was.
-          return@Runnable
-        }
-
-        doAssociate(account, false)
-      }, Threads.BACKGROUND)
+      if (App.auth.isSignedIn) {
+        App.taskRunner.runTask(Runnable {
+          App.auth.signOut()
+        }, Threads.BACKGROUND).then( Runnable {
+          performExplicitSignIn()
+        }, Threads.UI)
+      } else {
+        performExplicitSignIn()
+      }
     }
 
     override fun onCancelClick() {

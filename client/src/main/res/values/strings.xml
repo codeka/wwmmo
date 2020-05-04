@@ -107,12 +107,11 @@
     To sign in, click &quot;Sign in&quot; below and choose an account.
   </string>
   <string name="signin_pending_help">
-    Associating your account with your email...
+    Associating your account with your email…
   </string>
-  <string name="signin_complete_help">
-    Thanks for signing in, verification is now complete and you can continue playing War Worlds.
-    If you access your account through another device using the same email address, the game will
-    be automatically synchronised between the two devices automatically.
+  <string name="signin_switch_user_help">
+    You are currently signed in, but you can switch to a different account by clicking "Switch user"
+    below.
   </string>
   <string name="signin_error_account_already_exists">
     This account is already associated with another email address. Do you want to associate it
@@ -129,7 +128,8 @@
   <string name="empire_settings_patreon">Patreon</string>
   <string name="empire_settings_patreon_desc">
     Connect your empire to your Patreon account in order to collect your benefits!\n\n
-    <a href="https://www.patreon.com/codeka">And of course, click here to support me if you\'re not already!</a>
+    <a href="https://www.patreon.com/codeka">And of course, click here to support me if you\'re not
+      already!</a>
   </string>
   <string name="empire_settings_patreon_connect">Connect to Patreon</string>
   <string name="empire_settings_rename">Rename Empire</string>
