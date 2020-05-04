@@ -565,7 +565,7 @@ public class StarController {
     private void updateColonies(Star star) throws SQLException {
       boolean needDelete = false;
 
-      final float MIN_POPULATION = 0.0001f;
+      final float MIN_POPULATION = 0.1f;
 
       TreeMap<Integer, Float> empireTaxes = new TreeMap<>();
 

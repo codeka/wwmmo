@@ -2,6 +2,7 @@ package au.com.codeka.common.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -147,7 +148,8 @@ public class Simulation {
             for (BaseFleet fleet : star.getFleets()) {
                 for (BaseFleet predictedFleet : predictionStar.getFleets()) {
                     if (fleet.getKey().equals(predictedFleet.getKey())) {
-                        log(String.format("Fleet #%s updating timeDestroyed to: %s", fleet.getKey(), predictedFleet.getTimeDestroyed()));
+                        log(String.format("Fleet #%s updating timeDestroyed to: %s",
+                            fleet.getKey(), predictedFleet.getTimeDestroyed()));
                         fleet.setTimeDestroyed(predictedFleet.getTimeDestroyed());
                     }
                 }
@@ -174,7 +176,8 @@ public class Simulation {
         DateTime lastSimulation = star.getLastSimulation();
         if (lastSimulation == null) {
             for (BaseFleet fleet : star.getFleets()) {
-                if (lastSimulation == null || fleet.getStateStartTime().compareTo(lastSimulation) < 0) {
+                if (lastSimulation == null
+                    || fleet.getStateStartTime().compareTo(lastSimulation) < 0) {
                     lastSimulation = fleet.getStateStartTime();
                 }
             }
@@ -205,8 +208,10 @@ public class Simulation {
         return lastSimulation;
     }
 
-    private void simulateStepForAllEmpires(Duration dt, DateTime now, BaseStar star, Set<String> empireKeys) {
-        log(String.format("- Step [dt=%.2f hrs] [now=%s]", (float)(dt.toStandardSeconds().getSeconds()) / 3600.0f, now));
+    private void simulateStepForAllEmpires(
+        Duration dt, DateTime now, BaseStar star, Set<String> empireKeys) {
+        log(String.format(Locale.ENGLISH, "- Step [dt=%.2f hrs] [now=%s]",
+            (float)(dt.toStandardSeconds().getSeconds()) / 3600.0f, now));
         for (String empireKey : empireKeys) {
             log(String.format("-- Empire [%s]", empireKey == null ? "Native" : empireKey));
             simulateStep(dt, now, star, empireKey);
@@ -256,7 +261,7 @@ public class Simulation {
                 continue;
             }
 
-            log(String.format("--- Colony [planetIndex=%d] [population=%.2f]",
+            log(String.format(Locale.ENGLISH, "--- Colony [planetIndex=%d] [population=%.2f]",
                     colony.getPlanetIndex(), colony.getPopulation()));
             BasePlanet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
 
@@ -266,7 +271,8 @@ public class Simulation {
             colony.setGoodsDelta(goods);
             totalGoods += goods * dtInHours;
             goodsDeltaPerHour += goods;
-            log(String.format("    Goods: [delta=%.2f / hr] [this turn=%.2f]", goods, goods * dtInHours));
+            log(String.format(Locale.ENGLISH, "    Goods: [delta=%.2f / hr] [this turn=%.2f]",
+                goods, goods * dtInHours));
 
             // calculate the output from mining this turn and add it to the star global
             float minerals = colony.getPopulation() * colony.getMiningFocus() *
@@ -274,7 +280,8 @@ public class Simulation {
             colony.setMineralsDelta(minerals);
             totalMinerals += minerals * dtInHours;
             mineralsDeltaPerHour += minerals;
-            log(String.format("    Minerals: [delta=%.2f / hr] [this turn=%.2f]", goods, goods * dtInHours));
+            log(String.format(Locale.ENGLISH, "    Minerals: [delta=%.2f / hr] [this turn=%.2f]",
+                goods, goods * dtInHours));
 
             totalPopulation += colony.getPopulation();
 
@@ -282,7 +289,8 @@ public class Simulation {
             float taxPerPopulationPerHour = 0.012f;
             float taxPerHour = taxPerPopulationPerHour * colony.getPopulation();
             float taxThisTurn = taxPerHour * dtInHours;
-            log(String.format("    Taxes %.2f + %.2f = %.2f uncollected", colony.getUncollectedTaxes(), taxThisTurn, colony.getUncollectedTaxes() + taxThisTurn));
+            log(String.format(Locale.ENGLISH, "    Taxes %.2f + %.2f = %.2f uncollected",
+                colony.getUncollectedTaxes(), taxThisTurn, colony.getUncollectedTaxes() + taxThisTurn));
             totalTaxPerHour += taxPerHour;
             colony.setUncollectedTaxes(colony.getUncollectedTaxes() + taxThisTurn);
         }
@@ -322,8 +330,9 @@ public class Simulation {
             if (numValidBuildRequests > 0) {
                 float totalWorkers = colony.getPopulation() * colony.getConstructionFocus();
                 float workersPerBuildRequest = totalWorkers / numValidBuildRequests;
-                log(String.format("--- Building [buildRequests=%d] [planetIndex=%d] [totalWorker=%.2f]",
-                        numValidBuildRequests, colony.getPlanetIndex(), totalWorkers));
+                log(String.format(Locale.ENGLISH,
+                    "--- Building [buildRequests=%d] [planetIndex=%d] [totalWorker=%.2f]",
+                    numValidBuildRequests, colony.getPlanetIndex(), totalWorkers));
 
                 // OK, we can spare at least ONE population
                 if (workersPerBuildRequest < 1.0f) {
@@ -337,7 +346,7 @@ public class Simulation {
 
                 for (BaseBuildRequest br : buildRequests) {
                     Design design = BaseDesignManager.i.getDesign(br.getDesignKind(), br.getDesignID());
-                    log(String.format("---- Building [design=%s %s] [count=%d]",
+                    log(String.format(Locale.ENGLISH, "---- Building [design=%s %s] [count=%d]",
                             br.getDesignKind(), br.getDesignID(), br.getCount()));
 
                     DateTime startTime = br.getStartTime();
@@ -366,8 +375,9 @@ public class Simulation {
                         // if there's less than 10 seconds to go, just say it's done now.
                         timeRemainingInHours = 0.0f;
                     }
-                    log(String.format("     Time [total=%.2f hrs] [remaining=%.2f hrs]",
-                            totalBuildTimeInHours, timeRemainingInHours));
+                    log(String.format(Locale.ENGLISH,
+                        "     Time [total=%.2f hrs] [remaining=%.2f hrs]",
+                        totalBuildTimeInHours, timeRemainingInHours));
 
                     float dtUsed = dtInHours;
                     if (startTime.isAfter(now)) {
@@ -381,10 +391,11 @@ public class Simulation {
                     // what is the current amount of time we have now as a percentage of the total build
                     // time?
                     float progressThisTurn = dtUsed / totalBuildTimeInHours;
-                    log(String.format("Progress this turn: %f", progressThisTurn));
+                    log(String.format(Locale.ENGLISH, "Progress this turn: %f", progressThisTurn));
                     if (progressThisTurn <= 0) {
                         DateTime endTime;
-                        timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
+                        timeRemainingInHours =
+                            (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
                         if (timeRemainingInHours < (10.0f / 3600.0f)) {
                             endTime = now;
                         } else {
@@ -399,14 +410,15 @@ public class Simulation {
 
                     // work out how many minerals we require for this turn
                     float mineralsRequired = br.getCount() * buildCost.getCostInMinerals() * progressThisTurn;
-                    log(String.format("Cost in minerals: %f", mineralsRequired));
+                    log(String.format(Locale.ENGLISH, "Cost in minerals: %f", mineralsRequired));
                     if (mineralsRequired > mineralsPerBuildRequest) {
                         // if we don't have enough minerals, we'll just do a percentage of the work
                         // this turn
                         totalMinerals -= mineralsPerBuildRequest;
                         float percentMineralsAvailable = mineralsPerBuildRequest / mineralsRequired;
                         br.setProgress(br.getProgress(false) + (progressThisTurn * percentMineralsAvailable));
-                        log(String.format("     Progress %.4f%% + %.4f%% (this turn, adjusted - %.4f%% originally) ",
+                        log(String.format(Locale.ENGLISH,
+                            "     Progress %.4f%% + %.4f%% (this turn, adjusted - %.4f%% originally) ",
                             br.getProgress(false) * 100.0f,
                             progressThisTurn * percentMineralsAvailable * 100.0f,
                             progressThisTurn * 100.0f));
@@ -415,12 +427,14 @@ public class Simulation {
                         // removing the minerals we need from the global pool...
                         totalMinerals -= mineralsRequired;
                         br.setProgress(br.getProgress(false) + progressThisTurn);
-                        log(String.format("     Progress %.4f%% + %.4f%% (this turn)",
+                        log(String.format(Locale.ENGLISH,
+                            "     Progress %.4f%% + %.4f%% (this turn)",
                             br.getProgress(false) * 100.0f, progressThisTurn * 100.0f));
                     }
                     mineralsDeltaPerHour -= mineralsRequired / dtInHours;
-                    log(String.format("     Minerals [required=%.2f] [available=%.2f] [available per build=%.2f]",
-                            mineralsRequired, totalMinerals, mineralsPerBuildRequest));
+                    log(String.format(Locale.ENGLISH,
+                        "     Minerals [required=%.2f] [available=%.2f] [available per build=%.2f]",
+                        mineralsRequired, totalMinerals, mineralsPerBuildRequest));
 
                     // adjust the end_time for this turn
                     timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
@@ -429,9 +443,13 @@ public class Simulation {
                         // avoid overflow errors.
                         timeRemainingInHours = 100000;
                     }
-                    DateTime endTime = now.plus((long)(dtUsed * 1000 * 3600) + (long)(timeRemainingInHours * 1000 * 3600));
+                    DateTime endTime =
+                        now.plus(
+                            (long)(dtUsed * 1000 * 3600)
+                                + (long)(timeRemainingInHours * 1000 * 3600));
                     br.setEndTime(endTime);
-                    log(String.format("     End Time: %s (%.2f hrs)", endTime, Seconds.secondsBetween(now, endTime).getSeconds() / 3600.0f));
+                    log(String.format(Locale.ENGLISH, "     End Time: %s (%.2f hrs)",
+                        endTime, Seconds.secondsBetween(now, endTime).getSeconds() / 3600.0f));
 
                     if (br.getProgress(false) >= 1.0f) {
                         // if we've finished this turn, just set progress
@@ -450,15 +468,16 @@ public class Simulation {
         float totalGoodsRequired = totalGoodsPerHour * dtInHours;
         goodsDeltaPerHour -= totalGoodsPerHour;
 
-        // If we have more than total_goods_required stored, then we're cool. Otherwise, our population
-        // suffers...
+        // If we have more than total_goods_required stored, then we're cool. Otherwise, our
+        // population suffers...
         float goodsEfficiency = 1.0f;
         if (totalGoodsRequired > totalGoods && totalGoodsRequired > 0) {
             goodsEfficiency = totalGoods / totalGoodsRequired;
         }
 
-        log(String.format("--- Updating Population [goods required=%.2f] [goods available=%.2f] [efficiency=%.2f]",
-                          totalGoodsRequired, totalGoods, goodsEfficiency));
+        log(String.format(Locale.ENGLISH,
+            "--- Updating Population [goods required=%.2f] [goods available=%.2f] [efficiency=%.2f]",
+            totalGoodsRequired, totalGoods, goodsEfficiency));
 
         // subtract all the goods we'll need
         totalGoods -= totalGoodsRequired;
@@ -468,7 +487,7 @@ public class Simulation {
 
             if (empire != null) {
                 if (empire.getGoodsZeroTime() == null || empire.getGoodsZeroTime().isAfter(now.plus(dt))) {
-                    log(String.format("    GOODS HAVE HIT ZERO"));
+                    log("    GOODS HAVE HIT ZERO");
                     empire.setGoodsZeroTime(now.plus(dt));
                 }
             }
@@ -477,6 +496,11 @@ public class Simulation {
         // now loop through the colonies and update the population/goods counter
         for (BaseColony colony : star.getColonies()) {
             if (!equalEmpireKey(colony.getEmpireKey(), empireKey)) {
+                continue;
+            }
+
+            // If the colony is basically dead, don't adjust the population.
+            if (colony.getPopulation() < 0.1) {
                 continue;
             }
 
@@ -502,8 +526,8 @@ public class Simulation {
             if (newPopulation < 100.0f && colony.isInCooldown()) {
                 newPopulation = 100.0f;
             }
-            log(String.format("    Colony[%d]: [delta=%.2f] [new=%.2f]",
-                              colony.getPlanetIndex(), populationIncrease, newPopulation));
+            log(String.format(Locale.ENGLISH, "    Colony[%d]: [delta=%.2f] [new=%.2f]",
+                colony.getPlanetIndex(), populationIncrease, newPopulation));
             colony.setPopulation(newPopulation);
         }
 
@@ -539,7 +563,8 @@ public class Simulation {
         // get the existing combat report, or create a new one
         BaseCombatReport combatReport = star.getCombatReport();
         if (combatReport == null) {
-            log(String.format("-- Combat [new combat report] [%d attacking]", numAttacking));
+            log(String.format(Locale.ENGLISH, "-- Combat [new combat report] [%d attacking]",
+                numAttacking));
             combatReport = star.createCombatReport(null);
             star.setCombatReport(combatReport);
         } else {
@@ -552,7 +577,8 @@ public class Simulation {
                 }
             }
 
-            log(String.format("-- Combat, [loaded %d rounds] [%d attacking]", combatReport.getCombatRounds().size(), numAttacking));
+            log(String.format(Locale.ENGLISH, "-- Combat, [loaded %d rounds] [%d attacking]",
+                combatReport.getCombatRounds().size(), numAttacking));
         }
 
         DateTime attackStartTime = null;
@@ -592,7 +618,8 @@ public class Simulation {
             BaseCombatReport.CombatRound round = new BaseCombatReport.CombatRound();
             round.setStarKey(star.getKey());
             round.setRoundTime(now);
-            log(String.format("--- Round #%d [%s]", combatReport.getCombatRounds().size() + 1, now));
+            log(String.format(Locale.ENGLISH, "--- Round #%d [%s]",
+                combatReport.getCombatRounds().size() + 1, now));
             boolean stillAttacking = simulateCombatRound(now, star, round);
             if (combatReport.getStartTime() == null) {
                 combatReport.setStartTime(now);
@@ -601,7 +628,7 @@ public class Simulation {
             combatReport.getCombatRounds().add(round);
 
             if (!stillAttacking) {
-                log(String.format("--- Combat finished."));
+                log("--- Combat finished.");
                 break;
             }
             now = now.plusMinutes(1);
@@ -663,24 +690,28 @@ public class Simulation {
             BaseCombatReport.FleetSummary target = findTarget(round, fleet);
             if (target == null) {
                 // if there's no more available targets, then we're no longer attacking
-                log(String.format("    Fleet #%d no suitable target.", fleet.getIndex()));
+                log(String.format(Locale.ENGLISH, "    Fleet #%d no suitable target.",
+                    fleet.getIndex()));
                 fleet.setFleetState(BaseFleet.State.IDLE);
                 continue;
             } else {
-                log(String.format("    Fleet #%d attacking fleet #%d", fleet.getIndex(), target.getIndex()));
+                log(String.format(Locale.ENGLISH, "    Fleet #%d attacking fleet #%d",
+                    fleet.getIndex(), target.getIndex()));
             }
 
-            ShipDesign fleetDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+            ShipDesign fleetDesign =
+                (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
             float damage = fleet.getNumShips() * fleetDesign.getBaseAttack();
-            log(String.format("    Fleet #%d (%s x %.2f) hit by fleet #%d (%s x %.2f) for %.2f damage",
-                    target.getIndex(), target.getDesignID(), target.getNumShips(),
-                    fleet.getIndex(), fleet.getDesignID(), fleet.getNumShips(), damage));
+            log(String.format(Locale.ENGLISH,
+                "    Fleet #%d (%s x %.2f) hit by fleet #%d (%s x %.2f) for %.2f damage",
+                target.getIndex(), target.getDesignID(), target.getNumShips(), fleet.getIndex(),
+                fleet.getDesignID(), fleet.getNumShips(), damage));
 
             Double totalDamage = hits.get(target.getIndex());
             if (totalDamage == null) {
-                hits.put(target.getIndex(), new Double(damage));
+                hits.put(target.getIndex(), (double) damage);
             } else {
-                hits.put(target.getIndex(), new Double(totalDamage + damage));
+                hits.put(target.getIndex(), totalDamage + damage);
             }
 
             BaseCombatReport.FleetAttackRecord attackRecord = new BaseCombatReport.FleetAttackRecord(
@@ -696,7 +727,8 @@ public class Simulation {
             }
             for (BaseFleet targetFleet : fleet.getFleets()) {
                 if (targetFleet.getState() == BaseFleet.State.IDLE) {
-                    ShipDesign targetDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+                    ShipDesign targetDesign =
+                        (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
                     ArrayList<ShipEffect> effects = targetDesign.getEffects(ShipEffect.class);
                     for (ShipEffect effect : effects) {
                         effect.onAttacked(star, targetFleet);
@@ -713,12 +745,16 @@ public class Simulation {
                 continue;
             }
 
-            ShipDesign fleetDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+            ShipDesign fleetDesign =
+                (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
             damage /= fleetDesign.getBaseDefence();
             fleet.removeShips((float) (double) damage);
-            log(String.format("    Fleet #%d %.2f ships lost (%.2f ships remaining)", fleet.getIndex(), damage, fleet.getNumShips()));
+            log(String.format(Locale.ENGLISH,
+                "    Fleet #%d %.2f ships lost (%.2f ships remaining)",
+                fleet.getIndex(), damage, fleet.getNumShips()));
 
-            BaseCombatReport.FleetDamagedRecord damageRecord = new BaseCombatReport.FleetDamagedRecord(
+            BaseCombatReport.FleetDamagedRecord damageRecord =
+                new BaseCombatReport.FleetDamagedRecord(
                     round.getFleets(), fleet.getIndex(), (float) damage.doubleValue());
             round.getFleetDamagedRecords().add(damageRecord);
 
@@ -790,7 +826,9 @@ public class Simulation {
             if (otherFleet.getFleetState() == BaseFleet.State.MOVING) {
                 continue;
             }
-            ShipDesign design = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, otherFleet.getDesignID());
+            ShipDesign design =
+                (ShipDesign) BaseDesignManager.i.getDesign(
+                    DesignKind.SHIP, otherFleet.getDesignID());
             if (foundFleet == null || design.getCombatPriority() < foundPriority) {
                 foundFleet = otherFleet;
                 foundPriority = design.getCombatPriority();
@@ -800,7 +838,8 @@ public class Simulation {
         return foundFleet;
     }
 
-    private static boolean isFriendly(BaseCombatReport.FleetSummary fleet1, BaseCombatReport.FleetSummary fleet2) {
+    private static boolean isFriendly(
+        BaseCombatReport.FleetSummary fleet1, BaseCombatReport.FleetSummary fleet2) {
         BaseFleet baseFleet1 = fleet1.getFleets().get(0);
         BaseFleet baseFleet2 = fleet2.getFleets().get(0);
         return isFriendly(baseFleet1, baseFleet2);

@@ -85,7 +85,7 @@ public class ColonyController {
     float remainingShips = totalTroopCarriers - colonyDefence;
     float remainingPopulation = colony.getPopulation()
         - (totalTroopCarriers * 4.0f / colony.getDefenceBoost());
-    colony.setPopulation(remainingPopulation);
+    colony.setPopulation(Math.min(0.0f, remainingPopulation));
 
     Messages.SituationReport.Builder sitrep_pb = null;
     if (colony.getEmpireID() != null) {
@@ -102,7 +102,7 @@ public class ColonyController {
           Locale.US,
           "Colony destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
           remainingPopulation, remainingShips));
-      EmpireController empireController = new EmpireController();
+      EmpireController empireController = new EmpireController(db.getTransaction());
       Empire empire = null;
       if (colony.getEmpireID() != null) {
         empire = empireController.getEmpire(colony.getEmpireID());
@@ -110,7 +110,8 @@ public class ColonyController {
 
       // Record the colony in the stats for the destroyer.
 
-      new BattleRankController().recordColonyDestroyed(empireID, colony.getPopulation());
+      new BattleRankController(db.getTransaction())
+          .recordColonyDestroyed(empireID, colony.getPopulation());
 
       // Transfer the cash that results from this to the attacker.
       double cashTransferred = getAttackCashValue(empire, colony);
@@ -144,17 +145,20 @@ public class ColonyController {
 
       // If this is the last colony for this empire on this star, make sure the empire's home
       // star is reset.
-      boolean anotherColonyExists = false;
-      for (BaseColony baseColony : star.getColonies()) {
-        if (baseColony.getEmpireKey() != null && colony.getEmpireKey() != null &&
-            baseColony.getEmpireKey().equals(colony.getEmpireKey()) &&
-            !baseColony.getKey().equals(colony.getKey())) {
-          anotherColonyExists = true;
+      if (empire != null) {
+        boolean anotherColonyExists = false;
+        for (BaseColony baseColony : star.getColonies()) {
+          if (baseColony.getEmpireKey() != null && colony.getEmpireKey() != null &&
+              baseColony.getEmpireKey().equals(colony.getEmpireKey()) &&
+              !baseColony.getKey().equals(colony.getKey())) {
+            anotherColonyExists = true;
+            break;
+          }
         }
-      }
-      if (!anotherColonyExists &&
-          new EmpireController().getEmpire(empireID).getHomeStarID() == star.getID()) {
-        new EmpireController().findNewHomeStar(empireID);
+
+        if (!anotherColonyExists && empire.getHomeStarID() == star.getID()) {
+          new EmpireController(db.getTransaction()).findNewHomeStar(empire.getID());
+        }
       }
 
       if (sitrep_pb != null) {
@@ -183,7 +187,7 @@ public class ColonyController {
     }
 
     if (sitrep_pb != null) {
-      new SituationReportController().saveSituationReport(sitrep_pb.build());
+      new SituationReportController(db.getTransaction()).saveSituationReport(sitrep_pb.build());
     }
   }
 
