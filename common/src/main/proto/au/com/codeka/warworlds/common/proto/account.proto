@@ -7,6 +7,10 @@ import "au/com/codeka/warworlds/common/proto/empire.proto";
 
 message NewAccountRequest {
   optional string empire_name = 1;
+
+  // If set, you've signed in with the given account. We'll want to associate the above empire with
+  // the account specified here. If this is not specified we'll be creating an anonymous empire.
+  optional string id_token = 2;
 }
 
 message NewAccountResponse {
@@ -44,8 +48,11 @@ message AccountAssociateResponse {
     // Some other unexpected error.
     UNEXPECTED_ERROR = 4;
 
-    // The association hasn't happened yet.
-    NOT_VERIFIED = 5;
+    // If you've tried to sign in to an account that does not have an empire, we should let you
+    // create one.
+    NO_EMPIRE_FOR_ACCOUNT = 6;
+
+    reserved 5;
   }
   optional AccountAssociateStatus status = 1;
 

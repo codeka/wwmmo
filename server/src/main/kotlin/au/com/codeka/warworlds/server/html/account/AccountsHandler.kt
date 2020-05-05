@@ -18,7 +18,6 @@ import au.com.codeka.warworlds.server.world.WatchableObject
 class AccountsHandler : ProtobufRequestHandler() {
   private val log = Log("EmpiresHandler")
 
-  @Throws(RequestException::class)
   public override fun post() {
     val req = readProtobuf(NewAccountRequest::class.java)
     log.info("Creating new account: %s", req.empire_name)
@@ -34,24 +33,33 @@ class AccountsHandler : ProtobufRequestHandler() {
     val nameStatus = NameValidator.validate(
         req.empire_name,
         Configuration.i.limits!!.maxEmpireNameLength)
-    if (!nameStatus.isValid || nameStatus.name == null) {
+    if (!nameStatus.isValid) {
       writeProtobuf(
           NewAccountResponse.Builder()
               .message(nameStatus.errorMsg)
               .build())
       return
     }
-    val existingEmpires: List<WatchableObject<Empire>?> = EmpireManager.i.search(nameStatus.name)
+
+    val existingEmpires = EmpireManager.i.search(nameStatus.name)
     // The parameter to search is a query, so it'll find non-exact matches, but that's all we care
     // about, so we'll have to check manually.
     for (existingEmpire in existingEmpires) {
-      if (existingEmpire!!.get().display_name.compareTo(nameStatus.name!!, ignoreCase = true) == 0) {
+      if (existingEmpire.get().display_name.compareTo(nameStatus.name, ignoreCase = true) == 0) {
         writeProtobuf(
             NewAccountResponse.Builder()
                 .message("An empire with that name already exists.")
                 .build())
         return
       }
+    }
+
+    // If they've give us an idToken, we'll immediately associate this empire with that account.
+    // In that case, tokenInfo will be non-null.
+    val tokenInfo = if (req.id_token != null) {
+      TokenVerifier.verify(req.id_token)
+    } else {
+      null
     }
 
     // Generate a cookie for the user to authenticate with in the future.
@@ -69,8 +77,15 @@ class AccountsHandler : ProtobufRequestHandler() {
     }
 
     // Make a new account with all the details.
-    val acct = Account.Builder().empire_id(empire.get().id).build()
-    DataStore.i.accounts().put(cookie, acct)
+    val acctBuilder = Account.Builder()
+        .empire_id(empire.get().id)
+    if (tokenInfo != null) {
+      acctBuilder
+          .email(tokenInfo.email)
+          .email_status(Account.EmailStatus.VERIFIED)
+    }
+    DataStore.i.accounts().put(cookie, acctBuilder.build())
+
     writeProtobuf(NewAccountResponse.Builder().cookie(cookie).build())
   }
 }

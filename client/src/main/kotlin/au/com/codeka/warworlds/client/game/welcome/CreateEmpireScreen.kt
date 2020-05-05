@@ -54,6 +54,7 @@ class CreateEmpireScreen : Screen() {
           .header("Content-Type", "application/x-protobuf")
           .body(NewAccountRequest.Builder()
               .empire_name(empireName)
+              .id_token(App.auth.account?.idToken)
               .build().encode())
           .build()
       val resp = request.getBody(NewAccountResponse::class.java)
@@ -78,7 +79,7 @@ class CreateEmpireScreen : Screen() {
         .setString(GameSettings.Key.COOKIE, resp.cookie)
         .commit()
 
-    // Tell the Server we can now connect.
+    context.home()
     context.pushScreen(
         WelcomeScreen(),
         SharedViews.builder()

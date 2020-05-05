@@ -22,11 +22,12 @@ import java.util.*
  */
 class EmpireManager private constructor() {
   private val watchedEmpires: MutableMap<Long, WatchableObject<Empire>>
+
   fun getEmpire(id: Long): WatchableObject<Empire>? {
     synchronized(watchedEmpires) {
       var watchableEmpire = watchedEmpires[id]
       if (watchableEmpire == null) {
-        val empire: Empire = DataStore.i.empires().get(id) ?: return null
+        val empire: Empire = DataStore.i.empires()[id] ?: return null
         watchableEmpire = watchEmpire(empire)
       }
       return watchableEmpire
@@ -36,11 +37,11 @@ class EmpireManager private constructor() {
   /**
    * Searches the database for empires matching the given query string.
    */
-  fun search(query: String?): List<WatchableObject<Empire>?> {
+  fun search(query: String): List<WatchableObject<Empire>> {
     val empireIds: List<Long> = DataStore.i.empires().search(query)
-    val empires: MutableList<WatchableObject<Empire>?> = ArrayList()
+    val empires: MutableList<WatchableObject<Empire>> = ArrayList()
     for (id in empireIds) {
-      empires.add(getEmpire(id))
+      empires.add(getEmpire(id)!!)
     }
     return empires
   }

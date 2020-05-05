@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.client.game.welcome
 import android.view.ViewGroup
 import au.com.codeka.warworlds.client.App
 import au.com.codeka.warworlds.client.R
-import au.com.codeka.warworlds.client.concurrency.TaskRunner
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.game.world.EmpireManager
 import au.com.codeka.warworlds.client.net.HttpRequest
@@ -42,7 +41,7 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
     updateState()
 
     if (immediate) {
-      performExplicitSignIn()
+      performExplicitSignIn(GameSettings.getString(GameSettings.Key.COOKIE))
     }
 
     return ShowInfo.builder().view(layout).toolbarVisible(false).build()
@@ -66,7 +65,29 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
     }
   }
 
-  private fun performExplicitSignIn() {
+  private val layoutCallbacks: SignInLayout.Callbacks = object : SignInLayout.Callbacks {
+    override fun onSignInClick() {
+      if (App.auth.isSignedIn) {
+        App.taskRunner.runTask(Runnable {
+          App.auth.signOut()
+        }, Threads.BACKGROUND).then( Runnable {
+          performExplicitSignIn("" /* cookie */)
+        }, Threads.UI)
+      } else {
+        performExplicitSignIn(GameSettings.getString(GameSettings.Key.COOKIE))
+      }
+    }
+
+    override fun onCreateEmpireClick() {
+      context.pushScreen(CreateEmpireScreen())
+    }
+
+    override fun onCancelClick() {
+      context.popScreen()
+    }
+  }
+
+  private fun performExplicitSignIn(cookie: String) {
     val accountFuture = App.auth.explicitSignIn(context.activity)
     App.taskRunner.runTask(Runnable {
       val account = accountFuture.get()
@@ -77,30 +98,12 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
         return@Runnable
       }
 
-      doAssociate(account, false)
+      doAssociate(account, cookie, false)
     }, Threads.BACKGROUND)
   }
 
-  private val layoutCallbacks: SignInLayout.Callbacks = object : SignInLayout.Callbacks {
-    override fun onSignInClick() {
-      if (App.auth.isSignedIn) {
-        App.taskRunner.runTask(Runnable {
-          App.auth.signOut()
-        }, Threads.BACKGROUND).then( Runnable {
-          performExplicitSignIn()
-        }, Threads.UI)
-      } else {
-        performExplicitSignIn()
-      }
-    }
-
-    override fun onCancelClick() {
-      context.popScreen()
-    }
-  }
-
   /** Associate our account with the empire we're currently logged in as. */
-  private fun doAssociate(account: GoogleSignInAccount, force: Boolean) {
+  private fun doAssociate(account: GoogleSignInAccount, cookie: String, force: Boolean) {
     val myEmpire = if (EmpireManager.hasMyEmpire()) EmpireManager.getMyEmpire() else null
     log.info("Associating email address '%s' with empire #%d %s (force=%s)...",
         account.email, myEmpire?.id, myEmpire?.display_name, if (force) "true" else "false")
@@ -117,7 +120,7 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
         .method(HttpRequest.Method.POST)
         .header("Content-Type", "application/x-protobuf")
         .body(AccountAssociateRequest.Builder()
-            .cookie(GameSettings.getString(GameSettings.Key.COOKIE))
+            .cookie(cookie)
             .force(force)
             .email_addr(account.email)
             .id_token(account.idToken)
@@ -130,10 +133,11 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
       App.taskRunner.runTask(Runnable {
         onSignInError(
             AccountAssociateStatus.STATUS_UNKNOWN,
+            account,
             "An unknown error occurred.")
       }, Threads.UI)
     } else if (resp.status != AccountAssociateStatus.SUCCESS) {
-      App.taskRunner.runTask(Runnable { onSignInError(resp.status, null) }, Threads.UI)
+      App.taskRunner.runTask(Runnable { onSignInError(resp.status, account, null) }, Threads.UI)
     } else {
       log.info("Associate successful")
       App.taskRunner.runTask(
@@ -158,6 +162,7 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
 
   private fun onSignInError(
       status: AccountAssociateStatus,
+      account: GoogleSignInAccount?,
       msg: String?) {
     if (msg == null) {
       askingToForce = when (status) {
@@ -167,6 +172,10 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
         }
         AccountAssociateStatus.EMAIL_ALREADY_ASSOCIATED -> {
           layout.setForceSignIn(R.string.signin_error_email_already_associated)
+          true
+        }
+        AccountAssociateStatus.NO_EMPIRE_FOR_ACCOUNT -> {
+          layout.setCreateEmpireError(R.string.signin_error_no_empire, account?.email)
           true
         }
         AccountAssociateStatus.UNEXPECTED_ERROR -> {

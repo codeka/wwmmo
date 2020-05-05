@@ -56,6 +56,7 @@
   <string name="starfield">Starfield</string>
   <string name="star_search">Search stars</string>
 
+  <string name="create_empire">Create empire</string>
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to
     get started.
@@ -120,6 +121,11 @@
   <string name="signin_error_email_already_associated">
     This email address is associated with a different account. Do you want to associate with this
     account instead? You will not be able to access the old account if you do.
+  </string>
+  <string name="signin_error_no_empire">
+    This account, %s, does not have an empire associated with it. You can create one now if you
+    like, by clicking "Create empire" below, or you can choose a different account by clicking
+    "Cancel".
   </string>
   <string name="signin_error_unknown">
     Oops, something\'s gone wrong!

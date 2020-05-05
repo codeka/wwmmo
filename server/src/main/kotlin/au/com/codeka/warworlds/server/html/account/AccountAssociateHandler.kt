@@ -19,28 +19,6 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
     private val log = Log("AccountAssociateHandler")
   }
 
-  /** Get is for checking whether the associate has succeeded.  */
-  public override fun get() {
-    val empireId = request.getParameter("id").toLong()
-    val account = AccountManager.i.getAccount(empireId)
-    if (account == null) {
-      log.warning("Could not associate account, no account for empire: %d", empireId)
-      response.status = 401
-      return
-    }
-    if (account.get().email_status == Account.EmailStatus.VERIFIED) {
-      log.info("Account is verified!")
-      writeProtobuf(AccountAssociateResponse.Builder()
-          .status(AccountAssociateResponse.AccountAssociateStatus.SUCCESS)
-          .build())
-    } else {
-      log.info("Account not verified: %s", account.get().email_status)
-      writeProtobuf(AccountAssociateResponse.Builder()
-          .status(AccountAssociateResponse.AccountAssociateStatus.NOT_VERIFIED)
-          .build())
-    }
-  }
-
   /** Post is to actually initiate an association.  */
   public override fun post() {
     val req = readProtobuf(AccountAssociateRequest::class.java)
@@ -50,6 +28,8 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
           "(token email=${tokenInfo.email}, request email=${req.email_addr})")
       throw RequestException(400, "Invalid email address")
     }
+
+    val resp = AccountAssociateResponse.Builder()
 
     val acc =
       if (req.cookie == "") {
@@ -62,7 +42,8 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
     if (acc == null) {
       log.warning("Could not sign in/associate account, no account for email=%s cookie=%s",
           req.email_addr, req.cookie)
-      response.status = 401
+      resp.status(AccountAssociateResponse.AccountAssociateStatus.NO_EMPIRE_FOR_ACCOUNT)
+      writeProtobuf(resp.build())
       return
     }
 
@@ -73,7 +54,6 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
     log.info(
         "Attempting to sign in/associate empire #%d with '%s', name=%s audience: %s",
         account.get().empire_id, emailAddr, tokenInfo.displayName, tokenInfo.audience)
-    val resp = AccountAssociateResponse.Builder()
 
     if (req.cookie != "") {
       // See if there's already one associated with this email address.

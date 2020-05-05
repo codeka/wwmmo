@@ -5,29 +5,29 @@ package au.com.codeka.warworlds.server.util
  */
 object NameValidator {
   fun validate(name: String, maxLength: Int): NameStatus {
-    var name = name
-    name = name.trim { it <= ' ' }
-    if (name.length > maxLength) {
-      return NameStatus(false, "Name too long.", null)
+    var n = name
+    n = n.trim { it <= ' ' }
+    if (n.length > maxLength) {
+      return NameStatus(false, "Name too long.", n)
     }
 
     // Collapse multiple whitespace characters into one.
-    name = name.replace("\\s+".toRegex(), " ")
-    return NameStatus(true, null, name)
+    n = n.replace("\\s+".toRegex(), " ")
+    return NameStatus(true, null, n)
   }
 
   /** Same as [.validate], but instead of throwing, truncate.  */
   fun validateTruncate(name: String, maxLength: Int): String {
-    var name = name
-    name = name.trim { it <= ' ' }
-    if (name.length > maxLength) {
-      name = name.substring(0, maxLength)
+    var n = name
+    n = n.trim { it <= ' ' }
+    if (n.length > maxLength) {
+      n = n.substring(0, maxLength)
     }
 
     // Collapse multiple whitespace characters into one.
-    name = name.replace("\\s+".toRegex(), " ")
-    return name
+    n = n.replace("\\s+".toRegex(), " ")
+    return n
   }
 
-  class NameStatus(var isValid: Boolean, var errorMsg: String?, var name: String?)
+  class NameStatus(var isValid: Boolean, var errorMsg: String?, var name: String)
 }

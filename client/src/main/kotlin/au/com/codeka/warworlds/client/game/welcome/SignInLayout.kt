@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions
 class SignInLayout(context: Context?, callbacks: Callbacks) : RelativeLayout(context) {
   interface Callbacks {
     fun onSignInClick()
+    fun onCreateEmpireClick()
     fun onCancelClick()
   }
 
@@ -27,20 +28,24 @@ class SignInLayout(context: Context?, callbacks: Callbacks) : RelativeLayout(con
   private val signInHelp: TextView
   private val signInError: TextView
 
+  private var inCreateEmpireError: Boolean = false
+
   init {
     View.inflate(context, R.layout.signin, this)
     setBackground(this)
-    signInHelp = Preconditions.checkNotNull(findViewById(R.id.signin_help))
-    signInError = Preconditions.checkNotNull(findViewById(R.id.signin_error))
-    signInButton = Preconditions.checkNotNull(findViewById(R.id.signin_btn))
-    cancelButton = Preconditions.checkNotNull(findViewById(R.id.cancel_btn))
-    if (getString(GameSettings.Key.EMAIL_ADDR).isEmpty()) {
-      signInButton.setText(R.string.next)
-    } else {
-      signInButton.setText(R.string.switch_user)
+    signInHelp = findViewById(R.id.signin_help)
+    signInError = findViewById(R.id.signin_error)
+    signInButton = findViewById(R.id.signin_btn)
+    cancelButton = findViewById(R.id.cancel_btn)
+
+    signInButton.setOnClickListener {
+      if (inCreateEmpireError) {
+        callbacks.onCreateEmpireClick()
+      } else {
+        callbacks.onSignInClick()
+      }
     }
-    signInButton.setOnClickListener { v: View? -> callbacks.onSignInClick() }
-    cancelButton.setOnClickListener { v: View? -> callbacks.onCancelClick() }
+    cancelButton.setOnClickListener { callbacks.onCancelClick() }
   }
 
   /**
@@ -66,6 +71,14 @@ class SignInLayout(context: Context?, callbacks: Callbacks) : RelativeLayout(con
     signInHelp.setText(helpResId)
     signInButton.setText(R.string.yes)
     cancelButton.setText(R.string.no)
+  }
+
+  fun setCreateEmpireError(helpResId: Int, emailAddr: String?) {
+    signInHelp.text = resources.getString(helpResId, emailAddr)
+    signInButton.isEnabled = true
+    signInButton.setText(R.string.create_empire)
+    cancelButton.setText(R.string.cancel)
+    inCreateEmpireError = true
   }
 
   fun setErrorMsg(resId: Int) {
