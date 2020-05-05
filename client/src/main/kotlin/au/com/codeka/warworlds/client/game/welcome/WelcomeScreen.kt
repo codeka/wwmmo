@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.client.util.Version.string
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Empire
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.common.base.Preconditions
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -62,6 +63,8 @@ class WelcomeScreen : Screen() {
     if (motd != null) {
       welcomeLayout.updateWelcomeMessage(motd)
     }
+
+    updateSignInButtonText(App.auth.account)
 
 /*
           String currAccountName = prefs.getString("AccountName", null);
@@ -197,6 +200,14 @@ class WelcomeScreen : Screen() {
     }
   }
 
+  private fun updateSignInButtonText(account: GoogleSignInAccount?) {
+    if (account == null) {
+      welcomeLayout.setSignInText(R.string.signin)
+    } else {
+      welcomeLayout.setSignInText(R.string.switch_user)
+    }
+  }
+
   private val layoutCallbacks: WelcomeLayout.Callbacks = object : WelcomeLayout.Callbacks {
     override fun onStartClick() {
       context.home()
@@ -236,11 +247,7 @@ class WelcomeScreen : Screen() {
 
     @EventHandler
     fun onAuthUpdated(auth: AuthAccountUpdate) {
-      if (auth.account == null) {
-        welcomeLayout.setSignInText(R.string.signin)
-      } else {
-        welcomeLayout.setSignInText(R.string.switch_user)
-      }
+      updateSignInButtonText(auth.account)
     }
   }
 

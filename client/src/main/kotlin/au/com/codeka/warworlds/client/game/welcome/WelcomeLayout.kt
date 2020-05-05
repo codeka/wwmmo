@@ -32,6 +32,7 @@ class WelcomeLayout(context: Context?, private val callbacks: Callbacks)
   private val empireName: TextView
   private val empireIcon: ImageView
   private val motdView: TransparentWebView
+
   fun refreshEmpireDetails(empire: Empire) {
     empireName.text = empire.display_name
     Picasso.get()
