@@ -21,6 +21,7 @@ class Camera {
 
   private val projMatrix = FloatArray(16)
   private val viewMatrix = FloatArray(16)
+
   val viewProjMatrix = FloatArray(16)
     get() {
       Matrix.setIdentityM(viewMatrix, 0)
@@ -29,14 +30,14 @@ class Camera {
       Matrix.multiplyMM(field, 0, projMatrix, 0, viewMatrix, 0)
       return field
     }
-  private val translateHelper = FloatArray(16)
+
   var zoomAmount = 0f
     private set
   private var flinging = false
   private var flingX = 0f
   private var flingY = 0f
   private var flingFactor = 0f
-  private val decelerateInterpolator: DecelerateInterpolator
+  private val decelerateInterpolator = DecelerateInterpolator(1.0f)
   var screenWidth = 0f
     private set
   var screenHeight = 0f
@@ -44,6 +45,7 @@ class Camera {
   private var translateX = 0f
   private var translateY = 0f
   private var listener: CameraUpdateListener? = null
+
   fun setCameraUpdateListener(listener: CameraUpdateListener?) {
     this.listener = listener
   }
@@ -77,7 +79,6 @@ class Camera {
    * @param y Amount to translate in Y direction.
    * @param silent If true, we will not call the listener.
    */
-  @JvmOverloads
   fun translate(x: Float, y: Float, silent: Boolean = false) {
     var x = x
     var y = y
@@ -120,7 +121,6 @@ class Camera {
   }
 
   init {
-    decelerateInterpolator = DecelerateInterpolator(1.0f)
     Matrix.setIdentityM(viewMatrix, 0)
   }
 }

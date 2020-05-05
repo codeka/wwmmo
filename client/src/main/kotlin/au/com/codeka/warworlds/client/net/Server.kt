@@ -67,6 +67,7 @@ class Server {
   /** A lock used to guard access to the web socket/queue.  */
   private val lock = Any()
 
+  private var reconnectPending = false
   private var reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS
 
   fun setup() {
@@ -77,8 +78,8 @@ class Server {
             .setString(GameSettings.Key.COOKIE, "")
             .commit()
       } else if (key == GameSettings.Key.COOKIE) {
-        // We got a new cookie, try connecting again (immediately).
-        reconnectTimeMs = 0
+        // We got a new cookie, try connecting again (in 100ms).
+        reconnectTimeMs = 100
         disconnect()
       }
     }
@@ -230,13 +231,19 @@ class Server {
     }
     if (currState.state != ServerStateEvent.ConnectionState.ERROR) {
       updateState(ServerStateEvent.ConnectionState.DISCONNECTED, null)
-      App.taskRunner.runTask(Runnable {
-        reconnectTimeMs *= 2
-        if (reconnectTimeMs > MAX_RECONNECT_TIME_MS) {
-          reconnectTimeMs = MAX_RECONNECT_TIME_MS
+      synchronized(lock) {
+        if (!reconnectPending) {
+          reconnectPending = true
+          App.taskRunner.runTask(Runnable {
+            reconnectTimeMs *= 2
+            if (reconnectTimeMs > MAX_RECONNECT_TIME_MS) {
+              reconnectTimeMs = MAX_RECONNECT_TIME_MS
+            }
+            connect()
+            reconnectPending = false
+          }, Threads.BACKGROUND, reconnectTimeMs.toLong())
         }
-        connect()
-      }, Threads.BACKGROUND, reconnectTimeMs.toLong())
+      }
     }
   }
 

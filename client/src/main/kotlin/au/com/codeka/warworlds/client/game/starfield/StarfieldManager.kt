@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.common.proto.Star.CLASSIFICATION
 import au.com.codeka.warworlds.common.sim.StarHelper
 import com.google.common.base.Preconditions
 import java.util.*
+import kotlin.math.roundToInt
 
 /**
  * [StarfieldManager] manages the starfield view that we display in the main activity. You can
@@ -40,7 +41,6 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private val gestureDetector: StarfieldGestureDetector
   private val context: Context
   private val tapListeners = ArrayList<TapListener>()
-  private var initialized = false
 
   // The selected star/fleet. If selectedFleet is non-null, selectedStar will be the star that
   // fleet is on.
@@ -249,35 +249,30 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     }
   }
 
+  /** Warp the view to center on the given star. */
   fun warpTo(star: Star) {
     warpTo(star.sector_x, star.sector_y, star.offset_x - 512.0f, star.offset_y - 512.0f)
   }
 
-  fun warpTo(sectorX: Long, sectorY: Long, offsetX: Float, offsetY: Float) {
+  private fun warpTo(sectorX: Long, sectorY: Long, offsetX: Float, offsetY: Float) {
     centerSectorX = sectorX
     centerSectorY = sectorY
     sectorRadius = 1
+    log.info("WarpTo: $centerSectorX, $centerSectorY - $offsetX, $offsetY")
     updateSectorBounds(centerSectorX - sectorRadius, centerSectorY - sectorRadius,
         centerSectorX + sectorRadius, centerSectorY + sectorRadius)
-    log.info("WarpTo: %.2f %.2f", offsetX, offsetY)
     camera.warpTo(
         scene.dimensionResolver.dp2px(-offsetX),
         scene.dimensionResolver.dp2px(offsetY))
   }
 
   /**
-   * This is called after we're connected to the server. If this is our first time being called,
-   * we'll initialize the scene at the default viewport.
+   * This is called after we're connected to the server. We'll warp to the connected empire's home
+   * star.
    */
   fun onConnected() {
-    if (initialized) {
-      return
-    }
-    initialized = true
-
     // Shouldn't be null after we're connected to the server.
-    val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
-    warpTo(myEmpire.home_star)
+    warpTo(EmpireManager.getMyEmpire().home_star)
   }
 
   /**
@@ -286,10 +281,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    * now in-bounds, and ask the server to keep us updated of the new stars.
    */
   private fun updateSectorBounds(left: Long, top: Long, right: Long, bottom: Long) {
+    log.info("updateSectorBounds($left, $top, $right, $bottom) current: " +
+        "$sectorLeft, $sectorTop, $sectorRight, $sectorBottom")
+
     // Remove the objects that are now out of bounds.
     for (sy in sectorTop..sectorBottom) {
       for (sx in sectorLeft..sectorRight) {
         if (sy < top || sy > bottom || sx < left || sx > right) {
+          log.info("removeSector($sx, $sy)")
           removeSector(Pair.create(sx, sy))
         }
       }
@@ -299,6 +298,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     for (sy in top..bottom) {
       for (sx in left..right) {
         if (sy < sectorTop || sy > sectorBottom || sx < sectorLeft || sx > sectorRight) {
+          log.info("createSectorBackground($sx, $sy)")
           createSectorBackground(sx, sy)
         }
       }
@@ -320,14 +320,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
 
   /**
    * This is called when the camera moves to a new (x,y) coord. We'll want to check whether we
-   * need to re-caculate the bounds and warp the camera back to the center.
+   * need to re-calculate the bounds and warp the camera back to the center.
    *
    * @param x The distance the camera has translated from the origin in the X direction.
    * @param y The distance the camera has translated from the origin in the Y direction.
    */
   private fun onCameraTranslate(x: Float, y: Float) {
-    val newCentreX = centerSectorX + Math.round(scene.dimensionResolver.px2dp(x / 1024.0f))
-    val newCentreY = centerSectorY + Math.round(scene.dimensionResolver.px2dp(y / 1024.0f))
+    val newCentreX = centerSectorX + scene.dimensionResolver.px2dp(x / 1024.0f).roundToInt()
+    val newCentreY = centerSectorY + scene.dimensionResolver.px2dp(y / 1024.0f).roundToInt()
     val top = newCentreY - sectorRadius
     val left = newCentreX - sectorRadius
     val bottom = newCentreY + sectorRadius
