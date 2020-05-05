@@ -157,8 +157,10 @@ class DrawerController(
             empireMenuItem.icon = errorDrawable
           }
 
-          override fun onPrepareLoad(placeHolderDrawable: Drawable) {
-            empireMenuItem.icon = placeHolderDrawable
+          override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+            if (placeHolderDrawable != null) {
+              empireMenuItem.icon = placeHolderDrawable
+            }
           }
         }
         // Picasso only keeps a weak reference to the target, but we want to keep it alive (at least

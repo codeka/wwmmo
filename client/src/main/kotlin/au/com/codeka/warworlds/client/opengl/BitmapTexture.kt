@@ -25,9 +25,6 @@ class BitmapTexture private constructor(loader: Loader) : Texture() {
       setTextureId(l.createGlTexture())
       loader = null
     }
-    if (l != null) {
-      log.info("DEANH: still loading..." + l.picassoTarget)
-    }
     super.bind()
   }
 
