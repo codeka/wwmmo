@@ -26,6 +26,26 @@ import java.util.*
 class Server {
   private val packetDispatcher = PacketDispatcher()
 
+  companion object {
+    private val log = Log("Server")
+    private const val DEFAULT_RECONNECT_TIME_MS = 1000
+    private const val MAX_RECONNECT_TIME_MS = 30000
+
+    private fun populateDeviceInfo(instanceIdResult: InstanceIdResult): DeviceInfo {
+      return DeviceInfo.Builder()
+          .device_build(Build.ID)
+          .device_id(GameSettings.getString(GameSettings.Key.INSTANCE_ID))
+          .device_manufacturer(Build.MANUFACTURER)
+          .device_model(Build.MODEL)
+          .device_version(Build.VERSION.RELEASE)
+          .fcm_device_info(FcmDeviceInfo.Builder()
+              .token(instanceIdResult.token)
+              .device_id(instanceIdResult.id)
+              .build())
+          .build()
+    }
+  }
+
   var currState = ServerStateEvent("", ServerStateEvent.ConnectionState.DISCONNECTED, null)
     private set
 
@@ -46,6 +66,7 @@ class Server {
 
   /** A lock used to guard access to the web socket/queue.  */
   private val lock = Any()
+
   private var reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS
 
   fun setup() {
@@ -56,7 +77,8 @@ class Server {
             .setString(GameSettings.Key.COOKIE, "")
             .commit()
       } else if (key == GameSettings.Key.COOKIE) {
-        // We got a new cookie, try connecting again.
+        // We got a new cookie, try connecting again (immediately).
+        reconnectTimeMs = 0
         disconnect()
       }
     }
@@ -245,24 +267,5 @@ class Server {
       loginStatus: LoginStatus?) {
     currState = ServerStateEvent(ServerUrl.url, state, loginStatus)
     App.eventBus.publish(currState)
-  }
-
-  companion object {
-    private val log = Log("Server")
-    private const val DEFAULT_RECONNECT_TIME_MS = 1000
-    private const val MAX_RECONNECT_TIME_MS = 30000
-    private fun populateDeviceInfo(instanceIdResult: InstanceIdResult): DeviceInfo {
-      return DeviceInfo.Builder()
-          .device_build(Build.ID)
-          .device_id(GameSettings.getString(GameSettings.Key.INSTANCE_ID))
-          .device_manufacturer(Build.MANUFACTURER)
-          .device_model(Build.MODEL)
-          .device_version(Build.VERSION.RELEASE)
-          .fcm_device_info(FcmDeviceInfo.Builder()
-              .token(instanceIdResult.token)
-              .device_id(instanceIdResult.id)
-              .build())
-          .build()
-    }
   }
 }
