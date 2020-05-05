@@ -51,7 +51,7 @@ public class ColonyAttackHandler extends RequestHandler {
       Messages.Star.Builder star_pb = Messages.Star.newBuilder();
       star.toProtocolBuffer(star_pb);
       setResponseBody(star_pb.build());
-    } catch (Exception e) {
+    } catch (Throwable e) {
       throw new RequestException(e);
     }
   }

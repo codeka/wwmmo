@@ -3,7 +3,11 @@ package au.com.codeka.warworlds.server.data;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import au.com.codeka.common.Log;
+
 public class Transaction implements AutoCloseable {
+  private static final Log log = new Log("Transaction");
+
   private Connection conn;
   private boolean wasCommitted;
 
@@ -33,7 +37,11 @@ public class Transaction implements AutoCloseable {
   @Override
   public void close() throws SQLException {
     if (!wasCommitted) {
-      conn.rollback();
+      try {
+        conn.rollback();
+      } catch (Throwable e) {
+        log.error("Error rolling back transaction.", e);
+      }
     }
     conn.setAutoCommit(true);
     conn.close();

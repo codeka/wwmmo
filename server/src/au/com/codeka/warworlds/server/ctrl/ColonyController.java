@@ -100,8 +100,10 @@ public class ColonyController {
     if (remainingPopulation <= 0.0f) {
       log.info(String.format(
           Locale.US,
-          "Colony destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
-          remainingPopulation, remainingShips));
+          "Colony destroyed [star=%d %s] [defender=%d] [attacker=%d]: " +
+              "remainingPopulation=%.2f, remainingShips=%.2f",
+          star.getID(), star.getName(), colony.getEmpireID(), empireID, remainingPopulation,
+          remainingShips));
       EmpireController empireController = new EmpireController(db.getTransaction());
       Empire empire = null;
       if (colony.getEmpireID() != null) {
@@ -157,7 +159,7 @@ public class ColonyController {
         }
 
         if (!anotherColonyExists && empire.getHomeStarID() == star.getID()) {
-          new EmpireController(db.getTransaction()).findNewHomeStar(empire.getID());
+          new EmpireController().findNewHomeStar(empire.getID(), star.getID());
         }
       }
 

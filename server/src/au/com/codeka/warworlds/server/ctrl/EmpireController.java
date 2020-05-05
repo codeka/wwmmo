@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.TreeMap;
 import org.joda.time.DateTime;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
 
@@ -499,14 +497,17 @@ public class EmpireController {
   /**
    * If your old home star has been destroyed, for example, this will find us a new one.
    */
-  public void findNewHomeStar(int empireID) throws RequestException {
+  public void findNewHomeStar(int empireID, int excludingStarId) throws RequestException {
     ArrayList<Integer> starIds = new ArrayList<>();
     String sql = "SELECT DISTINCT star_id FROM colonies WHERE empire_id = ?";
     try (SqlStmt stmt = DB.prepare(sql)) {
       stmt.setInt(1, empireID);
       SqlResult res = stmt.select();
       while (res.next()) {
-        starIds.add(res.getInt(1));
+        int starId = res.getInt(1);
+        if (starId != excludingStarId) {
+          starIds.add(res.getInt(1));
+        }
       }
     } catch (Exception e) {
       throw new RequestException(e);
