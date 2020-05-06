@@ -81,7 +81,8 @@ public class ColoniesHandler extends RequestHandler {
       if (colonyShipFleet == null) {
         throw new RequestException(400,
             Messages.GenericError.ErrorCode.CannotColonizePlanetNoColonyShips,
-            "No idle Colony Ship is available to colonize this planet.");
+            "No idle Colony Ship is available to colonize this planet.")
+            .withLogMessageOnly();
       }
 
       float population = 100.0f;
