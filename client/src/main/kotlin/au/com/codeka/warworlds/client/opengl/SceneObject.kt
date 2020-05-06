@@ -21,7 +21,6 @@ open class SceneObject @JvmOverloads constructor(dimensionResolver: DimensionRes
   private var children: ArrayList<SceneObject>? = null
 
   /** Matrix transform that transforms this scene object into world space.  */
-  @JvmField
   protected val matrix = FloatArray(16)
   protected val modelViewProjMatrix = FloatArray(16)
 

@@ -20,7 +20,6 @@ import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.Design.DesignType
 import au.com.codeka.warworlds.common.proto.Star.CLASSIFICATION
 import au.com.codeka.warworlds.common.sim.StarHelper
-import com.google.common.base.Preconditions
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -284,25 +283,25 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     log.info("updateSectorBounds($left, $top, $right, $bottom) current: " +
         "$sectorLeft, $sectorTop, $sectorRight, $sectorBottom")
 
-    // Remove the objects that are now out of bounds.
-    for (sy in sectorTop..sectorBottom) {
-      for (sx in sectorLeft..sectorRight) {
-        if (sy < top || sy > bottom || sx < left || sx > right) {
-          log.info("removeSector($sx, $sy)")
-          removeSector(Pair.create(sx, sy))
-        }
-      }
+    // TODO: Instead of removing all and re-creating again, see if we can just remove the ones that
+    // are no longer in view, move over the ones that are still in the viewport, and then add only
+    // the new ones.
+    val sectorsToRemove = ArrayList(sectorSceneObjects.keys)
+    for (coord in sectorsToRemove) {
+      removeSector(coord)
     }
 
     // Create the background for all of the new sectors.
     for (sy in top..bottom) {
       for (sx in left..right) {
-        if (sy < sectorTop || sy > sectorBottom || sx < sectorLeft || sx > sectorRight) {
-          log.info("createSectorBackground($sx, $sy)")
-          createSectorBackground(sx, sy)
-        }
+        createSectorBackground(sx, sy)
       }
     }
+
+    sectorTop = top
+    sectorLeft = left
+    sectorBottom = bottom
+    sectorRight = right
 
     // Tell the server we want to watch these new sectors, it'll send us back all the stars we
     // don't have yet.
@@ -312,10 +311,6 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
               .top(top).left(left).bottom(bottom).right(right).build())
           .build())
     }, Threads.BACKGROUND)
-    sectorTop = top
-    sectorLeft = left
-    sectorBottom = bottom
-    sectorRight = right
   }
 
   /**
@@ -339,7 +334,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   }
 
   /** Create a [Sprite] to represent the given [Star].  */
-  fun createStarSprite(star: Star): Sprite {
+  private fun createStarSprite(star: Star): Sprite {
     val uvTopLeft = getStarUvTopLeft(star)
     val sprite = scene.createSprite(SpriteTemplate.Builder()
         .shader(scene.spriteShader)
@@ -461,8 +456,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       container.addChild(sprite)
 
       // Add the counts.
-      var text: String
-      text = if (iconInfo.numFighterShips == 0 && iconInfo.numNonFighterShips == 0) {
+      val text = if (iconInfo.numFighterShips == 0 && iconInfo.numNonFighterShips == 0) {
         String.format(Locale.ENGLISH, "%d", iconInfo.numColonies)
       } else if (iconInfo.numColonies == 0) {
         String.format(Locale.ENGLISH, "[%d, %d]",
@@ -611,7 +605,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       synchronized(scene.lock) {
         for (i in 0 until sceneObjects.size()) {
           val sceneObjectInfo = sceneObjects.valueAt(i).tag as SceneObjectInfo?
-          if (sceneObjectInfo != null && sceneObjectInfo.fleet != null) {
+          if (sceneObjectInfo?.fleet != null) {
             updateMovingFleet(sceneObjects.valueAt(i))
           }
         }
@@ -645,7 +639,9 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   /** Remove all objects in the given sector from the scene.  */
   private fun removeSector(sectorCoord: Pair<Long, Long>) {
     var objects: ArrayList<SceneObject>?
-    synchronized(sectorSceneObjects) { objects = sectorSceneObjects.remove(sectorCoord) }
+    synchronized(sectorSceneObjects) {
+      objects = sectorSceneObjects.remove(sectorCoord)
+    }
     if (objects == null) {
       return
     }
@@ -662,7 +658,46 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         scene.rootObject.removeChild(obj)
       }
     }
-    synchronized(backgroundSceneObjects) { backgroundSceneObjects.remove(sectorCoord) }
+    synchronized(backgroundSceneObjects) {
+      backgroundSceneObjects.remove(sectorCoord)
+    }
+  }
+
+  /**
+   * Move the sector at the given coords by the given offsetX and offsetY.
+   *
+   * <p>This is useful when move the camera or warping: we can reuse sectors just by moving them
+   * over instead of destroying and re-creating them.
+   */
+  private fun offsetSector(sectorCoord: Pair<Long, Long>, offsetX: Float, offsetY: Float) {
+    var objects: ArrayList<SceneObject>?
+    synchronized(sectorSceneObjects) {
+      objects = sectorSceneObjects[sectorCoord]
+    }
+    if (objects == null) {
+      return
+    }
+    synchronized(scene.lock) {
+      for (obj in objects!!) {
+        val sceneObjectInfo = obj.tag as SceneObjectInfo?
+        if (sceneObjectInfo != null) {
+          val sceneObject = if (sceneObjectInfo.fleet != null) {
+            sceneObjects[sceneObjectInfo.fleet.id]
+          } else {
+            sceneObjects[sceneObjectInfo.star.id]
+          }
+
+          sceneObject?.translate(offsetX, offsetY)
+        }
+      }
+    }
+    var backgroundSceneObject: BackgroundSceneObject?
+    synchronized(backgroundSceneObjects) {
+      backgroundSceneObject = backgroundSceneObjects[sectorCoord]
+    }
+    if (backgroundSceneObject != null) {
+      backgroundSceneObject!!.translate(offsetX, offsetY)
+    }
   }
 
   private fun getStarUvTopLeft(star: Star): Vector2 {

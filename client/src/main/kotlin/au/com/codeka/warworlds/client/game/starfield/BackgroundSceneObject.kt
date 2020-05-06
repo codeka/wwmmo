@@ -12,19 +12,6 @@ class BackgroundSceneObject(scene: Scene, private val sectorX: Long, private val
   private val starfield: Sprite
   private val gases: MutableList<Sprite>
   private var zoomAmount = 0f
-  fun setZoomAmount(zoomAmount: Float) {
-    this.zoomAmount = zoomAmount
-    var bgAlpha = 1.0f
-    if (zoomAmount < 0.73) {
-      bgAlpha = 0.0f
-    } else if (zoomAmount < 0.78) {
-      bgAlpha = (zoomAmount - 0.73f) / 0.05f
-    }
-    starfield.alpha = bgAlpha
-    for (gas in gases) {
-      gas.alpha = bgAlpha
-    }
-  }
 
   init {
     starfield = scene.createSprite(SpriteTemplate.Builder()
@@ -49,6 +36,20 @@ class BackgroundSceneObject(scene: Scene, private val sectorX: Long, private val
       gasSprite.setSize(size, size)
       addChild(gasSprite)
       gases.add(gasSprite)
+    }
+  }
+
+  fun setZoomAmount(zoomAmount: Float) {
+    this.zoomAmount = zoomAmount
+    var bgAlpha = 1.0f
+    if (zoomAmount < 0.73) {
+      bgAlpha = 0.0f
+    } else if (zoomAmount < 0.78) {
+      bgAlpha = (zoomAmount - 0.73f) / 0.05f
+    }
+    starfield.alpha = bgAlpha
+    for (gas in gases) {
+      gas.alpha = bgAlpha
     }
   }
 }
