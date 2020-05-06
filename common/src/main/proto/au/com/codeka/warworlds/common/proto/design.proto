@@ -36,9 +36,9 @@ message Design {
   // The details of the cost of this build.
   message BuildCost {
     // The number of minerals this design takes to build one instance.
-    optional int32 minerals = 1;
+    optional float minerals = 1;
     // The population need to build one instance of this design.
-    optional int32 population = 2;
+    optional float population = 2;
     // The maximum number of instances of this design you can build at once.
     optional int32 max_count = 3;
   }

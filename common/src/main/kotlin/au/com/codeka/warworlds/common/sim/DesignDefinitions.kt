@@ -20,8 +20,8 @@ object DesignDefinitions {
           .dependencies(Lists.newArrayList(
               Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
           .build_cost(Design.BuildCost.Builder()
-              .minerals(100)
-              .population(10)
+              .minerals(100f)
+              .population(10f)
               .max_count(100)
               .build())
           .base_attack(1.0f)
@@ -39,12 +39,12 @@ object DesignDefinitions {
                   .display_name("Cryogenic Chamber")
                   .description(
                       "<p>The cryogenic chamber means colonists are put to sleep during the voyage"
-                          + " to the next planet. This allows for a larger number of colonists to be"
-                          + " deployed, increasing the number of initial colonists from 100 to"
+                          + " to the next planet. This allows for a larger number of colonists to"
+                          + " be deployed, increasing the number of initial colonists from 100 to"
                           + " 400.</p>")
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(2000)
-                      .population(20)
+                      .minerals(2000f)
+                      .population(20f)
                       .build())
                   .dependencies(Lists.newArrayList(
                       Design.Dependency.Builder()
@@ -61,13 +61,14 @@ object DesignDefinitions {
           .display_name("Scout")
           .description(
               "<p>Scouts are small, fast ships with no attack capability (and not much in the way"
-                  + " of defensive capabilities, either). What they <em>are</em> good at, though, is"
-                  + " getting in and out of enemy star-systems and reporting back what they found.</p>")
+                  + " of defensive capabilities, either). What they <em>are</em> good at, though,"
+                  + " is getting in and out of enemy star-systems and reporting back what they"
+                  + " found.</p>")
           .dependencies(Lists.newArrayList(
               Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
           .build_cost(Design.BuildCost.Builder()
-              .minerals(2)
-              .population(1)
+              .minerals(2f)
+              .population(1f)
               .max_count(10000)
               .build())
           .base_attack(1.0f)
@@ -87,10 +88,11 @@ object DesignDefinitions {
                   .description(
                       "<p>Adding a cloaking device to a scout makes it invisible to enemy radar."
                           + " Additionally, if you set the scout's stance to \"Neutral\" or"
-                          + " \"Passive\", it will remain <em>undetected</em> around enemy stars.</p>")
+                          + " \"Passive\", it will remain <em>undetected</em> around enemy"
+                          + " stars.</p>")
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(20)
-                      .population(1)
+                      .minerals(20f)
+                      .population(1f)
                       .build())
                   .dependencies(Lists.newArrayList(
                       Design.Dependency.Builder()
@@ -107,13 +109,14 @@ object DesignDefinitions {
           .display_name("Fighter")
           .description(
               "<p>Your basic fighter has average speed, low-grade weapons and low-grade shields."
-                  + " They make up for a general lack of firepower by being incredibly cheap to produce"
-                  + " and fuel-efficient, allowing you to overwhelm your enemy with numbers.</p>")
+                  + " They make up for a general lack of firepower by being incredibly cheap to"
+                  + " produce and fuel-efficient, allowing you to overwhelm your enemy with"
+                  + " numbers.</p>")
           .dependencies(Lists.newArrayList(
               Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
           .build_cost(Design.BuildCost.Builder()
-              .minerals(5)
-              .population(2)
+              .minerals(5f)
+              .population(0.5f)
               .max_count(50000)
               .build())
           .base_attack(5.0f)
@@ -129,11 +132,11 @@ object DesignDefinitions {
               Design.Upgrade.Builder()
                   .type(Design.UpgradeType.BOOST)
                   .display_name("Boost")
-                  .description("<p>Boost will halve the remaining travel-time for an in-flight fleet of"
-                      + "fighters.</p>")
+                  .description("<p>Boost will halve the remaining travel-time for an in-flight"
+                      + " fleet of fighters.</p>")
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(50)
-                      .population(100)
+                      .minerals(50f)
+                      .population(100f)
                       .build())
                   .dependencies(Lists.newArrayList(
                       Design.Dependency.Builder()
@@ -148,13 +151,13 @@ object DesignDefinitions {
           .type(Design.DesignType.TROOP_CARRIER)
           .design_kind(Design.DesignKind.SHIP)
           .display_name("Troop Carrier")
-          .description("<p>The Troop Carrier carries ground troops which you can deploy to capture an enemy"
-              + " colony.</p>")
+          .description("<p>The Troop Carrier carries ground troops which you can deploy to capture"
+              + " an enemy colony.</p>")
           .dependencies(Lists.newArrayList(
               Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
           .build_cost(Design.BuildCost.Builder()
-              .minerals(5)
-              .population(2)
+              .minerals(5f)
+              .population(0.5f)
               .max_count(50000)
               .build())
           .base_attack(1.0f)
@@ -178,8 +181,8 @@ object DesignDefinitions {
           .dependencies(Lists.newArrayList(
               Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(1).build()))
           .build_cost(Design.BuildCost.Builder()
-              .minerals(50)
-              .population(2)
+              .minerals(50f)
+              .population(2f)
               .max_count(500)
               .build())
           .base_attack(0.1f)
@@ -198,14 +201,14 @@ object DesignDefinitions {
           .display_name("Wormhole Generator")
           .description(
               "<p>The Wormhole Generator will - quite literally - generate a wormhole. Once the"
-                  + " ship is built, select a location on the starfield to deploy, and the ship will"
-                  + " generate a wormhole which you can then use to instantly transport ships"
+                  + " ship is built, select a location on the starfield to deploy, and the ship"
+                  + " will generate a wormhole which you can then use to instantly transport ships"
                   + " throughout your empire.</p>")
           .dependencies(Lists.newArrayList(
               Design.Dependency.Builder().type(Design.DesignType.SHIPYARD).level(2).build()))
           .build_cost(Design.BuildCost.Builder()
-              .minerals(9800)
-              .population(5000)
+              .minerals(9800f)
+              .population(5000f)
               .max_count(1)
               .build())
           .base_attack(1.0f)
@@ -228,19 +231,19 @@ object DesignDefinitions {
           .description(
               "<p>The shipyard allows you to build ships.</p>"
                   + " <p>You can have only one shipyard on your planet, but it's efficiency and the"
-                  + " range of ships available to you can be upgraded with the building of supporting"
-                  + " buildings.</p>")
+                  + " range of ships available to you can be upgraded with the building of"
+                  + " supporting buildings.</p>")
           .build_cost(Design.BuildCost.Builder()
-              .minerals(100)
-              .population(25)
+              .minerals(100f)
+              .population(25f)
               .build())
           .image_url("shipyard.png")
           .max_per_colony(1)
           .upgrades(Lists.newArrayList(
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(500)
-                      .population(500)
+                      .minerals(500f)
+                      .population(500f)
                       .build())
                   .dependencies(Lists.newArrayList(
                       Design.Dependency.Builder()
@@ -260,10 +263,11 @@ object DesignDefinitions {
                   + " higher the silo level, the more you can store. Silos store produce for all"
                   + " colonies in this starsystem and you can build as many as you like.</p>"
                   + "<p>A level 1 Silo adds 100 storage for minerals and goods. A level 2 Silo adds"
-                  + " 210, level 3 adds 330, a level 4 Silo adds 460, and a level 5 Silo adds 600.</p>")
+                  + " 210, level 3 adds 330, a level 4 Silo adds 460, and a level 5 Silo adds"
+                  + " 600.</p>")
           .build_cost(Design.BuildCost.Builder()
-              .minerals(100)
-              .population(25)
+              .minerals(100f)
+              .population(25f)
               .build())
           .image_url("silo.png")
           .effect(Lists.newArrayList(
@@ -277,8 +281,8 @@ object DesignDefinitions {
           .upgrades(Lists.newArrayList(
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(200)
-                      .population(200)
+                      .minerals(200f)
+                      .population(200f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -291,8 +295,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(200)
-                      .population(200)
+                      .minerals(200f)
+                      .population(200f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -305,8 +309,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(200)
-                      .population(200)
+                      .minerals(200f)
+                      .population(200f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -319,8 +323,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(200)
-                      .population(200)
+                      .minerals(200f)
+                      .population(200f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -338,18 +342,18 @@ object DesignDefinitions {
           .type(Design.DesignType.RESEARCH)
           .design_kind(Design.DesignKind.BUILDING)
           .display_name("Research Laboratory")
-          .description("<p>Allows you to build more advanced ships and buildings. The higher the level of"
-              + " this building, the more advanced research becomes available.</p>")
+          .description("<p>Allows you to build more advanced ships and buildings. The higher the"
+              + " level of this building, the more advanced research becomes available.</p>")
           .build_cost(Design.BuildCost.Builder()
-              .minerals(200)
-              .population(250)
+              .minerals(200f)
+              .population(250f)
               .build())
           .image_url("research.png")
           .upgrades(Lists.newArrayList(
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(1500)
-                      .population(2000)
+                      .minerals(1500f)
+                      .population(2000f)
                       .build())
                   .build()
           ))
@@ -365,8 +369,8 @@ object DesignDefinitions {
                   + " Your colony's base defence will be increased by 0.25 for each level of Ground"
                   + " Shield.</p>")
           .build_cost(Design.BuildCost.Builder()
-              .minerals(50)
-              .population(100)
+              .minerals(50f)
+              .population(100f)
               .build())
           .image_url("groundshield.png")
           .max_per_colony(1)
@@ -376,8 +380,8 @@ object DesignDefinitions {
           .upgrades(Lists.newArrayList(
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(50)
-                      .population(100)
+                      .minerals(50f)
+                      .population(100f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -393,8 +397,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(50)
-                      .population(100)
+                      .minerals(50f)
+                      .population(100f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -410,8 +414,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(50)
-                      .population(100)
+                      .minerals(50f)
+                      .population(100f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -427,8 +431,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(50)
-                      .population(100)
+                      .minerals(50f)
+                      .population(100f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -455,8 +459,8 @@ object DesignDefinitions {
                   + " congeniality. But each level of biosphere adds 100 or 15% (whichever is"
                   + " greater).</p>")
           .build_cost(Design.BuildCost.Builder()
-              .minerals(200)
-              .population(150)
+              .minerals(200f)
+              .population(150f)
               .build())
           .max_per_colony(1)
           .image_url("biosphere.png")
@@ -470,8 +474,8 @@ object DesignDefinitions {
           .upgrades(Lists.newArrayList(
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(50)
-                      .population(100)
+                      .minerals(50f)
+                      .population(100f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -483,8 +487,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(50)
-                      .population(100)
+                      .minerals(50f)
+                      .population(100f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -496,8 +500,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(50)
-                      .population(100)
+                      .minerals(50f)
+                      .population(100f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -521,8 +525,8 @@ object DesignDefinitions {
                   + " always points back to your HQ so that you don't get lost navigating the"
                   + " starfield.</p>")
           .build_cost(Design.BuildCost.Builder()
-              .minerals(100000)
-              .population(50000)
+              .minerals(100000f)
+              .population(50000f)
               .build())
           .image_url("hq.png")
           .max_per_empire(1)
@@ -534,14 +538,14 @@ object DesignDefinitions {
           .display_name("Sensor Array")
           .description(
               "<p>The Sensor Array lets you detect enemy ships (not from native colonies, though)"
-                  + " up to 20 parsecs away for 1st level, 30 for 2nd level, 40 for 3rd level and so"
-                  + " on. There's no point building more than on per star, though nothing will stop"
-                  + " you if you try.</p>"
-                  + "<p>A level 5 Sensor Array will send you a notification when it detects enemy ships"
-                  + " inbound for your planet.</p>")
+                  + " up to 20 parsecs away for 1st level, 30 for 2nd level, 40 for 3rd level and"
+                  + " so on. There's no point building more than on per star, though nothing will"
+                  + " stop you if you try.</p>"
+                  + "<p>A level 5 Sensor Array will send you a notification when it detects enemy"
+                  + " ships inbound for your planet.</p>")
           .build_cost(Design.BuildCost.Builder()
-              .minerals(100)
-              .population(200)
+              .minerals(100f)
+              .population(200f)
               .build())
           .max_per_colony(1)
           .image_url("radar.png")
@@ -551,8 +555,8 @@ object DesignDefinitions {
           .upgrades(Lists.newArrayList(
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(100)
-                      .population(200)
+                      .minerals(100f)
+                      .population(200f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -563,8 +567,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(100)
-                      .population(200)
+                      .minerals(100f)
+                      .population(200f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -575,8 +579,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(100)
-                      .population(200)
+                      .minerals(100f)
+                      .population(200f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -592,8 +596,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(100)
-                      .population(200)
+                      .minerals(100f)
+                      .population(200f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -625,8 +629,8 @@ object DesignDefinitions {
                   + " mind the range will always be quite limited, so be sure to only build a"
                   + " Disruptor on the closest star to the wormhole you can.</p>")
           .build_cost(Design.BuildCost.Builder()
-              .minerals(148000)
-              .population(1000)
+              .minerals(148000f)
+              .population(1000f)
               .build())
           .max_per_colony(1)
           .image_url("wormhole-disruptor.png")
@@ -644,8 +648,8 @@ object DesignDefinitions {
           .upgrades(Lists.newArrayList(
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(74000)
-                      .population(500)
+                      .minerals(74000f)
+                      .population(500f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -661,8 +665,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(74000)
-                      .population(500)
+                      .minerals(74000f)
+                      .population(500f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -678,8 +682,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(74000)
-                      .population(500)
+                      .minerals(74000f)
+                      .population(500f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()
@@ -695,8 +699,8 @@ object DesignDefinitions {
                   .build(),
               Design.Upgrade.Builder()
                   .build_cost(Design.BuildCost.Builder()
-                      .minerals(74000)
-                      .population(500)
+                      .minerals(74000f)
+                      .population(500f)
                       .build())
                   .effects(Lists.newArrayList(
                       Design.Effect.Builder()

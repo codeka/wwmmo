@@ -364,7 +364,7 @@ class Simulation @JvmOverloads constructor(
           //  ShipDesign.Upgrade upgrade = shipDesign.getUpgrade(br.getUpgradeID());
           //  buildCost = upgrade.getBuildCost();
           //}
-          log("---- Building [design=%s %s] [count=%d] cost [workers=%d] [minerals=%d] [start-time=%d]",
+          log("---- Building [design=%s %s] [count=%d] cost [workers=%.2f] [minerals=%.2f] [start-time=%d]",
               design.design_kind, design.type, br.count, buildCost.population, buildCost.minerals,
               br.start_time)
 
@@ -372,8 +372,8 @@ class Simulation @JvmOverloads constructor(
           // requires, if you have the right number of workers and the right amount of minerals,
           // you can finish the build in one turn. However, if you only have a fraction of them
           // available, then that fraction of progress will be made.
-          val totalWorkersRequired = buildCost.population * br.count.toFloat()
-          val totalMineralsRequired = buildCost.minerals * br.count.toFloat()
+          val totalWorkersRequired = buildCost.population * br.count
+          val totalMineralsRequired = buildCost.minerals * br.count
           log("     Required: [population=%.2f] [minerals=%.2f]",
               totalWorkersRequired, totalMineralsRequired)
           log("     Available: [population=%.2f] [minerals=%.2f]",
