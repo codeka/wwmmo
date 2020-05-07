@@ -32,11 +32,15 @@ test {
     // Show that tests are run in the command-line output
     events 'passed'
   }
+  useJUnitPlatform()
 }
 
 dependencies {
   implementation 'com.squareup.wire:wire-runtime:3.1.0'
   implementation 'com.google.code.findbugs:jsr305:3.0.2'
   implementation 'com.google.guava:guava:24.1-android'
-  testImplementation 'junit:junit:4.12'
+
+  testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
+  testImplementation 'io.kotest:kotest-runner-junit5-jvm:4.0.5'
+  testImplementation 'io.kotest:kotest-assertions-core-jvm:4.0.5'
 }

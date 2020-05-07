@@ -22,7 +22,7 @@ object StarHelper {
     return null
   }
 
-  /** Gets the delta minerals per hour *at this time* for the given empty.  */
+  /** Gets the delta minerals per hour *at this time* for the given empire.  */
   fun getDeltaMineralsPerHour(star: Star, empireId: Long, now: Long): Float {
     var delta = 0.0f
     val storage = getStorage(star, empireId)

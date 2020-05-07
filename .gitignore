@@ -31,6 +31,9 @@ local.properties
 captures/
 *.iml
 
+# No idea why these are being created
+common/.attach_pid*
+
 # Ignore build directory in top-level folder and the first child. This is where
 # build artifacts go.
 /build

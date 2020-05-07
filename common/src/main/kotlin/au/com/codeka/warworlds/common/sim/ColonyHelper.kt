@@ -25,6 +25,10 @@ object ColonyHelper {
     return population
   }
 
+  /**
+   * Get the delta minerals per hour this colony is producing (not counting what's being taken
+   * by active build requests).
+   */
   fun getDeltaMineralsPerHour(colony: Colony, now: Long): Float {
     var delta: Float = colony.delta_minerals
     for (br in colony.build_requests) {
