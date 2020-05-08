@@ -15,8 +15,8 @@ class Scene(val dimensionResolver: DimensionResolver, val textureManager: Textur
   // synchronized on this lock.
   val lock = Any()
 
-  fun createSprite(tmpl: SpriteTemplate): Sprite {
-    return Sprite(dimensionResolver, tmpl)
+  fun createSprite(tmpl: SpriteTemplate, debugName: String): Sprite {
+    return Sprite(dimensionResolver, debugName, tmpl)
   }
 
   fun createText(text: String): TextSceneObject {

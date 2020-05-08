@@ -26,17 +26,26 @@ import kotlin.math.floor
  * Bottom pane of the fleets view that contains the "move" function.
  */
 class MoveBottomPane(
-    context: Context?,
-    starfieldManager: StarfieldManager,
-    callback: () -> Unit) : RelativeLayout(context, null) {
+    context: Context,
+    private val starfieldManager: StarfieldManager,
+    private val callback: () -> Unit) : RelativeLayout(context, null) {
 
-  private val callback: () -> Unit
-  private val starfieldManager: StarfieldManager
+  companion object {
+    private val log = Log("MoveBottomPane")
+  }
+
   private lateinit var star: Star
   private lateinit var fleet: Fleet
   private var destStar: Star? = null
   private var fleetMoveIndicator: SceneObject? = null
   private var fleetMoveIndicatorFraction = 0f
+
+  init {
+    View.inflate(context, R.layout.ctrl_fleet_move_bottom_pane, this)
+    findViewById<View>(R.id.move_btn).setOnClickListener { view: View -> onMoveClick(view) }
+    findViewById<View>(R.id.cancel_btn).setOnClickListener { view: View -> onCancelClick(view) }
+  }
+
   fun setFleet(star: Star, fleetId: Long) {
     for (fleet in star.fleets) {
       if (fleet.id == fleetId) {
@@ -106,6 +115,7 @@ class MoveBottomPane(
     }
     val starSceneObject = starfieldManager.getStarSceneObject(star.id) ?: return
     val fmi = starfieldManager.createFleetSprite(fleet)
+
     fleetMoveIndicator = fmi
     fmi.setDrawRunnable(Runnable {
       if (destStar != null) {
@@ -126,12 +136,10 @@ class MoveBottomPane(
   }
 
   private fun destroyFleetMoveIndicator() {
-    if (fleetMoveIndicator != null) {
-      if (fleetMoveIndicator!!.parent != null) {
-        fleetMoveIndicator!!.parent!!.removeChild(fleetMoveIndicator!!)
-      }
-      fleetMoveIndicator = null
-    }
+    val fmi = fleetMoveIndicator ?: return
+    val fmiParent = fmi.parent ?: return
+    fmiParent.removeChild(fmi)
+    fleetMoveIndicator = null
   }
 
   private fun onMoveClick(view: View) {
@@ -170,17 +178,5 @@ class MoveBottomPane(
       destStar = null
       refreshMoveIndicator()
     }
-  }
-
-  companion object {
-    private val log = Log("MoveBottomPane")
-  }
-
-  init {
-    this.callback = Preconditions.checkNotNull(callback)
-    this.starfieldManager = Preconditions.checkNotNull(starfieldManager)
-    View.inflate(context, R.layout.ctrl_fleet_move_bottom_pane, this)
-    findViewById<View>(R.id.move_btn).setOnClickListener { view: View -> onMoveClick(view) }
-    findViewById<View>(R.id.cancel_btn).setOnClickListener { view: View -> onCancelClick(view) }
   }
 }

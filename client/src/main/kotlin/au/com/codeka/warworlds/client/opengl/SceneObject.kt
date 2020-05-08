@@ -78,7 +78,8 @@ open class SceneObject constructor(
   }
 
   fun removeChild(child: SceneObject) {
-    Preconditions.checkState(child.parent === this, "%s.parent (%s) != %s", child, child.parent, this)
+    Preconditions.checkState(
+        child.parent === this, "%s.parent (%s) != %s", child, child.parent, this)
     if (children != null) {
       children!!.remove(child)
       child.scene = null

@@ -109,7 +109,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         val tap = Vector3(x.toDouble(), y.toDouble(), 0.0)
         for (i in 0 until scene.rootObject.numChildren) {
           val so = scene.rootObject.getChild(i)
-          if (so == null || so.tapTargetRadius == null) {
+          if (so?.tapTargetRadius == null) {
             continue
           }
           so.project(camera.viewProjMatrix, outVec)
@@ -343,7 +343,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         .uvBottomRight(Vector2(
             uvTopLeft.x + if (star.classification == CLASSIFICATION.NEUTRON) 0.5f else 0.25f,
             uvTopLeft.y + if (star.classification == CLASSIFICATION.NEUTRON) 0.5f else 0.25f))
-        .build())
+        .build(), "Star:${star.id}:${star.name}")
     if (star.classification == CLASSIFICATION.NEUTRON) {
       sprite.setSize(90.0f, 90.0f)
     } else {
@@ -357,7 +357,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     val sprite = scene.createSprite(SpriteTemplate.Builder()
         .shader(scene.spriteShader)
         .texture(scene.textureManager.loadTexture(getFleetTexture(fleet)))
-        .build())
+        .build(), "Fleet:${fleet.id}:${fleet.design_type}:${fleet.num_ships}")
     sprite.setSize(64.0f, 64.0f)
     return sprite
   }
@@ -441,7 +441,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       }
     }
     var i = 0
-    for ((_, iconInfo) in empires) {
+    for ((empireId, iconInfo) in empires) {
       val pt = Vector2(0.0, 30.0)
       pt.rotate((-(Math.PI / 4.0)).toFloat() * (i + 1).toDouble())
 
@@ -450,7 +450,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
           .shader(scene.spriteShader)
           .texture(scene.textureManager.loadTextureUrl(
               ImageHelper.getEmpireImageUrlExactDimens(context, iconInfo.empire, 64, 64)))
-          .build())
+          .build(), "Empire:$empireId")
       sprite.translate(pt.x.toFloat() + 10.0f, pt.y.toFloat())
       sprite.setSize(20.0f, 20.0f)
       container.addChild(sprite)
@@ -490,6 +490,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     }
     var container = sceneObjects[fleet.id]
     if (container == null) {
+      log.info("attaching moving fleet: new container")
       container =
           SceneObject(
               scene.dimensionResolver, "Fleet:${fleet.id}:${fleet.design_type}:${fleet.num_ships}")
@@ -500,8 +501,13 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       val pos = getMovingFleetPosition(star, destStar, fleet)
       container.translate(pos.x.toFloat(), (-pos.y).toFloat())
     } else {
+      log.info("attaching moving fleet: existing container")
+
       // Temporarily remove the container, and clear out it's children. We'll re-add them all.
-      synchronized(scene.lock) { scene.rootObject.removeChild(container) }
+      synchronized(scene.lock) {
+        scene.rootObject.removeChild(container)
+        sceneObjects.remove(fleet.id)
+      }
       container.removeAllChildren()
     }
     val sprite = createFleetSprite(fleet)
@@ -553,7 +559,12 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     if (selectedFleet != null && selectedFleet!!.id == fleet.id) {
       App.taskRunner.runTask(Runnable { setSelectedFleet(null, null) }, Threads.UI)
     }
+
+    val soi: SceneObjectInfo = sceneObject.tag as SceneObjectInfo
+    val coord = Pair<Long, Long>(soi.star.sector_x, soi.star.sector_y)
+
     synchronized(scene.lock) {
+      removeSectorSceneObject(coord, sceneObject)
       sceneObject.parent!!.removeChild(sceneObject)
       sceneObjects.remove(fleet.id)
     }
@@ -638,6 +649,13 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     }
   }
 
+  private fun removeSectorSceneObject(sectorCoord: Pair<Long, Long>, obj: SceneObject) {
+    synchronized(sectorSceneObjects) {
+      val objects = sectorSceneObjects[sectorCoord]
+      objects?.remove(obj)
+    }
+  }
+
   /** Remove all objects in the given sector from the scene.  */
   private fun removeSector(sectorCoord: Pair<Long, Long>) {
     var objects: ArrayList<SceneObject>?
@@ -652,8 +670,10 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         val sceneObjectInfo = obj.tag as SceneObjectInfo?
         if (sceneObjectInfo != null) {
           if (sceneObjectInfo.fleet != null) {
+            log.info("Removing fleet: ${sceneObjectInfo.fleet.id} ${sceneObjectInfo.fleet.design_type}")
             sceneObjects.remove(sceneObjectInfo.fleet.id)
           } else {
+            log.info("Removing star")
             sceneObjects.remove(sceneObjectInfo.star.id)
           }
         }

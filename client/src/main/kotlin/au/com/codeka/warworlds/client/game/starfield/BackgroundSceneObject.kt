@@ -12,7 +12,7 @@ class BackgroundSceneObject(scene: Scene, private val sectorX: Long, private val
   private val starfield: Sprite = scene.createSprite(SpriteTemplate.Builder()
       .shader(scene.spriteShader)
       .texture(scene.textureManager.loadTexture("stars/starfield.png"))
-      .build())
+      .build(), "Background:$sectorX,$sectorY")
   private val gases: MutableList<Sprite>
   private var zoomAmount = 0f
 
@@ -29,7 +29,7 @@ class BackgroundSceneObject(scene: Scene, private val sectorX: Long, private val
           .texture(scene.textureManager.loadTexture("stars/gas.png"))
           .uvTopLeft(Vector2((0.25f * x).toDouble(), (0.25f * y).toDouble()))
           .uvBottomRight(Vector2((0.25f * x + 0.25f).toDouble(), (0.25f * y + 0.25f).toDouble()))
-          .build())
+          .build(), "Gas:$x,$y")
       gasSprite.translate((rand.nextFloat() - 0.5f) * 1024.0f, (rand.nextFloat() - 0.5f) * 1024.0f)
       val size = 300.0f + rand.nextFloat() * 200.0f
       gasSprite.setSize(size, size)
