@@ -104,7 +104,8 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       for (i in star.fleets.indices) {
         val fleet = star.fleets[i]
         if (fleet.design_type == Design.DesignType.COLONY_SHIP &&
-            fleet.empire_id == modification.empire_id) {
+            fleet.empire_id == modification.empire_id &&
+            fleet.state == Fleet.FLEET_STATE.IDLE) {
           // TODO: check for cryogenics
           if (ceil(fleet.num_ships.toDouble()) == 1.0) {
             remainingFuel = star.fleets[i].fuel_amount
