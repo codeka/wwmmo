@@ -830,7 +830,7 @@ class Simulation constructor(
           if (hasEffect(fleet, Design.EffectType.ENERGY_TRANSPORT)) {
             continue
           }
-          if (!isFriendly(fleet, energyTransportFleet)) {
+          if (!isFriendly(fleet, energyTransportFleet) || fleet.state != Fleet.FLEET_STATE.IDLE) {
             continue
           }
           val design = getDesign(fleet.design_type)
