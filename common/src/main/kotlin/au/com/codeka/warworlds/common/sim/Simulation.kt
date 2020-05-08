@@ -521,9 +521,9 @@ class Simulation constructor(
       }
       var populationIncrease: Float
       if (goodsEfficiency >= 1.0f) {
-        populationIncrease = max(colony.population, 10.0f) * 0.1f
+        populationIncrease = max(colony.population, 100.0f) * 0.25f
       } else {
-        populationIncrease = max(colony.population, 10.0f)
+        populationIncrease = max(colony.population, 100.0f)
         populationIncrease *= 0.9f
         populationIncrease *= 0.25f * (goodsEfficiency - 1.0f)
       }
