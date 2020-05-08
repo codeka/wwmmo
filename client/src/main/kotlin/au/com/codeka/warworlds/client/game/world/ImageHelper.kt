@@ -12,6 +12,7 @@ import au.com.codeka.warworlds.client.net.ServerUrl.url
 import au.com.codeka.warworlds.client.opengl.DimensionResolver
 import au.com.codeka.warworlds.client.util.Callback
 import au.com.codeka.warworlds.common.Log
+import au.com.codeka.warworlds.common.proto.Building
 import au.com.codeka.warworlds.common.proto.Empire
 import au.com.codeka.warworlds.common.proto.Planet
 import au.com.codeka.warworlds.common.proto.Star
@@ -58,7 +59,7 @@ object ImageHelper {
       context: Context, empire: Empire?, width: Int, height: Int): String {
     val dpi = getDensityName(context.resources.displayMetrics.densityDpi)
     return String.format(Locale.ENGLISH, "%srender/empire/%d/%dx%d/%s.png",
-        url, if (empire == null || empire.id == null) 0 else empire.id, width, height,
+        url, if (empire?.id == null) 0 else empire.id, width, height,
         dpi)
   }
 
@@ -112,6 +113,13 @@ object ImageHelper {
     val width = resolver.px2dp(view.layoutParams.width.toFloat()).toInt()
     val height = resolver.px2dp(view.layoutParams.height.toFloat()).toInt()
     bindImage(view, getEmpireImageUrl(view.context, empire, width, height))
+  }
+
+  /**
+   * Bind a building's image to the given [ImageView].
+   */
+  fun bindBuildingImage(view: ImageView, building: Building) {
+
   }
 
   /**

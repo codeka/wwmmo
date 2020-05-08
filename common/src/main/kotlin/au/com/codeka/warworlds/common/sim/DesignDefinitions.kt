@@ -512,7 +512,7 @@ object DesignDefinitions {
                   ))
                   .build()
           ))
-          .show_in_solar_system(false)
+          .show_in_solar_system(true)
           .build(),
       Design.Builder()
           .type(Design.DesignType.HQ)
