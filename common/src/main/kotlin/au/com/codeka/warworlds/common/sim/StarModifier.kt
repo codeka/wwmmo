@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.common.sim.FleetHelper.hasEffect
 import au.com.codeka.warworlds.common.sim.FleetHelper.isFriendly
 import au.com.codeka.warworlds.common.sim.FleetHelper.isOwnedBy
 import au.com.codeka.warworlds.common.sim.StarHelper.distanceBetween
+import au.com.codeka.warworlds.common.sim.StarHelper.getStorageIndex
 import com.google.common.base.Preconditions
 import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
@@ -94,6 +95,9 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.COLONIZE)
     logHandler!!.log(String.format(Locale.US, "- colonizing planet #%d", modification.planet_index))
 
+    // When we destroy the colonyship, we'll take it's energy and add it to the star's supply.
+    var remainingFuel: Float = 0f
+
     // Destroy a colony ship, unless this is a native colony.
     if (modification.empire_id != null) {
       var found = false
@@ -103,12 +107,14 @@ class StarModifier(private val identifierGenerator: () -> Long) {
             fleet.empire_id == modification.empire_id) {
           // TODO: check for cryogenics
           if (ceil(fleet.num_ships.toDouble()) == 1.0) {
+            remainingFuel = star.fleets[i].fuel_amount
             star.fleets.removeAt(i)
           } else {
             // Make sure we don't have too much fuel.
             val design = getDesign(fleet.design_type)
             val maxFuelAmount = design.fuel_size * (fleet.num_ships - 1)
             val fuelAmount = max(fleet.fuel_amount, maxFuelAmount)
+            remainingFuel = fleet.fuel_amount - fuelAmount
             star.fleets[i] = fleet.newBuilder()
                 .num_ships(fleet.num_ships - 1)
                 .fuel_amount(fuelAmount)
@@ -139,18 +145,19 @@ class StarModifier(private val identifierGenerator: () -> Long) {
             .build())
         .build()
     logHandler.log(String.format(Locale.US,
-        "  colonized: colony_id=%d",
+        "  colonized: colony_idCOLONIZE=%d",
         star.planets[modification.planet_index].colony.id))
 
     // if there's no storage for this empire, add one with some defaults now.
-    var hasStorage = false
-    for (storage in star.empire_stores) {
-      if (storage.empire_id == modification.empire_id) {
-        hasStorage = true
-      }
-    }
-    if (!hasStorage) {
-      star.empire_stores.add(createDefaultStorage(modification.empire_id).build())
+    val storageIndex = getStorageIndex(star, modification.empire_id)
+    if (storageIndex < 0) {
+      val storage = createDefaultStorage(modification.empire_id)
+      storage.total_energy += remainingFuel
+      star.empire_stores.add(storage.build())
+    } else {
+      star.empire_stores[storageIndex] = star.empire_stores[storageIndex].newBuilder()
+          .total_energy(star.empire_stores[storageIndex].total_energy + remainingFuel)
+          .build()
     }
   }
 
