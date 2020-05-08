@@ -6,12 +6,14 @@ import com.google.common.base.Preconditions
 import java.util.*
 
 /** Base class for any "object" within a [Scene].  */
-open class SceneObject @JvmOverloads constructor(dimensionResolver: DimensionResolver, scene: Scene? = null) {
-  private val dimensionResolver: DimensionResolver
+open class SceneObject constructor(
+    private val dimensionResolver: DimensionResolver,
+    private val debugName: String,
+    private var scene: Scene? = null) {
 
-  /** The scene we belong to, or null if we're not part of a scene.  */
-  var scene: Scene?
-    private set
+  companion object {
+    private val log = Log("SceneObject")
+  }
 
   /** Our parent [SceneObject], if any.  */
   var parent: SceneObject? = null
@@ -37,15 +39,19 @@ open class SceneObject @JvmOverloads constructor(dimensionResolver: DimensionRes
    */
   var tapTargetRadius: Float? = null
     private set
-  /** Gets the "tag" you previously set in [.setTag].  */
-  /**
-   * Sets this [SceneObject]'s "tag", which is just an arbitrary object we'll hang onto for
-   * you.
-   */
+
+  /** A [SceneObject]'s "tag", which is just an arbitrary object we'll hang onto for you. */
   var tag: Any? = null
 
   /** An optional [Runnable] that'll be called before this [SceneObject] is drawn.  */
   private var drawRunnable: Runnable? = null
+
+  init {
+    widthPx = 1.0f
+    heightPx = 1.0f
+    Matrix.setIdentityM(matrix, 0)
+    Matrix.setIdentityM(modelViewProjMatrix, 0)
+  }
 
   /**
    * Sets an optional draw [Runnable] that is called on the draw thread before this
@@ -72,7 +78,7 @@ open class SceneObject @JvmOverloads constructor(dimensionResolver: DimensionRes
   }
 
   fun removeChild(child: SceneObject) {
-    Preconditions.checkState(child.parent === this, "%s != %s", child.parent, this)
+    Preconditions.checkState(child.parent === this, "%s.parent (%s) != %s", child, child.parent, this)
     if (children != null) {
       children!!.remove(child)
       child.scene = null
@@ -165,7 +171,8 @@ open class SceneObject @JvmOverloads constructor(dimensionResolver: DimensionRes
       var transformedRadius = clipVector[0]
       project(modelViewProjMatrix, clipVector, 0)
       transformedRadius -= clipVector[0]
-      if (clipVector[0] < -1.0f - transformedRadius || clipVector[0] > 1.0f + transformedRadius || clipVector[1] < -1.0f - transformedRadius || clipVector[1] > 1.0f + transformedRadius) {
+      if (clipVector[0] < -1.0f - transformedRadius || clipVector[0] > 1.0f + transformedRadius ||
+          clipVector[1] < -1.0f - transformedRadius || clipVector[1] > 1.0f + transformedRadius) {
         // it's outside of the frustum, clip
         return
       }
@@ -198,16 +205,7 @@ open class SceneObject @JvmOverloads constructor(dimensionResolver: DimensionRes
   /** Sub classes should implement this to actually draw this [SceneObject].  */
   protected open fun drawImpl(mvpMatrix: FloatArray?) {}
 
-  companion object {
-    private val log = Log("SceneObject")
-  }
-
-  init {
-    this.dimensionResolver = Preconditions.checkNotNull(dimensionResolver)
-    this.scene = scene
-    widthPx = 1.0f
-    heightPx = 1.0f
-    Matrix.setIdentityM(matrix, 0)
-    Matrix.setIdentityM(modelViewProjMatrix, 0)
+  override fun toString(): String {
+    return "[SceneObject $debugName]"
   }
 }

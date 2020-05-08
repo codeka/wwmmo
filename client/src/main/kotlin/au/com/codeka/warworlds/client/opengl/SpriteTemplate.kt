@@ -13,16 +13,44 @@ import java.nio.ShortBuffer
  * and so on). You would use it to add an actual [Sprite] to a [Scene].
  */
 class SpriteTemplate(
-    private val shader: SpriteShader?, private val texture: BitmapTexture?, uvTopLeft: Vector2, uvBottomRight: Vector2) {
+    private val shader: SpriteShader, private val texture: BitmapTexture, uvTopLeft: Vector2,
+    uvBottomRight: Vector2) {
   private val positionBuffer: FloatBuffer
   private val texCoordBuffer: FloatBuffer
   private val indexBuffer: ShortBuffer
 
-  @JvmOverloads
+  init {
+    // initialize vertex byte buffer for shape coordinates
+    // (# of coordinate values * 4 bytes per float)
+    var bb = ByteBuffer.allocateDirect(SQUARE_COORDS.size * 4)
+    bb.order(ByteOrder.nativeOrder())
+    positionBuffer = bb.asFloatBuffer()
+    positionBuffer.put(SQUARE_COORDS)
+    positionBuffer.position(0)
+    val uvs = floatArrayOf(
+        uvTopLeft.x.toFloat(), uvTopLeft.y.toFloat(),  // top left
+        uvTopLeft.x.toFloat(), uvBottomRight.y.toFloat(),  // bottom left
+        uvBottomRight.x.toFloat(), uvBottomRight.y.toFloat(),  // bottom right
+        uvBottomRight.x.toFloat(), uvTopLeft.y.toFloat())
+    bb = ByteBuffer.allocateDirect(uvs.size * 4)
+    bb.order(ByteOrder.nativeOrder())
+    texCoordBuffer = bb.asFloatBuffer()
+    texCoordBuffer.put(uvs)
+    texCoordBuffer.position(0)
+
+    // initialize byte buffer for the draw list
+    // (# of coordinate values * 2 bytes per short)
+    bb = ByteBuffer.allocateDirect(SQUARE_INDICES.size * 2)
+    bb.order(ByteOrder.nativeOrder())
+    indexBuffer = bb.asShortBuffer()
+    indexBuffer.put(SQUARE_INDICES)
+    indexBuffer.position(0)
+  }
+
   fun draw(mvpMatrix: FloatArray?, alpha: Float = 1.0f) {
     Threads.checkOnThread(Threads.GL)
-    shader!!.begin()
-    texture!!.bind()
+    shader.begin()
+    texture.bind()
     GLES20.glVertexAttribPointer(
         shader.positionHandle, 3, GLES20.GL_FLOAT, false, 0, positionBuffer)
     GLES20.glVertexAttribPointer(
@@ -66,7 +94,8 @@ class SpriteTemplate(
       if (uvBottomRight == null) {
         uvBottomRight = Vector2(1.0, 1.0)
       }
-      return SpriteTemplate(shader, texture, uvTopLeft!!, uvBottomRight!!)
+
+      return SpriteTemplate(shader!!, texture!!, uvTopLeft!!, uvBottomRight!!)
     }
   }
 
@@ -79,32 +108,4 @@ class SpriteTemplate(
     private val SQUARE_INDICES = shortArrayOf(0, 1, 2, 0, 2, 3)
   }
 
-  init {
-
-    // initialize vertex byte buffer for shape coordinates
-    // (# of coordinate values * 4 bytes per float)
-    var bb = ByteBuffer.allocateDirect(SQUARE_COORDS.size * 4)
-    bb.order(ByteOrder.nativeOrder())
-    positionBuffer = bb.asFloatBuffer()
-    positionBuffer.put(SQUARE_COORDS)
-    positionBuffer.position(0)
-    val uvs = floatArrayOf(
-        uvTopLeft.x.toFloat(), uvTopLeft.y.toFloat(),  // top left
-        uvTopLeft.x.toFloat(), uvBottomRight.y.toFloat(),  // bottom left
-        uvBottomRight.x.toFloat(), uvBottomRight.y.toFloat(),  // bottom right
-        uvBottomRight.x.toFloat(), uvTopLeft.y.toFloat())
-    bb = ByteBuffer.allocateDirect(uvs.size * 4)
-    bb.order(ByteOrder.nativeOrder())
-    texCoordBuffer = bb.asFloatBuffer()
-    texCoordBuffer.put(uvs)
-    texCoordBuffer.position(0)
-
-    // initialize byte buffer for the draw list
-    // (# of coordinate values * 2 bytes per short)
-    bb = ByteBuffer.allocateDirect(SQUARE_INDICES.size * 2)
-    bb.order(ByteOrder.nativeOrder())
-    indexBuffer = bb.asShortBuffer()
-    indexBuffer.put(SQUARE_INDICES)
-    indexBuffer.position(0)
-  }
 }

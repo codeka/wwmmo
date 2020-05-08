@@ -367,7 +367,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     var oldStar: Star? = null
     var container = sceneObjects[star.id]
     if (container == null) {
-      container = SceneObject(scene.dimensionResolver)
+      container = SceneObject(scene.dimensionResolver, "Star:${star.id}:${star.name}")
       container.setClipRadius(80.0f)
       container.setTapTargetRadius(80.0f)
       addSectorSceneObject(Pair.create(star.sector_x, star.sector_y), container)
@@ -490,7 +490,9 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     }
     var container = sceneObjects[fleet.id]
     if (container == null) {
-      container = SceneObject(scene.dimensionResolver)
+      container =
+          SceneObject(
+              scene.dimensionResolver, "Fleet:${fleet.id}:${fleet.design_type}:${fleet.num_ships}")
       container.setClipRadius(80.0f)
       container.setTapTargetRadius(80.0f)
       container.tag = SceneObjectInfo(star, fleet, destStar)

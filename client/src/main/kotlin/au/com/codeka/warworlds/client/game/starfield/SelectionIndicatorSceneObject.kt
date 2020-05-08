@@ -8,5 +8,5 @@ import au.com.codeka.warworlds.common.Colour
  * A [SceneObject] that we can add to a star or fleet to indicate that it's the currently-
  * selected one.
  */
-class SelectionIndicatorSceneObject(dimensionResolver: DimensionResolver?)
-  : BaseIndicatorSceneObject(dimensionResolver, Colour.WHITE, 5.0f)
+class SelectionIndicatorSceneObject(dimensionResolver: DimensionResolver)
+  : BaseIndicatorSceneObject(dimensionResolver, "SelectionIndicator", Colour.WHITE, 5.0f)

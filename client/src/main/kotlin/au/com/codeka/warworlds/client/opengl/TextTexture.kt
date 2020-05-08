@@ -57,13 +57,13 @@ class TextTexture : Texture() {
   }
 
   /** Gets the bounds of the given char.  */
-  fun getCharBounds(ch: Char): Rect? {
+  fun getCharBounds(ch: Char): Rect {
     var bounds = characters[ch]
     if (bounds == null) {
       ensureChar(ch)
       bounds = characters[ch]
     }
-    return bounds
+    return bounds!!
   }
 
   private fun ensureChar(ch: Char) {

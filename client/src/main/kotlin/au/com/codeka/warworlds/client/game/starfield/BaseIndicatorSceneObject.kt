@@ -19,8 +19,8 @@ import java.nio.ShortBuffer
  * selection, etc). Basically it draws a solid circle and a bit of shading in the middle.
  */
 open class BaseIndicatorSceneObject(
-    dimensionResolver: DimensionResolver?, colour: Colour, lineThickness: Float)
-    : SceneObject(dimensionResolver!!) {
+    dimensionResolver: DimensionResolver, debugName: String, colour: Colour, lineThickness: Float)
+    : SceneObject(dimensionResolver, debugName) {
   private val shader: IndicatorShader
   private val positionBuffer: FloatBuffer
   private val texCoordBuffer: FloatBuffer

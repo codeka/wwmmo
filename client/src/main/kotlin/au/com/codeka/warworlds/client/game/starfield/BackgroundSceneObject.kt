@@ -8,16 +8,15 @@ import au.com.codeka.warworlds.common.Vector2
 import java.util.*
 
 class BackgroundSceneObject(scene: Scene, private val sectorX: Long, private val sectorY: Long)
-    : SceneObject(scene.dimensionResolver) {
-  private val starfield: Sprite
+    : SceneObject(scene.dimensionResolver, "Background:$sectorX,$sectorY") {
+  private val starfield: Sprite = scene.createSprite(SpriteTemplate.Builder()
+      .shader(scene.spriteShader)
+      .texture(scene.textureManager.loadTexture("stars/starfield.png"))
+      .build())
   private val gases: MutableList<Sprite>
   private var zoomAmount = 0f
 
   init {
-    starfield = scene.createSprite(SpriteTemplate.Builder()
-        .shader(scene.spriteShader)
-        .texture(scene.textureManager.loadTexture("stars/starfield.png"))
-        .build())
     starfield.setSize(1024.0f, 1024.0f)
     addChild(starfield)
     gases = ArrayList()

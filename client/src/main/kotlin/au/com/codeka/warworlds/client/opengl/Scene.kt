@@ -7,13 +7,12 @@ import com.google.common.base.Preconditions
  */
 class Scene(val dimensionResolver: DimensionResolver, val textureManager: TextureManager) {
   /** Gets the root [SceneObject] that you should add all your sprites and stuff to.  */
-  val rootObject = SceneObject(dimensionResolver, this)
+  val rootObject = SceneObject(dimensionResolver, "ROOT", this)
   val spriteShader = SpriteShader()
   private val textTexture = TextTexture()
 
   // All modifications to the scene (adding children, modifying children, etc) should happen while
   // synchronized on this lock.
-  @JvmField
   val lock = Any()
 
   fun createSprite(tmpl: SpriteTemplate): Sprite {

@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.client.opengl
 import android.opengl.GLES20
 import android.opengl.Matrix
 import au.com.codeka.warworlds.client.concurrency.Threads
-import com.google.common.base.Preconditions
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -13,19 +12,17 @@ import java.nio.ShortBuffer
  * A [SceneObject] that represents a piece of text.
  */
 class TextSceneObject(
-    dimensionResolver: DimensionResolver,
-    shader: SpriteShader,
-    textTexture: TextTexture,
-    text: String) : SceneObject(dimensionResolver) {
-  private val dimensionResolver: DimensionResolver
-  private val shader: SpriteShader
-  private val textTexture: TextTexture
-  val text: String
+    private val dimensionResolver: DimensionResolver,
+    private val shader: SpriteShader,
+    private val textTexture: TextTexture,
+    val text: String) : SceneObject(dimensionResolver, "Text:$text") {
+
   private var textWidth = 0f
-  private var dirty: Boolean
+  private var dirty: Boolean = true
   private var positionBuffer: FloatBuffer? = null
   private var texCoordBuffer: FloatBuffer? = null
   private var indexBuffer: ShortBuffer? = null
+
   fun setTextSize(dp: Float) {
     val px = dimensionResolver.dp2px(dp)
     val scale = px / textTexture.textHeight
@@ -60,9 +57,9 @@ class TextSceneObject(
 
   private fun measureText(): Float {
     var width = 0.0f
-    for (i in 0 until text.length) {
-      val bounds = textTexture.getCharBounds(text[i])
-      width += bounds!!.width().toFloat()
+    for (element in text) {
+      val bounds = textTexture.getCharBounds(element)
+      width += bounds.width().toFloat()
     }
     return width
   }
@@ -77,11 +74,11 @@ class TextSceneObject(
     // # of chars * 2 triangles * 3 verts per triangle
     val indices = ShortArray(text.length * 2 * 3)
     var offsetX = 0f
-    for (i in 0 until text.length) {
+    for (i in text.indices) {
       val ch = text[i]
       val bounds = textTexture.getCharBounds(ch)
       positions[i * 12] = offsetX
-      positions[i * 12 + 1] = -bounds!!.height() / 2.0f
+      positions[i * 12 + 1] = -bounds.height() / 2.0f
       positions[i * 12 + 2] = 0.0f
       positions[i * 12 + 3] = offsetX + bounds.width()
       positions[i * 12 + 4] = -bounds.height() / 2.0f
@@ -134,11 +131,4 @@ class TextSceneObject(
     dirty = false
   }
 
-  init {
-    this.dimensionResolver = Preconditions.checkNotNull(dimensionResolver)
-    this.shader = Preconditions.checkNotNull(shader)
-    this.textTexture = Preconditions.checkNotNull(textTexture)
-    this.text = text
-    dirty = true
-  }
 }
