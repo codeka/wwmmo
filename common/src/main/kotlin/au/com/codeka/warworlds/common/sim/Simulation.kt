@@ -521,7 +521,10 @@ class Simulation constructor(
       }
       var populationIncrease: Float
       if (goodsEfficiency >= 1.0f) {
-        populationIncrease = max(colony.population, 100.0f) * 0.25f
+        // Increase population exponentially: the less population there is, the more people will
+        // try to make more babies...
+        val difference = planet.population_congeniality - colony.population
+        populationIncrease = max(difference, 100.0f) * 0.25f
       } else {
         populationIncrease = max(colony.population, 100.0f)
         populationIncrease *= 0.9f
