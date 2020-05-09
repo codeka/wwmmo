@@ -67,9 +67,9 @@ open class RequestHandler {
       }
     } catch (e: RequestException) {
       handleException(e)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       log.error("Unexpected exception", e)
-      throw e
+      handleException(RequestException(e))
     }
   }
 

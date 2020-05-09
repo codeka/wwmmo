@@ -13,6 +13,14 @@ $(function() {
     }
   });
 
+  $(document).ajaxError(function(evnt, xhr, settings) {
+    if (settings.error) {
+      // it has an error handler, don't do anything.
+    }
+
+    document.body.innerHTML = xhr.responseText;
+  });
+
   // clicking the toggle button toggles the menu
   $("#navmenu-toggle").on("click", function() {
     var $navmenu = $("#navmenu");

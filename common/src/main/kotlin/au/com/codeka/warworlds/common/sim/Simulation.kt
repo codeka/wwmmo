@@ -248,8 +248,17 @@ class Simulation constructor(
 
       // Apply storage bonuses this round (note: this could change from step to step, if a building
       // finishes being built, for example).
-      for (building in colony.buildings) {
+      for (buildingIndex in colony.buildings.indices) {
+        var building = colony.buildings[buildingIndex]
         val design = getDesign(building.design_type)
+
+        // Validate the building's level. TODO: remove this once we've validated all current stars
+        if (building.level - 1 > design.upgrades.size) {
+          colony.buildings[buildingIndex] =
+              building.newBuilder().level(design.upgrades.size + 1).build()
+          building = colony.buildings[buildingIndex]
+        }
+
         var effects = design.effect
         if (building.level != null && building.level > 1) {
           // Level will be 2 for the first upgrade, 3 for the second and so on.
@@ -371,6 +380,7 @@ class Simulation constructor(
           if (br.building_id != null) {
             for (building in colony.buildings) {
               if (building.id == br.building_id) {
+                // The building is at it's "old" level, so the cost is the cost of the *next* level.
                 buildCost = design.upgrades[building.level - 1].build_cost
                 break
               }

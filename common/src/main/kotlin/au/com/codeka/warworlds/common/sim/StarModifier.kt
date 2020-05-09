@@ -77,7 +77,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST -> applyDeleteBuildRequest(star, modification, logHandler)
       StarModification.MODIFICATION_TYPE.SPLIT_FLEET -> applySplitFleet(star, modification, logHandler)
       StarModification.MODIFICATION_TYPE.MERGE_FLEET ->  applyMergeFleet(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.MOVE_FLEET -> applyMoveFleet(star, auxStars, modification, logHandler)
+      StarModification.MODIFICATION_TYPE.MOVE_FLEET -> applyMoveFleet(star, auxStars!!, modification, logHandler)
       StarModification.MODIFICATION_TYPE.EMPTY_NATIVE -> applyEmptyNative(star, modification, logHandler)
       StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING -> applyUpgradeBuilding(star, modification, logHandler)
       StarModification.MODIFICATION_TYPE.ATTACK_COLONY -> applyAttackColony(star, modification, logHandler)
@@ -352,12 +352,12 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     }
   }
 
-  @Throws(SuspiciousModificationException::class)
   private fun applyAddBuildRequest(
       star: Star.Builder,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
-    Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
+      logHandler: Simulation.LogHandler) {
+    Preconditions.checkArgument(
+        modification.type == StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
     val planet = getPlanetWithColony(star, modification.colony_id)
     if (planet != null) {
       val colonyBuilder = planet.colony.newBuilder()
@@ -400,24 +400,41 @@ class StarModifier(private val identifierGenerator: () -> Long) {
 
       // If the build request has a building_id, then that building should be on this colony.
       if (modification.building_id != null) {
-        var found = false
+        var building: Building? = null
         for (bldg in colonyBuilder.buildings) {
           if (bldg.id == modification.building_id) {
-            found = true
+            building = bldg
           }
         }
-        if (!found) {
+        if (building == null) {
           throw SuspiciousModificationException(
               star.id,
               modification,
               "Cannot upgrade a building that doesn't exist: #%d", modification.building_id)
+        }
+
+        // If the modification specifies a different design to the building, that's suspicious.
+        if (building.design_type != design.type) {
+          throw SuspiciousModificationException(
+              star.id,
+              modification,
+              "Cannot upgrade a building to a different design, " +
+                  "current=${building.design_type} new=${modification.design_type}")
+        }
+
+        // And it shouldn't be for a higher level than the building supports
+        if (building.level > design.upgrades.size) {
+          throw SuspiciousModificationException(
+              star.id,
+              modification,
+              "Cannot upgrade a building past it's maximum level, ${design.upgrades.size + 1}")
         }
       }
       var count = 1
       if (design.design_kind == Design.DesignKind.SHIP) {
         count = modification.count
       }
-      logHandler!!.log("- adding build request")
+      logHandler.log("- adding build request")
       colonyBuilder.build_requests.add(BuildRequest.Builder()
           .id(identifierGenerator())
           .design_type(modification.design_type)
@@ -438,12 +455,12 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     }
   }
 
-  @Throws(SuspiciousModificationException::class)
   private fun applyDeleteBuildRequest(
       star: Star.Builder,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
-    Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST)
+      logHandler: Simulation.LogHandler) {
+    Preconditions.checkArgument(
+        modification.type == StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST)
     var planet: Planet? = null
     var buildRequest: BuildRequest? = null
     for (p in star.planets) {
@@ -527,11 +544,10 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     }
   }
 
-  @Throws(SuspiciousModificationException::class)
   private fun applyMergeFleet(
       star: Star.Builder,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
+      logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.MERGE_FLEET)
     var fleetIndex = findFleetIndex(star, modification.fleet_id)
     if (fleetIndex >= 0) {
@@ -601,15 +617,13 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     }
   }
 
-  @Throws(SuspiciousModificationException::class)
   private fun applyMoveFleet(
       star: Star.Builder,
-      auxStars: Collection<Star>?,
+      auxStars: Collection<Star>,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
+      logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.MOVE_FLEET)
-    Preconditions.checkNotNull(auxStars)
-    logHandler!!.log("- moving fleet")
+    logHandler.log("- moving fleet")
     var targetStar: Star? = null
     for (s in auxStars!!) {
       if (s.id == modification.star_id) {
@@ -700,13 +714,14 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     }
   }
 
-  @Throws(SuspiciousModificationException::class)
   private fun applyUpgradeBuilding(
       star: Star.Builder,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
-    Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING)
-    logHandler!!.log("- upgrading building")
+      logHandler: Simulation.LogHandler) {
+    Preconditions.checkArgument(
+        modification.type == StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING)
+
+    logHandler.log("- upgrading building")
     for (i in star.planets.indices) {
       if (star.planets[i].colony != null
           && star.planets[i].colony.id == modification.colony_id) {
@@ -722,7 +737,13 @@ class StarModifier(private val identifierGenerator: () -> Long) {
           if (colony.buildings[j].id == modification.building_id) {
             found = true
             val building = colony.buildings[j].newBuilder()
-            // TODO: check if it's at max level?
+            val design = getDesign(building.design_type)
+            if (design.upgrades.size > building.level) {
+              // We don't throw an exception here, just ignore it. The error should have been
+              // caught by the addBuildRequest modification.
+              return
+            }
+
             building.level(building.level + 1)
             colony.buildings[j] = building.build()
           }
@@ -738,13 +759,12 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     }
   }
 
-  @Throws(SuspiciousModificationException::class)
   private fun applyAttackColony(
       star: Star.Builder,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
+      logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.ATTACK_COLONY)
-    logHandler!!.log("- attacking colony")
+    logHandler.log("- attacking colony")
     var found = false
     for (i in star.planets.indices) {
       if (star.planets[i].colony != null
