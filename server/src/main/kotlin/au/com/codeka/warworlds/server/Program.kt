@@ -40,6 +40,7 @@ object Program {
       val server = Server()
       val connector = ServerConnector(server)
       connector.port = port
+      connector.host = "0.0.0.0"
       server.addConnector(connector)
       val context = ServletContextHandler(ServletContextHandler.SESSIONS)
       context.contextPath = "/"
