@@ -46,7 +46,8 @@ class Connection internal constructor(
     try {
       encoder.send(pkt)
     } catch (e: IOException) {
-      log.warning("Error", e)
+      log.warning("Error sending packet, assuming disconnected: ${e.message}")
+      onDisconnect()
     }
   }
 
