@@ -15,6 +15,7 @@ import au.com.codeka.warworlds.client.MainActivity
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.game.empire.EmpireScreen
+import au.com.codeka.warworlds.client.game.sitrep.SitReportScreen
 import au.com.codeka.warworlds.client.game.starfield.StarfieldScreen
 import au.com.codeka.warworlds.client.game.starsearch.StarSearchScreen
 import au.com.codeka.warworlds.client.game.world.EmpireManager
@@ -136,6 +137,10 @@ class DrawerController(
         R.id.nav_empire -> {
           screenStack.home()
           screenStack.push(EmpireScreen())
+        }
+        R.id.nav_sitrep -> {
+          screenStack.home()
+          screenStack.push(SitReportScreen())
         }
       }
       closeDrawer()

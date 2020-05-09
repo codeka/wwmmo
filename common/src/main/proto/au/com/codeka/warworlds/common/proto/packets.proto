@@ -6,6 +6,7 @@ import "au/com/codeka/warworlds/common/proto/common.proto";
 import "au/com/codeka/warworlds/common/proto/chat.proto";
 import "au/com/codeka/warworlds/common/proto/empire.proto";
 import "au/com/codeka/warworlds/common/proto/star.proto";
+import "au/com/codeka/warworlds/common/proto/sitreport.proto";
 
 // Wrapper class for all the packets.
 message Packet {
@@ -16,6 +17,7 @@ message Packet {
   optional RequestEmpirePacket request_empire = 5;
   optional EmpireDetailsPacket empire_details = 6;
   optional ChatMessagesPacket chat_msgs = 7;
+  optional RpcPacket rpc = 8;
 }
 
 // The "hello" packet that's sent by the client when it first connects to the game socket.
@@ -74,4 +76,38 @@ message EmpireDetailsPacket {
 // being received from the server, could contain multiple messages for multiple rooms.
 message ChatMessagesPacket {
   repeated ChatMessage messages = 1;
+}
+
+// An RPC is a special kind of packet where we expect a "synchronous" response. In reality we just
+// associate each RPC with a unique ID and in the client wait for the reply that has the same ID.
+message RpcPacket {
+  // A unique ID for this RPC. The server doesn't care about this value, it just needs to be unique
+  // on the client, but this is how the client associates a reply with the initial request.
+  optional int64 id = 1;
+
+  // The "type" of RPC this is.
+  enum Message {
+    UNKNOWN_MESSAGE = 0;
+
+    // A request for situation report(s). Specify SitReportRequest as the payload of the request and
+    // get a SiReportResponse as the payload of the response.
+    SITUATION_REPORT = 1;
+  }
+  optional Message msg = 2;
+
+  message SitReportRequest {
+    // If set, the ID of the star you want the situation report for. If not specified, all situation
+    // reports for this empire will be included in the response.
+    optional int64 star_id = 1;
+  }
+
+  message SitReportResponse {
+    // The list of situation reports that match the requested query.
+    repeated SituationReport sit_reports = 1;
+  }
+
+  oneof Payload {
+    SitReportRequest sit_report_request = 10;
+    SitReportResponse sit_report_response = 11;
+  }
 }
