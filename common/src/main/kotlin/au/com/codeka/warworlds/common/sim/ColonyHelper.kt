@@ -16,7 +16,7 @@ object ColonyHelper {
         val design = DesignHelper.getDesign(building.design_type)
         for (effect in design.effect) {
           if (effect.type === Design.EffectType.POPULATION_BOOST) {
-            val extraPopulation = effect.minimum.toFloat().coerceAtMost(population * effect.bonus)
+            val extraPopulation = effect.minimum.toFloat().coerceAtLeast(population * effect.bonus)
             population += extraPopulation.toInt()
           }
         }

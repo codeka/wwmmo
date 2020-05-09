@@ -281,6 +281,21 @@ class StarManager private constructor() {
           i++
           continue
         }
+
+        // Generate a sit report for the move-complete event.
+        val sitReport = SituationReport.Builder()
+            .empire_id(fleet.empire_id)
+            .star_id(destStar.get().id)
+            .report_time(System.currentTimeMillis())
+            .move_complete_record(SituationReport.MoveCompleteRecord.Builder()
+                .design_type(fleet.design_type)
+                .fleet_id(fleet.id)
+                .fuel_amount(fleet.fuel_amount)
+                .num_ships(fleet.num_ships)
+                .build())
+        val sitReports: MutableMap<Long, SituationReport.Builder> = Maps.newHashMap()
+        sitReports[fleet.empire_id] = sitReport
+
         synchronized(destStar.lock) {
           // TODO: this could deadlock, need to lock in the same order
           val destStarBuilder = destStar.get().newBuilder()
@@ -291,9 +306,13 @@ class StarManager private constructor() {
                   .empire_id(fleet.empire_id)
                   .fleet(fleet)
                   .build(),
+              sitReports = sitReports,
               logHandler = logHandler)
           destStar.set(destStarBuilder.build())
         }
+
+        // Save the situation reports to the data store.
+        DataStore.i.sitReports().save(sitReports.values.map { sr -> sr.build() })
 
         // Then remove it from our star.
         starBuilder.fleets.removeAt(i)

@@ -290,7 +290,8 @@ class Simulation constructor(
         colony.focus(colony.focus.newBuilder()
             .construction(0.25f).energy(0.25f).farming(0.25f).mining(0.25f).build())
       }
-      log("--- Colony [planetIndex=%d] [population=%.2f]", i, colony.population)
+      log("--- Colony [planetIndex=%d] [population=%.2f / %d]",
+          i, colony.population, getMaxPopulation(planet))
 
       // Calculate the output from farming this turn and add it to the star global
       val goods = colony.population * colony.focus.farming * (planet.farming_congeniality / 100.0f)
@@ -505,7 +506,7 @@ class Simulation constructor(
     if (totalGoodsRequired > storage.total_goods && totalGoodsRequired > 0) {
       goodsEfficiency = storage.total_goods / totalGoodsRequired
     }
-    log("--- Updating Population [goods required=%.2f] [goods available=%.2f] [efficiency=%.2f]",
+    log("--- Updating population [goods required=%.2f] [goods available=%.2f] [efficiency=%.2f]",
         totalGoodsRequired, storage.total_goods, goodsEfficiency)
 
     // subtract all the goods we'll need
@@ -556,7 +557,8 @@ class Simulation constructor(
       if (newPopulation < 100.0f && colony.cooldown_end_time != null) {
         newPopulation = 100.0f
       }
-      log("    Colony[%d]: [delta=%.2f] [new=%.2f]", i, populationIncrease, newPopulation)
+      log("    Colony[%d]: [delta=%.2f] [new=%.2f] [max=%d]",
+          i, populationIncrease, newPopulation, maxPopulation)
       colony.population(newPopulation)
       star.planets[i] = planet.newBuilder().colony(colony.build()).build()
     }
@@ -623,7 +625,7 @@ class Simulation constructor(
     if (sitReports != null) {
       // Make sure we have all the empires set up in the situation report to begin with.
       for (fleet in combatReportBuilder.fleets_before) {
-        if (sitReports[fleet.empire_id] == null) {
+        if (fleet.empire_id != null && sitReports[fleet.empire_id] == null) {
           sitReports[fleet.empire_id] = SituationReport.Builder()
               .empire_id(fleet.empire_id)
               .star_id(star.id)
@@ -649,7 +651,7 @@ class Simulation constructor(
         var thisFleetLost = fleetsLost[fleetBefore.empire_id]
         if (thisFleetLost == null) {
           thisFleetLost = EnumMap<Design.DesignType, Float>(Design.DesignType::class.java)
-          fleetsLost[fleetBefore.empire_id] = thisFleetLost
+          fleetsLost[fleetBefore.empire_id ?: 0] = thisFleetLost
         }
         thisFleetLost[fleetBefore.design_type] =
             (thisFleetLost[fleetBefore.design_type] ?: 0f) + numDestroyed

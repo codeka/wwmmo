@@ -22,6 +22,16 @@
           </div>
         </div>
       {% end %}
+      {% if sitrep.move_complete_record %}
+        {% set design = designs[sitrep.move_complete_record.design_type.name] %}
+        <div class="sitrep-event move-complete">
+          <div class="fleet-icon"><img src="/admin/img/sprites/{{ design.image_url }}" /></div>
+          <div class="sitrep-details">
+            <h4>Move complete</h4>
+            <p>{{ design.display_name }} x {{ sitrep.move_complete_record.num_ships }}</p>
+          </div>
+        </div>
+      {% end %}
       <!--
       <span class="separator">&bull;</span>
       -->
