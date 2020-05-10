@@ -11,32 +11,61 @@
   .fleet-small img {
     vertical-align: middle;
   }
+
+  #build-requests {
+    width: 49%;
+    float: left;
+  }
+
+  #simulate-result {
+    margin-left: 1%;
+    width: 49%;
+    float: left;
+  }
 </style>
 {% end %}
 {% block "content" %}
 <h1>Build requests</h1>
-<table>
-  <tr>
-    <th></th>
-    <th>Star</th>
-    <th>Design</th>
-    <th>Count</th>
-    <th>Progress</th>
-    <th>Time complete</th>
-    <th></th>
-  </tr>
-  {% for br in build_requests %}
-  <tr>
-    <td>{{ loop.index + 1 }}</td>
-    <td>{% include "inc/star_name.html" star=request_stars.get(br.id) %}</td>
-    <td>{% include "inc/design_name.html" design_type=br.design_type %}</td>
-    <td>{{ br.count }}</td>
-    <td>{{ br.progress }}</td>
-    <td><time timestamp="{{ br.end_time }}" class="timer"></time></td>
-    <td><a href="javascript:forceComplete({{ request_stars.get(br.id).id }}, {{ br.id }});">Force complete</a></td>
-  </tr>
-  {% end %}
-</table>
+
+<section id="build-requests">
+  <table>
+    <tr>
+      <th></th>
+      <th>Star</th>
+      <th>Design</th>
+      <th>Count</th>
+      <th>Progress</th>
+      <th>Time complete</th>
+      <th></th>
+    </tr>
+    {% for br in build_requests %}
+    <tr>
+      <td>{{ loop.index + 1 }}</td>
+      <td>{% include "inc/star_name.html" star=request_stars.get(br.id) %}</td>
+      <td>{% include "inc/design_name.html" design_type=br.design_type %}</td>
+      <td>{{ br.count }}</td>
+      <td>{{ br.progress }}</td>
+      <td><time timestamp="{{ br.end_time }}" class="timer"></time></td>
+      <td>
+        <a href="javascript:forceComplete({{ request_stars.get(br.id).id }}, {{ br.id }});">
+          Force complete
+        </a>
+      </td>
+    </tr>
+    {% end %}
+  </table>
+</section>
+
+<section id="simulate-result"></section>
+
+<script id="simulate-result-tmpl" type="text/html">
+  <h3>Timing</h3>
+  <div>Load: <%= loadTime %>ms</div>
+  <div>Simulate: <%= simulateTime %>ms</div>
+  <h3>Logs</h3>
+  <div style="white-space: pre;"><%= logMessages %></div>
+</script>
+
 
 <script>
   function forceComplete(starId, reqId) {
@@ -49,7 +78,8 @@
       },
       method: "POST",
       success: function(data) {
-        window.location.reload();
+        var html = $("#simulate-result-tmpl").applyTemplate(data);
+        $("#simulate-result").html(html);
       }
     });
   }

@@ -738,9 +738,12 @@ class StarModifier(private val identifierGenerator: () -> Long) {
             found = true
             val building = colony.buildings[j].newBuilder()
             val design = getDesign(building.design_type)
-            if (design.upgrades.size > building.level) {
+            if (building.level > design.upgrades.size) {
               // We don't throw an exception here, just ignore it. The error should have been
               // caught by the addBuildRequest modification.
+              logHandler.log(
+                  "  - cannot upgrade, already too high level (" +
+                      "${design.upgrades.size} < ${building.level})")
               return
             }
 

@@ -3,6 +3,7 @@
 div.sitrep-event {
   display: inline-block;
   height: 64px;
+  vertical-align: middle;
 }
 
 div.sitrep-event div.fleet-icon {
@@ -29,4 +30,16 @@ span.separator {
   line-height: 64px;
   margin: 0 24px;
   vertical-align: top;
+}
+
+div.combat-entry {
+  display: inline-block;
+  height: 32px;
+  vertical-align: middle;
+  line-height: 32px;
+}
+
+div.combat-entry img {
+  width: 32px;
+  height: 32px;
 }

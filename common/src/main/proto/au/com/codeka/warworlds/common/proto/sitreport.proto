@@ -44,11 +44,14 @@ message SituationReport {
     // The design type of the fleet that was moved.
     optional Design.DesignType design_type = 3;
 
-    // The number of ships in this fleet.
+    // The number of ships in this fleet, before any combat may have reduced them.
     optional float num_ships = 4;
 
     // The amount of fuel the fleet has left now that it's finished it's move.
     optional float fuel_amount = 5;
+
+    // If true, this fleet was destroyed in the ensuing combat.
+    optional bool was_destroyed = 6;
   }
   optional MoveCompleteRecord move_complete_record = 7;
 

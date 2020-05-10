@@ -139,7 +139,7 @@ class AjaxStarfieldHandler : AjaxHandler() {
     }
 
     // Now just simulate to make sure it processes it.
-    modifyAndSimulate(starId, null)
+    setResponseGson(modifyAndSimulate(starId, null))
   }
 
   private fun modifyAndSimulate(starId: Long, modification: StarModification?): SimulateResponse {

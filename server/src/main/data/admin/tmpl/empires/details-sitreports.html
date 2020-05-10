@@ -29,12 +29,46 @@
           <div class="sitrep-details">
             <h4>Move complete</h4>
             <p>{{ design.display_name }} x {{ sitrep.move_complete_record.num_ships }}</p>
+            <p><em>{% if sitrep.move_complete_record.was_destroyed %}destroyed{% else %}not destroyed{% end %}</em></p>
           </div>
         </div>
       {% end %}
-      <!--
-      <span class="separator">&bull;</span>
-      -->
+      {% if sitrep.fleet_destroyed_record || sitrep.fleet_victorious_record %}
+        <div class="sitrep-event combat">
+          <p>
+            {% if sitrep.fleet_destroyed_record %}
+              {% for r in sitrep.fleet_destroyed_record %}
+                {% set design = designs[r.design_type.name] %}
+                <div class="combat-entry">
+                  <div class="fleet-icon">
+                    <img src="/admin/img/sprites/{{ design.image_url }}" />
+                  </div>
+                  {{ design.display_name }} x {{ r.num_ships }}
+                </div>
+              {% end %}
+              <div class="combat-entry"><strong>lost</strong></div>
+            {% else %}
+              <em>no losses</em>
+            {% end %}
+          </p>
+          <p>
+            {% if sitrep.fleet_victorious_record %}
+              {% for r in sitrep.fleet_victorious_record %}
+                {% set design = designs[r.design_type.name] %}
+                <div class="combat-entry">
+                  <div class="fleet-icon">
+                    <img src="/admin/img/sprites/{{ design.image_url }}" />
+                  </div>
+                  {{ design.display_name }} x {{ r.num_ships }}
+                </div>
+              {% end %}
+              <div class="combat-entry"><strong>destroyed</strong></div>
+            {% else %}
+              <em>nothing destroyed</em>
+            {% end %}
+          </p>
+        </div>
+      {% end %}
     </td>
   </tr>
   {% end %}
