@@ -623,58 +623,65 @@ class Simulation constructor(
     }
 
     if (sitReports != null) {
-      // Make sure we have all the empires set up in the situation report to begin with.
-      for (fleet in combatReportBuilder.fleets_before) {
-        if (fleet.empire_id != null && sitReports[fleet.empire_id] == null) {
-          sitReports[fleet.empire_id] = SituationReport.Builder()
-              .empire_id(fleet.empire_id)
-              .star_id(star.id)
-              .report_time(System.currentTimeMillis())
+      populateCombatSitReports(
+          star, combatReportBuilder.fleets_before, combatReportBuilder.fleets_after, sitReports)
+    }
+  }
+
+  private fun populateCombatSitReports(
+      star: Star.Builder, fleetsBefore: List<Fleet>, fleetsAfter: List<Fleet>,
+      sitReports: MutableMap<Long, SituationReport.Builder>) {
+    // Make sure we have all the empires set up in the situation report to begin with.
+    for (fleet in fleetsBefore) {
+      if (fleet.empire_id != null && sitReports[fleet.empire_id] == null) {
+        sitReports[fleet.empire_id] = SituationReport.Builder()
+            .empire_id(fleet.empire_id)
+            .star_id(star.id)
+            .report_time(System.currentTimeMillis())
+      }
+    }
+
+    // Now calculate the losses
+    val fleetsLost = HashMap<Long, EnumMap<Design.DesignType, Float>>()
+    for (fleetBefore in fleetsBefore) {
+      var wasDestroyed = true
+      var numDestroyed = 0.0f
+      for (fleetAfter in fleetsAfter) {
+        if (fleetAfter.id == fleetBefore.id) {
+          wasDestroyed = false
+          numDestroyed = fleetBefore.num_ships - fleetAfter.num_ships
         }
       }
-
-      // Now calculate the losses
-      val fleetsLost = HashMap<Long, EnumMap<Design.DesignType, Float>>()
-      for (fleetBefore in combatReportBuilder.fleets_before) {
-        var wasDestroyed = true
-        var numDestroyed = 0.0f
-        for (fleetAfter in combatReportBuilder.fleets_after) {
-          if (fleetAfter.id == fleetBefore.id) {
-            wasDestroyed = false
-            numDestroyed = fleetAfter.num_ships - fleetBefore.num_ships
-          }
-        }
-        if (wasDestroyed) {
-          numDestroyed = fleetBefore.num_ships
-        }
-
-        var thisFleetLost = fleetsLost[fleetBefore.empire_id]
-        if (thisFleetLost == null) {
-          thisFleetLost = EnumMap<Design.DesignType, Float>(Design.DesignType::class.java)
-          fleetsLost[fleetBefore.empire_id ?: 0] = thisFleetLost
-        }
-        thisFleetLost[fleetBefore.design_type] =
-            (thisFleetLost[fleetBefore.design_type] ?: 0f) + numDestroyed
+      if (wasDestroyed) {
+        numDestroyed = fleetBefore.num_ships
       }
 
-      // Finally, populate all the sit reports. Each sit-report gets one copy of the losses.
-      for (entry in sitReports) {
-        val empireId = entry.key
-        val sitReport = entry.value
+      var thisFleetLost = fleetsLost[fleetBefore.empire_id ?: 0]
+      if (thisFleetLost == null) {
+        thisFleetLost = EnumMap<Design.DesignType, Float>(Design.DesignType::class.java)
+        fleetsLost[fleetBefore.empire_id ?: 0] = thisFleetLost
+      }
+      thisFleetLost[fleetBefore.design_type] =
+          (thisFleetLost[fleetBefore.design_type] ?: 0f) + numDestroyed
+    }
 
-        for (combatEntry in fleetsLost) {
-          val isEnemy = empireId != combatEntry.key
+    // Finally, populate all the sit reports. Each sit-report gets one copy of the losses.
+    for (entry in sitReports) {
+      val empireId = entry.key
+      val sitReport = entry.value
 
-          for (lossEntry in combatEntry.value) {
-            val fleetRecord = SituationReport.FleetRecord.Builder()
-                .design_type(lossEntry.key)
-                .num_ships(lossEntry.value)
-                .build()
-            if (isEnemy) {
-              sitReport.fleet_victorious_record.add(fleetRecord)
-            } else {
-              sitReport.fleet_destroyed_record.add(fleetRecord)
-            }
+      for (combatEntry in fleetsLost) {
+        val isEnemy = empireId != combatEntry.key
+
+        for (lossEntry in combatEntry.value) {
+          val fleetRecord = SituationReport.FleetRecord.Builder()
+              .design_type(lossEntry.key)
+              .num_ships(lossEntry.value)
+              .build()
+          if (isEnemy) {
+            sitReport.fleet_victorious_record.add(fleetRecord)
+          } else {
+            sitReport.fleet_destroyed_record.add(fleetRecord)
           }
         }
       }
@@ -715,18 +722,19 @@ class Simulation constructor(
             break
           } else {
             // Got a target, work out how much damage this fleet has already taken.
+            val targetDesign = getDesign(target.design_type)
             var numShips = target.num_ships.toDouble()
             var previousDamage = 0.0
             if (damageCounter.containsKey(target.id)) {
               previousDamage = damageCounter[target.id]!!
               numShips -= previousDamage
             }
-            log("      Target=[%d] numShips=%.4f * %.2f <-- attack=%.4f",
-                target.id, numShips, design.base_defence, attack)
-            numShips *= design.base_defence.toDouble()
+            log("      Target=[%d %s] numShips=%.4f * %.2f <-- attack=%.4f",
+                target.id, targetDesign.display_name, numShips, design.base_defence, attack)
+            numShips *= targetDesign.base_defence.toDouble()
             if (numShips >= attack) {
               // If there's more ships than we have attack capability, just apply the damage.
-              damageCounter[target.id] = previousDamage + attack / design.base_defence
+              damageCounter[target.id] = previousDamage + attack / targetDesign.base_defence
               attack -= numShips
             } else {
               // If we have more attack capability than they have ships, they're dead.

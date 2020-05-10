@@ -107,7 +107,7 @@ class AjaxStarfieldHandler : AjaxHandler() {
     }
 
     // Now just simulate to make sure it processes it.
-    modifyAndSimulate(starId, null)
+    setResponseGson(modifyAndSimulate(starId, null))
   }
 
   private fun handleForceBuildRequestComplete(starId: Long, buildRequestId: Long) {

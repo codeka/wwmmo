@@ -71,8 +71,8 @@ object DesignDefinitions {
               .population(1f)
               .max_count(10000)
               .build())
-          .base_attack(1.0f)
-          .base_defence(1.0f)
+          .base_attack(0.1f)
+          .base_defence(0.1f)
           .combat_priority(100)
           .effect(Lists.newArrayList(
               Design.Effect.Builder().type(Design.EffectType.SCOUT_SHIP).build(),
