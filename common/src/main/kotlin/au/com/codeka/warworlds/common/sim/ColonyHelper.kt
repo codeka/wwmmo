@@ -14,7 +14,12 @@ object ColonyHelper {
     if (planet.colony.buildings != null) {
       for (building in planet.colony.buildings) {
         val design = DesignHelper.getDesign(building.design_type)
-        for (effect in design.effect) {
+        val effects = if (building.level > 1) {
+           design.upgrades[building.level - 2].effects
+          } else {
+            design.effect
+          }
+        for (effect in effects) {
           if (effect.type === Design.EffectType.POPULATION_BOOST) {
             val extraPopulation = effect.minimum.toFloat().coerceAtLeast(population * effect.bonus)
             population += extraPopulation.toInt()
