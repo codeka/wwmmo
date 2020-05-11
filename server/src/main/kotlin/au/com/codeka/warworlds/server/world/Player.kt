@@ -13,7 +13,9 @@ import au.com.codeka.warworlds.server.concurrency.Threads
 import au.com.codeka.warworlds.server.net.Connection
 import au.com.codeka.warworlds.server.world.chat.ChatManager
 import au.com.codeka.warworlds.server.world.chat.Participant.OnlineCallback
+import au.com.codeka.warworlds.server.world.rpcs.SitReportRpcHandler
 import com.google.common.collect.Lists
+import java.lang.RuntimeException
 import java.util.*
 
 /** Represents a currently-connected player.  */
@@ -45,6 +47,7 @@ class Player(private val connection: Connection,
       pkt.modify_star != null -> onModifyStar(pkt.modify_star)
       pkt.request_empire != null -> onRequestEmpire(pkt.request_empire)
       pkt.chat_msgs != null -> onChatMessages(pkt.chat_msgs)
+      pkt.rpc != null -> onRpc(pkt.rpc)
       else -> log.error("Unknown/unexpected packet. %s", PacketDebug.getPacketDebug(pkt))
     }
   }
@@ -180,6 +183,19 @@ class Player(private val connection: Connection,
         .empire_id(empire.get().id)
         .action(ChatMessage.MessageAction.Normal)
         .room_id(null /* TODO */)
+        .build())
+  }
+
+  private fun onRpc(pkt: RpcPacket) {
+    val resp = when {
+      pkt.sit_report_request != null -> SitReportRpcHandler().handle(empire, pkt)
+      else -> throw RuntimeException("Unexpected RPC: $pkt")
+    }
+
+    connection.send(Packet.Builder()
+        .rpc(resp.newBuilder()
+            .id(pkt.id)
+            .build())
         .build())
   }
 

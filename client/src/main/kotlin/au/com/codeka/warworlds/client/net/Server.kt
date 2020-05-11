@@ -14,13 +14,13 @@ import au.com.codeka.warworlds.common.net.PacketDecoder
 import au.com.codeka.warworlds.common.net.PacketEncoder
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.LoginResponse.LoginStatus
-import com.google.common.base.Preconditions
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.*
+import java.util.concurrent.atomic.AtomicLong
 
 /** Represents our connection to the server. */
 class Server {
@@ -66,6 +66,10 @@ class Server {
 
   /** A lock used to guard access to the web socket/queue.  */
   private val lock = Any()
+
+  /** A counter that is incremented every time we send an RPC, to identify the responses */
+  private val rpcCounter = AtomicLong()
+  private val pendingRpcs: HashMap<Long, PendingRpc> = HashMap()
 
   private var reconnectPending = false
   private var reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS
@@ -157,16 +161,17 @@ class Server {
         }, Threads.BACKGROUND)
   }
 
-  private fun connectGameSocket(loginResponse: LoginResponse?) {
+  private fun connectGameSocket(loginResponse: LoginResponse) {
     try {
-      gameSocket = Socket()
-      var host = loginResponse!!.host
+      val s = Socket()
+      gameSocket = s
+      var host = loginResponse.host
       if (host == null) {
         host = ServerUrl.host
       }
-      gameSocket!!.connect(InetSocketAddress(host, loginResponse.port))
-      packetEncoder = PacketEncoder(gameSocket!!.getOutputStream(), packetEncodeHandler)
-      packetDecoder = PacketDecoder(gameSocket!!.getInputStream(), packetDecodeHandler)
+      s.connect(InetSocketAddress(host, loginResponse.port))
+      packetEncoder = PacketEncoder(s.getOutputStream(), packetEncodeHandler)
+      packetDecoder = PacketDecoder(s.getInputStream(), packetDecodeHandler)
       val oldQueuedPackets = queuedPackets
       queuedPackets = null
       send(Packet.Builder()
@@ -204,7 +209,6 @@ class Server {
       if (queuedPackets != null) {
         queuedPackets!!.add(pkt)
       } else {
-        Preconditions.checkNotNull(packetEncoder)
         try {
           packetEncoder!!.send(pkt)
         } catch (e: IOException) {
@@ -212,6 +216,38 @@ class Server {
           disconnect()
         }
       }
+    }
+  }
+
+  /**
+   * Send an [RpcPacket] and wait for the response. This will block until a response is received,
+   * so you should be sure to call this only from a background thread.
+   */
+  fun sendRpc(rpc: RpcPacket): RpcPacket {
+    Threads.checkNotOnThread(Threads.UI)
+
+    val id = rpcCounter.addAndGet(1L)
+    val pendingRpc = PendingRpc(id)
+    pendingRpcs[id] = pendingRpc
+
+    send(Packet.Builder()
+        .rpc(rpc.newBuilder().id(id).build())
+        .build())
+
+    synchronized(pendingRpc.lock) {
+      pendingRpc.lock.wait()
+      return pendingRpc.response!!
+    }
+  }
+
+  /**
+   * Handle responses to RPCs. We'll find the PendingRpc and notify it.
+   */
+  private fun handleRpcResponse(rpc: RpcPacket) {
+    val pendingRpc = pendingRpcs[rpc.id] ?: return // TODO: should it be an error when there's none?
+    synchronized(pendingRpc.lock) {
+      pendingRpc.response = rpc
+      pendingRpc.lock.notifyAll()
     }
   }
 
@@ -255,8 +291,14 @@ class Server {
       log.debug(">> %s", packetDebug)
     }
   }
-  private val packetDecodeHandler: PacketDecoder.PacketHandler = object : PacketDecoder.PacketHandler {
+  private val packetDecodeHandler: PacketDecoder.PacketHandler =
+      object : PacketDecoder.PacketHandler {
     override fun onPacket(decoder: PacketDecoder, pkt: Packet, encodedSize: Int) {
+      if (pkt.rpc != null) {
+        handleRpcResponse(pkt.rpc)
+        return
+      }
+
       val packetDebug = PacketDebug.getPacketDebug(pkt, encodedSize)
       App.eventBus.publish(ServerPacketEvent(
           pkt, encodedSize, ServerPacketEvent.Direction.Received, packetDebug))
@@ -274,5 +316,10 @@ class Server {
       loginStatus: LoginStatus?) {
     currState = ServerStateEvent(ServerUrl.url, state, loginStatus)
     App.eventBus.publish(currState)
+  }
+
+  class PendingRpc(val id: Long) {
+    val lock = Object()
+    var response: RpcPacket? = null
   }
 }

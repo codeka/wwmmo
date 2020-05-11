@@ -85,16 +85,6 @@ message RpcPacket {
   // on the client, but this is how the client associates a reply with the initial request.
   optional int64 id = 1;
 
-  // The "type" of RPC this is.
-  enum Message {
-    UNKNOWN_MESSAGE = 0;
-
-    // A request for situation report(s). Specify SitReportRequest as the payload of the request and
-    // get a SiReportResponse as the payload of the response.
-    SITUATION_REPORT = 1;
-  }
-  optional Message msg = 2;
-
   message SitReportRequest {
     // If set, the ID of the star you want the situation report for. If not specified, all situation
     // reports for this empire will be included in the response.

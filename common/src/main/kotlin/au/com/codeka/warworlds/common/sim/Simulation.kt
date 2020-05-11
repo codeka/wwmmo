@@ -802,7 +802,6 @@ class Simulation constructor(
             sitReport.move_complete_record.newBuilder().was_destroyed(wasDestroyed).build())
       }
     }
-
   }
 
   /**
