@@ -8,9 +8,6 @@ import "au/com/codeka/warworlds/common/proto/design.proto";
 // A SituationReport is generated every time something "interesting" happens in your empire: a fleet
 // move is completed, a build is completed, a colony is attacked and so on.
 message SituationReport {
-  // A unique ID for this particular report.
-  optional int64 id = 1;
-
   // The ID of the empire this report is for.
   optional int64 empire_id = 2;
 

@@ -7,6 +7,7 @@ import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemScreen
 import au.com.codeka.warworlds.client.ui.Screen
 import au.com.codeka.warworlds.client.ui.ScreenContext
 import au.com.codeka.warworlds.client.ui.ShowInfo
+import au.com.codeka.warworlds.client.util.eventbus.EventHandler
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.RpcPacket
 import au.com.codeka.warworlds.common.proto.SituationReport
@@ -28,11 +29,19 @@ class SitReportScreen : Screen() {
             context.pushScreen(SolarSystemScreen(star!!, -1))
           }
         })
+
+    App.eventBus.register(eventHandler)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+
+    App.eventBus.unregister(eventHandler)
   }
 
   fun refresh(sitReports: List<SituationReport>) {
     log.info("populating response: ${sitReports.size} reports")
-    // TODO: implement me!
+    layout.refresh(sitReports)
   }
 
   override fun onShow(): ShowInfo? {
@@ -48,5 +57,12 @@ class SitReportScreen : Screen() {
     }, Threads.BACKGROUND)
 
     return ShowInfo.builder().view(layout).build()
+  }
+
+  private val eventHandler: Any = object : Any() {
+    @EventHandler
+    fun onStarUpdated(s: Star) {
+      layout.onStarUpdated(s)
+    }
   }
 }

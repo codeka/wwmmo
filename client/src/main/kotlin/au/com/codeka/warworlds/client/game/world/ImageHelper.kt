@@ -79,6 +79,16 @@ object ImageHelper {
         .into(view)
   }
 
+  /**
+   * Bind an image with the given star to the given [ImageView].
+   */
+  fun bindStarIcon(view: ImageView, star: Star) {
+    val resolver = DimensionResolver(view.context)
+    val width = resolver.px2dp(view.layoutParams.width.toFloat()).toInt()
+    val height = resolver.px2dp(view.layoutParams.height.toFloat()).toInt()
+    bindImage(view, getStarImageUrl(view.context, star, width, height))
+  }
+
   /** Bind the given star icon to the given span in a [SpannableStringBuilder].  */
   fun bindStarIcon(
       ssb: SpannableStringBuilder, startIndex: Int, endIndex: Int, context: Context,

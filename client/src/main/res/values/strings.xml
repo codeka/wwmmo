@@ -56,6 +56,14 @@
   <string name="starfield">Starfield</string>
   <string name="star_search">Search stars</string>
 
+  <!-- Sit Report strings -->
+  <string name="build_complete">&lt;b>Build&lt;/b> complete on %s</string>
+  <string name="fleet_move_complete">&lt;b>Move&lt;/b> to %s complete</string>
+  <string name="attack_on_star">&lt;b>Attack&lt;/b> on %s</string>
+  <string name="fleet_details_not_destroyed">%.0f x %s</string>
+  <string name="fleet_details_destroyed">%.0f x %s, and was destroyed</string>
+  <string name="build_details">%s</string>
+
   <string name="create_empire">Create empire</string>
   <string name="create_empire_welcome">
     Before you begin, you need to tell us a little about your Empire. Fill in the details below to

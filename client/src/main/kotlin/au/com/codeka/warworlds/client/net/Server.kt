@@ -294,16 +294,17 @@ class Server {
   private val packetDecodeHandler: PacketDecoder.PacketHandler =
       object : PacketDecoder.PacketHandler {
     override fun onPacket(decoder: PacketDecoder, pkt: Packet, encodedSize: Int) {
-      if (pkt.rpc != null) {
-        handleRpcResponse(pkt.rpc)
-        return
-      }
-
       val packetDebug = PacketDebug.getPacketDebug(pkt, encodedSize)
       App.eventBus.publish(ServerPacketEvent(
           pkt, encodedSize, ServerPacketEvent.Direction.Received, packetDebug))
       log.debug("<< %s", packetDebug)
-      packetDispatcher.dispatch(pkt)
+
+      if (pkt.rpc != null) {
+        // We do some special-casing for RPCs
+        handleRpcResponse(pkt.rpc)
+      } else {
+        packetDispatcher.dispatch(pkt)
+      }
     }
 
     override fun onDisconnect() {
