@@ -432,6 +432,12 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     } else {
       oldStar = (container.tag as SceneObjectInfo?)!!.star
 
+      // Check to see that stuff we care about has actually changed. If any stuff hasn't changed
+      // then don't update the star.
+      if (willRenderTheSame(oldStar, star)) {
+        return
+      }
+
       // Temporarily remove the container, and clear out it's children. We'll re-add them all.
       synchronized(scene.lock) {
         if (container.parent != null) {
@@ -459,7 +465,69 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     attachMovingFleets(star)
   }
 
-  /** Attach the empire labels and fleet counts to the given sprite container for the given star.  */
+  /**
+   * Quick sanity check to see whether the two stars given will render exactly the same. Presumably
+   * they're just different versions of the same star and often stuff that we don't care about
+   * rendering here will have changed (e.g. a building has completed building). In the case that
+   * they are going to render the same, we can save a lot of time by not changing the star.
+   *
+   * <p>We make a few assumptions here to simplify:
+   *   1. Stars never move (their offset_x,offset_y etc are never checked)
+   *   2. Stars never change classification
+   *   3. Stars with different IDs will always render differently
+   */
+  private fun willRenderTheSame(lhs: Star, rhs: Star): Boolean {
+    // Obviously a different ID will be rendered differently.
+    if (lhs.id != rhs.id) {
+      return false
+    }
+
+    if (lhs.name != rhs.name) {
+      return false
+    }
+
+    // If the moving fleets have changed, tha counts as a difference we care about.
+    for (lhsFleet in lhs.fleets) {
+      // If it's moving in LHS and not in RHS then it's a difference
+      if (lhsFleet.state != Fleet.FLEET_STATE.MOVING) {
+        continue
+      }
+
+      var movingInRhs = false
+      for (rhsFleet in rhs.fleets) {
+        if (rhsFleet.id == lhsFleet.id && rhsFleet.state == Fleet.FLEET_STATE.MOVING) {
+          movingInRhs = true
+          break
+        }
+      }
+      if (!movingInRhs) {
+        return false
+      }
+    }
+
+    // And same with moving fleets in RHS that are not moving in LHS
+    for (rhsFleet in rhs.fleets) {
+      if (rhsFleet.state != Fleet.FLEET_STATE.MOVING) {
+        continue
+      }
+
+      var movingInLhs = false
+      for (lhsFleet in rhs.fleets) {
+        if (rhsFleet.id == lhsFleet.id && lhsFleet.state == Fleet.FLEET_STATE.MOVING) {
+          movingInLhs = true
+          break
+        }
+      }
+      if (!movingInLhs) {
+        return false
+      }
+    }
+
+    // OK it's a difference we don't care about. They would render the same way
+    return true
+  }
+
+  /** Attach the empire labels and fleet counts to the given sprite container for the given star. */
   private fun attachEmpireFleetIcons(container: SceneObject, star: Star) {
     val empires: MutableMap<Long, EmpireIconInfo> = TreeMap()
     for (planet in star.planets) {

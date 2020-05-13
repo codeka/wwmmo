@@ -110,7 +110,8 @@ object StarManager {
 
   private val eventListener: Any = object : Any() {
     /**
-     * When the server that a star has been updated, we'll want to update our cached copy of it.
+     * When the server tells us that a star has been updated, we'll want to update our cached copy
+     * of it.
      */
     @EventHandler(thread = Threads.BACKGROUND)
     fun onStarUpdatedPacket(pkt: StarUpdatedPacket) {
