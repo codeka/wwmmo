@@ -71,6 +71,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private var pendingSectorLeft: Long? = null
   private var pendingSectorRight: Long? = null
   private var pendingSectorBottom: Long? = null
+  private var pendingRemoveAllSectors: Boolean? = null
   private var sectorsUpdating: Boolean = false
 
   /** A mapping of IDs to [SceneObject] representing stars and fleets.  */
@@ -302,6 +303,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       pendingSectorTop = top
       pendingSectorRight = right
       pendingSectorBottom = bottom
+      pendingRemoveAllSectors = pendingRemoveAllSectors ?: false || removeAllSectors
       return
     }
     sectorsUpdating = true
@@ -363,7 +365,8 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         val top = pendingSectorTop!! ; pendingSectorTop = null
         val right = pendingSectorRight!! ; pendingSectorRight = null
         val bottom = pendingSectorBottom!! ; pendingSectorBottom = null
-        updateSectorBounds(left, top, right, bottom, true /* todo: is this right? */)
+        val removeAllSectors = pendingRemoveAllSectors!! ; pendingRemoveAllSectors = null
+        updateSectorBounds(left, top, right, bottom, removeAllSectors)
       }
     }, Threads.UI, 1000)
   }
