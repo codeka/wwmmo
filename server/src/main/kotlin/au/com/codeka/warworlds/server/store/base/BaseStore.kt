@@ -46,7 +46,6 @@ abstract class BaseStore protected constructor(private val fileName: String) {
     ensureVersion()
   }
 
-  @Throws(StoreException::class)
   fun close() {
     // TODO: close? dataSource
   }

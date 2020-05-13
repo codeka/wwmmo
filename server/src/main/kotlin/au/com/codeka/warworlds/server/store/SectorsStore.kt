@@ -5,6 +5,8 @@ import au.com.codeka.warworlds.common.proto.Sector
 import au.com.codeka.warworlds.common.proto.SectorCoord
 import au.com.codeka.warworlds.server.store.base.BaseStore
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.math.sqrt
 
 /**
  * Sectors store is a special store for storing the details of the sectors.
@@ -130,7 +132,7 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
       insertNewSector(coord)
       return true
     }
-    return false
+    return (count == 1)
   }
 
   /**
@@ -199,7 +201,7 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
         .stmt("INSERT INTO sectors (x, y, distance_to_centre, state) VALUES (?, ?, ?, ?)")
         .param(0, coord.x)
         .param(1, coord.y)
-        .param(2, Math.sqrt(coord.x * coord.x + coord.y * coord.y.toDouble()))
+        .param(2, sqrt(coord.x * coord.x + coord.y * coord.y.toDouble()))
         .param(3, SectorState.New.value)
         .execute()
   }
@@ -216,6 +218,27 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
           .execute()
       version++
     }
+
+    // Note: regardless of disk version, we'll reset all "generating" states back to New so they
+    // can re-generated (they are probably in a bad state, so delete any stars in there as well)
+    val sectorsToReset = ArrayList<SectorCoord>()
+    val res = newReader()
+        .stmt("SELECT x, y FROM sectors WHERE state = ?")
+        .param(0, SectorState.Generating.value)
+        .query()
+    while (res.next()) {
+      val sectorX = res.getLong(0)
+      val sectorY = res.getLong(1)
+      sectorsToReset.add(SectorCoord.Builder().x(sectorX).y(sectorY).build())
+    }
+    for (coord in sectorsToReset) {
+      val stars = DataStore.i.stars().getStarsForSector(coord.x, coord.y)
+      for (star in stars) {
+        DataStore.i.stars().delete(star.id)
+      }
+      updateSectorState(coord, SectorState.Generating, SectorState.New)
+    }
+
     return version
   }
 }

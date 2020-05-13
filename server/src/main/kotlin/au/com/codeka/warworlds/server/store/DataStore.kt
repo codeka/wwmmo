@@ -40,8 +40,9 @@ class DataStore private constructor() {
       chat.open()
       empires.open()
       seq.open()
-      sectors.open()
       stars.open()
+      // Note: sectors depends on stars, so open sectors after stars
+      sectors.open()
       stats.open()
       suspiciousEvents.open()
       sitReports.open()

@@ -24,7 +24,7 @@ class SectorGenerator {
     }
     log.info("Generating sector (%d, %d)...", sector.x, sector.y)
     val coord = SectorCoord.Builder().x(sector.x).y(sector.y).build()
-    if (!DataStore.Companion.i.sectors().updateSectorState(
+    if (!DataStore.i.sectors().updateSectorState(
             coord, SectorState.New, SectorState.Generating)) {
       log.warning("Could not update sector state to generating, assuming we can't generate there.")
       return null
