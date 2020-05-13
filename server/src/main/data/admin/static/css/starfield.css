@@ -248,3 +248,8 @@ table td {
 .simulate {
   padding-bottom: 64px;
 }
+
+.actions {
+  padding-top: 24px;
+  padding-left: 16px;
+}

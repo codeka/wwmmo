@@ -427,6 +427,27 @@ $(function() {
     });
   }
 
+  window.resetCurrentSector = function() {
+    if (!confirm("Are you sure you want to reset sector " + currSectorX + ", " + currSectorY + "? "
+        + "This is permanent and cannot be undone!")) {
+      return;
+    }
+
+    $.ajax({
+      url: "/admin/ajax/starfield",
+      method: "POST",
+      data: {
+        "action": "resetSector",
+        "x": currSectorX,
+        "y": currSectorY
+      },
+      success: function(data) {
+        refreshSector();
+      },
+    });
+
+  }
+
   window.showRaw = function() {
     $("#simulate-result").html("<pre><code>" + JSON.stringify(currStar, null, 2) + "</code></pre>");
   }

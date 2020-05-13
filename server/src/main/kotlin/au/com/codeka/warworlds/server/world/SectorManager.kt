@@ -41,11 +41,20 @@ class SectorManager {
 
   /**
    * Called in the very rare situations where we need to forget the whole sector (for example,
-   * when a star is deleted). Package private because we shouldn't normally want to call this
-   * directly.
+   * when a star is deleted).
    */
   fun forgetSector(coord: SectorCoord) {
     synchronized(sectors) { sectors.remove(coord) }
+  }
+
+  /**
+   * Completely reset the given sector: delete all stars in it and cause it to be re-generated.
+   */
+  fun resetSector(coord: SectorCoord) {
+    synchronized(sectors) {
+      DataStore.i.sectors().resetSector(coord)
+      sectors.remove(coord)
+    }
   }
 
   /**
@@ -88,27 +97,23 @@ class SectorManager {
       }
 
       // Looks like it's eligible, let's do it.
-      StarManager.Companion.i.addNativeColonies(star.id)
+      StarManager.i.addNativeColonies(star.id)
     }
   }
 
-  private inner class StarWatcher(coord: SectorCoord) : WatchableObject.Watcher<Star> {
-    private val coord: SectorCoord
-    override fun onUpdate(`object`: WatchableObject<Star>) {
-      val sector = sectors[coord]!!
-      val newSector = sector.get()!!.newBuilder()
+  private inner class StarWatcher(private val coord: SectorCoord) : WatchableObject.Watcher<Star> {
+
+    override fun onUpdate(obj: WatchableObject<Star>) {
+      val sector = sectors[coord] ?: return
+      val newSector = sector.get().newBuilder()
       for (i in newSector.stars.indices) {
-        if (newSector.stars[i].id == `object`.get().id) {
+        if (newSector.stars[i].id == obj.get().id) {
           newSector.stars.removeAt(i)
           break
         }
       }
-      newSector.stars.add(`object`.get())
+      newSector.stars.add(obj.get())
       sector.set(newSector.build())
-    }
-
-    init {
-      this.coord = Preconditions.checkNotNull(coord)
     }
   }
 

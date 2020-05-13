@@ -196,6 +196,20 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
     }
   }
 
+  fun resetSector(coord: SectorCoord) {
+    val stars = DataStore.i.stars().getStarsForSector(coord.x, coord.y)
+    for (star in stars) {
+      DataStore.i.stars().delete(star.id)
+    }
+
+    newWriter()
+        .stmt("UPDATE sectors SET state = ? WHERE x = ? AND y = ?")
+        .param(0, SectorState.New.value)
+        .param(1, coord.x)
+        .param(2, coord.y)
+        .execute()
+  }
+
   private fun insertNewSector(coord: SectorCoord) {
     newWriter()
         .stmt("INSERT INTO sectors (x, y, distance_to_centre, state) VALUES (?, ?, ?, ?)")
@@ -232,11 +246,7 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
       sectorsToReset.add(SectorCoord.Builder().x(sectorX).y(sectorY).build())
     }
     for (coord in sectorsToReset) {
-      val stars = DataStore.i.stars().getStarsForSector(coord.x, coord.y)
-      for (star in stars) {
-        DataStore.i.stars().delete(star.id)
-      }
-      updateSectorState(coord, SectorState.Generating, SectorState.New)
+      resetSector(coord)
     }
 
     return version

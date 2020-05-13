@@ -63,6 +63,11 @@ class AjaxStarfieldHandler : AjaxHandler() {
         val buildRequestId = request.getParameter("reqId").toLong()
         handleForceBuildRequestComplete(starId, buildRequestId)
       }
+      "resetSector" -> {
+        val x = request.getParameter("x").toLong()
+        val y = request.getParameter("y").toLong()
+        handleResetSector(x, y)
+      }
       else -> throw RequestException(400, "Unknown action: ${request.getParameter("action")}")
     }
   }
@@ -179,6 +184,10 @@ class AjaxStarfieldHandler : AjaxHandler() {
     resp.simulateTime = (simulateTime - startTime) / 1000000L
     resp.logMessages = logMessages.toString()
     return resp
+  }
+
+  private fun handleResetSector(x: Long, y: Long) {
+    SectorManager.i.resetSector(SectorCoord.Builder().x(x).y(y).build())
   }
 
   private class LogHandler internal constructor(private val logMessages: StringBuilder)
