@@ -266,7 +266,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     sectorRadius = 1
     log.info("WarpTo: $centerSectorX, $centerSectorY - $offsetX, $offsetY")
     updateSectorBounds(centerSectorX - sectorRadius, centerSectorY - sectorRadius,
-        centerSectorX + sectorRadius, centerSectorY + sectorRadius)
+        centerSectorX + sectorRadius, centerSectorY + sectorRadius, true)
     camera.warpTo(
         scene.dimensionResolver.dp2px(-offsetX),
         scene.dimensionResolver.dp2px(offsetY))
@@ -285,8 +285,13 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    * Update the sector "bounds", that is the area of the universe that we're currently looking at.
    * We'll need to remove stars that have gone out of bounds, add a background for stars that are
    * now in-bounds, and ask the server to keep us updated of the new stars.
+   *
+   * @param removeAllSectors If true, we'll clear out all the existing sectors and reload them all.
+   *        If false, we'll keep sectors that we already have an not re-request those. Only pass
+   *        true if you have not modified centerSectorX and centerSectorY
    */
-  private fun updateSectorBounds(left: Long, top: Long, right: Long, bottom: Long) {
+  private fun updateSectorBounds(
+      left: Long, top: Long, right: Long, bottom: Long, removeAllSectors: Boolean) {
     // If we're already centered on this bounds, just skip.
     if (left == sectorLeft && top == sectorTop && right == sectorRight && bottom == sectorBottom) {
       return
@@ -304,25 +309,42 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     log.info("updateSectorBounds($left, $top, $right, $bottom) current: " +
         "$sectorLeft, $sectorTop, $sectorRight, $sectorBottom")
 
+
+    if (removeAllSectors) {
+      val sectorsToRemove = ArrayList(sectorSceneObjects.keys)
+      for (coord in sectorsToRemove) {
+        removeSector(coord)
+      }
+
+      // Create the background for all of the new sectors.
+      for (sy in top..bottom) {
+        for (sx in left..right) {
+          createSectorBackground(sx, sy)
+        }
+      }
+    } else {
+      for (sy in sectorTop..sectorBottom) {
+        for (sx in sectorLeft..sectorRight) {
+          if (sx < left || sy < top || sx > right || sy > bottom) {
+            createSectorBackground(sx, sy)
+          }
+        }
+      }
+
+      // Create the background for all of the new sectors.
+      for (sy in top..bottom) {
+        for (sx in left..right) {
+          if (sx < sectorLeft || sy < sectorTop || sx > sectorRight || sy > sectorBottom) {
+            createSectorBackground(sx, sy)
+          }
+        }
+      }
+    }
+
     sectorTop = top
     sectorLeft = left
     sectorBottom = bottom
     sectorRight = right
-
-    // TODO: Instead of removing all and re-creating again, see if we can just remove the ones that
-    // are no longer in view, move over the ones that are still in the viewport, and then add only
-    // the new ones.
-    val sectorsToRemove = ArrayList(sectorSceneObjects.keys)
-    for (coord in sectorsToRemove) {
-      removeSector(coord)
-    }
-
-    // Create the background for all of the new sectors.
-    for (sy in top..bottom) {
-      for (sx in left..right) {
-        createSectorBackground(sx, sy)
-      }
-    }
 
     // Tell the server we want to watch these new sectors, it'll send us back all the stars we
     // don't have yet.
@@ -341,7 +363,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         val top = pendingSectorTop!! ; pendingSectorTop = null
         val right = pendingSectorRight!! ; pendingSectorRight = null
         val bottom = pendingSectorBottom!! ; pendingSectorBottom = null
-        updateSectorBounds(left, top, right, bottom)
+        updateSectorBounds(left, top, right, bottom, true /* todo: is this right? */)
       }
     }, Threads.UI, 1000)
   }
@@ -362,7 +384,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     val right = newCentreX + sectorRadius
     if (top != sectorTop || left != sectorLeft || bottom != sectorBottom || right != sectorRight) {
       log.info("onCameraTranslate: bounds=%d,%d - %d,%d", left, top, right, bottom)
-      updateSectorBounds(left, top, right, bottom)
+      updateSectorBounds(left, top, right, bottom, false)
     }
   }
 
