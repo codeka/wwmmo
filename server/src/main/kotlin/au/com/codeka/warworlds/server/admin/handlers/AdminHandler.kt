@@ -138,7 +138,10 @@ open class AdminHandler : RequestHandler() {
     } catch (e: URISyntaxException) {
       throw RuntimeException(e)
     }
-    val finalUrl = requestUrl.path
+    var finalUrl = requestUrl.path
+    if (requestUrl.query != "") {
+      finalUrl += "?" + requestUrl.query
+    }
     var redirectUrl = requestUrl.resolve("/admin/login").toString()
     try {
       redirectUrl += "?continue=" + URLEncoder.encode(finalUrl, "utf-8")

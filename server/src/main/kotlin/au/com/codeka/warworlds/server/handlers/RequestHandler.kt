@@ -184,11 +184,16 @@ open class RequestHandler {
       val requestURI = URI(request.requestURL.toString())
 
       // TODO(dean): is hard-coding the https part for game.war-worlds.com the best way? no...
-      return if (requestURI.host == "game.war-worlds.com") {
+      var url = if (requestURI.host == "game.war-worlds.com") {
         "https://game.war-worlds.com" + requestURI.path
       } else {
         requestURI.toString()
       }
+
+      if (request.queryString != "") {
+        url += "?" + request.queryString
+      }
+      return url
     }
 
   private fun <T> getRequestJson(protoType: Class<T>): T {
