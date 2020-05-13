@@ -19,6 +19,33 @@ class NameGenerator {
       }
     }
 
+    init {
+      val path = File("data/vocab")
+      val files = ArrayList<String>()
+      for (vocabFile in path.listFiles() ?: arrayOfNulls(0)) {
+        if (vocabFile.isDirectory) {
+          continue
+        }
+        if (!vocabFile.name.endsWith(".txt")) {
+          continue
+        }
+        files.add(vocabFile.absolutePath)
+      }
+      loadVocabularies(files)
+      try {
+        val lines = Files.readLines(File(path, "blacklist"), Charset.defaultCharset())
+        for (l in lines) {
+          val line = l.trim { it <= ' ' }.toLowerCase(Locale.ENGLISH)
+          if (line.isEmpty()) {
+            continue
+          }
+          BLACKLIST.add(line)
+        }
+      } catch (e: IOException) {
+        log.error("Error loading blacklist.", e)
+      }
+    }
+
     private fun parseVocabularyFile(path: String): Vocabulary? {
       log.info("Parsing vocabulary file: %s", path)
       var ins: BufferedReader? = null
@@ -26,15 +53,14 @@ class NameGenerator {
         ins = BufferedReader(InputStreamReader(FileInputStream(path)))
         val vocab = Vocabulary(path)
         var line: String
-        while (ins.readLine().also { line = it } != null) {
+        while (ins.readLine().also { line = it ?: "" } != null) {
           for (word in line.split("[^a-zA-Z]+").toTypedArray()) {
-            var letters = word.trim { it <= ' ' }
+            val letters = word.trim { it <= ' ' }
             if (letters.isEmpty()) {
               continue
             }
             var lastLetters = "  "
-            for (i in 0 until letters.length) {
-              val letter = letters[i]
+            for (letter in letters) {
               vocab.addLetter(lastLetters, letter)
               lastLetters += letter
               lastLetters = lastLetters.substring(1)
@@ -43,8 +69,6 @@ class NameGenerator {
           }
         }
         vocab
-      } catch (e: IOException) {
-        null // should never happen
       } finally {
         if (ins != null) {
           try {
@@ -73,35 +97,7 @@ class NameGenerator {
         // if (names.get(key) < 10) {
         //   continue;
         // }
-        println(key + "               ".substring(0, 12 - key.length)
-            + Integer.toString(names[key]!!))
-      }
-    }
-
-    init {
-      val path = File("data/vocab")
-      val files = ArrayList<String>()
-      for (vocabFile in path.listFiles()) {
-        if (vocabFile.isDirectory) {
-          continue
-        }
-        if (!vocabFile.name.endsWith(".txt")) {
-          continue
-        }
-        files.add(vocabFile.absolutePath)
-      }
-      loadVocabularies(files)
-      try {
-        val lines = Files.readLines(File(path, "blacklist"), Charset.defaultCharset())
-        for (l in lines) {
-          var line = l.trim { it <= ' ' }.toLowerCase()
-          if (line.isEmpty()) {
-            continue
-          }
-          BLACKLIST.add(line)
-        }
-      } catch (e: IOException) {
-        log.error("Error loading blacklist.", e)
+        println(key + "               ".substring(0, 12 - key.length) + (names[key]!!).toString())
       }
     }
   }
@@ -140,7 +136,7 @@ class NameGenerator {
     }
 
     // Make sure it's title case.
-    name = name!!.toLowerCase()
+    name = name!!.toLowerCase(Locale.ENGLISH)
     return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name)
   }
 
@@ -202,6 +198,5 @@ class NameGenerator {
       }
       return ' '
     }
-
   }
 }

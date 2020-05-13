@@ -21,7 +21,7 @@ class SectorManager {
     synchronized(sectors) {
       var sector = sectors[coord]
       if (sector == null) {
-        var s: Sector? = DataStore.Companion.i.sectors().getSector(coord.x, coord.y)
+        var s: Sector? = DataStore.i.sectors().getSector(coord.x, coord.y)
         if (s!!.state == SectorState.New.value) {
           s = SectorGenerator().generate(s)
         }

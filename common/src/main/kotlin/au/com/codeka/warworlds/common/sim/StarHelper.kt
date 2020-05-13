@@ -45,10 +45,12 @@ object StarHelper {
    * Gets the index of the [EmpireStorage] for the empire with the given ID, or -1 if there's
    * no [EmpireStorage] for that empire.
    */
-  fun getStorageIndex(star: Star.Builder, empireId: Long): Int {
+  fun getStorageIndex(star: Star.Builder, empireId: Long?): Int {
     for (i in star.empire_stores.indices) {
       if (star.empire_stores[i].empire_id != null
           && star.empire_stores[i].empire_id == empireId) {
+        return i
+      } else if (star.empire_stores[i].empire_id == null && empireId == null) {
         return i
       }
     }
