@@ -65,6 +65,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private var sectorRight: Long = 0
   private var sectorBottom: Long = 0
 
+  // Because we don't want to update the sector bounds over and over, we'll ensure only one pending
+  // update is happening at once. This keeps track of whether we need to re-update later on or not.
+  private var pendingSectorTop: Long? = null
+  private var pendingSectorLeft: Long? = null
+  private var pendingSectorRight: Long? = null
+  private var pendingSectorBottom: Long? = null
+  private var sectorsUpdating: Boolean = false
+
   /** A mapping of IDs to [SceneObject] representing stars and fleets.  */
   private val sceneObjects = LongSparseArray<SceneObject>()
 
@@ -279,8 +287,27 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    * now in-bounds, and ask the server to keep us updated of the new stars.
    */
   private fun updateSectorBounds(left: Long, top: Long, right: Long, bottom: Long) {
+    // If we're already centered on this bounds, just skip.
+    if (left == sectorLeft && top == sectorTop && right == sectorRight && bottom == sectorBottom) {
+      return
+    }
+
+    if (sectorsUpdating) {
+      pendingSectorLeft = left
+      pendingSectorTop = top
+      pendingSectorRight = right
+      pendingSectorBottom = bottom
+      return
+    }
+    sectorsUpdating = true
+
     log.info("updateSectorBounds($left, $top, $right, $bottom) current: " +
         "$sectorLeft, $sectorTop, $sectorRight, $sectorBottom")
+
+    sectorTop = top
+    sectorLeft = left
+    sectorBottom = bottom
+    sectorRight = right
 
     // TODO: Instead of removing all and re-creating again, see if we can just remove the ones that
     // are no longer in view, move over the ones that are still in the viewport, and then add only
@@ -297,11 +324,6 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       }
     }
 
-    sectorTop = top
-    sectorLeft = left
-    sectorBottom = bottom
-    sectorRight = right
-
     // Tell the server we want to watch these new sectors, it'll send us back all the stars we
     // don't have yet.
     App.taskRunner.runTask(Runnable {
@@ -310,6 +332,18 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
               .top(top).left(left).bottom(bottom).right(right).build())
           .build())
     }, Threads.BACKGROUND)
+
+    // We'll wait at least one second before attempting to update the sector bounds again.
+    App.taskRunner.runTask(Runnable {
+      sectorsUpdating = false
+      if (pendingSectorBottom != null) {
+        val left = pendingSectorLeft!! ; pendingSectorLeft = null
+        val top = pendingSectorTop!! ; pendingSectorTop = null
+        val right = pendingSectorRight!! ; pendingSectorRight = null
+        val bottom = pendingSectorBottom!! ; pendingSectorBottom = null
+        updateSectorBounds(left, top, right, bottom)
+      }
+    }, Threads.UI, 1000)
   }
 
   /**
