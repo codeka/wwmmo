@@ -51,6 +51,9 @@ class SunAndPlanetsView(context: Context?, attrs: AttributeSet?) : RelativeLayou
     selectionIndicator = ImageView(context)
     selectionIndicator.setImageResource(R.drawable.planet_selection)
     selectionIndicator.visibility = View.GONE
+
+    // Set ourselves to be clickable so that touch event don't go through to the starfield under us.
+    isClickable = true
   }
 
   fun setPlanetSelectedHandler(handler: PlanetSelectedHandler?) {

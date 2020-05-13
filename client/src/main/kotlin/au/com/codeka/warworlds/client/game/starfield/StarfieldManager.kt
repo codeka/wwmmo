@@ -29,6 +29,12 @@ import kotlin.math.roundToInt
  * move-fleet view, etc.
  */
 class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
+  companion object {
+    /** Number of milliseconds between updates to moving fleets.  */
+    private const val UPDATE_MOVING_FLEETS_TIME_MS = 2000L
+    private val log = Log("StarfieldManager")
+  }
+
   interface TapListener {
     fun onStarTapped(star: Star)
     fun onFleetTapped(star: Star, fleet: Fleet)
@@ -38,7 +44,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private val scene: Scene = renderSurfaceView.createScene()
   private val camera: Camera = renderSurfaceView.camera
   private val gestureDetector: StarfieldGestureDetector
-  private val context: Context
+  private val context: Context = renderSurfaceView.context
   private val tapListeners = ArrayList<TapListener>()
 
   // The selected star/fleet. If selectedFleet is non-null, selectedStar will be the star that
@@ -73,12 +79,6 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    * current selection. It's never null, but it might not be attached to anything.
    */
   private val selectionIndicatorSceneObject: SelectionIndicatorSceneObject
-
-  companion object {
-    /** Number of milliseconds between updates to moving fleets.  */
-    private const val UPDATE_MOVING_FLEETS_TIME_MS = 2000L
-    private val log = Log("StarfieldManager")
-  }
 
   private val gestureListener = object : StarfieldGestureDetector.Callback {
     override fun onScroll(dx: Float, dy: Float) {
@@ -137,7 +137,6 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   }
 
   init {
-    context = renderSurfaceView.context
     gestureDetector = StarfieldGestureDetector(renderSurfaceView, gestureListener)
     renderSurfaceView.setScene(scene)
     selectionIndicatorSceneObject = SelectionIndicatorSceneObject(scene.dimensionResolver)

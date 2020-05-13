@@ -20,7 +20,8 @@ import au.com.codeka.warworlds.common.proto.Star
  */
 // TODO: it probably makes sense to split these into a bunch of sub-views.
 class SolarSystemLayout(
-    context: Context?, callbacks: Callbacks, star: Star, startPlanetIndex: Int) : RelativeLayout(context) {
+    context: Context?, callbacks: Callbacks, star: Star, startPlanetIndex: Int)
+    : RelativeLayout(context) {
   interface Callbacks {
     fun onBuildClick(planetIndex: Int)
     fun onFocusClick(planetIndex: Int)

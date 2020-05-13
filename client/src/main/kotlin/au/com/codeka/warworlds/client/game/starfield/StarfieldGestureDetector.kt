@@ -11,10 +11,10 @@ import androidx.core.view.ScaleGestureDetectorCompat
 import com.google.common.base.Preconditions
 
 /**
- * Wraps both a [GestureDetectorCompat] and a [ScaleGestureDetector] and combines
- * them into one set of callbacks that we can more easily respond to.
+ * Wraps both a [GestureDetectorCompat] and a [ScaleGestureDetector] and combines them into one set
+ * of callbacks that we can more easily respond to.
  */
-class StarfieldGestureDetector(view: View, callback: Callback) {
+class StarfieldGestureDetector(private val view: View, private val callback: Callback) {
   interface Callback {
     /**
      * Called when you scroll the view.
@@ -48,10 +48,9 @@ class StarfieldGestureDetector(view: View, callback: Callback) {
     fun onTap(x: Float, y: Float)
   }
 
-  private val view: View
-  private val callback: Callback
-  private var gestureDetector: GestureDetectorCompat? = null
-  private var scaleGestureDetector: ScaleGestureDetector? = null
+  private lateinit var gestureDetector: GestureDetectorCompat
+  private lateinit var scaleGestureDetector: ScaleGestureDetector
+
   fun create() {
     gestureDetector = GestureDetectorCompat(view.context, gestureListener)
     scaleGestureDetector = ScaleGestureDetector(view.context, scaleGestureListener)
@@ -61,20 +60,20 @@ class StarfieldGestureDetector(view: View, callback: Callback) {
 
   fun destroy() {
     view.setOnTouchListener(null)
-    scaleGestureDetector = null
-    gestureDetector = null
   }
 
   private val onTouchListener = OnTouchListener { v, event ->
-    scaleGestureDetector!!.onTouchEvent(event)
-    if (gestureDetector!!.onTouchEvent(event)) {
+    scaleGestureDetector.onTouchEvent(event)
+    if (gestureDetector.onTouchEvent(event)) {
       return@OnTouchListener true
     }
     if (event.action == MotionEvent.ACTION_UP) {
       callback.onTap(event.x, event.y)
+      v.performClick()
     }
     true
   }
+
   private val gestureListener: SimpleOnGestureListener = object : SimpleOnGestureListener() {
     override fun onScroll(
         event1: MotionEvent, event2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
@@ -88,15 +87,12 @@ class StarfieldGestureDetector(view: View, callback: Callback) {
       return true
     }
   }
-  private val scaleGestureListener: SimpleOnScaleGestureListener = object : SimpleOnScaleGestureListener() {
-    override fun onScale(detector: ScaleGestureDetector): Boolean {
-      callback.onScale(detector.scaleFactor)
-      return true
-    }
-  }
 
-  init {
-    this.view = Preconditions.checkNotNull(view)
-    this.callback = Preconditions.checkNotNull(callback)
-  }
+  private val scaleGestureListener: SimpleOnScaleGestureListener =
+      object : SimpleOnScaleGestureListener() {
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
+          callback.onScale(detector.scaleFactor)
+          return true
+        }
+      }
 }
