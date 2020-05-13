@@ -27,7 +27,9 @@ import java.util.*
 /**
  * The bottom pane when you have a star selected.
  */
-class StarSelectedBottomPane(context: Context, private var star: Star, callback: Callback) : FrameLayout(context!!, null) {
+class StarSelectedBottomPane(context: Context, private var star: Star, callback: Callback)
+  : FrameLayout(context, null) {
+
   interface Callback {
     fun onStarClicked(star: Star, planet: Planet?)
     fun onFleetClicked(star: Star, fleet: Fleet)
@@ -42,10 +44,9 @@ class StarSelectedBottomPane(context: Context, private var star: Star, callback:
   private val renameButton: Button
   private val scoutReportButton: Button
 
-
   init {
     View.inflate(context, R.layout.starfield_bottom_pane_star, this)
-    findViewById<View>(R.id.view_btn).setOnClickListener { v: View? -> callback.onStarClicked(this.star, null) }
+    findViewById<View>(R.id.view_btn).setOnClickListener { callback.onStarClicked(this.star, null) }
     planetList = findViewById(R.id.planet_list)
     fleetList = findViewById(R.id.fleet_list)
     starName = findViewById(R.id.star_name)
@@ -53,7 +54,7 @@ class StarSelectedBottomPane(context: Context, private var star: Star, callback:
     starIcon = findViewById(R.id.star_icon)
     renameButton = findViewById(R.id.rename_btn)
     scoutReportButton = findViewById(R.id.scout_report_btn)
-    scoutReportButton.setOnClickListener { v: View? -> callback.onScoutReportClicked(this.star) }
+    scoutReportButton.setOnClickListener { callback.onScoutReportClicked(this.star) }
     planetList.setPlanetSelectedHandler(object : PlanetListSimple.PlanetSelectedHandler {
       override fun onPlanetSelected(planet: Planet?) {
         callback.onStarClicked(star, planet)
@@ -86,20 +87,20 @@ class StarSelectedBottomPane(context: Context, private var star: Star, callback:
   }
 
   private fun refresh() {
-    if (star!!.classification == CLASSIFICATION.WORMHOLE) {
+    if (star.classification == CLASSIFICATION.WORMHOLE) {
       planetList.visibility = View.GONE
       findViewById<View>(R.id.wormhole_details).visibility = View.VISIBLE
       //      refreshWormholeDetails();
     } else {
       findViewById<View>(R.id.wormhole_details).visibility = View.GONE
       planetList.visibility = View.VISIBLE
-      planetList.setStar(star!!)
+      planetList.setStar(star)
     }
-    fleetList.setStar(star!!)
+    fleetList.setStar(star)
     val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
     var numMyEmpire = 0
     var numOtherEmpire = 0
-    for (planet in star!!.planets) {
+    for (planet in star.planets) {
       if (planet.colony == null || planet.colony.empire_id == null) {
         continue
       }
@@ -126,10 +127,10 @@ class StarSelectedBottomPane(context: Context, private var star: Star, callback:
   private val eventListener: Any = object : Any() {
     @EventHandler
     fun onStarUpdated(s: Star) {
-      if (s.id == star!!.id) {
+      if (s.id == star.id) {
         star = s
+        refresh()
       }
-      refresh()
     }
 
     @EventHandler
