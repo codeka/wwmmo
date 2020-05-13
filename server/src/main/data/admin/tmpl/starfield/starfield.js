@@ -371,6 +371,24 @@ $(function() {
     updateUrl();
   });
 
+  $("#star button").on("click", function() {
+    var starId = $("#star input[name=star_id]").val();
+    $.ajax({
+      url: "/admin/ajax/starfield",
+      data: { "action": "search", "star_id": starId },
+      success: function(star) {
+        location.href = "/admin/starfield?sector=" + star.sector_x + "," + star.sector_y +
+                        "&star=" + star.id;
+      }
+    });
+  });
+
+  $("#star input[type=number]").on("keypress", function (e) {
+    if (e.which == 13) {
+      $("#star button").click();
+    }
+  });
+
   function updateUrl() {
     $.QueryString["sector"] = currSectorX + "," + currSectorY;
     if (currStar == null) {

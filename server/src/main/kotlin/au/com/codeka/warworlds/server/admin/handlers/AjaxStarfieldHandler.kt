@@ -26,6 +26,10 @@ class AjaxStarfieldHandler : AjaxHandler() {
         val y = request.getParameter("y").toLong()
         handleXyRequest(x, y)
       }
+      "search" -> {
+        val starId = request.getParameter("star_id").toLong()
+        handleSearchRequest(starId)
+      }
       else -> throw RequestException(400, "Unknown action: ${request.getParameter("action")}")
     }
   }
@@ -67,6 +71,15 @@ class AjaxStarfieldHandler : AjaxHandler() {
     val sector = SectorManager.i.getSector(SectorCoord.Builder().x(x).y(y).build())
     SectorManager.i.verifyNativeColonies(sector)
     setResponseJson(sector.get())
+  }
+
+  private fun handleSearchRequest(starId: Long) {
+    val star = StarManager.i.getStar(starId)
+    if (star == null) {
+      response.status = 404
+      return
+    }
+    setResponseJson(star.get())
   }
 
   private fun handleSimulateRequest(starId: Long) {
