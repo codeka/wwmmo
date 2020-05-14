@@ -328,7 +328,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       for (sy in sectorTop..sectorBottom) {
         for (sx in sectorLeft..sectorRight) {
           if (sx < left || sy < top || sx > right || sy > bottom) {
-            createSectorBackground(sx, sy)
+            removeSector(sx, sy)
           }
         }
       }
@@ -809,6 +809,10 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     synchronized(backgroundSceneObjects) {
       backgroundSceneObjects.remove(sectorCoord)
     }
+  }
+
+  private fun removeSector(sx: Long, sy: Long) {
+    removeSector(Pair(sx, sy))
   }
 
   /**

@@ -9,6 +9,7 @@ import java.util.*
 open class SceneObject constructor(
     private val dimensionResolver: DimensionResolver,
     private val debugName: String,
+    var drawLayer: Int = 0,
     private var scene: Scene? = null) {
 
   companion object {
@@ -58,8 +59,7 @@ open class SceneObject constructor(
    * [SceneObject] is drawn. You can use this to update the position, scale, etc of the
    * object just before it's drawn (useful for animation, etc).
    *
-   *
-   * You cannot modify the object heirarchy in this method (add children, remove children, etc)
+   * You cannot modify the object hierarchy in this method (add children, remove children, etc)
    */
   fun setDrawRunnable(drawRunnable: Runnable?) {
     this.drawRunnable = drawRunnable
@@ -159,9 +159,9 @@ open class SceneObject constructor(
     setTranslation(tx, ty)
   }
 
-  fun draw(viewProjMatrix: FloatArray?) {
-    val localDrawRunnable = drawRunnable
-    localDrawRunnable?.run()
+  fun draw(viewProjMatrix: FloatArray) {
+    drawRunnable?.run()
+
     Matrix.multiplyMM(modelViewProjMatrix, 0, viewProjMatrix, 0, matrix, 0)
     if (clipRadius != null) {
       clipVector[4] = clipRadius ?: 0f
@@ -178,12 +178,15 @@ open class SceneObject constructor(
         return
       }
     }
+
     drawImpl(modelViewProjMatrix)
-    if (children != null) {
-      for (i in children!!.indices) {
-        children!![i].draw(modelViewProjMatrix)
-      }
+    for (child in sortedChildren()) {
+      child.draw(modelViewProjMatrix)
     }
+  }
+
+  private fun sortedChildren(): List<SceneObject> {
+    return children?.sortedBy { c -> c.drawLayer } ?: emptyList()
   }
 
   /**
