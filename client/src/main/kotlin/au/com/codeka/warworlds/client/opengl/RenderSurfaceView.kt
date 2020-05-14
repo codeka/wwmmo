@@ -2,19 +2,50 @@ package au.com.codeka.warworlds.client.opengl
 
 import android.content.Context
 import android.graphics.PixelFormat
+import android.opengl.EGL14
+import android.opengl.EGLExt
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import au.com.codeka.warworlds.client.concurrency.RunnableQueue
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.common.Log
-import com.google.common.base.Preconditions
+import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
+import javax.microedition.khronos.egl.EGLDisplay
 import javax.microedition.khronos.opengles.GL10
 
+fun EGLConfig.findAttribute(egl: EGL10, display: EGLDisplay, attribute: Int, defValue: Int): Int {
+  val value = intArrayOf(0);
+  if (egl.eglGetConfigAttrib(display, this, attribute, value)) {
+    return value[0]
+  }
+  return defValue
+}
+
+fun EGLConfig.debugString(egl: EGL10, display: EGLDisplay): String {
+  val rSize = this.findAttribute(egl, display, EGL10.EGL_RED_SIZE, 0)
+  val gSize = this.findAttribute(egl, display, EGL10.EGL_GREEN_SIZE, 0)
+  val bSize = this.findAttribute(egl, display, EGL10.EGL_BLUE_SIZE, 0)
+  val aSize = this.findAttribute(egl, display, EGL10.EGL_ALPHA_SIZE, 0)
+  val depthSize = this.findAttribute(egl, display, EGL10.EGL_DEPTH_SIZE, 0)
+  val stencilSize = this.findAttribute(egl, display, EGL10.EGL_STENCIL_SIZE, 0)
+  return "RGBA_$rSize.$gSize.$bSize.$aSize D:$depthSize S:$stencilSize"
+}
+
 /** GLSurfaceView upon which we do all of our rendering.  */
-class RenderSurfaceView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : GLSurfaceView(context, attrs) {
-  private var renderer: Renderer? = null
+class RenderSurfaceView constructor(context: Context, attrs: AttributeSet? = null)
+    : GLSurfaceView(context, attrs) {
+  companion object {
+    private val log = Log("RenderSurfaceView")
+  }
+
+  private lateinit var renderer: Renderer
+
+  init {
+    setEGLContextClientVersion(2)
+    setEGLConfigChooser(ConfigChooser())
+  }
 
   fun setRenderer() {
     holder.setFormat(PixelFormat.RGBA_8888)
@@ -27,41 +58,38 @@ class RenderSurfaceView @JvmOverloads constructor(context: Context, attrs: Attri
    * Set the [Scene] that we'll be rendering. Can be null, in which case nothing is rendered.
    */
   fun setScene(scene: Scene?) {
-    Preconditions.checkState(renderer != null)
-    renderer!!.setScene(scene)
+    renderer.setScene(scene)
   }
 
   /**
    * Creates a new [Scene], which you can populate and then later call @{link #setScene}.
    */
   fun createScene(): Scene {
-    Preconditions.checkState(renderer != null)
-    return renderer!!.createScene()
+    return renderer.createScene()
   }
 
   /** Gets the [Camera] you can use to scroll around the view, etc.  */
   val camera: Camera
     get() {
-      Preconditions.checkState(renderer != null)
-      return renderer!!.camera
+      return renderer.camera
     }
 
   /** Gets the [FrameCounter], used to count FPS.  */
   val frameCounter: FrameCounter
     get() {
-      Preconditions.checkState(renderer != null)
-      return renderer!!.frameCounter
+      return renderer.frameCounter
     }
 
   class Renderer(context: Context) : GLSurfaceView.Renderer {
     private val multiSampling = true
     private var deviceInfo: DeviceInfo? = null
-    private val dimensionResolver: DimensionResolver
-    private val textureManager: TextureManager
+    private val dimensionResolver: DimensionResolver = DimensionResolver(context)
+    private val textureManager: TextureManager = TextureManager(context)
     private var scene: Scene? = null
-    private val runnableQueue: RunnableQueue
-    val camera: Camera
-    val frameCounter: FrameCounter
+    private val runnableQueue: RunnableQueue = RunnableQueue(50 /* numQueuedItems */)
+    val camera: Camera = Camera()
+    val frameCounter: FrameCounter = FrameCounter()
+
     fun setScene(scene: Scene?) {
       synchronized(this) { this.scene = scene }
     }
@@ -94,24 +122,75 @@ class RenderSurfaceView @JvmOverloads constructor(context: Context, attrs: Attri
       GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
       val currScene = scene
       if (currScene != null) {
-        synchronized(currScene.lock) { currScene.draw(camera) }
+        synchronized(currScene.lock) {
+          currScene.draw(camera)
+        }
       }
     }
+  }
 
-    init {
-      textureManager = TextureManager(context)
-      runnableQueue = RunnableQueue(50 /* numQueuedItems */)
-      dimensionResolver = DimensionResolver(context)
-      camera = Camera()
-      frameCounter = FrameCounter()
+  private class ConfigChooser() : EGLConfigChooser {
+    override fun chooseConfig(egl: EGL10, display: EGLDisplay): EGLConfig {
+      val attributes = intArrayOf(
+          EGL10.EGL_RED_SIZE, 8,
+          EGL10.EGL_GREEN_SIZE, 8,
+          EGL10.EGL_BLUE_SIZE, 8,
+          EGL10.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
+          EGL10.EGL_NONE
+      )
+
+      val numConfigsArray = intArrayOf(0)
+      if (!egl.eglChooseConfig(display, attributes, null, 0, numConfigsArray)) {
+        throw Exception("eglChooseConfig failed")
+      }
+
+      val numConfigs = numConfigsArray[0]
+      if (numConfigs <= 0) {
+        throw Exception("No matching configs found.")
+      }
+
+      val configs = arrayOfNulls<EGLConfig>(numConfigs)
+      if (!egl.eglChooseConfig(display, attributes, configs, numConfigs, numConfigsArray)) {
+        throw Exception("eglChooseConfig failed")
+      }
+
+      var bestConfig: EGLConfig? = null
+      for (config in configs) {
+        if (config == null) {
+          continue
+        }
+        log.debug("- testing config: ${config.debugString(egl, display)}")
+
+        if (config.findAttribute(egl, display, EGL10.EGL_DEPTH_SIZE, 0) != 0) {
+          log.debug(" skipping due to non-0 depth size")
+          continue
+        }
+        if (config.findAttribute(egl, display, EGL10.EGL_STENCIL_SIZE, 0) != 0) {
+          log.debug(" skipping due to non-0 stencil size")
+          continue
+        }
+
+        if (bestConfig == null) {
+          log.debug(" first viable config")
+          bestConfig = config
+          continue
+        }
+
+        // Check if this has a higher bit-depth R channel, if so it's better than what we've already
+        // got.
+        if (bestConfig.findAttribute(egl, display, EGL10.EGL_RED_SIZE, 0) <
+            config.findAttribute(egl, display, EGL10.EGL_RED_SIZE, 0)) {
+          log.debug(" updating best to this config")
+          bestConfig = config
+        }
+      }
+
+      if (bestConfig == null) {
+        log.info("Couldn't find a config, returning a random: ${configs[0]!!.debugString(egl, display)}")
+        return configs[0]!!
+      }
+      log.info("Found config: ${bestConfig.debugString(egl, display)}")
+      return bestConfig
     }
-  }
-
-  companion object {
-    private val log = Log("RenderSurfaceView")
-  }
-
-  init {
-    setEGLContextClientVersion(2)
   }
 }

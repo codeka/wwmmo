@@ -16,8 +16,8 @@ class SpriteShader : Shader() {
   var alphaHandle = 0
     private set
 
-  protected override val vertexShaderCode: String?
-    protected get() = TextUtils.join("\n", arrayOf(
+  override val vertexShaderCode: String?
+    get() = TextUtils.join("\n", arrayOf(
         "uniform mat4 uMvpMatrix;",
         "attribute vec4 aPosition;",
         "attribute vec2 aTexCoord;",
@@ -27,14 +27,15 @@ class SpriteShader : Shader() {
         "  gl_Position = uMvpMatrix * aPosition;",
         "}"))
 
-  protected override val fragmentShaderCode: String?
-    protected get() = TextUtils.join("\n", arrayOf(
+  override val fragmentShaderCode: String?
+    get() = TextUtils.join("\n", arrayOf(
         "precision mediump float;",
         "uniform sampler2D uTexture;",
         "uniform float uAlpha;",
         "varying vec2 vTexCoord;",
         "void main() {",
         "  vec4 color = texture2D(uTexture, vTexCoord);",
+        //"  color.rgb = vec3(1, 1, 1);",
         "  color.a = color.a * uAlpha;",
         "  gl_FragColor = color;",
         "}"))

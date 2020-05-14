@@ -49,6 +49,7 @@ class SpriteTemplate(
 
   fun draw(mvpMatrix: FloatArray?, alpha: Float = 1.0f) {
     Threads.checkOnThread(Threads.GL)
+
     shader.begin()
     texture.bind()
     GLES20.glVertexAttribPointer(
