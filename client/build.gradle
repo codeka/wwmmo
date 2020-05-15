@@ -33,6 +33,9 @@ android {
     multiDexEnabled true
     vectorDrawables.useSupportLibrary = true
   }
+  sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+  }
   compileOptions {
     coreLibraryDesugaringEnabled true
 
