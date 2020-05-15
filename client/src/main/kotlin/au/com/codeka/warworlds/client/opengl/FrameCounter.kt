@@ -3,19 +3,15 @@ package au.com.codeka.warworlds.client.opengl
 /** Helper class for keep track of framerate and such.  */
 class FrameCounter {
   /**
-   * A counter that's incremented each frame. After [.COUNT_INTERVAL_NANOS], we use the
-   * counter to calculate the average framerate over that period.
+   * A counter that's incremented each frame. After [.COUNT_INTERVAL_NANOS], we use the counter to
+   * calculate the average framerate over that period.
    */
   private var counter = 0
 
-  /**
-   * The time, in nanoseconds, that we last counted the framerate.
-   */
+  /** The time, in nanoseconds, that we last counted the framerate. */
   private var lastFrameCountTime: Long = 0
 
-  /**
-   * Current count of frames per second (will be initially zero).
-   */
+  /** Current count of frames per second (will be initially zero). */
   var framesPerSecond = 0f
     private set
 
@@ -36,9 +32,7 @@ class FrameCounter {
   }
 
   companion object {
-    /**
-     * When counting framerate, count the number of frames over this many nanoseconds.
-     */
+    /** When counting framerate, count the number of frames over this many nanoseconds. */
     private const val COUNT_INTERVAL_NANOS = 1 * 1000000000L
   }
 }

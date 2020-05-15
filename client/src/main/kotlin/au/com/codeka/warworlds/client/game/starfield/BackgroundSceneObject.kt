@@ -12,7 +12,7 @@ import java.util.*
  * look a bit nicer. It also handles switching to the "heatmap" of ownership when you zoom out.
  */
 class BackgroundSceneObject(scene: Scene, private val sectorX: Long, private val sectorY: Long)
-    : SceneObject(scene.dimensionResolver, "Background:$sectorX,$sectorY", drawLayer = 10) {
+    : SceneObject(scene.dimensionResolver, "Background:$sectorX,$sectorY", drawLayer = -10) {
   private val starfield: Sprite = scene.createSprite(
       SpriteTemplate.Builder()
           .shader(scene.spriteShader)

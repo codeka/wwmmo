@@ -30,7 +30,8 @@ fun EGLConfig.debugString(egl: EGL10, display: EGLDisplay): String {
   val aSize = this.findAttribute(egl, display, EGL10.EGL_ALPHA_SIZE, 0)
   val depthSize = this.findAttribute(egl, display, EGL10.EGL_DEPTH_SIZE, 0)
   val stencilSize = this.findAttribute(egl, display, EGL10.EGL_STENCIL_SIZE, 0)
-  return "RGBA_$rSize.$gSize.$bSize.$aSize D:$depthSize S:$stencilSize"
+  val sampleSize = this.findAttribute(egl, display, EGL10.EGL_SAMPLES, 0)
+  return "RGBA_$rSize.$gSize.$bSize.$aSize D:$depthSize S:$stencilSize MSAA:${sampleSize}x"
 }
 
 /** GLSurfaceView upon which we do all of our rendering.  */
@@ -38,6 +39,9 @@ class RenderSurfaceView constructor(context: Context, attrs: AttributeSet? = nul
     : GLSurfaceView(context, attrs) {
   companion object {
     private val log = Log("RenderSurfaceView")
+
+    // We'll prefer multi-sampling. TODO: make this configurable
+    private const val PREFER_MULTISAMPLE = true
   }
 
   private lateinit var renderer: Renderer
@@ -81,7 +85,6 @@ class RenderSurfaceView constructor(context: Context, attrs: AttributeSet? = nul
     }
 
   class Renderer(context: Context) : GLSurfaceView.Renderer {
-    private val multiSampling = true
     private var deviceInfo: DeviceInfo? = null
     private val dimensionResolver: DimensionResolver = DimensionResolver(context)
     private val textureManager: TextureManager = TextureManager(context)
@@ -129,7 +132,7 @@ class RenderSurfaceView constructor(context: Context, attrs: AttributeSet? = nul
     }
   }
 
-  private class ConfigChooser() : EGLConfigChooser {
+  private class ConfigChooser : EGLConfigChooser {
     override fun chooseConfig(egl: EGL10, display: EGLDisplay): EGLConfig {
       val attributes = intArrayOf(
           EGL10.EGL_RED_SIZE, 8,
@@ -176,11 +179,12 @@ class RenderSurfaceView constructor(context: Context, attrs: AttributeSet? = nul
           continue
         }
 
-        // Check if this has a higher bit-depth R channel, if so it's better than what we've already
-        // got.
-        if (bestConfig.findAttribute(egl, display, EGL10.EGL_RED_SIZE, 0) <
-            config.findAttribute(egl, display, EGL10.EGL_RED_SIZE, 0)) {
-          log.debug(" updating best to this config")
+        // If we want multi-sampling and this one has multi-sampling, then it's better.
+        if (PREFER_MULTISAMPLE &&
+            config.findAttribute(egl, display, EGL10.EGL_SAMPLES, 0) >
+                bestConfig.findAttribute(egl, display, EGL10.EGL_SAMPLES, 0)) {
+          log.debug(" updating best to config which has " +
+              "${config.findAttribute(egl, display, EGL10.EGL_SAMPLES, 0)}x multi-sampling")
           bestConfig = config
         }
       }

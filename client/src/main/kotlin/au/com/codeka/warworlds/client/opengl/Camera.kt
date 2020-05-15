@@ -3,9 +3,7 @@ package au.com.codeka.warworlds.client.opengl
 import android.opengl.Matrix
 import android.view.animation.DecelerateInterpolator
 
-/**
- * The [Camera] can be used to draw a [Scene], scroll and zoom around.
- */
+/** The [Camera] can be used to draw a [Scene], scroll and zoom around. */
 class Camera {
   interface CameraUpdateListener {
     /**
@@ -80,19 +78,17 @@ class Camera {
    * @param silent If true, we will not call the listener.
    */
   fun translate(x: Float, y: Float, silent: Boolean = false) {
-    var x = x
-    var y = y
-    x /= zoomAmount * 0.5f
-    y /= zoomAmount * 0.5f
-    translateX += x
-    translateY += y
+    val scaledX = x / (zoomAmount * 0.5f)
+    val scaledY = y / (zoomAmount * 0.5f)
+    translateX += scaledX
+    translateY += scaledY
     if (listener != null && !silent) {
-      listener!!.onCameraTranslate(-translateX, translateY, x, y)
+      listener!!.onCameraTranslate(-translateX, translateY, scaledX, scaledY)
     }
   }
 
   /**
-   * Simliar to [.translate] except that we translate to an absolute
+   * Similar to [.translate] except that we translate to an absolute
    * X,Y coordinate.
    *
    * @param x The X-coordinate you want to warp to.

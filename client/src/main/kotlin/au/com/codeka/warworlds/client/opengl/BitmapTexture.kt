@@ -28,10 +28,9 @@ class BitmapTexture private constructor(loader: Loader) : Texture() {
     super.bind()
   }
 
-  /**
-   * Handles loading a texture into a [BitmapTexture].
-   */
-  private class Loader internal constructor(private val context: Context, fileName: String?, url: String?) {
+  /** Handles loading a texture into a [BitmapTexture]. */
+  private class Loader internal constructor(
+      private val context: Context, fileName: String?, url: String?) {
     private val fileName: String?
     private val url: String?
     private var bitmap: Bitmap? = null
@@ -94,12 +93,10 @@ class BitmapTexture private constructor(loader: Loader) : Texture() {
 
   companion object {
     private val log = Log("TextureBitmap")
-    @JvmStatic
     fun load(context: Context, fileName: String?): BitmapTexture {
       return BitmapTexture(Loader(context, fileName, null /* url */))
     }
 
-    @JvmStatic
     fun loadUrl(context: Context, url: String?): BitmapTexture {
       return BitmapTexture(Loader(context, null /* fileName */, url))
     }
