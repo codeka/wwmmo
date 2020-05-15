@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.game.starfield
+package au.com.codeka.warworlds.client.game.starfield.scene
 
 import android.opengl.GLES20
 import android.text.TextUtils

@@ -7,7 +7,7 @@ import java.io.IOException
 /**
  * A "cursor" that's used to scroll through the results of querying stars.
  */
-class StarCursor(private val cursor: Cursor) : Iterable<Star?>, AutoCloseable {
+class StarCursor(private val cursor: Cursor) : Iterable<Star>, AutoCloseable {
   val size: Int
     get() = cursor.count
 
@@ -48,5 +48,4 @@ class StarCursor(private val cursor: Cursor) : Iterable<Star?>, AutoCloseable {
       hasValue = cursor.moveToFirst()
     }
   }
-
 }

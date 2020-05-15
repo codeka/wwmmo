@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.game.starfield
+package au.com.codeka.warworlds.client.game.starfield.scene
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -7,8 +7,10 @@ import android.opengl.GLES20
 import android.opengl.GLUtils
 import au.com.codeka.warworlds.client.App
 import au.com.codeka.warworlds.client.concurrency.Threads
+import au.com.codeka.warworlds.client.game.world.StarManager
 import au.com.codeka.warworlds.client.opengl.Texture
 import au.com.codeka.warworlds.common.proto.Sector
+import au.com.codeka.warworlds.common.proto.SectorCoord
 import au.com.codeka.warworlds.common.proto.Star
 import com.google.common.base.Preconditions
 import java.util.*
@@ -17,8 +19,9 @@ import java.util.*
  * A [Texture] that returns a bitmap to use as a texture for the "tactical" SceneObject that
  * covers a sector.
  */
-class TacticalTexture private constructor(sector: Sector) : Texture() {
+class TacticalTexture private constructor(private val sectorCoord: SectorCoord) : Texture() {
   private var bitmap: Bitmap? = null
+
   override fun bind() {
     if (bitmap != null) {
       setTextureId(createGlTexture())
@@ -43,11 +46,12 @@ class TacticalTexture private constructor(sector: Sector) : Texture() {
 
     // The radius of the circle, in pixels, that we'll put around each empire.
     private const val CIRCLE_RADIUS = 20
-    fun create(sector: Sector): TacticalTexture {
-      return TacticalTexture(sector)
+
+    fun create(sectorCoord: SectorCoord): TacticalTexture {
+      return TacticalTexture(sectorCoord)
     }
 
-    private fun createBitmap(sector: Sector): Bitmap {
+    private fun createBitmap(sectorCoord: SectorCoord): Bitmap {
       val bmp = Bitmap.createBitmap(TEXTURE_SIZE, TEXTURE_SIZE, Bitmap.Config.ARGB_8888)
       val canvas = Canvas(bmp)
       val paint = Paint()
@@ -56,24 +60,16 @@ class TacticalTexture private constructor(sector: Sector) : Texture() {
       // We have to look at sectors around this one as well, so that edges look right
       for (offsetY in -1..1) {
         for (offsetX in -1..1) {
-          var s: Sector?
-          s = if (offsetX == 0 && offsetY == 0) {
-            sector
-          } else {
-            null // TODO SectorManager.i.getSector(sector.getX() + offsetX, sector.getY() + offsetY);
-          }
-          if (s == null) {
-            continue
-          }
-          drawCircles(s, offsetX, offsetY, canvas, paint)
+          drawCircles(sectorCoord, offsetX, offsetY, canvas, paint)
         }
       }
       return bmp
     }
 
-    private fun drawCircles(sector: Sector, offsetX: Int, offsetY: Int, canvas: Canvas, paint: Paint) {
+    private fun drawCircles(
+        sectorCoord: SectorCoord, offsetX: Int, offsetY: Int, canvas: Canvas, paint: Paint) {
       val scaleFactor = TEXTURE_SIZE.toFloat() / 1024f
-      for (star in sector.stars) {
+      for (star in StarManager.searchSectorStars(sectorCoord)) {
         val x = (star.offset_x + offsetX * 1024.0f) * scaleFactor
         val y = (star.offset_y + offsetY * 1024.0f) * scaleFactor
         val radius = CIRCLE_RADIUS.toFloat()
@@ -140,6 +136,6 @@ class TacticalTexture private constructor(sector: Sector) : Texture() {
   }
 
   init {
-    App.taskRunner.runTask(Runnable { bitmap = createBitmap(sector) }, Threads.BACKGROUND)
+    App.taskRunner.runTask(Runnable { bitmap = createBitmap(sectorCoord) }, Threads.BACKGROUND)
   }
 }

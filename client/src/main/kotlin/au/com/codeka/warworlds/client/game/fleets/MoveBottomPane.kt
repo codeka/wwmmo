@@ -6,9 +6,8 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import au.com.codeka.warworlds.client.R
-import au.com.codeka.warworlds.client.game.fleets.MoveBottomPane
-import au.com.codeka.warworlds.client.game.starfield.StarfieldManager
-import au.com.codeka.warworlds.client.game.starfield.StarfieldManager.TapListener
+import au.com.codeka.warworlds.client.game.starfield.scene.StarfieldManager
+import au.com.codeka.warworlds.client.game.starfield.scene.StarfieldManager.TapListener
 import au.com.codeka.warworlds.client.game.world.StarManager
 import au.com.codeka.warworlds.client.opengl.SceneObject
 import au.com.codeka.warworlds.common.Log

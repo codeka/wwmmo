@@ -30,6 +30,11 @@ object StarManager {
     return stars[id]
   }
 
+  /** Gets all of the stars in the given sector. */
+  fun searchSectorStars(sectorCoord: SectorCoord): StarCursor {
+    return stars.searchSectorStars(sectorCoord)
+  }
+
   val myStars: StarCursor
     get() = stars.myStars
 

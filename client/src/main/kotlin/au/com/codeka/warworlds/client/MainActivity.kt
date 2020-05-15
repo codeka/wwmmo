@@ -9,7 +9,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import au.com.codeka.warworlds.client.ctrl.DebugView
 import au.com.codeka.warworlds.client.ctrl.drawer.DrawerController
-import au.com.codeka.warworlds.client.game.starfield.StarfieldManager
+import au.com.codeka.warworlds.client.game.starfield.scene.StarfieldManager
 import au.com.codeka.warworlds.client.game.starfield.StarfieldScreen
 import au.com.codeka.warworlds.client.game.welcome.CreateEmpireScreen
 import au.com.codeka.warworlds.client.game.welcome.WarmWelcomeScreen

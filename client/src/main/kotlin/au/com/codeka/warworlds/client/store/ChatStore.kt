@@ -12,8 +12,8 @@ import java.util.*
  * Store for storing chats, etc.
  */
 class ChatStore(private val name: String, private val helper: SQLiteOpenHelper) : BaseStore(name, helper) {
-  override fun onCreate(db: SQLiteDatabase?) {
-    db!!.execSQL(
+  override fun onCreate(db: SQLiteDatabase) {
+    db.execSQL(
         "CREATE TABLE " + name + "_rooms ("
             + "  id INTEGER PRIMARY KEY,"
             + "  room BLOB)")
@@ -28,7 +28,7 @@ class ChatStore(private val name: String, private val helper: SQLiteOpenHelper) 
             + "  room_id, date_posted, id)")
   }
 
-  override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
+  override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
 
   /** Adds the given messages to the store.  */
   fun addMessages(msgs: List<ChatMessage>) {

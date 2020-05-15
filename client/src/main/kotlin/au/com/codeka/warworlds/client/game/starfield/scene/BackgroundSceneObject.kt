@@ -1,10 +1,11 @@
-package au.com.codeka.warworlds.client.game.starfield
+package au.com.codeka.warworlds.client.game.starfield.scene
 
 import au.com.codeka.warworlds.client.opengl.Scene
 import au.com.codeka.warworlds.client.opengl.SceneObject
 import au.com.codeka.warworlds.client.opengl.Sprite
 import au.com.codeka.warworlds.client.opengl.SpriteTemplate
 import au.com.codeka.warworlds.common.Vector2
+import au.com.codeka.warworlds.common.proto.SectorCoord
 import java.util.*
 
 /**
@@ -20,6 +21,12 @@ class BackgroundSceneObject(scene: Scene, sectorX: Long, sectorY: Long)
           .build(),
       "Background:$sectorX,$sectorY")
   private val gases: MutableList<Sprite>
+  private val tactical: Sprite = scene.createSprite(
+      SpriteTemplate.Builder()
+          .shader(scene.spriteShader)
+          .texture(TacticalTexture.create(SectorCoord.Builder().x(sectorX).y(sectorY).build()))
+          .build(),
+      "Tactical:$sectorX,$sectorY")
   private var zoomAmount = 0f
 
   init {
@@ -46,6 +53,9 @@ class BackgroundSceneObject(scene: Scene, sectorX: Long, sectorY: Long)
 
     starfield.setSize(1024.0f, 1024.0f)
     addChild(starfield)
+
+    tactical.setSize(1024.0f, 1024.0f)
+    addChild(tactical)
   }
 
   fun setZoomAmount(zoomAmount: Float) {
@@ -60,5 +70,7 @@ class BackgroundSceneObject(scene: Scene, sectorX: Long, sectorY: Long)
     for (gas in gases) {
       gas.alpha = bgAlpha
     }
+
+    tactical.alpha = 0.0f // TODO: fade in
   }
 }

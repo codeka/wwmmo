@@ -1,5 +1,6 @@
-package au.com.codeka.warworlds.client.game.starfield
+package au.com.codeka.warworlds.client.game.starfield.scene
 
+import au.com.codeka.warworlds.client.game.starfield.scene.BaseIndicatorSceneObject
 import au.com.codeka.warworlds.client.opengl.DimensionResolver
 import au.com.codeka.warworlds.client.opengl.SceneObject
 import au.com.codeka.warworlds.common.Colour

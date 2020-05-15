@@ -13,7 +13,7 @@ import java.nio.ShortBuffer
  * and so on). You would use it to add an actual [Sprite] to a [Scene].
  */
 class SpriteTemplate(
-    private val shader: SpriteShader, private val texture: BitmapTexture, uvTopLeft: Vector2,
+    private val shader: SpriteShader, private val texture: Texture, uvTopLeft: Vector2,
     uvBottomRight: Vector2) {
   private val positionBuffer: FloatBuffer
   private val texCoordBuffer: FloatBuffer
@@ -65,7 +65,7 @@ class SpriteTemplate(
 
   class Builder {
     private var shader: SpriteShader? = null
-    private var texture: BitmapTexture? = null
+    private var texture: Texture? = null
     private var uvTopLeft: Vector2? = null
     private var uvBottomRight: Vector2? = null
     fun shader(shader: SpriteShader?): Builder {
@@ -73,7 +73,7 @@ class SpriteTemplate(
       return this
     }
 
-    fun texture(texture: BitmapTexture?): Builder {
+    fun texture(texture: Texture?): Builder {
       this.texture = texture
       return this
     }

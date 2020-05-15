@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.game.starfield
+package au.com.codeka.warworlds.client.game.starfield.scene
 
 import android.content.Context
 import androidx.collection.LongSparseArray
@@ -6,6 +6,7 @@ import androidx.core.util.Pair
 import au.com.codeka.warworlds.client.App
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.concurrency.Threads.Companion.checkOnThread
+import au.com.codeka.warworlds.client.game.starfield.StarfieldGestureDetector
 import au.com.codeka.warworlds.client.game.world.EmpireManager
 import au.com.codeka.warworlds.client.game.world.ImageHelper
 import au.com.codeka.warworlds.client.game.world.StarManager

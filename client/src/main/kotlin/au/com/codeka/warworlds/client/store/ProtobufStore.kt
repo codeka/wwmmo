@@ -10,8 +10,8 @@ class ProtobufStore<M : Message<*, *>?>(
     private val name: String, protoClass: Class<M>, private val helper: SQLiteOpenHelper)
   : BaseStore(name, helper) {
   private val serializer: ProtobufSerializer<M>
-  override fun onCreate(db: SQLiteDatabase?) {
-    db!!.execSQL(
+  override fun onCreate(db: SQLiteDatabase) {
+    db.execSQL(
         "CREATE TABLE " + name + " ("
             + "  key INTEGER PRIMARY KEY,"
             + "  value BLOB)")

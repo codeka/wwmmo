@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import au.com.codeka.warworlds.common.proto.Empire
+import au.com.codeka.warworlds.common.proto.SectorCoord
 import au.com.codeka.warworlds.common.proto.Star
 import java.io.IOException
 
@@ -11,22 +12,42 @@ import java.io.IOException
  * Specialization of [BaseStore] which stores stars. We have a custom class here because
  * we want to add some extra columns for indexing.
  */
-class StarStore(private val name: String, private val helper: SQLiteOpenHelper) : BaseStore(name, helper) {
-  override fun onCreate(db: SQLiteDatabase?) {
-    db!!.execSQL(
-        "CREATE TABLE " + name + " ("
+class StarStore(private val name: String, private val helper: SQLiteOpenHelper)
+    : BaseStore(name, helper) {
+  override fun onCreate(db: SQLiteDatabase) {
+    db.execSQL(
+        "CREATE TABLE $name ("
             + "  key INTEGER PRIMARY KEY,"
             + "  my_empire INTEGER," // 1 if my empire has something on this star, 0 if not.
             + "  last_simulation INTEGER,"
             + "  name TEXT,"
             + "  value BLOB)")
-    db.execSQL(
-        "CREATE INDEX IX_" + name + "_my_empire_name ON " + name + " (my_empire, name)")
+    db.execSQL("CREATE INDEX IX_${name}_my_empire_name ON $name (my_empire, name)")
   }
 
-  override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
+  override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+    if (newVersion == 1) {
+      db.execSQL("ALTER TABLE $name ADD COLUMN sector_x INTEGER")
+      db.execSQL("ALTER TABLE $name ADD COLUMN sector_y INTEGER")
+      db.execSQL("CREATE INDEX IX_${name}_sector ON $name (sector_x, sector_y)")
 
-  /* selection */ /* selectionArgs */ /* groupBy */ /* having */ /* orderBy */
+      // Update all the stars once more so that they have the correct sector_x, sector_y values.
+      val cursor =
+          StarCursor(
+              helper.readableDatabase.query(
+                  name,
+                  arrayOf("value"),
+                  null /* selection */,
+                  null /* selectionArgs */,
+                  null /* groupBy */,
+                  null /* having */,
+                  null /* orderBy */))
+      for (star in cursor) {
+        put(star.id, star)
+      }
+    }
+  }
+
   val myStars: StarCursor
     get() = StarCursor(helper.readableDatabase.query(
         name, arrayOf("value"),
@@ -35,6 +56,16 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper) 
         null /* groupBy */,
         null /* having */,
         null /* orderBy */))
+
+  fun searchSectorStars(sectorCoord: SectorCoord): StarCursor {
+    return StarCursor(helper.readableDatabase.query(
+        name, arrayOf("value"),
+        "sector_x = ${sectorCoord.x} AND sector_y = ${sectorCoord.y}" /* selection */,
+        null /* selectionArgs */,
+        null /* groupBy */,
+        null /* having */,
+        null /* orderBy */))
+  }
 
   fun searchMyStars(search: String): StarCursor {
     val likeOperand = search.replace("%", "%%") + "%"
@@ -47,7 +78,7 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper) 
   }
 
   /**
-   * Gets the most recent value of last_simulation out of all our empire's stars. See [ ] for details.
+   * Gets the most recent value of last_simulation out of all our empire's stars.
    */
   val lastSimulationOfOurStar: Long?
     get() {
@@ -83,28 +114,37 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper) 
 
   /**
    * Puts the given value to the data store.
+   *
+   * @param myEmpire A reference to my empire. This should only be null if you're 100% certain that
+   *        the star already exists in the data store.
    */
-  fun put(id: Long, star: Star, myEmpire: Empire) {
+  fun put(id: Long, star: Star, myEmpire: Empire? = null) {
     val db = helper.writableDatabase
     val contentValues = ContentValues()
     contentValues.put("key", id)
-    contentValues.put("my_empire", if (isMyStar(star, myEmpire)) 1 else 0)
+    if (myEmpire != null) {
+      contentValues.put("my_empire", if (isMyStar(star, myEmpire)) 1 else 0)
+    }
     contentValues.put("last_simulation", star.last_simulation)
+    contentValues.put("sector_x", star.sector_x)
+    contentValues.put("sector_y", star.sector_y)
     contentValues.put("value", star.encode())
     db.insertWithOnConflict(name, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE)
   }
 
   /** Puts all of the given values into the data store in a single transaction.  */
-  fun putAll(values: Map<Long?, Star>, myEmpire: Empire) {
+  fun putAll(stars: Map<Long?, Star>, myEmpire: Empire) {
     val db = helper.writableDatabase
     db.beginTransaction()
     try {
       val contentValues = ContentValues()
-      for ((key, value) in values) {
+      for ((key, star) in stars) {
         contentValues.put("key", key)
-        contentValues.put("my_empire", if (isMyStar(value, myEmpire)) 1 else 0)
-        contentValues.put("last_simulation", value.last_simulation)
-        contentValues.put("value", value.encode())
+        contentValues.put("my_empire", if (isMyStar(star, myEmpire)) 1 else 0)
+        contentValues.put("last_simulation", star.last_simulation)
+        contentValues.put("sector_x", star.sector_x)
+        contentValues.put("sector_y", star.sector_y)
+        contentValues.put("value", star.encode())
         db.insertWithOnConflict(name, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE)
       }
       db.setTransactionSuccessful()
@@ -130,5 +170,4 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper) 
       return false
     }
   }
-
 }

@@ -5,7 +5,8 @@ import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.game.chat.ChatScreen
 import au.com.codeka.warworlds.client.game.fleets.FleetsScreen
 import au.com.codeka.warworlds.client.game.solarsystem.SolarSystemScreen
-import au.com.codeka.warworlds.client.game.starfield.StarfieldManager.TapListener
+import au.com.codeka.warworlds.client.game.starfield.scene.StarfieldManager
+import au.com.codeka.warworlds.client.game.starfield.scene.StarfieldManager.TapListener
 import au.com.codeka.warworlds.client.ui.Screen
 import au.com.codeka.warworlds.client.ui.ScreenContext
 import au.com.codeka.warworlds.client.ui.SharedViews
