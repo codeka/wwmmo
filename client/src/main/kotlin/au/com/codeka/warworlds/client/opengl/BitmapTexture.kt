@@ -41,7 +41,12 @@ class BitmapTexture private constructor(loader: Loader) : Texture() {
           try {
             log.info("Loading resource: %s", fileName)
             val ins = context.assets.open(fileName)
-            bitmap = BitmapFactory.decodeStream(ins)
+
+            // BitmapFactory.decodeStream defaults to premultiplied alpha but since we're going to
+            // render these with OpenGL, we don't want premultiplied alpha.
+            val opt = BitmapFactory.Options()
+            opt.inPremultiplied = false
+            bitmap = BitmapFactory.decodeStream(ins, null, opt)
           } catch (e: IOException) {
             log.error("Error loading texture '%s'", fileName, e)
           }

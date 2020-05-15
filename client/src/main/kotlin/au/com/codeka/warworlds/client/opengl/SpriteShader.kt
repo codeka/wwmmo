@@ -35,7 +35,6 @@ class SpriteShader : Shader() {
         "varying vec2 vTexCoord;",
         "void main() {",
         "  vec4 color = texture2D(uTexture, vTexCoord);",
-        //"  color.rgb = vec3(1, 1, 1);",
         "  color.a = color.a * uAlpha;",
         "  gl_FragColor = color;",
         "}"))

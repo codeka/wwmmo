@@ -11,7 +11,7 @@ import java.util.*
  * BackgroundSceneObject is an object that adds the gas/starfield background to make the starfield
  * look a bit nicer. It also handles switching to the "heatmap" of ownership when you zoom out.
  */
-class BackgroundSceneObject(scene: Scene, private val sectorX: Long, private val sectorY: Long)
+class BackgroundSceneObject(scene: Scene, sectorX: Long, sectorY: Long)
     : SceneObject(scene.dimensionResolver, "Background:$sectorX,$sectorY", drawLayer = -10) {
   private val starfield: Sprite = scene.createSprite(
       SpriteTemplate.Builder()
@@ -51,11 +51,11 @@ class BackgroundSceneObject(scene: Scene, private val sectorX: Long, private val
   fun setZoomAmount(zoomAmount: Float) {
     this.zoomAmount = zoomAmount
     var bgAlpha = 1.0f
-//    if (zoomAmount < 0.73) {
-//      bgAlpha = 0.0f
-//    } else if (zoomAmount < 0.78) {
-//      bgAlpha = (zoomAmount - 0.73f) / 0.05f
-//    }
+    if (zoomAmount < 0.73) {
+      bgAlpha = 0.0f
+    } else if (zoomAmount < 0.78) {
+      bgAlpha = (zoomAmount - 0.73f) / 0.05f
+    }
     starfield.alpha = bgAlpha
     for (gas in gases) {
       gas.alpha = bgAlpha
