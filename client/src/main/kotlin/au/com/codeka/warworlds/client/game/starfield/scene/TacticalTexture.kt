@@ -9,7 +9,6 @@ import au.com.codeka.warworlds.client.App
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.game.world.StarManager
 import au.com.codeka.warworlds.client.opengl.Texture
-import au.com.codeka.warworlds.common.proto.Sector
 import au.com.codeka.warworlds.common.proto.SectorCoord
 import au.com.codeka.warworlds.common.proto.Star
 import com.google.common.base.Preconditions
@@ -69,7 +68,13 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
     private fun drawCircles(
         sectorCoord: SectorCoord, offsetX: Int, offsetY: Int, canvas: Canvas, paint: Paint) {
       val scaleFactor = TEXTURE_SIZE.toFloat() / 1024f
-      for (star in StarManager.searchSectorStars(sectorCoord)) {
+      val starCursor =
+          StarManager.searchSectorStars(
+              sectorCoord.newBuilder()
+                  .x(sectorCoord.x + offsetX)
+                  .y(sectorCoord.y + offsetY)
+                  .build())
+      for (star in starCursor) {
         val x = (star.offset_x + offsetX * 1024.0f) * scaleFactor
         val y = (star.offset_y + offsetY * 1024.0f) * scaleFactor
         val radius = CIRCLE_RADIUS.toFloat()
@@ -93,7 +98,7 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
       }
     }
 
-    // TODO: this logic is basicaly cut'n'paste from EmpireRendererHandler on the server.
+    // TODO: this logic is basically cut'n'paste from EmpireRendererHandler on the server.
     private fun getShieldColour(empireId: Long?): Int {
       if (empireId == null) {
         return 0
@@ -115,10 +120,11 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
       // otherwise, pick the first colony we find to represent the star
       // TODO: what if the star is colonized by more than one empire?
       for (planet in star.planets) {
-        if (planet.colony != null) {
+        if (planet.colony?.empire_id != null) {
           return planet.colony.empire_id
         }
       }
+
       return null
     }
 

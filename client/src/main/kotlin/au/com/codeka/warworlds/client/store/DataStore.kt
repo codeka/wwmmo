@@ -32,7 +32,7 @@ class DataStore {
    * class manages a single instance of a sqlite database.
    */
   private class StoreHelper(applicationContext: Context?)
-      : SQLiteOpenHelper(applicationContext, "objects.db", null, 2) {
+      : SQLiteOpenHelper(applicationContext, "objects.db", null, 3) {
     val empireStore: ProtobufStore<Empire> = ProtobufStore("empires", Empire::class.java, this)
     val starStore: StarStore = StarStore("stars", this)
     val chatStore: ChatStore = ChatStore("chat", this)

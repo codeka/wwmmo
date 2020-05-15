@@ -71,6 +71,6 @@ class BackgroundSceneObject(scene: Scene, sectorX: Long, sectorY: Long)
       gas.alpha = bgAlpha
     }
 
-    tactical.alpha = 0.0f // TODO: fade in
+    tactical.alpha = 1.0f // TODO: fade in
   }
 }

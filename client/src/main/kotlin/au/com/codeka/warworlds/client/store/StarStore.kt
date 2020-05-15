@@ -26,7 +26,7 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper)
   }
 
   override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-    if (newVersion == 1) {
+    if (newVersion == 3) {
       db.execSQL("ALTER TABLE $name ADD COLUMN sector_x INTEGER")
       db.execSQL("ALTER TABLE $name ADD COLUMN sector_y INTEGER")
       db.execSQL("CREATE INDEX IX_${name}_sector ON $name (sector_x, sector_y)")
@@ -34,7 +34,7 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper)
       // Update all the stars once more so that they have the correct sector_x, sector_y values.
       val cursor =
           StarCursor(
-              helper.readableDatabase.query(
+              db.query(
                   name,
                   arrayOf("value"),
                   null /* selection */,
@@ -43,7 +43,10 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper)
                   null /* having */,
                   null /* orderBy */))
       for (star in cursor) {
-        put(star.id, star)
+        val contentValues = ContentValues()
+        contentValues.put("sector_x", star.sector_x)
+        contentValues.put("sector_y", star.sector_y)
+        db.update(name, contentValues, "key = ?", arrayOf(star.id.toString()))
       }
     }
   }
@@ -114,17 +117,12 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper)
 
   /**
    * Puts the given value to the data store.
-   *
-   * @param myEmpire A reference to my empire. This should only be null if you're 100% certain that
-   *        the star already exists in the data store.
    */
-  fun put(id: Long, star: Star, myEmpire: Empire? = null) {
+  fun put(id: Long, star: Star, myEmpire: Empire) {
     val db = helper.writableDatabase
     val contentValues = ContentValues()
     contentValues.put("key", id)
-    if (myEmpire != null) {
-      contentValues.put("my_empire", if (isMyStar(star, myEmpire)) 1 else 0)
-    }
+    contentValues.put("my_empire", if (isMyStar(star, myEmpire)) 1 else 0)
     contentValues.put("last_simulation", star.last_simulation)
     contentValues.put("sector_x", star.sector_x)
     contentValues.put("sector_y", star.sector_y)
