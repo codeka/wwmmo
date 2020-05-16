@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.client.game.starfield.scene
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
+import android.graphics.*
 import android.opengl.GLES20
 import android.opengl.GLUtils
 import au.com.codeka.warworlds.client.App
@@ -35,6 +33,8 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
     GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandleBuffer[0])
     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
+    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
     GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
     return textureHandleBuffer[0]
   }
@@ -44,7 +44,7 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
     private const val TEXTURE_SIZE = 128
 
     // The radius of the circle, in pixels, that we'll put around each empire.
-    private const val CIRCLE_RADIUS = 20
+    private const val CIRCLE_RADIUS = 30
 
     fun create(sectorCoord: SectorCoord): TacticalTexture {
       return TacticalTexture(sectorCoord)
@@ -55,6 +55,7 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
       val canvas = Canvas(bmp)
       val paint = Paint()
       paint.style = Paint.Style.FILL
+      paint.isAntiAlias = true
 
       // We have to look at sectors around this one as well, so that edges look right
       for (offsetY in -1..1) {
@@ -93,7 +94,11 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
         } else {
           color = getShieldColour(empireId)
         }
-        paint.color = color
+
+        paint.shader =
+            RadialGradient(
+                x, y, CIRCLE_RADIUS.toFloat(), intArrayOf(color, color and 0x00ffffff),
+                floatArrayOf(0.1f, 1.0f), Shader.TileMode.CLAMP)
         canvas.drawCircle(x, y, radius, paint)
       }
     }

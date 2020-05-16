@@ -61,10 +61,10 @@ class BackgroundSceneObject(scene: Scene, sectorX: Long, sectorY: Long)
   fun setZoomAmount(zoomAmount: Float) {
     this.zoomAmount = zoomAmount
     var bgAlpha = 1.0f
-    if (zoomAmount < 0.73) {
+    if (this.zoomAmount < 0.73) {
       bgAlpha = 0.0f
-    } else if (zoomAmount < 0.78) {
-      bgAlpha = (zoomAmount - 0.73f) / 0.05f
+    } else if (this.zoomAmount < 0.78) {
+      bgAlpha = (this.zoomAmount - 0.73f) / 0.05f
     }
     starfield.alpha = bgAlpha
     for (gas in gases) {
