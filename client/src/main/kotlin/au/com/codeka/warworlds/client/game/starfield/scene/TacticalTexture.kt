@@ -7,6 +7,7 @@ import au.com.codeka.warworlds.client.App
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.game.world.StarManager
 import au.com.codeka.warworlds.client.opengl.Texture
+import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.SectorCoord
 import au.com.codeka.warworlds.common.proto.Star
 import com.google.common.base.Preconditions
@@ -40,22 +41,39 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
   }
 
   companion object {
+    private val log = Log("TacticalTexture")
+
     // The size of the texture, in pixels, that we'll generate.
     private const val TEXTURE_SIZE = 128
 
     // The radius of the circle, in pixels, that we'll put around each empire.
     private const val CIRCLE_RADIUS = 30
 
+    private val gradientColors = intArrayOf(0, 0)
+    private val gradientStops = floatArrayOf(0.1f, 1.0f)
+
+    private val textureCache = TacticalTextureLruCache(16)
+
     fun create(sectorCoord: SectorCoord): TacticalTexture {
-      return TacticalTexture(sectorCoord)
+      synchronized(textureCache) {
+        val cachedTexture = textureCache[sectorCoord]
+        if (cachedTexture != null) {
+          return cachedTexture
+        }
+        val texture = TacticalTexture(sectorCoord)
+        textureCache.put(sectorCoord, texture)
+        return texture
+      }
     }
 
     private fun createBitmap(sectorCoord: SectorCoord): Bitmap {
+      log.info("Generating bitmap for ${sectorCoord.x},${sectorCoord.y}...")
+      val startTime = System.currentTimeMillis()
+
       val bmp = Bitmap.createBitmap(TEXTURE_SIZE, TEXTURE_SIZE, Bitmap.Config.ARGB_8888)
       val canvas = Canvas(bmp)
       val paint = Paint()
       paint.style = Paint.Style.FILL
-      paint.isAntiAlias = true
 
       // We have to look at sectors around this one as well, so that edges look right
       for (offsetY in -1..1) {
@@ -63,44 +81,50 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
           drawCircles(sectorCoord, offsetX, offsetY, canvas, paint)
         }
       }
+
+      val endTime = System.currentTimeMillis()
+      log.info("Bitmap for ${sectorCoord.x},${sectorCoord.y} generated in ${endTime - startTime}ms")
       return bmp
     }
 
     private fun drawCircles(
         sectorCoord: SectorCoord, offsetX: Int, offsetY: Int, canvas: Canvas, paint: Paint) {
       val scaleFactor = TEXTURE_SIZE.toFloat() / 1024f
-      val starCursor =
-          StarManager.searchSectorStars(
-              sectorCoord.newBuilder()
-                  .x(sectorCoord.x + offsetX)
-                  .y(sectorCoord.y + offsetY)
-                  .build())
-      for (star in starCursor) {
-        val x = (star.offset_x + offsetX * 1024.0f) * scaleFactor
-        val y = (star.offset_y + offsetY * 1024.0f) * scaleFactor
-        val radius = CIRCLE_RADIUS.toFloat()
-        if (x < -radius || x > TEXTURE_SIZE + radius || y < -radius || y > TEXTURE_SIZE + radius) {
-          // if it's completely off the bitmap, skip drawing it
-          continue
-        }
-        var color = 0
-        var empireId = getEmpireId(star)
-        if (empireId == null) {
-          empireId = getFleetOnlyEmpire(star)
-          if (empireId != null) {
-            color = getShieldColour(empireId)
-            color = 0x66ffffff and color
-          }
-        } else {
-          color = getShieldColour(empireId)
-        }
+      StarManager.searchSectorStars(
+          sectorCoord.newBuilder()
+              .x(sectorCoord.x + offsetX)
+              .y(sectorCoord.y + offsetY)
+              .build()).use {
+        starCursor ->
+          for (star in starCursor) {
+            val x = (star.offset_x + offsetX * 1024.0f) * scaleFactor
+            val y = (star.offset_y + offsetY * 1024.0f) * scaleFactor
+            val radius = CIRCLE_RADIUS.toFloat()
+            if (x < -radius || x > TEXTURE_SIZE + radius ||
+                y < -radius || y > TEXTURE_SIZE + radius) {
+              // if it's completely off the bitmap, skip drawing it
+              continue
+            }
+            var color = 0
+            var empireId = getEmpireId(star)
+            if (empireId == null) {
+              empireId = getFleetOnlyEmpire(star)
+              if (empireId != null) {
+                color = getShieldColour(empireId)
+                color = 0x66ffffff and color
+              }
+            } else {
+              color = getShieldColour(empireId)
+            }
 
-        paint.shader =
-            RadialGradient(
-                x, y, CIRCLE_RADIUS.toFloat(), intArrayOf(color, color and 0x00ffffff),
-                floatArrayOf(0.1f, 1.0f), Shader.TileMode.CLAMP)
-        canvas.drawCircle(x, y, radius, paint)
-      }
+            gradientColors[0] = color
+            gradientColors[1] = color and 0x00ffffff
+            val gradient = RadialGradient(
+                x, y, CIRCLE_RADIUS.toFloat(), gradientColors, gradientStops, Shader.TileMode.CLAMP)
+            paint.shader = gradient
+            canvas.drawCircle(x, y, radius, paint)
+          }
+        }
     }
 
     // TODO: this logic is basically cut'n'paste from EmpireRendererHandler on the server.
