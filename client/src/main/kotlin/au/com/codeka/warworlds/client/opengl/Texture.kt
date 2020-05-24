@@ -20,7 +20,7 @@ open class Texture protected constructor() {
     }
   }
 
-  fun close() {
+  open fun close() {
     if (id != -1) {
      val textureHandleBuffer = intArrayOf(id)
       GLES20.glDeleteTextures(1, textureHandleBuffer, 0)

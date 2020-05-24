@@ -23,6 +23,8 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
   override fun bind() {
     if (bitmap != null) {
       setTextureId(createGlTexture())
+      bitmap?.recycle()
+      bitmap = null
     }
     super.bind()
   }
