@@ -14,6 +14,7 @@ import au.com.codeka.warworlds.common.net.PacketDecoder
 import au.com.codeka.warworlds.common.net.PacketEncoder
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.LoginResponse.LoginStatus
+import au.com.codeka.warworlds.common.sim.DesignDefinitions
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import java.io.IOException
@@ -163,6 +164,9 @@ class Server {
 
   private fun connectGameSocket(loginResponse: LoginResponse) {
     try {
+      // Make sure we update our copy of the design definitions.
+      DesignDefinitions.init(loginResponse.designs)
+
       val s = Socket()
       gameSocket = s
       var host = loginResponse.host

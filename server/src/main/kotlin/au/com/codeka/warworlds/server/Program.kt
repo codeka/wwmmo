@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.server
 
 import au.com.codeka.warworlds.common.Log
+import au.com.codeka.warworlds.common.proto.Designs
+import au.com.codeka.warworlds.common.sim.DesignDefinitions
 import au.com.codeka.warworlds.server.admin.AdminServlet
 import au.com.codeka.warworlds.server.html.HtmlServlet
 import au.com.codeka.warworlds.server.net.ServerSocketManager
@@ -10,10 +12,13 @@ import au.com.codeka.warworlds.server.world.NotificationManager
 import au.com.codeka.warworlds.server.world.StarSimulatorQueue
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
+import com.google.gson.GsonBuilder
+import com.squareup.wire.WireTypeAdapterFactory
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.ServletHolder
+import java.io.File
 
 object Program {
   private val log = Log("Runner")
@@ -23,6 +28,7 @@ object Program {
     LogImpl.setup()
     Configuration.i.load()
     DataStore.i.open()
+    DesignDefinitions.init(loadDesignDefinitions())
     StarSimulatorQueue.i.start()
     ServerSocketManager.i.start()
     SmtpHelper.i.start()
@@ -94,5 +100,13 @@ object Program {
     } catch (e: Exception) {
       log.error("Error shutting down data store.", e)
     }
+  }
+
+  private fun loadDesignDefinitions(): Designs {
+    val json = File("data/designs/designs.json").readText(Charsets.UTF_8)
+    val gson = GsonBuilder()
+        .registerTypeAdapterFactory(WireTypeAdapterFactory())
+        .create()
+    return gson.fromJson(json, Designs::class.java)
   }
 }

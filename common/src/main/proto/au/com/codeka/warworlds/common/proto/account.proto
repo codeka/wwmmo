@@ -3,6 +3,7 @@ syntax = "proto2";
 package au.com.codeka.warworlds.common.proto;
 
 import "au/com/codeka/warworlds/common/proto/common.proto";
+import "au/com/codeka/warworlds/common/proto/design.proto";
 import "au/com/codeka/warworlds/common/proto/empire.proto";
 
 message NewAccountRequest {
@@ -122,6 +123,13 @@ message LoginResponse {
   // If true, we'll force the ads to be removed. If false, or not specified, we'll check
   // whatever the In-App Purchase API has to say.
   optional bool force_remove_ads = 6;
+
+  // The complete list of designs that the server has. Getting them from the server lets us at
+  // least handle new designs without *requiring* a client update (though you may get some weirdness
+  // with no new effects being handled, etc, but that's still better than crashing -- we can
+  // mitigate that by implementing the effects before updating the design definitions to include
+  // it).
+  optional Designs designs = 7;
 }
 
 // Contains details about a device, such as it's ID, model etc. Also contains details about the

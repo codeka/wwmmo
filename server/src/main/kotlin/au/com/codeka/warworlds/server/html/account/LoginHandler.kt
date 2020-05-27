@@ -4,8 +4,8 @@ import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Account
 import au.com.codeka.warworlds.common.proto.LoginRequest
 import au.com.codeka.warworlds.common.proto.LoginResponse
+import au.com.codeka.warworlds.common.sim.DesignDefinitions
 import au.com.codeka.warworlds.server.handlers.ProtobufRequestHandler
-import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.net.ServerSocketManager
 import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.world.EmpireManager
@@ -69,8 +69,11 @@ class LoginHandler : ProtobufRequestHandler() {
     DataStore.i.stats().addLoginEvent(req, account)
     val resp = LoginResponse.Builder().status(LoginResponse.LoginStatus.SUCCESS)
     // Tell the server socket to expect a connection from this client.
-    ServerSocketManager.Companion.i.addPendingConnection(account, empire, null /* encryptionKey */)
-    resp.port(8081).empire(empire.get())
+    ServerSocketManager.i.addPendingConnection(account, empire, null /* encryptionKey */)
+    resp
+        .port(8081)
+        .empire(empire.get())
+        .designs(DesignDefinitions.designs)
     writeProtobuf(resp.build())
   }
 }
