@@ -12,7 +12,8 @@ import java.util.*
  * BackgroundSceneObject is an object that adds the gas/starfield background to make the starfield
  * look a bit nicer. It also handles switching to the "heatmap" of ownership when you zoom out.
  */
-class BackgroundSceneObject(scene: Scene, sectorX: Long, sectorY: Long)
+class BackgroundSceneObject(private val scene: Scene, private val sectorX: Long,
+                            private val sectorY: Long)
     : SceneObject(scene.dimensionResolver, "Background:$sectorX,$sectorY", drawLayer = -10) {
   private val starfield: Sprite = scene.createSprite(
       SpriteTemplate.Builder()
@@ -21,12 +22,9 @@ class BackgroundSceneObject(scene: Scene, sectorX: Long, sectorY: Long)
           .build(),
       "Background:$sectorX,$sectorY")
   private val gases: MutableList<Sprite>
-  private val tactical: Sprite = scene.createSprite(
-      SpriteTemplate.Builder()
-          .shader(scene.spriteShader)
-          .texture(TacticalTexture.create(SectorCoord.Builder().x(sectorX).y(sectorY).build()))
-          .build(),
-      "Tactical:$sectorX,$sectorY")
+
+  // This is created on-demand the first time it should be displayed.
+  private var tactical: Sprite? = null
   private var zoomAmount = 0f
 
   init {
@@ -54,8 +52,6 @@ class BackgroundSceneObject(scene: Scene, sectorX: Long, sectorY: Long)
     starfield.setSize(1024.0f, 1024.0f)
     addChild(starfield)
 
-    tactical.setSize(1024.0f, 1024.0f)
-    addChild(tactical)
   }
 
   fun setZoomAmount(zoomAmount: Float) {
@@ -71,6 +67,22 @@ class BackgroundSceneObject(scene: Scene, sectorX: Long, sectorY: Long)
       gas.alpha = bgAlpha
     }
 
-    tactical.alpha = 1.0f - bgAlpha
+    if (tactical == null && bgAlpha < 1.0f) {
+      ensureTacticalObject()
+    }
+    tactical?.alpha = 1.0f - bgAlpha
+  }
+
+  fun ensureTacticalObject() {
+    val sprite = scene.createSprite(
+        SpriteTemplate.Builder()
+            .shader(scene.spriteShader)
+            .texture(TacticalTexture.create(SectorCoord.Builder().x(sectorX).y(sectorY).build()))
+            .build(),
+        "Tactical:$sectorX,$sectorY")
+
+    sprite.setSize(1024.0f, 1024.0f)
+    addChild(sprite)
+    tactical = sprite
   }
 }

@@ -20,6 +20,10 @@ import java.util.*
 class TacticalTexture private constructor(private val sectorCoord: SectorCoord) : Texture() {
   private var bitmap: Bitmap? = null
 
+  init {
+    App.taskRunner.runTask(Runnable { bitmap = createBitmap(sectorCoord) }, Threads.BACKGROUND)
+  }
+
   override fun bind() {
     if (bitmap != null) {
       setTextureId(createGlTexture())
@@ -172,9 +176,5 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
       }
       return null
     }
-  }
-
-  init {
-    App.taskRunner.runTask(Runnable { bitmap = createBitmap(sectorCoord) }, Threads.BACKGROUND)
   }
 }
