@@ -21,6 +21,7 @@ import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -136,6 +137,15 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
           WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
           PixelFormat.TRANSLUCENT);
       mDebugViewLayout.gravity = Gravity.TOP;
+    }
+  }
+
+  @Override
+  protected synchronized void onResume() {
+    super.onResume();
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      getWindow().setNavigationBarColor(getResources().getColor(android.R.color.black));
     }
   }
 

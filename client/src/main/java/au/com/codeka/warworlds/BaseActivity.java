@@ -8,6 +8,7 @@ import android.graphics.PixelFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.Gravity;
@@ -69,6 +70,15 @@ public class BaseActivity extends AppCompatActivity {
    */
   protected boolean wantsActionBar() {
     return false;
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      getWindow().setNavigationBarColor(getResources().getColor(android.R.color.black));
+    }
   }
 
   @Override
