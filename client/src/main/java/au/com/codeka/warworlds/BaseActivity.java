@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
@@ -77,7 +78,7 @@ public class BaseActivity extends AppCompatActivity {
     super.onResume();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      getWindow().setNavigationBarColor(getResources().getColor(android.R.color.black));
+      getWindow().setNavigationBarColor(Color.BLACK);
     }
   }
 

@@ -16,6 +16,7 @@ import org.andengine.ui.activity.SimpleLayoutGameActivity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.hardware.Sensor;
@@ -23,6 +24,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -47,6 +49,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
   private WindowManager.LayoutParams mDebugViewLayout;
   private SensorEventListener mBugReportShakeListener = new BugReportSensorListener(this);
   private long mForegroundStartTimeMs;
+  private Handler handler = new Handler();
 
   protected int mCameraWidth;
   protected int mCameraHeight;
@@ -145,7 +148,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
     super.onResume();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      getWindow().setNavigationBarColor(getResources().getColor(android.R.color.black));
+      getWindow().setNavigationBarColor(Color.BLACK);
     }
   }
 
