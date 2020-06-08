@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
+
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.protobuf.Messages;
@@ -30,225 +31,226 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class FleetMergeDialog extends DialogFragment {
-    private Fleet mFleet;
-    private List<Fleet> mPotentialMergeTargets;
-    private View mView;
-    private Fleet mSelectedFleet;
+  private Fleet fleet;
+  private List<Fleet> potentialMergeTargets;
+  private View view;
+  private Fleet selectedFleet;
 
-    public FleetMergeDialog() {
+  public FleetMergeDialog() {
+  }
+
+  public void setup(Fleet fleet, List<Fleet> potentialFleets) {
+    potentialMergeTargets = potentialFleets;
+    this.fleet = fleet;
+  }
+
+  @Override
+  public Dialog onCreateDialog(Bundle savedInstanceState) {
+    LayoutInflater inflater = getActivity().getLayoutInflater();
+    view = inflater.inflate(R.layout.fleet_merge_dlg, null);
+
+    final ListView fleetList = (ListView) view.findViewById(R.id.ship_list);
+    final TextView note = (TextView) view.findViewById(R.id.note);
+    boolean isError = false;
+
+    final FleetListAdapter adapter = new FleetListAdapter();
+    fleetList.setAdapter(adapter);
+
+    if (!fleet.getState().equals(Fleet.State.IDLE)) {
+      note.setText("You cannot merge a fleet unless it is Idle.");
+      isError = true;
+    } else {
+      ArrayList<Fleet> otherFleets = new ArrayList<>();
+      for (Fleet f : potentialMergeTargets) {
+        if (f.getKey().equals(fleet.getKey())) {
+          continue;
+        }
+        if (!f.getStarKey().equals(fleet.getStarKey())) {
+          continue;
+        }
+        if (f.getEmpireKey() == null || fleet.getEmpireKey() == null
+            || !f.getEmpireKey().equals(fleet.getEmpireKey())) {
+          continue;
+        }
+        if (!f.getDesignID().equals(fleet.getDesignID())) {
+          continue;
+        }
+        if (!f.getState().equals(Fleet.State.IDLE)) {
+          continue;
+        }
+        otherFleets.add(f);
+      }
+
+      if (otherFleets.isEmpty()) {
+        note.setText("No other fleet is suitable for merging.");
+        isError = true;
+      } else {
+        adapter.setFleets(otherFleets);
+      }
     }
 
-    public void setup(Fleet fleet, List<Fleet> potentialFleets) {
-        mPotentialMergeTargets = potentialFleets;
-        mFleet = fleet;
+    StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
+    b.setView(view);
+    b.setTitle("Merge Fleet");
+
+    if (!isError) {
+      b.setPositiveButton("Merge", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          onMergeClick();
+        }
+      });
+    }
+
+    b.setNegativeButton("Cancel", null);
+
+    final StyledDialog dialog = b.create();
+    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+      @Override
+      public void onShow(DialogInterface d) {
+        dialog.getPositiveButton().setEnabled(false);
+      }
+    });
+
+    fleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Fleet f = (Fleet) adapter.getItem(position);
+        selectedFleet = f;
+        adapter.notifyDataSetChanged();
+        dialog.getPositiveButton().setEnabled(true);
+      }
+    });
+
+    return dialog;
+  }
+
+  private void onMergeClick() {
+    if (selectedFleet == null) {
+      return;
+    }
+
+    // if they have different upgrades, issue a warning that you'll lose them
+    boolean hasDifferentUpgrades = false;
+    for (BaseFleetUpgrade upgrade1 : fleet.getUpgrades()) {
+      boolean exists = false;
+      for (BaseFleetUpgrade upgrade2 : selectedFleet.getUpgrades()) {
+        if (upgrade1.getUpgradeID().equals(upgrade2.getUpgradeID())) {
+          exists = true;
+        }
+      }
+      if (!exists) {
+        hasDifferentUpgrades = true;
+      }
+    }
+    if (hasDifferentUpgrades) {
+      new StyledDialog.Builder(getActivity())
+          .setMessage("These fleets have different upgrades, you'll lose any upgrades that aren't on both fleets. Are you sure you want to merge them?")
+          .setTitle("Different upgrades")
+          .setPositiveButton("Merge", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              dialog.dismiss();
+              doMerge();
+            }
+          }).setNegativeButton("Cancel", null)
+          .create().show();
+    } else {
+      doMerge();
+    }
+  }
+
+  private void doMerge() {
+    dismiss();
+
+    new BackgroundRunner<Boolean>() {
+      @Override
+      protected Boolean doInBackground() {
+        String url = String.format("stars/%s/fleets/%s/orders",
+            fleet.getStarKey(),
+            fleet.getKey());
+        Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
+            .setOrder(Messages.FleetOrder.FLEET_ORDER.MERGE)
+            .setMergeFleetKey(selectedFleet.getKey())
+            .build();
+
+        try {
+          return ApiClient.postProtoBuf(url, fleetOrder);
+        } catch (ApiException e) {
+          // TODO: do something..?
+          return false;
+        }
+      }
+
+      @Override
+      protected void onComplete(Boolean success) {
+        // the star this fleet is attached to needs to be refreshed...
+        StarManager.i.refreshStar(Integer.parseInt(fleet.getStarKey()));
+      }
+
+    }.execute();
+  }
+
+  private class FleetListAdapter extends BaseAdapter {
+    private ArrayList<Fleet> mFleets;
+    private Context mContext;
+
+    public FleetListAdapter() {
+      mContext = getActivity();
+    }
+
+    public void setFleets(List<Fleet> fleets) {
+      mFleets = new ArrayList<Fleet>(fleets);
+
+      Collections.sort(mFleets, new Comparator<Fleet>() {
+        @Override
+        public int compare(Fleet lhs, Fleet rhs) {
+          // by definition, they'll all be the same design so just
+          // sort based on number of ships
+          return (int) (rhs.getNumShips() - lhs.getNumShips());
+        }
+      });
+
+      notifyDataSetChanged();
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        mView = inflater.inflate(R.layout.fleet_merge_dlg, null);
-
-        final ListView fleetList = (ListView) mView.findViewById(R.id.ship_list);
-        final TextView note = (TextView) mView.findViewById(R.id.note);
-        boolean isError = false;
-
-        final FleetListAdapter adapter = new FleetListAdapter();
-        fleetList.setAdapter(adapter);
-
-        if (!mFleet.getState().equals(Fleet.State.IDLE)) {
-            note.setText("You cannot merge a fleet unless it is Idle.");
-            isError = true;
-        } else {
-            ArrayList<Fleet> otherFleets = new ArrayList<Fleet>();
-            for (Fleet f : mPotentialMergeTargets) {
-                if (f.getKey().equals(mFleet.getKey())) {
-                    continue;
-                }
-                if (!f.getStarKey().equals(mFleet.getStarKey())) {
-                    continue;
-                }
-                if (!f.getEmpireKey().equals(mFleet.getEmpireKey())) {
-                    continue;
-                }
-                if (!f.getDesignID().equals(mFleet.getDesignID())) {
-                    continue;
-                }
-                if (!f.getState().equals(Fleet.State.IDLE)) {
-                    continue;
-                }
-                otherFleets.add(f);
-            }
-
-            if (otherFleets.isEmpty()) {
-                note.setText("No other fleet is suitable for merging.");
-                isError = true;
-            } else {
-                adapter.setFleets(otherFleets);
-            }
-        }
-
-        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
-        b.setView(mView);
-        b.setTitle("Merge Fleet");
-
-        if (!isError) {
-            b.setPositiveButton("Merge", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    onMergeClick();
-                }
-            });
-        }
-
-        b.setNegativeButton("Cancel", null);
-
-        final StyledDialog dialog = b.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface d) {
-                dialog.getPositiveButton().setEnabled(false);
-            }
-        });
-
-        fleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Fleet f = (Fleet) adapter.getItem(position);
-                mSelectedFleet = f;
-                adapter.notifyDataSetChanged();
-                dialog.getPositiveButton().setEnabled(true);
-            }
-        });
-
-        return dialog;
+    public int getCount() {
+      if (mFleets == null)
+        return 0;
+      return mFleets.size();
     }
 
-    private void onMergeClick() {
-        if (mSelectedFleet == null) {
-            return;
-        }
-
-        // if they have different upgrades, issue a warning that you'll lose them
-        boolean hasDifferentUpgrades = false;
-        for (BaseFleetUpgrade upgrade1 : mFleet.getUpgrades()) {
-            boolean exists = false;
-            for (BaseFleetUpgrade upgrade2 : mSelectedFleet.getUpgrades()) {
-                if (upgrade1.getUpgradeID().equals(upgrade2.getUpgradeID())) {
-                    exists = true;
-                }
-            }
-            if (!exists) {
-                hasDifferentUpgrades = true;
-            }
-        }
-        if (hasDifferentUpgrades) {
-            new StyledDialog.Builder(getActivity())
-                .setMessage("These fleets have different upgrades, you'll lose any upgrades that aren't on both fleets. Are you sure you want to merge them?")
-                .setTitle("Different upgrades")
-                .setPositiveButton("Merge", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        doMerge();
-                    }
-                }).setNegativeButton("Cancel", null)
-                .create().show();
-        } else {
-            doMerge();
-        }
+    @Override
+    public Object getItem(int position) {
+      if (mFleets == null)
+        return null;
+      return mFleets.get(position);
     }
 
-    private void doMerge() {
-        dismiss();
-
-        new BackgroundRunner<Boolean>() {
-            @Override
-            protected Boolean doInBackground() {
-                String url = String.format("stars/%s/fleets/%s/orders",
-                                           mFleet.getStarKey(),
-                                           mFleet.getKey());
-                Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
-                               .setOrder(Messages.FleetOrder.FLEET_ORDER.MERGE)
-                               .setMergeFleetKey(mSelectedFleet.getKey())
-                               .build();
-
-                try {
-                    return ApiClient.postProtoBuf(url, fleetOrder);
-                } catch (ApiException e) {
-                    // TODO: do something..?
-                    return false;
-                }
-            }
-
-            @Override
-            protected void onComplete(Boolean success) {
-                // the star this fleet is attached to needs to be refreshed...
-                StarManager.i.refreshStar(Integer.parseInt(mFleet.getStarKey()));
-            }
-
-        }.execute();
+    @Override
+    public long getItemId(int position) {
+      return position;
     }
 
-    private class FleetListAdapter extends BaseAdapter {
-        private ArrayList<Fleet> mFleets;
-        private Context mContext;
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      Fleet fleet = mFleets.get(position);
+      View view = convertView;
 
-        public FleetListAdapter() {
-            mContext = getActivity();
-        }
+      if (view == null) {
+        view = new FleetListRow(mContext);
+      }
 
-        public void setFleets(List<Fleet> fleets) {
-            mFleets = new ArrayList<Fleet>(fleets);
+      ((FleetListRow) view).setFleet(fleet);
 
-            Collections.sort(mFleets, new Comparator<Fleet>() {
-                @Override
-                public int compare(Fleet lhs, Fleet rhs) {
-                    // by definition, they'll all be the same design so just
-                    // sort based on number of ships
-                    return (int)(rhs.getNumShips() - lhs.getNumShips());
-                }
-            });
+      if (selectedFleet != null && selectedFleet.getKey().equals(fleet.getKey())) {
+        view.setBackgroundResource(R.color.list_item_selected);
+      } else {
+        view.setBackgroundResource(android.R.color.transparent);
+      }
 
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            if (mFleets == null)
-                return 0;
-            return mFleets.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            if (mFleets == null)
-                return null;
-            return mFleets.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            Fleet fleet = mFleets.get(position);
-            View view = convertView;
-
-            if (view == null) {
-                view = new FleetListRow(mContext);
-            }
-
-            ((FleetListRow) view).setFleet(fleet);
-
-            if (mSelectedFleet != null && mSelectedFleet.getKey().equals(fleet.getKey())) {
-                view.setBackgroundResource(R.color.list_item_selected);
-            } else {
-                view.setBackgroundResource(android.R.color.transparent);
-            }
-
-            return view;
-        }
+      return view;
     }
+  }
 }
