@@ -36,7 +36,6 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
-import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
@@ -87,83 +86,58 @@ public class SolarSystemFragment extends Fragment {
     }
 
     solarSystemSurfaceView.addPlanetSelectedListener(
-        new SolarSystemSurfaceView.OnPlanetSelectedListener() {
-          @Override
-          public void onPlanetSelected(Planet planet) {
-            SolarSystemFragment.this.planet = planet;
-            refreshSelectedPlanet();
-          }
+        planet -> {
+          SolarSystemFragment.this.planet = planet;
+          refreshSelectedPlanet();
         });
 
-    buildButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (star == null) {
-          return; // can happen before the star loads
-        }
-        if (colony == null) {
-          return; // shouldn't happen, the button should be hidden.
-        }
-
-        Intent intent = new Intent(getActivity(), BuildActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-
-        Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
-        colony.toProtocolBuffer(colony_pb);
-        intent.putExtra("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
-
-        startActivityForResult(intent, BUILD_REQUEST);
+    buildButton.setOnClickListener(v -> {
+      if (star == null) {
+        return; // can happen before the star loads
       }
+      if (colony == null) {
+        return; // shouldn't happen, the button should be hidden.
+      }
+
+      Intent intent = new Intent(getActivity(), BuildActivity.class);
+      intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+
+      Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
+      colony.toProtocolBuffer(colony_pb);
+      intent.putExtra("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
+
+      startActivityForResult(intent, BUILD_REQUEST);
     });
 
-    focusButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (star == null || star.getPlanets() == null || colony == null) {
-          return;
-        }
-
-        FocusDialog dialog = new FocusDialog();
-        dialog.setColony(star, colony);
-        dialog.show(getActivity().getSupportFragmentManager(), "");
+    focusButton.setOnClickListener(v -> {
+      if (star == null || star.getPlanets() == null || colony == null) {
+        return;
       }
+
+      FocusDialog dialog = new FocusDialog();
+      dialog.setColony(star, colony);
+      dialog.show(getActivity().getSupportFragmentManager(), "");
     });
 
-    sitrepButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (star == null) {
-          return; // can happen before the star loads
-        }
-
-        Intent intent = new Intent(getActivity(), SitrepActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-        startActivity(intent);
+    sitrepButton.setOnClickListener(v -> {
+      if (star == null) {
+        return; // can happen before the star loads
       }
+
+      Intent intent = new Intent(getActivity(), SitrepActivity.class);
+      intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+      startActivity(intent);
     });
 
-    planetViewButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onViewColony();
-      }
-    });
+    planetViewButton.setOnClickListener(v -> onViewColony());
 
-    emptyViewButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onViewColony();
-      }
-    });
+    emptyViewButton.setOnClickListener(v -> onViewColony());
 
-    fleetList.setFleetSelectedHandler(new FleetListSimple.FleetSelectedHandler() {
-      @Override
-      public void onFleetSelected(Fleet fleet) {
-        Intent intent = new Intent(getActivity(), FleetActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-        intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
-        startActivity(intent);
-      }
+    fleetList.setFleetSelectedHandler(fleet -> {
+      Intent intent = new Intent(getActivity(), FleetActivity.class);
+      intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+      intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
+      startActivity(intent);
     });
 
     return view;
@@ -183,24 +157,21 @@ public class SolarSystemFragment extends Fragment {
       onStarFetched(star);
     }
 
-    // this will, on HONEYCOMB+ re-centre the progress back over the solarsystem. It looks
-    // better...
+    // this will, on HONEYCOMB+ re-centre the progress back over the solarsystem. It looks better...
     int sdk = android.os.Build.VERSION.SDK_INT;
     if (sdk >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-      solarSystemSurfaceViewOnLayoutChangedListener = new View.OnLayoutChangeListener() {
-        @Override
-        public void onLayoutChange(View v, int left, int top, int right,
-                                   int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-          int containerWidth = right - left;
-          int containerHeight = bottom - top;
-          int progressWidth = (int) (50 * solarSystemSurfaceView.getPixelScale());
-          int progressHeight = progressWidth;
+      solarSystemSurfaceViewOnLayoutChangedListener =
+          (View.OnLayoutChangeListener) (v, left, top, right, bottom, oldLeft,
+                                         oldTop, oldRight, oldBottom) -> {
+        int containerWidth = right - left;
+        int containerHeight = bottom - top;
+        int progressWidth = (int) (50 * solarSystemSurfaceView.getPixelScale());
+        int progressHeight = progressWidth;
 
-          RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) progressBar.getLayoutParams();
-          lp.leftMargin = (containerWidth / 2) - (progressWidth / 2);
-          lp.topMargin = (containerHeight / 2) - (progressHeight / 2);
-          progressBar.setLayoutParams(lp);
-        }
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) progressBar.getLayoutParams();
+        lp.leftMargin = (containerWidth / 2) - (progressWidth / 2);
+        lp.topMargin = (containerHeight / 2) - (progressHeight / 2);
+        progressBar.setLayoutParams(lp);
       };
 
       solarSystemSurfaceView.addOnLayoutChangeListener(
@@ -340,17 +311,21 @@ public class SolarSystemFragment extends Fragment {
 
       if (ep.getDeltaGoodsPerHour() >= 0) {
         deltaGoodsTextView.setTextColor(Color.GREEN);
-        deltaGoodsTextView.setText(String.format(Locale.ENGLISH, "+%d/hr", (int) ep.getDeltaGoodsPerHour()));
+        deltaGoodsTextView.setText(
+            String.format(Locale.ENGLISH, "+%d/hr", (int) ep.getDeltaGoodsPerHour()));
       } else {
         deltaGoodsTextView.setTextColor(Color.RED);
-        deltaGoodsTextView.setText(String.format(Locale.ENGLISH, "%d/hr", (int) ep.getDeltaGoodsPerHour()));
+        deltaGoodsTextView.setText(
+            String.format(Locale.ENGLISH, "%d/hr", (int) ep.getDeltaGoodsPerHour()));
       }
       if (ep.getDeltaMineralsPerHour() >= 0) {
         deltaMineralsTextView.setTextColor(Color.GREEN);
-        deltaMineralsTextView.setText(String.format(Locale.ENGLISH, "+%d/hr", (int) ep.getDeltaMineralsPerHour()));
+        deltaMineralsTextView.setText(
+            String.format(Locale.ENGLISH, "+%d/hr", (int) ep.getDeltaMineralsPerHour()));
       } else {
         deltaMineralsTextView.setTextColor(Color.RED);
-        deltaMineralsTextView.setText(String.format(Locale.ENGLISH, "%d/hr", (int) ep.getDeltaMineralsPerHour()));
+        deltaMineralsTextView.setText(
+            String.format(Locale.ENGLISH, "%d/hr", (int) ep.getDeltaMineralsPerHour()));
       }
     }
   }
@@ -400,9 +375,8 @@ public class SolarSystemFragment extends Fragment {
 
     View congenialityContainer = view.findViewById(R.id.congeniality_container);
     if (planetCentre == null) {
-      // this is probably because the SolarSystemView probably hasn't rendered yet. We'll
-      // just ignore this then cause it'll fire an onPlanetSelected when it finishes
-      // drawing.
+      // this is probably because the SolarSystemView probably hasn't rendered yet. We'll just
+      // ignore this then cause it'll fire an onPlanetSelected when it finishes drawing.
       congenialityContainer.setVisibility(View.GONE);
     } else {
       float pixelScale = solarSystemSurfaceView.getPixelScale();
@@ -420,7 +394,8 @@ public class SolarSystemFragment extends Fragment {
         offsetY = -(20 * pixelScale);
       }
 
-      RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) congenialityContainer.getLayoutParams();
+      RelativeLayout.LayoutParams params =
+          (RelativeLayout.LayoutParams) congenialityContainer.getLayoutParams();
       params.leftMargin = (int) (x - offsetX);
       params.topMargin = (int) (y - offsetY);
       if (params.topMargin < (40 * pixelScale)) {
@@ -435,26 +410,28 @@ public class SolarSystemFragment extends Fragment {
         R.id.solarsystem_population_congeniality);
     TextView populationCongenialityTextView = view.findViewById(
         R.id.solarsystem_population_congeniality_value);
-    populationCongenialityTextView.setText(Integer.toString(
-        planet.getPopulationCongeniality()));
+    populationCongenialityTextView.setText(
+        String.format(Locale.ENGLISH, "%d", planet.getPopulationCongeniality()));
     populationCongenialityProgressBar.setProgress(
-        (int) (populationCongenialityProgressBar.getMax() * (planet.getPopulationCongeniality() / 1000.0)));
+        (int) (populationCongenialityProgressBar.getMax()
+            * (planet.getPopulationCongeniality() / 1000.0)));
 
     ProgressBar farmingCongenialityProgressBar = view.findViewById(
         R.id.solarsystem_farming_congeniality);
     TextView farmingCongenialityTextView = view.findViewById(
         R.id.solarsystem_farming_congeniality_value);
-    farmingCongenialityTextView.setText(Integer.toString(
-        planet.getFarmingCongeniality()));
+    farmingCongenialityTextView.setText(
+        String.format(Locale.ENGLISH, "%d", planet.getFarmingCongeniality()));
     farmingCongenialityProgressBar.setProgress(
-        (int) (farmingCongenialityProgressBar.getMax() * (planet.getFarmingCongeniality() / 100.0)));
+        (int) (farmingCongenialityProgressBar.getMax()
+            * (planet.getFarmingCongeniality() / 100.0)));
 
     ProgressBar miningCongenialityProgressBar = view.findViewById(
         R.id.solarsystem_mining_congeniality);
     TextView miningCongenialityTextView = view.findViewById(
         R.id.solarsystem_mining_congeniality_value);
-    miningCongenialityTextView.setText(Integer.toString(
-        planet.getMiningCongeniality()));
+    miningCongenialityTextView.setText(
+        String.format(Locale.ENGLISH, "%d", planet.getMiningCongeniality()));
     miningCongenialityProgressBar.setProgress(
         (int) (miningCongenialityProgressBar.getMax() * (planet.getMiningCongeniality() / 100.0)));
 

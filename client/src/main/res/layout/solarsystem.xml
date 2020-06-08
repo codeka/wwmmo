@@ -25,24 +25,17 @@
         android:layout_above="@+id/bottom_pane"
         android:layout_marginBottom="-4px" />
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/bottom_pane"
         style="@style/BottomPane"
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:layout_alignParentBottom="true" >
-
-        <au.com.codeka.warworlds.ctrl.InfobarView
-            android:id="@+id/infobar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_above="@id/infobar"
+            android:layout_height="wrap_content"
             android:baselineAligned="false"
             android:orientation="horizontal" >
 
@@ -50,7 +43,7 @@
                 android:id="@+id/bottom_left_pane"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/planet_name"
@@ -80,7 +73,7 @@
 
                 <RelativeLayout android:id="@+id/enemy_colony_details"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="wrap_content"
                                 android:layout_below="@id/population_count"
                                 android:visibility="gone">
                     <ImageView android:id="@+id/enemy_empire_icon"
@@ -161,7 +154,7 @@
                 android:id="@+id/bottom_right_pane"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
                 <View android:id="@+id/btn_spacer"
                       android:layout_width="1dp"
@@ -194,7 +187,7 @@
                     android:text="Sit. Rep." />
 
                 <ScrollView android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="180dp"
                             android:layout_below="@+id/sitrep_btn">
                     <au.com.codeka.warworlds.ctrl.FleetListSimple
                               android:id="@+id/fleet_list"
@@ -204,7 +197,12 @@
                 </ScrollView>
             </RelativeLayout>
         </LinearLayout>
-    </RelativeLayout>
+
+        <au.com.codeka.warworlds.ctrl.InfobarView
+            android:id="@+id/infobar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <au.com.codeka.warworlds.ctrl.SelectionView
         android:id="@+id/selection"
