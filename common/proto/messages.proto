@@ -773,6 +773,12 @@ message EmpirePresence {
 message ColonizeRequest {
   // The index of the planet you want to colonize
   optional int32 planet_index = 1;
+
+  // If set, these are the default values you want set for focus initially.
+  optional float focus_population = 2;
+  optional float focus_farming = 3;
+  optional float focus_mining = 4;
+  optional float focus_construction = 5;
 }
 
 //

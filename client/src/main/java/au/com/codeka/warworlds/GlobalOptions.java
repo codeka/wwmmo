@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,7 +15,7 @@ public class GlobalOptions {
   private SharedPreferences preferences;
 
   private static CopyOnWriteArrayList<OptionsChangedListener> mOptionsChangedListeners =
-      new CopyOnWriteArrayList<OptionsChangedListener>();
+      new CopyOnWriteArrayList<>();
 
   public static void addOptionsChangedListener(OptionsChangedListener listener) {
     if (!mOptionsChangedListeners.contains(listener)) {
@@ -35,18 +36,17 @@ public class GlobalOptions {
   public GlobalOptions() {
     preferences = PreferenceManager.getDefaultSharedPreferences(App.i);
 
-    preferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-      @Override
-      public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.startsWith("GlobalOptions.")) {
-          fireOptionsChanged(GlobalOptions.this);
-        }
+    preferences.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {
+      if (key.startsWith("GlobalOptions.")) {
+        fireOptionsChanged(GlobalOptions.this);
       }
     });
   }
 
   public StarfieldDetail getStarfieldDetail() {
-    String val = preferences.getString("GlobalOptions.StarfieldDetail", StarfieldDetail.STARS_AND_GAS.toString());
+    String val =
+        preferences.getString(
+            "GlobalOptions.StarfieldDetail", StarfieldDetail.STARS_AND_GAS.toString());
     for (StarfieldDetail d : StarfieldDetail.values()) {
       if (d.toString().equals(val)) {
         return d;
@@ -93,7 +93,9 @@ public class GlobalOptions {
   }
 
   public AutoSendCrashReport getAutoSendCrashReport() {
-    String str = preferences.getString("GlobalOptions.AutoSendCrashReports", AutoSendCrashReport.Ask.toString());
+    String str =
+        preferences.getString(
+            "GlobalOptions.AutoSendCrashReports", AutoSendCrashReport.Ask.toString());
     if (str.equals("0"))
       return AutoSendCrashReport.Ask;
     return AutoSendCrashReport.valueOf(str);
@@ -141,7 +143,8 @@ public class GlobalOptions {
   }
 
   public ArrayList<Integer> getMutedConversations() {
-    String name = "GlobalOptions.MutedConversations[" + RealmContext.i.getCurrentRealm().getID() + "]";
+    String name =
+        "GlobalOptions.MutedConversations[" + RealmContext.i.getCurrentRealm().getID() + "]";
     String value = preferences.getString(name, "");
     ArrayList<Integer> conversationIDs = new ArrayList<Integer>();
     for (String s : value.split(",")) {
@@ -170,7 +173,8 @@ public class GlobalOptions {
       sb.append(id);
     }
 
-    String name = "GlobalOptions.MutedConversations[" + RealmContext.i.getCurrentRealm().getID() + "]";
+    String name =
+        "GlobalOptions.MutedConversations[" + RealmContext.i.getCurrentRealm().getID() + "]";
     preferences.edit()
         .putString(name, sb.toString())
         .apply();
@@ -179,6 +183,37 @@ public class GlobalOptions {
   public boolean isConversationMuted(int convID) {
     ArrayList<Integer> mutedConversations = getMutedConversations();
     return mutedConversations.contains(convID);
+  }
+
+  static class DefaultInitialFocus {
+    public float focusPopulation = 0.25f;
+    public float focusFarming = 0.25f;
+    public float focusMining = 0.25f;
+    public float focusConstruction = 0.25f;
+  }
+
+  public DefaultInitialFocus getDefaultInitialFocus() {
+    String val = preferences.getString("GlobalOptions.DefaultInitialFocus", "");
+    DefaultInitialFocus dif = new DefaultInitialFocus();
+    String[] split = val.split(",");
+    if (split.length != 4) {
+      return dif;
+    }
+
+    dif.focusPopulation = Float.parseFloat(split[0]);
+    dif.focusFarming = Float.parseFloat(split[1]);
+    dif.focusMining = Float.parseFloat(split[2]);
+    dif.focusConstruction = Float.parseFloat(split[3]);
+    return dif;
+  }
+
+  public void setDefaultInitialFocus(DefaultInitialFocus dif) {
+    String val = String.format(
+        Locale.ENGLISH, "%.2f,%.2f,%.2f,%.2f", dif.focusPopulation, dif.focusFarming,
+        dif.focusMining, dif.focusConstruction);
+    preferences.edit()
+        .putString("GlobalOptions.DefaultInitialFocus", val)
+        .apply();
   }
 
   /**

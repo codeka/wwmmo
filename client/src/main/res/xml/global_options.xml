@@ -13,6 +13,11 @@
             android:title="Unique Stars &amp; Planets" />
     </PreferenceCategory>
     <PreferenceCategory
+        android:key="pref_key_game"
+        android:title="Game settings">
+        <DialogPreference />
+    </PreferenceCategory>
+    <PreferenceCategory
         android:key="pref_key_conn"
         android:title="Connection">
         <CheckBoxPreference
