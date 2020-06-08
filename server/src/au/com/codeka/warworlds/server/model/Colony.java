@@ -56,6 +56,14 @@ public class Colony extends BaseColony {
       mEmpireID = empireID;
       mEmpireKey = Integer.toString(mEmpireID);
     }
+
+    // Make sure the focuses add up to 1.0.
+    float total = focusPopulation + focusFarming + focusMining + focusConstruction;
+    focusPopulation *= 1.0f / total;
+    focusFarming *= 1.0f / total;
+    focusMining *= 1.0f / total;
+    focusConstruction *= 1.0f / total;
+
     mPopulationFocus = focusPopulation;
     mConstructionFocus = focusConstruction;
     mFarmingFocus = focusFarming;
