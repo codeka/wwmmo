@@ -19,9 +19,7 @@ import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
-/**
- * Handles the /realms/.../stars/<star_id>/colonies URLs.
- */
+/** Handles the /realms/.../stars/<star_id>/colonies URLs. */
 public class ColoniesHandler extends RequestHandler {
   @Override
   protected void post() throws RequestException {
@@ -90,11 +88,14 @@ public class ColoniesHandler extends RequestHandler {
         population = 400.0f;
       }
 
-      // remove a ship from your colonyship fleet
+      // remove a ship from your colony ship fleet
       new FleetController(t).removeShips(star, colonyShipFleet, 1.0f);
 
       // and colonize the planet!
-      Colony colony = new ColonyController(t).colonize(myEmpire, star, planetIndex, population);
+      Colony colony =
+          new ColonyController(t).colonize(myEmpire, star, planetIndex, population,
+              colonize_request_pb.getFocusPopulation(), colonize_request_pb.getFocusFarming(),
+              colonize_request_pb.getFocusMining(), colonize_request_pb.getFocusConstruction());
 
       Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
       colony.toProtocolBuffer(colony_pb);

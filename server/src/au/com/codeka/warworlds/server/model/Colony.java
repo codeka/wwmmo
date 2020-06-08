@@ -44,7 +44,8 @@ public class Colony extends BaseColony {
   }
 
   public Colony(int id, int sectorID, int starID, int planetIndex, Integer empireID,
-                float population) {
+                float population, float focusPopulation, float focusFarming, float focusMining,
+                float focusConstruction) {
     mID = id;
     mKey = Integer.toString(mID);
     mSectorID = sectorID;
@@ -55,10 +56,10 @@ public class Colony extends BaseColony {
       mEmpireID = empireID;
       mEmpireKey = Integer.toString(mEmpireID);
     }
-    mPopulationFocus = 0.25f;
-    mConstructionFocus = 0.25f;
-    mFarmingFocus = 0.25f;
-    mMiningFocus = 0.25f;
+    mPopulationFocus = focusPopulation;
+    mConstructionFocus = focusConstruction;
+    mFarmingFocus = focusFarming;
+    mMiningFocus = focusMining;
     mUncollectedTaxes = 0.0f;
     mCooldownTimeEnd = new DateTime().plusHours(8);
     mPopulation = population;

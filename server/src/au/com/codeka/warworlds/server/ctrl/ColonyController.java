@@ -281,8 +281,9 @@ public class ColonyController {
   }
 
   public Colony colonize(
-      Empire empire, Star star, int planetIndex, float population) throws RequestException {
-    Colony colony = null;
+      Empire empire, Star star, int planetIndex, float population, float focusPopulation,
+      float focusFarming, float focusMining, float focusConstruction) throws RequestException {
+    Colony colony;
 
     // add the initial colony and fleets to the star
     String sql = "INSERT INTO colonies (sector_id, star_id, planet_index, empire_id," +
@@ -292,7 +293,8 @@ public class ColonyController {
         " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     try (SqlStmt stmt = db.prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
       colony = new Colony(0, star.getSectorID(), star.getID(), planetIndex,
-          empire == null ? null : empire.getID(), population);
+          empire == null ? null : empire.getID(), population, focusPopulation, focusFarming,
+          focusMining, focusConstruction);
       stmt.setInt(1, colony.getSectorID());
       stmt.setInt(2, colony.getStarID());
       stmt.setInt(3, colony.getPlanetIndex());

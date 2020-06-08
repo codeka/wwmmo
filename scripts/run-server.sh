@@ -13,6 +13,9 @@ function build_and_run_server()
 {
   pushd $ROOTPATH > /dev/null
   ./gradlew --daemon :server:installDist
+  if [ $? != 0 ]; then
+    return $?
+  fi
   popd > /dev/null
 
   pushd $INSTALLPATH > /dev/null

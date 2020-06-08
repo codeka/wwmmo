@@ -17,6 +17,7 @@ import javax.validation.constraints.NotNull;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.RunnableArg;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
@@ -56,21 +57,26 @@ public class MyEmpire extends Empire {
     }
 
     String url = String.format("stars/%s/colonies", planet.getStar().getKey());
+    GlobalOptions.DefaultInitialFocus dif = new GlobalOptions().getDefaultInitialFocus();
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST")
-        .body(Messages.ColonizeRequest.newBuilder().setPlanetIndex(planet.getIndex()).build())
-        .completeCallback(new ApiRequest.CompleteCallback() {
-          @Override
-          public void onRequestComplete(ApiRequest request) {
-            Colony colony = new Colony();
-            colony.fromProtocolBuffer(request.body(Messages.Colony.class));
+        .body(
+            Messages.ColonizeRequest.newBuilder()
+                .setPlanetIndex(planet.getIndex())
+                .setFocusPopulation(dif.focusPopulation)
+                .setFocusFarming(dif.focusFarming)
+                .setFocusMining(dif.focusMining)
+                .setFocusConstruction(dif.focusConstruction)
+                .build())
+        .completeCallback(request -> {
+          Colony colony = new Colony();
+          colony.fromProtocolBuffer(request.body(Messages.Colony.class));
 
-            if (callback != null) {
-              callback.onColonizeComplete(colony);
-            }
-
-            // make sure we record the fact that the star is updated as well
-            StarManager.i.refreshStar(Integer.parseInt(colony.getStarKey()));
+          if (callback != null) {
+            callback.onColonizeComplete(colony);
           }
+
+          // make sure we record the fact that the star is updated as well
+          StarManager.i.refreshStar(Integer.parseInt(colony.getStarKey()));
         }).build());
   }
 

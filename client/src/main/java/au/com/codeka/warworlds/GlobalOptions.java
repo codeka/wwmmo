@@ -185,7 +185,7 @@ public class GlobalOptions {
     return mutedConversations.contains(convID);
   }
 
-  static class DefaultInitialFocus {
+  public static class DefaultInitialFocus {
     public float focusPopulation = 0.25f;
     public float focusFarming = 0.25f;
     public float focusMining = 0.25f;

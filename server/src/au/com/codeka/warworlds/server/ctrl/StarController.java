@@ -1061,7 +1061,7 @@ public class StarController {
       for (int i = 0; i < numColonies; i++) {
         Planet planet = planets.get(i);
         Colony colony = new ColonyController(getTransaction())
-            .colonize(null, star, planet.getIndex(), 100.0f);
+            .colonize(null, star, planet.getIndex(), 100.0f, 0.25f, 0.25f, 0.25f, 0.25f);
         colony.setConstructionFocus(0.0f);
         colony.setPopulationFocus(0.5f);
         colony.setFarmingFocus(0.5f);

@@ -357,8 +357,9 @@ public class EmpireController {
     star = new StarController().getStar(star.getID());
     Planet planet = (Planet) star.getPlanets()[starFinder.getPlanetIndex() - 1];
 
+    // TODO: we could probably use the user's configured defaults for focus here too.
     new ColonyController(db.getTransaction()).colonize(empire, star, starFinder.getPlanetIndex(),
-        planet.getPopulationCongeniality() * 0.8f);
+        planet.getPopulationCongeniality() * 0.8f, 0.25f, 0.25f, 0.25f, 0.25f);
 
     new FleetController(db.getTransaction()).createFleet(empire, star, "colonyship", 2.0f);
     new FleetController(db.getTransaction()).createFleet(empire, star, "scout", 10.0f);
