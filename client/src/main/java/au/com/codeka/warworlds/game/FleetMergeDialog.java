@@ -94,32 +94,19 @@ public class FleetMergeDialog extends DialogFragment {
     b.setTitle("Merge Fleet");
 
     if (!isError) {
-      b.setPositiveButton("Merge", new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-          onMergeClick();
-        }
-      });
+      b.setPositiveButton("Merge", (dialog, which) -> onMergeClick());
     }
 
     b.setNegativeButton("Cancel", null);
 
     final StyledDialog dialog = b.create();
-    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-      @Override
-      public void onShow(DialogInterface d) {
-        dialog.getPositiveButton().setEnabled(false);
-      }
-    });
+    dialog.setOnShowListener(d -> dialog.getPositiveButton().setEnabled(false));
 
-    fleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Fleet f = (Fleet) adapter.getItem(position);
-        selectedFleet = f;
-        adapter.notifyDataSetChanged();
-        dialog.getPositiveButton().setEnabled(true);
-      }
+    fleetList.setOnItemClickListener((parent, view, position, id) -> {
+      Fleet f = (Fleet) adapter.getItem(position);
+      selectedFleet = f;
+      adapter.notifyDataSetChanged();
+      dialog.getPositiveButton().setEnabled(true);
     });
 
     return dialog;
@@ -145,14 +132,12 @@ public class FleetMergeDialog extends DialogFragment {
     }
     if (hasDifferentUpgrades) {
       new StyledDialog.Builder(getActivity())
-          .setMessage("These fleets have different upgrades, you'll lose any upgrades that aren't on both fleets. Are you sure you want to merge them?")
+          .setMessage("These fleets have different upgrades, you'll lose any upgrades that aren't" +
+              " on both fleets. Are you sure you want to merge them?")
           .setTitle("Different upgrades")
-          .setPositiveButton("Merge", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              dialog.dismiss();
-              doMerge();
-            }
+          .setPositiveButton("Merge", (dialog, which) -> {
+            dialog.dismiss();
+            doMerge();
           }).setNegativeButton("Cancel", null)
           .create().show();
     } else {
@@ -202,13 +187,9 @@ public class FleetMergeDialog extends DialogFragment {
     public void setFleets(List<Fleet> fleets) {
       mFleets = new ArrayList<Fleet>(fleets);
 
-      Collections.sort(mFleets, new Comparator<Fleet>() {
-        @Override
-        public int compare(Fleet lhs, Fleet rhs) {
-          // by definition, they'll all be the same design so just
-          // sort based on number of ships
-          return (int) (rhs.getNumShips() - lhs.getNumShips());
-        }
+      Collections.sort(mFleets, (lhs, rhs) -> {
+        // by definition, they'll all be the same design so just sort based on number of ships.
+        return (int) (rhs.getNumShips() - lhs.getNumShips());
       });
 
       notifyDataSetChanged();
