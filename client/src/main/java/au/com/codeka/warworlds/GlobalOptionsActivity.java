@@ -11,6 +11,9 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 
 import au.com.codeka.warworlds.ctrl.PreferenceFragment;
+import au.com.codeka.warworlds.game.solarsystem.FocusDialog;
+import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Star;
 
 public class GlobalOptionsActivity extends BaseActivity {
 
@@ -86,6 +89,20 @@ public class GlobalOptionsActivity extends BaseActivity {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
       setPreferencesFromResource(R.xml.global_options, rootKey);
+    }
+
+    @Override
+    public void onDisplayPreferenceDialog(Preference preference) {
+      // TODO: we only have one.
+      FocusDialog dialog = new FocusDialog();
+      GlobalOptions.DefaultInitialFocus dif = new GlobalOptions().getDefaultInitialFocus();
+      dialog.setCallback((focusPopulation, focusFarming, focusMining, focusConstruction) ->
+          new GlobalOptions().setDefaultInitialFocus(
+              new GlobalOptions.DefaultInitialFocus(
+                  focusPopulation, focusFarming, focusMining, focusConstruction)));
+      dialog.setInitialValues(
+          dif.focusPopulation, dif.focusFarming, dif.focusMining, dif.focusConstruction);
+      dialog.show(getActivity().getSupportFragmentManager(), "");
     }
 
     @Override

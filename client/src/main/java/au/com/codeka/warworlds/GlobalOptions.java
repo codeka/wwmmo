@@ -190,6 +190,17 @@ public class GlobalOptions {
     public float focusFarming = 0.25f;
     public float focusMining = 0.25f;
     public float focusConstruction = 0.25f;
+
+    public DefaultInitialFocus() {
+    }
+
+    public DefaultInitialFocus(
+        float focusPopulation, float focusFarming, float focusMining, float focusConstruction) {
+      this.focusPopulation = focusPopulation;
+      this.focusFarming = focusFarming;
+      this.focusMining = focusMining;
+      this.focusConstruction = focusConstruction;
+    }
   }
 
   public DefaultInitialFocus getDefaultInitialFocus() {

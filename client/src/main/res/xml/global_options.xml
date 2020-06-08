@@ -15,7 +15,10 @@
     <PreferenceCategory
         app:key="pref_key_game"
         app:title="Game settings">
-        <au.com.codeka.warworlds.DefaultFocusDialogPreference />
+        <au.com.codeka.warworlds.DefaultFocusDialogPreference
+            app:key="GlobalOptions.DefaultInitialFocus"
+            app:title="Initial colony focus"
+            app:summary="When colonizing a new planet, the focus will be set to this initially."/>
     </PreferenceCategory>
     <PreferenceCategory
         app:key="pref_key_conn"

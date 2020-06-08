@@ -7,6 +7,8 @@ import androidx.preference.DialogPreference;
 
 public class DefaultFocusDialogPreference extends DialogPreference {
   public DefaultFocusDialogPreference(Context context, AttributeSet attributeSet) {
-    super(context);
+    super(context, attributeSet);
+    setPersistent(true);
+    setDialogLayoutResource(R.layout.focus_dlg);
   }
 }

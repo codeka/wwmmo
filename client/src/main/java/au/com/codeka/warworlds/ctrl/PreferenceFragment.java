@@ -7,4 +7,5 @@ import androidx.preference.PreferenceFragmentCompat;
  * A {@link Fragment} that loads and displays preferences.
  */
 public abstract class PreferenceFragment extends PreferenceFragmentCompat {
+
 }
