@@ -1,268 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
-        android:key="pref_key_graphics"
-        android:title="Graphics">
+        app:key="pref_key_graphics"
+        app:title="Graphics">
         <ListPreference
-            android:defaultValue="STARS_AND_GAS"
-            android:key="GlobalOptions.StarfieldDetail"
-            android:title="Starfield Detail" />
+            app:defaultValue="STARS_AND_GAS"
+            app:key="GlobalOptions.StarfieldDetail"
+            app:title="Starfield Detail" />
         <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="GlobalOptions.GenUniqueStarsAndPlanets"
-            android:title="Unique Stars &amp; Planets" />
+            app:defaultValue="false"
+            app:key="GlobalOptions.GenUniqueStarsAndPlanets"
+            app:title="Unique Stars &amp; Planets" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:key="pref_key_game"
-        android:title="Game settings">
-        <DialogPreference />
+        app:key="pref_key_game"
+        app:title="Game settings">
+        <au.com.codeka.warworlds.DefaultFocusDialogPreference />
     </PreferenceCategory>
     <PreferenceCategory
-        android:key="pref_key_conn"
-        android:title="Connection">
+        app:key="pref_key_conn"
+        app:title="Connection">
         <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="GlobalOptions.NonSecureServerConnection"
-            android:title="Use non-secure server connection" />
+            app:defaultValue="false"
+            app:key="GlobalOptions.NonSecureServerConnection"
+            app:title="Use non-secure server connection" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:key="pref_key_chat"
-        android:title="Chat">
+        app:key="pref_key_chat"
+        app:title="Chat">
         <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="GlobalOptions.AutoTranslateChatMessages"
-            android:title="Auto-translate" />
+            app:defaultValue="false"
+            app:key="GlobalOptions.AutoTranslateChatMessages"
+            app:title="Auto-translate" />
         <ListPreference
-            android:defaultValue="None"
-            android:key="GlobalOptions.ChatProfanityFilterLevel"
-            android:title="Profanity Filter" />
+            app:defaultValue="None"
+            app:key="GlobalOptions.ChatProfanityFilterLevel"
+            app:title="Profanity Filter" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:key="pref_key_crash_reports"
-        android:title="Crash Reports">
+        app:key="pref_key_crash_reports"
+        app:title="Crash Reports">
         <ListPreference
-            android:defaultValue="Ask"
-            android:key="GlobalOptions.AutoSendCrashReports"
-            android:title="Auto-send Crash Reports" />
+            app:defaultValue="Ask"
+            app:key="GlobalOptions.AutoSendCrashReports"
+            app:title="Auto-send Crash Reports" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:key="pref_key_notifications"
-        android:title="Notifications">
+        app:key="pref_key_notifications"
+        app:title="Notifications">
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="GlobalOptions.EnableNotifications"
-            android:title="Enable Notifications" />
-        <PreferenceScreen
-            android:dependency="GlobalOptions.EnableNotifications"
-            android:key="GlobalOptions.Notifications[BUILDING_BUILD_COMPLETE]"
-            android:title="Building constructed">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="GlobalOptions.Notifications[BUILDING_BUILD_COMPLETE].Enabled"
-                android:title="Notification Enabled" />
-            <RingtonePreference
-                android:dependency="GlobalOptions.Notifications[BUILDING_BUILD_COMPLETE].Enabled"
-                android:key="GlobalOptions.Notifications[BUILDING_BUILD_COMPLETE].Ringtone"
-                android:ringtoneType="notification"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:title="Ringtone" />
-            <ListPreference
-                android:defaultValue="#FF0000"
-                android:dependency="GlobalOptions.Notifications[BUILDING_BUILD_COMPLETE].Enabled"
-                android:key="GlobalOptions.Notifications[BUILDING_BUILD_COMPLETE].LedColour"
-                android:summary=""
-                android:title="LED Color" />
-        </PreferenceScreen>
-        <PreferenceScreen
-            android:dependency="GlobalOptions.EnableNotifications"
-            android:key="GlobalOptions.Notifications[FLEET_BUILD_COMPLETE]"
-            android:title="Fleet constructed">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="GlobalOptions.Notifications[FLEET_BUILD_COMPLETE].Enabled"
-                android:title="Notification Enabled" />
-            <RingtonePreference
-                android:dependency="GlobalOptions.Notifications[FLEET_BUILD_COMPLETE].Enabled"
-                android:key="GlobalOptions.Notifications[FLEET_BUILD_COMPLETE].Ringtone"
-                android:ringtoneType="notification"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:title="Ringtone" />
-            <ListPreference
-                android:defaultValue="#FF0000"
-                android:dependency="GlobalOptions.Notifications[FLEET_BUILD_COMPLETE].Enabled"
-                android:key="GlobalOptions.Notifications[FLEET_BUILD_COMPLETE].LedColour"
-                android:summary=""
-                android:title="LED Color" />
-        </PreferenceScreen>
-        <PreferenceScreen
-            android:dependency="GlobalOptions.EnableNotifications"
-            android:key="GlobalOptions.Notifications[FLEET_MOVE_COMPLETE]"
-            android:title="Fleet move complete">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="GlobalOptions.Notifications[FLEET_MOVE_COMPLETE].Enabled"
-                android:title="Notification Enabled" />
-            <RingtonePreference
-                android:dependency="GlobalOptions.Notifications[FLEET_MOVE_COMPLETE].Enabled"
-                android:key="GlobalOptions.Notifications[FLEET_MOVE_COMPLETE].Ringtone"
-                android:ringtoneType="notification"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:title="Ringtone" />
-            <ListPreference
-                android:defaultValue="#FF0000"
-                android:dependency="GlobalOptions.Notifications[FLEET_MOVE_COMPLETE].Enabled"
-                android:key="GlobalOptions.Notifications[FLEET_MOVE_COMPLETE].LedColour"
-                android:title="LED Color" />
-        </PreferenceScreen>
-        <PreferenceScreen
-            android:dependency="GlobalOptions.EnableNotifications"
-            android:key="GlobalOptions.Notifications[FLEET_UNDER_ATTACK]"
-            android:title="Fleet under attack">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="GlobalOptions.Notifications[FLEET_UNDER_ATTACK].Enabled"
-                android:title="Notification Enabled" />
-            <RingtonePreference
-                android:dependency="GlobalOptions.Notifications[FLEET_UNDER_ATTACK].Enabled"
-                android:key="GlobalOptions.Notifications[FLEET_UNDER_ATTACK].Ringtone"
-                android:ringtoneType="notification"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:title="Ringtone" />
-            <ListPreference
-                android:defaultValue="#FF0000"
-                android:dependency="GlobalOptions.Notifications[FLEET_UNDER_ATTACK].Enabled"
-                android:key="GlobalOptions.Notifications[FLEET_UNDER_ATTACK].LedColour"
-                android:title="LED Color" />
-        </PreferenceScreen>
-        <PreferenceScreen
-            android:dependency="GlobalOptions.EnableNotifications"
-            android:key="GlobalOptions.Notifications[FLEET_DESTROYED]"
-            android:title="Fleet destroyed">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="GlobalOptions.Notifications[FLEET_DESTROYED].Enabled"
-                android:title="Notification Enabled" />
-            <RingtonePreference
-                android:dependency="GlobalOptions.Notifications[FLEET_DESTROYED].Enabled"
-                android:key="GlobalOptions.Notifications[FLEET_DESTROYED].Ringtone"
-                android:ringtoneType="notification"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:title="Ringtone" />
-            <ListPreference
-                android:defaultValue="#FF0000"
-                android:dependency="GlobalOptions.Notifications[FLEET_DESTROYED].Enabled"
-                android:key="GlobalOptions.Notifications[FLEET_DESTROYED].LedColour"
-                android:title="LED Color" />
-        </PreferenceScreen>
-        <PreferenceScreen
-            android:dependency="GlobalOptions.EnableNotifications"
-            android:key="GlobalOptions.Notifications[FLEET_VICTORIOUS]"
-            android:title="Fleet victorious">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="GlobalOptions.Notifications[FLEET_VICTORIOUS].Enabled"
-                android:title="Notification Enabled" />
-            <RingtonePreference
-                android:dependency="GlobalOptions.Notifications[FLEET_VICTORIOUS].Enabled"
-                android:key="GlobalOptions.Notifications[FLEET_VICTORIOUS].Ringtone"
-                android:ringtoneType="notification"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:title="Ringtone" />
-            <ListPreference
-                android:defaultValue="#FF0000"
-                android:dependency="GlobalOptions.Notifications[FLEET_VICTORIOUS].Enabled"
-                android:key="GlobalOptions.Notifications[FLEET_VICTORIOUS].LedColour"
-                android:title="LED Color" />
-        </PreferenceScreen>
-        <PreferenceScreen
-            android:dependency="GlobalOptions.EnableNotifications"
-            android:key="GlobalOptions.Notifications[COLONY_DESTROYED]"
-            android:title="Colony Destroyed">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="GlobalOptions.Notifications[COLONY_DESTROYED].Enabled"
-                android:title="Notification Enabled" />
-            <RingtonePreference
-                android:dependency="GlobalOptions.Notifications[COLONY_DESTROYED].Enabled"
-                android:key="GlobalOptions.Notifications[COLONY_DESTROYED].Ringtone"
-                android:ringtoneType="notification"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:title="Ringtone" />
-            <ListPreference
-                android:defaultValue="#FF0000"
-                android:dependency="GlobalOptions.Notifications[COLONY_DESTROYED].Enabled"
-                android:key="GlobalOptions.Notifications[COLONY_DESTROYED].LedColour"
-                android:title="LED Color" />
-        </PreferenceScreen>
-        <PreferenceScreen
-            android:dependency="GlobalOptions.EnableNotifications"
-            android:key="GlobalOptions.Notifications[COLONY_ATTACKED]"
-            android:title="Colony Attacked">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="GlobalOptions.Notifications[COLONY_ATTACKED].Enabled"
-                android:title="Notification Enabled" />
-            <RingtonePreference
-                android:dependency="GlobalOptions.Notifications[COLONY_ATTACKED].Enabled"
-                android:key="GlobalOptions.Notifications[COLONY_ATTACKED].Ringtone"
-                android:ringtoneType="notification"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:title="Ringtone" />
-            <ListPreference
-                android:defaultValue="#FF0000"
-                android:dependency="GlobalOptions.Notifications[COLONY_ATTACKED].Enabled"
-                android:key="GlobalOptions.Notifications[COLONY_ATTACKED].LedColour"
-                android:title="LED Color" />
-        </PreferenceScreen>
-        <PreferenceScreen
-            android:dependency="GlobalOptions.EnableNotifications"
-            android:key="GlobalOptions.Notifications[STAR_GOODS_ZERO]"
-            android:title="Food Depleted">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="GlobalOptions.Notifications[STAR_GOODS_ZERO].Enabled"
-                android:title="Notification Enabled" />
-            <RingtonePreference
-                android:dependency="GlobalOptions.Notifications[STAR_GOODS_ZERO].Enabled"
-                android:key="GlobalOptions.Notifications[STAR_GOODS_ZERO].Ringtone"
-                android:ringtoneType="notification"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:title="Ringtone" />
-            <ListPreference
-                android:defaultValue="#FF0000"
-                android:dependency="GlobalOptions.Notifications[STAR_GOODS_ZERO].Enabled"
-                android:key="GlobalOptions.Notifications[STAR_GOODS_ZERO].LedColour"
-                android:title="LED Color" />
-        </PreferenceScreen>
-        <PreferenceScreen
-            android:dependency="GlobalOptions.EnableNotifications"
-            android:key="GlobalOptions.Notifications[CHAT_MESSAGE]"
-            android:title="Private Chat Message">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="GlobalOptions.Notifications[CHAT_MESSAGE].Enabled"
-                android:title="Notification Enabled" />
-            <RingtonePreference
-                android:dependency="GlobalOptions.Notifications[CHAT_MESSAGE].Enabled"
-                android:key="GlobalOptions.Notifications[CHAT_MESSAGE].Ringtone"
-                android:ringtoneType="notification"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:title="Ringtone" />
-            <ListPreference
-                android:defaultValue="#FF0000"
-                android:dependency="GlobalOptions.Notifications[CHAT_MESSAGE].Enabled"
-                android:key="GlobalOptions.Notifications[CHAT_MESSAGE].LedColour"
-                android:title="LED Color" />
-        </PreferenceScreen>
+            app:defaultValue="true"
+            app:key="GlobalOptions.EnableNotifications"
+            app:title="Enable Notifications" />
+        <CheckBoxPreference
+            app:dependency="GlobalOptions.EnableNotifications"
+            app:key="GlobalOptions.Notifications[BUILDING_BUILD_COMPLETE].Enabled"
+            app:title="Building constructed" />
+        <CheckBoxPreference
+            app:dependency="GlobalOptions.EnableNotifications"
+            app:key="GlobalOptions.Notifications[FLEET_BUILD_COMPLETE].Enabled"
+            app:title="Fleet constructed" />
+        <CheckBoxPreference
+            app:dependency="GlobalOptions.EnableNotifications"
+            app:key="GlobalOptions.Notifications[FLEET_MOVE_COMPLETE].Enabled"
+            app:title="Fleet move complete" />
+        <CheckBoxPreference
+            app:dependency="GlobalOptions.EnableNotifications"
+            app:key="GlobalOptions.Notifications[FLEET_UNDER_ATTACK].Enabled"
+            app:title="Fleet under attack" />
+        <CheckBoxPreference
+            app:dependency="GlobalOptions.EnableNotifications"
+            app:key="GlobalOptions.Notifications[FLEET_DESTROYED].Enabled"
+            app:title="Fleet destroyed" />
+        <CheckBoxPreference
+            app:dependency="GlobalOptions.EnableNotifications"
+            app:key="GlobalOptions.Notifications[FLEET_VICTORIOUS].Enabled"
+            app:title="Fleet victorious" />
+        <CheckBoxPreference
+            app:dependency="GlobalOptions.EnableNotifications"
+            app:key="GlobalOptions.Notifications[COLONY_DESTROYED].Enabled"
+            app:title="Colony Destroyed" />
+        <CheckBoxPreference
+            app:dependency="GlobalOptions.EnableNotifications"
+            app:key="GlobalOptions.Notifications[COLONY_ATTACKED].Enabled"
+            app:title="Colony Attacked" />
+        <CheckBoxPreference
+            app:dependency="GlobalOptions.EnableNotifications"
+            app:key="GlobalOptions.Notifications[STAR_GOODS_ZERO].Enabled"
+            app:title="Food Depleted" />
+        <CheckBoxPreference
+            app:dependency="GlobalOptions.EnableNotifications"
+            app:key="GlobalOptions.Notifications[CHAT_MESSAGE].Enabled"
+            app:title="Private Chat Message" />
     </PreferenceCategory>
 </PreferenceScreen>

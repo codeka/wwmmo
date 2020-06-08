@@ -2,19 +2,13 @@ package au.com.codeka.warworlds;
 
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.RingtonePreference;
 import android.text.Html;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
-import java.util.Locale;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
 
 import au.com.codeka.warworlds.ctrl.PreferenceFragment;
 
@@ -90,9 +84,13 @@ public class GlobalOptionsActivity extends BaseActivity {
         "Filter all profanity", "Filter only strong profanity", "Filter nothing"};
 
     @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+      setPreferencesFromResource(R.xml.global_options, rootKey);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
-      addPreferencesFromResource(R.xml.global_options);
 
       ListPreference starfieldDetail = (ListPreference) findPreference(
           "GlobalOptions.StarfieldDetail");
@@ -115,12 +113,6 @@ public class GlobalOptionsActivity extends BaseActivity {
         if (colour != null) {
           colour.setEntryValues(COLOUR_VALUES);
           colour.setEntries(COLOUR_DISPLAY);
-        }
-
-        RingtonePreference ringtone = (RingtonePreference) findPreference(
-            String.format("GlobalOptions.Notifications[%s].Ringtone", kind));
-        if (ringtone != null) {
-          ringtone.setDefaultValue(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
         }
       }
     }
@@ -210,35 +202,10 @@ public class GlobalOptionsActivity extends BaseActivity {
 
         GlobalOptions.NotificationOptions options = opts.getNotificationOptions(kind);
 
-        Ringtone ringtone = RingtoneManager.getRingtone(
-            getActivity(), Uri.parse(options.getRingtone()));
-        CharSequence colourName = "Unknown";
-        for (int i = 0; i < COLOUR_VALUES.length; i++) {
-          int c = Color.parseColor(COLOUR_VALUES[i]);
-          if (options.getLedColour() == c) {
-            colourName = COLOUR_DISPLAY[i];
-          }
-        }
-
         if (!options.isEnabled()) {
           p.setSummary("Disabled");
-        } else if (ringtone != null) {
-          p.setSummary(
-              String.format(Locale.ENGLISH, "%s, LED: %s",
-                  ringtone.getTitle(getActivity()), colourName));
         } else {
-          p.setSummary(String.format(Locale.ENGLISH, "LED: %s", colourName));
-        }
-
-        p = findPreference(prefBaseName + ".LedColour");
-        if (p != null) {
-          p.setSummary(colourName);
-        }
-
-
-        p = findPreference(prefBaseName + ".Ringtone");
-        if (p != null && ringtone != null) {
-          p.setSummary(ringtone.getTitle(getActivity()));
+          p.setSummary("Enabled");
         }
       }
     }
