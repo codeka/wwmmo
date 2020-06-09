@@ -59,10 +59,17 @@ public class Colony extends BaseColony {
 
     // Make sure the focuses add up to 1.0.
     float total = focusPopulation + focusFarming + focusMining + focusConstruction;
-    focusPopulation *= 1.0f / total;
-    focusFarming *= 1.0f / total;
-    focusMining *= 1.0f / total;
-    focusConstruction *= 1.0f / total;
+    if (total < 0.1f) {
+      focusPopulation = 0.25f;
+      focusFarming = 0.25f;
+      focusMining = 0.25f;
+      focusConstruction = 0.25f;
+    } else {
+      focusPopulation *= 1.0f / total;
+      focusFarming *= 1.0f / total;
+      focusMining *= 1.0f / total;
+      focusConstruction *= 1.0f / total;
+    }
 
     mPopulationFocus = focusPopulation;
     mConstructionFocus = focusConstruction;
