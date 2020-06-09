@@ -93,16 +93,20 @@ public class GlobalOptionsActivity extends BaseActivity {
 
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
-      // TODO: we only have one.
-      FocusDialog dialog = new FocusDialog();
-      GlobalOptions.DefaultInitialFocus dif = new GlobalOptions().getDefaultInitialFocus();
-      dialog.setCallback((focusPopulation, focusFarming, focusMining, focusConstruction) ->
-          new GlobalOptions().setDefaultInitialFocus(
-              new GlobalOptions.DefaultInitialFocus(
-                  focusPopulation, focusFarming, focusMining, focusConstruction)));
-      dialog.setInitialValues(
-          dif.focusPopulation, dif.focusFarming, dif.focusMining, dif.focusConstruction);
-      dialog.show(getActivity().getSupportFragmentManager(), "");
+      if (preference.getKey().equals("GlobalOptions.DefaultInitialFocus")) {
+        FocusDialog dialog = new FocusDialog();
+        GlobalOptions.DefaultInitialFocus dif = new GlobalOptions().getDefaultInitialFocus();
+        dialog.setCallback((focusPopulation, focusFarming, focusMining, focusConstruction) ->
+            new GlobalOptions().setDefaultInitialFocus(
+                new GlobalOptions.DefaultInitialFocus(
+                    focusPopulation, focusFarming, focusMining, focusConstruction)));
+        dialog.setInitialValues(
+            dif.focusPopulation, dif.focusFarming, dif.focusMining, dif.focusConstruction);
+        dialog.show(getActivity().getSupportFragmentManager(), "");
+        return;
+      }
+
+      super.onDisplayPreferenceDialog(preference);
     }
 
     @Override
