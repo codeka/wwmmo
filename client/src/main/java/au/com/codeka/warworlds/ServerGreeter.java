@@ -10,8 +10,9 @@ import android.os.Debug;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
-import android.preference.PreferenceManager;
 import android.widget.Toast;
+
+import androidx.preference.PreferenceManager;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.auth.UserRecoverableAuthException;
