@@ -82,15 +82,14 @@ public class BuildQueueHandler extends RequestHandler {
             buildRequest.getDesignKind(), buildRequest.getCount(), buildRequest.getNotes(),
             buildRequest.getExistingBuildingID(), buildRequest.getExistingFleetID(),
             buildRequest.getUpgradeID());
-        new StarController(t).update(star);
       } else {
         new BuildQueueController(t).build(buildRequest);
 
         // add the build request to the star and simulate again
         star.getBuildRequests().add(buildRequest);
         new Simulation().simulate(star);
-        new StarController(t).update(star);
       }
+      new StarController(t).update(star);
 
       t.commit();
 

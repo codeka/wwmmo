@@ -18,53 +18,54 @@ import java.util.concurrent.atomic.AtomicInteger;
  * around a thread pool.
  */
 public abstract class BackgroundRunner {
-    private static final ThreadFactory sThreadFactory = new ThreadFactory() {
-        private final AtomicInteger mCount = new AtomicInteger(1);
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "BackgroundRunner #" + mCount.getAndIncrement());
-        }
+  private static final ThreadFactory sThreadFactory = new ThreadFactory() {
+    private final AtomicInteger mCount = new AtomicInteger(1);
+
+    public Thread newThread(Runnable r) {
+      return new Thread(r, "BackgroundRunner #" + mCount.getAndIncrement());
+    }
+  };
+
+  private static final BlockingQueue<Runnable> sPoolWorkQueue =
+      new LinkedBlockingQueue<Runnable>(250);
+
+  private static final Executor sExecutor = new ThreadPoolExecutor(
+      5, // core pool size
+      20, // max pool size
+      1, TimeUnit.SECONDS, // keep-alive time
+      sPoolWorkQueue, sThreadFactory);
+
+  private Callable<Void> mWorker;
+  private FutureTask<Void> mFuture;
+  private final AtomicBoolean mTaskInvoked = new AtomicBoolean();
+  private boolean mIsFinished;
+
+  public BackgroundRunner() {
+    mWorker = new Callable<Void>() {
+      @Override
+      public Void call() throws Exception {
+        mTaskInvoked.set(true);
+        Thread.currentThread().setPriority(Thread.NORM_PRIORITY - 1);
+        doInBackground();
+        return null;
+      }
     };
 
-    private static final BlockingQueue<Runnable> sPoolWorkQueue =
-            new LinkedBlockingQueue<Runnable>(250);
+    mFuture = new FutureTask<Void>(mWorker) {
+      @Override
+      protected void done() {
+        mIsFinished = true;
+      }
+    };
+  }
 
-    private static final Executor sExecutor = new ThreadPoolExecutor(
-            5, // core pool size
-            20, // max pool size
-            1, TimeUnit.SECONDS, // keep-alive time
-            sPoolWorkQueue, sThreadFactory);
+  public void execute() {
+    sExecutor.execute(mFuture);
+  }
 
-    private Callable<Void> mWorker;
-    private FutureTask<Void> mFuture;
-    private final AtomicBoolean mTaskInvoked = new AtomicBoolean();
-    private boolean mIsFinished;
+  public boolean isFinished() {
+    return mIsFinished;
+  }
 
-    public BackgroundRunner() {
-        mWorker = new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                mTaskInvoked.set(true);
-                Thread.currentThread().setPriority(Thread.NORM_PRIORITY - 1);
-                doInBackground();
-                return null;
-            }
-        };
-
-        mFuture = new FutureTask<Void>(mWorker) {
-            @Override
-            protected void done() {
-                mIsFinished = true;
-            }
-        };
-    }
-
-    public void execute() {
-        sExecutor.execute(mFuture);
-    }
-
-    public boolean isFinished() {
-        return mIsFinished;
-    }
-
-    protected abstract void doInBackground();
+  protected abstract void doInBackground();
 }

@@ -7,9 +7,11 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.warworlds.server.BackgroundRunner;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -21,135 +23,156 @@ import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildingController {
-    private DataBase db;
+  private static final Log log = new Log("BuildingController");
+  private DataBase db;
 
-    public BuildingController() {
-        db = new DataBase();
-    }
-    public BuildingController(Transaction trans) {
-        db = new DataBase(trans);
-    }
+  public BuildingController() {
+    db = new DataBase();
+  }
 
-    public Building createBuilding(Star star, Colony colony, String designID, String notes) throws RequestException {
-        try {
-            Building building = new Building(star, colony, designID, notes);
-            db.createBuilding(colony, building);
-            colony.getBuildings().add(building);
+  public BuildingController(Transaction trans) {
+    db = new DataBase(trans);
+  }
 
-            // TODO: hard-coded?
-            if (building.getDesignID().equals("hq")) {
-                new EmpireController().setHomeStar(colony.getEmpireID(), star.getID());
+  public Building createBuilding(
+      Star star, Colony colony, String designID, String notes) throws RequestException {
+    try {
+      Building building = new Building(star, colony, designID, notes);
+      db.createBuilding(colony, building);
+      colony.getBuildings().add(building);
+
+      // TODO: hard-coded?
+      if (building.getDesignID().equals("hq")) {
+        // Do this in a separate thread so as to not deadlock the current transaction. It doesn't
+        // matter if there's a delay here.
+        new BackgroundRunner() {
+          @Override
+          protected void doInBackground() {
+            try {
+              new EmpireController().setHomeStar(colony.getEmpireID(), star.getID());
+            } catch (RequestException e) {
+              log.error("Error setting home star.", e);
             }
+          }
+        }.execute();
+      }
 
-            return building;
-        } catch(Exception e) {
-            throw new RequestException(e);
-        }
+      return building;
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
+  public Building upgradeBuilding(
+      Star star, Colony colony, int buildingID) throws RequestException {
+    Building existingBuilding = null;
+    for (BaseBuilding building : colony.getBuildings()) {
+      if (((Building) building).getID() == buildingID) {
+        existingBuilding = (Building) building;
+        break;
+      }
+    }
+    if (existingBuilding == null) {
+      throw new RequestException(404);
     }
 
-    public Building upgradeBuilding(Star star, Colony colony, int buildingID) throws RequestException {
-        Building existingBuilding = null;
-        for (BaseBuilding building : colony.getBuildings()) {
-            if (((Building) building).getID() == buildingID) {
-                existingBuilding = (Building) building;
-                break;
-            }
-        }
-        if (existingBuilding == null) {
-            throw new RequestException(404);
-        }
-
-        BuildingDesign design = (BuildingDesign) DesignManager.i.getDesign(DesignKind.BUILDING, existingBuilding.getDesignID());
-        if (existingBuilding.getLevel() > design.getUpgrades().size()) {
-            return existingBuilding;
-        }
-
-        try {
-            db.upgradeBuilding(existingBuilding);
-            return existingBuilding;
-        } catch(Exception e) {
-            throw new RequestException(e);
-        }
+    BuildingDesign design =
+        (BuildingDesign) DesignManager.i.getDesign(
+            DesignKind.BUILDING, existingBuilding.getDesignID());
+    if (existingBuilding.getLevel() > design.getUpgrades().size()) {
+      return existingBuilding;
     }
 
-    public ArrayList<BuildingPosition> getBuildings(int empireID, long minSectorX, long minSectorY,
-            long maxSectorX, long maxSectorY) throws RequestException {
-        return getBuildings(empireID, minSectorX, minSectorY, maxSectorX, maxSectorY, null);
+    try {
+      db.upgradeBuilding(existingBuilding);
+      return existingBuilding;
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
+  public ArrayList<BuildingPosition> getBuildings(
+      int empireID, long minSectorX, long minSectorY, long maxSectorX, long maxSectorY)
+      throws RequestException {
+    return getBuildings(empireID, minSectorX, minSectorY, maxSectorX, maxSectorY, null);
+  }
+
+  public ArrayList<BuildingPosition> getBuildings(
+      int empireID, long minSectorX, long minSectorY, long maxSectorX, long maxSectorY,
+      @Nullable String designID) throws RequestException {
+    try {
+      return db.getBuildings(empireID, minSectorX, minSectorY, maxSectorX, maxSectorY, designID);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
+  private static class DataBase extends BaseDataBase {
+    public DataBase() {
+      super();
     }
 
-    public ArrayList<BuildingPosition> getBuildings(int empireID, long minSectorX, long minSectorY,
-            long maxSectorX, long maxSectorY, @Nullable String designID) throws RequestException {
-        try {
-            return db.getBuildings(empireID, minSectorX, minSectorY, maxSectorX, maxSectorY, designID);
-        } catch(Exception e) {
-            throw new RequestException(e);
-        }
+    public DataBase(Transaction trans) {
+      super(trans);
     }
 
-    private static class DataBase extends BaseDataBase {
-        public DataBase() {
-            super();
-        }
-        public DataBase(Transaction trans) {
-            super(trans);
-        }
-
-        public void createBuilding(Colony colony, Building building) throws Exception {
-            String sql = "INSERT INTO buildings (star_id, colony_id, empire_id," +
-                                               " design_id, build_time, level, notes)" +
-                        " VALUES (?, ?, ?, ?, ?, ?, ?)";
-            try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setInt(1, colony.getStarID());
-                stmt.setInt(2, colony.getID());
-                stmt.setInt(3, colony.getEmpireID());
-                stmt.setString(4, building.getDesignID());
-                stmt.setDateTime(5, DateTime.now());
-                stmt.setInt(6, 1);
-                stmt.setString(7, building.getNotes());
-                stmt.update();
-                building.setID(stmt.getAutoGeneratedID());
-            }
-        }
-
-        public void upgradeBuilding(Building building) throws Exception {
-            String sql = "UPDATE buildings SET level = level+1 WHERE id = ?";
-            try (SqlStmt stmt = prepare(sql)) {
-                stmt.setInt(1, building.getID());
-                stmt.update();
-                building.setLevel(building.getLevel()+1);
-            }
-        }
-
-        public ArrayList<BuildingPosition> getBuildings(int empireID, long minSectorX, long minSectorY,
-                long maxSectorX, long maxSectorY, @Nullable String designID) throws Exception {
-            String sql = "SELECT buildings.*, sectors.x AS sector_x, sectors.y AS sector_y," +
-                               " stars.x AS offset_x, stars.y AS offset_y " +
-                        " FROM buildings" +
-                        " INNER JOIN  stars ON buildings.star_id = stars.id" +
-                        " INNER JOIN sectors ON stars.sector_id = sectors.id" +
-                        " WHERE buildings.empire_id = ?" +
-                          " AND sectors.x >= ? AND sectors.x <= ?" +
-                          " AND sectors.y >= ? AND sectors.y <= ?";
-            if (designID != null) {
-                sql += " AND buildings.design_id = ?";
-            }
-            try (SqlStmt stmt = prepare(sql)) {
-                stmt.setInt(1, empireID);
-                stmt.setLong(2, minSectorX);
-                stmt.setLong(3, maxSectorX);
-                stmt.setLong(4, minSectorY);
-                stmt.setLong(5, maxSectorY);
-                if (designID != null) {
-                    stmt.setString(6, designID);
-                }
-                SqlResult res = stmt.select();
-
-                ArrayList<BuildingPosition> buildings = new ArrayList<BuildingPosition>();
-                while (res.next()) {
-                    buildings.add(new BuildingPosition(res));
-                }
-                return buildings;
-            }
-        }
+    public void createBuilding(Colony colony, Building building) throws Exception {
+      String sql = "INSERT INTO buildings (star_id, colony_id, empire_id," +
+          " design_id, build_time, level, notes)" +
+          " VALUES (?, ?, ?, ?, ?, ?, ?)";
+      try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
+        stmt.setInt(1, colony.getStarID());
+        stmt.setInt(2, colony.getID());
+        stmt.setInt(3, colony.getEmpireID());
+        stmt.setString(4, building.getDesignID());
+        stmt.setDateTime(5, DateTime.now());
+        stmt.setInt(6, 1);
+        stmt.setString(7, building.getNotes());
+        stmt.update();
+        building.setID(stmt.getAutoGeneratedID());
+      }
     }
+
+    public void upgradeBuilding(Building building) throws Exception {
+      String sql = "UPDATE buildings SET level = level+1 WHERE id = ?";
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, building.getID());
+        stmt.update();
+        building.setLevel(building.getLevel() + 1);
+      }
+    }
+
+    public ArrayList<BuildingPosition> getBuildings(
+        int empireID, long minSectorX, long minSectorY, long maxSectorX, long maxSectorY,
+        @Nullable String designID) throws Exception {
+      String sql = "SELECT buildings.*, sectors.x AS sector_x, sectors.y AS sector_y," +
+          " stars.x AS offset_x, stars.y AS offset_y " +
+          " FROM buildings" +
+          " INNER JOIN  stars ON buildings.star_id = stars.id" +
+          " INNER JOIN sectors ON stars.sector_id = sectors.id" +
+          " WHERE buildings.empire_id = ?" +
+          " AND sectors.x >= ? AND sectors.x <= ?" +
+          " AND sectors.y >= ? AND sectors.y <= ?";
+      if (designID != null) {
+        sql += " AND buildings.design_id = ?";
+      }
+      try (SqlStmt stmt = prepare(sql)) {
+        stmt.setInt(1, empireID);
+        stmt.setLong(2, minSectorX);
+        stmt.setLong(3, maxSectorX);
+        stmt.setLong(4, minSectorY);
+        stmt.setLong(5, maxSectorY);
+        if (designID != null) {
+          stmt.setString(6, designID);
+        }
+        SqlResult res = stmt.select();
+
+        ArrayList<BuildingPosition> buildings = new ArrayList<BuildingPosition>();
+        while (res.next()) {
+          buildings.add(new BuildingPosition(res));
+        }
+        return buildings;
+      }
+    }
+  }
 }
