@@ -13,6 +13,7 @@ import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.BackgroundRunner;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
@@ -105,10 +106,9 @@ public class ColonyController {
           star.getID(), star.getName(), colony.getEmpireID(), empireID, remainingPopulation,
           remainingShips));
       EmpireController empireController = new EmpireController(db.getTransaction());
-      Empire empire = null;
-      if (colony.getEmpireID() != null) {
-        empire = empireController.getEmpire(colony.getEmpireID());
-      }
+      final Empire empire = colony.getEmpireID() == null
+          ? null
+          : empireController.getEmpire(colony.getEmpireID());
 
       // Record the colony in the stats for the destroyer.
 
@@ -159,7 +159,18 @@ public class ColonyController {
         }
 
         if (!anotherColonyExists && empire.getHomeStarID() == star.getID()) {
-          new EmpireController().findNewHomeStar(empire.getID(), star.getID());
+          // Do this in a separate thread so as to not deadlock the current transaction. It doesn't
+          // matter if there's a delay finding a new home star of a few seconds.
+          new BackgroundRunner() {
+            @Override
+            protected void doInBackground() {
+              try {
+                new EmpireController().findNewHomeStar(empire.getID(), star.getID());
+              } catch (RequestException e) {
+                log.error("Error setting home star.", e);
+              }
+            }
+          }.execute();
         }
       }
 
