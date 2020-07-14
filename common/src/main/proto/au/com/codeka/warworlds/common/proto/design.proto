@@ -24,6 +24,9 @@ message Design {
     HQ = 106;
     RADAR = 107;
     WORMHOLE_DISRUPTOR = 108;
+    GREENHOUSE = 109;
+    MINING_DRILL = 110;
+    REFINERY = 111;
   }
   optional DesignType type = 1;
 
@@ -80,6 +83,9 @@ message Design {
     RADAR_SCAN = 104;
     WORMHOLE_DISRUPT = 105;
     RADAR_ALERT = 106;
+    FARMING_BOOST = 107;
+    MINING_BOOST = 108;
+    ENERGY_BOOST = 109;
   }
 
   // The additional stats for the effect this design has.

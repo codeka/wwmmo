@@ -294,7 +294,9 @@ class Simulation constructor(
           i, colony.population, getMaxPopulation(planet))
 
       // Calculate the output from farming this turn and add it to the star global
-      val goods = colony.population * colony.focus.farming * (planet.farming_congeniality / 100.0f)
+      val goods =
+          colony.population * colony.focus.farming *
+              (ColonyHelper.getFarmingCongeniality(planet) / 100.0f)
       colony.delta_goods(goods)
       storage.total_goods(0f.coerceAtLeast(storage.total_goods + goods * dt))
       goodsDeltaPerHour += goods
@@ -302,7 +304,9 @@ class Simulation constructor(
           storage.total_goods, goods, goods * dt)
 
       // calculate the output from mining this turn and add it to the star global
-      val mineralsPerHour = colony.population * colony.focus.mining * (planet.mining_congeniality / 10.0f)
+      val mineralsPerHour =
+          colony.population * colony.focus.mining *
+              (ColonyHelper.getMiningCongeniality(planet) / 10.0f)
       colony.delta_minerals(mineralsPerHour)
       storage.total_minerals(0f.coerceAtLeast(storage.total_minerals + mineralsPerHour * dt))
       mineralsDeltaPerHour += mineralsPerHour
@@ -310,7 +314,9 @@ class Simulation constructor(
           storage.total_minerals, mineralsPerHour, mineralsPerHour * dt)
 
       // calculate the output from energy this turn and add it to the star global
-      val energy = colony.population * colony.focus.energy * (planet.energy_congeniality / 10.0f)
+      val energy =
+          colony.population * colony.focus.energy *
+              (ColonyHelper.getEnergyCongeniality(planet) / 10.0f)
       colony.delta_energy(energy)
       storage.total_energy(0f.coerceAtLeast(storage.total_energy + energy * dt))
       energyDeltaPerHour += energy

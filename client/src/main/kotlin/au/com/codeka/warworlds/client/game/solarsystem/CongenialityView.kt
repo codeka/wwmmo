@@ -9,6 +9,7 @@ import android.widget.TextView
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.util.NumberFormatter
 import au.com.codeka.warworlds.common.proto.Planet
+import au.com.codeka.warworlds.common.sim.ColonyHelper
 
 /**
  * View that displays the "congeniality" of a planet.
@@ -26,12 +27,15 @@ class CongenialityView(context: Context?, attributeSet: AttributeSet?) : Relativ
     populationTextView.text = NumberFormatter.format(planet.population_congeniality)
     populationProgressBar.progress = (populationProgressBar.max
         * (planet.population_congeniality / 1000.0)).toInt()
-    farmingTextView.text = NumberFormatter.format(planet.farming_congeniality)
-    farmingProgressBar.progress = (farmingProgressBar.max * (planet.farming_congeniality / 100.0)).toInt()
-    miningTextView.text = NumberFormatter.format(planet.mining_congeniality)
-    miningProgressBar.progress = (miningProgressBar.max * (planet.mining_congeniality / 100.0)).toInt()
-    energyTextView.text = NumberFormatter.format(planet.energy_congeniality)
-    energyProgressBar.progress = (miningProgressBar.max * (planet.energy_congeniality / 100.0)).toInt()
+    val farmingCongeniality = ColonyHelper.getFarmingCongeniality(planet)
+    farmingTextView.text = NumberFormatter.format(farmingCongeniality)
+    farmingProgressBar.progress = (farmingProgressBar.max * (farmingCongeniality / 100.0)).toInt()
+    val miningCongeniality = ColonyHelper.getMiningCongeniality(planet)
+    miningTextView.text = NumberFormatter.format(miningCongeniality)
+    miningProgressBar.progress = (miningProgressBar.max * (miningCongeniality / 100.0)).toInt()
+    val energyCongeniality = ColonyHelper.getEnergyCongeniality(planet)
+    energyTextView.text = NumberFormatter.format(energyCongeniality)
+    energyProgressBar.progress = (miningProgressBar.max * (energyCongeniality / 100.0)).toInt()
   }
 
   init {

@@ -538,6 +538,201 @@
       ]
     },
     {
+      "type": "GREENHOUSE",
+      "display_name": "Green House",
+      "description": "A green house allows your colony to boost it‘s food production.",
+      "build_cost": {
+        "minerals": 200,
+        "population": 150
+      },
+      "image_url": "greenhouse.png",
+      "design_kind": "BUILDING",
+      "dependencies": [],
+      "effect": [
+        {
+          "type": "FARMING_BOOST",
+          "bonus": 0.15,
+          "minimum": 25
+        }
+      ],
+      "max_per_colony": 1,
+      "show_in_solar_system": true,
+      "upgrades":  [
+        {
+          "build_cost": {
+            "minerals": 50,
+            "population": 100
+          },
+          "dependencies": [],
+          "effects": [
+            {
+              "type": "FARMING_BOOST",
+              "bonus": 0.3,
+              "minimum": 50
+            }
+          ]
+        },
+        {
+          "build_cost": {
+            "minerals": 50,
+            "population": 100
+          },
+          "dependencies": [],
+          "effects": [
+            {
+              "type": "FARMING_BOOST",
+              "bonus": 0.45,
+              "minimum": 75
+            }
+          ]
+        },
+        {
+          "build_cost": {
+            "minerals": 50,
+            "population": 100
+          },
+          "dependencies": [],
+          "effects": [
+            {
+              "type": "FARMING_BOOST",
+              "bonus": 0.6,
+              "minimum": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "MINING_DRILL",
+      "display_name": "Mining Drill",
+      "description": "A mining drill boosts your colony‘s ability to mine minerals.",
+      "build_cost": {
+        "minerals": 200,
+        "population": 150
+      },
+      "image_url": "mining-drill.png",
+      "design_kind": "BUILDING",
+      "dependencies": [],
+      "effect": [
+        {
+          "type": "MINING_BOOST",
+          "bonus": 0.15,
+          "minimum": 25
+        }
+      ],
+      "max_per_colony": 1,
+      "show_in_solar_system": true,
+      "upgrades":  [
+        {
+          "build_cost": {
+            "minerals": 50,
+            "population": 100
+          },
+          "dependencies": [],
+          "effects": [
+            {
+              "type": "MINING_BOOST",
+              "bonus": 0.3,
+              "minimum": 50
+            }
+          ]
+        },
+        {
+          "build_cost": {
+            "minerals": 50,
+            "population": 100
+          },
+          "dependencies": [],
+          "effects": [
+            {
+              "type": "MINING_BOOST",
+              "bonus": 0.45,
+              "minimum": 75
+            }
+          ]
+        },
+        {
+          "build_cost": {
+            "minerals": 50,
+            "population": 100
+          },
+          "dependencies": [],
+          "effects": [
+            {
+              "type": "MINING_BOOST",
+              "bonus": 0.6,
+              "minimum": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "REFINERY",
+      "display_name": "Refinery",
+      "description": "A refinery boosts your colony‘s energy production.",
+      "build_cost": {
+        "minerals": 200,
+        "population": 150
+      },
+      "image_url": "refinery.png",
+      "design_kind": "BUILDING",
+      "dependencies": [],
+      "effect": [
+        {
+          "type": "ENERGY_BOOST",
+          "bonus": 0.15,
+          "minimum": 25
+        }
+      ],
+      "max_per_colony": 1,
+      "show_in_solar_system": true,
+      "upgrades":  [
+        {
+          "build_cost": {
+            "minerals": 50,
+            "population": 100
+          },
+          "dependencies": [],
+          "effects": [
+            {
+              "type": "ENERGY_BOOST",
+              "bonus": 0.3,
+              "minimum": 50
+            }
+          ]
+        },
+        {
+          "build_cost": {
+            "minerals": 50,
+            "population": 100
+          },
+          "dependencies": [],
+          "effects": [
+            {
+              "type": "ENERGY_BOOST",
+              "bonus": 0.45,
+              "minimum": 75
+            }
+          ]
+        },
+        {
+          "build_cost": {
+            "minerals": 50,
+            "population": 100
+          },
+          "dependencies": [],
+          "effects": [
+            {
+              "type": "ENERGY_BOOST",
+              "bonus": 0.6,
+              "minimum": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
       "type": "HQ",
       "display_name": "Galactic HQ",
       "description": "Serves as the “headquarters” of your Empire. You can only have one HQ across all of your planets and stars.<br/><br/>Once you build a Galactic HQ, a beacon will appear on the map screen that always points back to your HQ so that you don‘t get lost navigating the starfield.",
