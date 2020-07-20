@@ -16,7 +16,7 @@ sed -r 's/(RESOURCE_VERSION\s*=\s*)([0-9]+)/echo \1$((\2+1))/ge' handlers/__init
 mv /tmp/wwmmo.txt handlers/__init__.py
 
 # now do the actual upload. we expect appcfg.py to be on the path
-appcfg.py --oauth2 update .
+gcloud app deploy .
 
 popd > /dev/null
 
