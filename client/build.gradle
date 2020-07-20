@@ -62,10 +62,10 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
 
-      buildConfigField "String", "DEFAULT_SERVER", "\"http://wwmmo.codeka.com.au/\""
+      buildConfigField "String", "DEFAULT_SERVER", "\"http://game2.war-worlds.com/\""
     }
     debug {
-      buildConfigField "String", "DEFAULT_SERVER", "\"http://192.168.1.2:8080/\""
+      buildConfigField "String", "DEFAULT_SERVER", "\"http://game2.war-worlds.com/\""
     }
   }
   packagingOptions {
