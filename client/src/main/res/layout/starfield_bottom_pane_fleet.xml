@@ -58,7 +58,6 @@
           android:layout_height="wrap_content"
           android:layout_alignParentStart="true"
           android:layout_below="@id/fleet_icon"
-          android:layout_toStartOf="@+id/separator"
           android:layout_marginTop="8dp"
           android:layout_marginStart="4dp"
           android:gravity="center_vertical"
@@ -71,7 +70,6 @@
           android:layout_height="wrap_content"
           android:layout_below="@+id/fleet_destination"
           android:layout_alignStart="@+id/fleet_destination"
-          android:layout_toStartOf="@+id/separator"
           android:layout_margin="4dp" />
 
       <TextView
@@ -80,7 +78,6 @@
           android:layout_height="wrap_content"
           android:layout_below="@+id/progress_bar"
           android:layout_alignStart="@+id/fleet_destination"
-          android:layout_toStartOf="@+id/separator"
           android:layout_margin="4dp"
           android:gravity="center_vertical" />
     </RelativeLayout>
@@ -90,8 +87,6 @@
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/fleet_destination"
-        android:layout_alignParentEnd="true"
         android:layout_margin="4dp"
         android:text="@string/boost" />
   </LinearLayout>
@@ -101,7 +96,6 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_below="@id/fleet_info"
-      android:layout_alignParentStart="true"
-      android:layout_alignTop="@id/alliance_btn" />
+      android:layout_alignParentStart="true" />
 
 </RelativeLayout>

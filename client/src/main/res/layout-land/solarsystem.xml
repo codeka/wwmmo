@@ -69,7 +69,7 @@
         android:id="@+id/planet_summary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/sitrep_btn"/>
+        android:layout_below="@+id/enemy_empire_view"/>
 
     <ScrollView
         android:layout_width="match_parent"
