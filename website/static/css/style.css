@@ -109,12 +109,16 @@ header#page-header ul.main-nav li a {
 header#page-header nav.userinfo {
   position: absolute;
   right: 0;
-  bottom: 0;
+  bottom: -10px;
   color: #fff;
 }
 
 header#page-header nav.userinfo a {
   color: #99f;
+}
+
+header#page-header nav.userinfo img {
+  vertical-align: middle;
 }
 
 header#page-header div.donate-btn {

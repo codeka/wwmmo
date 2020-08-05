@@ -24,8 +24,6 @@
           <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
         </form>
       </div>
-      <a href="https://plus.google.com/114217154998683929092?prsrc=3" rel="publisher" class="gplus-btn"
-         title="Visit us on Google+">
         <img src="https://ssl.gstatic.com/images/icons/gplus-32.png" alt="Google+" width="32" height="32">
       </a>
       <a href="http://twitter.com/WarWorlds" title="Follow us on Twitter!" class="twitter-btn">
@@ -44,7 +42,7 @@
           <a href="{{logout_url}}">Log out</a>
         {% else %}
           You&rsquo;re not logged in.
-          <a href="{{login_url}}">Log in</a>
+          <a href="{{login_url}}"><img src="/img/v{{resource_version}}/signin_normal.png" height="32"></a>
         {% endif %}
       </nav>
       {% block headerlinks %}{% endblock %}
