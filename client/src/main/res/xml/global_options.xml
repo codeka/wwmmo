@@ -21,14 +21,6 @@
             app:summary="When colonizing a new planet, the focus will be set to this initially."/>
     </PreferenceCategory>
     <PreferenceCategory
-        app:key="pref_key_conn"
-        app:title="Connection">
-        <CheckBoxPreference
-            app:defaultValue="false"
-            app:key="GlobalOptions.NonSecureServerConnection"
-            app:title="Use non-secure server connection" />
-    </PreferenceCategory>
-    <PreferenceCategory
         app:key="pref_key_chat"
         app:title="Chat">
         <CheckBoxPreference

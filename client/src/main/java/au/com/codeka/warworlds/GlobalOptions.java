@@ -107,16 +107,6 @@ public class GlobalOptions {
         .apply();
   }
 
-  public boolean nonSecureServerConnection() {
-    return preferences.getBoolean("GlobalOptions.NonSecureServerConnection", false);
-  }
-
-  public void nonSecureServerConnection(boolean val) {
-    preferences.edit()
-        .putBoolean("GlobalOptions.NonSecureServerConnection", val)
-        .apply();
-  }
-
   public boolean notificationsEnabled() {
     return preferences.getBoolean("GlobalOptions.EnableNotifications", true);
   }

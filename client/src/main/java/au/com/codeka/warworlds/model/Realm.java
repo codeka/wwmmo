@@ -32,14 +32,9 @@ public class Realm {
   }
 
   public void update() {
-    boolean nonSecureServerConnection = new GlobalOptions().nonSecureServerConnection();
-
     String url = originalBaseUrl.toString();
-    if (nonSecureServerConnection) {
-      url = url.replace("https:", "http:");
-    }
     try {
-      baseUrl = new URI(url);
+      baseUrl = new URI(url); 
     } catch (URISyntaxException e) {
       baseUrl = originalBaseUrl;
     }
