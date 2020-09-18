@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.ctrl.DebugView;
-import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.PurchaseManager;
 
 import com.google.android.gms.common.ConnectionResult;
