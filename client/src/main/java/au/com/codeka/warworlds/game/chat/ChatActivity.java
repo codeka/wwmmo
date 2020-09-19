@@ -56,68 +56,47 @@ public class ChatActivity extends BaseActivity {
     firstRefresh = true;
 
     final EditText chatMsg = findViewById(R.id.chat_text);
-    chatMsg.setOnEditorActionListener(new OnEditorActionListener() {
-      @Override
-      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (actionId == EditorInfo.IME_NULL) {
-          sendCurrentChat();
-          return true;
-        }
-        return false;
+    chatMsg.setOnEditorActionListener((v, actionId, event) -> {
+      if (actionId == EditorInfo.IME_NULL) {
+        sendCurrentChat();
+        return true;
       }
+      return false;
     });
 
     Button send = findViewById(R.id.chat_send);
-    send.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        sendCurrentChat();
-      }
-    });
+    send.setOnClickListener(v -> sendCurrentChat());
   }
 
   @Override
   public void onResumeFragments() {
     super.onResumeFragments();
 
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeting greeting) {
-        refreshConversations();
+    ServerGreeter.waitForHello(this, (success, greeting) -> {
+      refreshConversations();
 
-        if (firstRefresh) {
-          firstRefresh = false;
+      if (firstRefresh) {
+        firstRefresh = false;
 
-          Bundle extras = getIntent().getExtras();
-          if (extras != null) {
-            final int conversationID = extras.getInt("au.com.codeka.warworlds.ConversationID");
-            if (conversationID != 0) {
-              int position = 0;
-              for (; position < conversations.size(); position++) {
-                if (conversations.get(position).getID() == conversationID) {
-                  break;
-                }
-              }
-              if (position < conversations.size()) {
-                final int finalPosition = position;
-                handler.post(new Runnable() {
-                  @Override
-                  public void run() {
-                    viewPager.setCurrentItem(finalPosition);
-                  }
-                });
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+          final int conversationID = extras.getInt("au.com.codeka.warworlds.ConversationID");
+          if (conversationID != 0) {
+            int position = 0;
+            for (; position < conversations.size(); position++) {
+              if (conversations.get(position).getID() == conversationID) {
+                break;
               }
             }
-
-            final String empireKey = extras.getString("au.com.codeka.warworlds.NewConversationEmpireKey");
-            if (empireKey != null) {
-              handler.post(new Runnable() {
-                @Override
-                public void run() {
-                  ChatManager.i.startConversation(empireKey);
-                }
-              });
+            if (position < conversations.size()) {
+              final int finalPosition = position;
+              handler.post(() -> viewPager.setCurrentItem(finalPosition));
             }
+          }
+
+          final String empireKey = extras.getString("au.com.codeka.warworlds.NewConversationEmpireKey");
+          if (empireKey != null) {
+            handler.post(() -> ChatManager.i.startConversation(empireKey));
           }
         }
       }
@@ -247,7 +226,8 @@ public class ChatActivity extends BaseActivity {
     msg.setConversation(conversation);
 
     // if this is our first chat after the update ...
-    if (!Util.getSharedPreferences().getBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
+    if (!Util.getSharedPreferences().getBoolean(
+        "au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
       // ... and this message is all in English ...
       if (isEnglish(message)) {
         // ... and they haven't already set the 'auto-translate' setting ...
@@ -268,7 +248,10 @@ public class ChatActivity extends BaseActivity {
         .apply();
 
     new StyledDialog.Builder(this)
-        .setMessage("Do you want to enable auto-translation of chat message? If you enable this setting, then any chat messages that are not in English will be automatically translated to English for you.\r\n\r\nYou can adjust this setting later from the Options screen.")
+        .setMessage("Do you want to enable auto-translation of chat message? If you enable this " +
+            "setting, then any chat messages that are not in English will be automatically " +
+            "translated to English for you.\r\n\r\nYou can adjust this setting later from the " +
+            "Options screen.")
         .setTitle("Auto-translation")
         .setPositiveButton("Enable", true, new DialogInterface.OnClickListener() {
           @Override

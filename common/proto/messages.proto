@@ -521,6 +521,9 @@ message ChatMessage {
     Normal = 0; // a "normal" chat message, the default
     ParticipantAdded = 1; // a new participant was added
     ParticipantLeft = 2; // someone left the conversation
+
+    // used on the client to indicate an error. message will contain a humand-readable error message.
+    ErrorMessage = 3;
   }
   optional MessageAction action = 8;
 }

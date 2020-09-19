@@ -9,6 +9,7 @@ import java.util.Locale;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -31,8 +32,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.util.Preconditions;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
 import au.com.codeka.common.model.BaseChatConversationParticipant;
+import au.com.codeka.common.model.BaseChatMessage;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
@@ -62,7 +68,7 @@ public class ChatFragment extends Fragment {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    Bundle args = getArguments();
+    Bundle args = requireArguments();
     conversation = ChatManager.i.getConversationByID(
         args.getInt("au.com.codeka.warworlds.ConversationID"));
     handler = new Handler();
@@ -94,35 +100,35 @@ public class ChatFragment extends Fragment {
     unreadCountBtn = v.findViewById(R.id.unread_btn);
     if (unreadCountBtn != null) {
       refreshUnreadCountButton();
-      unreadCountBtn.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          // move to the first conversation with an unread message
-          ((ChatActivity) getActivity()).moveToFirstUnreadConversation();
+      unreadCountBtn.setOnClickListener(v1 -> {
+        // move to the first conversation with an unread message
+        ChatActivity activity = (ChatActivity) getActivity();
+        if (activity != null) {
+          activity.moveToFirstUnreadConversation();
         }
       });
     }
 
-    chatOutput.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ChatAdapter.ItemEntry entry = (ChatAdapter.ItemEntry) chatAdapter.getItem(position);
-        if (entry.message == null) {
-          return;
-        }
-        Empire empire = EmpireManager.i.getEmpire(entry.message.getEmpireID());
-        if (empire == null) {
-          return;
-        }
+    chatOutput.setOnItemClickListener((parent, view, position, id) -> {
+      ChatAdapter.ItemEntry entry = (ChatAdapter.ItemEntry) chatAdapter.getItem(position);
+      if (entry.message == null) {
+        return;
+      }
+      Empire empire = EmpireManager.i.getEmpire(entry.message.getEmpireID());
+      if (empire == null) {
+        return;
+      }
 
-        ChatMessageDialog dialog = new ChatMessageDialog();
-        Bundle args = new Bundle();
-        args.putByteArray("au.com.codeka.warworlds.ChatMessage",
-            entry.message.toProtocolBuffer().toByteArray());
-        args.putByteArray("au.com.codeka.warworlds.Empire",
-            empire.toProtocolBuffer().toByteArray());
-        dialog.setArguments(args);
-        dialog.show(getActivity().getSupportFragmentManager(), "");
+      ChatMessageDialog dialog = new ChatMessageDialog();
+      Bundle args = new Bundle();
+      args.putByteArray("au.com.codeka.warworlds.ChatMessage",
+          entry.message.toProtocolBuffer().toByteArray());
+      args.putByteArray("au.com.codeka.warworlds.Empire",
+          empire.toProtocolBuffer().toByteArray());
+      dialog.setArguments(args);
+      FragmentActivity activity = getActivity();
+      if (activity != null) {
+        dialog.show(activity.getSupportFragmentManager(), "");
       }
     });
 
@@ -316,7 +322,6 @@ public class ChatFragment extends Fragment {
       if (entry.message != null && entry.message.getAction() != null) {
         action = entry.message.getAction();
       }
-
       View view = convertView;
       if (view == null) {
         LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
@@ -333,17 +338,17 @@ public class ChatFragment extends Fragment {
 
       if (entry.date == null && entry.message == null) {
         // this implies we're at the end of the list, fetch the next bunch
-        handler.post(new Runnable() {
-          @Override
-          public void run() {
-            fetchChatItems();
-          }
-        });
+        handler.post(ChatFragment.this::fetchChatItems);
       } else if (entry.date != null) {
         TextView message = view.findViewById(R.id.message);
         message.setTextColor(Color.LTGRAY);
         message.setGravity(Gravity.END);
         message.setText(entry.date.toString("EE, dd MMM yyyy"));
+      } else if (action == ChatMessage.MessageAction.ErrorMessage) {
+        TextView message = view.findViewById(R.id.message);
+        message.setTextColor(Color.RED);
+        message.setGravity(Gravity.START);
+        message.setText(entry.message.getMessage());
       } else if (action != ChatMessage.MessageAction.Normal) {
         TextView message = view.findViewById(R.id.message);
         message.setTextColor(Color.LTGRAY);
@@ -433,31 +438,23 @@ public class ChatFragment extends Fragment {
     }
   }
 
-  private void setupGlobalChatHeader(View v) {
-    ImageButton settingsBtn = v.findViewById(R.id.settings_btn);
-    settingsBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        ChatGlobalSettingsDialog dialog = new ChatGlobalSettingsDialog();
-        dialog.show(getActivity().getSupportFragmentManager(), "");
+  private void setupGlobalChatHeader(View view) {
+    ImageButton settingsBtn = view.findViewById(R.id.settings_btn);
+    settingsBtn.setOnClickListener(v -> {
+      ChatGlobalSettingsDialog dialog = new ChatGlobalSettingsDialog();
+      FragmentActivity activity = getActivity();
+      if (activity != null) {
+        dialog.show(activity.getSupportFragmentManager(), "");
       }
     });
 
-    Button blockedBtn = v.findViewById(R.id.blocked_btn);
-    blockedBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        startActivity(new Intent(getActivity(), BlockedEmpiresActivity.class));
-      }
-    });
+    Button blockedBtn = view.findViewById(R.id.blocked_btn);
+    blockedBtn.setOnClickListener(
+        v -> startActivity(new Intent(getActivity(), BlockedEmpiresActivity.class)));
 
-    Button newGroupBtn = v.findViewById(R.id.new_group_btn);
-    newGroupBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        ChatManager.i.startConversation(null);
-      }
-    });
+    Button newGroupBtn = view.findViewById(R.id.new_group_btn);
+    newGroupBtn.setOnClickListener(
+        v -> ChatManager.i.startConversation(null));
   }
 
   private void setupAllianceChatHeader(View v) {

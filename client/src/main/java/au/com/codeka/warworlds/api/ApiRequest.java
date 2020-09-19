@@ -209,7 +209,7 @@ public class ApiRequest {
         }
       }
     }
-    if (response != null && response.code() == 403) {
+    if (error == null && response != null && response.code() == 403) {
       error = Messages.GenericError.newBuilder()
           .setErrorCode(Messages.GenericError.ErrorCode.AuthenticationError.getNumber())
           .setErrorMessage(response.message())

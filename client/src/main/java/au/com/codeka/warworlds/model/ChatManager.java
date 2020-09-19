@@ -3,6 +3,8 @@ package au.com.codeka.warworlds.model;
 import android.content.Context;
 import android.util.SparseArray;
 
+import com.google.common.base.Preconditions;
+
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -14,7 +16,6 @@ import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.GlobalOptions;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
@@ -64,19 +65,38 @@ public class ChatManager {
     }
 
     RequestManager.i.sendRequest(new ApiRequest.Builder("chat", "POST").body(msgPb.build())
-        .completeCallback(new ApiRequest.CompleteCallback() {
-          @Override
-          public void onRequestComplete(ApiRequest request) {
-            ChatMessage respMsg = new ChatMessage();
-            respMsg.fromProtocolBuffer(request.body(Messages.ChatMessage.class));
-            ChatConversation conv = getConversation(respMsg);
-            if (conv != null) {
-              if (recentMessages.addMessage(respMsg)) {
-                conv.addMessage(respMsg);
-                eventBus.publish(new MessageAddedEvent(conv, respMsg));
-              }
+        .completeCallback(request -> {
+          ChatMessage respMsg = new ChatMessage();
+          Messages.ChatMessage pb =
+              Preconditions.checkNotNull(request.body(Messages.ChatMessage.class));
+          respMsg.fromProtocolBuffer(pb);
+          ChatConversation conv = getConversation(respMsg);
+          if (conv != null) {
+            if (recentMessages.addMessage(respMsg)) {
+              conv.addMessage(respMsg);
+              eventBus.publish(new MessageAddedEvent(conv, respMsg));
             }
           }
+        })
+        .errorCallback((request, error) -> {
+          // If we get an error, we'll add it as a special message to the conversation so the user
+          // at least knows what happened.
+          Messages.ChatMessage.Builder pb = Messages.ChatMessage.newBuilder()
+              .setAction(Messages.ChatMessage.MessageAction.ErrorMessage)
+              .setMessage(error.getErrorMessage())
+              .setDatePosted(System.currentTimeMillis() / 1000);
+          if (msg.getConversationID() != null) {
+            pb.setConversationId(msg.getConversationID());
+          }
+
+          ChatConversation conv = getConversation(msg);
+          if (conv != null) {
+            ChatMessage errMsg = new ChatMessage();
+            errMsg.fromProtocolBuffer(pb.build());
+            conv.addMessage(errMsg);
+            eventBus.publish(new MessageAddedEvent(conv, errMsg));
+          }
+          log.error("Error in chat: %s", error.getErrorMessage());
         }).build());
   }
 

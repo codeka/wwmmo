@@ -129,7 +129,8 @@ public class BaseChatMessage {
     public enum MessageAction {
         Normal(0),
         ParticipantAdded(1),
-        ParticipantLeft(2);
+        ParticipantLeft(2),
+        ErrorMessage(3);
 
         private int mValue;
 
