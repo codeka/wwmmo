@@ -18,6 +18,9 @@
   // Play Store) is allowed to log in.
   "allowNonProdClientLogins": false,
 
+  // If true, anonymous users are allowed to chat. If false (the default) they're not allowed.
+  "anonymousUsersCanChat": false,
+
   // Database configuration
   "database": {
     "server": "localhost",
@@ -42,7 +45,7 @@
     // maximum ratio of emojis:text in chat messages, only counted if the message is > 8 characters
     // long (which would allow you to send an all-emoji message if it consisted of <= 4 emojis).
     // 20% is the default.
-    "maxEmojiRatio": 0.2,
+    "maxEmojiRatio": 0.2
   },
 
   // Configuration related to empire resets.

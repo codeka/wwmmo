@@ -48,6 +48,7 @@ public class Configuration {
   @Expose private boolean allowNonProdClientLogins;
   @Expose private ClickerConfig[] clickers;
   @Expose private SafetyNetConfig safetyNet;
+  @Expose private boolean anonymousUsersCanChat;
 
   public Configuration() {
     limits = new LimitsConfiguration();
@@ -105,6 +106,10 @@ public class Configuration {
 
   public SafetyNetConfig getSafetyNet() {
     return safetyNet;
+  }
+
+  public boolean getAnonymousUsersCanChat() {
+    return anonymousUsersCanChat;
   }
 
   public static class DatabaseConfiguration {

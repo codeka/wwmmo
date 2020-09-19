@@ -5,13 +5,16 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.ChatController;
+import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.ChatMessage;
+import au.com.codeka.warworlds.server.model.Empire;
 
 /**
  * Handles the /realms/.../chat URL.
@@ -84,12 +87,16 @@ public class ChatHandler extends RequestHandler {
     Messages.ChatMessage chat_msg_pb = getRequestBody(Messages.ChatMessage.class);
 
     if (chat_msg_pb.hasAllianceKey() && chat_msg_pb.getAllianceKey().length() > 0) {
-      // confirm that if they've specified an alliance, that it's actually their
-      // own alliance...
+      // confirm that if they've specified an alliance, that it's actually their own alliance.
       int allianceID = Integer.parseInt(chat_msg_pb.getAllianceKey());
       if (allianceID != getSession().getAllianceID()) {
         throw new RequestException(400);
       }
+    }
+
+    // if they're anonymous, they're not allowed to chat.
+    if (!Configuration.i.getAnonymousUsersCanChat() && getSession().isAnonymous()) {
+      throw new RequestException(403, "You cannot chat until you sign in.");
     }
 
     // if it's not admin, add the right empire ID
