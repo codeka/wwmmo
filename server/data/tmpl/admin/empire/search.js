@@ -135,6 +135,11 @@ function showEmpireList(empires) {
     var empire = empires[i];
     $tbody.append(rowTmpl.applyTemplate(empire));
   }
+
+  // If there's only one, just click on it since that's probably what you want anyway.
+  if (empires.length == 1) {
+    $("#empire-list a.empire-name").click();
+  }
 }
 
 // Renders the given request graph (given in data) to the given div.
