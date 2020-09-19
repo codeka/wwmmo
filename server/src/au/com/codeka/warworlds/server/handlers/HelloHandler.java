@@ -294,6 +294,7 @@ public class HelloHandler extends RequestHandler {
       log.debug("SafetyNet is disabled, not checking.");
       return;
     }
+    log.debug("SafetyNet is enabled.");
 
     if (config.getExemptedEmpires() != null) {
       for (int i = 0; i < config.getExemptedEmpires().length; i++) {
@@ -303,6 +304,7 @@ public class HelloHandler extends RequestHandler {
         }
       }
     }
+    log.debug("Empire [%d] is not exempt from SafetyNet checked.");
 
     boolean pass = true;
     if (attestationStatement == null) {
@@ -317,7 +319,7 @@ public class HelloHandler extends RequestHandler {
 
     if (!pass) {
       throw new RequestException(400, Messages.GenericError.ErrorCode.ClientDeviceRejected,
-          "You are running an unsupported device.\nIf you believe this to be in error, please " +
+          "You're running an unsupported device.\nIf you believe this to be in error, please " +
               "contact me via discord.")
           .withSkipLog();
     }
@@ -360,8 +362,14 @@ public class HelloHandler extends RequestHandler {
 
   private void ensureDeviceDeniedStatus(
       int empireId, Messages.HelloRequest hello_request_pb) throws RequestException {
+    if (Configuration.i.getSafetyNet() == null || !Configuration.i.getSafetyNet().isEnabled()) {
+      // SafetyNet is disabled, so ignore whether this device was denied before.
+      return;
+    }
+
     if (new EmpireController().isDeviceAccessDenied(
         empireId, hello_request_pb.getDeviceModel(), hello_request_pb.getDeviceBuild())) {
+      log.debug("Device set as access denied, rejecting connection.");
       throw new RequestException(
           400,
           Messages.GenericError.ErrorCode.ClientDeviceRejected,
