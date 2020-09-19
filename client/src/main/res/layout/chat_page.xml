@@ -15,4 +15,54 @@
               android:stackFromBottom="true"
               android:listSelector="@drawable/list_selector"  />
 
+    <RelativeLayout
+        android:id="@+id/anon_chat_disabled_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#C0000000"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/chat_unavailable_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="80dp"
+            android:text="Chat unavailable"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/chat_unavailable_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chat_unavailable_title"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="10dp"
+            android:text="In an effort to combat spam, chat is not available to players that haven't signed in.\n\nTap the button below to sign in." />
+        <Button
+            android:id="@+id/sign_in_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/chat_unavailable_msg"
+            android:layout_marginStart="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="10dp"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="20dp"
+            android:text="Sign in" />
+        <Button
+            android:id="@+id/cancel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginBottom="40dp"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="20dp"
+            android:text="Close" />
+    </RelativeLayout>
+
 </RelativeLayout>

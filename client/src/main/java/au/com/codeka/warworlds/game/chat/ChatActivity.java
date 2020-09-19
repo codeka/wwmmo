@@ -35,7 +35,9 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 
 public class ChatActivity extends BaseActivity {
   private ChatPagerAdapter chatPagerAdapter;
@@ -100,6 +102,12 @@ public class ChatActivity extends BaseActivity {
           }
         }
       }
+
+      // Anonymous users can't chat, so disable the controls for sending messages.
+      final EditText chatMsg = findViewById(R.id.chat_text);
+      final Button send = findViewById(R.id.chat_send);
+      chatMsg.setEnabled(!Util.isAnonymous());
+      send.setEnabled(!Util.isAnonymous());
     });
   }
 

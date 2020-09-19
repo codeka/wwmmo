@@ -40,8 +40,10 @@ import androidx.fragment.app.FragmentActivity;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.model.BaseChatMessage;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.AccountsActivity;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
@@ -131,6 +133,22 @@ public class ChatFragment extends Fragment {
         dialog.show(activity.getSupportFragmentManager(), "");
       }
     });
+
+    View chatUnavailableContainer = v.findViewById(R.id.anon_chat_disabled_container);
+    if (Util.isAnonymous()) {
+      chatUnavailableContainer.setVisibility(View.VISIBLE);
+
+      Button signInBtn = v.findViewById(R.id.sign_in_btn);
+      signInBtn.setOnClickListener(v12 -> {
+        final Intent intent = new Intent(getContext(), AccountsActivity.class);
+        startActivity(intent);
+      });
+
+      Button cancelBtn = v.findViewById(R.id.cancel_btn);
+      cancelBtn.setOnClickListener(v1 -> {
+        chatUnavailableContainer.setVisibility(View.GONE);
+      });
+    }
 
     return v;
   }

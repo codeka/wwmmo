@@ -119,4 +119,8 @@ public class Util {
   public static SharedPreferences getSharedPreferences() {
     return App.i.getSharedPreferences(SHARED_PREFS, 0);
   }
+
+  public static boolean isAnonymous() {
+    return getSharedPreferences().getString("AccountName", "").endsWith("@anon.war-worlds.com");
+  }
 }
