@@ -2,14 +2,12 @@ package au.com.codeka.warworlds.game.chat;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,7 +20,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -32,13 +29,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.util.Preconditions;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import au.com.codeka.common.model.BaseChatConversationParticipant;
-import au.com.codeka.common.model.BaseChatMessage;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.AccountsActivity;
 import au.com.codeka.warworlds.GlobalOptions;
@@ -54,7 +48,6 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.ShieldManager;
-
 
 public class ChatFragment extends Fragment {
   private ChatConversation conversation;
@@ -145,9 +138,7 @@ public class ChatFragment extends Fragment {
       });
 
       Button cancelBtn = v.findViewById(R.id.cancel_btn);
-      cancelBtn.setOnClickListener(v1 -> {
-        chatUnavailableContainer.setVisibility(View.GONE);
-      });
+      cancelBtn.setOnClickListener(v1 -> chatUnavailableContainer.setVisibility(View.GONE));
     }
 
     return v;
@@ -176,40 +167,32 @@ public class ChatFragment extends Fragment {
   }
 
   private void fetchChatItems() {
-    conversation.fetchOlderMessages(new ChatManager.MessagesFetchedListener() {
-      @Override
-      public void onMessagesFetched(List<ChatMessage> msgs) {
-        if (msgs.size() == 0) {
-          noMoreChats = true;
-        }
+    conversation.fetchOlderMessages(msgs -> {
+      if (msgs.size() == 0) {
+        noMoreChats = true;
+      }
 
-        // get the current item at the top
-        refreshMessages();
+      // get the current item at the top
+      refreshMessages();
 
-        // figure out which position the item we had before was at
-        int position = -1;
-        if (msgs.size() == 0) {
-          position = 0;
-        } else {
-          int lastMsgID = msgs.get(msgs.size() - 1).getID();
-          for (int i = 0; i < chatAdapter.getCount(); i++) {
-            ChatAdapter.ItemEntry thisEntry = (ChatAdapter.ItemEntry) chatAdapter.getItem(i);
-            if (thisEntry.message != null && thisEntry.message.getID() == lastMsgID) {
-              position = i;
-              break;
-            }
+      // figure out which position the item we had before was at
+      int position = -1;
+      if (msgs.size() == 0) {
+        position = 0;
+      } else {
+        int lastMsgID = msgs.get(msgs.size() - 1).getID();
+        for (int i = 0; i < chatAdapter.getCount(); i++) {
+          ChatAdapter.ItemEntry thisEntry = (ChatAdapter.ItemEntry) chatAdapter.getItem(i);
+          if (thisEntry.message != null && thisEntry.message.getID() == lastMsgID) {
+            position = i;
+            break;
           }
         }
+      }
 
-        if (position >= 0) {
-          final int finalPosition = position;
-          handler.post(new Runnable() {
-            @Override
-            public void run() {
-              chatOutput.setSelection(finalPosition);
-            }
-          });
-        }
+      if (position >= 0) {
+        final int finalPosition = position;
+        handler.post(() -> chatOutput.setSelection(finalPosition));
       }
     });
   }
@@ -503,31 +486,23 @@ public class ChatFragment extends Fragment {
     final double pixelScale = getActivity().getResources().getDisplayMetrics().density;
 
     ImageButton settingsBtn = v.findViewById(R.id.settings_btn);
-    settingsBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        ChatPrivateSettingsDialog dialog = new ChatPrivateSettingsDialog();
-        Bundle args = new Bundle();
-        Messages.ChatConversation.Builder chat_conversation_pb =
-            Messages.ChatConversation.newBuilder();
-        conversation.toProtocolBuffer(chat_conversation_pb);
-        args.putByteArray("au.com.codeka.warworlds.ChatConversation",
-            chat_conversation_pb.build().toByteArray());
-        dialog.setArguments(args);
-        dialog.show(getActivity().getSupportFragmentManager(), "");
-      }
+    settingsBtn.setOnClickListener(v1 -> {
+      ChatPrivateSettingsDialog dialog = new ChatPrivateSettingsDialog();
+      Bundle args = new Bundle();
+      Messages.ChatConversation.Builder chat_conversation_pb =
+          Messages.ChatConversation.newBuilder();
+      conversation.toProtocolBuffer(chat_conversation_pb);
+      args.putByteArray("au.com.codeka.warworlds.ChatConversation",
+          chat_conversation_pb.build().toByteArray());
+      dialog.setArguments(args);
+      dialog.show(getActivity().getSupportFragmentManager(), "");
     });
 
     if (empireIDs.size() == 0) {
       empireName.setText("Empty Chat");
     } else {
       List<Empire> empires = EmpireManager.i.getEmpires(empireIDs);
-      Collections.sort(empires, new Comparator<Empire>() {
-        @Override
-        public int compare(Empire lhs, Empire rhs) {
-          return lhs.getDisplayName().compareTo(rhs.getDisplayName());
-        }
-      });
+      Collections.sort(empires, (lhs, rhs) -> lhs.getDisplayName().compareTo(rhs.getDisplayName()));
 
       StringBuilder sb = new StringBuilder();
       for (Empire empire : empires) {
