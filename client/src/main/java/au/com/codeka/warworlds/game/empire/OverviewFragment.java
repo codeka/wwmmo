@@ -1,22 +1,17 @@
 package au.com.codeka.warworlds.game.empire;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -25,15 +20,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ctrl.EmpireRankList;
 import au.com.codeka.warworlds.ctrl.EmpireRankRecyclerViewHelper;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.Empire;
-import au.com.codeka.warworlds.model.EmpireBattleRank;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -104,16 +98,13 @@ public class OverviewFragment extends BaseFragment {
           return;
         }
         PopupMenu popupMenu = new PopupMenu(activity, rootView.findViewById(R.id.popup_menu));
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-          @Override
-          public boolean onMenuItemClick(MenuItem item) {
-            // Change the rank type and then refresh.
-            rankType = item.getItemId();
-            recyclerView.setVisibility(View.GONE);
-            progress.setVisibility(View.VISIBLE);
-            empireRankListHelper.refresh();
-            return false;
-          }
+        popupMenu.setOnMenuItemClickListener(item -> {
+          // Change the rank type and then refresh.
+          rankType = item.getItemId();
+          recyclerView.setVisibility(View.GONE);
+          progress.setVisibility(View.VISIBLE);
+          empireRankListHelper.refresh();
+          return false;
         });
         popupMenu.inflate(R.menu.empire_rank_menu);
         popupMenu.show();
@@ -133,12 +124,7 @@ public class OverviewFragment extends BaseFragment {
     });
 
     final Button searchBtn = rootView.findViewById(R.id.search_btn);
-    searchBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onEmpireSearch();
-      }
-    });
+    searchBtn.setOnClickListener(v -> onEmpireSearch());
 
     return rootView;
   }
@@ -165,6 +151,7 @@ public class OverviewFragment extends BaseFragment {
   }
 
   private void onEmpireSearch() {
+    log.info("onEmpireSearch...");
     final TextView empireSearch = rootView.findViewById(R.id.empire_search);
     final ProgressBar progress = rootView.findViewById(R.id.progress_bar);
     final RecyclerView rankList = rootView.findViewById(R.id.empire_rankings);
@@ -179,13 +166,10 @@ public class OverviewFragment extends BaseFragment {
 
     String nameSearch = empireSearch.getText().toString();
     EmpireManager.i.searchEmpires(nameSearch,
-        new EmpireManager.SearchCompleteHandler() {
-          @Override
-          public void onSearchComplete(List<Empire> empires) {
-            empireRankListHelper.setEmpires(empires);
-            rankList.setVisibility(View.VISIBLE);
-            progress.setVisibility(View.GONE);
-          }
+        empires -> {
+          empireRankListHelper.setEmpires(empires);
+          rankList.setVisibility(View.VISIBLE);
+          progress.setVisibility(View.GONE);
         });
   }
 
@@ -209,28 +193,22 @@ public class OverviewFragment extends BaseFragment {
       final ProgressBar progress = rootView.findViewById(R.id.progress_bar);
       if (rankType == R.id.stars_rank) {
         EmpireManager.i.searchEmpiresByRank(startPosition + 1, startPosition + 1 + count,
-            new EmpireManager.SearchCompleteHandler() {
-              @Override
-              public void onSearchComplete(List<Empire> empires) {
-                callback.onRowsFetched(empires);
-                if (progress.getVisibility() == View.VISIBLE) {
-                  progress.setVisibility(View.GONE);
-                }
+            empires -> {
+              callback.onRowsFetched(empires);
+              if (progress.getVisibility() == View.VISIBLE) {
+                progress.setVisibility(View.GONE);
               }
             });
       } else {
         int numDays =
             (rankType == R.id.battle_rank_7d ? 7 : rankType == R.id.battle_rank_14d ? 14 : 28);
         EmpireManager.i.getEmpireBattleRanks(startPosition, count, numDays,
-            new EmpireManager.BattleRankCompleteHandler() {
-          @Override
-          public void onComplete(List<EmpireBattleRank> battleRanks) {
-            callback.onBattleRankRowsFetched(battleRanks);
-            if (progress.getVisibility() == View.VISIBLE) {
-              progress.setVisibility(View.GONE);
-            }
-          }
-        });
+            battleRanks -> {
+              callback.onBattleRankRowsFetched(battleRanks);
+              if (progress.getVisibility() == View.VISIBLE) {
+                progress.setVisibility(View.GONE);
+              }
+            });
       }
     }
   };

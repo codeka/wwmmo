@@ -5,7 +5,7 @@ dependencies {
   implementation 'com.google.guava:guava:24.1-android'
   implementation 'com.google.code.gson:gson:2.8.6'
   implementation 'joda-time:joda-time:2.9.9'
-  implementation 'com.google.protobuf:protobuf-java:3.6.0'
+  implementation 'com.google.protobuf:protobuf-java:3.9.2'
   implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
 

@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.ctrl;
 
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,6 @@ import android.widget.TextView;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -19,6 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Alliance;
@@ -35,6 +35,8 @@ import au.com.codeka.warworlds.model.MyEmpire;
  * empire ranks.
  */
 public class EmpireRankRecyclerViewHelper {
+  private static final Log log = new Log("EmpireRankRecyclerViewHelper");
+
   public interface RowsFetchCallback {
     void onRowsFetched(List<Empire> empires);
     void onBattleRankRowsFetched(List<EmpireBattleRank> ranks);
@@ -130,12 +132,14 @@ public class EmpireRankRecyclerViewHelper {
       this.empires = empires;
       sortEmpires();
       notifyDataSetChanged();
+      includeLoadingPlaceholder = false;
     }
 
     public void addBattleRanks(List<EmpireBattleRank> battleRanks) {
       this.empires.clear();
       this.battleRanks.addAll(battleRanks);
       notifyDataSetChanged();
+      includeLoadingPlaceholder = !battleRanks.isEmpty();
     }
 
     public void addEmpires(List<Empire> empires) {
@@ -146,17 +150,14 @@ public class EmpireRankRecyclerViewHelper {
     }
 
     private void sortEmpires() {
-      Collections.sort(empires, new Comparator<Empire>() {
-        @Override
-        public int compare(Empire lhs, Empire rhs) {
-          if (lhs.getRank() == null || rhs.getRank() == null) {
-            return lhs.getDisplayName().compareTo(rhs.getDisplayName());
-          }
-
-          int lhsRank = lhs.getRank().getRank();
-          int rhsRank = rhs.getRank().getRank();
-          return lhsRank - rhsRank;
+      Collections.sort(empires, (lhs, rhs) -> {
+        if (lhs.getRank() == null || rhs.getRank() == null) {
+          return lhs.getDisplayName().compareTo(rhs.getDisplayName());
         }
+
+        int lhsRank = lhs.getRank().getRank();
+        int rhsRank = rhs.getRank().getRank();
+        return lhsRank - rhsRank;
       });
     }
 
