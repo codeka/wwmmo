@@ -3,7 +3,6 @@
 {% block "head" %}
   <script src="/realms/{{realm}}/js/tmpl.js"></script>
   <script src="/realms/{{realm}}/js/empirestore.js"></script>
-  <script src="/realms/{{realm}}/js/admin-chat.js"></script>
   <style>
     section#messages {
       position: absolute;
@@ -91,4 +90,5 @@
     <div class="hack"><input type="text"></div>
     <input type="submit" value="Send">
   </form>
+  <script src="/realms/{{realm}}/admin/chat/chat.js"></script>
 {% end %}

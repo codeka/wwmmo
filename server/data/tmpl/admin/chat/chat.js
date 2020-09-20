@@ -14,7 +14,7 @@ var msgs = [];
 var num_unread = 0;
 
 $.ajax({
-  "url": "/realms/"+window.realm+"/alliances",
+  "url": "/realms/{{realm}}/alliances",
   "dataType": "json",
   "success": function(data) {
     for (var i = 0; i < data.alliances.length; i++) {
@@ -125,7 +125,7 @@ function formatMessage(msg) {
   }
 
   if (msg.empire_key) {
-    msgstr += " : <b><a href=\"/realms/"+window.realm+"/admin/empire/search#search=";
+    msgstr += " : <b><a href=\"/realms/{{realm}}/admin/empire/search#search=";
     msgstr += msg.empire_key+"\">"+msg.empire+"</a></b>";
   } else {
     msgstr += " : <b>"+msg.empire+"</b>";
@@ -150,7 +150,7 @@ function formatMessage(msg) {
 }
 
 function sendMessage(msg) {
-  var url = "/realms/"+window.realm+"/chat";
+  var url = "/realms/{{realm}}/chat";
   $.ajax({
     url: url, type: "POST", contentType: "application/json",
     data: JSON.stringify({
@@ -174,9 +174,9 @@ window.lastFetch.setDate(lastFetch.getDate() - 4);
 // The "oldest" message we've fetched so far, which we'll use to fetch older messages.
 window.firstFetch = lastFetch;
 
-function fetchMessages() {
+function fetchMessages(scrollToBottom) {
   $.ajax({
-    "url": "/realms/"+window.realm+"/chat?after="+parseInt(window.lastFetch.getTime() / 1000),
+    "url": "/realms/{{realm}}/chat?after="+parseInt(window.lastFetch.getTime() / 1000),
     "method": "get",
     "dataType": "json",
     "success": function(data) {
@@ -192,6 +192,10 @@ function fetchMessages() {
       }
 
       refreshMessages();
+      if (scrollToBottom) {
+        var $section = $("section#messages");
+        $section.get(0).scrollTo(0, $section.get(0).scrollHeight);
+      }
     }
   });
 }
@@ -203,7 +207,7 @@ function fetchOlder() {
   window.firstFetch.setDate(firstFetch.getDate() - 4);
   var after = parseInt(window.firstFetch.getTime() / 1000);
   $.ajax({
-    "url": "/realms/"+window.realm+"/chat?before="+before+"&after="+after,
+    "url": "/realms/{{realm}}/chat?before="+before+"&after="+after,
     "method": "get",
     "dataType": "json",
     "success": function(data) {
@@ -219,13 +223,18 @@ function fetchOlder() {
   });
 }
 
-$("section#messages").scroll(function() {
+function checkScrollToBottom() {
   var $section = $("section#messages");
-  if ($section.scrollTop() + $section.height() >= $section[0].scrollHeight) {
+  if ($section.scrollTop() + $section.height() >= $section.get(0).scrollHeight) {
     num_unread = 0;
     document.title = original_page_title;
   }
+}
+
+$("section#messages").scroll(function() {
+  checkScrollToBottom();
 });
 
-fetchMessages();
+fetchMessages(true);
 setInterval(fetchMessages, 15000);
+
