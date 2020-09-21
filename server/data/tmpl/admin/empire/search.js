@@ -2,7 +2,7 @@ google.load("visualization", "1", {packages:["corechart"]});
 
 var currentEmpireID = null;
 
-$("#find-byemailidname").on("submit", function(evnt) {
+$("#search").on("submit", function(evnt) {
   evnt.preventDefault();
 
   var query;
@@ -22,7 +22,7 @@ $("#refresh-ranks input").click(function() {
     url: "refresh-ranks",
     type: "POST",
     success: function(data) {
-      $("#find-byemailidname input[type=submit]").click();
+      $("#search input[type=submit]").click();
     },
     error: function(xhr, status, err) {
       alert("An error occured, check server logs: " + xhr.status);
@@ -174,7 +174,7 @@ $(function() {
   hashparams.register(function(params) {
     if ($("#search-value").val() != params["search"]) {
       $("#search-value").val(params["search"]);
-      $("#find-byemailidname").submit();
+      $("#search").submit();
     }
 
     if (params["id"]) {

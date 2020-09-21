@@ -57,8 +57,9 @@ form#empire-query input[value="Building Stats"] {
   right: 0;
 }
 
-table {
+table#empire-list {
   width: 560pt;
+  margin-top: 20pt;
 }
 div.spinner {
 }
