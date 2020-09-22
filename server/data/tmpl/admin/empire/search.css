@@ -18,18 +18,22 @@
 }
 form {
   position: relative;
-  height: 28pt;
   line-height: 28pt;
   width: 555pt;
 }
 form input[type=submit] {
   position: absolute;
   right: 0;
+  bottom: 0;
+}
+form div {
+  height: 28pt;
+  position: relative;
 }
 form div.hack {
   position: absolute;
   top: 0; left: 60pt;
-  bottom: 4pt; right: 185pt;;
+  bottom: 4pt; right: 100pt;
 }
 input[type=text] {
   width: 98%;

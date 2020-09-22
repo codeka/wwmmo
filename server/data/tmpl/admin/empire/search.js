@@ -5,16 +5,25 @@ var currentEmpireID = null;
 $("#search").on("submit", function(evnt) {
   evnt.preventDefault();
 
+  var $sort = $("#search-sort");
+
   var query;
   var $inp = $("#search-value");
   if ($inp.val().indexOf("@") > 0) {
     query = "email="+$inp.val();
   } else if (parseInt($inp.val()) == $inp.val()) {
     query = "ids="+$inp.val();
+  } else if ($inp.val() == "") {
+    if ($sort.val() == "rank") {
+      query = "minRank=1&maxRank=50";
+    } else {
+      query = "name=";
+    }
   } else {
     query = "name="+$inp.val();
   }
-  fetchEmpireList(query);
+
+  fetchEmpireList(query, $sort.val());
 });
 
 $("#refresh-ranks input").click(function() {
@@ -115,12 +124,13 @@ $("#empire-list").on("click", "a.empire-name", function() {
    tabs.refresh();
 });
 
-function fetchEmpireList(query) {
+function fetchEmpireList(query, sort) {
   var $tbody = $("#empire-list tbody");
   $tbody.html("<tr><td colspan=\"4\"><div class=\"spinner\"></div></td></tr>");
 
   $.ajax({
-      url: "/realms/{{realm}}/empires/search?"+query,
+      url: "/realms/{{realm}}/empires/search?"+query+"&sort="+sort,
+      cache: false,
       dataType: "json",
       success: function(data) {
         showEmpireList(data.empires);
@@ -184,7 +194,7 @@ $(function() {
   });
 
   if ($("#search-value").val() == "") {
-    fetchEmpireList("minRank=1&maxRank=50");
+    fetchEmpireList("minRank=1&maxRank=50", "rank");
   }
 });
 

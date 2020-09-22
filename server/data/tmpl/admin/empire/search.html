@@ -17,8 +17,18 @@
   <div id="search-time"></div>
   <div id="search-results"></div>
   <form id="search">
-    <label for="search-value">Search:</label>
-    <div class="hack"><input type="text" id="search-value" placeholder="Key, email or name" /></div>
+    <div>
+      <label for="search-value">Search:</label>
+      <div class="hack"><input type="text" id="search-value" placeholder="ID, email or name" /></div>
+    </div>
+    <div>
+      <label for="search-sort">Sort:</label>
+      <div class="hack"><select id="search-sort">
+        <option value="rank">Rank</option>
+        <option value="signup_date_asc">Oldest first</option>
+        <option value="signup_date_desc">Newest first</option>
+      </select></div>
+    </div>
     <input type="submit" value="Search" />
   </form>
   <table id="empire-list">

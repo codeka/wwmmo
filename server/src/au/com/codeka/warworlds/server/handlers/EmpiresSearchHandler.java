@@ -21,6 +21,19 @@ public class EmpiresSearchHandler extends RequestHandler {
     ArrayList<Empire> empires = new ArrayList<>();
     EmpireController ctrl = new EmpireController();
 
+    EmpireController.Order order = EmpireController.Order.UNSPECIFIED;
+    switch (getRequest().getParameter("sort")) {
+      case "rank":
+        order = EmpireController.Order.RANK;
+        break;
+      case "signup_date_asc":
+        order = EmpireController.Order.OLDEST_FIRST;
+        break;
+      case "signup_date_desc":
+        order = EmpireController.Order.NEWEST_FIRST;
+        break;
+    }
+
     String str = getRequest().getParameter("email");
     if (str != null) {
       Empire empire = ctrl.getEmpireByEmail(str);
@@ -31,7 +44,7 @@ public class EmpiresSearchHandler extends RequestHandler {
 
     str = getRequest().getParameter("name");
     if (str != null) {
-      empires.addAll(ctrl.getEmpiresByName(str, 25));
+      empires.addAll(ctrl.getEmpiresByName(str, order, 50));
     }
 
     str = getRequest().getParameter("ids");

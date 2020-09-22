@@ -42,6 +42,21 @@ public class EmpireController {
   public static final double STARTING_CASH_BONUS = 250000;
   public static final double RESET_CASH_BONUS = 50000;
 
+  /** The order we want the empires returned in. */
+  public enum Order {
+    /** Unspecified order, it can just be the default. */
+    UNSPECIFIED,
+
+    /** Return oldest empires first. */
+    OLDEST_FIRST,
+
+    /** Return newest empires first. */
+    NEWEST_FIRST,
+
+    /** Order by rank, 1st place 1st. */
+    RANK,
+  }
+
   public EmpireController() {
     db = new DataBase();
   }
@@ -105,9 +120,9 @@ public class EmpireController {
     }
   }
 
-  public List<Empire> getEmpiresByName(String name, int limit) throws RequestException {
+  public List<Empire> getEmpiresByName(String name, Order order, int limit) throws RequestException {
     try {
-      return db.getEmpiresByName(name, limit);
+      return db.getEmpiresByName(name, order, limit);
     } catch (Exception e) {
       throw new RequestException(e);
     }
@@ -616,7 +631,8 @@ public class EmpireController {
         return new ArrayList<>();
       }
 
-      String sql = getSelectEmpire("empires.id IN " + buildInClause(ids), true, null);
+      String sql =
+          getSelectEmpire("empires.id IN " + buildInClause(ids), true, Order.UNSPECIFIED, null);
 
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
@@ -628,7 +644,7 @@ public class EmpireController {
         }
 
         populateEmpires(empires);
-        return sortEmpires(empires.values(), EmpiresSortBy.ID);
+        return sortEmpires(empires.values(), Order.UNSPECIFIED);
       }
     }
 
@@ -719,7 +735,7 @@ public class EmpireController {
     }
 
     public Empire getEmpireByEmail(String email) throws Exception {
-      String sql = getSelectEmpire("user_email = ?", true, null);
+      String sql = getSelectEmpire("user_email = ?", true, Order.UNSPECIFIED, null);
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setString(1, email);
         SqlResult res = stmt.select();
@@ -740,10 +756,15 @@ public class EmpireController {
       }
     }
 
-    public List<Empire> getEmpiresByName(String name, int limit) throws Exception {
-      String sql = getSelectEmpire("empires.name ~* ?", false, limit);
+    public List<Empire> getEmpiresByName(String name, Order order, int limit) throws Exception {
+      String select = name.isEmpty()
+          ? ""
+          : "empires.name ~* ?";
+      String sql = getSelectEmpire(select, false, order, limit);
       try (SqlStmt stmt = prepare(sql)) {
-        stmt.setString(1, name);
+        if (!select.isEmpty()) {
+          stmt.setString(1, name);
+        }
         SqlResult res = stmt.select();
 
         HashMap<Integer, Empire> empires = new HashMap<>();
@@ -753,14 +774,14 @@ public class EmpireController {
         }
 
         populateEmpires(empires);
-        return sortEmpires(empires.values(), EmpiresSortBy.NAME);
+        return sortEmpires(empires.values(), order);
       }
     }
 
     public List<Empire> getEmpiresByRank(int minRank, int maxRank) throws Exception {
       String sql = getSelectEmpire(
-          "empires.id IN (SELECT empire_id FROM empire_ranks WHERE rank BETWEEN ? AND ?)", false,
-          null);
+          "empires.id IN (SELECT empire_id FROM empire_ranks WHERE rank BETWEEN ? AND ?)",
+          false, Order.RANK, null);
       try (SqlStmt stmt = prepare(sql)) {
         stmt.setInt(1, minRank);
         stmt.setInt(2, maxRank);
@@ -773,7 +794,7 @@ public class EmpireController {
         }
 
         populateEmpires(empires);
-        return sortEmpires(empires.values(), EmpiresSortBy.RANK);
+        return sortEmpires(empires.values(), Order.RANK);
       }
     }
 
@@ -827,24 +848,40 @@ public class EmpireController {
       }
     }
 
-    private String getSelectEmpire(String whereClause, boolean includeBanned, Integer limit) {
-      String sql = "SELECT empires.*, empire_ranks.*, alliances.id AS alliance_id, alliances.name as alliance_name,"
-          + " alliances.description as alliance_description, alliances.creator_empire_id,"
-          + " alliances.created_date, alliances.bank_balance, alliances.image_updated_date,"
-          + " alliances.is_active, alliances.total_stars AS alliance_total_stars,"
-          + " patreon.max_pledge,"
+    private String getSelectEmpire(
+        String whereClause, boolean includeBanned, Order order, Integer limit) {
+      String sql = "SELECT empires.*, empire_ranks.*, alliances.id AS alliance_id,"
+          + " alliances.name as alliance_name, alliances.description as alliance_description,"
+          + " alliances.creator_empire_id, alliances.created_date, alliances.bank_balance,"
+          + " alliances.image_updated_date, alliances.is_active,"
+          + " alliances.total_stars AS alliance_total_stars, patreon.max_pledge,"
           + " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires,"
           + " (SELECT MAX(create_date) FROM empire_shields WHERE empire_shields.empire_id = empires.id AND rejected = 0) AS shield_last_update,"
           + " (SELECT COUNT(*) FROM alliance_requests WHERE alliance_id = alliances.id AND state = "
           + AllianceRequest.RequestState.PENDING.getNumber() + ") AS num_pending_requests"
-          + " FROM empires" + " LEFT JOIN alliances ON empires.alliance_id = alliances.id"
+          + " FROM empires"
+          + " LEFT JOIN alliances ON empires.alliance_id = alliances.id"
           + " LEFT JOIN empire_ranks ON empires.id = empire_ranks.empire_id"
           + " LEFT JOIN patreon ON empires.id = patreon.empire_id"
           + " WHERE ";
       if (!includeBanned) {
         sql += "state != 2 AND ";
       }
-      sql += whereClause;
+      sql += whereClause.isEmpty() ? "1 = 1" : whereClause;
+      switch(order) {
+        case UNSPECIFIED:
+          // Nothing
+          break;
+        case NEWEST_FIRST:
+          sql += " ORDER BY signup_date DESC";
+          break;
+        case OLDEST_FIRST:
+          sql += " ORDER BY signup_date ASC";
+          break;
+        case RANK:
+          sql += " ORDER BY empire_ranks.rank ASC";
+          break;
+      }
       if (limit != null) {
         sql += " LIMIT " + limit;
       }
@@ -879,24 +916,21 @@ public class EmpireController {
       }
     }
 
-    enum EmpiresSortBy {
-      NAME,
-      RANK,
-      ID
-    }
-
-    private List<Empire> sortEmpires(Collection<Empire> empires, EmpiresSortBy sortBy) {
+    private List<Empire> sortEmpires(Collection<Empire> empires, Order order) {
       ArrayList<Empire> sorted = new ArrayList<>(empires);
       sorted.sort((lhs, rhs) -> {
-        switch (sortBy) {
-          case NAME:
+        switch (order) {
+          case UNSPECIFIED:
             return lhs.getDisplayName().compareTo(rhs.getDisplayName());
           case RANK:
             if (lhs.getRank() != null && rhs.getRank() != null) {
               return lhs.getRank().getRank() - rhs.getRank().getRank();
             }
-            // fall through
-          case ID:
+            return lhs.getDisplayName().compareTo(rhs.getDisplayName());
+          case NEWEST_FIRST:
+            return rhs.getSignupDate().compareTo(lhs.getSignupDate());
+          case OLDEST_FIRST:
+            return lhs.getSignupDate().compareTo(rhs.getSignupDate());
           default:
             return lhs.getID() - rhs.getID();
         }
