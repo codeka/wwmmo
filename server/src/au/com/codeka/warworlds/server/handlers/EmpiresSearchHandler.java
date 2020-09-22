@@ -22,16 +22,18 @@ public class EmpiresSearchHandler extends RequestHandler {
     EmpireController ctrl = new EmpireController();
 
     EmpireController.Order order = EmpireController.Order.UNSPECIFIED;
-    switch (getRequest().getParameter("sort")) {
-      case "rank":
-        order = EmpireController.Order.RANK;
-        break;
-      case "signup_date_asc":
-        order = EmpireController.Order.OLDEST_FIRST;
-        break;
-      case "signup_date_desc":
-        order = EmpireController.Order.NEWEST_FIRST;
-        break;
+    if (getRequest().getParameter("sort") != null) {
+      switch (getRequest().getParameter("sort")) {
+        case "rank":
+          order = EmpireController.Order.RANK;
+          break;
+        case "signup_date_asc":
+          order = EmpireController.Order.OLDEST_FIRST;
+          break;
+        case "signup_date_desc":
+          order = EmpireController.Order.NEWEST_FIRST;
+          break;
+      }
     }
 
     String str = getRequest().getParameter("email");
