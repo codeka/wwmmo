@@ -17,6 +17,7 @@ public class Empire extends BaseEmpire {
   private Integer mAllianceID;
   private boolean mForceRemoveAds;
   private DateTime mLastSitrepReadTime;
+  private DateTime mSignupDate;
 
   public Empire() {
   }
@@ -50,6 +51,7 @@ public class Empire extends BaseEmpire {
     } else {
       mPatreonLevel = PatreonLevel.fromPledge(maxPledge);
     }
+    mSignupDate = res.getDateTime("signup_date");
   }
 
   public int getID() {
@@ -88,6 +90,10 @@ public class Empire extends BaseEmpire {
 
   public DateTime getLastSitrepReadTime() {
     return mLastSitrepReadTime;
+  }
+
+  public DateTime getSignupDate() {
+    return mSignupDate;
   }
 
   @Override

@@ -38,7 +38,8 @@ function spacePad(str, n) {
   var padded = "                                           "+str;
   return padded.substr(padded.length - n);
 }
-
+/*
+// TODO: re-implement cash audit
 $("#empire-query").on("click", ":submit", function(evnt) {
   evnt.preventDefault();
   if($(this).val() == "Cash Audit") {
@@ -105,7 +106,7 @@ $("#empire-query").on("click", ":submit", function(evnt) {
     });
   }
 });
-
+*/
 $("#empire-list").on("click", "a.empire-name", function() {
    currentEmpireID = $(this).data("id");
    $("#search-results")

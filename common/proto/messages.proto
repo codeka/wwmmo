@@ -188,8 +188,6 @@ message Empire {
     EMPIRE = 3;
   }
   optional PatreonLevel patreon_level = 18;
-}
-
 
 message Empires {
   repeated Empire empires = 1;
