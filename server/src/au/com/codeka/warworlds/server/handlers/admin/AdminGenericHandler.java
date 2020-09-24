@@ -2,9 +2,12 @@ package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.util.TreeMap;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.server.RequestException;
 
 public class AdminGenericHandler extends AdminHandler {
+  private static Log log = new Log("AdminGenericHandler");
+
   @Override
   protected void get() throws RequestException {
     if (!isAdmin()) {
@@ -23,13 +26,14 @@ public class AdminGenericHandler extends AdminHandler {
       contentType = "text/html";
     }
     getResponse().setContentType(contentType);
-    getResponse().setHeader("Content-Type", contentType);
+    getResponse().setHeader("Content-Type", contentType + "; charset=utf-8");
 
     path = getExtraOption() + path;
     if (path.equals(getExtraOption() + ".html")) {
       path = getExtraOption() + "index.html";
     }
 
+    log.info("rendering: %s", path);
     render(path, new TreeMap<>());
   }
 }

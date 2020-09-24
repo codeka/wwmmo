@@ -3,64 +3,7 @@
 {% block "head" %}
   <script src="/realms/{{realm}}/js/tmpl.js"></script>
   <script src="/realms/{{realm}}/js/empirestore.js"></script>
-  <style>
-    section#messages {
-      position: absolute;
-      left: 0px;
-      right: 340px;
-      bottom: 50px;
-      top: 70px;
-      overflow-y: auto;
-      margin-right: 30px;
-      border: solid 1px #999;
-    }
-    section#conversations {
-      position: absolute;
-      right: 30px;
-      width: 300px;
-      bottom: 50px;
-      top: 70px;
-      overflow-y: auto;
-    }
-    section#conversations div.conv {
-      height: 30px;
-      line-height: 30px;
-    }
-    form {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 50px;
-    }
-    form div.hack {
-      position: absolute;
-      left: 0; top: 4px; right: 120px;
-    }
-    form div.hack input[type=text] {
-      width: 100%;
-    }
-    form input[type=submit] {
-      position: absolute;
-      top: 0; right: 30px;
-    }
-    section#messages span.translated {
-      font-style: italics;
-    }
-    section#messages span.profanity-strong {
-      color: #a00;
-    }
-    section#messages span.profanity-mild {
-      color: #cc0;
-    }
-    section#messages div.msg-content {
-      padding: 1em;
-      padding-top: 0;
-    }
-    section#messages div.fetch-older {
-      height: 32px;
-      line-height: 32px;
-      text-align: center;
-    }
-  </style>
+  <link rel="stylesheet" href="/realms/{{realm}}/admin/chat/messages.css">
 {% end %}
 
 {% block "content" %}
@@ -90,5 +33,5 @@
     <div class="hack"><input type="text"></div>
     <input type="submit" value="Send">
   </form>
-  <script src="/realms/{{realm}}/admin/chat/chat.js"></script>
+  <script src="/realms/{{realm}}/admin/chat/messages.js"></script>
 {% end %}

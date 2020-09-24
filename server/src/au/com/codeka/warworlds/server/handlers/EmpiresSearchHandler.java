@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.server.handlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import au.com.codeka.common.Log;

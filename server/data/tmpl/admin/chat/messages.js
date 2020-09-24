@@ -142,7 +142,7 @@ function formatMessage(msg) {
     msgstr = "<span class=\"profanity-strong\">"+msgstr+"</span>";
   }
 
-  var div = $("<div class=\"msg-header\" style=\""+style+"\">"+msgstr+"</div>");
+  var div = $("<div class=\"msg-menu\" style=\""+style+"\">⋮</div><div class=\"msg-header\" style=\""+style+"\">"+msgstr+"</div>");
   div.data("dt", msg.date_posted);
   msg.div = div;
   msg.loaded = true;
