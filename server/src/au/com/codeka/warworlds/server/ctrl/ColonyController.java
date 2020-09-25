@@ -83,6 +83,12 @@ public class ColonyController {
       colonyDefence = 1.0f;
     }
 
+    // You don't have enough troop carriers to attack, do nothing.
+    if (totalTroopCarriers < 0.1f) {
+      log.info("Empire [%d] Attempt to attack colony with no troop carriers available.", empireID);
+      return;
+    }
+
     float remainingShips = totalTroopCarriers - colonyDefence;
     float remainingPopulation = colony.getPopulation()
         - (totalTroopCarriers * 4.0f / colony.getDefenceBoost());
