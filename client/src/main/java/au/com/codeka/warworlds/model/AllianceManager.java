@@ -108,34 +108,31 @@ public class AllianceManager {
 
   public void fetchRequests(int allianceID, String cursor,
       @Nonnull final FetchRequestsCompleteHandler handler) {
-    String url = String.format("alliances/%d/requests", allianceID);
+    String url = String.format(Locale.US, "alliances/%d/requests", allianceID);
     if (cursor != null) {
       url += "?cursor=" + cursor;
     }
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "GET")
-        .completeCallback(new ApiRequest.CompleteCallback() {
-          @Override
-          public void onRequestComplete(ApiRequest request) {
-            Messages.AllianceRequests pb = request.body(Messages.AllianceRequests.class);
-            ArrayList<AllianceRequest> requests = new ArrayList<>();
-            TreeMap<Integer, Empire> empires = new TreeMap<>();
-            for (Messages.AllianceRequest request_pb : pb.getRequestsList()) {
-              AllianceRequest allianceRequest = new AllianceRequest();
-              allianceRequest.fromProtocolBuffer(request_pb);
-              requests.add(allianceRequest);
-              if (!empires.containsKey(request_pb.getRequestEmpireId())) {
-                empires.put(request_pb.getRequestEmpireId(),
-                    EmpireManager.i.getEmpire(request_pb.getRequestEmpireId()));
-              }
-              if (request_pb.hasTargetEmpireId()
-                  && !empires.containsKey(request_pb.getTargetEmpireId())) {
-                empires.put(request_pb.getTargetEmpireId(),
-                    EmpireManager.i.getEmpire(request_pb.getRequestEmpireId()));
-              }
+        .completeCallback(request -> {
+          Messages.AllianceRequests pb = request.body(Messages.AllianceRequests.class);
+          ArrayList<AllianceRequest> requests = new ArrayList<>();
+          TreeMap<Integer, Empire> empires = new TreeMap<>();
+          for (Messages.AllianceRequest request_pb : pb.getRequestsList()) {
+            AllianceRequest allianceRequest = new AllianceRequest();
+            allianceRequest.fromProtocolBuffer(request_pb);
+            requests.add(allianceRequest);
+            if (!empires.containsKey(request_pb.getRequestEmpireId())) {
+              empires.put(request_pb.getRequestEmpireId(),
+                  EmpireManager.i.getEmpire(request_pb.getRequestEmpireId()));
             }
-
-            handler.onRequestsFetched(empires, requests, pb.getCursor());
+            if (request_pb.hasTargetEmpireId()
+                && !empires.containsKey(request_pb.getTargetEmpireId())) {
+              empires.put(request_pb.getTargetEmpireId(),
+                  EmpireManager.i.getEmpire(request_pb.getRequestEmpireId()));
+            }
           }
+
+          handler.onRequestsFetched(empires, requests, pb.getCursor());
         })
         .build());
   }

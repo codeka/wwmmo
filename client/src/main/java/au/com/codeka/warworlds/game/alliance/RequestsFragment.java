@@ -16,6 +16,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.common.base.Strings;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -51,15 +53,15 @@ public class RequestsFragment extends Fragment implements TabManager.Reloadable 
   @Override
   public void onAttach(Context context) {
     super.onAttach(context);
-    AllianceManager.eventBus.register(mEventHandler);
-    ShieldManager.eventBus.register(mEventHandler);
+    AllianceManager.eventBus.register(eventHandler);
+    ShieldManager.eventBus.register(eventHandler);
   }
 
   @Override
   public void onDetach() {
     super.onDetach();
-    AllianceManager.eventBus.unregister(mEventHandler);
-    ShieldManager.eventBus.unregister(mEventHandler);
+    AllianceManager.eventBus.unregister(eventHandler);
+    ShieldManager.eventBus.unregister(eventHandler);
   }
 
   @Override
@@ -85,7 +87,7 @@ public class RequestsFragment extends Fragment implements TabManager.Reloadable 
     return view;
   }
 
-  private Object mEventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
       requestListAdapter.notifyDataSetChanged();
@@ -189,7 +191,7 @@ public class RequestsFragment extends Fragment implements TabManager.Reloadable 
     public int getCount() {
       if (entries == null)
         return 0;
-      return entries.size() + (cursor == null ? 0 : 1);
+      return entries.size() + (Strings.isNullOrEmpty(cursor) ? 0 : 1);
     }
 
     @Override
