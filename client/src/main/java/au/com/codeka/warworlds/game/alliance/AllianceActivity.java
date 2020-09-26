@@ -16,27 +16,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import javax.annotation.Nonnegative;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.WarWorldsActivity;
@@ -60,31 +56,28 @@ public class AllianceActivity extends TabFragmentActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeting greeting) {
-        if (!success) {
-          startActivity(new Intent(AllianceActivity.this, WarWorldsActivity.class));
-        } else {
-          MyEmpire myEmpire = EmpireManager.i.getEmpire();
-          if (myEmpire.getAlliance() != null) {
-            getTabManager().addTab(context, new TabInfo(AllianceActivity.this, "Overview",
-                AllianceDetailsFragment.class, null));
-          }
+    ServerGreeter.waitForHello(this, (success, greeting) -> {
+      if (!success) {
+        startActivity(new Intent(AllianceActivity.this, WarWorldsActivity.class));
+      } else {
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        if (myEmpire.getAlliance() != null) {
+          getTabManager().addTab(context, new TabInfo(AllianceActivity.this, "Overview",
+              AllianceDetailsFragment.class, null));
+        }
 
-          getTabManager().addTab(context, new TabInfo(AllianceActivity.this, "Alliances",
-              AllianceListFragment.class, null));
+        getTabManager().addTab(context, new TabInfo(AllianceActivity.this, "Alliances",
+            AllianceListFragment.class, null));
 
-          if (myEmpire.getAlliance() != null) {
-            Integer numPendingRequests = myEmpire.getAlliance().getNumPendingRequests();
-            String pending = "";
-            if (numPendingRequests != null && numPendingRequests > 0) {
-              pending = " (<font color=\"red\">" + numPendingRequests + "</font>)";
-            }
-            getTabManager().addTab(context, new TabInfo(AllianceActivity.this,
-                "Requests" + pending,
-                RequestsFragment.class, null));
+        if (myEmpire.getAlliance() != null) {
+          Integer numPendingRequests = myEmpire.getAlliance().getNumPendingRequests();
+          String pending = "";
+          if (numPendingRequests != null && numPendingRequests > 0) {
+            pending = " (<font color=\"red\">" + numPendingRequests + "</font>)";
           }
+          getTabManager().addTab(context, new TabInfo(AllianceActivity.this,
+              "Requests" + pending,
+              RequestsFragment.class, null));
         }
       }
     });
@@ -126,38 +119,25 @@ public class AllianceActivity extends TabFragmentActivity {
       rankListAdapter = new RankListAdapter();
 
       final Button createBtn = view.findViewById(R.id.create_alliance_btn);
-      createBtn.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          onAllianceCreate();
-        }
-      });
+      createBtn.setOnClickListener(v -> onAllianceCreate());
 
       final CheckBox showInactiveChk = view.findViewById(R.id.show_inactive);
-      showInactiveChk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-          refresh();
-        }
-      });
+      showInactiveChk.setOnCheckedChangeListener((compoundButton, b) -> refresh());
 
       ListView alliancesList = view.findViewById(R.id.alliances);
       alliancesList.setAdapter(rankListAdapter);
-      alliancesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-          RankListAdapter.ItemEntry item =
-              (RankListAdapter.ItemEntry) rankListAdapter.getItem(position);
-          if (item.alliance != null) {
-            Intent intent = new Intent(getActivity(), AllianceDetailsActivity.class);
-            intent.putExtra("au.com.codeka.warworlds.AllianceKey", item.alliance.getKey());
+      alliancesList.setOnItemClickListener((parent, view, position, id) -> {
+        RankListAdapter.ItemEntry item =
+            (RankListAdapter.ItemEntry) rankListAdapter.getItem(position);
+        if (item.alliance != null) {
+          Intent intent = new Intent(getActivity(), AllianceDetailsActivity.class);
+          intent.putExtra("au.com.codeka.warworlds.AllianceKey", item.alliance.getKey());
 
-            Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
-            item.alliance.toProtocolBuffer(alliance_pb);
-            intent.putExtra("au.com.codeka.warworlds.Alliance", alliance_pb.build().toByteArray());
+          Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
+          item.alliance.toProtocolBuffer(alliance_pb);
+          intent.putExtra("au.com.codeka.warworlds.Alliance", alliance_pb.build().toByteArray());
 
-            getActivity().startActivity(intent);
-          }
+          getActivity().startActivity(intent);
         }
       });
 
@@ -205,14 +185,14 @@ public class AllianceActivity extends TabFragmentActivity {
       boolean hideDead = !((CheckBox) view.findViewById(R.id.show_inactive)).isChecked();
       AllianceManager.i.fetchAlliances(hideDead,
           new AllianceManager.FetchAlliancesCompleteHandler() {
-        @Override
-        public void onAlliancesFetched(List<Alliance> alliances) {
-          rankListAdapter.setAlliances(alliances);
+            @Override
+            public void onAlliancesFetched(List<Alliance> alliances) {
+              rankListAdapter.setAlliances(alliances);
 
-          alliancesList.setVisibility(View.VISIBLE);
-          progressBar.setVisibility(View.GONE);
-        }
-      });
+              alliancesList.setVisibility(View.VISIBLE);
+              progressBar.setVisibility(View.GONE);
+            }
+          });
     }
 
     private class RankListAdapter extends BaseAdapter {
@@ -338,12 +318,12 @@ public class AllianceActivity extends TabFragmentActivity {
 
   public static class RequestsFragment extends BaseFragment
       implements TabManager.Reloadable {
-    private View mView;
-    private RequestListAdapter mRequestListAdapter;
-    private Alliance mAlliance;
-    private Handler mHandler = new Handler();
-    private String mCursor;
-    private boolean mFetching;
+    private View view;
+    private RequestListAdapter requestListAdapter;
+    private Alliance alliance;
+    private Handler handler = new Handler();
+    private String cursor;
+    private boolean fetching;
 
     @Override
     public void onAttach(Context context) {
@@ -362,48 +342,45 @@ public class AllianceActivity extends TabFragmentActivity {
     @Override
     public View onCreateView(
         LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
-      mView = inflator.inflate(R.layout.alliance_requests_tab, container, false);
-      mRequestListAdapter = new RequestListAdapter();
+      view = inflator.inflate(R.layout.alliance_requests_tab, container, false);
+      requestListAdapter = new RequestListAdapter();
 
-      ListView joinRequestsList = mView.findViewById(R.id.join_requests);
-      joinRequestsList.setAdapter(mRequestListAdapter);
+      ListView joinRequestsList = view.findViewById(R.id.join_requests);
+      joinRequestsList.setAdapter(requestListAdapter);
 
-      joinRequestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-          RequestListAdapter.ItemEntry entry =
-              (RequestListAdapter.ItemEntry) mRequestListAdapter.getItem(position);
-          RequestVoteDialog dialog = RequestVoteDialog.newInstance(mAlliance, entry.request);
-          dialog.show(getActivity().getSupportFragmentManager(), "");
-        }
+      joinRequestsList.setOnItemClickListener((parent, view, position, id) -> {
+        RequestListAdapter.ItemEntry entry =
+            (RequestListAdapter.ItemEntry) requestListAdapter.getItem(position);
+        RequestVoteDialog dialog = RequestVoteDialog.newInstance(alliance, entry.request);
+        dialog.show(getActivity().getSupportFragmentManager(), "");
       });
 
       refresh();
-      return mView;
+      return view;
     }
 
     private Object mEventHandler = new Object() {
       @EventHandler
       public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
-        mRequestListAdapter.notifyDataSetChanged();
+        requestListAdapter.notifyDataSetChanged();
       }
 
       @EventHandler
       public void onAllianceUpdated(Alliance alliance) {
-        if (mAlliance == null || mAlliance.getKey().equals(alliance.getKey())) {
-          mAlliance = alliance;
+        if (RequestsFragment.this.alliance == null || RequestsFragment.this.alliance.getKey().equals(alliance.getKey())) {
+          RequestsFragment.this.alliance = alliance;
         }
         refreshRequests();
       }
     };
 
     private void refresh() {
-      final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
-      final ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
+      final ProgressBar progressBar = view.findViewById(R.id.loading);
+      final ListView joinRequestsList = view.findViewById(R.id.join_requests);
       joinRequestsList.setVisibility(View.GONE);
       progressBar.setVisibility(View.VISIBLE);
 
-      if (mAlliance == null) {
+      if (alliance == null) {
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire != null && myEmpire.getAlliance() != null) {
           AllianceManager.i.fetchAlliance(Integer.parseInt(myEmpire.getAlliance().getKey()), null);
@@ -422,43 +399,39 @@ public class AllianceActivity extends TabFragmentActivity {
     }
 
     private void fetchRequests(boolean clear) {
-      if (mFetching) {
+      if (fetching) {
         return;
       }
-      mFetching = true;
+      fetching = true;
 
-      final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
-      final ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
+      final ProgressBar progressBar = view.findViewById(R.id.loading);
+      final ListView joinRequestsList = view.findViewById(R.id.join_requests);
 
       if (clear) {
-        mCursor = null;
-        mRequestListAdapter.clearRequests();
+        cursor = null;
+        requestListAdapter.clearRequests();
       }
 
-      AllianceManager.i.fetchRequests(Integer.parseInt(mAlliance.getKey()), mCursor,
-          new AllianceManager.FetchRequestsCompleteHandler() {
-            @Override
-            public void onRequestsFetched(Map<Integer, Empire> empires,
-                                          List<AllianceRequest> requests, String cursor) {
-              mFetching = false;
-              mCursor = cursor;
-              mRequestListAdapter.appendRequests(empires, requests);
+      AllianceManager.i.fetchRequests(Integer.parseInt(alliance.getKey()), cursor,
+          (empires, requests, cursor) -> {
+            fetching = false;
+            this.cursor = cursor;
+            requestListAdapter.appendRequests(empires, requests);
 
-              joinRequestsList.setVisibility(View.VISIBLE);
-              progressBar.setVisibility(View.GONE);
-            }
+            joinRequestsList.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
           });
     }
 
     private class RequestListAdapter extends BaseAdapter {
-      private ArrayList<ItemEntry> mEntries;
+      private ArrayList<ItemEntry> entries;
 
       public RequestListAdapter() {
-        mEntries = new ArrayList<>();
+        entries = new ArrayList<>();
       }
 
       public void clearRequests() {
-        mEntries = new ArrayList<>();
+        entries = new ArrayList<>();
         notifyDataSetChanged();
       }
 
@@ -474,7 +447,7 @@ public class AllianceActivity extends TabFragmentActivity {
             log.error("Empire for %d not found!", request.getTargetEmpireID());
             continue;
           }
-          mEntries.add(new ItemEntry(empire, request));
+          entries.add(new ItemEntry(empire, request));
         }
 
         notifyDataSetChanged();
@@ -488,19 +461,19 @@ public class AllianceActivity extends TabFragmentActivity {
 
       @Override
       public int getCount() {
-        if (mEntries == null)
+        if (entries == null)
           return 0;
-        return mEntries.size() + (mCursor == null ? 0 : 1);
+        return entries.size() + (cursor == null ? 0 : 1);
       }
 
       @Override
       public Object getItem(int position) {
-        if (mEntries == null)
+        if (entries == null)
           return null;
-        if (mEntries.size() <= position) {
+        if (entries.size() <= position) {
           return null;
         }
-        return mEntries.get(position);
+        return entries.get(position);
       }
 
       @Override
@@ -545,12 +518,7 @@ public class AllianceActivity extends TabFragmentActivity {
         if (entry == null) {
           //  once this view comes into... view, we'll want to load the next
           // lot of requests
-          mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-              fetchNextRequests();
-            }
-          }, 100);
+          handler.postDelayed(() -> fetchNextRequests(), 100);
 
           return view;
         }

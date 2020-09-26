@@ -8,19 +8,15 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
 import android.text.Html;
-import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -32,7 +28,7 @@ import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
 public class AllianceChangeDetailsActivity extends BaseActivity {
-  private ImagePickerHelper mImagePickerHelper = new ImagePickerHelper(this);
+  private ImagePickerHelper imagePickerHelper = new ImagePickerHelper(this);
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -41,33 +37,18 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
     setContentView(R.layout.alliance_change_details);
 
     final Button changeNameBtn = findViewById(R.id.change_name_btn);
-    changeNameBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onChangeNameClick();
-      }
-    });
+    changeNameBtn.setOnClickListener(v -> onChangeNameClick());
 
     final Button chooseImageBtn = findViewById(R.id.choose_image_btn);
-    chooseImageBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onChooseImageClick();
-      }
-    });
+    chooseImageBtn.setOnClickListener(v -> onChooseImageClick());
 
     final Button changeImageBtn = findViewById(R.id.change_image_btn);
-    changeImageBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onChangeImageClick();
-      }
-    });
+    changeImageBtn.setOnClickListener(v -> onChangeImageClick());
   }
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    mImagePickerHelper.onActivityResult(requestCode, resultCode, data);
+    imagePickerHelper.onActivityResult(requestCode, resultCode, data);
 
     super.onActivityResult(requestCode, resultCode, data);
   }
@@ -76,14 +57,11 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
   public void onResumeFragments() {
     super.onResumeFragments();
 
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeting greeting) {
-        if (!success) {
-          startActivity(new Intent(AllianceChangeDetailsActivity.this, WarWorldsActivity.class));
-        } else {
-          fullRefresh();
-        }
+    ServerGreeter.waitForHello(this, (success, greeting) -> {
+      if (!success) {
+        startActivity(new Intent(AllianceChangeDetailsActivity.this, WarWorldsActivity.class));
+      } else {
+        fullRefresh();
       }
     });
   }
@@ -91,13 +69,13 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
   @Override
   public void onStart() {
     super.onStart();
-    ShieldManager.eventBus.register(mEventHandler);
+    ShieldManager.eventBus.register(eventHandler);
   }
 
   @Override
   public void onStop() {
     super.onStop();
-    ShieldManager.eventBus.unregister(mEventHandler);
+    ShieldManager.eventBus.unregister(eventHandler);
   }
 
   private void fullRefresh() {
@@ -158,11 +136,11 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
     }
   }
   private void onChooseImageClick() {
-    mImagePickerHelper.chooseImage();
+    imagePickerHelper.chooseImage();
   }
 
   private void onChangeImageClick() {
-    Bitmap bmp = mImagePickerHelper.getImage();
+    Bitmap bmp = imagePickerHelper.getImage();
     if (bmp == null) {
       return;
     }
@@ -176,7 +154,7 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
   }
 
   private void loadImage() {
-    Bitmap bmp = mImagePickerHelper.getImage();
+    Bitmap bmp = imagePickerHelper.getImage();
     if (bmp == null) {
       return;
     }
@@ -190,7 +168,7 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
     (findViewById(R.id.change_image_btn)).setEnabled(true);
   }
 
-  private Object mEventHandler = new Object() {
+  private Object eventHandler = new Object() {
     @EventHandler
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
       fullRefresh();

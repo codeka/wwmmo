@@ -142,14 +142,14 @@ public class RequestVoteDialog extends DialogFragment {
   private void refresh() {
     LayoutInflater inflater = getActivity().getLayoutInflater();
 
-    TextView empireName = (TextView) view.findViewById(R.id.empire_name);
-    ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
-    TextView requestDescription = (TextView) view.findViewById(R.id.request_description);
-    ImageView pngImage = (ImageView) view.findViewById(R.id.png_image);
-    TextView requestVotes = (TextView) view.findViewById(R.id.request_votes);
-    TextView requestRequiredVotes = (TextView) view.findViewById(R.id.request_required_votes);
-    TextView message = (TextView) view.findViewById(R.id.message);
-    TextView requestBy = (TextView) view.findViewById(R.id.request_by);
+    TextView empireName = view.findViewById(R.id.empire_name);
+    ImageView empireIcon = view.findViewById(R.id.empire_icon);
+    TextView requestDescription = view.findViewById(R.id.request_description);
+    ImageView pngImage = view.findViewById(R.id.png_image);
+    TextView requestVotes = view.findViewById(R.id.request_votes);
+    TextView requestRequiredVotes = view.findViewById(R.id.request_required_votes);
+    TextView message = view.findViewById(R.id.message);
+    TextView requestBy = view.findViewById(R.id.request_by);
 
     Empire empire;
     if (getRequest().getTargetEmpireID() != null) {
@@ -210,7 +210,7 @@ public class RequestVoteDialog extends DialogFragment {
       view.findViewById(R.id.votes).setVisibility(View.VISIBLE);
     }
 
-    LinearLayout currVoteContainer = (LinearLayout) view.findViewById(R.id.curr_votes);
+    LinearLayout currVoteContainer = view.findViewById(R.id.curr_votes);
     currVoteContainer.removeAllViews();
     if (!getRequest().getVotes().isEmpty()) {
       view.findViewById(R.id.curr_votes_none).setVisibility(View.GONE);
@@ -219,15 +219,15 @@ public class RequestVoteDialog extends DialogFragment {
             false);
         Empire voteEmpire = EmpireManager.i.getEmpire(vote.getEmpireID());
         if (voteEmpire != null) {
-          empireIcon = (ImageView) v.findViewById(R.id.empire_icon);
+          empireIcon = v.findViewById(R.id.empire_icon);
           empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), voteEmpire));
-          empireName = (TextView) v.findViewById(R.id.empire_name);
+          empireName = v.findViewById(R.id.empire_name);
           empireName.setText(voteEmpire.getDisplayName());
         }
-        TextView voteDate = (TextView) v.findViewById(R.id.vote_time);
+        TextView voteDate = v.findViewById(R.id.vote_time);
         voteDate.setText(TimeFormatter.create().format(vote.getDate()));
-        TextView votes = (TextView) v.findViewById(R.id.empire_votes);
-        votes.setText(String.format("%s%d", vote.getVotes() > 0 ? "+" : "-",
+        TextView votes = v.findViewById(R.id.empire_votes);
+        votes.setText(String.format(Locale.US, "%s%d", vote.getVotes() > 0 ? "+" : "-",
             Math.abs(vote.getVotes())));
         if (vote.getVotes() > 0) {
           votes.setTextColor(Color.GREEN);
