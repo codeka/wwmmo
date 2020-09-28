@@ -60,8 +60,6 @@ public class SolarSystemFragment extends Fragment {
   // needs to be Object so we can do a version check before instantiating the class
   Object solarSystemSurfaceViewOnLayoutChangedListener;
 
-  private static final int BUILD_REQUEST = 3000;
-
   public Star getStar() {
     return star;
   }

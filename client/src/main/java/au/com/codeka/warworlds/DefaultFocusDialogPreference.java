@@ -9,6 +9,6 @@ public class DefaultFocusDialogPreference extends DialogPreference {
   public DefaultFocusDialogPreference(Context context, AttributeSet attributeSet) {
     super(context, attributeSet);
     setPersistent(true);
-    setDialogLayoutResource(R.layout.focus_dlg);
+    setDialogLayoutResource(R.layout.focus_ctrl);
   }
 }

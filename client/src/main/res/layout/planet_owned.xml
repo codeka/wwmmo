@@ -19,13 +19,86 @@
         android:layout_below="@id/planet_details"
         android:layout_alignParentBottom="true">
 
-        <Button android:id="@+id/colonize_btn"
+        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+            android:id="@+id/horz_sep_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="8dp"
+            android:text="Focus" />
+
+        <au.com.codeka.warworlds.game.solarsystem.FocusView
+            android:id="@+id/focus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/horz_sep_1"/>
+
+        <Button
+            android:id="@+id/update_focus_btn"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:layout_below="@id/focus"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:text="Colonize" />
+            android:text="Update" />
+
+        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+            android:id="@+id/horz_sep_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/update_focus_btn"
+            android:layout_marginTop="8dp"
+            android:text="Build" />
+
+        <Button
+            android:id="@+id/build_btn"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/horz_sep_2"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:text="Build" />
+
+        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+            android:id="@+id/horz_sep_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/build_btn"
+            android:layout_marginTop="8dp"
+            android:text="Abandon" />
+
+        <TextView
+            android:id="@+id/abandon_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/horz_sep_3"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="24dp"
+            android:text="Abandoning a colony will leave the inhabitants to turn Native." />
+
+        <Button
+            android:id="@+id/abandon_btn"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/abandon_text"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:text="Abandon" />
 
     </RelativeLayout>
 

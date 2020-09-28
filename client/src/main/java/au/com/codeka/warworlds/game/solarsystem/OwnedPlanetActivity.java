@@ -5,17 +5,17 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.game.build.BuildActivity;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
@@ -23,6 +23,10 @@ import au.com.codeka.warworlds.model.StarManager;
 public class OwnedPlanetActivity extends BaseActivity {
   private Star star;
   private Planet planet;
+  private Colony colony;
+
+  private FocusView focusView;
+  private PlanetDetailsView planetDetails;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,27 @@ public class OwnedPlanetActivity extends BaseActivity {
 
     View rootView = findViewById(android.R.id.content);
     ActivityBackgroundGenerator.setBackground(rootView);
+
+    final Button buildButton = findViewById(R.id.build_btn);
+    buildButton.setOnClickListener(v -> {
+      if (star == null) {
+        return; // can happen before the star loads
+      }
+      if (colony == null) {
+        return; // shouldn't happen, the button should be hidden.
+      }
+
+      Intent intent = new Intent(this, BuildActivity.class);
+      intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+
+      Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
+      colony.toProtocolBuffer(colony_pb);
+      intent.putExtra("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
+      startActivity(intent);
+    });
+
+    planetDetails = findViewById(R.id.planet_details);
+    focusView = findViewById(R.id.focus);
   }
 
   @Override
@@ -73,8 +98,13 @@ public class OwnedPlanetActivity extends BaseActivity {
 
     star = s;
     planet = (Planet) star.getPlanets()[planetIndex - 1];
+    for (BaseColony colony : star.getColonies()) {
+      if (colony.getPlanetIndex() == planetIndex) {
+        this.colony = (Colony) colony;
+      }
+    }
 
-    PlanetDetailsView planetDetails = findViewById(R.id.planet_details);
     planetDetails.setup(star, planet, null);
+    focusView.setColony(star, colony);
   }
 }

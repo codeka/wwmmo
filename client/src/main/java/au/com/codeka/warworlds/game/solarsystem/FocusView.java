@@ -5,17 +5,16 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
@@ -31,7 +30,10 @@ import au.com.codeka.warworlds.model.StarManager;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class FocusDialog extends DialogFragment {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+public class FocusView extends FrameLayout {
   private static final Log log = new Log("FocusDialog");
 
   // Either colony/planet will be non-null or callback will be.
@@ -44,11 +46,10 @@ public class FocusDialog extends DialogFragment {
   private float initialFocusMining;
   private float initialFocusConstruction;
 
-  private List<SeekBar> seekBars;
-  private List<TextView> textViews;
-  private List<ImageButton> lockButtons;
-  private ArrayList<Integer> lockedIndexes;
-  private View view;
+  private final List<SeekBar> seekBars;
+  private final List<TextView> textViews;
+  private final List<ImageButton> lockButtons;
+  private final ArrayList<Integer> lockedIndexes;
 
   public interface Callback {
     void onChangedClick(
@@ -57,48 +58,10 @@ public class FocusDialog extends DialogFragment {
 
   private static float SEEKBAR_MAX = 1000.0f;
 
-  public FocusDialog() {
-  }
+  public FocusView(@Nonnull Context context, @Nullable AttributeSet attrs) {
+    super(context, attrs);
 
-  public void setColony(Star star, Colony colony) {
-    this.colony = colony;
-    planet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
-  }
-
-  public void setCallback(Callback callback) {
-    this.callback = callback;
-  }
-
-  public void setInitialValues(
-      float initialFocusPopulation, float initialFocusFarming, float initialFocusMining,
-      float initialFocusConstruction) {
-    this.initialFocusPopulation = initialFocusPopulation;
-    this.initialFocusFarming = initialFocusFarming;
-    this.initialFocusMining = initialFocusMining;
-    this.initialFocusConstruction = initialFocusConstruction;
-  }
-
-  @Override
-  public Dialog onCreateDialog(Bundle savedInstanceState) {
-    LayoutInflater inflater = getActivity().getLayoutInflater();
-    view = inflater.inflate(R.layout.focus_dlg, null);
-    if (savedInstanceState != null) {
-      byte[] bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Colony");
-      if (bytes != null) {
-        try {
-          Messages.Colony colony_pb;
-          colony_pb = Messages.Colony.parseFrom(bytes);
-          colony = new Colony();
-          colony.fromProtocolBuffer(colony_pb);
-
-          bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Planet");
-          Messages.Planet planet_pb = Messages.Planet.parseFrom(bytes);
-          planet = new Planet();
-          planet.fromProtocolBuffer(null, planet_pb);
-        } catch (InvalidProtocolBufferException e) {
-        }
-      }
-    }
+    inflate(context, R.layout.focus_ctrl, this);
 
     lockedIndexes = new ArrayList<>();
     seekBars = new ArrayList<>();
@@ -125,11 +88,11 @@ public class FocusDialog extends DialogFragment {
         R.id.focus_mining_minus_btn,
         R.id.focus_construction_minus_btn};
     for (int i = 0; i < 4; i++) {
-      SeekBar seekBar = (SeekBar) view.findViewById(seekBarIds[i]);
-      TextView textView = (TextView) view.findViewById(textViewIds[i]);
-      ImageButton lockButton = (ImageButton) view.findViewById(lockButtonIds[i]);
-      Button plusButton = (Button) view.findViewById(plusBtnIds[i]);
-      Button minusButton = (Button) view.findViewById(minusBtnIds[i]);
+      SeekBar seekBar = findViewById(seekBarIds[i]);
+      TextView textView = findViewById(textViewIds[i]);
+      ImageButton lockButton = findViewById(lockButtonIds[i]);
+      Button plusButton = findViewById(plusBtnIds[i]);
+      Button minusButton = findViewById(minusBtnIds[i]);
       seekBar.setMax((int) SEEKBAR_MAX);
       lockButton.setTag(i);
       plusButton.setTag(i);
@@ -161,7 +124,7 @@ public class FocusDialog extends DialogFragment {
         int index = (Integer) thisLockButton.getTag();
 
         // if we're the locked one, unlock
-        if (lockedIndexes != null && lockedIndexes.contains(index)) {
+        if (lockedIndexes.contains(index)) {
           lockedIndexes.remove(index);
           thisLockButton.setImageResource(R.drawable.lock_opened);
           seekBars.get(index).setEnabled(true);
@@ -171,8 +134,8 @@ public class FocusDialog extends DialogFragment {
           seekBars.get(index).setEnabled(false);
         }
 
-        // if there's two locked buttons, make sure the others are disabled, you
-        // can't lock more than two at once.
+        // if there's two locked buttons, make sure the others are disabled, you can't lock more
+        // than two at once.
         for (int i1 = 0; i1 < 4; i1++) {
           boolean isLocked = lockedIndexes.contains(i1);
           if (isLocked || lockedIndexes.size() < 2) {
@@ -206,64 +169,58 @@ public class FocusDialog extends DialogFragment {
       });
     }
 
-    if (colony != null) {
-      ((SeekBar) view.findViewById(R.id.focus_population))
-          .setProgress((int) (colony.getPopulationFocus() * SEEKBAR_MAX));
-      ((SeekBar) view.findViewById(R.id.focus_farming))
-          .setProgress((int) (colony.getFarmingFocus() * SEEKBAR_MAX));
-      ((SeekBar) view.findViewById(R.id.focus_mining))
-          .setProgress((int) (colony.getMiningFocus() * SEEKBAR_MAX));
-      ((SeekBar) view.findViewById(R.id.focus_construction))
-          .setProgress((int) (colony.getConstructionFocus() * SEEKBAR_MAX));
+    ((SeekBar) findViewById(R.id.focus_population))
+        .setProgress((int) (initialFocusPopulation * SEEKBAR_MAX));
+    ((SeekBar) findViewById(R.id.focus_farming))
+        .setProgress((int) (initialFocusFarming * SEEKBAR_MAX));
+    ((SeekBar) findViewById(R.id.focus_mining))
+        .setProgress((int) (initialFocusMining * SEEKBAR_MAX));
+    ((SeekBar) findViewById(R.id.focus_construction))
+        .setProgress((int) (initialFocusConstruction * SEEKBAR_MAX));
 
-      ((TextView) view.findViewById(R.id.focus_population_value))
-          .setText(focusToString(colony.getPopulationFocus()));
-      ((TextView) view.findViewById(R.id.focus_farming_value))
-          .setText(focusToString(colony.getFarmingFocus()));
-      ((TextView) view.findViewById(R.id.focus_mining_value))
-          .setText(focusToString(colony.getMiningFocus()));
-      ((TextView) view.findViewById(R.id.focus_construction_value))
-          .setText(focusToString(colony.getConstructionFocus()));
-    } else {
-        ((SeekBar) view.findViewById(R.id.focus_population))
-            .setProgress((int) (initialFocusPopulation * SEEKBAR_MAX));
-        ((SeekBar) view.findViewById(R.id.focus_farming))
-            .setProgress((int) (initialFocusFarming * SEEKBAR_MAX));
-        ((SeekBar) view.findViewById(R.id.focus_mining))
-            .setProgress((int) (initialFocusMining * SEEKBAR_MAX));
-        ((SeekBar) view.findViewById(R.id.focus_construction))
-            .setProgress((int) (initialFocusConstruction * SEEKBAR_MAX));
-
-        ((TextView) view.findViewById(R.id.focus_population_value)).setText(focusToString(0.25f));
-        ((TextView) view.findViewById(R.id.focus_farming_value)).setText(focusToString(0.25f));
-        ((TextView) view.findViewById(R.id.focus_mining_value)).setText(focusToString(0.25f));
-        ((TextView) view.findViewById(R.id.focus_construction_value)).setText(focusToString(0.25f));
-    }
+    ((TextView) findViewById(R.id.focus_population_value)).setText(focusToString(0.25f));
+    ((TextView) findViewById(R.id.focus_farming_value)).setText(focusToString(0.25f));
+    ((TextView) findViewById(R.id.focus_mining_value)).setText(focusToString(0.25f));
+    ((TextView) findViewById(R.id.focus_construction_value)).setText(focusToString(0.25f));
 
     updateDeltas();
-
-    StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
-    b.setView(view);
-
-    b.setPositiveButton("Set", (dialog, which) -> onSetClick());
-    b.setNegativeButton("Cancel", null);
-
-    return b.create();
   }
 
-  @Override
-  public void onSaveInstanceState(Bundle state) {
-    super.onSaveInstanceState(state);
-    if (colony != null) {
-      Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
-      colony.toProtocolBuffer(colony_pb);
-      state.putByteArray("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
-    }
-    if (planet != null) {
-      Messages.Planet.Builder planet_pb = Messages.Planet.newBuilder();
-      planet.toProtocolBuffer(planet_pb);
-      state.putByteArray("au.com.codeka.warworlds.Planet", planet_pb.build().toByteArray());
-    }
+  public void setColony(Star star, Colony colony) {
+    this.colony = colony;
+    planet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
+
+    ((SeekBar) findViewById(R.id.focus_population))
+        .setProgress((int) (colony.getPopulationFocus() * SEEKBAR_MAX));
+    ((SeekBar) findViewById(R.id.focus_farming))
+        .setProgress((int) (colony.getFarmingFocus() * SEEKBAR_MAX));
+    ((SeekBar) findViewById(R.id.focus_mining))
+        .setProgress((int) (colony.getMiningFocus() * SEEKBAR_MAX));
+    ((SeekBar) findViewById(R.id.focus_construction))
+        .setProgress((int) (colony.getConstructionFocus() * SEEKBAR_MAX));
+
+    ((TextView) findViewById(R.id.focus_population_value))
+        .setText(focusToString(colony.getPopulationFocus()));
+    ((TextView) findViewById(R.id.focus_farming_value))
+        .setText(focusToString(colony.getFarmingFocus()));
+    ((TextView) findViewById(R.id.focus_mining_value))
+        .setText(focusToString(colony.getMiningFocus()));
+    ((TextView) findViewById(R.id.focus_construction_value))
+        .setText(focusToString(colony.getConstructionFocus()));
+    updateDeltas();
+  }
+
+  public void setCallback(@Nullable Callback callback) {
+    this.callback = callback;
+  }
+
+  public void setInitialValues(
+      float initialFocusPopulation, float initialFocusFarming, float initialFocusMining,
+      float initialFocusConstruction) {
+    this.initialFocusPopulation = initialFocusPopulation;
+    this.initialFocusFarming = initialFocusFarming;
+    this.initialFocusMining = initialFocusMining;
+    this.initialFocusConstruction = initialFocusConstruction;
   }
 
   private static String focusToString(float focus) {
@@ -315,17 +272,17 @@ public class FocusDialog extends DialogFragment {
 
   private void updateDeltas() {
     if (colony == null) {
-      ((TextView) view.findViewById(R.id.focus_farming_delta)).setText("-- / hr");
-      ((TextView) view.findViewById(R.id.focus_mining_delta)).setText("-- / hr");
+      ((TextView) findViewById(R.id.focus_farming_delta)).setText("-- / hr");
+      ((TextView) findViewById(R.id.focus_mining_delta)).setText("-- / hr");
       return;
     }
 
     float population = colony.getPopulation();
 
     float focusFarming =
-        (float) (((SeekBar) view.findViewById(R.id.focus_farming)).getProgress() / SEEKBAR_MAX);
+        (((SeekBar) findViewById(R.id.focus_farming)).getProgress() / SEEKBAR_MAX);
     float focusMining =
-        (float) (((SeekBar) view.findViewById(R.id.focus_mining)).getProgress() / SEEKBAR_MAX);
+        (((SeekBar) findViewById(R.id.focus_mining)).getProgress() / SEEKBAR_MAX);
 
     float congenialityFarming = (float) planet.getFarmingCongeniality() / 100.0f;
     float congenialityMining = (float) planet.getMiningCongeniality() / 100.0f;
@@ -333,12 +290,12 @@ public class FocusDialog extends DialogFragment {
     float rateFarming = population * focusFarming * congenialityFarming;
     float rateMining = population * focusMining * congenialityMining;
 
-    ((TextView) view.findViewById(R.id.focus_farming_delta))
+    ((TextView) findViewById(R.id.focus_farming_delta))
         .setText(String.format(
             Locale.ENGLISH,
             "%s%d / hr",
             (rateFarming < 0 ? "-" : "+"), Math.abs((int) rateFarming)));
-    ((TextView) view.findViewById(R.id.focus_mining_delta))
+    ((TextView) findViewById(R.id.focus_mining_delta))
         .setText(String.format(
             Locale.ENGLISH,
             "%s%d / hr",
@@ -346,14 +303,13 @@ public class FocusDialog extends DialogFragment {
   }
 
   private void onSetClick() {
-    float focusPopulation = (float) (seekBars.get(0).getProgress() / SEEKBAR_MAX);
-    float focusFarming = (float) (seekBars.get(1).getProgress() / SEEKBAR_MAX);
-    float focusMining = (float) (seekBars.get(2).getProgress() / SEEKBAR_MAX);
-    float focusConstruction = (float) (seekBars.get(3).getProgress() / SEEKBAR_MAX);
+    float focusPopulation = (seekBars.get(0).getProgress() / SEEKBAR_MAX);
+    float focusFarming = (seekBars.get(1).getProgress() / SEEKBAR_MAX);
+    float focusMining = (seekBars.get(2).getProgress() / SEEKBAR_MAX);
+    float focusConstruction = (seekBars.get(3).getProgress() / SEEKBAR_MAX);
 
     if (callback != null) {
       callback.onChangedClick(focusPopulation, focusFarming, focusMining, focusConstruction);
-      dismiss();
       return;
     }
 
@@ -361,7 +317,6 @@ public class FocusDialog extends DialogFragment {
     colony.setFarmingFocus(focusFarming);
     colony.setMiningFocus(focusMining);
     colony.setConstructionFocus(focusConstruction);
-    dismiss();
 
     new BackgroundRunner<Void>() {
       @Override
