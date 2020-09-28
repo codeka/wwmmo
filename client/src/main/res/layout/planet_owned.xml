@@ -57,6 +57,16 @@
             android:layout_marginTop="8dp"
             android:text="Build" />
 
+        <TextView
+            android:id="@+id/build_queue_length"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_below="@id/horz_sep_2"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp"
+            android:text="Build queue: 0" />
+
         <Button
             android:id="@+id/build_btn"
             android:layout_width="100dp"

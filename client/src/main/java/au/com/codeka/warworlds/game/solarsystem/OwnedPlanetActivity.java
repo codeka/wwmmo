@@ -4,7 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
+import java.util.Locale;
+
+import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
@@ -27,6 +31,7 @@ public class OwnedPlanetActivity extends BaseActivity {
 
   private FocusView focusView;
   private PlanetDetailsView planetDetails;
+  private TextView buildQueueLength;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,7 @@ public class OwnedPlanetActivity extends BaseActivity {
     planetDetails = findViewById(R.id.planet_details);
     focusView = findViewById(R.id.focus);
     findViewById(R.id.update_focus_btn).setOnClickListener(v -> focusView.save());
+    buildQueueLength = findViewById(R.id.build_queue_length);
   }
 
   @Override
@@ -107,5 +113,13 @@ public class OwnedPlanetActivity extends BaseActivity {
 
     planetDetails.setup(star, planet, null);
     focusView.setColony(star, colony);
+
+    int totalBuildRequests = 0;
+    for (BaseBuildRequest buildRequest : star.getBuildRequests()) {
+      if (buildRequest.getPlanetIndex() == planetIndex) {
+        totalBuildRequests ++;
+      }
+    }
+    buildQueueLength.setText(String.format(Locale.US, "Build queue: %d", totalBuildRequests));
   }
 }
