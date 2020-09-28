@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -92,17 +94,29 @@ public class GlobalOptionsActivity extends BaseActivity {
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
       if (preference.getKey().equals("GlobalOptions.DefaultInitialFocus")) {
-        /* TODO
-        FocusView dialog = new FocusView();
+        Context context = getContext();
+        if (context == null) {
+          return;
+        }
+
+        FocusView focusView = new FocusView(context, null);
         GlobalOptions.DefaultInitialFocus dif = new GlobalOptions().getDefaultInitialFocus();
-        dialog.setCallback((focusPopulation, focusFarming, focusMining, focusConstruction) ->
-            new GlobalOptions().setDefaultInitialFocus(
-                new GlobalOptions.DefaultInitialFocus(
-                    focusPopulation, focusFarming, focusMining, focusConstruction)));
-        dialog.setInitialValues(
+        focusView.setInitialValues(
             dif.focusPopulation, dif.focusFarming, dif.focusMining, dif.focusConstruction);
-        dialog.show(getActivity().getSupportFragmentManager(), "");
-         */
+        StyledDialog.Builder dialogBuilder = new StyledDialog.Builder(context);
+        dialogBuilder.setView(focusView);
+        dialogBuilder.setPositiveButton("Save",
+            (dialog, which) -> {
+                new GlobalOptions().setDefaultInitialFocus(
+                    new GlobalOptions.DefaultInitialFocus(
+                        focusView.getFocusPopulation(),
+                        focusView.getFocusFarming(),
+                        focusView.getFocusMining(),
+                        focusView.getFocusConstruction()));
+                dialog.dismiss();
+            });
+        dialogBuilder.setNegativeButton("Cancel", null);
+        dialogBuilder.create().show();
         return;
       }
 

@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.os.Bundle;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -20,15 +16,12 @@ import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-
-import com.google.protobuf.InvalidProtocolBufferException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,22 +32,11 @@ public class FocusView extends FrameLayout {
   // Either colony/planet will be non-null or callback will be.
   @Nullable private Colony colony;
   @Nullable private Planet planet;
-  @Nullable private Callback callback;
-
-  private float initialFocusPopulation;
-  private float initialFocusFarming;
-  private float initialFocusMining;
-  private float initialFocusConstruction;
 
   private final List<SeekBar> seekBars;
   private final List<TextView> textViews;
   private final List<ImageButton> lockButtons;
   private final ArrayList<Integer> lockedIndexes;
-
-  public interface Callback {
-    void onChangedClick(
-        float focusPopulation, float focusFarming, float focusMining, float focusConstruction);
-  }
 
   private static float SEEKBAR_MAX = 1000.0f;
 
@@ -168,22 +150,6 @@ public class FocusView extends FrameLayout {
         redistribute(seekBar12, progress / SEEKBAR_MAX);
       });
     }
-
-    ((SeekBar) findViewById(R.id.focus_population))
-        .setProgress((int) (initialFocusPopulation * SEEKBAR_MAX));
-    ((SeekBar) findViewById(R.id.focus_farming))
-        .setProgress((int) (initialFocusFarming * SEEKBAR_MAX));
-    ((SeekBar) findViewById(R.id.focus_mining))
-        .setProgress((int) (initialFocusMining * SEEKBAR_MAX));
-    ((SeekBar) findViewById(R.id.focus_construction))
-        .setProgress((int) (initialFocusConstruction * SEEKBAR_MAX));
-
-    ((TextView) findViewById(R.id.focus_population_value)).setText(focusToString(0.25f));
-    ((TextView) findViewById(R.id.focus_farming_value)).setText(focusToString(0.25f));
-    ((TextView) findViewById(R.id.focus_mining_value)).setText(focusToString(0.25f));
-    ((TextView) findViewById(R.id.focus_construction_value)).setText(focusToString(0.25f));
-
-    updateDeltas();
   }
 
   public void setColony(Star star, Colony colony) {
@@ -210,17 +176,72 @@ public class FocusView extends FrameLayout {
     updateDeltas();
   }
 
-  public void setCallback(@Nullable Callback callback) {
-    this.callback = callback;
-  }
-
   public void setInitialValues(
       float initialFocusPopulation, float initialFocusFarming, float initialFocusMining,
       float initialFocusConstruction) {
-    this.initialFocusPopulation = initialFocusPopulation;
-    this.initialFocusFarming = initialFocusFarming;
-    this.initialFocusMining = initialFocusMining;
-    this.initialFocusConstruction = initialFocusConstruction;
+    ((SeekBar) findViewById(R.id.focus_population))
+        .setProgress((int) (initialFocusPopulation * SEEKBAR_MAX));
+    ((SeekBar) findViewById(R.id.focus_farming))
+        .setProgress((int) (initialFocusFarming * SEEKBAR_MAX));
+    ((SeekBar) findViewById(R.id.focus_mining))
+        .setProgress((int) (initialFocusMining * SEEKBAR_MAX));
+    ((SeekBar) findViewById(R.id.focus_construction))
+        .setProgress((int) (initialFocusConstruction * SEEKBAR_MAX));
+
+    ((TextView) findViewById(R.id.focus_population_value)).setText(focusToString(0.25f));
+    ((TextView) findViewById(R.id.focus_farming_value)).setText(focusToString(0.25f));
+    ((TextView) findViewById(R.id.focus_mining_value)).setText(focusToString(0.25f));
+    ((TextView) findViewById(R.id.focus_construction_value)).setText(focusToString(0.25f));
+
+    updateDeltas();
+  }
+
+  public float getFocusPopulation() {
+    return (seekBars.get(0).getProgress() / SEEKBAR_MAX);
+  }
+
+  public float getFocusFarming() {
+    return (seekBars.get(1).getProgress() / SEEKBAR_MAX);
+  }
+
+  public float getFocusMining() {
+    return (seekBars.get(2).getProgress() / SEEKBAR_MAX);
+  }
+
+  public float getFocusConstruction() {
+    return (seekBars.get(3).getProgress() / SEEKBAR_MAX);
+  }
+
+  public void save() {
+    colony.setPopulationFocus(getFocusPopulation());
+    colony.setFarmingFocus(getFocusFarming());
+    colony.setMiningFocus(getFocusMining());
+    colony.setConstructionFocus(getFocusConstruction());
+
+    new BackgroundRunner<Void>() {
+      @Override
+      protected Void doInBackground() {
+        String url = String.format("stars/%s/colonies/%s",
+            colony.getStarKey(),
+            colony.getKey());
+
+        Messages.Colony.Builder pb = Messages.Colony.newBuilder();
+        colony.toProtocolBuffer(pb);
+        try {
+          ApiClient.putProtoBuf(url, pb.build(), Messages.Colony.class);
+        } catch (ApiException e) {
+          log.error("Error updating colony!", e);
+        }
+
+        return null;
+      }
+
+      @Override
+      protected void onComplete(Void unused) {
+        // notify the StarManager that this star has been updated
+        StarManager.i.refreshStar(Integer.parseInt(colony.getStarKey()));
+      }
+    }.execute();
   }
 
   private static String focusToString(float focus) {
@@ -300,47 +321,5 @@ public class FocusView extends FrameLayout {
             Locale.ENGLISH,
             "%s%d / hr",
             (rateMining < 0 ? "-" : "+"), Math.abs((int) rateMining)));
-  }
-
-  private void onSetClick() {
-    float focusPopulation = (seekBars.get(0).getProgress() / SEEKBAR_MAX);
-    float focusFarming = (seekBars.get(1).getProgress() / SEEKBAR_MAX);
-    float focusMining = (seekBars.get(2).getProgress() / SEEKBAR_MAX);
-    float focusConstruction = (seekBars.get(3).getProgress() / SEEKBAR_MAX);
-
-    if (callback != null) {
-      callback.onChangedClick(focusPopulation, focusFarming, focusMining, focusConstruction);
-      return;
-    }
-
-    colony.setPopulationFocus(focusPopulation);
-    colony.setFarmingFocus(focusFarming);
-    colony.setMiningFocus(focusMining);
-    colony.setConstructionFocus(focusConstruction);
-
-    new BackgroundRunner<Void>() {
-      @Override
-      protected Void doInBackground() {
-        String url = String.format("stars/%s/colonies/%s",
-            colony.getStarKey(),
-            colony.getKey());
-
-        Messages.Colony.Builder pb = Messages.Colony.newBuilder();
-        colony.toProtocolBuffer(pb);
-        try {
-          ApiClient.putProtoBuf(url, pb.build(), Messages.Colony.class);
-        } catch (ApiException e) {
-          log.error("Error updating colony!", e);
-        }
-
-        return null;
-      }
-
-      @Override
-      protected void onComplete(Void unused) {
-        // notify the StarManager that this star has been updated
-        StarManager.i.refreshStar(Integer.parseInt(colony.getStarKey()));
-      }
-    }.execute();
   }
 }

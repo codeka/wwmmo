@@ -56,6 +56,7 @@ public class OwnedPlanetActivity extends BaseActivity {
 
     planetDetails = findViewById(R.id.planet_details);
     focusView = findViewById(R.id.focus);
+    findViewById(R.id.update_focus_btn).setOnClickListener(v -> focusView.save());
   }
 
   @Override
