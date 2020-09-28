@@ -99,6 +99,7 @@
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity" />
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.EnemyPlanetActivity" />
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.EmptyPlanetActivity" />
+    <activity android:name="au.com.codeka.warworlds.game.solarsystem.OwnedPlanetActivity" />
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.FleetActivity" />
     <activity android:name="au.com.codeka.warworlds.game.starfield.StarfieldActivity" />
     <activity android:name="au.com.codeka.warworlds.game.alliance.AllianceActivity" />

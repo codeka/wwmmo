@@ -129,24 +129,16 @@
                           android:layout_centerHorizontal="true" />
 
                     <Button
-                        android:id="@+id/solarsystem_colony_build"
+                        android:id="@+id/solarsystem_colony_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/colony_focus_view"
                         android:layout_alignParentLeft="true"
-                        android:layout_toLeftOf="@id/colony_center_marker"
-                        android:layout_margin="8dp"
-                        android:text="@string/build" />
-
-                    <Button
-                        android:id="@+id/solarsystem_colony_focus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/colony_focus_view"
+                        android:layout_alignParentStart="true"
                         android:layout_alignParentRight="true"
-                        android:layout_toRightOf="@id/colony_center_marker"
+                        android:layout_alignParentEnd="true"
                         android:layout_margin="8dp"
-                        android:text="@string/focus" />
+                        android:text="@string/view" />
                 </RelativeLayout>
             </RelativeLayout>
 

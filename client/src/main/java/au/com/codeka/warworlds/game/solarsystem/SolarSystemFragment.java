@@ -36,6 +36,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
@@ -71,8 +72,7 @@ public class SolarSystemFragment extends Fragment {
 
     solarSystemSurfaceView = view.findViewById(R.id.solarsystem_view);
     progressBar = view.findViewById(R.id.progress_bar);
-    final Button buildButton = view.findViewById(R.id.solarsystem_colony_build);
-    final Button focusButton = view.findViewById(R.id.solarsystem_colony_focus);
+    final Button viewButton = view.findViewById(R.id.solarsystem_colony_view);
     final Button sitrepButton = view.findViewById(R.id.sitrep_btn);
     final Button planetViewButton = view.findViewById(R.id.enemy_empire_view);
     final Button emptyViewButton = view.findViewById(R.id.empty_view_btn);
@@ -91,34 +91,6 @@ public class SolarSystemFragment extends Fragment {
           refreshSelectedPlanet();
         });
 
-    buildButton.setOnClickListener(v -> {
-      if (star == null) {
-        return; // can happen before the star loads
-      }
-      if (colony == null) {
-        return; // shouldn't happen, the button should be hidden.
-      }
-
-      Intent intent = new Intent(getActivity(), BuildActivity.class);
-      intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-
-      Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
-      colony.toProtocolBuffer(colony_pb);
-      intent.putExtra("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
-
-      startActivityForResult(intent, BUILD_REQUEST);
-    });
-
-    focusButton.setOnClickListener(v -> {
-      if (star == null || star.getPlanets() == null || colony == null) {
-        return;
-      }
-
-      FocusDialog dialog = new FocusDialog();
-      dialog.setColony(star, colony);
-      dialog.show(getActivity().getSupportFragmentManager(), "");
-    });
-
     sitrepButton.setOnClickListener(v -> {
       if (star == null) {
         return; // can happen before the star loads
@@ -130,7 +102,7 @@ public class SolarSystemFragment extends Fragment {
     });
 
     planetViewButton.setOnClickListener(v -> onViewColony());
-
+    viewButton.setOnClickListener(v -> onViewColony());
     emptyViewButton.setOnClickListener(v -> onViewColony());
 
     fleetList.setFleetSelectedHandler(fleet -> {
@@ -341,10 +313,14 @@ public class SolarSystemFragment extends Fragment {
       return;
     }
 
-    // TODO: determine if enemy colony or not...
+    MyEmpire myEmpire = EmpireManager.i.getEmpire();
     Intent intent;
     if (colony != null) {
-      intent = new Intent(getActivity(), EnemyPlanetActivity.class);
+      if (colony.getEmpireID() == myEmpire.getID()) {
+        intent = new Intent(getActivity(), OwnedPlanetActivity.class);
+      } else {
+        intent = new Intent(getActivity(), EnemyPlanetActivity.class);
+      }
     } else {
       intent = new Intent(getActivity(), EmptyPlanetActivity.class);
     }
