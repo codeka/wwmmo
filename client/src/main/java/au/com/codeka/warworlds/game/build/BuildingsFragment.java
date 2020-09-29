@@ -20,25 +20,21 @@ public class BuildingsFragment extends BuildActivity.BaseTabFragment {
     final Star star = getStar();
     final Colony colony = getColony();
 
-    buildingsList = (BuildingsList) v.findViewById(R.id.building_list);
+    buildingsList = v.findViewById(R.id.building_list);
     if (colony != null) {
       buildingsList.setColony(star, colony);
     }
 
-    buildingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view,
-          int position, long id) {
-        BuildingsList.Entry entry = buildingsList.getItem(position);
-        if (entry.design != null) {
-          BuildConfirmDialog dialog = new BuildConfirmDialog();
-          dialog.setup(entry.design, star, colony);
-          dialog.show(getActivity().getSupportFragmentManager(), "");
-        } else if (entry.building != null) {
-          BuildConfirmDialog dialog = new BuildConfirmDialog();
-          dialog.setup(entry.building, star, colony);
-          dialog.show(getActivity().getSupportFragmentManager(), "");
-        }
+    buildingsList.setOnItemClickListener((parent, view, position, id) -> {
+      BuildingsList.Entry entry = buildingsList.getItem(position);
+      if (entry.design != null) {
+        BuildConfirmDialog dialog = new BuildConfirmDialog();
+        dialog.setup(entry.design, star, colony);
+        dialog.show(getActivity().getSupportFragmentManager(), "");
+      } else if (entry.building != null) {
+        BuildConfirmDialog dialog = new BuildConfirmDialog();
+        dialog.setup(entry.building, star, colony);
+        dialog.show(getActivity().getSupportFragmentManager(), "");
       }
     });
 

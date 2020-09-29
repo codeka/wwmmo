@@ -47,13 +47,17 @@ public class BuildActivity extends BaseActivity {
   private ColonyPagerAdapter colonyPagerAdapter;
   private Colony initialColony;
 
+  public Star getStar() {
+    return star;
+  }
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.build);
 
     colonyPagerAdapter = new ColonyPagerAdapter(getSupportFragmentManager());
-    viewPager = (ViewPager) findViewById(R.id.pager);
+    viewPager = findViewById(R.id.pager);
     viewPager.setAdapter(colonyPagerAdapter);
 
     if (savedInstanceState != null) {
@@ -79,24 +83,21 @@ public class BuildActivity extends BaseActivity {
   @Override
   public void onResumeFragments() {
     super.onResumeFragments();
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeting greeting) {
-        Bundle extras = getIntent().getExtras();
-        String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-        byte[] colonyBytes = extras.getByteArray("au.com.codeka.warworlds.Colony");
-        try {
-          Messages.Colony colony_pb = Messages.Colony.parseFrom(colonyBytes);
-          initialColony = new Colony();
-          initialColony.fromProtocolBuffer(colony_pb);
-        } catch (InvalidProtocolBufferException e) {
-        }
+    ServerGreeter.waitForHello(this, (success, greeting) -> {
+      Bundle extras = getIntent().getExtras();
+      String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+      byte[] colonyBytes = extras.getByteArray("au.com.codeka.warworlds.Colony");
+      try {
+        Messages.Colony colony_pb = Messages.Colony.parseFrom(colonyBytes);
+        initialColony = new Colony();
+        initialColony.fromProtocolBuffer(colony_pb);
+      } catch (InvalidProtocolBufferException e) {
+      }
 
-        StarManager.eventBus.register(eventHandler);
-        Star star = StarManager.i.getStar(Integer.parseInt(starKey));
-        if (star != null) {
-          updateStar(star);
-        }
+      StarManager.eventBus.register(eventHandler);
+      Star star = StarManager.i.getStar(Integer.parseInt(starKey));
+      if (star != null) {
+        updateStar(star);
       }
     });
   }
@@ -125,16 +126,16 @@ public class BuildActivity extends BaseActivity {
   }
 
   private void refreshColonyDetails(Colony colony) {
-    ImageView planetIcon = (ImageView) findViewById(R.id.planet_icon);
+    ImageView planetIcon = findViewById(R.id.planet_icon);
     Planet planet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
     Sprite planetSprite = PlanetImageManager.getInstance().getSprite(planet);
     planetIcon.setImageDrawable(new SpriteDrawable(planetSprite));
 
-    TextView planetName = (TextView) findViewById(R.id.planet_name);
+    TextView planetName = findViewById(R.id.planet_name);
     planetName.setText(String.format(Locale.ENGLISH, "%s %s", star.getName(),
         RomanNumeralFormatter.format(colony.getPlanetIndex())));
 
-    TextView buildQueueDescription = (TextView) findViewById(R.id.build_queue_description);
+    TextView buildQueueDescription = findViewById(R.id.build_queue_description);
     int buildQueueLength = 0;
     for (BaseBuildRequest br : star.getBuildRequests()) {
       if (br.getColonyKey().equals(colony.getKey())) {
@@ -169,12 +170,7 @@ public class BuildActivity extends BaseActivity {
         colonies.add((Colony) c);
       }
     }
-    Collections.sort(colonies, new Comparator<Colony>() {
-      @Override
-      public int compare(Colony lhs, Colony rhs) {
-        return lhs.getPlanetIndex() - rhs.getPlanetIndex();
-      }
-    });
+    Collections.sort(colonies, (lhs, rhs) -> lhs.getPlanetIndex() - rhs.getPlanetIndex());
 
     if (initialColony != null) {
       int colonyIndex = 0;
