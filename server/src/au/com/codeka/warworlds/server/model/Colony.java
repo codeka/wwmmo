@@ -112,6 +112,19 @@ public class Colony extends BaseColony {
   }
 
   /**
+   * Set the colony to abandoned. Make sure the focus is reasonable for a native colony and set the
+   * empire ID to null.
+   */
+  public void setAbandoned() {
+    mEmpireID = null;
+    mEmpireKey = null;
+    mPopulationFocus = 0.1f;
+    mFarmingFocus = 0.99f;
+    mMiningFocus = 0.0f;
+    mConstructionFocus = 0.0f;
+  }
+
+  /**
    * Sanitize this colony for viewing by other empires. Basically, we just zero-out various
    * "sensitive" bits of data.
    */

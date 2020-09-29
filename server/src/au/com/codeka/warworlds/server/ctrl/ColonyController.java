@@ -154,30 +154,7 @@ public class ColonyController {
       // If this is the last colony for this empire on this star, make sure the empire's home
       // star is reset.
       if (empire != null) {
-        boolean anotherColonyExists = false;
-        for (BaseColony baseColony : star.getColonies()) {
-          if (baseColony.getEmpireKey() != null && colony.getEmpireKey() != null &&
-              baseColony.getEmpireKey().equals(colony.getEmpireKey()) &&
-              !baseColony.getKey().equals(colony.getKey())) {
-            anotherColonyExists = true;
-            break;
-          }
-        }
-
-        if (!anotherColonyExists && empire.getHomeStarID() == star.getID()) {
-          // Do this in a separate thread so as to not deadlock the current transaction. It doesn't
-          // matter if there's a delay finding a new home star of a few seconds.
-          new BackgroundRunner() {
-            @Override
-            protected void doInBackground() {
-              try {
-                new EmpireController().findNewHomeStar(empire.getID(), star.getID());
-              } catch (RequestException e) {
-                log.error("Error setting home star.", e);
-              }
-            }
-          }.execute();
-        }
+        maybeResetHomeStar(empire, star, colony);
       }
 
       if (sitrep_pb != null) {
@@ -207,6 +184,52 @@ public class ColonyController {
 
     if (sitrep_pb != null) {
       new SituationReportController(db.getTransaction()).saveSituationReport(sitrep_pb.build());
+    }
+  }
+
+  /**
+   * Abandoning a colony will revert it to native. We'll adjust the focus so as not to kill the
+   * population if we can. And we'll also remove all buildings and build requests from the colony.
+   */
+  public void abandon(int empireID, Star star, Colony colony) throws RequestException {
+    // Remove any build requests currently in progress in this colony.
+    star.getBuildRequests().removeIf(
+        buildRequest -> buildRequest.getPlanetIndex() == colony.getPlanetIndex());
+
+    Empire empire = new EmpireController().getEmpire(empireID);
+    maybeResetHomeStar(empire, star, colony);
+
+    colony.setAbandoned();
+  }
+
+  /**
+   * If the given colony is the last one on the star for the given empire, and this is our home
+   * star, we'll need to pick another because we're assuming the colony is about to go away.
+   */
+  private void maybeResetHomeStar(Empire empire, Star star, Colony oldColony) {
+    boolean anotherColonyExists = false;
+    for (BaseColony baseColony : star.getColonies()) {
+      if (baseColony.getEmpireKey() != null && oldColony.getEmpireKey() != null &&
+          baseColony.getEmpireKey().equals(oldColony.getEmpireKey()) &&
+          !baseColony.getKey().equals(oldColony.getKey())) {
+        anotherColonyExists = true;
+        break;
+      }
+    }
+
+    if (!anotherColonyExists && empire.getHomeStarID() == star.getID()) {
+      // Do this in a separate thread so as to not deadlock the current transaction. It doesn't
+      // matter if there's a delay finding a new home star of a few seconds.
+      new BackgroundRunner() {
+        @Override
+        protected void doInBackground() {
+          try {
+            new EmpireController().findNewHomeStar(empire.getID(), star.getID());
+          } catch (RequestException e) {
+            log.error("Error setting home star.", e);
+          }
+        }
+      }.execute();
     }
   }
 

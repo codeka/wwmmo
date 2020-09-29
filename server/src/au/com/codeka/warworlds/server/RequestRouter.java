@@ -67,6 +67,9 @@ public class RequestRouter extends InstrumentedHandler {
         "stars/(?<starid>[0-9]+)/colonies/(?<colonyid>[0-9]+)", ColonyHandler.class));
     sRoutes.add(new Route(
         "stars/(?<starid>[0-9]+)/colonies/(?<colonyid>[0-9]+)/attack", ColonyAttackHandler.class));
+    sRoutes.add(new Route(
+        "stars/(?<starid>[0-9]+)/colonies/(?<colonyid>[0-9]+)/abandon",
+        ColonyAbandonHandler.class));
     sRoutes.add(new Route("stars/(?<starid>[0-9]+)/colonies", ColoniesHandler.class));
     sRoutes.add(new Route(
         "stars/(?<starid>[0-9]+)/combat-reports/(?<combatreportid>[0-9]+)",

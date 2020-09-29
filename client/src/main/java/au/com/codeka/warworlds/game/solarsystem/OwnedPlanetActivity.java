@@ -2,12 +2,15 @@ package au.com.codeka.warworlds.game.solarsystem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Locale;
 
+import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
@@ -15,7 +18,12 @@ import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.ApiRequest;
+import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.build.BuildActivity;
@@ -25,6 +33,8 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class OwnedPlanetActivity extends BaseActivity {
+  private static final Log log = new Log("OwnedPlanetActivity");
+
   private Star star;
   private Planet planet;
   private Colony colony;
@@ -63,6 +73,8 @@ public class OwnedPlanetActivity extends BaseActivity {
     focusView = findViewById(R.id.focus);
     findViewById(R.id.update_focus_btn).setOnClickListener(v -> focusView.save());
     buildQueueLength = findViewById(R.id.build_queue_length);
+
+    findViewById(R.id.abandon_btn).setOnClickListener(v -> onAbandonColony());
   }
 
   @Override
@@ -99,6 +111,37 @@ public class OwnedPlanetActivity extends BaseActivity {
       refresh(s);
     }
   };
+
+  private void onAbandonColony() {
+    new StyledDialog.Builder(this).setMessage(Html.fromHtml(
+        "Are you sure you want to abandon this colony? The colony will revert to native if you" +
+            " do."))
+        .setTitle("Abandon colony")
+        .setPositiveButton("Abandon", (dialog, which) -> {
+          new BackgroundRunner<Void>() {
+            @Override
+            protected Void doInBackground() {
+              String url = String.format("stars/%s/colonies/%s/abandon",
+                  colony.getStarKey(), colony.getKey());
+
+              RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST").build());
+              return null;
+            }
+
+            @Override
+            protected void onComplete(Void unused) {
+              // notify the StarManager that this star has been updated
+              StarManager.i.refreshStar(Integer.parseInt(colony.getStarKey()));
+
+              // also finish the activity and go back to the solarsystem view.
+              finish();
+            }
+          }.execute();
+
+          dialog.dismiss();;
+        })
+        .setNegativeButton("Cancel", null).create().show();
+  }
 
   private void refresh(Star s) {
     int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
