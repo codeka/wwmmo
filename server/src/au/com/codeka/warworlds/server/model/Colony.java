@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
+
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.warworlds.server.data.SqlResult;
@@ -16,6 +18,7 @@ public class Colony extends BaseColony {
   private int mSectorID;
   private int mStarID;
   private Integer mEmpireID;
+  private DateTime mAbandonedTime;
 
   public Colony() {
     mBuildings = new ArrayList<BaseBuilding>();
@@ -39,6 +42,7 @@ public class Colony extends BaseColony {
     mUncollectedTaxes = res.getFloat("uncollected_taxes");
     mCooldownTimeEnd = res.getDateTime("cooldown_end_time");
     mPopulation = res.getFloat("population");
+    mAbandonedTime = res.getDateTime("abandoned_time");
     mDefenceBoost = 1.0f;
     mBuildings = new ArrayList<>();
   }
@@ -111,6 +115,12 @@ public class Colony extends BaseColony {
     return mEmpireID;
   }
 
+  /** Gets the {@link DateTime} this colony was abandoned, or null if it has not been abandoned. */
+  @Nullable
+  public DateTime getAbandonedTime() {
+    return mAbandonedTime;
+  }
+
   /**
    * Set the colony to abandoned. Make sure the focus is reasonable for a native colony and set the
    * empire ID to null.
@@ -122,6 +132,7 @@ public class Colony extends BaseColony {
     mFarmingFocus = 0.99f;
     mMiningFocus = 0.0f;
     mConstructionFocus = 0.0f;
+    mAbandonedTime = DateTime.now();
   }
 
   /**
@@ -150,6 +161,7 @@ public class Colony extends BaseColony {
         .add("population", mPopulation)
         .add("defenseBoost", mDefenceBoost)
         .add("buildings", mBuildings)
+        .add("abandoned", mAbandonedTime)
         .toString();
   }
 }

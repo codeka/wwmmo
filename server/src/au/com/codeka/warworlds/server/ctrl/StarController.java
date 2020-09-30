@@ -571,7 +571,8 @@ public class StarController {
 
       String sql = "UPDATE colonies SET" +
           " focus_population = ?, focus_construction = ?, focus_farming = ?," +
-          " focus_mining = ?, population = ?, uncollected_taxes = ?, empire_id = ?" +
+          " focus_mining = ?, population = ?, uncollected_taxes = ?, empire_id = ?," +
+          " abandoned_time = ?" +
           " WHERE id = ?";
       try (SqlStmt stmt = prepare(sql)) {
         for (BaseColony baseColony : star.getColonies()) {
@@ -595,7 +596,8 @@ public class StarController {
           stmt.setDouble(5, colony.getPopulation());
           stmt.setDouble(6, 0); // TODO: remove this column from the database
           stmt.setInt(7, colony.getEmpireID());
-          stmt.setInt(8, ((Colony) colony).getID());
+          stmt.setDateTime(8, colony.getAbandonedTime());
+          stmt.setInt(9, colony.getID());
           stmt.update();
 
           colony.setUncollectedTaxes(0.0f);

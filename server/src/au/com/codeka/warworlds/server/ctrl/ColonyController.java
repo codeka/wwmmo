@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
 
@@ -256,6 +257,23 @@ public class ColonyController {
     boolean hasHqElsewhere = false;
 
     if (empire == null) {
+      // For native colonies, you get $10k -- except where the colony was recently abandoned, in
+      // which case you get nothing.
+      if (colony.getAbandonedTime() != null) {
+        // If it was abandoned less than two weeks ago, you get nothing.
+        Duration diff = new Duration(colony.getAbandonedTime(), DateTime.now());
+        if (diff.getStandardDays() <= 14) {
+          return 0.0;
+        }
+
+        // If it's been more than four weeks, you get the full 10k
+        if (diff.getStandardDays() > 28) {
+          return 10000.0;
+        }
+
+        final double fraction = (diff.getStandardDays() - 14.0) / 14.0;
+        return fraction * 10000.0;
+      }
       return 10000.0;
     }
 
