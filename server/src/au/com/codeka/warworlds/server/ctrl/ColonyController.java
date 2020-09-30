@@ -266,12 +266,12 @@ public class ColonyController {
           return 0.0;
         }
 
-        // If it's been more than four weeks, you get the full 10k
-        if (diff.getStandardDays() > 28) {
+        // If it's been more than six weeks, you get the full 10k
+        if (diff.getStandardDays() > 42) {
           return 10000.0;
         }
 
-        final double fraction = (diff.getStandardDays() - 14.0) / 14.0;
+        final double fraction = (diff.getStandardDays() - 14.0) / 28;
         return fraction * 10000.0;
       }
       return 10000.0;

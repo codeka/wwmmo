@@ -314,7 +314,7 @@ public class SolarSystemFragment extends Fragment {
     MyEmpire myEmpire = EmpireManager.i.getEmpire();
     Intent intent;
     if (colony != null) {
-      if (colony.getEmpireID() == myEmpire.getID()) {
+      if (colony.getEmpireID() != null && colony.getEmpireID() == myEmpire.getID()) {
         intent = new Intent(getActivity(), OwnedPlanetActivity.class);
       } else {
         intent = new Intent(getActivity(), EnemyPlanetActivity.class);
