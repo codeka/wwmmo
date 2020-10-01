@@ -11,11 +11,12 @@
         android:layout_alignParentTop="true"
         android:text="Select the fleet to merge with and tap &quot;Merge&quot;" />
 
-    <ListView
+    <LinearLayout
         android:id="@+id/ship_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/note"
-        android:listSelector="@drawable/list_selector" />
+        android:listSelector="@drawable/list_selector"
+        android:orientation="vertical" />
 
 </RelativeLayout>

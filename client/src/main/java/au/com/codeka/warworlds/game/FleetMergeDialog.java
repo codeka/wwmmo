@@ -2,19 +2,16 @@ package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
@@ -35,6 +32,9 @@ public class FleetMergeDialog extends DialogFragment {
   private List<Fleet> potentialMergeTargets;
   private View view;
   private Fleet selectedFleet;
+  private FleetListRow selectedRow;
+  private LinearLayout fleetList;
+  private StyledDialog dialog;
 
   public FleetMergeDialog() {
   }
@@ -49,12 +49,9 @@ public class FleetMergeDialog extends DialogFragment {
     LayoutInflater inflater = getActivity().getLayoutInflater();
     view = inflater.inflate(R.layout.fleet_merge_dlg, null);
 
-    final ListView fleetList = (ListView) view.findViewById(R.id.ship_list);
-    final TextView note = (TextView) view.findViewById(R.id.note);
+    fleetList = view.findViewById(R.id.ship_list);
+    final TextView note = view.findViewById(R.id.note);
     boolean isError = false;
-
-    final FleetListAdapter adapter = new FleetListAdapter();
-    fleetList.setAdapter(adapter);
 
     if (!fleet.getState().equals(Fleet.State.IDLE)) {
       note.setText("You cannot merge a fleet unless it is Idle.");
@@ -85,7 +82,7 @@ public class FleetMergeDialog extends DialogFragment {
         note.setText("No other fleet is suitable for merging.");
         isError = true;
       } else {
-        adapter.setFleets(otherFleets);
+        refreshFleets(otherFleets);
       }
     }
 
@@ -99,16 +96,8 @@ public class FleetMergeDialog extends DialogFragment {
 
     b.setNegativeButton("Cancel", null);
 
-    final StyledDialog dialog = b.create();
+    dialog = b.create();
     dialog.setOnShowListener(d -> dialog.getPositiveButton().setEnabled(false));
-
-    fleetList.setOnItemClickListener((parent, view, position, id) -> {
-      Fleet f = (Fleet) adapter.getItem(position);
-      selectedFleet = f;
-      adapter.notifyDataSetChanged();
-      dialog.getPositiveButton().setEnabled(true);
-    });
-
     return dialog;
   }
 
@@ -176,62 +165,33 @@ public class FleetMergeDialog extends DialogFragment {
     }.execute();
   }
 
-  private class FleetListAdapter extends BaseAdapter {
-    private ArrayList<Fleet> mFleets;
-    private Context mContext;
+  private void refreshFleets(ArrayList<Fleet> fleets) {
+    Collections.sort(fleets, (lhs, rhs) -> {
+      // by definition, they'll all be the same design so just sort based on number of ships.
+      return (int) (rhs.getNumShips() - lhs.getNumShips());
+    });
 
-    public FleetListAdapter() {
-      mContext = getActivity();
-    }
+    for (Fleet fleet : fleets) {
+      FleetListRow row = new FleetListRow(getContext());
+      row.setFleet(fleet);
+      row.setTag(fleet);
+      row.setOnClickListener(rowClickListener);
 
-    public void setFleets(List<Fleet> fleets) {
-      mFleets = new ArrayList<Fleet>(fleets);
-
-      Collections.sort(mFleets, (lhs, rhs) -> {
-        // by definition, they'll all be the same design so just sort based on number of ships.
-        return (int) (rhs.getNumShips() - lhs.getNumShips());
-      });
-
-      notifyDataSetChanged();
-    }
-
-    @Override
-    public int getCount() {
-      if (mFleets == null)
-        return 0;
-      return mFleets.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-      if (mFleets == null)
-        return null;
-      return mFleets.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-      return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-      Fleet fleet = mFleets.get(position);
-      View view = convertView;
-
-      if (view == null) {
-        view = new FleetListRow(mContext);
-      }
-
-      ((FleetListRow) view).setFleet(fleet);
-
-      if (selectedFleet != null && selectedFleet.getKey().equals(fleet.getKey())) {
-        view.setBackgroundResource(R.color.list_item_selected);
-      } else {
-        view.setBackgroundResource(android.R.color.transparent);
-      }
-
-      return view;
+      fleetList.addView(row);
     }
   }
+
+  private View.OnClickListener rowClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      if (selectedRow != null) {
+        selectedRow.setBackgroundResource(android.R.color.transparent);
+      }
+      selectedFleet = (Fleet) v.getTag();
+      selectedRow = (FleetListRow) v;
+      selectedRow.setBackgroundResource(R.color.list_item_selected);
+
+      dialog.getPositiveButton().setEnabled(true);
+    }
+  };
 }
