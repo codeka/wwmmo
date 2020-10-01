@@ -10,13 +10,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -38,7 +36,6 @@ import au.com.codeka.warworlds.ctrl.BuildEstimateView;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
@@ -46,8 +43,6 @@ import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ShipUpgradeDialog extends DialogFragment {
   private final Log log = new Log("ShipUpgradeDialog");
@@ -76,7 +71,7 @@ public class ShipUpgradeDialog extends DialogFragment {
     super.onCreateDialog(savedInstanceState);
     fetchArguments();
 
-    final Activity activity = checkNotNull(getActivity());
+    final Activity activity = requireActivity();
     LayoutInflater inflater = activity.getLayoutInflater();
     @SuppressLint("InflateParams") // no parent for dialogs
     View view = inflater.inflate(R.layout.build_ship_upgrade_dlg, null);
@@ -88,12 +83,9 @@ public class ShipUpgradeDialog extends DialogFragment {
     TextView upgradesNone = view.findViewById(R.id.upgrades_none);
     buildEstimateView = view.findViewById(R.id.build_estimate);
     buildEstimateView.setOnBuildEstimateRefreshRequired(
-        new BuildEstimateView.BuildEstimateRefreshRequiredHandler() {
-          @Override
-          public void onBuildEstimateRefreshRequired() {
-            refreshBuildEstimate();
-            refreshBuildNowCost();
-          }
+        () -> {
+          refreshBuildEstimate();
+          refreshBuildNowCost();
         });
 
     ShipDesign design = fleet.getDesign();
@@ -122,15 +114,12 @@ public class ShipUpgradeDialog extends DialogFragment {
       refreshBuildEstimate();
       refreshBuildNowCost();
 
-      upgradesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
-          upgradeListAdapter.setSelectedItem(position);
+      upgradesList.setOnItemClickListener((listView, view1, position, id) -> {
+        upgradeListAdapter.setSelectedItem(position);
 
-          upgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(position);
-          refreshBuildEstimate();
-          refreshBuildNowCost();
-        }
+        upgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(position);
+        refreshBuildEstimate();
+        refreshBuildNowCost();
       });
     } else {
       log.debug("No upgrades available.");
@@ -138,28 +127,18 @@ public class ShipUpgradeDialog extends DialogFragment {
       upgradesNone.setVisibility(View.VISIBLE);
     }
 
-    buildNowBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onUpgradeClick(true);
-      }
-    });
+    buildNowBtn.setOnClickListener(v -> onUpgradeClick(true));
 
     return new StyledDialog.Builder(getActivity())
         .setView(view)
-        .setPositiveButton("Upgrade", new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            onUpgradeClick(false);
-          }
-        })
+        .setPositiveButton("Upgrade", (dialog, which) -> onUpgradeClick(false))
         .setNegativeButton("Cancel", null)
         .create();
   }
 
   private void fetchArguments() {
     try {
-      Bundle args = checkNotNull(getArguments());
+      Bundle args = requireArguments();
       Messages.Star star_pb =
           Messages.Star.parseFrom(args.getByteArray("au.com.codeka.warworlds.Star"));
       star = new Star();
@@ -283,7 +262,8 @@ public class ShipUpgradeDialog extends DialogFragment {
       TextView upgradeName = view.findViewById(R.id.upgrade_name);
       TextView upgradeDescription = view.findViewById(R.id.upgrade_description);
 
-      upgradeIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(entry.getSpriteName())));
+      upgradeIcon.setImageDrawable(
+          new SpriteDrawable(SpriteManager.i.getSprite(entry.getSpriteName())));
       upgradeName.setText(entry.getDisplayName());
       upgradeDescription.setText(Html.fromHtml(entry.getDescription()));
 

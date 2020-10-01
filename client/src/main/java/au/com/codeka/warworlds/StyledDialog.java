@@ -102,7 +102,7 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
     try {
       super.show();
     } catch (WindowManager.BadTokenException e) {
-      // this can happen if the activity has been stopped... just ignore it.
+      // This can happen if the activity has been stopped... just ignore it.
     }
   }
 
