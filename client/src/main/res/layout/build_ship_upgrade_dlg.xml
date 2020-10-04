@@ -30,8 +30,9 @@
     android:layout_alignStart="@id/fleet_name"
     tools:text="Some extra details" />
 
-  <ListView
+  <LinearLayout
     android:id="@+id/upgrades"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:layout_height="90dp"

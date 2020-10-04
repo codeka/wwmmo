@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -52,6 +53,8 @@ public class ShipUpgradeDialog extends DialogFragment {
   private Fleet fleet;
   private BuildEstimateView buildEstimateView;
   private ShipDesign.Upgrade upgrade;
+  private View selectedRow = null;
+  private LinearLayout upgradesContainer;
 
   public void setup(Star star, Colony colony, Fleet fleet) {
     Bundle args = new Bundle();
@@ -79,7 +82,7 @@ public class ShipUpgradeDialog extends DialogFragment {
 
     ImageView fleetIcon = view.findViewById(R.id.fleet_icon);
     TextView fleetName = view.findViewById(R.id.fleet_name);
-    ListView upgradesList = view.findViewById(R.id.upgrades);
+    upgradesContainer = view.findViewById(R.id.upgrades);
     TextView upgradesNone = view.findViewById(R.id.upgrades_none);
     buildEstimateView = view.findViewById(R.id.build_estimate);
     buildEstimateView.setOnBuildEstimateRefreshRequired(
@@ -95,9 +98,6 @@ public class ShipUpgradeDialog extends DialogFragment {
     fleetName.setText(String.format(Locale.ENGLISH, "%d × %s",
         (int) fleet.getNumShips(), design.getDisplayName()));
 
-    final UpgradeListAdapter upgradeListAdapter = new UpgradeListAdapter();
-    upgradesList.setAdapter(upgradeListAdapter);
-
     ArrayList<ShipDesign.Upgrade> upgrades = new ArrayList<>();
     for (ShipDesign.Upgrade upgrade : design.getUpgrades()) {
       if (!fleet.hasUpgrade(upgrade.getID())) {
@@ -106,24 +106,10 @@ public class ShipUpgradeDialog extends DialogFragment {
     }
     if (upgrades.size() > 0) {
       log.debug("%d updates available.", upgrades.size());
-      upgradeListAdapter.setup(upgrades);
-
-      // select the first one by default
-      upgradeListAdapter.setSelectedItem(0);
-      upgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(0);
-      refreshBuildEstimate();
-      refreshBuildNowCost();
-
-      upgradesList.setOnItemClickListener((listView, view1, position, id) -> {
-        upgradeListAdapter.setSelectedItem(position);
-
-        upgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(position);
-        refreshBuildEstimate();
-        refreshBuildNowCost();
-      });
+      refreshUpgrades(upgrades);
     } else {
       log.debug("No upgrades available.");
-      upgradesList.setVisibility(View.GONE);
+      upgradesContainer.setVisibility(View.GONE);
       upgradesNone.setVisibility(View.VISIBLE);
     }
 
@@ -164,6 +150,39 @@ public class ShipUpgradeDialog extends DialogFragment {
     }
   }
 
+  private void refreshUpgrades(ArrayList<ShipDesign.Upgrade> upgrades) {
+    LayoutInflater inflater =
+        (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+    for (ShipDesign.Upgrade upgrade : upgrades) {
+      View view = inflater.inflate(R.layout.build_ship_upgrade_row, upgradesContainer, false);
+      view.setBackgroundResource(R.color.list_item_normal);
+
+      ImageView upgradeIcon = view.findViewById(R.id.upgrade_icon);
+      TextView upgradeName = view.findViewById(R.id.upgrade_name);
+      TextView upgradeDescription = view.findViewById(R.id.upgrade_description);
+
+      upgradeIcon.setImageDrawable(
+          new SpriteDrawable(SpriteManager.i.getSprite(upgrade.getSpriteName())));
+      upgradeName.setText(upgrade.getDisplayName());
+      upgradeDescription.setText(Html.fromHtml(upgrade.getDescription()));
+
+      view.setTag(upgrade);
+      view.setOnClickListener(v -> {
+        if (selectedRow != null) {
+          selectedRow.setBackgroundResource(R.color.list_item_normal);
+        }
+        selectedRow = v;
+        selectedRow.setBackgroundResource(R.color.list_item_selected);
+        this.upgrade = (ShipDesign.Upgrade) v.getTag();
+        refreshBuildEstimate();
+        refreshBuildNowCost();
+      });
+
+      upgradesContainer.addView(view);
+    }
+  }
+
   private void refreshBuildEstimate() {
     if (upgrade == null) {
       buildEstimateView.refresh(star, null);
@@ -198,76 +217,5 @@ public class ShipUpgradeDialog extends DialogFragment {
         activity, colony, fleet.getDesign(), Integer.parseInt(fleet.getKey()),
         (int) fleet.getNumShips(), upgrade.getID(), accelerateImmediately);
     dismiss();
-  }
-
-  /**
-   * This adapter is used to populate the list of upgrade designs in our view.
-   */
-  private class UpgradeListAdapter extends BaseAdapter {
-    private List<ShipDesign.Upgrade> mEntries;
-    private ShipDesign.Upgrade mSelectedEntry;
-
-    public void setup(List<ShipDesign.Upgrade> upgrades) {
-      mEntries = new ArrayList<>(upgrades);
-      notifyDataSetChanged();
-    }
-
-    void setSelectedItem(int position) {
-      mSelectedEntry = mEntries.get(position);
-      notifyDataSetChanged();
-    }
-
-    @Override
-    public int getCount() {
-      if (mEntries == null)
-        return 0;
-      return mEntries.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-      if (mEntries == null)
-        return null;
-      return mEntries.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-      return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-      ShipDesign.Upgrade entry = mEntries.get(position);
-
-      View view = convertView;
-      if (view == null) {
-        Activity activity = getActivity();
-        if (activity == null) {
-          return null;
-        }
-
-        LayoutInflater inflater =
-            (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = inflater.inflate(R.layout.build_ship_upgrade_row, parent, false);
-      }
-
-      if (mSelectedEntry != null && mSelectedEntry.getID().equals(entry.getID())) {
-        view.setBackgroundResource(R.color.list_item_selected);
-      } else {
-        view.setBackgroundResource(R.color.list_item_normal);
-      }
-
-      ImageView upgradeIcon = view.findViewById(R.id.upgrade_icon);
-      TextView upgradeName = view.findViewById(R.id.upgrade_name);
-      TextView upgradeDescription = view.findViewById(R.id.upgrade_description);
-
-      upgradeIcon.setImageDrawable(
-          new SpriteDrawable(SpriteManager.i.getSprite(entry.getSpriteName())));
-      upgradeName.setText(entry.getDisplayName());
-      upgradeDescription.setText(Html.fromHtml(entry.getDescription()));
-
-      return view;
-    }
   }
 }
