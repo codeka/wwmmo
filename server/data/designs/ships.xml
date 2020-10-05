@@ -115,6 +115,9 @@
           <p>Enemy colonies are too powerful to be fooled by missionaries. They'll just kill your
            missionaries. Try propaganda instead.</p>
         ]]></description>
+        <incompatible>
+          <upgrade>propaganda</upgrade>
+        </incompatible>
       </upgrade>
       <upgrade id="propaganda">
         <sprite>upgrade.propaganda</sprite>
@@ -127,6 +130,9 @@
           <p>This will also work on native colonies, but it's kind of a waste of time when
           missionaries can do the job in an instant.</p>
         ]]></description>
+        <incompatible>
+          <upgrade>missionary</upgrade>
+        </incompatible>
       </upgrade>
     </upgrades>
   </design>

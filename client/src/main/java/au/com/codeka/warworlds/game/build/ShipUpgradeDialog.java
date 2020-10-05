@@ -98,12 +98,7 @@ public class ShipUpgradeDialog extends DialogFragment {
     fleetName.setText(String.format(Locale.ENGLISH, "%d × %s",
         (int) fleet.getNumShips(), design.getDisplayName()));
 
-    ArrayList<ShipDesign.Upgrade> upgrades = new ArrayList<>();
-    for (ShipDesign.Upgrade upgrade : design.getUpgrades()) {
-      if (!fleet.hasUpgrade(upgrade.getID())) {
-        upgrades.add(upgrade);
-      }
-    }
+    ArrayList<ShipDesign.Upgrade> upgrades = ShipDesign.Upgrade.getAvailableUpgrades(design, fleet);
     if (upgrades.size() > 0) {
       log.debug("%d updates available.", upgrades.size());
       refreshUpgrades(upgrades);
@@ -179,8 +174,17 @@ public class ShipUpgradeDialog extends DialogFragment {
         refreshBuildNowCost();
       });
 
+      if (selectedRow == null) {
+        this.upgrade = upgrade;
+        selectedRow = view;
+        view.setBackgroundResource(R.color.list_item_selected);
+      }
+
       upgradesContainer.addView(view);
     }
+
+    refreshBuildEstimate();
+    refreshBuildNowCost();
   }
 
   private void refreshBuildEstimate() {

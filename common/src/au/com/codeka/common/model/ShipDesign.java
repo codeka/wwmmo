@@ -114,6 +114,7 @@ public class ShipDesign extends Design {
     private String mDescription;
     private String mSpriteName;
     private BuildCost mBuildCost;
+    private ArrayList<String> mIncompatibleUpgrades;
 
     public Upgrade(Element upgradeElem) {
       mID = upgradeElem.getAttribute("id");
@@ -126,6 +127,13 @@ public class ShipDesign extends Design {
           mDescription = elem.getTextContent();
         } else if (elem.getNodeName().equals("cost")) {
           mBuildCost = new BuildCost(elem);
+        } else if (elem.getNodeName().equals("incompatible")) {
+          mIncompatibleUpgrades = new ArrayList<>();
+          for (Element childElem : XmlIterator.childElements(elem)) {
+            if (childElem.getNodeName().equals("upgrade")) {
+              mIncompatibleUpgrades.add(childElem.getTextContent());
+            }
+          }
         }
       }
     }
@@ -150,8 +158,42 @@ public class ShipDesign extends Design {
       return mBuildCost;
     }
 
+    public ArrayList<String> getIncompatibleUpgrades() {
+      return mIncompatibleUpgrades;
+    }
+
     public ArrayList<Dependency> getDependencies() {
-      return new ArrayList<Dependency>(); // TODO: none yet...
+      return new ArrayList<>(); // TODO: none yet...
+    }
+
+    /**
+     * Filters the list of upgrades available to the given fleet (for example, if it already has
+     * an upgrade or it has an incompatible upgrade, remove them).
+     */
+    public static ArrayList<Upgrade> getAvailableUpgrades(ShipDesign design, BaseFleet fleet) {
+      ArrayList<Upgrade> upgrades = new ArrayList<>();
+      for (Upgrade upgrade : design.getUpgrades()) {
+        if (fleet.hasUpgrade(upgrade.getID())) {
+          continue;
+        }
+
+        boolean hasIncompatibleUpgrade = false;
+        if (upgrade.getIncompatibleUpgrades() != null) {
+          for (String incompatible : upgrade.getIncompatibleUpgrades()) {
+            if (fleet.hasUpgrade(incompatible)) {
+              hasIncompatibleUpgrade = true;
+              break;
+            }
+          }
+        }
+        if (hasIncompatibleUpgrade) {
+          continue;
+        }
+
+        upgrades.add(upgrade);
+      }
+
+      return upgrades;
     }
   }
 }

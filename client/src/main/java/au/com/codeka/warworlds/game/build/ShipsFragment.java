@@ -275,14 +275,14 @@ public class ShipsFragment extends BaseTabFragment {
         tv.setText(entry.heading);
       } else if (entry.fleet != null || entry.buildRequest != null) {
         // existing fleet/upgrading fleet
-        ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.building_row1);
-        TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-        TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-        TextView level = (TextView) view.findViewById(R.id.building_level);
-        TextView levelLabel = (TextView) view.findViewById(R.id.building_level_label);
-        ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
-        TextView notes = (TextView) view.findViewById(R.id.notes);
+        ImageView icon = view.findViewById(R.id.building_icon);
+        LinearLayout row1 = view.findViewById(R.id.building_row1);
+        TextView row2 = view.findViewById(R.id.building_row2);
+        TextView row3 = view.findViewById(R.id.building_row3);
+        TextView level = view.findViewById(R.id.building_level);
+        TextView levelLabel = view.findViewById(R.id.building_level_label);
+        ProgressBar progress = view.findViewById(R.id.building_progress);
+        TextView notes = view.findViewById(R.id.notes);
 
         Fleet fleet = entry.fleet;
         BuildRequest buildRequest = entry.buildRequest;
@@ -291,17 +291,8 @@ public class ShipsFragment extends BaseTabFragment {
 
         icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
-        int numUpgrades = 0;// design.getUpgrades().size();
-
-        if (numUpgrades == 0 || fleet == null) {
-          level.setVisibility(View.GONE);
-          levelLabel.setVisibility(View.GONE);
-        } else {
-          // TODO
-          level.setText("?");
-          level.setVisibility(View.VISIBLE);
-          levelLabel.setVisibility(View.VISIBLE);
-        }
+        level.setVisibility(View.GONE);
+        levelLabel.setVisibility(View.GONE);
 
         row1.removeAllViews();
         FleetListRow.populateFleetNameRow(getActivity(), row1, fleet, design);
@@ -316,21 +307,19 @@ public class ShipsFragment extends BaseTabFragment {
           progress.setVisibility(View.VISIBLE);
           progress.setProgress((int) buildRequest.getPercentComplete());
         } else {
-          String upgrades = "";
-          for (ShipDesign.Upgrade upgrade : design.getUpgrades()) {
-            if (fleet != null && !fleet.hasUpgrade(upgrade.getID())) {
-              if (upgrades.length() > 0) {
-                upgrades += ", ";
-              }
-              upgrades += upgrade.getDisplayName();
+          StringBuilder upgrades = new StringBuilder();
+          for (ShipDesign.Upgrade upgrade : ShipDesign.Upgrade.getAvailableUpgrades(design, fleet)) {
+            if (upgrades.length() > 0) {
+              upgrades.append(", ");
             }
+            upgrades.append(upgrade.getDisplayName());
           }
 
           progress.setVisibility(View.GONE);
           if (upgrades.length() == 0) {
-            row2.setText(Html.fromHtml(String.format(Locale.ENGLISH, "Upgrades: <i>none</i>")));
+            row2.setText(Html.fromHtml("Available upgrades: <i>none</i>"));
           } else {
-            row2.setText(String.format(Locale.ENGLISH, "Upgrades: " + upgrades));
+            row2.setText("Available upgrades: " + upgrades);
           }
 
           String requiredHtml = design.getDependenciesHtml(getColony());
