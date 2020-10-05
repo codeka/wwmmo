@@ -640,13 +640,20 @@ public class Simulation {
     }
   }
 
-  private boolean simulateCombatRound(DateTime now, BaseStar star, BaseCombatReport.CombatRound round) {
+  private boolean simulateCombatRound(
+      DateTime now, BaseStar star, BaseCombatReport.CombatRound round) {
     for (BaseFleet fleet : star.getFleets()) {
       if (isDestroyed(fleet, now)) {
         continue;
       }
       // if it's got a cloaking device and it's not aggressive, then it's invisible to combat
       if (fleet.hasUpgrade("cloak") && fleet.getStance() != Stance.AGGRESSIVE) {
+        if (fleet.getState() != BaseFleet.State.IDLE) {
+          // If it's ATTACKING then it probably thought it was about to be attacked, but due to the
+          // cloak it actually won't so reset it to IDLE.
+          fleet.setState(BaseFleet.State.IDLE, now);
+        }
+
         continue;
       }
 
@@ -686,7 +693,7 @@ public class Simulation {
     }
 
     // each fleet targets and fires at once
-    TreeMap<Integer, Double> hits = new TreeMap<Integer, Double>();
+    TreeMap<Integer, Double> hits = new TreeMap<>();
     for (BaseCombatReport.FleetSummary fleet : round.getFleets()) {
       if (fleet.getFleetState() != BaseFleet.State.ATTACKING) {
         continue;

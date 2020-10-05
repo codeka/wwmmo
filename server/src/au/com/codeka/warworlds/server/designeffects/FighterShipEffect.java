@@ -62,8 +62,15 @@ public class FighterShipEffect extends ShipEffect {
         fleet.attack(DateTime.now());
       }
 
+      // If we believe the other fleet will start attacking us, then we'll attack as well.
       if (existingFleet.getState() != BaseFleet.State.ATTACKING
           && existingFleet.getStance() == Stance.AGGRESSIVE) {
+        // However, if we have a cloak and are non-aggressive, they won't see us so they won't
+        // actually attack us.
+        if (fleet.hasUpgrade("cloak") && fleet.getStance() != Stance.AGGRESSIVE) {
+          continue;
+        }
+
         log.debug("Fleet #%s arrived at star #%s, an enemy fleet is switching to attack mode.",
             fleet.getKey(), star.getKey());
         existingFleet.attack(DateTime.now());
@@ -93,8 +100,8 @@ public class FighterShipEffect extends ShipEffect {
       return;
     }
 
-    // if we has a cloaking device, and it's not AGGRESSIVE, then we can't see it
-    if (((Fleet) otherFleet).hasUpgrade("cloak") && otherFleet.getStance() != Stance.AGGRESSIVE) {
+    // if it has a cloaking device, and it's not AGGRESSIVE, then we can't see it.
+    if (otherFleet.hasUpgrade("cloak") && otherFleet.getStance() != Stance.AGGRESSIVE) {
       return;
     }
 
@@ -106,7 +113,7 @@ public class FighterShipEffect extends ShipEffect {
 
     log.info("Fleet #%s arrived at star #%s, #%s switching to attack mode.",
         otherFleet.getKey(), star.getKey(), fleet.getKey());
-    ((Fleet) fleet).attack(DateTime.now());
+    fleet.attack(DateTime.now());
   }
 
   /**
