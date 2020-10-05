@@ -78,6 +78,14 @@ public class EmpireController {
     }
   }
 
+  public List<Empire> getAllEmpires() throws RequestException {
+    try {
+      return db.getEmpires((int[]) null);
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+  }
+
   public List<Empire> getEmpires(int[] ids) throws RequestException {
     try {
       return db.getEmpires(ids);
@@ -626,13 +634,17 @@ public class EmpireController {
       }
     }
 
-    public List<Empire> getEmpires(int[] ids) throws Exception {
-      if (ids.length == 0) {
+    public List<Empire> getEmpires(@Nullable int[] ids) throws Exception {
+      if (ids != null && ids.length == 0) {
         return new ArrayList<>();
       }
 
-      String sql =
-          getSelectEmpire("empires.id IN " + buildInClause(ids), true, Order.UNSPECIFIED, null);
+      String sql;
+      if (ids == null) {
+        sql = getSelectEmpire("1 = 1", true, Order.UNSPECIFIED, null);
+      } else {
+        sql = getSelectEmpire("empires.id IN " + buildInClause(ids), true, Order.UNSPECIFIED, null);
+      }
 
       try (SqlStmt stmt = prepare(sql)) {
         SqlResult res = stmt.select();
