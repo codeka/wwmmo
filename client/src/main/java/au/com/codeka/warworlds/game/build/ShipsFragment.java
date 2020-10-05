@@ -54,54 +54,50 @@ public class ShipsFragment extends BaseTabFragment {
     shipListAdapter = new ShipListAdapter();
     updateStar(getStar(), getColony());
 
-    final ListView availableDesignsList = (ListView) v.findViewById(R.id.ship_list);
+    final ListView availableDesignsList = v.findViewById(R.id.ship_list);
     availableDesignsList.setAdapter(shipListAdapter);
-    availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ShipListAdapter.ItemEntry entry =
-            (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
-        if (entry.fleet == null && entry.buildRequest == null) {
-          BuildConfirmDialog dialog = new BuildConfirmDialog();
-          dialog.setup(entry.design, getStar(), getColony());
-          dialog.show(getActivity().getSupportFragmentManager(), "");
-        } else if (entry.fleet != null && entry.buildRequest == null) {
-          ShipUpgradeDialog dialog = new ShipUpgradeDialog();
-          dialog.setup(getStar(), getColony(), entry.fleet);
-          dialog.show(getActivity().getSupportFragmentManager(), "");
+    availableDesignsList.setOnItemClickListener((parent, view, position, id) -> {
+      ShipListAdapter.ItemEntry entry =
+          (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
+      if (entry.fleet == null && entry.buildRequest == null) {
+        BuildConfirmDialog dialog = new BuildConfirmDialog();
+        dialog.setup(entry.design, getStar(), getColony());
+        dialog.show(getActivity().getSupportFragmentManager(), "");
+      } else if (entry.fleet != null && entry.buildRequest == null) {
+        if (ShipDesign.Upgrade.getAvailableUpgrades(entry.fleet.getDesign(), entry.fleet).isEmpty()) {
+          // No available upgrades, don't show the dialog.
+          return;
         }
+
+        ShipUpgradeDialog dialog = new ShipUpgradeDialog();
+        dialog.setup(getStar(), getColony(), entry.fleet);
+        dialog.show(getActivity().getSupportFragmentManager(), "");
       }
     });
 
-    availableDesignsList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-      @Override
-      public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-        final ShipListAdapter.ItemEntry entry =
-            (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
+    availableDesignsList.setOnItemLongClickListener((adapterView, view, position, id) -> {
+      final ShipListAdapter.ItemEntry entry =
+          (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
 
-        NotesDialog dialog = new NotesDialog();
-        dialog.setup(entry.fleet == null ? entry.buildRequest.getNotes() : entry.fleet.getNotes(),
-          new NotesDialog.NotesChangedHandler() {
-            @Override
-            public void onNotesChanged(String notes) {
-              if (entry.fleet != null) {
-                entry.fleet.setNotes(notes);
-              } else if (entry.buildRequest != null) {
-                entry.buildRequest.setNotes(notes);
-              }
-              shipListAdapter.notifyDataSetChanged();
+      NotesDialog dialog = new NotesDialog();
+      dialog.setup(entry.fleet == null ? entry.buildRequest.getNotes() : entry.fleet.getNotes(),
+          notes -> {
+            if (entry.fleet != null) {
+              entry.fleet.setNotes(notes);
+            } else if (entry.buildRequest != null) {
+              entry.buildRequest.setNotes(notes);
+            }
+            shipListAdapter.notifyDataSetChanged();
 
-              if (entry.fleet != null) {
-                FleetManager.i.updateNotes(entry.fleet);
-              } else {
-                BuildManager.i.updateNotes(entry.buildRequest.getKey(), notes);
-              }
+            if (entry.fleet != null) {
+              FleetManager.i.updateNotes(entry.fleet);
+            } else {
+              BuildManager.i.updateNotes(entry.buildRequest.getKey(), notes);
             }
           });
 
-        dialog.show(getActivity().getSupportFragmentManager(), "");
-        return true;
-      }
+      dialog.show(getActivity().getSupportFragmentManager(), "");
+      return true;
     });
 
     return v;
