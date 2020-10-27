@@ -75,7 +75,7 @@
       <rect location="171,78" size="26x25" />
       <direction>0,1</direction>
     </sprite>
-    <sprite name="upgrade.propaganda">
+    <sprite name="upgrade.emissary">
       <rect location="149,119" size="47x21" />
       <direction>0,1</direction>
     </sprite>

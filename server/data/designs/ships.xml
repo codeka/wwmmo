@@ -20,6 +20,7 @@
       <upgrade id="cryogenics">
         <sprite>upgrade.cryogenics</sprite>
         <name>Cryogenic Chamber</name>
+        <modifier>Cryo</modifier>
         <cost minerals="2000" time="8.0" />
         <description><![CDATA[
           The cryogenic chamber means colonists are put to sleep during the voyage to the next planet. This allows for
@@ -50,6 +51,7 @@
       <upgrade id="cloak">
         <sprite>upgrade.cloak</sprite>
         <name>Cloak</name>
+        <modifier>Cloaked</modifier>
         <cost minerals="1000" time="0.55" />
         <description><![CDATA[
           Adding a cloaking device to a scout makes it invisible to enemy radar. Additionally, if you set
@@ -79,6 +81,7 @@
       <upgrade id="boost">
         <sprite>upgrade.boost</sprite>
         <name>Warp Boost</name>
+        <modifier>Boosted</modifier>
         <cost minerals="45" time="0.15" />
         <description><![CDATA[
           Boost will halve the remaining travel-time for an in-flight fleet of fighters.
@@ -109,26 +112,25 @@
         <name>Missionary</name>
         <cost minerals="10" time="0.05" />
         <description><![CDATA[
-          <p>Fill your troop carrier with missionaries, instead of troop soliders. They will be able to
-          convince native colonies to join you, instead of fighting. Saves a lot of bloodshed (and
-          a colony ship).</p>
-          <p>Enemy colonies are too powerful to be fooled by missionaries. They'll just kill your
-           missionaries. Try propaganda instead.</p>
+          <p>Give your troops training as missionaries. No longer warriors, they will instantly
+           convert a native colony to your cause. Avoid the bloodshed and save a colony ship in the
+           process!</p>
+          <p>Does not work on enemy player's colonies.</p>
         ]]></description>
         <incompatible>
-          <upgrade>propaganda</upgrade>
+          <upgrade>emissary</upgrade>
         </incompatible>
       </upgrade>
-      <upgrade id="propaganda">
-        <sprite>upgrade.propaganda</sprite>
-        <name>Propaganda</name>
+      <upgrade id="emissary">
+        <sprite>upgrade.emissary</sprite>
+        <name>Emissary</name>
         <cost minerals="10" time="0.05" />
         <description><![CDATA[
-          <p>Fill your troop carrier with subtle propaganda. It'll take a while, but as long as your
-          ships stay around the star, they'll eventually be able to convert an enemy's colony to
-          your own side. No fuss, no muss.</p>
-          <p>This will also work on native colonies, but it's kind of a waste of time when
-          missionaries can do the job in an instant.</p>
+          <p>Give your troops training as emissaries. No longer warriors, they will slowly convert
+           an enemy player colony to your cause as long as they remain around the star. Why fight
+           when you can negotiate?</p>
+
+          <p>Works on native colonies too, but missionaries are faster.</p>
         ]]></description>
         <incompatible>
           <upgrade>missionary</upgrade>

@@ -56,12 +56,7 @@ public class EnemyPlanetActivity extends BaseActivity {
     ActivityBackgroundGenerator.setBackground(rootView);
 
     Button attackBtn = findViewById(R.id.attack_btn);
-    attackBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onAttackClick();
-      }
-    });
+    attackBtn.setOnClickListener(v -> onAttackClick());
   }
 
   @Override
@@ -70,17 +65,14 @@ public class EnemyPlanetActivity extends BaseActivity {
     ShieldManager.eventBus.register(eventHandler);
     StarManager.eventBus.register(eventHandler);
 
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeting greeting) {
-        if (!success) {
-          startActivity(new Intent(EnemyPlanetActivity.this, WarWorldsActivity.class));
-        } else {
-          starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-          star = StarManager.i.getStar(Integer.parseInt(starKey));
-          if (star != null) {
-            refreshStarDetails();
-          }
+    ServerGreeter.waitForHello(this, (success, greeting) -> {
+      if (!success) {
+        startActivity(new Intent(EnemyPlanetActivity.this, WarWorldsActivity.class));
+      } else {
+        starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
+        star = StarManager.i.getStar(Integer.parseInt(starKey));
+        if (star != null) {
+          refreshStarDetails();
         }
       }
     });
@@ -135,7 +127,8 @@ public class EnemyPlanetActivity extends BaseActivity {
     if (colony != null) {
       colonyEmpire = EmpireManager.i.getEmpire(colony.getEmpireID());
       if (colonyEmpire == null) {
-        attackBtn.setEnabled(false);
+        // We shouldn't get here, should be on EmptyPlanetActivity
+        return;
       } else {
         refreshEmpireDetails();
       }
@@ -171,8 +164,8 @@ public class EnemyPlanetActivity extends BaseActivity {
         continue;
       }
       if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
-        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP,
-            fleet.getDesignID());
+        ShipDesign design =
+            (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
         if (design.hasEffect("troopcarrier") && fleet.getState() == Fleet.State.IDLE) {
           attack += Math.ceil(fleet.getNumShips());
         }
@@ -185,19 +178,33 @@ public class EnemyPlanetActivity extends BaseActivity {
       + "<p><b>Colony defence:</b> %d<br />"
       + "   <b>Your attack capability:</b> %d</p>", colonyEmpire.getDisplayName(), defence,
         attack)));
-    b.setPositiveButton("Attack!", new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(final DialogInterface dialog, int which) {
-        myEmpire.attackColony(star, colony, new MyEmpire.AttackColonyCompleteHandler() {
-          @Override
-          public void onComplete() {
-            dialog.dismiss();
-            finish();
-          }
-        });
-      }
-    });
+    b.setPositiveButton("Attack!", (dialog, which) -> myEmpire.attackColony(star, colony, () -> {
+      dialog.dismiss();
+      finish();
+    }));
     b.setNegativeButton("Cancel", null);
     b.create().show();
+  }
+
+  private void setAttackVisible(boolean visible) {
+    findViewById(R.id.horz_sep_1).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.attack_label).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.attack_btn).setVisibility(visible ? View.VISIBLE : View.GONE);
+  }
+
+  private void setMissionaryVisible(boolean visible) {
+    findViewById(R.id.horz_sep_2).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.missionary_label).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.missionary_btn).setVisibility(visible ? View.VISIBLE : View.GONE);
+  }
+  private void setEmissaryVisible(boolean visible) {
+    findViewById(R.id.horz_sep_3).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.emissary_btn).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.emissary_est_time).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.emissary_help).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.emissary_label).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.emissary_max_ships).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.emissary_min_ships).setVisibility(visible ? View.VISIBLE : View.GONE);
+    findViewById(R.id.emissary_seekbar).setVisibility(visible ? View.VISIBLE : View.GONE);
   }
 }

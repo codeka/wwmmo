@@ -113,6 +113,7 @@ public class ShipDesign extends Design {
     private String mDisplayName;
     private String mDescription;
     private String mSpriteName;
+    private String mFleetNameModifier;
     private BuildCost mBuildCost;
     private ArrayList<String> mIncompatibleUpgrades;
 
@@ -125,6 +126,8 @@ public class ShipDesign extends Design {
           mDisplayName = elem.getTextContent();
         } else if (elem.getNodeName().equals("description")) {
           mDescription = elem.getTextContent();
+        } else if (elem.getNodeName().equals("modifier")) {
+          mFleetNameModifier = elem.getTextContent();
         } else if (elem.getNodeName().equals("cost")) {
           mBuildCost = new BuildCost(elem);
         } else if (elem.getNodeName().equals("incompatible")) {
@@ -135,6 +138,10 @@ public class ShipDesign extends Design {
             }
           }
         }
+      }
+
+      if (mFleetNameModifier == null) {
+        mFleetNameModifier = mDisplayName;
       }
     }
 
@@ -148,6 +155,10 @@ public class ShipDesign extends Design {
 
     public String getDescription() {
       return mDescription;
+    }
+
+    public String getFleetNameModifier() {
+      return mFleetNameModifier;
     }
 
     public String getSpriteName() {

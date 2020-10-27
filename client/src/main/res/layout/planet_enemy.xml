@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
     <au.com.codeka.warworlds.ctrl.PlanetDetailsView
         android:id="@+id/planet_details"
@@ -20,13 +21,16 @@
                    android:layout_width="40dp"
                    android:layout_height="40dp"
                    android:layout_marginTop="6dp"
-                   android:layout_marginLeft="6dp" />
+                   android:layout_marginLeft="6dp"
+                   android:layout_marginStart="6dp" />
         <TextView android:id="@+id/enemy_empire_name"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_toRightOf="@id/enemy_empire_icon"
+                  android:layout_toEndOf="@id/enemy_empire_icon"
                   android:layout_marginTop="6dp"
                   android:layout_marginLeft="6dp"
+                  android:layout_marginStart="6dp"
                   android:textAppearance="?android:attr/textAppearanceSmall"
                   android:singleLine="true"
                   android:ellipsize="end"
@@ -35,20 +39,155 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_toRightOf="@id/enemy_empire_icon"
+                  android:layout_toEndOf="@id/enemy_empire_icon"
                   android:layout_below="@id/enemy_empire_name"
                   android:layout_marginLeft="6dp"
+                  android:layout_marginStart="6dp"
                   android:textAppearance="?android:attr/textAppearanceSmall"
                   android:text="Defence: 1234" />
+
+        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+            android:id="@+id/horz_sep_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/enemy_empire_defence"
+            android:layout_marginTop="16dp"
+            android:text="Attack" />
+
+        <TextView
+            android:id="@+id/attack_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/attack_btn"
+            android:layout_alignBottom="@+id/attack_btn"
+            android:gravity="center"
+            android:layout_marginStart="24dp"
+            android:layout_marginLeft="24dp"
+            android:text="Available Troop Carriers: 0" />
+
         <Button android:id="@+id/attack_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/enemy_empire_icon"
-                android:layout_alignLeft="@id/enemy_empire_icon"
-                android:layout_alignRight="@id/enemy_empire_defence"
+                android:layout_below="@id/horz_sep_1"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:paddingHorizontal="30dp"
+                android:paddingVertical="4dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:text="Attack" />
+
+        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+            android:id="@+id/horz_sep_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/attack_btn"
+            android:layout_marginTop="16dp"
+            android:text="Missionary" />
+
+        <TextView
+            android:id="@+id/missionary_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/missionary_btn"
+            android:layout_alignBottom="@+id/missionary_btn"
+            android:gravity="center"
+            android:layout_marginStart="24dp"
+            android:layout_marginLeft="24dp"
+            android:text="Available Troop Carriers: 0" />
+
+        <Button
+            android:id="@+id/missionary_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/horz_sep_2"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="4dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:text="Send missionaries" />
+
+        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+            android:id="@+id/horz_sep_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/missionary_btn"
+            android:layout_marginTop="16dp"
+            android:text="Emissaries" />
+
+        <TextView
+            android:id="@+id/emissary_help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/horz_sep_3"
+            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="16dp"
+            android:text="The more emissaries you send, the faster the enemy will be converted to your side. Though there are diminishing returns from sending more and more." />
+
+        <SeekBar
+            android:id="@+id/emissary_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/emissary_help"
+            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="24dp"/>
+
+        <TextView
+            android:id="@+id/emissary_min_ships"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/emissary_seekbar"
+            android:layout_alignStart="@id/emissary_seekbar"
+            android:layout_alignLeft="@id/emissary_seekbar"
+            tools:text="123" />
+
+        <TextView
+            android:id="@+id/emissary_max_ships"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/emissary_seekbar"
+            android:layout_alignEnd="@id/emissary_seekbar"
+            android:layout_alignRight="@id/emissary_seekbar"
+            tools:text="2,345" />
+
+        <TextView
+            android:id="@+id/emissary_est_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/emissary_btn"
+            android:layout_alignBottom="@+id/emissary_btn"
+            android:gravity="center"
+            android:layout_marginStart="24dp"
+            android:layout_marginLeft="24dp"
+            android:text="Estimated time: 1 hr, 34 min" />
+
+        <TextView
+            android:id="@+id/emissary_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/emissary_est_time"
+            android:gravity="center"
+            android:layout_marginStart="24dp"
+            android:layout_marginLeft="24dp"
+            android:text="Available Troop Carriers: 0" />
+
+        <Button
+            android:id="@+id/emissary_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/emissary_max_ships"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="4dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:text="Send emissaries" />
     </RelativeLayout>
 
 </RelativeLayout>
