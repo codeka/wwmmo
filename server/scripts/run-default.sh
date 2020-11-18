@@ -8,6 +8,7 @@ function run_server()
 {
   pushd $DIR > /dev/null
   SERVER_OPTS=""
+  SERVER_OPTS="$SERVER_OPTS -Xms3G"
   SERVER_OPTS="$SERVER_OPTS -Djava.awt.headless=true"
   SERVER_OPTS="$SERVER_OPTS -Dau.com.codeka.warworlds.server.ConfigFile=data/config-default.json"
   SERVER_OPTS="$SERVER_OPTS -Djava.util.logging.config.file=logging-default.properties"

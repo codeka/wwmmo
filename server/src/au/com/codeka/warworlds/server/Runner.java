@@ -30,6 +30,7 @@ public class Runner {
       ErrorReportingLoggingHandler.setup();
       DesignManager.setup();
       NameGenerator.setup();
+      MemoryUsageLogger.start();
 
       MetricsManager.i.start();
       EventProcessor.i.ping();
@@ -68,6 +69,8 @@ public class Runner {
 
   private static final Runnable shutdownHook = () -> {
     try {
+      MemoryUsageLogger.stop();
+
       log.info("Stopping star simulator thread");
       StarSimulatorThreadManager.i.stop();
 

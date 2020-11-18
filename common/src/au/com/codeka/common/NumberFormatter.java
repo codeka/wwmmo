@@ -1,4 +1,4 @@
-package au.com.codeka;
+package au.com.codeka.common;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
