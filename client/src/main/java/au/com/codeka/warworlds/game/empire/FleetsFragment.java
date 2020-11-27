@@ -19,7 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentManager;
-import au.com.codeka.NumberFormatter;
+import au.com.codeka.common.NumberFormatter;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.protobuf.Messages;

@@ -136,28 +136,45 @@ public class MyEmpire extends Empire {
         }).build());
   }
 
-  public void attackColony(final Star star, final Colony colony,
+  public enum AttackKind {
+    NORMAL,
+    SEND_MISSIONARIES,
+    SEND_EMISSARIES,
+  }
+
+  public void attackColony(final Star star, final Colony colony, AttackKind attackKind,
       final AttackColonyCompleteHandler callback) {
-    String url = "stars/" + star.getKey() + "/colonies/" + colony.getKey() + "/attack";
+
+    String kind = "";
+    switch (attackKind) {
+      case NORMAL:
+        kind = "normal";
+        break;
+      case SEND_MISSIONARIES:
+        kind = "missionary";
+        break;
+      case SEND_EMISSARIES:
+        kind = "emissary";
+        break;
+    }
+
+    String url = "stars/" + star.getKey() + "/colonies/" + colony.getKey() + "/attack?kind=" + kind;
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST")
-        .completeCallback(new ApiRequest.CompleteCallback() {
-          @Override
-          public void onRequestComplete(ApiRequest request) {
-            Messages.Star pb = request.body(Messages.Star.class);
-            if (pb == null) {
-              return;
-            }
-            Star star = new Star();
-            star.fromProtocolBuffer(pb);
-            StarManager.i.refreshStar(star.getID());
+        .completeCallback(request -> {
+          Messages.Star pb = request.body(Messages.Star.class);
+          if (pb == null) {
+            return;
+          }
+          Star star1 = new Star();
+          star1.fromProtocolBuffer(pb);
+          StarManager.i.refreshStar(star1.getID());
 
-            // Refresh my own empire, because we'll have a bunch more cash (assuming we successfully
-            // destroyed them, of course).
-            EmpireManager.i.refreshEmpire();
+          // Refresh my own empire, because we'll have a bunch more cash (assuming we successfully
+          // destroyed them, of course).
+          EmpireManager.i.refreshEmpire();
 
-            if (callback != null) {
-              callback.onComplete();
-            }
+          if (callback != null) {
+            callback.onComplete();
           }
         }).build());
   }

@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
@@ -30,6 +32,7 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.FleetUpgrade;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShieldManager;
@@ -115,6 +118,8 @@ public class EnemyPlanetActivity extends BaseActivity {
   };
 
   private void refreshStarDetails() {
+    final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+
     int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
     planet = (Planet) star.getPlanets()[planetIndex - 1];
     for (BaseColony baseColony : star.getColonies()) {
@@ -138,6 +143,47 @@ public class EnemyPlanetActivity extends BaseActivity {
 
     PlanetDetailsView planetDetails = findViewById(R.id.planet_details);
     planetDetails.setup(star, planet, colony);
+
+    int numNormalTroopCarriers = 0;
+    int numMissionaryTroopCarriers = 0;
+    int numEmmissiaryTroopCarriers = 0;
+    for (BaseFleet fleet : star.getFleets()) {
+      if (fleet.getEmpireKey() == null || !fleet.getEmpireKey().equals(myEmpire.getKey())) {
+        // It's not our fleet, ignore.
+        continue;
+      }
+
+      if (!fleet.getDesignID().equals("troopcarrier")) {
+        // It's not a troop carrier, ignore.
+        continue;
+      }
+
+      ArrayList<BaseFleetUpgrade> upgrades = fleet.getUpgrades();
+      if (upgrades == null || upgrades.size() == 0) {
+        numNormalTroopCarriers += fleet.getNumShips();
+      } else {
+        for (BaseFleetUpgrade upgrade : upgrades) {
+          if (upgrade.getUpgradeID().equals("missionary")) {
+            numMissionaryTroopCarriers += fleet.getNumShips();
+          } else if (upgrade.getUpgradeID().equals("emissary")) {
+            numEmmissiaryTroopCarriers += fleet.getNumShips();
+          }
+        }
+      }
+    }
+
+    TextView tv = findViewById(R.id.attack_label);
+    tv.setText(
+        String.format(Locale.ENGLISH, "Available Troop Carriers: %d", numNormalTroopCarriers));
+
+    tv = findViewById(R.id.missionary_label);
+    tv.setText(
+        String.format(Locale.ENGLISH, "Available Troop Carriers: %d", numMissionaryTroopCarriers));
+
+    tv = findViewById(R.id.emissary_label);
+    tv.setText(
+        String.format(Locale.ENGLISH, "Available Troop Carriers: %d", numEmmissiaryTroopCarriers));
+
   }
 
   private void refreshEmpireDetails() {
@@ -155,35 +201,13 @@ public class EnemyPlanetActivity extends BaseActivity {
   }
 
   private void onAttackClick() {
-    int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
-
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-    int attack = 0;
-    for (BaseFleet fleet : star.getFleets()) {
-      if (fleet.getEmpireKey() == null) {
-        continue;
-      }
-      if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
-        ShipDesign design =
-            (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
-        if (design.hasEffect("troopcarrier") && fleet.getState() == Fleet.State.IDLE) {
-          attack += Math.ceil(fleet.getNumShips());
-        }
-      }
-    }
+    myEmpire.attackColony(star, colony, this::finish);
+  }
 
-    StyledDialog.Builder b = new StyledDialog.Builder(this);
-    b.setMessage(Html.fromHtml(String.format(Locale.ENGLISH,
-        "<p>Do you want to attack this %s colony?</p>"
-      + "<p><b>Colony defence:</b> %d<br />"
-      + "   <b>Your attack capability:</b> %d</p>", colonyEmpire.getDisplayName(), defence,
-        attack)));
-    b.setPositiveButton("Attack!", (dialog, which) -> myEmpire.attackColony(star, colony, () -> {
-      dialog.dismiss();
-      finish();
-    }));
-    b.setNegativeButton("Cancel", null);
-    b.create().show();
+  private void onSendMissionariesClick() {
+    final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+    myEmpire.attackColony(star, colony, this::finish);
   }
 
   private void setAttackVisible(boolean visible) {

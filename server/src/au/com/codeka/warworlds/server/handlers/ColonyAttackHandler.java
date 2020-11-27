@@ -44,7 +44,14 @@ public class ColonyAttackHandler extends RequestHandler {
       Simulation sim = new Simulation();
       sim.simulate(star);
 
-      new ColonyController(t).attack(getSession().getEmpireID(), star, colony);
+      String kind = getRequest().getParameter("kind");
+      if (kind == null || kind.equals("normal")) {
+        new ColonyController(t).attack(getSession().getEmpireID(), star, colony);
+      } else if (kind.equals("missionary")) {
+        new ColonyController(t).sendMissionaries(getSession().getEmpireID(), star, colony);
+      } else if (kind.equals("emissary")) {
+        new ColonyController(t).sendEmissaries(getSession().getEmpireID(), star, colony);
+      }
       new StarController(t).update(star);
       t.commit();
 

@@ -20,7 +20,7 @@ import org.joda.time.Duration;
 
 import java.util.Locale;
 
-import au.com.codeka.NumberFormatter;
+import au.com.codeka.common.NumberFormatter;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.Design;

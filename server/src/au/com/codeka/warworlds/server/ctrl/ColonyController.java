@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
@@ -13,6 +14,7 @@ import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.BackgroundRunner;
 import au.com.codeka.warworlds.server.Configuration;
@@ -76,8 +78,11 @@ public class ColonyController {
       if (fleet.getState() != Fleet.State.IDLE) {
         continue;
       }
-      totalTroopCarriers += fleet.getNumShips();
-      troopCarriers.add(fleet);
+      ArrayList<BaseFleetUpgrade> upgrades = fleet.getUpgrades();
+      if (upgrades == null || upgrades.size() == 0) {
+        totalTroopCarriers += fleet.getNumShips();
+        troopCarriers.add(fleet);
+      }
     }
     float colonyDefence = 0.25f * colony.getPopulation() * colony.getDefenceBoost();
     if (colonyDefence < 1.0f) {
@@ -93,6 +98,9 @@ public class ColonyController {
     float remainingShips = totalTroopCarriers - colonyDefence;
     float remainingPopulation = colony.getPopulation()
         - (totalTroopCarriers * 4.0f / colony.getDefenceBoost());
+    if (remainingPopulation < 1.0f) {
+      remainingPopulation = 0.0f;
+    }
     colony.setPopulation(Math.min(0.0f, remainingPopulation));
 
     Messages.SituationReport.Builder sitrep_pb = null;
@@ -139,14 +147,7 @@ public class ColonyController {
               .setReason(Messages.CashAuditRecord.Reason.ColonyDestroyed));
 
       float numShipsLost = totalTroopCarriers - remainingShips;
-      for (Fleet fleet : troopCarriers) {
-        float numShips = fleet.getNumShips();
-        new FleetController(db.getTransaction()).removeShips(star, fleet, numShipsLost);
-        numShipsLost -= numShips;
-        if (numShipsLost <= 0.0f) {
-          break;
-        }
-      }
+      destroyTroopCarriers(star, colony, troopCarriers, numShipsLost, null);
 
       // Remove any build requests currently in progress in this colony.
       star.getBuildRequests().removeIf(
@@ -169,23 +170,146 @@ public class ColonyController {
       log.info("Fleets destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
           remainingPopulation, remainingShips);
       colony.setPopulation(remainingPopulation);
-      for (Fleet fleet : troopCarriers) {
-        new FleetController(db.getTransaction()).removeShips(star, fleet, fleet.getNumShips());
-      }
-
-      if (sitrep_pb != null) {
-        Messages.SituationReport.ColonyAttackedRecord.Builder colony_attacked_pb =
-            Messages.SituationReport.ColonyAttackedRecord.newBuilder();
-        colony_attacked_pb.setColonyKey(colony.getKey());
-        colony_attacked_pb.setEnemyEmpireKey(Integer.toString(empireID));
-        colony_attacked_pb.setNumShips(totalTroopCarriers);
-        sitrep_pb.setColonyAttackedRecord(colony_attacked_pb);
-      }
+      destroyTroopCarriers(star, colony, troopCarriers, totalTroopCarriers, sitrep_pb);
     }
 
     if (sitrep_pb != null) {
       new SituationReportController(db.getTransaction()).saveSituationReport(sitrep_pb.build());
     }
+  }
+
+  /**
+   *
+   */
+  public void sendMissionaries(int empireID, Star star, Colony colony) throws RequestException {/*
+    float totalTroopCarriers = 0;
+    ArrayList<Fleet> troopCarriers = new ArrayList<>();
+    for (BaseFleet baseFleet : star.getFleets()) {
+      Fleet fleet = (Fleet) baseFleet;
+      if (fleet.getEmpireID() == null || fleet.getEmpireID() != empireID) {
+        continue;
+      }
+      if (!fleet.getDesign().hasEffect(TroopCarrierShipEffect.class)) {
+        continue;
+      }
+      if (fleet.getState() != Fleet.State.IDLE) {
+        continue;
+      }
+      ArrayList<BaseFleetUpgrade> upgrades = fleet.getUpgrades();
+      if (upgrades == null || upgrades.size() == 0) {
+        continue;
+      }
+
+      for (BaseFleetUpgrade upgrade : upgrades) {
+        if (upgrade.getUpgradeID().equals("missionary")) {
+          totalTroopCarriers += fleet.getNumShips();
+          troopCarriers.add(fleet);
+        }
+      }
+    }
+    float colonyDefence = 0.25f * colony.getPopulation() * colony.getDefenceBoost();
+    if (colonyDefence < 1.0f) {
+      colonyDefence = 1.0f;
+    }
+
+    // You don't have enough troop carriers to send, do nothing.
+    if (totalTroopCarriers < 0.1f) {
+      log.info(
+          "Empire [%d] Attempt to send missionaries to colony with none available.",
+          empireID);
+      return;
+    }
+
+    float remainingShips = totalTroopCarriers - colonyDefence;
+    if (remainingShips < 0.1f || colony.getEmpireKey() != null) {
+      // If there's not enough ships, or you're sending the ships to an enemy colony, rather than
+      // a native, we'll just destroy your fleets and that's the end of it. As if the colony has
+      // destroyed them.
+      log.info("Fleets destroyed: remainingShips=%.2f", remainingShips);
+      destroyTroopCarriers(star, colony, troopCarriers, totalTroopCarriers, null);
+    } else {
+      log.info(String.format(
+          Locale.US,
+          "Colony overtaken [star=%d %s] [defender=%d] [attacker=%d]:",
+          star.getID(), star.getName(), colony.getEmpireID(), empireID));
+      EmpireController empireController = new EmpireController(db.getTransaction());
+
+      // Record the colony in the stats for the destroyer. I guess...
+      new BattleRankController(db.getTransaction())
+          .recordColonyDestroyed(empireID, colony.getPopulation());
+
+      // Transfer the cash that results from this to the attacker.
+      double cashTransferred = getAttackCashValue(null, colony);
+      log.info(String.format(Locale.US, " - transferring cash: %.2f", cashTransferred));
+      if (colony.getEmpireID() != null) {
+        empireController.adjustBalance(colony.getEmpireID(), (float) -cashTransferred,
+            Messages.CashAuditRecord.newBuilder()
+                .setEmpireId(colony.getEmpireID())
+                .setColonyId(colony.getID())
+                .setReason(Messages.CashAuditRecord.Reason.ColonyDestroyed));
+      }
+      empireController.adjustBalance(empireID, (float) cashTransferred,
+          Messages.CashAuditRecord.newBuilder()
+              .setEmpireId(empireID)
+              .setColonyId(colony.getID())
+              .setReason(Messages.CashAuditRecord.Reason.ColonyDestroyed));
+
+      float numShipsLost = totalTroopCarriers - remainingShips;
+      destroyTroopCarriers(star, colony, troopCarriers, numShipsLost, null);
+
+      // Remove any build requests currently in progress in this colony.
+      star.getBuildRequests().removeIf(
+          buildRequest -> buildRequest.getPlanetIndex() == colony.getPlanetIndex());
+
+      // If this is the last colony for this empire on this star, make sure the empire's home
+      // star is reset.
+      if (empire != null) {
+        maybeResetHomeStar(empire, star, colony);
+      }
+
+      if (sitrep_pb != null) {
+        Messages.SituationReport.ColonyDestroyedRecord.Builder colony_destroyed_pb =
+            Messages.SituationReport.ColonyDestroyedRecord.newBuilder();
+        colony_destroyed_pb.setColonyKey(colony.getKey());
+        colony_destroyed_pb.setEnemyEmpireKey(Integer.toString(empireID));
+        sitrep_pb.setColonyDestroyedRecord(colony_destroyed_pb);
+      }
+    } else {
+      log.info("Fleets destroyed: remainingShips=%.2f", remainingShips);
+      destroyTroopCarriers(star, colony, troopCarriers, totalTroopCarriers, sitrep_pb);
+    }
+
+    if (sitrep_pb != null) {
+      new SituationReportController(db.getTransaction()).saveSituationReport(sitrep_pb.build());
+    }
+  */}
+
+  private void destroyTroopCarriers(Star star, Colony colony, List<Fleet> troopCarriers, float numToDestroy, @Nullable Messages.SituationReport.Builder sitrep_pb) throws RequestException{
+    float numDestroyed = numToDestroy;
+
+    for (Fleet fleet : troopCarriers) {
+      float numShips = fleet.getNumShips();
+      new FleetController(db.getTransaction()).removeShips(star, fleet, numToDestroy);
+      numToDestroy -= numShips;
+      if (numToDestroy <= 0.0f) {
+        break;
+      }
+    }
+
+    if (sitrep_pb != null) {
+      Messages.SituationReport.ColonyAttackedRecord.Builder colony_attacked_pb =
+          Messages.SituationReport.ColonyAttackedRecord.newBuilder();
+      colony_attacked_pb.setColonyKey(colony.getKey());
+      colony_attacked_pb.setEnemyEmpireKey(Integer.toString(troopCarriers.get(0).getEmpireID()));
+      colony_attacked_pb.setNumShips(numDestroyed);
+      sitrep_pb.setColonyAttackedRecord(colony_attacked_pb);
+    }
+  }
+
+  /**
+   *
+   */
+  public void sendEmissaries(int empireID, Star star, Colony colony) throws RequestException {
   }
 
   /**
