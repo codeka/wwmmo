@@ -22,6 +22,7 @@ public class Fleet extends BaseFleet {
   private Integer mEmpireID;
   private Integer mDestinationStarID;
   private Integer mTargetFleetID;
+  private DateTime mPropagandaCompleteTime;
 
   public Fleet() {
   }
@@ -161,6 +162,13 @@ public class Fleet extends BaseFleet {
     super.move(now, destinationStarKey, eta);
     mDestinationStarID = Integer.parseInt(destinationStarKey);
     mTargetFleetID = null;
+  }
+
+  public void propagandize(DateTime now, int colonyID, DateTime eta) {
+    mEta = eta;
+    mState = State.PROPAGANDIZING;
+    // TODO: mDestinationStarID isn't the best name now that we also use it for this :/
+    mDestinationStarID = colonyID;
   }
 
   @Override

@@ -1342,40 +1342,10 @@ message Alliance {
 
   // A user-defined description for this alliance.
   optional string description = 12;
-
-  // The amount of cash non-ranked empires can withdraw per day.
-  optional float daily_withdraw_amount = 13;
-
-  // When returned from the server, this will contain all of the configured ranks for this alliance.
-  repeated AllianceRank ranks = 14;
 }
 
 message Alliances {
   repeated Alliance alliances = 1;
-}
-
-enum AllianceRequestType {
-  JOIN = 0;
-  LEAVE = 1;
-  KICK = 2;
-  DEPOSIT_CASH = 3;
-  WITHDRAW_CASH = 4;
-  CHANGE_IMAGE = 5;
-  CHANGE_NAME = 6;
-  CHANGE_DESCRIPTION = 7;
-}
-
-message AllianceRank {
-  optional int32 id = 1;
-  optional int32 alliance_id = 2;
-  optional string name = 3;
-
-  // The types of requests this rank is allowed to approve.
-  repeated AllianceRequestType allowed_types = 4;
-
-  // The amount of cash this rank can withdraw from the bank without requiring approval. If this
-  // rank can also approve withdrawals, this is also the limit of withdrawal they can approve.
-  optional float daily_withdraw_amount = 5;
 }
 
 message AllianceMember {
@@ -1390,11 +1360,7 @@ message AllianceMember {
     LIEUTENANT = 1;
     MEMBER = 2;
   }
-  optional Rank old_rank = 5;
-
-  // The empire's rank in this alliance. 0 is the default and means un-ranked. -1 is a special rank
-  // for the owner (who can do anything). Otherwise, this reference an AllianceRank.
-  optional int32 rank_id = 6;
+  optional Rank rank = 5;
 }
 
 message AllianceRequest {
@@ -1403,7 +1369,17 @@ message AllianceRequest {
   optional int32 request_empire_id = 3;
   optional int64 request_date = 4;
 
-  optional AllianceRequestType request_type = 5;
+  enum RequestType {
+    JOIN = 0;
+    LEAVE = 1;
+    KICK = 2;
+    DEPOSIT_CASH = 3;
+    WITHDRAW_CASH = 4;
+    CHANGE_IMAGE = 5;
+    CHANGE_NAME = 6;
+    CHANGE_DESCRIPTION = 7;
+  }
+  optional RequestType request_type = 5;
   optional string message = 6;
 
   enum RequestState {

@@ -143,7 +143,7 @@ public class MyEmpire extends Empire {
   }
 
   public void attackColony(final Star star, final Colony colony, AttackKind attackKind,
-      final AttackColonyCompleteHandler callback) {
+                           float emissaryFraction, final AttackColonyCompleteHandler callback) {
 
     String kind = "";
     switch (attackKind) {
@@ -158,7 +158,8 @@ public class MyEmpire extends Empire {
         break;
     }
 
-    String url = "stars/" + star.getKey() + "/colonies/" + colony.getKey() + "/attack?kind=" + kind;
+    String url = "stars/" + star.getKey() + "/colonies/" + colony.getKey() + "/attack?kind=" + kind
+        + "&fraction=" + emissaryFraction;
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST")
         .completeCallback(request -> {
           Messages.Star pb = request.body(Messages.Star.class);

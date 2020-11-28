@@ -87,6 +87,9 @@ public class EnemyPlanetActivity extends BaseActivity {
       public void onStopTrackingTouch(SeekBar seekBar) {
       }
     });
+
+    Button sendEmissaryBtn = findViewById(R.id.emissary_btn);
+    sendEmissaryBtn.setOnClickListener(v -> onSendEmissariesClick());
   }
 
   @Override
@@ -115,7 +118,7 @@ public class EnemyPlanetActivity extends BaseActivity {
     ShieldManager.eventBus.unregister(eventHandler);
   }
 
-  private Object eventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onStarFetched(Star s) {
       if (starKey == null || !starKey.equals(s.getKey())) {
@@ -204,10 +207,6 @@ public class EnemyPlanetActivity extends BaseActivity {
     tv.setText(
         String.format(Locale.ENGLISH, "Available Troop Carriers: %d", numMissionaryTroopCarriers));
 
-    tv = findViewById(R.id.emissary_label);
-    tv.setText(
-        String.format(Locale.ENGLISH, "Available Troop Carriers: %d", numEmissaryTroopCarriers));
-
     if (colony != null) {
       int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
       if (defence < 1) {
@@ -239,7 +238,7 @@ public class EnemyPlanetActivity extends BaseActivity {
 
   private void onAttackClick() {
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-    myEmpire.attackColony(star, colony, MyEmpire.AttackKind.NORMAL, this::finish);
+    myEmpire.attackColony(star, colony, MyEmpire.AttackKind.NORMAL, 0.0f, this::finish);
   }
 
   private void refreshPropagandizeTimeEstimate() {
@@ -247,8 +246,6 @@ public class EnemyPlanetActivity extends BaseActivity {
     if (defence < 1) {
       defence = 1;
     }
-    int minTroopCarriers = Math.min(defence, numEmissaryTroopCarriers);
-    int maxTroopCarriers = numEmissaryTroopCarriers;
 
     SeekBar emissarySeekBar = findViewById(R.id.emissary_seekbar);
     float fraction = (float) emissarySeekBar.getProgress() / emissarySeekBar.getMax();
@@ -258,11 +255,7 @@ public class EnemyPlanetActivity extends BaseActivity {
     int actualEmissaryTroopCarriers =
         defence + (int)(fraction * (numEmissaryTroopCarriers - defence));
 
-    fraction = 1.0f / (1.0f + (float) Math.log((float) actualEmissaryTroopCarriers / defence));
-
-    // Normally, it takes 20 hour per 250 population (minimum of 10 minutes for populations > 250)
-    float basePropagandaTime = 0.333f * Math.max(0.5f, defence / 250.0f);
-    float propagandaTime = basePropagandaTime * fraction;
+    float propagandaTime = colony.getPropagandaTime(actualEmissaryTroopCarriers);
 
     TextView tv = findViewById(R.id.emissary_label);
     tv.setText(
@@ -280,7 +273,15 @@ public class EnemyPlanetActivity extends BaseActivity {
 
   private void onSendMissionariesClick() {
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-    myEmpire.attackColony(star, colony, MyEmpire.AttackKind.SEND_MISSIONARIES, this::finish);
+    myEmpire.attackColony(star, colony, MyEmpire.AttackKind.SEND_MISSIONARIES, 0.0f, this::finish);
+  }
+
+  private void onSendEmissariesClick() {
+    final SeekBar emissarySeekBar = findViewById(R.id.emissary_seekbar);
+    final float fraction = (float) emissarySeekBar.getProgress() / emissarySeekBar.getMax();
+    final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+    myEmpire.attackColony(
+        star, colony, MyEmpire.AttackKind.SEND_EMISSARIES, fraction, this::finish);
   }
 
   private void setAttackVisible(boolean visible) {

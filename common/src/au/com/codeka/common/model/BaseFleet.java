@@ -239,7 +239,8 @@ public abstract class BaseFleet {
     public enum State {
         IDLE(1),
         MOVING(2),
-        ATTACKING(3);
+        ATTACKING(3),
+        PROPAGANDIZING(4);
 
         private int mValue;
 

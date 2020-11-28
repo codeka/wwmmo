@@ -27,6 +27,7 @@ import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
+import sun.nio.cs.ext.MacTurkish;
 
 public class ColonyController {
   private final Log log = new Log("ColonyController");
@@ -213,15 +214,7 @@ public class ColonyController {
       float numShipsLost = totalTroopCarriers - remainingShips;
       destroyTroopCarriers(star, colony, troopCarriers, numShipsLost, null);
 
-      // Remove any build requests currently in progress in this colony.
-      star.getBuildRequests().removeIf(
-          buildRequest -> buildRequest.getPlanetIndex() == colony.getPlanetIndex());
-
-      // Before we swap the empireID, make sure we have the right empire presences.
-      ensureEmpirePresence(star, empireID);
-
-      // Finally, set the colony's empire ID to ours, we're the owner now!
-      colony.setEmpireID(empireID);
+      transferColonyOwnership(star, colony, empireID);
     }
   }
 
@@ -229,9 +222,107 @@ public class ColonyController {
    * When we send emissaries to an enemy colony, we actually just turn it to "propagandizing" state.
    * After some time (based on how many troop carriers you have and the defence of the colony) the
    * troop carriers will be destroyed and the colony will be converted to your own empire.
+   *
+   * @param empireID The ID of the empire doing the attacking.
+   * @param star The star we're attacking on.
+   * @param colony The colony that we attack.
+   * @param emissaryFraction The fraction of all the emissary troop carriers (above the defence
+   *                         level) to use.
    */
-  public void sendEmissaries(int empireID, Star star, Colony colony) throws RequestException {
+  public void sendEmissaries(
+      int empireID, Star star, Colony colony, float emissaryFraction) throws RequestException {
+    ArrayList<Fleet> troopCarriers = new ArrayList<>();
+    float totalTroopCarriers = findTroopCarriers(empireID, star, "emissary", troopCarriers);
+    float colonyDefence = 0.25f * colony.getPopulation() * colony.getDefenceBoost();
+    if (colonyDefence < 1.0f) {
+      colonyDefence = 1.0f;
+    }
 
+    // You don't have any troop carriers at all, do nothing.
+    if (totalTroopCarriers < 0.1f) {
+      log.info(
+          "Empire [%d] Attempt to send emissaries to colony with none available.",
+          empireID);
+      return;
+    }
+
+    // This is the actual number of troop carriers we'll use for this attack.
+    float usedEmissaryTroopCarriers =
+        colonyDefence + (int)(emissaryFraction * (totalTroopCarriers - colonyDefence));
+
+    float remainingShips = totalTroopCarriers - usedEmissaryTroopCarriers;
+    if (remainingShips < 0.1f) {
+      // If there's not enough ships, it means the troop carriers will be destroyed.
+      // TODO: wait some time before destroying the fleets (give you some time to add to it?)
+      log.info("Fleets destroyed: remainingShips=%.2f", remainingShips);
+      destroyTroopCarriers(star, colony, troopCarriers, totalTroopCarriers, null);
+    } else {
+      float propagandaTime = colony.getPropagandaTime(usedEmissaryTroopCarriers);
+      log.info(String.format(
+          Locale.US,
+          "Beginning take over of enemy colony [star=%d %s] [defender=%d] [attacker=%d] [time=%.2f hr]:",
+          star.getID(), star.getName(), colony.getEmpireID(), empireID, propagandaTime));
+
+      // Gather all the troop carriers into one fleet so we can put that fleet into the propaganda
+      // state.
+      FleetController fleetController = new FleetController(db.getTransaction());
+      Fleet propagandaFleet = null;
+      for (Fleet fleet : troopCarriers) {
+        if (propagandaFleet == null) {
+          propagandaFleet = fleet;
+          // If there's already too many ships in this fleet, just take the remaining ones out
+          // and we're done.
+          if (propagandaFleet.getNumShips() > usedEmissaryTroopCarriers) {
+            // If they have another fleet, we'll add what's left to that one. Otherwise, we'll
+            // need to make a new fleet for the left overs.
+            if (troopCarriers.size() > 1) {
+              troopCarriers.get(1).setNumShips(
+                  troopCarriers.get(1).getNumShips() +
+                      usedEmissaryTroopCarriers - propagandaFleet.getNumShips());
+            } else {
+              Empire empire = new EmpireController(db.getTransaction()).getEmpire(empireID);
+              Fleet newFleet = fleetController.createFleet(
+                  empire, star, "troopcarrier",
+                  usedEmissaryTroopCarriers - propagandaFleet.getNumShips());
+              fleetController.addUpgrade(star, newFleet, "emissary");
+            }
+            propagandaFleet.setNumShips(usedEmissaryTroopCarriers);
+            break;
+          }
+          continue;
+        }
+
+        float neededShips = usedEmissaryTroopCarriers - propagandaFleet.getNumShips();
+        if (fleet.getNumShips() > neededShips) {
+          fleetController.removeShips(star, fleet, neededShips);
+          propagandaFleet.setNumShips(usedEmissaryTroopCarriers);
+        } else {
+          // still not enough, but remove this fleet.
+          float numShips = fleet.getNumShips();
+          fleetController.removeShips(star, fleet, neededShips);
+          propagandaFleet.setNumShips(propagandaFleet.getNumShips() + numShips);
+        }
+      }
+
+      // OK, the fleet is now propagandizing. Record the details.
+      propagandaFleet.propagandize(
+          DateTime.now(),
+          colony.getID(),
+          DateTime.now().plusSeconds((int) (propagandaTime * 3600.0f)));
+    }
+  }
+
+  public void transferColonyOwnership(
+      Star star, Colony colony, int empireID) throws RequestException {
+    // Remove any build requests currently in progress in this colony.
+    star.getBuildRequests().removeIf(
+        buildRequest -> buildRequest.getPlanetIndex() == colony.getPlanetIndex());
+
+    // Before we swap the empireID, make sure we have the right empire presences.
+    ensureEmpirePresence(star, empireID);
+
+    // Finally, set the colony's empire ID to ours, we're the owner now!
+    colony.setEmpireID(empireID);
   }
 
   /**

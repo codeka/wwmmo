@@ -33,12 +33,13 @@ public class FleetMoveCompleteEvent extends Event {
 
   @Override
   public String getNextEventTimeSql() {
-    return "SELECT MIN(eta) FROM fleets";
+    return "SELECT MIN(eta) FROM fleets WHERE state = " + BaseFleet.State.MOVING.getValue();
   }
 
   @Override
   public void process() {
-    String sql = "SELECT id, star_id, target_star_id FROM fleets WHERE eta < ?";
+    String sql = "SELECT id, star_id, target_star_id FROM fleets WHERE eta < ? AND state = "
+        + BaseFleet.State.MOVING.getValue();
     try (SqlStmt stmt = DB.prepare(sql)) {
       // Anything in the next 10 seconds is a candidate.
       stmt.setDateTime(1, DateTime.now().plusSeconds(10));

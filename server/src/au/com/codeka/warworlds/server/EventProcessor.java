@@ -25,6 +25,7 @@ public class EventProcessor {
     sEventClasses.add(BuildCompleteEvent.class);
     sEventClasses.add(FleetDestroyedEvent.class);
     sEventClasses.add(EmpireStarGoodsReachedZeroEvent.class);
+    sEventClasses.add(PropagandizingCompleteEvent.class);
   }
 
   private Thread mThread;

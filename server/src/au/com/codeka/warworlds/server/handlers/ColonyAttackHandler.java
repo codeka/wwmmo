@@ -50,7 +50,9 @@ public class ColonyAttackHandler extends RequestHandler {
       } else if (kind.equals("missionary")) {
         new ColonyController(t).sendMissionaries(getSession().getEmpireID(), star, colony);
       } else if (kind.equals("emissary")) {
-        new ColonyController(t).sendEmissaries(getSession().getEmpireID(), star, colony);
+        String fraction = getRequest().getParameter("fraction");
+        new ColonyController(t).sendEmissaries(
+            getSession().getEmpireID(), star, colony, Float.parseFloat(fraction));
       }
       new StarController(t).update(star);
       t.commit();
