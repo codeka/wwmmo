@@ -11,7 +11,11 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
+
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
@@ -50,6 +54,10 @@ public class EnemyPlanetActivity extends BaseActivity {
   private Colony colony;
   private Empire colonyEmpire;
 
+  private int numNormalTroopCarriers = 0;
+  private int numMissionaryTroopCarriers = 0;
+  private int numEmissaryTroopCarriers = 0;
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -63,6 +71,22 @@ public class EnemyPlanetActivity extends BaseActivity {
 
     Button sendMissionariesBtn = findViewById(R.id.missionary_btn);
     sendMissionariesBtn.setOnClickListener(v -> onSendMissionariesClick());
+
+    SeekBar emissarySeekBar = findViewById(R.id.emissary_seekbar);
+    emissarySeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+      @Override
+      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        refreshPropagandizeTimeEstimate();
+      }
+
+      @Override
+      public void onStartTrackingTouch(SeekBar seekBar) {
+      }
+
+      @Override
+      public void onStopTrackingTouch(SeekBar seekBar) {
+      }
+    });
   }
 
   @Override
@@ -147,9 +171,6 @@ public class EnemyPlanetActivity extends BaseActivity {
     PlanetDetailsView planetDetails = findViewById(R.id.planet_details);
     planetDetails.setup(star, planet, colony);
 
-    int numNormalTroopCarriers = 0;
-    int numMissionaryTroopCarriers = 0;
-    int numEmmissiaryTroopCarriers = 0;
     for (BaseFleet fleet : star.getFleets()) {
       if (fleet.getEmpireKey() == null || !fleet.getEmpireKey().equals(myEmpire.getKey())) {
         // It's not our fleet, ignore.
@@ -169,7 +190,7 @@ public class EnemyPlanetActivity extends BaseActivity {
           if (upgrade.getUpgradeID().equals("missionary")) {
             numMissionaryTroopCarriers += fleet.getNumShips();
           } else if (upgrade.getUpgradeID().equals("emissary")) {
-            numEmmissiaryTroopCarriers += fleet.getNumShips();
+            numEmissaryTroopCarriers += fleet.getNumShips();
           }
         }
       }
@@ -185,8 +206,21 @@ public class EnemyPlanetActivity extends BaseActivity {
 
     tv = findViewById(R.id.emissary_label);
     tv.setText(
-        String.format(Locale.ENGLISH, "Available Troop Carriers: %d", numEmmissiaryTroopCarriers));
+        String.format(Locale.ENGLISH, "Available Troop Carriers: %d", numEmissaryTroopCarriers));
 
+    if (colony != null) {
+      int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
+      if (defence < 1) {
+        defence = 1;
+      }
+      tv = findViewById(R.id.emissary_min_ships);
+      tv.setText(String.format(Locale.ENGLISH, "%d", Math.min(numEmissaryTroopCarriers, defence)));
+
+      tv = findViewById(R.id.emissary_max_ships);
+      tv.setText(String.format(Locale.ENGLISH, "%d", numEmissaryTroopCarriers));
+
+      refreshPropagandizeTimeEstimate();
+    }
   }
 
   private void refreshEmpireDetails() {
@@ -206,6 +240,42 @@ public class EnemyPlanetActivity extends BaseActivity {
   private void onAttackClick() {
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
     myEmpire.attackColony(star, colony, MyEmpire.AttackKind.NORMAL, this::finish);
+  }
+
+  private void refreshPropagandizeTimeEstimate() {
+    int defence = (int) (0.25 * colony.getPopulation() * colony.getDefenceBoost());
+    if (defence < 1) {
+      defence = 1;
+    }
+    int minTroopCarriers = Math.min(defence, numEmissaryTroopCarriers);
+    int maxTroopCarriers = numEmissaryTroopCarriers;
+
+    SeekBar emissarySeekBar = findViewById(R.id.emissary_seekbar);
+    float fraction = (float) emissarySeekBar.getProgress() / emissarySeekBar.getMax();
+    // fraction will be a value between 0 and 1, but we want it to be logarithmic.
+
+    // This is the number of emissary troop carriers we'll actually use.
+    int actualEmissaryTroopCarriers =
+        defence + (int)(fraction * (numEmissaryTroopCarriers - defence));
+
+    fraction = 1.0f / (1.0f + (float) Math.log((float) actualEmissaryTroopCarriers / defence));
+
+    // Normally, it takes 20 hour per 250 population (minimum of 10 minutes for populations > 250)
+    float basePropagandaTime = 0.333f * Math.max(0.5f, defence / 250.0f);
+    float propagandaTime = basePropagandaTime * fraction;
+
+    TextView tv = findViewById(R.id.emissary_label);
+    tv.setText(
+        String.format(
+            Locale.ENGLISH,
+            "Troop Carriers: %d / %d",
+            actualEmissaryTroopCarriers,
+            numEmissaryTroopCarriers));
+
+    tv = findViewById(R.id.emissary_est_time);
+    tv.setText(
+       String.format(
+           Locale.US, "Estimated time: %s", TimeFormatter.create().format(propagandaTime)));
   }
 
   private void onSendMissionariesClick() {

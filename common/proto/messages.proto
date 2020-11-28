@@ -957,11 +957,13 @@ message Fleet {
   optional float num_ships = 4;
 
   // The current state of the fleet: idle == orbiting a star, moving == moving
-  // between stars, attacking == attacking an enemy fleet, colony, etc
+  // between stars, attacking == attacking an enemy fleet, propagandizing == converting an enemy
+  // colony to our own.
   enum FLEET_STATE {
     IDLE = 1;
     MOVING = 2;
     ATTACKING = 3;
+    PROPAGANDIZING = 4;
   }
   optional FLEET_STATE state = 5;
 

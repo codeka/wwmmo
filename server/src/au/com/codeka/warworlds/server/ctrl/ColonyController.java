@@ -226,6 +226,15 @@ public class ColonyController {
   }
 
   /**
+   * When we send emissaries to an enemy colony, we actually just turn it to "propagandizing" state.
+   * After some time (based on how many troop carriers you have and the defence of the colony) the
+   * troop carriers will be destroyed and the colony will be converted to your own empire.
+   */
+  public void sendEmissaries(int empireID, Star star, Colony colony) throws RequestException {
+
+  }
+
+  /**
    * Find all the troop carriers with the given upgrade ID (or no upgrades, if upgradeID is null).
    */
   float findTroopCarriers(
@@ -280,12 +289,6 @@ public class ColonyController {
       colony_attacked_pb.setNumShips(numDestroyed);
       sitrep_pb.setColonyAttackedRecord(colony_attacked_pb);
     }
-  }
-
-  /**
-   *
-   */
-  public void sendEmissaries(int empireID, Star star, Colony colony) throws RequestException {
   }
 
   /**
