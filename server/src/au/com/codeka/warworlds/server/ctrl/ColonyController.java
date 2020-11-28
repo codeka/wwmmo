@@ -65,25 +65,8 @@ public class ColonyController {
    * attacker. See {@link #getAttackCashValue(Empire, Colony)} for details of the calculation.
    */
   public void attack(int empireID, Star star, Colony colony) throws RequestException {
-    float totalTroopCarriers = 0;
     ArrayList<Fleet> troopCarriers = new ArrayList<>();
-    for (BaseFleet baseFleet : star.getFleets()) {
-      Fleet fleet = (Fleet) baseFleet;
-      if (fleet.getEmpireID() == null || fleet.getEmpireID() != empireID) {
-        continue;
-      }
-      if (!fleet.getDesign().hasEffect(TroopCarrierShipEffect.class)) {
-        continue;
-      }
-      if (fleet.getState() != Fleet.State.IDLE) {
-        continue;
-      }
-      ArrayList<BaseFleetUpgrade> upgrades = fleet.getUpgrades();
-      if (upgrades == null || upgrades.size() == 0) {
-        totalTroopCarriers += fleet.getNumShips();
-        troopCarriers.add(fleet);
-      }
-    }
+    float totalTroopCarriers = findTroopCarriers(empireID, star, null, troopCarriers);
     float colonyDefence = 0.25f * colony.getPopulation() * colony.getDefenceBoost();
     if (colonyDefence < 1.0f) {
       colonyDefence = 1.0f;
@@ -179,40 +162,20 @@ public class ColonyController {
   }
 
   /**
-   *
+   * Similar to {@link #attack(int, Star, Colony)}, but instead of destroying the colony, we'll
+   * attempt to take over it. This only works for native colonies, if you do this on a non-native
+   * colony, your ships will simply be destroyed. If there are not enough ships to take over the
+   * colony, again your ships will be destroyed.
    */
-  public void sendMissionaries(int empireID, Star star, Colony colony) throws RequestException {/*
-    float totalTroopCarriers = 0;
+  public void sendMissionaries(int empireID, Star star, Colony colony) throws RequestException {
     ArrayList<Fleet> troopCarriers = new ArrayList<>();
-    for (BaseFleet baseFleet : star.getFleets()) {
-      Fleet fleet = (Fleet) baseFleet;
-      if (fleet.getEmpireID() == null || fleet.getEmpireID() != empireID) {
-        continue;
-      }
-      if (!fleet.getDesign().hasEffect(TroopCarrierShipEffect.class)) {
-        continue;
-      }
-      if (fleet.getState() != Fleet.State.IDLE) {
-        continue;
-      }
-      ArrayList<BaseFleetUpgrade> upgrades = fleet.getUpgrades();
-      if (upgrades == null || upgrades.size() == 0) {
-        continue;
-      }
-
-      for (BaseFleetUpgrade upgrade : upgrades) {
-        if (upgrade.getUpgradeID().equals("missionary")) {
-          totalTroopCarriers += fleet.getNumShips();
-          troopCarriers.add(fleet);
-        }
-      }
-    }
+    float totalTroopCarriers = findTroopCarriers(empireID, star, "missionary", troopCarriers);
     float colonyDefence = 0.25f * colony.getPopulation() * colony.getDefenceBoost();
     if (colonyDefence < 1.0f) {
       colonyDefence = 1.0f;
     }
 
-    // You don't have enough troop carriers to send, do nothing.
+    // You don't have any troop carriers at all, do nothing.
     if (totalTroopCarriers < 0.1f) {
       log.info(
           "Empire [%d] Attempt to send missionaries to colony with none available.",
@@ -241,13 +204,6 @@ public class ColonyController {
       // Transfer the cash that results from this to the attacker.
       double cashTransferred = getAttackCashValue(null, colony);
       log.info(String.format(Locale.US, " - transferring cash: %.2f", cashTransferred));
-      if (colony.getEmpireID() != null) {
-        empireController.adjustBalance(colony.getEmpireID(), (float) -cashTransferred,
-            Messages.CashAuditRecord.newBuilder()
-                .setEmpireId(colony.getEmpireID())
-                .setColonyId(colony.getID())
-                .setReason(Messages.CashAuditRecord.Reason.ColonyDestroyed));
-      }
       empireController.adjustBalance(empireID, (float) cashTransferred,
           Messages.CashAuditRecord.newBuilder()
               .setEmpireId(empireID)
@@ -261,30 +217,50 @@ public class ColonyController {
       star.getBuildRequests().removeIf(
           buildRequest -> buildRequest.getPlanetIndex() == colony.getPlanetIndex());
 
-      // If this is the last colony for this empire on this star, make sure the empire's home
-      // star is reset.
-      if (empire != null) {
-        maybeResetHomeStar(empire, star, colony);
-      }
+      // Before we swap the empireID, make sure we have the right empire presences.
+      ensureEmpirePresence(star, empireID);
 
-      if (sitrep_pb != null) {
-        Messages.SituationReport.ColonyDestroyedRecord.Builder colony_destroyed_pb =
-            Messages.SituationReport.ColonyDestroyedRecord.newBuilder();
-        colony_destroyed_pb.setColonyKey(colony.getKey());
-        colony_destroyed_pb.setEnemyEmpireKey(Integer.toString(empireID));
-        sitrep_pb.setColonyDestroyedRecord(colony_destroyed_pb);
-      }
-    } else {
-      log.info("Fleets destroyed: remainingShips=%.2f", remainingShips);
-      destroyTroopCarriers(star, colony, troopCarriers, totalTroopCarriers, sitrep_pb);
+      // Finally, set the colony's empire ID to ours, we're the owner now!
+      colony.setEmpireID(empireID);
     }
+  }
 
-    if (sitrep_pb != null) {
-      new SituationReportController(db.getTransaction()).saveSituationReport(sitrep_pb.build());
+  /**
+   * Find all the troop carriers with the given upgrade ID (or no upgrades, if upgradeID is null).
+   */
+  float findTroopCarriers(
+      int empireID, Star star, @Nullable String upgradeID, ArrayList<Fleet> troopCarriers) {
+    float totalTroopCarriers = 0;
+    for (BaseFleet baseFleet : star.getFleets()) {
+      Fleet fleet = (Fleet) baseFleet;
+      if (fleet.getEmpireID() == null || fleet.getEmpireID() != empireID) {
+        continue;
+      }
+      if (!fleet.getDesign().hasEffect(TroopCarrierShipEffect.class)) {
+        continue;
+      }
+      if (fleet.getState() != Fleet.State.IDLE) {
+        continue;
+      }
+      ArrayList<BaseFleetUpgrade> upgrades = fleet.getUpgrades();
+      if (upgradeID == null && (upgrades == null || upgrades.isEmpty())) {
+        totalTroopCarriers += fleet.getNumShips();
+        troopCarriers.add(fleet);
+      } else if (upgradeID != null && upgrades != null) {
+        for (BaseFleetUpgrade upgrade : upgrades) {
+          if (upgrade.getUpgradeID().equals(upgradeID)) {
+            totalTroopCarriers += fleet.getNumShips();
+            troopCarriers.add(fleet);
+          }
+        }
+      }
     }
-  */}
+    return totalTroopCarriers;
+  }
 
-  private void destroyTroopCarriers(Star star, Colony colony, List<Fleet> troopCarriers, float numToDestroy, @Nullable Messages.SituationReport.Builder sitrep_pb) throws RequestException{
+  private void destroyTroopCarriers(
+      Star star, Colony colony, List<Fleet> troopCarriers, float numToDestroy,
+      @Nullable Messages.SituationReport.Builder sitrep_pb) throws RequestException {
     float numDestroyed = numToDestroy;
 
     for (Fleet fleet : troopCarriers) {
@@ -504,28 +480,7 @@ public class ColonyController {
         throw new RequestException(e);
       }
 
-      // only insert a new empire_presences row if there's not one already there
-      int numExistingColonies = 0;
-      for (BaseColony baseColony : star.getColonies()) {
-        Colony existingColony = (Colony) baseColony;
-        if (existingColony.getEmpireID() != null &&
-            existingColony.getEmpireID() == empire.getID()) {
-          numExistingColonies++;
-        }
-      }
-
-      if (numExistingColonies == 0) {
-        sql = "INSERT INTO empire_presences" +
-            " (empire_id, star_id, total_goods, total_minerals)" +
-            " VALUES (?, ?, 100, 100)";
-        try (SqlStmt stmt = db.prepare(sql)) {
-          stmt.setInt(1, empire.getID());
-          stmt.setInt(2, star.getID());
-          stmt.update();
-        } catch (Exception e) {
-          throw new RequestException(e);
-        }
-      }
+      ensureEmpirePresence(star, empire.getID());
     }
 
     // make sure the star is no longer marked abandoned!
@@ -539,6 +494,34 @@ public class ColonyController {
 
     star.getColonies().add(colony);
     return colony;
+  }
+
+  /**
+   * Make sure we have the empire presences for all the empires on the star.
+   */
+  private void ensureEmpirePresence(Star star, int empireID) throws RequestException {
+    // Only insert a new empire_presences row if there's not one already there.
+    int numExistingColonies = 0;
+    for (BaseColony baseColony : star.getColonies()) {
+      Colony existingColony = (Colony) baseColony;
+      if (existingColony.getEmpireID() != null &&
+          existingColony.getEmpireID() == empireID) {
+        numExistingColonies++;
+      }
+    }
+
+    if (numExistingColonies == 0) {
+      String sql = "INSERT INTO empire_presences" +
+          " (empire_id, star_id, total_goods, total_minerals)" +
+          " VALUES (?, ?, 100, 100)";
+      try (SqlStmt stmt = db.prepare(sql)) {
+        stmt.setInt(1, empireID);
+        stmt.setInt(2, star.getID());
+        stmt.update();
+      } catch (Exception e) {
+        throw new RequestException(e);
+      }
+    }
   }
 
   private static class DataBase extends BaseDataBase {

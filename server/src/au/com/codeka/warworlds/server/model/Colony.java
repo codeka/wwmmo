@@ -115,6 +115,11 @@ public class Colony extends BaseColony {
     return mEmpireID;
   }
 
+  public void setEmpireID(Integer empireID) {
+    mEmpireID = empireID;
+    mEmpireKey = empireID == null ? null : Integer.toString(empireID);
+  }
+
   /** Gets the {@link DateTime} this colony was abandoned, or null if it has not been abandoned. */
   @Nullable
   public DateTime getAbandonedTime() {

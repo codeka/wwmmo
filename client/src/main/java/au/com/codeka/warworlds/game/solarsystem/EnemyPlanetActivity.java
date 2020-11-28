@@ -60,6 +60,9 @@ public class EnemyPlanetActivity extends BaseActivity {
 
     Button attackBtn = findViewById(R.id.attack_btn);
     attackBtn.setOnClickListener(v -> onAttackClick());
+
+    Button sendMissionariesBtn = findViewById(R.id.missionary_btn);
+    sendMissionariesBtn.setOnClickListener(v -> onSendMissionariesClick());
   }
 
   @Override
@@ -202,12 +205,12 @@ public class EnemyPlanetActivity extends BaseActivity {
 
   private void onAttackClick() {
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-    myEmpire.attackColony(star, colony, this::finish);
+    myEmpire.attackColony(star, colony, MyEmpire.AttackKind.NORMAL, this::finish);
   }
 
   private void onSendMissionariesClick() {
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-    myEmpire.attackColony(star, colony, this::finish);
+    myEmpire.attackColony(star, colony, MyEmpire.AttackKind.SEND_MISSIONARIES, this::finish);
   }
 
   private void setAttackVisible(boolean visible) {
