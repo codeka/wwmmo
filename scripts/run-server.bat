@@ -12,7 +12,10 @@ SET RUNPATH=%ROOTPATH%\server\src\main
 
 PUSHD %ROOTPATH%
 CALL gradlew.bat --daemon :server:installDist
+SET err=%ERRORLEVEL%
 POPD
+
+IF %err% neq 0 GOTO EXITNOW
 
 rem This is so the app running on the phone will be able to connect to us. 8080 for the normal
 rem HTTP stuff, 8081 is our custom port for the long-lived connection. It's OK if these fail, usually
@@ -28,3 +31,5 @@ SET SERVER_OPTS=-Dau.com.codeka.warworlds.server.ConfigFile=%INSTALLPATH%\data\c
 SET SERVER_OPTS=%SERVER_OPTS% -Djava.util.logging.config.file=%INSTALLPATH%\logging-debug.properties
 CALL %INSTALLPATH%\bin\server.bat %*
 POPD
+
+:EXITNOW
