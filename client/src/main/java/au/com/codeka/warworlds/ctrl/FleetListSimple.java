@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.ctrl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import org.andengine.entity.primitive.LineLoop;
 
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.DesignKind;
@@ -95,10 +98,34 @@ public class FleetListSimple extends LinearLayout {
 
     FleetListRow.populateFleetNameRow(context, row1, fleet, design);
     FleetListRow.populateFleetStanceRow(context, row2, fleet);
+    if (fleet.getState() == BaseFleet.State.PROPAGANDIZING) {
+      // If this fleet is propagandizing, we'll want to update the view every now & then
+      postDelayed(new StanceRefreshRunnable(row2, fleet), 1000);
+    }
 
     view.setOnClickListener(onClickListener);
     view.setTag(fleet);
     return view;
+  }
+
+  private class StanceRefreshRunnable implements Runnable {
+    private final LinearLayout row2;
+    private final Fleet fleet;
+
+    public StanceRefreshRunnable(LinearLayout row2, Fleet fleet) {
+      this.row2 = row2;
+      this.fleet = fleet;
+    }
+
+    @Override
+    public void run() {
+      if (getContext() == null) {
+        return;
+      }
+
+      postDelayed(this, 1000);
+      FleetListRow.populateFleetStanceRow(context, row2, fleet);
+    }
   }
 
   public interface FleetSelectedHandler {

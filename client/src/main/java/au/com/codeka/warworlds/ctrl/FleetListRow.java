@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import au.com.codeka.common.TimeFormatter;
+import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
@@ -38,6 +39,8 @@ import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 
 import com.google.common.base.CaseFormat;
+
+import org.joda.time.DateTime;
 
 public class FleetListRow extends RelativeLayout {
   private Context context;
@@ -76,6 +79,9 @@ public class FleetListRow extends RelativeLayout {
 
     populateFleetNameRow(context, row1, fleet, design);
     populateFleetStanceRow(context, row2, fleet);
+    if (fleet.getState() == BaseFleet.State.PROPAGANDIZING) {
+      postDelayed(new StanceRefreshRunnable(row2, fleet), 1000);
+    }
 
     if (notes != null && fleet.getNotes() != null) {
       notes.setText(fleet.getNotes());
@@ -191,9 +197,18 @@ public class FleetListRow extends RelativeLayout {
   }
 
   public static void populateFleetStanceRow(Context context, LinearLayout row, Fleet fleet) {
-    String text = String.format("%s (stance: %s)",
-        CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, fleet.getState().toString()),
-        CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, fleet.getStance().toString()));
+    String text;
+    if (fleet.getState() == BaseFleet.State.PROPAGANDIZING) {
+
+      text = String.format(Locale.US, "%s (eta: %s) (stance: %s)",
+          CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, fleet.getState().toString()),
+          TimeFormatter.create().format(fleet.getEta(), DateTime.now()),
+          CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, fleet.getStance().toString()));
+    } else {
+      text = String.format(Locale.US, "%s (stance: %s)",
+          CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, fleet.getState().toString()),
+          CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, fleet.getStance().toString()));
+    }
     addTextToRow(context, row, text, 0);
   }
 
@@ -251,5 +266,23 @@ public class FleetListRow extends RelativeLayout {
 
     row.addView(iv);
   }
+  private class StanceRefreshRunnable implements Runnable {
+    private final LinearLayout row2;
+    private final Fleet fleet;
 
+    public StanceRefreshRunnable(LinearLayout row2, Fleet fleet) {
+      this.row2 = row2;
+      this.fleet = fleet;
+    }
+
+    @Override
+    public void run() {
+      if (getContext() == null) {
+        return;
+      }
+
+      postDelayed(this, 1000);
+      FleetListRow.populateFleetStanceRow(context, row2, fleet);
+    }
+  }
 }
