@@ -31,6 +31,7 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.FeatureFlags;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.BuildEstimateView;
@@ -98,7 +99,8 @@ public class ShipUpgradeDialog extends DialogFragment {
     fleetName.setText(String.format(Locale.ENGLISH, "%d × %s",
         (int) fleet.getNumShips(), design.getDisplayName()));
 
-    ArrayList<ShipDesign.Upgrade> upgrades = ShipDesign.Upgrade.getAvailableUpgrades(design, fleet);
+    ArrayList<ShipDesign.Upgrade> upgrades =
+        ShipDesign.Upgrade.getAvailableUpgrades(design, fleet, FeatureFlags.get());
     if (upgrades.size() > 0) {
       log.debug("%d updates available.", upgrades.size());
       refreshUpgrades(upgrades);

@@ -378,6 +378,15 @@ message HelloRequest {
 }
 
 //
+// FeatureFlags let us turn new features on/off from the server. This will let us wait for everybody
+// to update to the new version before we enable the new features.
+//
+message FeatureFlags {
+  // If true, we'll enable the ability to build the new troop carrier upgrades.
+  optional bool enable_troop_carrier_upgrades = 1;
+}
+
+//
 // The "hello" message is returned when you first connect to the game.
 //
 message HelloResponse {
@@ -420,6 +429,9 @@ message HelloResponse {
 
   // The version of the server.
   optional string server_version = 13;
+
+  // The feature flags we have turned on.
+  optional FeatureFlags feature_flags = 14;
 }
 
 //

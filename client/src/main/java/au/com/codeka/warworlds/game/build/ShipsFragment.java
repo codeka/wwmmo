@@ -25,6 +25,8 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
+import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.FeatureFlags;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -63,7 +65,8 @@ public class ShipsFragment extends BaseTabFragment {
         dialog.setup(entry.design, getStar(), getColony());
         dialog.show(getActivity().getSupportFragmentManager(), "");
       } else if (entry.fleet != null && entry.buildRequest == null) {
-        if (ShipDesign.Upgrade.getAvailableUpgrades(entry.fleet.getDesign(), entry.fleet).isEmpty()) {
+        if (ShipDesign.Upgrade.getAvailableUpgrades(
+            entry.fleet.getDesign(), entry.fleet, FeatureFlags.get()).isEmpty()) {
           // No available upgrades, don't show the dialog.
           return;
         }
@@ -303,7 +306,9 @@ public class ShipsFragment extends BaseTabFragment {
           progress.setProgress((int) buildRequest.getPercentComplete());
         } else {
           StringBuilder upgrades = new StringBuilder();
-          for (ShipDesign.Upgrade upgrade : ShipDesign.Upgrade.getAvailableUpgrades(design, fleet)) {
+          ArrayList<ShipDesign.Upgrade> availableUpgrades =
+              ShipDesign.Upgrade.getAvailableUpgrades(design, fleet, FeatureFlags.get());
+          for (ShipDesign.Upgrade upgrade : availableUpgrades) {
             if (upgrades.length() > 0) {
               upgrades.append(", ");
             }

@@ -21,6 +21,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.safetynet.ValidationFailureException;
 import au.com.codeka.common.safetynet.ValidationFailureReason;
 import au.com.codeka.warworlds.server.Configuration;
+import au.com.codeka.warworlds.server.FeatureFlags;
 import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -76,7 +77,8 @@ public class HelloHandler extends RequestHandler {
 
     Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder()
         .setMotd(Messages.MessageOfTheDay.newBuilder().setMessage("").setLastUpdate(""))
-        .setServerVersion(getServerVersion());
+        .setServerVersion(getServerVersion())
+        .setFeatureFlags(FeatureFlags.get());
 
     final String userAgent = getRequest().getHeader("User-Agent");
 

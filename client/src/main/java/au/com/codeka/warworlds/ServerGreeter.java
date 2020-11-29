@@ -299,6 +299,8 @@ public class ServerGreeter {
             return "Unknown error";
           }
 
+          FeatureFlags.setup(helloResponsePb.getFeatureFlags());
+
           if (resp.hasEmpire()) {
             needsEmpireSetup = false;
             MyEmpire myEmpire = new MyEmpire();

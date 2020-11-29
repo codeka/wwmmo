@@ -6,6 +6,7 @@ import java.util.List;
 import org.w3c.dom.Element;
 
 import au.com.codeka.common.XmlIterator;
+import au.com.codeka.common.protobuf.Messages;
 
 public class ShipDesign extends Design {
   private float mSpeedParsecPerHour;
@@ -181,7 +182,14 @@ public class ShipDesign extends Design {
      * Filters the list of upgrades available to the given fleet (for example, if it already has
      * an upgrade or it has an incompatible upgrade, remove them).
      */
-    public static ArrayList<Upgrade> getAvailableUpgrades(ShipDesign design, BaseFleet fleet) {
+    public static ArrayList<Upgrade> getAvailableUpgrades(
+        ShipDesign design, BaseFleet fleet, Messages.FeatureFlags flags) {
+
+      // If troop carrier upgrades are flagged off, nothing to return.
+      if (!flags.getEnableTroopCarrierUpgrades() && design.getID().equals("troopcarrier")) {
+        return new ArrayList<>();
+      }
+
       ArrayList<Upgrade> upgrades = new ArrayList<>();
       for (Upgrade upgrade : design.getUpgrades()) {
         if (fleet.hasUpgrade(upgrade.getID())) {
