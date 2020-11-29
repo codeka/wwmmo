@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.preference.PreferenceManager;
 
-import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -138,8 +137,7 @@ public class ServerGreeter {
       enableStrictMode();
     }
 
-    GCMRegistrar.checkDevice(activity);
-    GCMRegistrar.checkManifest(activity);
+    App.i.getNotificationManager().setup();
 
     PreferenceManager.setDefaultValues(activity, R.xml.global_options, false);
 
@@ -236,7 +234,7 @@ public class ServerGreeter {
 
         // Schedule registration with GCM, which will update our device when we get the
         // registration ID
-        GCMIntentService.register(activity);
+        //GCMIntentService.register(activity);
         String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey();
         if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {
           try {
@@ -319,7 +317,7 @@ public class ServerGreeter {
 
           if (resp.hasRequireGcmRegister() && resp.getRequireGcmRegister()) {
             log.info("Re-registering for GCM...");
-            GCMIntentService.register(activity);
+            //GCMIntentService.register(activity);
             // we can keep going, though...
           }
 

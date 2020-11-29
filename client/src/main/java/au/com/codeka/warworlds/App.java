@@ -2,12 +2,24 @@ package au.com.codeka.warworlds;
 
 import androidx.multidex.MultiDexApplication;
 
+import com.google.firebase.FirebaseApp;
+
+import au.com.codeka.warworlds.notifications.NotificationManager;
+
 public class App extends MultiDexApplication {
   public static App i;
 
+  private NotificationManager notificationManager;
+
   public App() {
-        i = this;
-    }
+    i = this;
+
+    notificationManager = new NotificationManager();
+  }
+
+  public NotificationManager getNotificationManager() {
+    return notificationManager;
+  }
 
   @Override
   public void onCreate() {
@@ -22,6 +34,8 @@ public class App extends MultiDexApplication {
       Class.forName("au.com.codeka.BackgroundRunner");
     } catch (ClassNotFoundException e) {
     }
+
+    FirebaseApp.initializeApp(this);
   }
 }
 

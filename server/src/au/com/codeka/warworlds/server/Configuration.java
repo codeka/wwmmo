@@ -1,13 +1,22 @@
 package au.com.codeka.warworlds.server;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.Expose;
 import com.google.gson.stream.JsonReader;
+
+import javax.annotation.Nullable;
 
 /**
  * The server's configuration parameters are read from a json object on startup and parsed into
@@ -20,6 +29,9 @@ public class Configuration {
       "1021675369049-85dehn126ib087kkc270k0lko6ahv2h7.apps.googleusercontent.com";
   public static final String DEV_CLIENT_ID =
       "1021675369049-kh3j8g9m8ugkrqamllddh3v0coss7gc8.apps.googleusercontent.com";
+
+  private static final Collection<String> FIREBASE_SCOPES =
+      Lists.newArrayList("https://www.googleapis.com/auth/firebase.messaging");
 
   /** Loads the {@link Configuration} from the given file and sets it to {@code Configuration.i}. */
   public static void loadConfig() throws FileNotFoundException {
@@ -49,6 +61,10 @@ public class Configuration {
   @Expose private ClickerConfig[] clickers;
   @Expose private SafetyNetConfig safetyNet;
   @Expose private boolean anonymousUsersCanChat;
+  @Expose private JsonElement firebase;
+
+  @Nullable
+  private GoogleCredentials firebaseCredentials;
 
   public Configuration() {
     limits = new LimitsConfiguration();
@@ -111,6 +127,26 @@ public class Configuration {
   public boolean getAnonymousUsersCanChat() {
     return anonymousUsersCanChat;
   }
+
+  public GoogleCredentials getFirebaseCredentials() {
+    try {
+      if (firebaseCredentials == null) {
+        try {
+          firebaseCredentials = GoogleCredentials.fromStream(
+              new ByteArrayInputStream(firebase.toString().getBytes("utf-8")))
+              .createScoped(FIREBASE_SCOPES);
+        } catch (UnsupportedEncodingException e) {
+          // Should never happen.
+        }
+      }
+
+      firebaseCredentials.refreshIfExpired();
+    } catch (IOException e) {
+      throw new RuntimeException("Should never happen.", e);
+    }
+    return firebaseCredentials;
+  }
+
 
   public static class DatabaseConfiguration {
     @Expose private String server;

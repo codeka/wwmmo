@@ -1,0 +1,92 @@
+{
+  "project_info": {
+    "project_number": "1021675369049",
+    "firebase_url": "https://codeka-com-au-warwworldsmmo.firebaseio.com",
+    "project_id": "codeka.com.au:warwworldsmmo"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1021675369049:android:a59a5dba79411d7758f748",
+        "android_client_info": {
+          "package_name": "au.com.codeka.warworlds"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1021675369049-d321rk1tgkmc15f707lan9uo3m3vb8sf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.codeka.warworlds",
+            "certificate_hash": "8a68ea8582deaf807fd7ca27503d8e0d04642ee9"
+          }
+        },
+        {
+          "client_id": "1021675369049-85dehn126ib087kkc270k0lko6ahv2h7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.codeka.warworlds",
+            "certificate_hash": "be6ffde6e562eb268f5e7dd7cfa0e497ba1a74ae"
+          }
+        },
+        {
+          "client_id": "1021675369049-70hmnlmhse7r67h516hjkihggslg5gm0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAulj6q4uq0fd7WnJpzSY769U0aMCthogg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1021675369049-70hmnlmhse7r67h516hjkihggslg5gm0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1021675369049:android:8d25328d2abd6aba58f748",
+        "android_client_info": {
+          "package_name": "au.com.codeka.warworlds.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1021675369049-76dusetnk96e4t4ji1bbend9ml2ihljo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.codeka.warworlds.debug",
+            "certificate_hash": "8a68ea8582deaf807fd7ca27503d8e0d04642ee9"
+          }
+        },
+        {
+          "client_id": "1021675369049-70hmnlmhse7r67h516hjkihggslg5gm0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAulj6q4uq0fd7WnJpzSY769U0aMCthogg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1021675369049-70hmnlmhse7r67h516hjkihggslg5gm0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

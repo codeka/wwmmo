@@ -20,8 +20,6 @@ import au.com.codeka.warworlds.server.handlers.NotificationHandler;
 import au.com.codeka.warworlds.server.model.ChatConversation;
 import au.com.codeka.warworlds.server.model.ChatConversationParticipant;
 
-import com.google.android.gcm.server.Message;
-import com.google.android.gcm.server.Result;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
@@ -109,9 +107,9 @@ public class NotificationController {
   /** Sends the given {@link Notification} to all the given chat conversation participants. */
   private void sendNotification(ChatConversationParticipant[] participants,
       Notification notification) throws RequestException {
-    Message.Builder msgBuilder = new Message.Builder();
+    HashMap<String, String> msgData = new HashMap<>();
     for (Map.Entry<String, String> value : notification.values.entrySet()) {
-      msgBuilder.addData(value.getKey(), value.getValue());
+      msgData.put(value.getKey(), value.getValue());
     }
 
     // go through attached handlers and mark any in there as already done.
@@ -163,13 +161,11 @@ public class NotificationController {
       throw new RequestException(e);
     }
 
-    sendNotification(msgBuilder.build(), devices);
+    sendNotification(msgData, devices);
   }
 
   /** Sends the given {@link Message} to the given list of devices. */
-  private void sendNotification(Message msg, Map<String, String> devices) throws RequestException {
-    // Temporarily disabled as this endpoint is deprecated.
-    /*
+  private void sendNotification(HashMap<String, String> msg, Map<String, String> devices) throws RequestException {/*
     Sender sender = new Sender(API_KEY);
     try {
       List<String> registrationIds = new ArrayList<String>();
@@ -208,10 +204,9 @@ public class NotificationController {
       }
     } catch (IOException e) {
       log.error("Error caught sending notification.", e);
-    }
-    */
+    }*/
   }
-
+/*
   private void handleNotRegisteredError(String registrationId, String userEmail, Result result)
       throws RequestException {
     log.warning("Could not send notification: DeviceNotRegistered: user=%s registration=%s",
@@ -244,7 +239,7 @@ public class NotificationController {
       throw new RequestException(e);
     }
   }
-
+*/
   /**
    * This class keeps an in-memory cache of "recent" notifications we've generated, which is used
    * to re-send notification if the client disconnects briefly.

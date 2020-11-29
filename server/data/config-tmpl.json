@@ -64,6 +64,21 @@
     "redirectUri": ""
   },
 
+  // Firebase config. Grab this from:
+  // https://console.firebase.google.com/u/1/project/codeka.com.au:warwworldsmmo/settings/serviceaccounts/adminsdk
+  "firebase": {
+    "type": "",
+    "project_id": "",
+    "private_key_id": "",
+    "private_key": "",
+    "client_email": "",
+    "client_id": "",
+    "auth_uri": "",
+    "token_uri": "",
+    "auth_provider_x509_cert_url": "",
+    "client_x509_cert_url": ""
+  },
+
   // A list of auto-clicker that, if the user has installed on their device, we will reject
   // connections from.
   "clickers": [

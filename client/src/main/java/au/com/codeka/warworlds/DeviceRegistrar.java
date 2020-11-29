@@ -10,7 +10,7 @@ import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 
 /**
- * Registers this device with GCM and notified the server of our device key.
+ * Registers this device with FCM and notifies the server of our device key.
  */
 public class DeviceRegistrar {
   private static final Log log = new Log("DeviceRegistrar");
@@ -46,14 +46,14 @@ public class DeviceRegistrar {
     return registrationKey;
   }
 
-  public static void updateGcmRegistration(final String gcmRegistrationID) {
+  public static void updateFcmToken(final String fcmToken) {
     String deviceRegistrationKey = getDeviceRegistrationKey();
     if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {
       return;
     }
 
     Messages.DeviceRegistration registrationPb = Messages.DeviceRegistration.newBuilder()
-        .setGcmRegistrationId(gcmRegistrationID)
+        .setFcmToken(fcmToken)
         .setKey(deviceRegistrationKey).build();
 
     RequestManager.i.sendRequest(new ApiRequest.Builder("devices/" + deviceRegistrationKey, "PUT")

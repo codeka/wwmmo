@@ -363,7 +363,7 @@ message HelloRequest {
 
   // If present and set to true, we'll occasionally respond to requests with a protocol buffer
   // wrapped in a NotficationWrapper message. This way, we can get notifications without having
-  // to wait for GCM.
+  // to wait for FCM.
   optional bool allow_inline_notfications = 6;
 
   // If true, we'll NOT return the list of star_ids that you own. Newer clients don't need
@@ -447,10 +447,9 @@ message DeviceRegistration {
   // will then refer to the device itself.
   optional string device_id = 2;
 
-  // The identifier of the GCM registration. When you complete the GCM registration
-  // process, you'll need to update this to include the GCM registration ID so that
-  // we can send you notifications.
-  optional string gcm_registration_id = 3;
+  // The Firebase Cloud Messaging token. When you complete FCM registration process, you'll need to
+  // update this to include the FCM token so that we can send you notifications.
+  optional string fcm_token = 3;
 
   // The value of android.os.Build.MODEL for this device
   optional string device_model = 4;
@@ -480,14 +479,14 @@ message DeviceRegistrations {
 
 //
 // The "online" status of a device. We'll use this to update whether or not
-// to send chat messages via GCM (or wait until you poll) etc.
+// to send chat messages via FCM (or wait until you poll) etc.
 //
 message DeviceOnlineStatus {
   optional bool is_online = 1;
 }
 
 //
-// Notifications are base-64 encoded strings (because that's all we can send via GCM).
+// Notifications are base-64 encoded strings (because that's all we can send via FCM).
 //
 message Notification {
   optional string name = 1;

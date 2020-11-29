@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.Logger;
 import org.slf4j.helpers.MessageFormatter;
@@ -30,6 +33,12 @@ public class Runner {
     LogImpl.setup();
     try {
       FeatureFlags.setup();
+
+      FirebaseOptions options = FirebaseOptions.builder()
+          .setCredentials(Configuration.i.getFirebaseCredentials())
+          .build();
+      FirebaseApp.initializeApp(options);
+
       new SchemaUpdater().verifySchema();
       ErrorReportingLoggingHandler.setup();
       DesignManager.setup();
