@@ -285,6 +285,7 @@ public class ColonyController {
                   empire, star, "troopcarrier",
                   usedEmissaryTroopCarriers - propagandaFleet.getNumShips());
               fleetController.addUpgrade(star, newFleet, "emissary");
+              star.addFleet(newFleet);
             }
             propagandaFleet.setNumShips(usedEmissaryTroopCarriers);
             break;
