@@ -26,6 +26,7 @@ import au.com.codeka.warworlds.server.designeffects.TroopCarrierShipEffect;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Fleet;
+import au.com.codeka.warworlds.server.model.FleetUpgrade;
 import au.com.codeka.warworlds.server.model.Star;
 import sun.nio.cs.ext.MacTurkish;
 
@@ -278,14 +279,14 @@ public class ColonyController {
             if (troopCarriers.size() > 1) {
               troopCarriers.get(1).setNumShips(
                   troopCarriers.get(1).getNumShips() +
-                      usedEmissaryTroopCarriers - propagandaFleet.getNumShips());
+                      propagandaFleet.getNumShips() - usedEmissaryTroopCarriers);
             } else {
               Empire empire = new EmpireController(db.getTransaction()).getEmpire(empireID);
-              Fleet newFleet = fleetController.createFleet(
+              Fleet newFleet = new Fleet(
                   empire, star, "troopcarrier",
-                  usedEmissaryTroopCarriers - propagandaFleet.getNumShips());
-              fleetController.addUpgrade(star, newFleet, "emissary");
-              star.addFleet(newFleet);
+                  propagandaFleet.getNumShips() - usedEmissaryTroopCarriers);
+              newFleet.getUpgrades().add(new FleetUpgrade(star.getID(), 0, "emissary"));
+              star.getFleets().add(newFleet);
             }
             propagandaFleet.setNumShips(usedEmissaryTroopCarriers);
             break;
