@@ -5,10 +5,16 @@ import android.util.SparseArray;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
 
 import androidx.collection.LruCache;
+
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiRequest;
@@ -24,7 +30,7 @@ public class StarManager extends BaseManager {
 
   /** We keep an in-memory cache for instant retrieval as well. */
   private final LruCache<Integer, Star> stars = new LruCache<>(100);
-  private final SparseArray<ApiRequest> inProgress = new SparseArray<>();
+  private final SparseArray<InProgressRequestInfo> inProgress = new SparseArray<>();
 
   public void clearCache() {
     stars.evictAll();
@@ -43,6 +49,21 @@ public class StarManager extends BaseManager {
 
     refreshStar(starID);
     return null;
+  }
+
+  /**
+   * Gets a star either from our in-memory cache, or the server. Returns a future that you can wait
+   * on if you need it immediately.
+   */
+  public ListenableFuture<Star> requireStar(int starID) {
+    Star star = stars.get(starID);
+    if (star != null) {
+      return Futures.immediateFuture(star);
+    }
+
+    SettableFuture<Star> future = SettableFuture.create();
+    refreshStar(starID, future);
+    return future;
   }
 
   /**
@@ -67,7 +88,7 @@ public class StarManager extends BaseManager {
 
     if (toFetch != null) {
       for (Integer starID : toFetch) {
-        refreshStar(starID, false);
+        refreshStar(starID, false, null);
       }
     }
     return result;
@@ -87,7 +108,12 @@ public class StarManager extends BaseManager {
    * star is updated.
    */
   public void refreshStar(int starID) {
-    refreshStar(starID, false);
+    refreshStar(starID, false, null);
+  }
+
+  /** Refresh the star, passing a future where we'll populate the value once it's been refreshed. */
+  public void refreshStar(int starID, SettableFuture<Star> future) {
+    refreshStar(starID, false, future);
   }
 
   /**
@@ -96,8 +122,11 @@ public class StarManager extends BaseManager {
    *
    * @param onlyIfCached If true, we'll only refresh the star if we already have a cached version,
    *                     otherwise this will do nothing.
+   * @param future Optional Future that we'll populate with the value of the star when it's
+   *              refreshed.
    */
-  public boolean refreshStar(final int starID, boolean onlyIfCached) {
+  public boolean refreshStar(
+      final int starID, boolean onlyIfCached, @Nullable SettableFuture<Star> future) {
     if (onlyIfCached && stars.get(starID) == null) {
       log.debug("Not updating star, onlyIfCached = true and star is not cached.");
       return false;
@@ -105,8 +134,12 @@ public class StarManager extends BaseManager {
 
     ApiRequest apiRequest;
     synchronized (inProgress) {
-      if (inProgress.get(starID) != null) {
+      InProgressRequestInfo info = inProgress.get(starID);
+      if (info != null) {
         log.debug("Star is already being refreshed, not calling again.");
+        if (future != null) {
+          info.ensureFutures().add(future);
+        }
         return true;
       }
 
@@ -114,7 +147,7 @@ public class StarManager extends BaseManager {
           .completeCallback(requestCompleteCallback)
           .skipCache(true)
           .build();
-      inProgress.put(starID, apiRequest);
+      inProgress.put(starID, new InProgressRequestInfo(apiRequest, future));
     }
 
     RequestManager.i.sendRequest(apiRequest);
@@ -129,12 +162,22 @@ public class StarManager extends BaseManager {
           star.fromProtocolBuffer(starPb);
           stars.put(star.getID(), star);
 
+          InProgressRequestInfo info = inProgress.get(star.getID());
           inProgress.remove(star.getID());
+
+          Runnable completeCallback = null;
+          if (info != null && info.futures != null) {
+            completeCallback = () -> {
+              for (SettableFuture<Star> future : info.futures) {
+                future.set(star);
+              }
+            };
+          }
 
           // Enqueue the star so that it get simulated, this will post to the event bus when
           // simulation finishes, so we don't need to do that here.
           log.debug("Star %d %s fetched from server, simulating...", star.getID(), star.getName());
-          StarSimulationQueue.i.simulate(star, true);
+          StarSimulationQueue.i.simulate(star, true, completeCallback);
         }
       };
 
@@ -166,5 +209,24 @@ public class StarManager extends BaseManager {
 
   public interface StarRenameCompleteHandler {
     void onStarRename(Star star, boolean successful, String errorMessage);
+  }
+
+  private class InProgressRequestInfo {
+    public ApiRequest request;
+    ArrayList<SettableFuture<Star>> futures;
+
+    public InProgressRequestInfo(ApiRequest request, @Nullable SettableFuture<Star> future) {
+      this.request = request;
+      if (future != null) {
+        ensureFutures().add(future);
+      }
+    }
+
+    public ArrayList<SettableFuture<Star>> ensureFutures() {
+      if (futures == null) {
+        futures = new ArrayList<>();
+      }
+      return futures;
+    }
   }
 }

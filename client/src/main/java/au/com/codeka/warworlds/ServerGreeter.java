@@ -128,9 +128,8 @@ public class ServerGreeter {
   }
 
   private static void sayHello(final Activity activity, final int retries) {
-    LogImpl.setup();
-    log.debug("Saying 'hello'...");
     Util.setup(activity);
+    log.debug("Saying 'hello'...");
 
     Util.loadProperties();
     if (Util.isDebug()) {
@@ -162,8 +161,6 @@ public class ServerGreeter {
     if (handler == null) {
       handler = new Handler();
     }
-
-    RequestManager.i.setup(activity);
 
     // Whenever an accessibility service is enabled or disabled, we'll want to clear the hello so
     // that the server is able to verify that it's a supported/allowed service.

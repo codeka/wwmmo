@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.model;
 
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -8,6 +9,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import android.os.SystemClock;
+
+import androidx.annotation.Nullable;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
@@ -27,10 +30,14 @@ public class StarSimulationQueue {
    * we finish.
    */
   public void simulate(Star star, boolean predict) {
+    simulate(star, predict, null);
+  }
+
+  public void simulate(Star star, boolean predict, @Nullable Runnable completeCallback) {
     ensureThread();
 
     // do it so that the most recently-added star is the one we'll predict.
-    enqueuedTasks.addFirst(new SimulateTask(star, predict));
+    enqueuedTasks.addFirst(new SimulateTask(star, predict, completeCallback));
   }
 
   /**
@@ -64,41 +71,41 @@ public class StarSimulationQueue {
     }
   }
 
-  private Runnable simulationRunnable = new Runnable() {
-    @Override
-    public void run() {
-      while (true) {
-        try {
-          SimulateTask task = enqueuedTasks.take();
-          Star star = task.star.get();
-          if (star == null) {
-            continue;
-          }
-
-          if (!needsSimulation(star)) {
-            StarManager.eventBus.publish(star);
-            continue;
-          }
-
-          DateTime lastSimulationTime = star.getLastSimulation();
-          long startTime = SystemClock.elapsedRealtime();
-          new Simulation(task.predict).simulate(star);
-          long endTime = SystemClock.elapsedRealtime();
-
-          StringBuilder sb = new StringBuilder();
-          for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
-            sb.append(String.format("%s->%.2f ", baseEmpirePresence.getEmpireKey(),
-                baseEmpirePresence.getDeltaGoodsPerHour()));
-          }
-          log.info("Simulation of %d (%s) complete in %d ms (last simulation = %s) (Δ goods = %s)",
-              star.getID(), star.getName(), endTime - startTime,
-              TimeFormatter.create().format(lastSimulationTime), sb.toString().trim());
-
-          StarManager.eventBus.publish(star);
-        } catch (Exception e) {
-          log.error("Exception caught simulating stars.", e);
-          return; // we'll get restarted when a new star needs to be simulated.
+  private final Runnable simulationRunnable = () -> {
+    while (true) {
+      try {
+        SimulateTask task = enqueuedTasks.take();
+        Star star = task.star.get();
+        if (star == null) {
+          continue;
         }
+
+        if (!needsSimulation(star)) {
+          StarManager.eventBus.publish(star);
+          continue;
+        }
+
+        DateTime lastSimulationTime = star.getLastSimulation();
+        long startTime = SystemClock.elapsedRealtime();
+        new Simulation(task.predict).simulate(star);
+        long endTime = SystemClock.elapsedRealtime();
+
+        StringBuilder sb = new StringBuilder();
+        for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
+          sb.append(String.format(Locale.US, "%s->%.2f ", baseEmpirePresence.getEmpireKey(),
+              baseEmpirePresence.getDeltaGoodsPerHour()));
+        }
+        log.info("Simulation of %d (%s) complete in %d ms (last simulation = %s) (Δ goods = %s)",
+            star.getID(), star.getName(), endTime - startTime,
+            TimeFormatter.create().format(lastSimulationTime), sb.toString().trim());
+
+        if (task.completeCallback != null) {
+          task.completeCallback.run();
+        }
+        StarManager.eventBus.publish(star);
+      } catch (Exception e) {
+        log.error("Exception caught simulating stars.", e);
+        return; // we'll get restarted when a new star needs to be simulated.
       }
     }
   };
@@ -106,10 +113,12 @@ public class StarSimulationQueue {
   private static class SimulateTask {
     public WeakReference<Star> star;
     public boolean predict;
+    @Nullable public Runnable completeCallback;
 
-    public SimulateTask(Star star, boolean predict) {
-      this.star = new WeakReference<Star>(star);
+    public SimulateTask(Star star, boolean predict, Runnable completeCallback) {
+      this.star = new WeakReference<>(star);
       this.predict = predict;
+      this.completeCallback = completeCallback;
     }
   }
 }

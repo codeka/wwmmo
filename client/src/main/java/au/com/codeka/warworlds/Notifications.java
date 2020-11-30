@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -52,6 +53,7 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 
+import com.google.common.util.concurrent.Futures;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class Notifications {
@@ -118,7 +120,7 @@ public class Notifications {
     try {
       // refresh the star this situation report is for, obviously
       // something happened that we'll want to know about
-      boolean refreshed = StarManager.i.refreshStar(Integer.parseInt(pb.getStarKey()), true);
+      boolean refreshed = StarManager.i.refreshStar(Integer.parseInt(pb.getStarKey()), true, null);
       log.debug("Refreshed star: successful? %s", refreshed ? "false" : "true");
       if (!refreshed) { // <-- only refresh the star if we have one cached
         // if we didn't refresh the star, then at least refresh
@@ -201,9 +203,13 @@ public class Notifications {
   private static void displayNotification(final Context context,
       final Messages.SituationReport sitrep) {
     String starKey = sitrep.getStarKey();
-    Star star = StarManager.i.getStar(Integer.parseInt(starKey));
-    if (star == null) {
-      log.error("Could not get star summary for star %s, cannot display notification.", starKey);
+    Star star;
+    try {
+      star = Futures.getChecked(
+          StarManager.i.requireStar(
+              Integer.parseInt(starKey)), IOException.class, 10, TimeUnit.SECONDS);
+    } catch (IOException e) {
+      log.warning("Error getting star.", e);
       return;
     }
 
@@ -218,6 +224,8 @@ public class Notifications {
     DatabaseHelper db = new DatabaseHelper();
     if (!db.addNotification(notification)) {
       displayNotification(buildNotification(context, db.getNotifications()));
+    } else {
+      log.info("Notification already in database, not displaying a again.");
     }
   }
 
@@ -229,6 +237,8 @@ public class Notifications {
     DatabaseHelper db = new DatabaseHelper();
     if (!db.addNotification(notification)) {
       displayNotification(buildNotification(context, db.getNotifications()));
+    } else {
+      log.info("Notification already in database, not displaying a again.");
     }
   }
 
@@ -313,6 +323,7 @@ public class Notifications {
     GlobalOptions.NotificationKind kind = getNotificationKind(sitrep);
     GlobalOptions.NotificationOptions options = new GlobalOptions().getNotificationOptions(kind);
     if (!options.isEnabled()) {
+      log.debug("Notification disabled by options, not displaying.");
       return null;
     }
 

@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.RealmManager;
@@ -40,10 +41,13 @@ public class Util {
       return false;
     }
 
+    LogImpl.setup();
+
     SpriteManager.i.setup(context);
     DesignManager.setup(context);
     PurchaseManager.i.setup();
     RealmManager.i.setup();
+    RequestManager.i.setup(context);
 
     try {
       PackageInfo packageInfo = App.i.getPackageManager().getPackageInfo(App.i.getPackageName(), 0);
