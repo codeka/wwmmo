@@ -31,7 +31,7 @@ import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
-import au.com.codeka.warworlds.Notifications;
+import au.com.codeka.warworlds.notifications.Notifications;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;

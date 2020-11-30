@@ -46,6 +46,7 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
+import au.com.codeka.warworlds.notifications.Notifications;
 
 /**
  * This class is used to make sure we're said "Hello" to the server and that we've got our
@@ -378,7 +379,7 @@ public class ServerGreeter {
         } else if (!errorOccurred) {
           Util.setup(activity);
           ChatManager.i.setup();
-          Notifications.startLongPoll();
+          App.i.getNotificationManager().startLongPoll();
 
           // make sure we're correctly registered as online.
           BackgroundDetector.i.onBackgroundStatusChange();

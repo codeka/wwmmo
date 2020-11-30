@@ -9,6 +9,7 @@ public class NotificationManager {
   private static final Log log = new Log("NotificationManager");
 
   private String token;
+  private LongPoller longPoller;
 
   public void setup() {
     log.info("Getting firebase messaging token.");
@@ -23,5 +24,10 @@ public class NotificationManager {
           log.info("Got FCM token: %s", token);
           DeviceRegistrar.updateFcmToken(token);
         });
+  }
+
+  public void startLongPoll() {
+    longPoller = new LongPoller();
+    longPoller.start();
   }
 }

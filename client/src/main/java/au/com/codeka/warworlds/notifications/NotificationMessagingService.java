@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.notifications;
 
 import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
@@ -11,9 +10,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.util.Map;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.DeviceRegistrar;
-import au.com.codeka.warworlds.Notifications;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.EmpireManager;
 
