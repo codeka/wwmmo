@@ -43,7 +43,7 @@ public class Runner {
       ErrorReportingLoggingHandler.setup();
       DesignManager.setup();
       NameGenerator.setup();
-      MemoryUsageLogger.start();
+      //MemoryUsageLogger.start();
 
       MetricsManager.i.start();
       EventProcessor.i.ping();

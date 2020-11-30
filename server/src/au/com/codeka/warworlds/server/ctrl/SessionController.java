@@ -45,7 +45,7 @@ public class SessionController {
             }
 
             if (session != null) {
-              new LoginController().updateSession(session);
+              new LoginController().updateSession(session, null);
               return session;
             }
 

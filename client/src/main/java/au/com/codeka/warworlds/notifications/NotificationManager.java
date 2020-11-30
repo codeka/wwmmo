@@ -11,6 +11,7 @@ public class NotificationManager {
   private String token;
 
   public void setup() {
+    log.info("Getting firebase messaging token.");
     FirebaseMessaging.getInstance().getToken()
         .addOnCompleteListener(task -> {
           if (!task.isSuccessful()) {

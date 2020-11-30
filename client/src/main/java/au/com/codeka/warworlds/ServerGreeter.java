@@ -137,8 +137,6 @@ public class ServerGreeter {
       enableStrictMode();
     }
 
-    App.i.getNotificationManager().setup();
-
     PreferenceManager.setDefaultValues(activity, R.xml.global_options, false);
 
     ActivityManager activityManager =
@@ -232,9 +230,9 @@ public class ServerGreeter {
           }
         }
 
-        // Schedule registration with GCM, which will update our device when we get the
+        // Schedule registration with FCM, which will update our device when we get the
         // registration ID
-        //GCMIntentService.register(activity);
+        App.i.getNotificationManager().setup();
         String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey();
         if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {
           try {

@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
@@ -20,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.text.Html;
 import android.util.Base64;
@@ -81,6 +83,9 @@ public class Notifications {
         break;
       case "chat":
         handleChatNotification(context, value);
+        break;
+      case "debug-msg":
+        handleDebugMsgNotification(context, value);
         break;
       case "cash":
         handleCashNotification(value);
@@ -162,6 +167,10 @@ public class Notifications {
     }
   }
 
+  private static void handleDebugMsgNotification(Context context, String value) {
+    displayNotification(context, value);
+  }
+
   private static void handleCashNotification(String value) {
     float newCash = Float.parseFloat(value);
     MyEmpire empire = EmpireManager.i.getEmpire();
@@ -212,15 +221,29 @@ public class Notifications {
     }
   }
 
+  private static void displayNotification(final Context context, final String debugMsg) {
+    NotificationDetails notification = new NotificationDetails();
+    notification.debugMsg = debugMsg;
+    notification.realm = RealmContext.i.getCurrentRealm();
+
+    DatabaseHelper db = new DatabaseHelper();
+    if (!db.addNotification(notification)) {
+      displayNotification(buildNotification(context, db.getNotifications()));
+    }
+  }
+
   private static void displayNotification(Notification notification) {
     if (notification == null) {
+      log.info("No notification.");
       return;
     }
 
     if (!new GlobalOptions().notificationsEnabled()) {
+      log.info("Global notifications option is disabled.");
       return;
     }
 
+    log.info("OK sending");
     NotificationManager nm =
         (NotificationManager) App.i.getSystemService(Context.NOTIFICATION_SERVICE);
     nm.notify(RealmContext.i.getCurrentRealm().getID(), notification);
@@ -252,6 +275,8 @@ public class Notifications {
         thisOptions = addSitrepNotification(context, notification, builder, inboxStyle, first);
       } else if (notification.chatMsg != null) {
         thisOptions = addChatNotification(context, notification, builder, inboxStyle, first);
+      } else if (notification.debugMsg != null) {
+        thisOptions = addDebugMsgNotification(context, notification, builder, inboxStyle, first);
       }
 
       if (thisOptions == null) {
@@ -333,6 +358,11 @@ public class Notifications {
       }
     }
 
+    ensureChannel(
+        context, "game-events", "Game events",
+        "Events that happen within the game (fleet moves, attacks, etc)");
+    builder.setChannelId("game-events");
+
     // subsequent notifications go in the expanded view
     inboxStyle.addLine(Html.fromHtml(sitrep.getSummaryLine(star)));
 
@@ -376,10 +406,55 @@ public class Notifications {
       }
     }
 
+    ensureChannel(context, "chat", "Chat messages", "DMs and other chat messages");
+    builder.setChannelId("chat");
+
     // subsequent notifications go in the expanded view
     inboxStyle.addLine(Html.fromHtml("<b>" + empireName + "</b>: " + msgContent));
 
     return options;
+  }
+
+  private static GlobalOptions.NotificationOptions addDebugMsgNotification(
+      Context context,
+      NotificationDetails notification, NotificationCompat.Builder builder,
+      NotificationCompat.InboxStyle inboxStyle, boolean first) {
+    GlobalOptions.NotificationKind kind = GlobalOptions.NotificationKind.CHAT_MESSAGE;
+    GlobalOptions.NotificationOptions options = new GlobalOptions().getNotificationOptions(kind);
+    if (!options.isEnabled()) {
+      return null;
+    }
+
+    if (first) {
+      builder.setContentTitle("Server Message");
+      builder.setContentText(notification.debugMsg);
+      builder.setWhen(System.currentTimeMillis());
+
+      String ringtone = new GlobalOptions().getNotificationOptions(kind).getRingtone();
+      if (ringtone != null && ringtone.length() > 0) {
+        builder.setSound(Uri.parse(ringtone));
+      }
+    }
+
+    ensureChannel(context, "debug-msg", "Server message", "Special messages from the server.");
+    builder.setChannelId("debug-msg");
+
+    // subsequent notifications go in the expanded view
+    inboxStyle.addLine(Html.fromHtml("<b>Server Message</b>: " + notification.debugMsg));
+
+    return options;
+  }
+
+  private static void ensureChannel(Context context, String id, String name, String description) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      return;
+    }
+    NotificationManager notificationManager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    NotificationChannel channel =
+        new NotificationChannel(id, name, NotificationManager.IMPORTANCE_DEFAULT);
+    channel.setDescription(description);
+    notificationManager.createNotificationChannel(channel);
   }
 
   private static GlobalOptions.NotificationKind getNotificationKind(SituationReport sitrep) {
@@ -428,7 +503,7 @@ public class Notifications {
    */
   private static class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper() {
-      super(App.i, "notifications.db", null, 5);
+      super(App.i, "notifications.db", null, 6);
     }
 
     /**
@@ -438,9 +513,16 @@ public class Notifications {
     @Override
     public void onCreate(SQLiteDatabase db) {
       db.execSQL(
-          "CREATE TABLE notifications (" + "  id INTEGER PRIMARY KEY," + "  realm_id INTEGER,"
-              + "  star BLOB," + "  sitrep BLOB," + "  chat_msg BLOB," + "  timestamp INTEGER,"
-              + "  sitrep_key STRING," + "  chat_msg_id INTEGER)");
+          "CREATE TABLE notifications ("
+              + "  id INTEGER PRIMARY KEY,"
+              + "  realm_id INTEGER,"
+              + "  star BLOB,"
+              + "  sitrep BLOB,"
+              + "  chat_msg BLOB,"
+              + "  debug_msg TEXT,"
+              + "  timestamp INTEGER,"
+              + "  sitrep_key TEXT,"
+              + "  chat_msg_id INTEGER)");
       db.execSQL("CREATE INDEX IX_realm_id_timestamp ON notifications (realm_id, timestamp)");
       db.execSQL("CREATE INDEX IX_sitrep_key ON notifications(sitrep_key)");
     }
@@ -448,7 +530,7 @@ public class Notifications {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
       if (oldVersion < 2) {
-        db.execSQL("ALTER TABLE notifications " + "ADD COLUMN realm_id INTEGER DEFAULT "
+        db.execSQL("ALTER TABLE notifications ADD COLUMN realm_id INTEGER DEFAULT "
             + RealmManager.BETA_REALM_ID);
         db.execSQL("CREATE INDEX IX_realm_id_timestamp ON notifications (realm_id, timestamp)");
       }
@@ -461,6 +543,9 @@ public class Notifications {
       }
       if (oldVersion < 5) {
         db.execSQL("ALTER TABLE notifications ADD COLUMN chat_msg_id INTEGER");
+      }
+      if (oldVersion < 6) {
+        db.execSQL("ALTER TABLE notifications ADD COLUMN debug_msg TEXT");
       }
     }
 
@@ -483,6 +568,8 @@ public class Notifications {
           rows = db.delete("notifications",
               "chat_msg_id = '" + details.chatMsg.getId() + "' AND realm_id = " + details.realm
                   .getID(), null);
+        } else if (details.debugMsg != null) {
+          // Note: we never delete a debug message.
         }
 
         ByteArrayOutputStream sitrep = new ByteArrayOutputStream();
@@ -518,6 +605,9 @@ public class Notifications {
           values.put("chat_msg_id", details.chatMsg.getId());
           values.put("timestamp", details.chatMsg.getDatePosted());
         }
+        if (details.debugMsg != null) {
+          values.put("debug_msg", details.debugMsg);
+        }
         values.put("realm_id", details.realm.getID());
         db.insert("notifications", null, values);
 
@@ -533,7 +623,8 @@ public class Notifications {
       Realm realm = RealmContext.i.getCurrentRealm();
       SQLiteDatabase db = getReadableDatabase();
       try {
-        Cursor cursor = db.query("notifications", new String[] {"star", "sitrep", "chat_msg"},
+        Cursor cursor = db.query("notifications",
+            new String[] {"star", "sitrep", "chat_msg", "debug_msg"},
             "realm_id = " + realm.getID(), null, null, null, "timestamp DESC");
         if (!cursor.moveToFirst()) {
           cursor.close();
@@ -554,6 +645,10 @@ public class Notifications {
             blob = cursor.getBlob(2);
             if (blob != null && blob.length > 0) {
               notification.chatMsg = Messages.ChatMessage.parseFrom(blob);
+            }
+            String text = cursor.getString(3);
+            if (text != null && !text.isEmpty()) {
+              notification.debugMsg = text;
             }
             notification.realm = realm;
             notifications.add(notification);
@@ -590,6 +685,7 @@ public class Notifications {
     public Messages.SituationReport sitrep;
     public Messages.Star star;
     public Messages.ChatMessage chatMsg;
+    public String debugMsg;
     public Realm realm;
   }
 
@@ -641,12 +737,7 @@ public class Notifications {
             final String name = pb.getName();
             final String value = pb.getValue();
             log.info("[%s] = %s", name, value);
-            handler.post(new Runnable() {
-              @Override
-              public void run() {
-                Notifications.handleNotification(App.i, name, value);
-              }
-            });
+            handler.post(() -> Notifications.handleNotification(App.i, name, value));
           }
         } catch (Throwable e) {
           if (pollDelayMs == 0) {

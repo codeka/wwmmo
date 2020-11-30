@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.ctrl;
 
 import java.security.SecureRandom;
+import java.sql.SQLException;
 
 import org.joda.time.DateTime;
 
@@ -117,7 +118,7 @@ public class LoginController {
    * Updates the given session, makes sure things like alliance ID are right.
    * @param session
    */
-  public void updateSession(Session session) throws RequestException {
+  public void updateSession(Session session, @Nullable String deviceRegistrationKey) throws RequestException {
     boolean banned = false;
 
     String sql = "SELECT alliance_id, state FROM empires WHERE id = ?";
@@ -137,13 +138,26 @@ public class LoginController {
 
         session.setAllianceID(allianceID);
       }
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new RequestException(e);
     }
 
     if (banned) {
       throw new RequestException(403, Messages.GenericError.ErrorCode.EmpireBanned,
           "You have been banned for misconduct.");
+    }
+
+    if (deviceRegistrationKey != null) {
+      // Update the device so that it has the correct email address (which can change after you
+      // log in from being anonymous).
+      sql = "UPDATE devices SET user_email=? WHERE id=?";
+      try (SqlStmt stmt = DB.prepare(sql)) {
+        stmt.setString(1, session.getEmail());
+        stmt.setInt(2, Integer.parseInt(deviceRegistrationKey));
+        stmt.update();
+      } catch (SQLException e) {
+        throw new RequestException(e);
+      }
     }
   }
 }

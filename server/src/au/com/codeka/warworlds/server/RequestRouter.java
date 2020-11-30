@@ -132,6 +132,7 @@ public class RequestRouter extends InstrumentedHandler {
     sRoutes.add(new Route("admin/empire/logins", AdminEmpireLoginsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/empire/(?<empireid>[0-9]+)/details", AdminEmpireDetailsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/empire/(?<empireid>[0-9]+)/logins", AdminEmpireLoginsHandler.class, "admin/"));
+    sRoutes.add(new Route("admin/empire/(?<empireid>[0-9]+)/notifications", AdminEmpireNotificationsHandler.class, "admin/"));
     sRoutes.add(new Route("admin/(?<path>empire/bonus-cash)", AdminEmpireBonusCashHandler.class, "admin/"));
     sRoutes.add(new Route("admin/(?<path>empire/ban)", AdminEmpireBanHandler.class, "admin/"));
     sRoutes.add(new Route("admin/users", AdminUsersHandler.class, "admin/"));

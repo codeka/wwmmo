@@ -225,6 +225,19 @@ $("body").on("tab:show", "#empire-sitrep-tab", function() {
   });
 });
 
+$("body").on("tab:show", "#empire-notifications-tab", function() {
+  if (currentEmpireID == null) {
+    return;
+  }
+
+  $.ajax({
+       url: "/realms/{{realm}}/admin/empire/" + currentEmpireID + "/notifications",
+       success: function(data) {
+         $("#empire-notifications-tab").html(data);
+       }
+  });
+});
+
 $("body").on("tab:show", "#empire-details-tab", function() {
   if (currentEmpireID == null) {
     return;

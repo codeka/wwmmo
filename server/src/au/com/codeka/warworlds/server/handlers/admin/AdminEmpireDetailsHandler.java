@@ -1,14 +1,11 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
-import com.google.protobuf.util.JsonFormat;
-
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -16,8 +13,6 @@ import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.monitor.RequestStatMonitor;
 
 public class AdminEmpireDetailsHandler extends AdminHandler {
-  private static final Log log = new Log("AdminEmpireDetailsHandler");
-
   @Override
   protected void get() throws RequestException {
     if (!isAdmin()) {

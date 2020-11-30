@@ -21,6 +21,8 @@ import au.com.codeka.warworlds.server.model.ChatConversation;
 import au.com.codeka.warworlds.server.model.ChatConversationParticipant;
 
 import com.google.common.collect.Lists;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
 
 import javax.annotation.Nullable;
 
@@ -104,6 +106,30 @@ public class NotificationController {
     return handlers.isConnected(empireID);
   }
 
+  /**
+   * Gets the FCM token(s) for the given empire. There can be multiple, if they have more than
+   * one registered device.
+   */
+  public ArrayList<String> getFcmTokensForEmpire(int empireID) throws RequestException {
+    ArrayList<String> tokens = new ArrayList<>();
+
+    String sql = "SELECT fcm_token"
+        + " FROM devices"
+        + " INNER JOIN empires ON devices.user_email = empires.user_email"
+        + " WHERE empires.id = " + empireID
+        + " AND fcm_token IS NOT NULL";
+    try (SqlStmt stmt = DB.prepare(sql)) {
+      SqlResult res = stmt.select();
+      while (res.next()) {
+        tokens.add(res.getString(1));
+      }
+    } catch (Exception e) {
+      throw new RequestException(e);
+    }
+
+    return tokens;
+  }
+
   /** Sends the given {@link Notification} to all the given chat conversation participants. */
   private void sendNotification(ChatConversationParticipant[] participants,
       Notification notification) throws RequestException {
@@ -113,7 +139,7 @@ public class NotificationController {
     }
 
     // go through attached handlers and mark any in there as already done.
-    Set<Integer> doneEmpires = new HashSet<Integer>();
+    Set<Integer> doneEmpires = new HashSet<>();
     for (ChatConversationParticipant participant : participants) {
       if (participant.isMuted()) {
         continue;
@@ -128,19 +154,20 @@ public class NotificationController {
       }
     }
 
-    Map<String, String> devices = new TreeMap<String, String>();
-    String sql = "SELECT gcm_registration_id, devices.user_email, empires.id AS empire_id"
+    Map<String, String> devices = new TreeMap<>();
+    String sql = "SELECT fcm_token, devices.user_email, empires.id AS empire_id"
         + " FROM devices" + " INNER JOIN empires ON devices.user_email = empires.user_email"
         + " WHERE empires.id IN " + BaseDataBase.buildInClause(participants)
-        + " AND gcm_registration_id IS NOT NULL";
+        + " AND fcm_token IS NOT NULL";
     try (SqlStmt stmt = DB.prepare(sql)) {
       SqlResult res = stmt.select();
       while (res.next()) {
-        String registrationId = res.getString(1);
+        String fcmToken = res.getString(1);
         String email = res.getString(2);
         int empireID = res.getInt(3);
 
         if (doneEmpires.contains(empireID)) {
+          log.info("done empires, not sending: %d", empireID);
           continue;
         }
 
@@ -152,94 +179,39 @@ public class NotificationController {
           }
         }
 
-        if ((participant == null || !participant.isMuted()) && registrationId != null
-            && email != null) {
-          devices.put(registrationId, email);
+        log.info("participant=%s fcmToken=%s email=%s", participant, fcmToken, email);
+        if ((participant == null || !participant.isMuted()) && fcmToken != null && email != null) {
+          devices.put(fcmToken, email);
         }
       }
     } catch (Exception e) {
       throw new RequestException(e);
     }
 
-    sendNotification(msgData, devices);
-  }
-
-  /** Sends the given {@link Message} to the given list of devices. */
-  private void sendNotification(HashMap<String, String> msg, Map<String, String> devices) throws RequestException {/*
-    Sender sender = new Sender(API_KEY);
-    try {
-      List<String> registrationIds = new ArrayList<String>();
-      for (String registrationId : devices.keySet()) {
-        registrationIds.add(registrationId);
-      }
-      if (registrationIds.size() == 0) {
-        return;
-      }
-
-      List<Result> results = sender.send(msg, registrationIds, 5).getResults();
-      for (int i = 0; i < results.size(); i++) {
-        Result result = results.get(i);
-        String registrationId = registrationIds.get(i);
-
-        boolean success = true;
-        if (result.getMessageId() != null) {
-          String canonicalRegistrationId = result.getCanonicalRegistrationId();
-          if (canonicalRegistrationId != null) {
-            handleCanonicalRegistrationId(registrationId, devices.get(registrationId), result);
-            success = false;
-          }
-        } else {
-          String errorCodeName = result.getErrorCodeName();
-          if (errorCodeName.equals(Constants.ERROR_NOT_REGISTERED)) {
-            handleNotRegisteredError(registrationId, devices.get(registrationId), result);
-          } else {
-            handleOtherError(registrationId, devices.get(registrationId), result);
-          }
-          success = false;
-        }
-        if (success) {
-          log.info(String.format("Notification successfully sent: %s user=%s registration=%s",
-              Configuration.i.getRealmName(), devices.get(registrationId), registrationId));
-        }
-      }
-    } catch (IOException e) {
-      log.error("Error caught sending notification.", e);
-    }*/
-  }
-/*
-  private void handleNotRegisteredError(String registrationId, String userEmail, Result result)
-      throws RequestException {
-    log.warning("Could not send notification: DeviceNotRegistered: user=%s registration=%s",
-        userEmail, registrationId);
-    String sql = "UPDATE devices SET gcm_registration_id = NULL WHERE gcm_registration_id = ?";
-    try (SqlStmt stmt = DB.prepare(sql)) {
-      stmt.setString(1, registrationId);
-      stmt.update();
-    } catch (Exception e) {
-      throw new RequestException(e);
+    if (!devices.isEmpty()) {
+      sendNotification(msgData, devices);
     }
   }
 
-  private void handleOtherError(String registrationId, String userEmail, Result result)
-      throws RequestException {
-    log.warning("Could not send notification: %s: user=%s registration=%s",
-        result.getErrorCodeName(), userEmail, registrationId);
+  /** Sends the given "msg" to the given list of devices. */
+  private void sendNotification(HashMap<String, String> data, Map<String, String> devices) {
+    ArrayList<Message> messages = new ArrayList<>();
+
+    for (Map.Entry<String, String> entry : devices.entrySet()) {
+      String fcmToken = entry.getKey();
+
+      Message msg = Message.builder()
+          .putAllData(data)
+          .setToken(fcmToken)
+          .build();
+      messages.add(msg);
+    }
+
+    // TODO: multicast?
+    FirebaseMessaging.getInstance().sendAllAsync(messages);
+    // TODO: check status?
   }
 
-  private void handleCanonicalRegistrationId(String registrationId, String userEmail, Result result)
-      throws RequestException {
-    log.info("Notification registration changed: user=%s registration=%s", userEmail,
-        result.getCanonicalRegistrationId());
-    String sql = "UPDATE devices SET gcm_registration_id = ? WHERE gcm_registration_id = ?";
-    try (SqlStmt stmt = DB.prepare(sql)) {
-      stmt.setString(1, result.getCanonicalRegistrationId());
-      stmt.setString(2, registrationId);
-      stmt.update();
-    } catch (Exception e) {
-      throw new RequestException(e);
-    }
-  }
-*/
   /**
    * This class keeps an in-memory cache of "recent" notifications we've generated, which is used
    * to re-send notification if the client disconnects briefly.

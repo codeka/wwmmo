@@ -81,6 +81,7 @@ public class HelloHandler extends RequestHandler {
         .setFeatureFlags(FeatureFlags.get());
 
     final String userAgent = getRequest().getHeader("User-Agent");
+    String deviceRegistrationKey = getUrlParameter("deviceid");
 
     GameHistory gameHistory = new GameHistoryController().getCurrent();
     if (gameHistory == null) {
@@ -125,7 +126,7 @@ public class HelloHandler extends RequestHandler {
       }
 
       // Make sure the session is up-to-date with things like the empire's alliance etc.
-      new LoginController().updateSession(getSession());
+      new LoginController().updateSession(getSession(), deviceRegistrationKey);
 
       log.info("Login in %dms %d [%s] [%s] [%s] [%s]\nSafetyNet: %s",
           System.currentTimeMillis() - startTime,

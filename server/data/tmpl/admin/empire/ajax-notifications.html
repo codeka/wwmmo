@@ -1,0 +1,30 @@
+
+<p>Tokens:</p>
+<ul>
+  {% for token in tokens %}
+  <li><div style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ token }}</div></li>
+  {% end %}
+</ul>
+
+<p>Send a manual notification to this empire:</p>
+<div style="margin: 10pt">
+  <input type="text" id="notification-msg">
+  <input type="submit" id="notification-send">
+</div>
+<script>
+  $("#notification-send").on("click", function() {
+    $.ajax({
+      url: "/realms/{{realm}}/admin/empire/{{ empireID }}/notifications",
+      type: "POST",
+      data: {
+        "msg": $("#notification-msg").val()
+      },
+      success: function(data) {
+        // do something?
+      },
+      error: function(xhr, status, err) {
+        alert("An error occurred, check server logs: " + xhr.status);
+      }
+    });
+  });
+</script>
