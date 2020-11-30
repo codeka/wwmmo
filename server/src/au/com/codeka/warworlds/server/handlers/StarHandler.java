@@ -7,6 +7,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
 import au.com.codeka.warworlds.server.ctrl.BuildingController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -32,13 +33,20 @@ public class StarHandler extends RequestHandler {
       throw new RequestException(404);
     }
 
-    int myEmpireID = getSession().getEmpireID();
-    ArrayList<BuildingPosition> buildings = new BuildingController()
-        .getBuildings(myEmpireID, star.getSectorX() - 1, star.getSectorY() - 1,
-            star.getSectorX() + 1, star.getSectorY() + 1);
+    ArrayList<BuildingPosition> buildings = null;
+    // Note: anybody can call this, even if not logged in (for example, the notification handle
+    // might call this from the background when the app isn't running).
+    Session session = getSessionNoError();
+    if (session != null) {
+      int myEmpireID = session.getEmpireID();
+      buildings = new BuildingController()
+          .getBuildings(myEmpireID, star.getSectorX() - 1, star.getSectorY() - 1,
+              star.getSectorX() + 1, star.getSectorY() + 1);
+    }
 
-    if (!isAdmin()) {
-      new StarController().sanitizeStar(star, myEmpireID, buildings, null);
+    if (session == null || !session.isAdmin()) {
+      new StarController().sanitizeStar(
+          star, session == null ? 0 : session.getEmpireID(), buildings, null);
     }
 
     Messages.Star.Builder star_pb = Messages.Star.newBuilder();
