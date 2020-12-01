@@ -3,19 +3,16 @@ package au.com.codeka.warworlds.game.solarsystem;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
@@ -49,7 +46,7 @@ public class EmptyPlanetActivity extends BaseActivity {
 
     ServerGreeter.waitForHello(this, (success, greeting) -> {
       if (!success) {
-        startActivity(new Intent(EmptyPlanetActivity.this, WarWorldsActivity.class));
+        startActivity(new Intent(EmptyPlanetActivity.this, WelcomeFragment.class));
       } else {
         String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
         StarManager.eventBus.register(eventHandler);

@@ -3,15 +3,11 @@ package au.com.codeka.warworlds.game.solarsystem;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -19,24 +15,17 @@ import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
-import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
-import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
-import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.FleetUpgrade;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShieldManager;
@@ -100,7 +89,7 @@ public class EnemyPlanetActivity extends BaseActivity {
 
     ServerGreeter.waitForHello(this, (success, greeting) -> {
       if (!success) {
-        startActivity(new Intent(EnemyPlanetActivity.this, WarWorldsActivity.class));
+        startActivity(new Intent(EnemyPlanetActivity.this, WelcomeFragment.class));
       } else {
         starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
         star = StarManager.i.getStar(Integer.parseInt(starKey));

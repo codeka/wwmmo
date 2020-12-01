@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 
@@ -43,7 +42,7 @@ public class EmpireResetActivity extends BaseActivity {
             public void onClick(View v) {
                 // now we can move to the WarWorlds activity again and get started.
                 finish();
-                startActivity(new Intent(mContext, WarWorldsActivity.class));
+                startActivity(new Intent(mContext, WelcomeFragment.class));
             }
         });
     }

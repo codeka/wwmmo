@@ -1,15 +1,22 @@
 package au.com.codeka.warworlds;
 
-import java.io.File;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Bundle;
+import android.text.Html;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import javax.annotation.Nullable;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -20,22 +27,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import android.app.ActivityManager;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
-import android.text.Html;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
@@ -47,118 +46,114 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
+import au.com.codeka.warworlds.ui.BaseFragment;
+import au.com.codeka.warworlds.ui.FragmentConfig;
 
 /**
- * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
+ * "Welcome" fragment. Displays the message of the day and lets you select "Start Game", "Options",
+ * etc.
  */
-public class WarWorldsActivity extends BaseActivity {
+@FragmentConfig(hideToolbar = true)
+public class WelcomeFragment extends BaseFragment {
   private static final Log log = new Log("WarWorldsActivity");
-  private Context context = this;
   private Button startGameButton;
   private TextView connectionStatus;
   private HelloWatcher helloWatcher;
   private Button realmSelectButton;
 
+  private TextView empireNameView;
+  private ImageView empireIconView;
+  private Button reauthButtonView;
+  private TransparentWebView motdView;
+
   @Nullable
   private Intent startGameIntent;
 
+  @Nullable
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    log.info("WarWorlds activity starting...");
-    super.onCreate(savedInstanceState);
+  public View onCreateView(
+      @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    return inflater.inflate(R.layout.welcome, container, false);
+  }
 
-    setContentView(R.layout.welcome);
-    Util.setup(context);
+  @Override
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
 
-    if (onBlueStacks()) {
-      Toast.makeText(
-          this,
-          "Sorry, this platform is not supported. Please use a supported platform.",
-          Toast.LENGTH_LONG).show();
-      finish();
-    }
+    ActivityBackgroundGenerator.setBackground(view);
 
-    View rootView = findViewById(android.R.id.content);
-    ActivityBackgroundGenerator.setBackground(rootView);
-
-    startGameButton = findViewById(R.id.start_game_btn);
-    connectionStatus = findViewById(R.id.connection_status);
-    realmSelectButton = findViewById(R.id.realm_select_btn);
-    final Button optionsButton = findViewById(R.id.options_btn);
+    startGameButton = view.findViewById(R.id.start_game_btn);
+    connectionStatus = view.findViewById(R.id.connection_status);
+    realmSelectButton = view.findViewById(R.id.realm_select_btn);
+    final Button optionsButton = view.findViewById(R.id.options_btn);
 
     refreshWelcomeMessage();
 
     realmSelectButton.setOnClickListener(
-        v -> startActivity(new Intent(context, RealmSelectActivity.class)));
+        v -> startActivity(new Intent(requireContext(), RealmSelectActivity.class)));
     optionsButton.setOnClickListener(
-        v -> startActivity(new Intent(context, GlobalOptionsActivity.class)));
+        v -> startActivity(new Intent(requireContext(), GlobalOptionsActivity.class)));
 
     startGameButton.setOnClickListener(v -> {
       if (startGameIntent == null) {
-        final Intent intent = new Intent(context, StarfieldActivity.class);
+        final Intent intent = new Intent(requireContext(), StarfieldActivity.class);
         startActivity(intent);
       } else {
         startActivity(startGameIntent);
       }
     });
 
-    findViewById(R.id.help_btn).setOnClickListener(v -> {
+    view.findViewById(R.id.help_btn).setOnClickListener(v -> {
       Intent i = new Intent(Intent.ACTION_VIEW);
       i.setData(Uri.parse("https://war-worlds.wikia.com/wiki/War_Worlds_Wiki"));
       startActivity(i);
     });
 
-    findViewById(R.id.website_btn).setOnClickListener(v -> {
+    view.findViewById(R.id.website_btn).setOnClickListener(v -> {
       Intent i = new Intent(Intent.ACTION_VIEW);
       i.setData(Uri.parse("http://www.war-worlds.com/"));
       startActivity(i);
     });
 
-    findViewById(R.id.rules_btn).setOnClickListener(v -> {
+    view.findViewById(R.id.rules_btn).setOnClickListener(v -> {
       Intent i = new Intent(Intent.ACTION_VIEW);
       i.setData(Uri.parse("http://www.war-worlds.com/rules"));
       startActivity(i);
     });
 
-    findViewById(R.id.reauth_btn).setOnClickListener(v -> onReauthClick());
+    reauthButtonView = view.findViewById(R.id.reauth_btn);
+    reauthButtonView.setOnClickListener(v -> onReauthClick());
+
+    empireNameView = view.findViewById(R.id.empire_name);
+    empireIconView = view.findViewById(R.id.empire_icon);
+
+    motdView = view.findViewById(R.id.motd);
   }
 
   @Override
-  public void onResumeFragments() {
-    super.onResumeFragments();
-    final SharedPreferences prefs = Util.getSharedPreferences();
-    if (!prefs.getBoolean("WarmWelcome", false)) {
-      // if we've never done the warm-welcome, do it now
-      log.info("Starting Warm Welcome");
-      startActivity(new Intent(this, WarmWelcomeActivity.class));
-      return;
-    }
-
-    if (RealmContext.i.getCurrentRealm() == null) {
-      log.info("No realm selected, switching to RealmSelectActivity");
-      startActivity(new Intent(this, RealmSelectActivity.class));
-      return;
-    }
+  public void onResume() {
+    super.onResume();
 
     startGameButton.setEnabled(false);
     realmSelectButton.setText(String
         .format(Locale.ENGLISH, "Realm: %s", RealmContext.i.getCurrentRealm().getDisplayName()));
 
-    final TextView empireName = findViewById(R.id.empire_name);
-    final ImageView empireIcon = findViewById(R.id.empire_icon);
-    empireName.setText("");
-    empireIcon.setImageBitmap(null);
+    empireNameView.setText("");
+    empireIconView.setImageBitmap(null);
 
     helloWatcher = new HelloWatcher();
     ServerGreeter.addHelloWatcher(helloWatcher);
 
     ShieldManager.eventBus.register(eventHandler);
 
-    ServerGreeter.waitForHello(this, (success, greeting) -> {
+    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
       if (success) {
         // we'll display a bit of debugging info along with the 'connected' message
         long maxMemoryBytes = Runtime.getRuntime().maxMemory();
-        int memoryClass = ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getMemoryClass();
+        int memoryClass =
+            ((ActivityManager) requireContext().getSystemService(Context.ACTIVITY_SERVICE))
+                .getMemoryClass();
 
         String serverVersion = "?";
         Messages.HelloResponse helloResponse = ServerGreeter.getHelloResponse();
@@ -180,14 +175,14 @@ public class WarWorldsActivity extends BaseActivity {
 
         MyEmpire empire = EmpireManager.i.getEmpire();
         if (empire != null) {
-          empireName.setText(empire.getDisplayName());
-          empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
+          empireNameView.setText(empire.getDisplayName());
+          empireIconView.setImageBitmap(EmpireShieldManager.i.getShield(requireContext(), empire));
         }
 
+        final SharedPreferences prefs = Util.getSharedPreferences();
         String currAccountName = prefs.getString("AccountName", null);
         if (currAccountName != null && currAccountName.endsWith("@anon.war-worlds.com")) {
-          Button reauthButton = findViewById(R.id.reauth_btn);
-          reauthButton.setText("Sign in");
+          reauthButtonView.setText("Sign in");
         }
         maybeShowSignInPrompt();
       }
@@ -195,7 +190,7 @@ public class WarWorldsActivity extends BaseActivity {
   }
 
   private void onReauthClick() {
-    final Intent intent = new Intent(context, AccountsActivity.class);
+    final Intent intent = new Intent(requireContext(), AccountsActivity.class);
     startActivity(intent);
   }
 
@@ -210,19 +205,14 @@ public class WarWorldsActivity extends BaseActivity {
     // set the count to -95, which means they won't get prompted for another 100 starts... should
     // be plenty to not be annoying, yet still be a useful prompt.
     prefs.edit().putInt("NumStartsSinceSignInPrompt", -95).apply();
-    new StyledDialog.Builder(context)
+    new StyledDialog.Builder(requireContext())
         .setMessage(Html.fromHtml("<p>In order to ensure your empire is safe in the event you lose "
             + "your phone, it's recommended that you sign in. You must also sign in if you want to "
             + "access your empire from multiple devices.</p><p>Click \"Sign in\" below to sign in "
             + "with a Google account.</p>"))
         .setTitle("Sign in")
         .setNegativeButton("No, thanks", null)
-        .setPositiveButton("Sign in", new DialogInterface.OnClickListener() {
-              @Override
-              public void onClick(DialogInterface dialog, int which) {
-                onReauthClick();
-              }
-            })
+        .setPositiveButton("Sign in", (dialog, which) -> onReauthClick())
         .create().show();
   }
 
@@ -292,7 +282,6 @@ public class WarWorldsActivity extends BaseActivity {
           }
         }
 
-        TransparentWebView motdView = findViewById(R.id.motd);
         motdView.loadHtml("html/skeleton.html", motd.toString());
       }
     }.execute();
@@ -311,8 +300,7 @@ public class WarWorldsActivity extends BaseActivity {
       // if it's the same as our empire, we'll need to update the icon we're currently showing.
       MyEmpire empire = EmpireManager.i.getEmpire();
       if (event.id == Integer.parseInt(empire.getKey())) {
-        ImageView empireIcon = findViewById(R.id.empire_icon);
-        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(context, empire));
+        empireIconView.setImageBitmap(EmpireShieldManager.i.getShield(requireContext(), empire));
       }
     }
   };
@@ -374,11 +362,5 @@ public class WarWorldsActivity extends BaseActivity {
           break;
       }
     }
-  }
-
-  private boolean onBlueStacks() {
-    File sharedFolder = new File(
-        Environment.getExternalStorageDirectory(), "/windows/BstSharedFolder");
-    return sharedFolder.exists();
   }
 }

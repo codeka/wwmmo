@@ -27,6 +27,7 @@ import au.com.codeka.warworlds.eventbus.EventBus;
  * again. If there's a saved package name when the activity count hits zero, then we're not going
  * into the background.
  */
+// TODO: Once we're fully migrated to fragment-only navigation, this becomes very simple.
 public class BackgroundDetector {
   public static final BackgroundDetector i = new BackgroundDetector();
   public static final EventBus eventBus = new EventBus();
@@ -84,9 +85,9 @@ public class BackgroundDetector {
    */
   public void resetBackStack() {
     if (currentVisibleActivity != null) {
-      if (!(currentVisibleActivity instanceof WarWorldsActivity)) {
+      if (!(currentVisibleActivity instanceof MainActivity)) {
         currentVisibleActivity.startActivity(
-            new Intent(currentVisibleActivity, WarWorldsActivity.class));
+            new Intent(currentVisibleActivity, MainActivity.class));
         currentVisibleActivity.finish();
       }
       needBackStackReset = false;

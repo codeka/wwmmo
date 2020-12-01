@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.TabFragmentActivity;
-import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -21,7 +21,7 @@ public class AllianceActivity extends TabFragmentActivity {
 
     ServerGreeter.waitForHello(this, (success, greeting) -> {
       if (!success) {
-        startActivity(new Intent(this, WarWorldsActivity.class));
+        startActivity(new Intent(this, WelcomeFragment.class));
       } else {
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire.getAlliance() != null) {

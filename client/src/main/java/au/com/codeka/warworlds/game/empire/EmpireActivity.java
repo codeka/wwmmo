@@ -10,7 +10,7 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.TabManager;
-import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 /**
@@ -95,7 +95,7 @@ public class EmpireActivity extends TabFragmentActivity {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
                 if (!success) {
-                    startActivity(new Intent(mContext, WarWorldsActivity.class));
+                    startActivity(new Intent(mContext, WelcomeFragment.class));
                     return;
                 }
 

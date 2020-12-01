@@ -32,7 +32,6 @@ import javax.annotation.Nonnull;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpire;
-import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
@@ -40,13 +39,12 @@ import au.com.codeka.warworlds.RunnableArg;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.TabManager;
-import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.PurchaseManager;
-import au.com.codeka.warworlds.model.RealmManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.billing.IabException;
@@ -444,7 +442,7 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
         ServerGreeter.clearHello();
 
         // redirect you to the main page.
-        startActivity(new Intent(getActivity(), WarWorldsActivity.class));
+        startActivity(new Intent(getActivity(), WelcomeFragment.class));
       }
 
       @Override

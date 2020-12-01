@@ -13,7 +13,7 @@ import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
-import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
@@ -92,7 +92,7 @@ public class FleetActivity extends BaseActivity {
       @Override
       public void onHelloComplete(boolean success, ServerGreeting greeting) {
         if (!success) {
-          startActivity(new Intent(FleetActivity.this, WarWorldsActivity.class));
+          startActivity(new Intent(FleetActivity.this, WelcomeFragment.class));
         } else {
           StarManager.eventBus.register(eventHandler);
           String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");

@@ -19,9 +19,7 @@ import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.WarWorldsActivity;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
@@ -83,7 +81,7 @@ public class OwnedPlanetActivity extends BaseActivity {
 
     ServerGreeter.waitForHello(this, (success, greeting) -> {
       if (!success) {
-        startActivity(new Intent(this, WarWorldsActivity.class));
+        startActivity(new Intent(this, WelcomeFragment.class));
       } else {
         String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
         StarManager.eventBus.register(eventHandler);

@@ -18,7 +18,7 @@ import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
@@ -59,7 +59,7 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
 
     ServerGreeter.waitForHello(this, (success, greeting) -> {
       if (!success) {
-        startActivity(new Intent(AllianceChangeDetailsActivity.this, WarWorldsActivity.class));
+        startActivity(new Intent(AllianceChangeDetailsActivity.this, WelcomeFragment.class));
       } else {
         fullRefresh();
       }

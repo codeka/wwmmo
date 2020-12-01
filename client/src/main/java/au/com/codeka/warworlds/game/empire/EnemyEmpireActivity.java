@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,7 +19,7 @@ import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
-import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.alliance.KickRequestDialog;
 import au.com.codeka.warworlds.game.chat.ChatActivity;
@@ -76,7 +75,7 @@ public class EnemyEmpireActivity extends BaseActivity {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
                 if (!success) {
-                    startActivity(new Intent(EnemyEmpireActivity.this, WarWorldsActivity.class));
+                    startActivity(new Intent(EnemyEmpireActivity.this, WelcomeFragment.class));
                 } else {
                     mEmpireID = Integer.parseInt(
                             getIntent().getExtras().getString("au.com.codeka.warworlds.EmpireKey"));

@@ -35,7 +35,7 @@ import au.com.codeka.warworlds.notifications.Notifications;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
-import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -177,7 +177,7 @@ public class SitrepActivity extends BaseActivity {
       @Override
       public void onHelloComplete(boolean success, ServerGreeting greeting) {
         if (!success) {
-          startActivity(new Intent(SitrepActivity.this, WarWorldsActivity.class));
+          startActivity(new Intent(SitrepActivity.this, WelcomeFragment.class));
         }
         refresh();
       }
@@ -378,7 +378,7 @@ public class SitrepActivity extends BaseActivity {
       @Override
       public void onHelloComplete(boolean success, ServerGreeting greeting) {
         if (!success) {
-          startActivity(new Intent(SitrepActivity.this, WarWorldsActivity.class));
+          startActivity(new Intent(SitrepActivity.this, WelcomeFragment.class));
         } else {
           refreshReportItems();
           refreshTitle();

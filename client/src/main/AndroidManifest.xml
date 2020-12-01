@@ -52,7 +52,7 @@
 
     <!-- Main activity -->
     <activity
-      android:name="au.com.codeka.warworlds.WarWorldsActivity"
+      android:name="au.com.codeka.warworlds.MainActivity"
       android:launchMode="singleTop">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />

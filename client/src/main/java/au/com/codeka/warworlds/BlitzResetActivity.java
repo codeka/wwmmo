@@ -40,7 +40,7 @@ public class BlitzResetActivity extends BaseActivity {
       public void onClick(View v) {
         // now we can move to the WarWorlds activity again and get started.
         finish();
-        startActivity(new Intent(context, WarWorldsActivity.class));
+        startActivity(new Intent(context, WelcomeFragment.class));
       }
     });
 

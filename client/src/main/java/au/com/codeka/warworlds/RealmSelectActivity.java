@@ -29,7 +29,7 @@ public class RealmSelectActivity extends BaseActivity {
       // if there's only one realm, select it and move on.
       RealmManager.i.selectRealm(RealmManager.i.getRealms().get(0).getDisplayName());
       finish();
-      startActivity(new Intent(context, WarWorldsActivity.class));
+      startActivity(new Intent(context, WelcomeFragment.class));
       return;
     }
 
@@ -66,7 +66,7 @@ public class RealmSelectActivity extends BaseActivity {
 
         // this activity is finished, move to the main WarWorldsActivity
         finish();
-        startActivity(new Intent(context, WarWorldsActivity.class));
+        startActivity(new Intent(context, WelcomeFragment.class));
       }
     });
 
