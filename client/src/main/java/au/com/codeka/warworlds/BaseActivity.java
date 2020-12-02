@@ -43,11 +43,6 @@ public class BaseActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    if (!wantsActionBar()) {
-      // If we don't want the action bar, then hide it.
-      getSupportActionBar().hide();
-    }
-
     // register our bug report shake listener with the accelerometer
     sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -63,13 +58,6 @@ public class BaseActivity extends AppCompatActivity {
           PixelFormat.TRANSLUCENT);
       debugViewLayout.gravity = Gravity.TOP;
     }
-  }
-
-  /**
-   * If you want the action bar in your activity, override this and return true.
-   */
-  protected boolean wantsActionBar() {
-    return false;
   }
 
   @Override

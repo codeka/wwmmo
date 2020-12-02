@@ -40,12 +40,6 @@ public class GlobalOptionsActivity extends BaseActivity {
     getSupportActionBar().setTitle("Options");
   }
 
-  /** We want an action bar, so we override this to return true. */
-  @Override
-  protected boolean wantsActionBar() {
-    return true;
-  }
-
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     if (item.getItemId() == android.R.id.home) {

@@ -77,15 +77,9 @@ public class SolarSystemActivity extends BaseActivity {
     }
 
     setContentView(R.layout.solarsystem_activity);
+    setSupportActionBar(findViewById(R.id.toolbar));
     drawerLayout = findViewById(R.id.drawer_layout);
     drawer = findViewById(R.id.drawer);
-
-    // We have to offset the drawerLayout a bit because the action bar will be covering it.
-    final TypedArray styledAttributes =
-        getTheme().obtainStyledAttributes(new int[] {android.R.attr.actionBarSize});
-    int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
-    styledAttributes.recycle();
-    ((FrameLayout.LayoutParams) drawerLayout.getLayoutParams()).topMargin = actionBarHeight;
 
     ListView searchList = findViewById(R.id.search_result);
     searchListAdapter = new SearchListAdapter(getLayoutInflater());
@@ -131,14 +125,6 @@ public class SolarSystemActivity extends BaseActivity {
 
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setHomeButtonEnabled(true);
-  }
-
-  /**
-   * We want an action bar, so we override this to return true.
-   */
-  @Override
-  protected boolean wantsActionBar() {
-    return true;
   }
 
   @Override

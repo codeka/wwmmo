@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="WarWorlds" parent="@style/Theme.AppCompat">
+    <style name="WarWorlds" parent="@style/Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@color/default_background</item>
 
         <item name="android:buttonStyle">@style/Button</item>
