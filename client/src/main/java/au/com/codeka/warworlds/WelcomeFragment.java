@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.navigation.fragment.NavHostFragment;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -47,13 +48,11 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.ui.BaseFragment;
-import au.com.codeka.warworlds.ui.FragmentConfig;
 
 /**
  * "Welcome" fragment. Displays the message of the day and lets you select "Start Game", "Options",
  * etc.
  */
-@FragmentConfig(hideToolbar = true)
 public class WelcomeFragment extends BaseFragment {
   private static final Log log = new Log("WarWorldsActivity");
   private Button startGameButton;
@@ -93,7 +92,9 @@ public class WelcomeFragment extends BaseFragment {
     realmSelectButton.setOnClickListener(
         v -> startActivity(new Intent(requireContext(), RealmSelectActivity.class)));
     optionsButton.setOnClickListener(
-        v -> startActivity(new Intent(requireContext(), GlobalOptionsActivity.class)));
+        v -> {
+          NavHostFragment.findNavController(this).navigate(R.id.globalOptionsFragment);
+        });
 
     startGameButton.setOnClickListener(v -> {
       if (startGameIntent == null) {

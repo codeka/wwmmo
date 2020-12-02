@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/main_nav"
+        app:startDestination="@id/welcomeFragment">
+
+    <fragment
+            android:id="@+id/welcomeFragment"
+            android:name="au.com.codeka.warworlds.WelcomeFragment"
+            android:label="WelcomeFragment">
+        <argument android:name="hideToolbar" app:argType="boolean" android:defaultValue="true" />
+
+        <action
+                android:id="@+id/action_welcomeFragment_to_globalOptionsFragment"
+                app:destination="@id/globalOptionsFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/globalOptionsFragment"
+            android:name="au.com.codeka.warworlds.GlobalOptionsFragment"
+            android:label="Options" />
+</navigation>

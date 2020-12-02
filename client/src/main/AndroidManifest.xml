@@ -64,7 +64,6 @@
 
     <activity android:name="au.com.codeka.warworlds.AccountsActivity" />
     <activity android:name="au.com.codeka.warworlds.WarmWelcomeActivity" />
-    <activity android:name="au.com.codeka.warworlds.GlobalOptionsActivity" />
     <activity android:name="au.com.codeka.warworlds.EmpireSetupActivity" />
     <activity android:name="au.com.codeka.warworlds.RealmSelectActivity" />
     <activity android:name="au.com.codeka.warworlds.EmpireResetActivity" />

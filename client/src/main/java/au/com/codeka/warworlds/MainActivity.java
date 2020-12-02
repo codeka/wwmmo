@@ -6,13 +6,17 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.widget.Toolbar;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 
 import java.io.File;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.warworlds.ui.FragmentConfig;
 
 /**
  * The main activity of the whole app. All our fragments are children of this.
@@ -37,9 +41,7 @@ public class MainActivity extends BaseActivity {
     }
 
     setContentView(R.layout.main_activity);
-
-    // TODO: support this
-    //setSupportActionBar(findViewById(R.id.toolbar));
+    setSupportActionBar(findViewById(R.id.toolbar));
 
     final SharedPreferences prefs = Util.getSharedPreferences();
     if (!prefs.getBoolean("WarmWelcome", false)) {
@@ -54,42 +56,29 @@ public class MainActivity extends BaseActivity {
       startActivity(new Intent(this, RealmSelectActivity.class));
       return;
     }
-
-    setContentFragment(new WelcomeFragment());
   }
 
-  private void setContentFragment(Fragment fragment) {
-    getSupportFragmentManager().beginTransaction()
-        .add(R.id.main_content, fragment)
-        .runOnCommit(() -> {
-          updateForFragment(fragment);
-        })
-        .commit();
-  }
+  @Override
+  protected void onStart() {
+    super.onStart();
 
-  private void updateForFragment(Fragment fragment) {
-    FragmentConfig config = fragment.getClass().getAnnotation(FragmentConfig.class);
-    if (config == null) {
-      // create a default config
-      config = DefaultFragmentConfig.class.getAnnotation(FragmentConfig.class);
-    }
+    NavController navController = Navigation.findNavController(this, R.id.main_content);
 
-    // TODO: support this
-    /*
-    if (config.hideToolbar()) {
-      getSupportActionBar().hide();
-    } else {
-      getSupportActionBar().show();
-    }
-    */
-  }
+    NavigationUI.setupWithNavController((Toolbar) findViewById(R.id.toolbar), navController);
 
-  /**
-   * This is a dummy class solely for the purpose of retaining a default instance of the fragment
-   * config.
-   */
-  @FragmentConfig
-  private static class DefaultFragmentConfig {
+    navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+      // TODO: handle default argument values better.
+      if (arguments == null) {
+        getSupportActionBar().show();
+      } else {
+        Boolean hideToolbar = arguments.getBoolean("hideToolbar");
+        if (hideToolbar != null && hideToolbar) {
+          getSupportActionBar().hide();
+        } else {
+          getSupportActionBar().show();
+        }
+      }
+    });
   }
 
   private boolean onBlueStacks() {
