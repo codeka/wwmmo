@@ -90,11 +90,9 @@ public class WelcomeFragment extends BaseFragment {
     refreshWelcomeMessage();
 
     realmSelectButton.setOnClickListener(
-        v -> startActivity(new Intent(requireContext(), RealmSelectActivity.class)));
+        v -> NavHostFragment.findNavController(this).navigate(R.id.realmSelectFragment));
     optionsButton.setOnClickListener(
-        v -> {
-          NavHostFragment.findNavController(this).navigate(R.id.globalOptionsFragment);
-        });
+        v -> NavHostFragment.findNavController(this).navigate(R.id.globalOptionsFragment));
 
     startGameButton.setOnClickListener(v -> {
       if (startGameIntent == null) {

@@ -6,11 +6,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
@@ -42,20 +41,6 @@ public class MainActivity extends BaseActivity {
 
     setContentView(R.layout.main_activity);
     setSupportActionBar(findViewById(R.id.toolbar));
-
-    final SharedPreferences prefs = Util.getSharedPreferences();
-    if (!prefs.getBoolean("WarmWelcome", false)) {
-      // if we've never done the warm-welcome, do it now
-      log.info("Starting Warm Welcome");
-      startActivity(new Intent(this, WarmWelcomeActivity.class));
-      return;
-    }
-
-    if (RealmContext.i.getCurrentRealm() == null) {
-      log.info("No realm selected, switching to RealmSelectActivity");
-      startActivity(new Intent(this, RealmSelectActivity.class));
-      return;
-    }
   }
 
   @Override
@@ -64,19 +49,29 @@ public class MainActivity extends BaseActivity {
 
     NavController navController = Navigation.findNavController(this, R.id.main_content);
 
+
+    final SharedPreferences prefs = Util.getSharedPreferences();
+    if (!prefs.getBoolean("WarmWelcome", false)) {
+      // if we've never done the warm-welcome, do it now
+      log.info("Starting Warm Welcome");
+      navController.navigate(R.id.warmWelcomeFragment);
+    } else if (RealmContext.i.getCurrentRealm() == null) {
+      log.info("No realm selected, switching to RealmSelectActivity");
+      navController.navigate(R.id.realmSelectFragment);
+    }
+
     NavigationUI.setupWithNavController((Toolbar) findViewById(R.id.toolbar), navController);
 
     navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-      // TODO: handle default argument values better.
-      if (arguments == null) {
-        getSupportActionBar().show();
+      ActionBar actionBar = getSupportActionBar();
+      if (actionBar == null) {
+        return;
+      }
+
+      if (arguments != null && arguments.getBoolean("hideToolbar")) {
+        actionBar.hide();
       } else {
-        Boolean hideToolbar = arguments.getBoolean("hideToolbar");
-        if (hideToolbar != null && hideToolbar) {
-          getSupportActionBar().hide();
-        } else {
-          getSupportActionBar().show();
-        }
+        actionBar.show();
       }
     });
   }

@@ -12,9 +12,33 @@
         <action
                 android:id="@+id/action_welcomeFragment_to_globalOptionsFragment"
                 app:destination="@id/globalOptionsFragment" />
+        <action
+                android:id="@+id/action_welcomeFragment_to_realmSelectFragment"
+                app:destination="@id/realmSelectFragment" />
     </fragment>
     <fragment
             android:id="@+id/globalOptionsFragment"
             android:name="au.com.codeka.warworlds.GlobalOptionsFragment"
             android:label="Options" />
+    <fragment
+            android:id="@+id/realmSelectFragment"
+            android:name="au.com.codeka.warworlds.RealmSelectFragment"
+            android:label="RealmSelectFragment" >
+        <argument android:name="hideToolbar" app:argType="boolean" android:defaultValue="true" />
+        <action
+                android:id="@+id/action_realmSelectFragment_to_welcomeFragment"
+                app:destination="@id/welcomeFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/warmWelcomeFragment"
+            android:name="au.com.codeka.warworlds.WarmWelcomeFragment"
+            android:label="WarmWelcomeFragment" >
+        <argument android:name="hideToolbar" app:argType="boolean" android:defaultValue="true" />
+        <action
+                android:id="@+id/action_warmWelcomeFragment_to_welcomeFragment"
+                app:destination="@id/welcomeFragment" />
+        <action
+                android:id="@+id/action_warmWelcomeFragment_to_realmSelectFragment"
+                app:destination="@id/realmSelectFragment" />
+    </fragment>
 </navigation>
