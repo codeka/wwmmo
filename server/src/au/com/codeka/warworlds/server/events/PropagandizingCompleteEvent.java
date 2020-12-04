@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server.events;
 
 import org.joda.time.DateTime;
 
+import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Locale;
 
 import au.com.codeka.common.Log;
@@ -38,8 +40,10 @@ public class PropagandizingCompleteEvent extends Event {
 
   @Override
   public void process() {
+    HashSet<Integer> invalidFleets = new HashSet<>();
     String sql = "SELECT id, star_id, target_star_id FROM fleets WHERE eta < ? AND state = "
         + BaseFleet.State.PROPAGANDIZING.getValue();
+    log.debug("SQL: %s", sql);
     try (SqlStmt stmt = DB.prepare(sql)) {
       // Anything in the next 10 seconds is a candidate.
       stmt.setDateTime(1, DateTime.now().plusSeconds(10));
@@ -48,12 +52,17 @@ public class PropagandizingCompleteEvent extends Event {
         int fleetID = res.getInt(1);
         int starID = res.getInt(2);
         int colonyID = res.getInt(3);
+        log.debug("Processing fleet %d", fleetID);
 
         RequestContext.i.setContext("event: PropagandizingCompleteEvent fleet.id=" + fleetID);
 
         Star star = new StarController().getStar(starID);
         try {
-          processFleet(fleetID, star, colonyID);
+          if (!processFleet(fleetID, star, colonyID)) {
+            // If it failed to process, we'll want to reset the fleet to IDLE state so that we
+            // don't keep trying to process it over and over.
+            invalidFleets.add(fleetID);
+          }
         } catch (Exception e) {
           log.error("Error processing fleet-move event!", e);
         }
@@ -61,9 +70,19 @@ public class PropagandizingCompleteEvent extends Event {
     } catch (Exception e) {
       log.error("Error processing fleet-move event!", e);
     }
+
+    for (Integer fleetID : invalidFleets) {
+      sql = "UPDATE fleets SET state = " + BaseFleet.State.IDLE.getValue() + ", eta = NULL WHERE id = ?";
+      try (SqlStmt stmt = DB.prepare(sql)) {
+        stmt.setInt(1, fleetID);
+        stmt.update();
+      } catch (SQLException e) {
+        log.error("Error resetting invalid fleet.", e);
+      }
+    }
   }
 
-  public static void processFleet(
+  public static boolean processFleet(
       int fleetID, Star star, int colonyID) throws RequestException {
     Simulation sim = new Simulation();
     sim.simulate(star);
@@ -78,16 +97,18 @@ public class PropagandizingCompleteEvent extends Event {
     }
     if (fleet == null) {
       // It's already been destroyed or something like that... nothing to do.
-      return;
+      log.debug("fleet is null");
+      return false;
     }
 
     // Now, make sure we have the right colony.
     Colony colony = star.getColony(colonyID);
-    if (colony == null || colony.getEmpireID() == null ||
-        colony.getEmpireID().equals(fleet.getEmpireID())) {
+    if (colony == null || (
+        colony.getEmpireID() != null && colony.getEmpireID().equals(fleet.getEmpireID()))) {
       // The colony doesn't exist any more, it's our or it's gone native...
       // TODO: what if some other player has taken it before us?
-      return;
+      log.debug("Colony doesn't seem to exist?");
+      return false;
     }
 
     // Remove the fleet.
@@ -108,5 +129,7 @@ public class PropagandizingCompleteEvent extends Event {
     new ColonyController().transferColonyOwnership(star, colony, empireID);
 
     new StarController().update(star);
+
+    return true;
   }
 }

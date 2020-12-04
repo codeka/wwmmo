@@ -73,7 +73,7 @@ public class EventProcessor {
 
         DateTime next = event.getNextEventTime();
         if (next != null) {
-          log.debug(String.format("Event %s says next event is at %s", eventClass.getName(), next));
+          log.debug("Event %s says next event is at %s", eventClass.getSimpleName(), next);
         }
         if (next != null && next.isBefore(DateTime.now())) {
           events.add(event);
@@ -95,11 +95,10 @@ public class EventProcessor {
       }
 
       // make sure we don't try to sleep for a negative amount of time...
-      if (nextEventDateTime.isBefore(DateTime.now())) {
-        nextEventDateTime = DateTime.now();
-      } else {
+      if (!nextEventDateTime.isBefore(DateTime.now())) {
         try {
           int seconds = Seconds.secondsBetween(DateTime.now(), nextEventDateTime).getSeconds();
+          log.debug("Sleeping for %d seconds", seconds);
           Thread.sleep(seconds * 1000);
         } catch (InterruptedException e) {
           // if we get interrupted it's because somebody pinged us and we need to
