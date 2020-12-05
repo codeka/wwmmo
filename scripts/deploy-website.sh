@@ -7,7 +7,7 @@ SCRIPTPATH=`dirname $SCRIPT`
 ROOTPATH=`dirname $SCRIPTPATH`
 INSTALLPATH=$ROOTPATH/website
 
-# update the RESOURCE_VERSION in the file handlers/__init__.py so that
+# update the RESOURCE_VERSION in the file handlers/common.py so that
 # all our resource references go to a different file. This is our cache-busting
 # mechanism.
 pushd $INSTALLPATH > /dev/null
