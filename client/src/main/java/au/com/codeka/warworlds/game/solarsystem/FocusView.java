@@ -107,7 +107,8 @@ public class FocusView extends FrameLayout {
 
         // if we're the locked one, unlock
         if (lockedIndexes.contains(index)) {
-          lockedIndexes.remove(index);
+          // Be sure to call the overload that takes a value, not an index.
+          lockedIndexes.remove((Object) index);
           thisLockButton.setImageResource(R.drawable.lock_opened);
           seekBars.get(index).setEnabled(true);
         } else {
