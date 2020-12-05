@@ -28,7 +28,6 @@ import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.FleetUpgrade;
 import au.com.codeka.warworlds.server.model.Star;
-import sun.nio.cs.ext.MacTurkish;
 
 public class ColonyController {
   private final Log log = new Log("ColonyController");

@@ -1,141 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/congeniality_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="horz_sep_1,population_congeniality_icon,population_congeniality,population_congeniality_value,farming_congeniality,farming_congeniality_icon,farming_congeniality_value,mining_congeniality,mining_congeniality_icon,mining_congeniality_value" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/colony_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="horz_sep_2,population_count" />
+
+    <au.com.codeka.warworlds.ctrl.StarStorageView
+        android:id="@+id/star_storage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <ImageView
         android:id="@+id/planet_icon"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_margin="10dp" />
 
-    <RelativeLayout android:id="@+id/congeniality_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_toRightOf="@+id/planet_icon"
-                    android:visibility="gone">
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/horz_sep_1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/star_storage"
+        app:layout_constraintStart_toEndOf="@id/planet_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="10dp"
+        android:text="Congeniality" />
 
-        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-            android:id="@+id/horz_sep_1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:text="Congeniality" />
+    <ImageView
+        android:id="@+id/population_congeniality_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintTop_toBottomOf="@id/horz_sep_1"
+        app:layout_constraintStart_toEndOf="@id/planet_icon"
+        android:src="@drawable/population_white" />
 
-        <ImageView
-            android:id="@+id/population_congeniality_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignLeft="@+id/horz_sep_1"
-            android:layout_below="@+id/horz_sep_1"
-            android:src="@drawable/population_white" />
+    <TextView
+        android:id="@+id/population_congeniality_value"
+        android:layout_width="45dp"
+        android:layout_height="20dp"
+        app:layout_constraintTop_toTopOf="@id/population_congeniality_icon"
+        app:layout_constraintEnd_toEndOf="@id/horz_sep_1"
+        android:text="1024" />
 
-        <TextView
-            android:id="@+id/population_congeniality_value"
-            android:layout_width="45dp"
-            android:layout_height="20dp"
-            android:layout_alignTop="@id/population_congeniality_icon"
-            android:layout_alignParentRight="true"
-            android:text="1024" />
+    <ProgressBar
+        android:id="@+id/population_congeniality"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        app:layout_constraintTop_toTopOf="@id/population_congeniality_icon"
+        app:layout_constraintEnd_toStartOf="@id/population_congeniality_value"
+        app:layout_constraintStart_toEndOf="@id/population_congeniality_icon"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
-        <ProgressBar
-            android:id="@+id/population_congeniality"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_alignTop="@id/population_congeniality_icon"
-            android:layout_toRightOf="@+id/population_congeniality_icon"
-            android:layout_toLeftOf="@id/population_congeniality_value" />
+    <ImageView
+        android:id="@+id/farming_congeniality_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintTop_toBottomOf="@id/population_congeniality_icon"
+        app:layout_constraintStart_toEndOf="@id/planet_icon"
+        android:src="@drawable/farming_white" />
 
-        <ImageView
-            android:id="@+id/farming_congeniality_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignLeft="@+id/horz_sep_1"
-            android:layout_below="@+id/population_congeniality_icon"
-            android:src="@drawable/farming_white" />
+    <TextView
+        android:id="@+id/farming_congeniality_value"
+        android:layout_width="45dp"
+        android:layout_height="20dp"
+        app:layout_constraintTop_toTopOf="@id/farming_congeniality_icon"
+        app:layout_constraintEnd_toEndOf="@id/horz_sep_1"
+        android:text="1024" />
 
-        <TextView
-            android:id="@+id/farming_congeniality_value"
-            android:layout_width="45dp"
-            android:layout_height="20dp"
-            android:layout_alignTop="@id/farming_congeniality_icon"
-            android:layout_alignParentRight="true"
-            android:text="1024" />
+    <ProgressBar
+        android:id="@+id/farming_congeniality"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        app:layout_constraintTop_toTopOf="@id/farming_congeniality_icon"
+        app:layout_constraintEnd_toStartOf="@id/farming_congeniality_value"
+        app:layout_constraintStart_toEndOf="@id/farming_congeniality_icon"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
-        <ProgressBar
-            android:id="@+id/farming_congeniality"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_alignTop="@id/farming_congeniality_icon"
-            android:layout_toRightOf="@+id/farming_congeniality_icon"
-            android:layout_toLeftOf="@id/farming_congeniality_value" />
+    <ImageView
+        android:id="@+id/mining_congeniality_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintTop_toBottomOf="@id/farming_congeniality_icon"
+        app:layout_constraintStart_toEndOf="@id/planet_icon"
+        android:src="@drawable/mining_white" />
 
-        <ImageView
-            android:id="@+id/mining_congeniality_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignLeft="@+id/horz_sep_1"
-            android:layout_below="@+id/farming_congeniality_icon"
-            android:src="@drawable/mining_white" />
+    <TextView
+        android:id="@+id/mining_congeniality_value"
+        android:layout_width="45dp"
+        android:layout_height="20dp"
+        app:layout_constraintTop_toTopOf="@id/mining_congeniality_icon"
+        app:layout_constraintEnd_toEndOf="@id/horz_sep_1"
+        android:text="1024" />
 
-        <TextView
-            android:id="@+id/mining_congeniality_value"
-            android:layout_width="45dp"
-            android:layout_height="20dp"
-            android:layout_alignTop="@id/mining_congeniality_icon"
-            android:layout_alignParentRight="true"
-            android:text="1024" />
+    <ProgressBar
+        android:id="@+id/mining_congeniality"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        app:layout_constraintTop_toTopOf="@id/mining_congeniality_icon"
+        app:layout_constraintEnd_toStartOf="@id/mining_congeniality_value"
+        app:layout_constraintStart_toEndOf="@id/mining_congeniality_icon"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
-        <ProgressBar
-            android:id="@+id/mining_congeniality"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_alignTop="@id/mining_congeniality_icon"
-            android:layout_toRightOf="@+id/mining_congeniality_icon"
-            android:layout_toLeftOf="@id/mining_congeniality_value" />
-    </RelativeLayout>
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/horz_sep_2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/mining_congeniality_icon"
+        app:layout_constraintStart_toEndOf="@id/planet_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="Colony" />
 
-    <RelativeLayout android:id="@+id/colony_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_toRightOf="@+id/planet_icon"
-                    android:layout_below="@id/congeniality_container"
-                    android:visibility="gone">
+    <TextView
+        android:id="@+id/population_count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/horz_sep_2"
+        app:layout_constraintStart_toStartOf="@id/horz_sep_2"
+        app:layout_constraintEnd_toEndOf="@id/horz_sep_2"
+        android:layout_marginStart="8dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Population: 123" />
 
-        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-            android:id="@+id/horz_sep_2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:text="Colony" />
-
-        <TextView
-            android:id="@+id/population_count"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/horz_sep_2"
-            android:layout_marginLeft="6dp"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Population: 123" />
-
-        <au.com.codeka.warworlds.ctrl.ColonyFocusView
-                android:id="@+id/colony_focus_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/population_count" />
-    </RelativeLayout>
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

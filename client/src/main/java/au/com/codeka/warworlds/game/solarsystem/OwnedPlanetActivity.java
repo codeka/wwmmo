@@ -152,7 +152,7 @@ public class OwnedPlanetActivity extends BaseActivity {
       }
     }
 
-    planetDetails.setup(star, planet, null);
+    planetDetails.setup(star, planet, colony);
     focusView.setColony(star, colony);
 
     int totalBuildRequests = 0;
