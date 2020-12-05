@@ -293,67 +293,10 @@
             android:textSize="10sp" />
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/stored_goods"
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:background="#000"
-        android:gravity="center|right"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <TextView
-        android:id="@+id/delta_goods"
-        android:layout_width="wrap_content"
-        android:layout_height="12dp"
-        android:layout_alignRight="@+id/stored_goods"
-        android:layout_below="@+id/stored_goods"
-        android:background="#000"
-        android:gravity="center|right"
-        android:textColor="#f00"
-        android:textSize="10sp" />
-
-    <ImageView
-        android:id="@+id/stored_goods_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:background="#000"
-        android:layout_toLeftOf="@+id/stored_goods"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/farming_white" />
-
-    <TextView
-        android:id="@+id/stored_minerals"
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_toLeftOf="@+id/stored_goods_icon"
-        android:layout_alignParentTop="true"
-        android:background="#000"
-        android:gravity="center|right"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <TextView
-        android:id="@+id/delta_minerals"
-        android:layout_width="wrap_content"
-        android:layout_height="12dp"
-        android:layout_alignRight="@+id/stored_minerals"
-        android:layout_below="@+id/stored_minerals"
-        android:background="#000"
-        android:gravity="center|right"
-        android:textColor="#0f0"
-        android:textSize="10sp" />
-
-    <ImageView
-        android:id="@+id/stored_minerals_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_toLeftOf="@+id/stored_minerals"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/mining_white" />
-
+    <au.com.codeka.warworlds.ctrl.StarStorageView
+            android:id="@+id/star_storage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true" />
 </RelativeLayout>

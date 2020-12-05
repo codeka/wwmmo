@@ -27,6 +27,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.ctrl.SelectionView;
+import au.com.codeka.warworlds.ctrl.StarStorageView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
@@ -49,6 +50,7 @@ import au.com.codeka.warworlds.model.StarSimulationQueue;
 public class SolarSystemFragment extends Fragment {
   private static final Log log = new Log("SolarSystemFragment");
   private SolarSystemSurfaceView solarSystemSurfaceView;
+  private StarStorageView starStorageView;
   private ProgressBar progressBar;
   private Star star;
   private Planet planet;
@@ -60,6 +62,9 @@ public class SolarSystemFragment extends Fragment {
   // needs to be Object so we can do a version check before instantiating the class
   Object solarSystemSurfaceViewOnLayoutChangedListener;
 
+  public SolarSystemFragment() {
+  }
+
   public Star getStar() {
     return star;
   }
@@ -70,6 +75,7 @@ public class SolarSystemFragment extends Fragment {
 
     solarSystemSurfaceView = view.findViewById(R.id.solarsystem_view);
     progressBar = view.findViewById(R.id.progress_bar);
+    starStorageView = view.findViewById(R.id.star_storage);
     final Button viewButton = view.findViewById(R.id.solarsystem_colony_view);
     final Button sitrepButton = view.findViewById(R.id.sitrep_btn);
     final Button planetViewButton = view.findViewById(R.id.enemy_empire_view);
@@ -245,59 +251,9 @@ public class SolarSystemFragment extends Fragment {
   }
 
   private void refresh() {
-    TextView storedGoodsTextView = view.findViewById(R.id.stored_goods);
-    TextView deltaGoodsTextView = view.findViewById(R.id.delta_goods);
-    View storedGoodsIcon = view.findViewById(R.id.stored_goods_icon);
-    TextView storedMineralsTextView = view.findViewById(R.id.stored_minerals);
-    TextView deltaMineralsTextView = view.findViewById(R.id.delta_minerals);
-    View storedMineralsIcon = view.findViewById(R.id.stored_minerals_icon);
+    starStorageView.refresh(star);
     FleetListSimple fleetList = view.findViewById(R.id.fleet_list);
-
     fleetList.setStar(star);
-
-    BaseEmpirePresence ep = star.getEmpire(EmpireManager.i.getEmpire().getKey());
-    if (ep == null) {
-      storedGoodsTextView.setVisibility(View.GONE);
-      deltaGoodsTextView.setVisibility(View.GONE);
-      storedGoodsIcon.setVisibility(View.GONE);
-      storedMineralsTextView.setVisibility(View.GONE);
-      deltaMineralsTextView.setVisibility(View.GONE);
-      storedMineralsIcon.setVisibility(View.GONE);
-    } else {
-      storedGoodsTextView.setVisibility(View.VISIBLE);
-      deltaGoodsTextView.setVisibility(View.VISIBLE);
-      storedGoodsIcon.setVisibility(View.VISIBLE);
-      storedMineralsTextView.setVisibility(View.VISIBLE);
-      deltaMineralsTextView.setVisibility(View.VISIBLE);
-      storedMineralsIcon.setVisibility(View.VISIBLE);
-
-      String goods = String.format(Locale.ENGLISH, "%d / %d", (int) ep.getTotalGoods(),
-          (int) ep.getMaxGoods());
-      storedGoodsTextView.setText(goods);
-
-      String minerals = String.format(Locale.ENGLISH, "%d / %d", (int) ep.getTotalMinerals(),
-          (int) ep.getMaxMinerals());
-      storedMineralsTextView.setText(minerals);
-
-      if (ep.getDeltaGoodsPerHour() >= 0) {
-        deltaGoodsTextView.setTextColor(Color.GREEN);
-        deltaGoodsTextView.setText(
-            String.format(Locale.ENGLISH, "+%d/hr", (int) ep.getDeltaGoodsPerHour()));
-      } else {
-        deltaGoodsTextView.setTextColor(Color.RED);
-        deltaGoodsTextView.setText(
-            String.format(Locale.ENGLISH, "%d/hr", (int) ep.getDeltaGoodsPerHour()));
-      }
-      if (ep.getDeltaMineralsPerHour() >= 0) {
-        deltaMineralsTextView.setTextColor(Color.GREEN);
-        deltaMineralsTextView.setText(
-            String.format(Locale.ENGLISH, "+%d/hr", (int) ep.getDeltaMineralsPerHour()));
-      } else {
-        deltaMineralsTextView.setTextColor(Color.RED);
-        deltaMineralsTextView.setText(
-            String.format(Locale.ENGLISH, "%d/hr", (int) ep.getDeltaMineralsPerHour()));
-      }
-    }
   }
 
   @Override
