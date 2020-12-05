@@ -77,7 +77,7 @@ public class OwnedPlanetActivity extends BaseActivity {
   };
 
   private void refresh(Star star) {
-    boolean dataSetChanged = (star == null);
+    boolean dataSetChanged = (this.star == null);
     this.star = star;
 
     colonies = new ArrayList<>();
