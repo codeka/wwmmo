@@ -1,14 +1,10 @@
 package au.com.codeka.warworlds.game.wormhole;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TreeMap;
 
-import org.andengine.engine.camera.Camera;
-import org.andengine.engine.camera.ZoomCamera;
-import org.andengine.entity.scene.Scene;
 import org.joda.time.DateTime;
 
 import android.app.Activity;
@@ -29,7 +25,6 @@ import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.warworlds.BaseGlFragment;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
@@ -50,14 +45,15 @@ import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.ui.BaseFragment;
 
 /**
  * This fragment is used in place of SolarSystemFragment in the SolarSystemActivity for
  * wormholes.
  */
-public class WormholeFragment extends BaseGlFragment {
+public class WormholeFragment extends BaseFragment {
   private static final Log log = new Log("WormholeFragment");
-  private WormholeSceneManager wormhole;
+  private Object wormhole;
   private Star star;
   private Star destStar;
   private DateTime tuneCompleteTime;
@@ -79,7 +75,7 @@ public class WormholeFragment extends BaseGlFragment {
 
     Bundle extras = getArguments();
     int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
-    wormhole = new WormholeSceneManager(WormholeFragment.this, starID);
+    wormhole = null;//new WormholeSceneManager(WormholeFragment.this, starID);
   }
 
   @Override
@@ -395,46 +391,16 @@ public class WormholeFragment extends BaseGlFragment {
     }
   }
 
-  /**
-   * Create the camera, we don't have a zoom factor.
-   */
-  @Override
-  protected Camera createCamera() {
-    ZoomCamera camera = new ZoomCamera(0, 0, mCameraWidth, mCameraHeight);
-
-    return camera;
-  }
-
-  @Override
-  protected int getRenderSurfaceViewID() {
-    return R.id.wormhole;
-  }
-
-  @Override
-  protected int getLayoutID() {
-    return R.layout.wormhole;
-  }
-
-  @Override
-  protected void onCreateResources() throws IOException {
-    wormhole.onLoadResources();
-  }
-
-  @Override
-  protected Scene onCreateScene() throws IOException {
-    return wormhole.createScene();
-  }
-
   @Override
   public void onStart() {
     super.onStart();
-    wormhole.onStart();
+  //  wormhole.onStart();
   }
 
   @Override
   public void onStop() {
     super.onStop();
-    wormhole.onStop();
+  ///  wormhole.onStop();
   }
 
   /**

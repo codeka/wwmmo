@@ -1,9 +1,9 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 import android.opengl.GLES20;
 import android.text.TextUtils;
 
-import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.common.Log;
 
 /**
  * {@link SpriteShader} manages the shader program used to render a sprite.

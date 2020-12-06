@@ -8,28 +8,18 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import org.andengine.opengl.texture.TextureOptions;
-import org.andengine.opengl.texture.atlas.ITextureAtlas.ITextureAtlasStateListener;
-import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
-import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
-import org.andengine.opengl.texture.atlas.bitmap.source.FileBitmapTextureAtlasSource;
-import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
-import org.andengine.opengl.texture.region.ITextureRegion;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.os.Build;
 
 import androidx.collection.LruCache;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
-import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
@@ -55,7 +45,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
     }
   };
 
-  private final LruCache<Integer, ITextureRegion> shieldTextures = new LruCache<>(32);
+  private final LruCache<Integer, Object> shieldTextures = new LruCache<>(32);
   private final Set<Integer> fetchingShields = new HashSet<>();
 
   public static final String EmpireShield = "empire";
@@ -107,7 +97,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
 
   /**
    * Gets (or creates) the empire's shield as an andengine texture.
-   */
+   *//*
   protected ITextureRegion getShieldTexture(BaseGlActivity glActivity, ShieldInfo shieldInfo) {
     ITextureRegion textureRegion = shieldTextures.get(shieldInfo.id);
     if (textureRegion == null) {
@@ -137,7 +127,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
     }
 
     return textureRegion;
-  }
+  }*/
 
   protected abstract Bitmap getDefaultShield(ShieldInfo shieldInfo);
 

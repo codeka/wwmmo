@@ -1,9 +1,9 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 import android.opengl.GLES20;
 
-import au.com.codeka.warworlds.client.BuildConfig;
-import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.Util;
 
 /**
  * Contains some useful info about the current OpenGL renderer.
@@ -26,7 +26,7 @@ public class DeviceInfo {
     maxTextureUnits = this.getInteger(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS);
     maxTextureSize = this.getInteger(GLES20.GL_MAX_TEXTURE_SIZE);
 
-    if (BuildConfig.DEBUG) {
+    if (Util.isDebug()) {
       log.debug("VERSION: %s", version);
       log.debug("RENDERER: %s", renderer);
       log.debug("EXTENSIONS: %s", extensions);

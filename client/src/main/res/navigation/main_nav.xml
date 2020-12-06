@@ -15,6 +15,9 @@
         <action
                 android:id="@+id/action_welcomeFragment_to_realmSelectFragment"
                 app:destination="@id/realmSelectFragment" />
+        <action
+                android:id="@+id/action_welcomeFragment_to_starfieldActivity"
+                app:destination="@id/starfieldFragment" />
     </fragment>
     <fragment
             android:id="@+id/globalOptionsFragment"
@@ -41,4 +44,8 @@
                 android:id="@+id/action_warmWelcomeFragment_to_realmSelectFragment"
                 app:destination="@id/realmSelectFragment" />
     </fragment>
+    <fragment
+            android:id="@+id/starfieldFragment"
+            android:name="au.com.codeka.warworlds.game.starfield.StarfieldFragment"
+            android:label="Starfield" />
 </navigation>

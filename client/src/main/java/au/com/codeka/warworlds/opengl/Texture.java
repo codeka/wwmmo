@@ -1,10 +1,8 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 import android.opengl.GLES20;
 
-/**
- * Base class for all textures in the app.
- */
+/** Base class for all textures in the app. */
 public class Texture {
   private int id;
 

@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.ctrl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Handler;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -10,8 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
-import org.andengine.entity.primitive.LineLoop;
 
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.DesignKind;

@@ -1,6 +1,7 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import androidx.annotation.Nullable;
 
@@ -19,6 +20,11 @@ public class TextureManager {
 
   public TextureManager(Context context) {
     this.context = Preconditions.checkNotNull(context);
+  }
+
+  @Nullable
+  public BitmapTexture fromBitmap(Bitmap bmp) {
+    return BitmapTexture.load(context, bmp);
   }
 
   /** Loads the texture with the given name, or returns null if the texture could not be loaded. */
@@ -47,8 +53,11 @@ public class TextureManager {
       }
     }
 
+    return null;
+/*
     BitmapTexture bmp = BitmapTexture.loadUrl(context, url);
     cache.put(url, new WeakReference<>(bmp));
     return bmp;
+ */
   }
 }

@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 import android.content.Context;
 import android.opengl.GLES20;
@@ -12,9 +12,7 @@ import com.google.common.base.Preconditions;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import au.com.codeka.warworlds.client.concurrency.RunnableQueue;
-import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.common.Log;
 
 /** GLSurfaceView upon which we do all of our rendering. */
 public class RenderSurfaceView extends GLSurfaceView {
@@ -30,7 +28,7 @@ public class RenderSurfaceView extends GLSurfaceView {
     setEGLContextClientVersion(2);
   }
 
-  public void setRenderer() {
+  public void create() {
     getHolder().setFormat(android.graphics.PixelFormat.RGBA_8888);
 
     renderer = new Renderer(getContext());
@@ -101,7 +99,7 @@ public class RenderSurfaceView extends GLSurfaceView {
       GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       GLES20.glEnable(GLES20.GL_BLEND);
       GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-      Threads.GL.resetThread();
+      //TODO Threads.GL.resetThread();
     }
 
     @Override
@@ -113,7 +111,7 @@ public class RenderSurfaceView extends GLSurfaceView {
 
     @Override
     public void onDrawFrame(final GL10 ignored) {
-      Threads.GL.setThread(Thread.currentThread(), runnableQueue);
+      //TODO Threads.GL.setThread(Thread.currentThread(), runnableQueue);
       frameCounter.onFrame();
 
       // Empty the task queue

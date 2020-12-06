@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 import com.google.common.base.Preconditions;
 

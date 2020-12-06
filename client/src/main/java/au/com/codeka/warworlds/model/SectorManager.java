@@ -47,7 +47,7 @@ public class SectorManager extends BaseManager {
   }
 
   /**
-   * Gets the second with the given x/y coordinates. If the sector is not cached, we DO NOT fetch
+   * Gets the sector with the given x/y coordinates. If the sector is not cached, we DO NOT fetch
    * it.
    */
   public Sector getSector(long sectorX, long sectorY) {
@@ -98,26 +98,23 @@ public class SectorManager extends BaseManager {
         url = "sectors?coords=" + url;
 
         ApiRequest request = new ApiRequest.Builder(url, "GET")
-            .completeCallback(new ApiRequest.CompleteCallback() {
-              @Override
-              public void onRequestComplete(ApiRequest request) {
-                Messages.Sectors sectorsPb = request.body(Messages.Sectors.class);
-                for (Messages.Sector sector_pb : sectorsPb.getSectorsList()) {
-                  Sector sector = new Sector();
-                  sector.fromProtocolBuffer(sector_pb);
+            .completeCallback(request1 -> {
+              Messages.Sectors sectorsPb = request1.body(Messages.Sectors.class);
+              for (Messages.Sector sector_pb : sectorsPb.getSectorsList()) {
+                Sector sector = new Sector();
+                sector.fromProtocolBuffer(sector_pb);
 
-                  Pair<Long, Long> key = new Pair<>(sector.getX(), sector.getY());
-                  sectors.put(key, sector);
-                  eventBus.publish(sector);
-                  pendingSectors.remove(key);
+                Pair<Long, Long> key = new Pair<>(sector.getX(), sector.getY());
+                sectors.put(key, sector);
+                eventBus.publish(sector);
+                pendingSectors.remove(key);
 
-                  for (BaseStar baseStar : sector.getStars()) {
-                    Star star = (Star) baseStar;
-                    sectorStars.put(star.getKey(), star);
-                  }
+                for (BaseStar baseStar : sector.getStars()) {
+                  Star star = (Star) baseStar;
+                  sectorStars.put(star.getKey(), star);
                 }
-                eventBus.publish(new SectorListChangedEvent());
               }
+              eventBus.publish(new SectorListChangedEvent());
             }).build();
         RequestManager.i.sendRequest(request);
       }

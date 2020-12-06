@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 import android.opengl.GLES20;
 
@@ -7,8 +7,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
-import au.com.codeka.warworlds.client.concurrency.Threads;
-import au.com.codeka.warworlds.common.Vector2;
+import au.com.codeka.common.Vector2;
 
 /**
  * A {@link SpriteTemplate} describes a sprite's characteristics (texture, bounds within the texture
@@ -68,7 +67,7 @@ public class SpriteTemplate {
   }
 
   public void draw(float[] mvpMatrix, float alpha) {
-    Threads.checkOnThread(Threads.GL);
+    //TODO Threads.checkOnThread(Threads.GL);
 
     shader.begin();
     texture.bind();
