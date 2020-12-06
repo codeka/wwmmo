@@ -1,23 +1,22 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import android.accessibilityservice.AccessibilityServiceInfo;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ServiceInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.accessibility.AccessibilityManager;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import java.util.List;
 import java.util.Locale;
 
 import au.com.codeka.common.Log;
@@ -26,13 +25,10 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.BaseStar.StarType;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.AccessibilityServiceReporter;
+import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.ctrl.FleetListSimple;
-import au.com.codeka.warworlds.ctrl.InfobarView;
-import au.com.codeka.warworlds.ctrl.PlanetListSimple;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
@@ -47,24 +43,21 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PurchaseManager;
-import au.com.codeka.warworlds.model.Sector;
-import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.IabHelper;
-import au.com.codeka.warworlds.model.billing.IabResult;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
+import au.com.codeka.warworlds.ui.BaseFragment;
 
 /**
  * The {@link StarfieldActivity} is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
-public class StarfieldActivity extends BaseStarfieldActivity {
+public class StarfieldActivity extends BaseActivity {
   private static final Log log = new Log("StarfieldActivity");
-  private Context context = this;
   private Star selectedStar;
   private Fleet selectedFleet;
   private Star homeStar;
@@ -82,17 +75,25 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   private static final int EMPIRE_REQUEST = 2;
   private static final int SITREP_REQUEST = 3;
 
+  @Nullable
   @Override
-  public void onCreate(final Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  public View onCreateView(
+      @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    return inflater.inflate(R.layout.starfield, container, false);
+  }
 
-    bottomPane = findViewById(R.id.bottom_pane);
-    selectionDetailsView = (SelectionDetailsView) findViewById(R.id.selection_details);
+  @Override
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
 
-    if (isPortrait()) {
-      InfobarView infobar = (InfobarView) findViewById(R.id.infobar);
-      infobar.hideEmpireName();
-    }
+    bottomPane = view.findViewById(R.id.bottom_pane);
+    selectionDetailsView = (SelectionDetailsView) view.findViewById(R.id.selection_details);
+
+//    if (isPortrait()) {
+//      InfobarView infobar = (InfobarView) view.findViewById(R.id.infobar);
+//      infobar.hideEmpireName();
+//    }
 
     // "Rename" button
     // "View" button
@@ -111,22 +112,24 @@ public class StarfieldActivity extends BaseStarfieldActivity {
             return;
           }
 
-          Intent intent = new Intent(context, SolarSystemActivity.class);
+          Intent intent = new Intent(requireContext(), SolarSystemActivity.class);
           intent.putExtra("au.com.codeka.warworlds.StarKey", selectedStar.getKey());
           startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
         }, v -> {
           if (selectedStar != null) {
             ScoutReportDialog dialog = new ScoutReportDialog();
             dialog.setStar(selectedStar);
-            dialog.show(getSupportFragmentManager(), "");
+            dialog.show(getChildFragmentManager(), "");
           }
-        }, star -> starfield.scrollTo(star.getSectorX(), star.getSectorY(),
-            star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY()));
+        }, star -> {
+          //starfield.scrollTo(star.getSectorX(), star.getSectorY(),
+          //    star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY())
+        } );
 
-    findViewById(R.id.empire_btn).setOnClickListener((View.OnClickListener) v -> openEmpireActivity());
-    findViewById(R.id.sitrep_btn).setOnClickListener((View.OnClickListener) v -> openSitrepActivity());
+    view.findViewById(R.id.empire_btn).setOnClickListener((View.OnClickListener) v -> openEmpireActivity());
+    view.findViewById(R.id.sitrep_btn).setOnClickListener((View.OnClickListener) v -> openSitrepActivity());
 
-    allianceBtn = (Button) findViewById(R.id.alliance_btn);
+    allianceBtn = view.findViewById(R.id.alliance_btn);
     allianceBtn.setOnClickListener(v -> onAllianceClick());
 
     if (savedInstanceState != null) {
@@ -161,7 +164,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     hideBottomPane(true);
   }
 
-  private boolean processIntent() {
+  private boolean processIntent() {/*
     Intent intent = getIntent();
     if (intent != null && intent.getExtras() != null) {
       String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
@@ -174,31 +177,31 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       }
       setIntent(null);
       return true;
-    }
+    }*/
     return false;
   }
 
   @Override
-  public void onResumeFragments() {
-    super.onResumeFragments();
-
-    ServerGreeter.waitForHello(this, (ServerGreeter.HelloCompleteHandler) (success, greeting) -> {
+  public void onResume() {
+    super.onResume();
+    ServerGreeter.waitForHello(
+        requireActivity(), (ServerGreeter.HelloCompleteHandler) (success, greeting) -> {
       if (!success) {
         return;
       }
-
+/*
       if (starToSelect != null && starfield.getScene() != null) {
         selectedStar = starToSelect;
         starfield.getScene().selectStar(starToSelect.getKey());
         starfield.scrollTo(starToSelect);
         starToSelect = null;
       }
-
+*//*
       if (fleetToSelect != null && starfield.getScene() != null) {
         starfield.getScene().selectFleet(fleetToSelect.getKey());
         fleetToSelect = null;
       }
-
+*/
       MyEmpire myEmpire = EmpireManager.i.getEmpire();
       if (myEmpire == null) {
         return;
@@ -212,34 +215,10 @@ public class StarfieldActivity extends BaseStarfieldActivity {
           .equals(homeStar.getKey()))) {
         StarfieldActivity.this.homeStar = (Star) homeStar;
         if (!doNotNavigateToHomeStar) {
-          starfield.scrollTo(homeStar);
+//          starfield.scrollTo(homeStar);
         }
       }
     });
-  }
-
-  @Override
-  protected void onNewIntent(Intent intent) {
-    super.onNewIntent(intent);
-    setIntent(intent);
-  }
-
-  @Override
-  protected int getLayoutID() {
-    return R.layout.starfield;
-  }
-
-  @Override
-  public void onStart() {
-    super.onStart();
-    StarManager.eventBus.register(eventHandler);
-    ShieldManager.eventBus.register(eventHandler);
-    StarfieldSceneManager.eventBus.register(eventHandler);
-  }
-
-  @Override
-  public void onPostResume() {
-    super.onPostResume();
 
     if (starRenamePurchase != null) {
       showStarRenamePopup(starRenamePurchase);
@@ -248,9 +227,17 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   }
 
   @Override
+  public void onStart() {
+    super.onStart();
+    StarManager.eventBus.register(eventHandler);
+    ShieldManager.eventBus.register(eventHandler);
+ //   StarfieldSceneManager.eventBus.register(eventHandler);
+  }
+
+  @Override
   public void onStop() {
     super.onStop();
-    StarfieldSceneManager.eventBus.unregister(eventHandler);
+//    StarfieldSceneManager.eventBus.unregister(eventHandler);
     StarManager.eventBus.unregister(eventHandler);
     ShieldManager.eventBus.unregister(eventHandler);
   }
@@ -272,24 +259,24 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   }
 
   public void openEmpireActivityAtFleet(Star star, Fleet fleet) {
-    Intent intent = new Intent(context, EmpireActivity.class);
+    Intent intent = new Intent(requireContext(), EmpireActivity.class);
     intent.putExtra("au.com.codeka.warworlds.StarID", star.getID());
     intent.putExtra("au.com.codeka.warworlds.FleetID", Integer.parseInt(fleet.getKey()));
     startActivityForResult(intent, EMPIRE_REQUEST);
   }
 
   public void openEmpireActivity() {
-    Intent intent = new Intent(context, EmpireActivity.class);
+    Intent intent = new Intent(requireContext(), EmpireActivity.class);
     startActivityForResult(intent, EMPIRE_REQUEST);
   }
 
   public void openSitrepActivity() {
-    Intent intent = new Intent(context, SitrepActivity.class);
+    Intent intent = new Intent(requireContext(), SitrepActivity.class);
     startActivityForResult(intent, SITREP_REQUEST);
   }
 
   public void onAllianceClick() {
-    Intent intent = new Intent(context, AllianceActivity.class);
+    Intent intent = new Intent(requireContext(), AllianceActivity.class);
     startActivity(intent);
   }
 
@@ -307,24 +294,24 @@ public class StarfieldActivity extends BaseStarfieldActivity {
 
   private void applyBottomPaneAnimation(boolean isOpen, boolean instant) {
     float dp;
-    if (isPortrait()) {
+//    if (isPortrait()) {
       if (isOpen) {
         dp = 180;
       } else {
         dp = 34;
       }
-    } else {
-      if (isOpen) {
-        dp = 200;
-      } else {
-        dp = 100;
-      }
-    }
+//    } else {
+//      if (isOpen) {
+//        dp = 200;
+//      } else {
+//        dp = 100;
+//      }
+//    }
 
     Resources r = getResources();
     float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
 
-    if (isPortrait()) {
+//    if (isPortrait()) {
       if (instant) {
         RelativeLayout.LayoutParams lp =
             (RelativeLayout.LayoutParams) bottomPane.getLayoutParams();
@@ -333,7 +320,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       } else {
         applyBottomPaneAnimationPortrait(px);
       }
-    } else {
+/*    } else {
       RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) allianceBtn.getLayoutParams();
       if (isOpen) {
         // NB: removeRule is not available until API level 17 :/
@@ -356,7 +343,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       } else {
         applyBottomPaneAnimationLandscape(px);
       }
-    }
+    }*/
   }
 
   private void applyBottomPaneAnimationLandscape(final float pxWidth) {
@@ -427,14 +414,14 @@ public class StarfieldActivity extends BaseStarfieldActivity {
   private void navigateToPlanet(StarType starType, long sectorX, long sectorY, String starKey,
       int starOffsetX, int starOffsetY, int planetIndex, boolean scrollView) {
     if (scrollView) {
-      starfield.scrollTo(sectorX, sectorY, starOffsetX, Sector.SECTOR_SIZE - starOffsetY);
+ //     starfield.scrollTo(sectorX, sectorY, starOffsetX, Sector.SECTOR_SIZE - starOffsetY);
     }
 
     Intent intent;
     if (starType.getType() == Star.Type.Wormhole) {
-      intent = new Intent(context, WormholeFragment.class);
+      intent = new Intent(requireContext(), WormholeFragment.class);
     } else {
-      intent = new Intent(context, SolarSystemActivity.class);
+      intent = new Intent(requireContext(), SolarSystemActivity.class);
     }
     intent.putExtra("au.com.codeka.warworlds.StarKey", starKey);
     intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planetIndex);
@@ -466,18 +453,18 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     int offsetX = star.getOffsetX();
     int offsetY = star.getOffsetY();
 
-    starfield
-        .scrollTo(star.getSectorX(), star.getSectorY(), offsetX, Sector.SECTOR_SIZE - offsetY);
+//    starfield
+//        .scrollTo(star.getSectorX(), star.getSectorY(), offsetX, Sector.SECTOR_SIZE - offsetY);
 
-    if (starfield.getScene() == null) {
-      // TODO: we should probably remember the fleet then navigate when the scene is ready.
-      return;
-    }
-    if (fleet.getState() == Fleet.State.MOVING) {
-      starfield.getScene().selectFleet(fleet.getKey());
-    } else {
-      starfield.getScene().selectStar(star.getKey());
-    }
+//    if (starfield.getScene() == null) {
+//      // TODO: we should probably remember the fleet then navigate when the scene is ready.
+//      return;
+//    }
+//    if (fleet.getState() == Fleet.State.MOVING) {
+//      starfield.getScene().selectFleet(fleet.getKey());
+ //   } else {
+ //     starfield.getScene().selectStar(star.getKey());
+ //   }
   }
 
   public void onRenameClick() {
@@ -495,17 +482,14 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       return;
     }
 
-    new StyledDialog.Builder(this).setMessage(String.format(Locale.ENGLISH,
+    new StyledDialog.Builder(requireContext()).setMessage(String.format(Locale.ENGLISH,
         "Renaming stars costs %s. If you wish to continue, you'll be directed " +
             "to the Play Store where you can purchase a one-time code to rename this " +
             "star. Are you sure you want to continue?", starRenameSku.getPrice()))
         .setTitle("Rename Star").setNegativeButton("Cancel", null)
-        .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            doRenameStar();
-            dialog.dismiss();
-          }
+        .setPositiveButton("Rename", (dialog, which) -> {
+          doRenameStar();
+          dialog.dismiss();
         }).create().show();
   }
 
@@ -516,38 +500,35 @@ public class StarfieldActivity extends BaseStarfieldActivity {
 
     try {
       PurchaseManager.i
-          .launchPurchaseFlow(this, "star_rename", new IabHelper.OnIabPurchaseFinishedListener() {
-            @Override
-            public void onIabPurchaseFinished(IabResult result, final Purchase info) {
-              if (selectedStar == null) {
-                return;
-              }
+          .launchPurchaseFlow(requireActivity(), "star_rename", (result, info) -> {
+            if (selectedStar == null) {
+              return;
+            }
 
-              Purchase purchase = info;
-              boolean isSuccess = result.isSuccess();
-              if (result.isFailure()
-                  && result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
-                // if they've already purchased a star-renamed, but not reclaimed it, then
-                // we let them through anyway.
-                log.debug("Already purchased a star-rename, we'll just show the popup.");
-                isSuccess = true;
-                try {
-                  purchase = PurchaseManager.i.getInventory().getPurchase("star_rename");
-                } catch (IabException e) {
-                  log.warning("Got an exception getting the purchase details.", e);
-                }
+            Purchase purchase = info;
+            boolean isSuccess = result.isSuccess();
+            if (result.isFailure()
+                && result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
+              // if they've already purchased a star-renamed, but not reclaimed it, then
+              // we let them through anyway.
+              log.debug("Already purchased a star-rename, we'll just show the popup.");
+              isSuccess = true;
+              try {
+                purchase = PurchaseManager.i.getInventory().getPurchase("star_rename");
+              } catch (IabException e) {
+                log.warning("Got an exception getting the purchase details.", e);
               }
+            }
 
-              if (isSuccess) {
-                try {
-                  showStarRenamePopup(purchase);
-                } catch (IllegalStateException e) {
-                  // this can be called before the activity is resumed, so we just set a
-                  // flag that'll cause us to pop up the dialog when the activity is resumed.
-                  log.warning(
-                      "Got an error trying to show the popup, we'll try again in a second...");
-                  starRenamePurchase = purchase;
-                }
+            if (isSuccess) {
+              try {
+                showStarRenamePopup(purchase);
+              } catch (IllegalStateException e) {
+                // this can be called before the activity is resumed, so we just set a
+                // flag that'll cause us to pop up the dialog when the activity is resumed.
+                log.warning(
+                    "Got an error trying to show the popup, we'll try again in a second...");
+                starRenamePurchase = purchase;
               }
             }
           });
@@ -560,8 +541,10 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     StarRenameDialog dialog = new StarRenameDialog();
     dialog.setPurchaseInfo(purchase);
     dialog.setStar(selectedStar);
-    dialog.show(getSupportFragmentManager(), "");
+    dialog.show(getChildFragmentManager(), "");
   }
+
+  /*
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -618,7 +601,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       }
     }
   }
-
+*/
   private void handleDeselect() {
     selectedStar = null;
     selectedFleet = null;
@@ -639,17 +622,17 @@ public class StarfieldActivity extends BaseStarfieldActivity {
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
       EmpireShieldManager.i.clearTextureCache();
 
-      if (selectedFleet != null) {
+      if (selectedFleet != null) {/*
         StarfieldActivity.this.getEngine().runOnUpdateThread(new Runnable() {
           @Override
           public void run() {
             // this will cause the selected fleet info to redraw and hence the shield
             StarfieldActivity.this.onFleetSelected(selectedFleet);
           }
-        });
+        });*/
       }
     }
-
+/*
     @EventHandler
     public void onStarSelected(final StarfieldSceneManager.StarSelectedEvent event) {
       StarfieldActivity.this.onStarSelected(event.star);
@@ -674,7 +657,7 @@ public class StarfieldActivity extends BaseStarfieldActivity {
       starToSelect = null;
       fleetToSelect = null;
       starKeyToSelect = null;
-    }
+    }*/
   };
 
   private void onStarSelected(Star star) {
