@@ -64,6 +64,11 @@ public class BitmapTexture extends Texture {
     }
 
     public void load() {
+      if (bitmap != null) {
+        // We already have a bitmap, nothing to do.
+        return;
+      }
+
       new BackgroundRunner<Bitmap>() {
         @Override
         protected Bitmap doInBackground() {
