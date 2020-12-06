@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -70,7 +71,6 @@ public class StarfieldFragment extends BaseFragment {
   private String starKeyToSelect;
   private Fleet fleetToSelect;
 
-  private static final int SOLAR_SYSTEM_REQUEST = 1;
   private static final int EMPIRE_REQUEST = 2;
   private static final int SITREP_REQUEST = 3;
 
@@ -111,9 +111,10 @@ public class StarfieldFragment extends BaseFragment {
             return;
           }
 
-          Intent intent = new Intent(requireContext(), SolarSystemActivity.class);
-          intent.putExtra("au.com.codeka.warworlds.StarKey", selectedStar.getKey());
-          startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
+
+          Bundle args = new Bundle();
+          args.putInt("au.com.codeka.warworlds.StarID", selectedStar.getID());
+          NavHostFragment.findNavController(this).navigate(R.id.solarSystemFragment, args);
         }, v -> {
           if (selectedStar != null) {
             ScoutReportDialog dialog = new ScoutReportDialog();
@@ -406,25 +407,24 @@ public class StarfieldFragment extends BaseFragment {
    *                   centered on the given star.
    */
   public void navigateToPlanet(Star star, Planet planet, boolean scrollView) {
-    navigateToPlanet(star.getStarType(), star.getSectorX(), star.getSectorY(), star.getKey(),
+    navigateToPlanet(star.getStarType(), star.getSectorX(), star.getSectorY(), star.getID(),
         star.getOffsetX(), star.getOffsetY(), planet.getIndex(), scrollView);
   }
 
-  private void navigateToPlanet(StarType starType, long sectorX, long sectorY, String starKey,
+  private void navigateToPlanet(StarType starType, long sectorX, long sectorY, int starID,
       int starOffsetX, int starOffsetY, int planetIndex, boolean scrollView) {
     if (scrollView) {
  //     starfield.scrollTo(sectorX, sectorY, starOffsetX, Sector.SECTOR_SIZE - starOffsetY);
     }
 
-    Intent intent;
+    Bundle args = new Bundle();
+    args.putInt("au.com.codeka.warworlds.StarID", starID);
+    args.putInt("au.com.codeka.warworlds.PlanetIndex", planetIndex);
     if (starType.getType() == Star.Type.Wormhole) {
-      intent = new Intent(requireContext(), WormholeFragment.class);
+      NavHostFragment.findNavController(this).navigate(R.id.wormholeFragment, args);
     } else {
-      intent = new Intent(requireContext(), SolarSystemActivity.class);
+      NavHostFragment.findNavController(this).navigate(R.id.solarSystemFragment, args);
     }
-    intent.putExtra("au.com.codeka.warworlds.StarKey", starKey);
-    intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planetIndex);
-    startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
   }
 
   public void navigateToFleet(final String starKey, final String fleetKey) {

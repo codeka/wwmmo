@@ -44,9 +44,7 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSimulationQueue;
 
-/**
- * This is a fragment which displays details about a single solar system.
- */
+/** This is a fragment which displays details about a single solar system. */
 public class SolarSystemFragment extends Fragment {
   private static final Log log = new Log("SolarSystemFragment");
   private SolarSystemSurfaceView solarSystemSurfaceView;
@@ -123,8 +121,8 @@ public class SolarSystemFragment extends Fragment {
   @Override
   public void onResume() {
     super.onResume();
-    Bundle args = getArguments();
-    starID = (int) args.getLong("au.com.codeka.warworlds.StarID");
+    starID = requireArguments().getInt("au.com.codeka.warworlds.StarID");
+    log.info("DEANH DEANH DEANH starID=%d", starID);
     StarManager.eventBus.register(eventHandler);
     ShieldManager.eventBus.register(eventHandler);
 
