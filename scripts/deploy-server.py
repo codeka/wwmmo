@@ -1,9 +1,6 @@
 
 import common
 import os
-import pathlib
-import shutil
-import subprocess
 
 # Do the build
 os.system("cd " + str(common.rootPath) + " && " + common.gradleCmd + " --daemon :server:distZip")
