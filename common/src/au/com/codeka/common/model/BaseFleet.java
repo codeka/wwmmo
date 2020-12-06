@@ -29,6 +29,9 @@ public abstract class BaseFleet {
     public String getKey() {
         return mKey;
     }
+    public int getID() {
+        return Integer.parseInt(mKey);
+    }
     public String getEmpireKey() {
         return mEmpireKey;
     }

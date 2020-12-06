@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,6 +15,8 @@ import androidx.navigation.ui.NavigationUI;
 import java.io.File;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.game.starfield.StarfieldManager;
+import au.com.codeka.warworlds.opengl.RenderSurfaceView;
 
 /**
  * The main activity of the whole app. All our fragments are children of this.
@@ -23,6 +24,8 @@ import au.com.codeka.common.Log;
 // TODO: when there's no other activities, get rid of BaseActivity.
 public class MainActivity extends BaseActivity {
   private static final Log log = new Log("MainActivity");
+
+  private StarfieldManager starfieldManager;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +44,12 @@ public class MainActivity extends BaseActivity {
 
     setContentView(R.layout.main_activity);
     setSupportActionBar(findViewById(R.id.toolbar));
+
+    RenderSurfaceView renderSurfaceView = findViewById(R.id.render_surface);
+    renderSurfaceView.create();
+    starfieldManager = new StarfieldManager(renderSurfaceView);
+    starfieldManager.create();
+
   }
 
   @Override
@@ -74,6 +83,14 @@ public class MainActivity extends BaseActivity {
         actionBar.show();
       }
     });
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+
+    starfieldManager.destroy();
+    starfieldManager = null;
   }
 
   private boolean onBlueStacks() {

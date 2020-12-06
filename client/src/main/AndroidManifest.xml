@@ -90,7 +90,7 @@
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.EmptyPlanetActivity" />
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.OwnedPlanetActivity" />
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.FleetActivity" />
-    <activity android:name="au.com.codeka.warworlds.game.starfield.StarfieldActivity" />
+    <activity android:name="au.com.codeka.warworlds.game.starfield.StarfieldFragment" />
     <activity android:name="au.com.codeka.warworlds.game.alliance.AllianceActivity" />
     <activity
       android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsActivity"
@@ -102,7 +102,7 @@
     <activity android:name="au.com.codeka.warworlds.game.SitrepActivity">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value="au.com.codeka.warworlds.game.starfield.StarfieldActivity" />
+        android:value="au.com.codeka.warworlds.game.starfield.StarfieldFragment" />
     </activity>
 
     <service

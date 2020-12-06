@@ -10,7 +10,7 @@
           android:layout_centerHorizontal="true"
           android:layout_centerVertical="true" />
 
-    <org.andengine.opengl.view.RenderSurfaceView
+    <View
             android:id="@+id/wormhole"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

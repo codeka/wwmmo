@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,7 +10,7 @@ import android.opengl.GLUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.common.Log;
 
 /**
  * This is a {@link Texture} which is used to back an image for drawing arbitrary strings.

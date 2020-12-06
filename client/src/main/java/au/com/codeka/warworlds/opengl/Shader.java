@@ -1,8 +1,8 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 import android.opengl.GLES20;
 
-import au.com.codeka.warworlds.common.Log;
+import au.com.codeka.common.Log;
 
 /**
  * Base class for shaders.

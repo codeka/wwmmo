@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 import android.graphics.Rect;
 import android.opengl.GLES20;
@@ -10,8 +10,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
-
-import au.com.codeka.warworlds.client.concurrency.Threads;
 
 /**
  * A {@link SceneObject} that represents a piece of text.
@@ -63,7 +61,7 @@ public class TextSceneObject extends SceneObject {
 
   @Override
   protected void drawImpl(float[] mvpMatrix) {
-    Threads.checkOnThread(Threads.GL);
+    //TODO Threads.checkOnThread(Threads.GL);
 
     if (dirty) {
       createBuffers();

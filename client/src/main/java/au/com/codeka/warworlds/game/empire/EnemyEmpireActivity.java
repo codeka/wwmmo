@@ -23,7 +23,7 @@ import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.alliance.KickRequestDialog;
 import au.com.codeka.warworlds.game.chat.ChatActivity;
-import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
+import au.com.codeka.warworlds.game.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.Empire;
@@ -220,7 +220,7 @@ public class EnemyEmpireActivity extends BaseActivity {
     public void onEmpireViewClick() {
         if (mEmpire != null && mEmpire.getHomeStar() != null) {
             BaseStar homeStar = mEmpire.getHomeStar();
-            Intent intent = new Intent(mContext, StarfieldActivity.class);
+            Intent intent = new Intent(mContext, StarfieldFragment.class);
             intent.putExtra("au.com.codeka.warworlds.StarKey", homeStar.getKey());
             intent.putExtra("au.com.codeka.warworlds.SectorX", homeStar.getSectorX());
             intent.putExtra("au.com.codeka.warworlds.SectorY", homeStar.getSectorY());

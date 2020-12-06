@@ -25,7 +25,6 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.BaseStar.StarType;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
@@ -53,10 +52,10 @@ import au.com.codeka.warworlds.model.billing.SkuDetails;
 import au.com.codeka.warworlds.ui.BaseFragment;
 
 /**
- * The {@link StarfieldActivity} is the "home" screen of the game, and displays the
+ * The {@link StarfieldFragment} is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
-public class StarfieldActivity extends BaseActivity {
+public class StarfieldFragment extends BaseFragment {
   private static final Log log = new Log("StarfieldActivity");
   private Star selectedStar;
   private Fleet selectedFleet;
@@ -211,9 +210,9 @@ public class StarfieldActivity extends BaseActivity {
 
       boolean doNotNavigateToHomeStar = processIntent();
       if (homeStar != null && (
-          StarfieldActivity.this.homeStar == null || !StarfieldActivity.this.homeStar.getKey()
+          StarfieldFragment.this.homeStar == null || !StarfieldFragment.this.homeStar.getKey()
           .equals(homeStar.getKey()))) {
-        StarfieldActivity.this.homeStar = (Star) homeStar;
+        StarfieldFragment.this.homeStar = (Star) homeStar;
         if (!doNotNavigateToHomeStar) {
 //          starfield.scrollTo(homeStar);
         }

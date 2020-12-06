@@ -42,7 +42,7 @@ import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
+import au.com.codeka.warworlds.game.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -96,8 +96,7 @@ public class WelcomeFragment extends BaseFragment {
 
     startGameButton.setOnClickListener(v -> {
       if (startGameIntent == null) {
-        final Intent intent = new Intent(requireContext(), StarfieldActivity.class);
-        startActivity(intent);
+        NavHostFragment.findNavController(this).navigate(R.id.starfieldFragment);
       } else {
         startActivity(startGameIntent);
       }

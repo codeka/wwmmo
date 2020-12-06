@@ -1,62 +1,42 @@
 package au.com.codeka.warworlds.game;
 
-import java.util.Locale;
-
-import org.andengine.engine.handler.IUpdateHandler;
-import org.andengine.entity.Entity;
-import org.andengine.entity.scene.Scene;
-import org.andengine.entity.sprite.Sprite;
-import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.opengl.vbo.VertexBufferObjectManager;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.Cash;
-import au.com.codeka.common.Vector2;
-import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.starfield.BaseStarfieldActivity;
-import au.com.codeka.warworlds.game.starfield.SectorSceneManager;
-import au.com.codeka.warworlds.game.starfield.StarfieldScene;
-import au.com.codeka.warworlds.game.starfield.StarfieldSceneManager;
-import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.designeffects.EmptySpaceMoverShipEffect;
-
-import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
  * This activity is used to select a location for moves. It's a bit annoying that we have to do
  * it like this...
  */
-public class FleetMoveActivity extends BaseStarfieldActivity {
+public class FleetMoveActivity extends BaseActivity {
   private Star srcStar;
   private Star destStar;
   private Fleet fleet;
   private float estimatedCost;
-  private FleetIndicatorEntity fleetIndicatorEntity;
+//  private FleetIndicatorEntity fleetIndicatorEntity;
 
   private Star markerStar;
-  private RadiusIndicatorEntity tooCloseIndicatorEntity;
+//  private RadiusIndicatorEntity tooCloseIndicatorEntity;
 
   public static void show(Activity activity, Fleet fleet) {
     Intent intent = new Intent(activity, FleetMoveActivity.class);
@@ -82,9 +62,9 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
 
     srcStar = StarManager.i.getStar(Integer.parseInt(fleet.getStarKey()));
     if (srcStar != null) {
-      starfield.scrollTo(srcStar);
+//      starfield.scrollTo(srcStar);
     }
-
+/*
     starfield.setSceneCreatedHandler(new SectorSceneManager.SceneCreatedHandler() {
       @Override
       public void onSceneCreated(Scene scene) {
@@ -106,22 +86,14 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
         });
       }
     });
-
+*/
     Button cancelBtn = (Button) findViewById(R.id.cancel_btn);
-    cancelBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        finish();
-      }
-    });
+    cancelBtn.setOnClickListener(v -> finish());
 
     Button moveBtn = (Button) findViewById(R.id.move_btn);
-    moveBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (destStar != null) {
-          onMoveClick();
-        }
+    moveBtn.setOnClickListener(v -> {
+      if (destStar != null) {
+       // onMoveClick();
       }
     });
   }
@@ -145,14 +117,14 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
   @Override
   public void onStart() {
     super.onStart();
-    StarfieldSceneManager.eventBus.register(eventHandler);
+//    StarfieldSceneManager.eventBus.register(eventHandler);
     StarManager.eventBus.register(eventHandler);
   }
 
   @Override
   public void onStop() {
     super.onStop();
-    StarfieldSceneManager.eventBus.unregister(eventHandler);
+//    StarfieldSceneManager.eventBus.unregister(eventHandler);
     StarManager.eventBus.unregister(eventHandler);
 
     // if we have a marker star, make sure we remove it first
@@ -170,80 +142,81 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
       if (star.getID() == Integer.parseInt(fleet.getStarKey())) {
         if (srcStar == null) {
           srcStar = star;
-          starfield.scrollTo(srcStar);
+//          starfield.scrollTo(srcStar);
         }
       }
     }
 
-    @EventHandler
-    public void onStarSelected(final StarfieldSceneManager.StarSelectedEvent event) {
-      if (event.star == null) {
-        destStar = null;
-        refreshSelection();
-        return;
-      }
-
-      if (srcStar != null && event.star.getKey().equals(srcStar.getKey())) {
-        // if src & dest are the same, just forget about it
-        destStar = null;
-      } else {
-        destStar = event.star;
-      }
-
-      refreshSelection();
-    }
-
-    @EventHandler
-    public void onSpaceTap(final StarfieldSceneManager.SpaceTapEvent event) {
-      // if the fleet you're moving has the 'empty space mover' effect, it means you can move it
-      // to regions of empty space.
-      if (!fleet.getDesign().hasEffect("empty-space-mover")) {
-        return;
-      }
-
-      // when moving to a region of empty space, we need to place a special "marker" star
-      // at the destination (since everything else we do assume you're moving to a star)
-      if (markerStar != null) {
-        Sector s = SectorManager.i.getSector(markerStar.getSectorX(), markerStar.getSectorY());
-        if (s != null) {
-          s.getStars().remove(markerStar);
-        }
-      }
-      markerStar = new Star(BaseStar.getStarType(Star.Type.Marker), "Marker", 20, event.sectorX,
-          event.sectorY, event.offsetX, event.offsetY, null);
-      Sector s = SectorManager.i.getSector(event.sectorX, event.sectorY);
-      if (s != null) {
-        s.getStars().add(markerStar);
-      }
-      SectorManager.eventBus.publish(s);
-
-      runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          StarfieldScene scene = starfield.getScene();
-          if (scene != null) {
-            scene.selectStar(markerStar.getKey());
+    /*
+        @EventHandler
+        public void onStarSelected(final StarfieldSceneManager.StarSelectedEvent event) {
+          if (event.star == null) {
+            destStar = null;
+            refreshSelection();
+            return;
           }
+
+          if (srcStar != null && event.star.getKey().equals(srcStar.getKey())) {
+            // if src & dest are the same, just forget about it
+            destStar = null;
+          } else {
+            destStar = event.star;
+          }
+
+          refreshSelection();
         }
-      });
-    }
-  };
 
-  @Override
-  protected int getLayoutID() {
-    return R.layout.fleet_move;
-  }
+        @EventHandler
+        public void onSpaceTap(final StarfieldSceneManager.SpaceTapEvent event) {
+          // if the fleet you're moving has the 'empty space mover' effect, it means you can move it
+          // to regions of empty space.
+          if (!fleet.getDesign().hasEffect("empty-space-mover")) {
+            return;
+          }
 
-  private void refreshSelection() {
-    final View starDetailsView = findViewById(R.id.star_details);
-    final View instructionsView = findViewById(R.id.instructions);
-    final TextView starDetailsLeft = (TextView) findViewById(R.id.star_details_left);
-    final TextView starDetailsRight = (TextView) findViewById(R.id.star_details_right);
+          // when moving to a region of empty space, we need to place a special "marker" star
+          // at the destination (since everything else we do assume you're moving to a star)
+          if (markerStar != null) {
+            Sector s = SectorManager.i.getSector(markerStar.getSectorX(), markerStar.getSectorY());
+            if (s != null) {
+              s.getStars().remove(markerStar);
+            }
+          }
+          markerStar = new Star(BaseStar.getStarType(Star.Type.Marker), "Marker", 20, event.sectorX,
+              event.sectorY, event.offsetX, event.offsetY, null);
+          Sector s = SectorManager.i.getSector(event.sectorX, event.sectorY);
+          if (s != null) {
+            s.getStars().add(markerStar);
+          }
+          SectorManager.eventBus.publish(s);
 
-    if (srcStar == null) {
-      return;
-    }
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              StarfieldScene scene = starfield.getScene();
+              if (scene != null) {
+                scene.selectStar(markerStar.getKey());
+              }
+            }
+          });
+        }
+      };
 
+      @Override
+      protected int getLayoutID() {
+        return R.layout.fleet_move;
+      }
+    */
+    private void refreshSelection() {
+      final View starDetailsView = findViewById(R.id.star_details);
+      final View instructionsView = findViewById(R.id.instructions);
+      final TextView starDetailsLeft = (TextView) findViewById(R.id.star_details_left);
+      final TextView starDetailsRight = (TextView) findViewById(R.id.star_details_right);
+
+      if (srcStar == null) {
+        return;
+      }
+/*
     Vector2 srcPoint = starfield.getSectorOffset(srcStar.getSectorX(), srcStar.getSectorY());
     srcPoint.add(srcStar.getOffsetX(), Sector.SECTOR_SIZE - srcStar.getOffsetY());
 
@@ -308,87 +281,88 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
           }
         }
       }
-    }
-  }
-
-  /**
-   * Searches for, and returns the distance to, the clostest star to the given star.
-   */
-  private float findClosestStar(Star toStar) {
-    float minDistance = -1.0f;
-    for (Star star : SectorManager.i.getAllVisibleStars()) {
-      if (star == toStar || star.getKey().equals(toStar.getKey())) {
-        continue;
-      }
-      float distance = Sector.distanceInParsecs(star, toStar);
-      if (distance < minDistance || minDistance < 0.0f) {
-        minDistance = distance;
-      }
-    }
-    return minDistance;
-  }
-
-  private void onMoveClick() {
-    if (destStar == null) {
-      return;
+    }*/
     }
 
-    final Button moveBtn = (Button) findViewById(R.id.move_btn);
-    moveBtn.setEnabled(false);
-
-    EmpireManager.i.getEmpire().addCash(-estimatedCost);
-
-    new BackgroundRunner<Boolean>() {
-      private String mErrorMessage;
-
-      @Override
-      protected Boolean doInBackground() {
-        String url = String.format("stars/%s/fleets/%s/orders", fleet.getStarKey(), fleet.getKey());
-        Messages.FleetOrder.Builder builder =
-            Messages.FleetOrder.newBuilder().setOrder(Messages.FleetOrder.FLEET_ORDER.MOVE);
-        if (markerStar != null) {
-          builder.setSectorX(markerStar.getSectorX());
-          builder.setSectorY(markerStar.getSectorY());
-          builder.setOffsetX(markerStar.getOffsetX());
-          builder.setOffsetY(markerStar.getOffsetY());
-        } else {
-          builder.setStarKey(destStar.getKey());
+    /**
+     * Searches for, and returns the distance to, the clostest star to the given star.
+     */
+    private float findClosestStar(Star toStar) {
+      float minDistance = -1.0f;
+      for (Star star : SectorManager.i.getAllVisibleStars()) {
+        if (star == toStar || star.getKey().equals(toStar.getKey())) {
+          continue;
         }
-        try {
-          return ApiClient.postProtoBuf(url, builder.build());
-        } catch (ApiException e) {
-          mErrorMessage = e.getServerErrorMessage();
-          return false;
+        float distance = Sector.distanceInParsecs(star, toStar);
+        if (distance < minDistance || minDistance < 0.0f) {
+          minDistance = distance;
         }
       }
+      return minDistance;
+    }
 
-      @Override
-      protected void onComplete(Boolean success) {
-        if (!success) {
-          StyledDialog dialog =
-              new StyledDialog.Builder(FleetMoveActivity.this).setTitle("Could not move fleet")
-                  .setMessage(mErrorMessage
-                      == null ? "Unable to move fleet, reason unknown." : mErrorMessage)
-                  .setPositiveButton("OK", null).create();
-          dialog.show();
-          moveBtn.setEnabled(true);
-        } else {
-          // the star this fleet is attached to needs to be refreshed...
-          StarManager.i.refreshStar(Integer.parseInt(fleet.getStarKey()));
-
-          // the empire needs to be updated, too, since we'll have subtracted
-          // the cost of this move from your cash
-          EmpireManager.i.refreshEmpire(fleet.getEmpireID());
-
-          finish();
-        }
+    private void onMoveClick() {
+      if (destStar == null) {
+        return;
       }
-    }.execute();
-  }
 
-  /**
-   * This entity is used to indicator where the fleet is going to go.
-   */
+      final Button moveBtn = (Button) findViewById(R.id.move_btn);
+      moveBtn.setEnabled(false);
+
+      EmpireManager.i.getEmpire().addCash(-estimatedCost);
+
+      new BackgroundRunner<Boolean>() {
+        private String mErrorMessage;
+
+        @Override
+        protected Boolean doInBackground() {
+          String url = String.format("stars/%s/fleets/%s/orders", fleet.getStarKey(), fleet.getKey());
+          Messages.FleetOrder.Builder builder =
+              Messages.FleetOrder.newBuilder().setOrder(Messages.FleetOrder.FLEET_ORDER.MOVE);
+          if (markerStar != null) {
+            builder.setSectorX(markerStar.getSectorX());
+            builder.setSectorY(markerStar.getSectorY());
+            builder.setOffsetX(markerStar.getOffsetX());
+            builder.setOffsetY(markerStar.getOffsetY());
+          } else {
+            builder.setStarKey(destStar.getKey());
+          }
+          try {
+            return ApiClient.postProtoBuf(url, builder.build());
+          } catch (ApiException e) {
+            mErrorMessage = e.getServerErrorMessage();
+            return false;
+          }
+        }
+
+        @Override
+        protected void onComplete(Boolean success) {
+          if (!success) {
+            StyledDialog dialog =
+                new StyledDialog.Builder(FleetMoveActivity.this).setTitle("Could not move fleet")
+                    .setMessage(mErrorMessage
+                        == null ? "Unable to move fleet, reason unknown." : mErrorMessage)
+                    .setPositiveButton("OK", null).create();
+            dialog.show();
+            moveBtn.setEnabled(true);
+          } else {
+            // the star this fleet is attached to needs to be refreshed...
+            StarManager.i.refreshStar(Integer.parseInt(fleet.getStarKey()));
+
+            // the empire needs to be updated, too, since we'll have subtracted
+            // the cost of this move from your cash
+            EmpireManager.i.refreshEmpire(fleet.getEmpireID());
+
+            finish();
+          }
+        }
+      }.execute();
+    }
+  };
+
+    /**
+     * This entity is used to indicator where the fleet is going to go.
+     *//*
   public class FleetIndicatorEntity extends Entity {
     private StarfieldSceneManager starfield;
     private Vector2 srcPoint;
@@ -498,6 +472,5 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
       public void reset() {
       }
     };
-  }
-
+  }*/
 }

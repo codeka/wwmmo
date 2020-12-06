@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -110,7 +111,14 @@ public class ServerGreeter {
     return helloResponsePb;
   }
 
-  public static void waitForHello(Activity activity, HelloCompleteHandler handler) {
+  /**
+   * Wait for hello.
+   *
+   * @param activity And {@link Activity} that we'll use as context. If you don't want to actually
+   *                 start the hello process, you can pass null for this.
+   * @param handler A callback that will be called when successfully connected to the server.
+   */
+  public static void waitForHello(@Nullable Activity activity, HelloCompleteHandler handler) {
     if (helloComplete) {
       log.debug("Already said 'hello', not saying it again...");
       handler.onHelloComplete(helloSuccessful, serverGreeting);
@@ -121,14 +129,14 @@ public class ServerGreeter {
     synchronized (helloCompleteHandlers) {
       helloCompleteHandlers.add(handler);
 
-      if (!helloStarted) {
+      if (!helloStarted && activity != null) {
         helloStarted = true;
         sayHello(activity, 0);
       }
     }
   }
 
-  private static void sayHello(final Activity activity, final int retries) {
+  private static void sayHello(@NonNull final Activity activity, final int retries) {
     Util.setup(activity);
     log.debug("Saying 'hello'...");
 

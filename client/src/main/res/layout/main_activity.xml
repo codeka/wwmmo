@@ -13,6 +13,20 @@
             app:layout_constraintStart_toStartOf="parent"
             android:visibility="gone"/>
 
+    <au.com.codeka.warworlds.opengl.RenderSurfaceView
+            android:id="@+id/render_surface"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    <au.com.codeka.warworlds.ctrl.SelectionView
+            android:id="@+id/selection"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone" />
+
+
     <androidx.fragment.app.FragmentContainerView
             android:name="androidx.navigation.fragment.NavHostFragment"
             app:navGraph="@navigation/main_nav"

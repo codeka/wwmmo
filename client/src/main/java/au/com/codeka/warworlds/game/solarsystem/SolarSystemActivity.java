@@ -2,10 +2,8 @@ package au.com.codeka.warworlds.game.solarsystem;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,15 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -35,9 +30,8 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
+import au.com.codeka.warworlds.game.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.game.wormhole.WormholeFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
@@ -155,7 +149,7 @@ public class SolarSystemActivity extends BaseActivity {
 
     switch (item.getItemId()) {
       case R.id.menu_locate:
-        Intent intent = new Intent(this, StarfieldActivity.class);
+        Intent intent = new Intent(this, StarfieldFragment.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         if (star != null) {
           intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());

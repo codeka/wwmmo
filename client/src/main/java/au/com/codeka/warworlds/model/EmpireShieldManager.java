@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
 
-import org.andengine.opengl.texture.region.ITextureRegion;
-
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -14,7 +12,6 @@ import android.graphics.Color;
 
 import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.warworlds.App;
-import au.com.codeka.warworlds.BaseGlActivity;
 
 public class EmpireShieldManager extends ShieldManager {
   public static EmpireShieldManager i = new EmpireShieldManager();
@@ -30,11 +27,6 @@ public class EmpireShieldManager extends ShieldManager {
    */
   public Bitmap getShield(Context context, Empire empire) {
     return getShield(context, getShieldInfo(empire));
-  }
-
-  /** Gets (or creates) the empire's shield as an andengine texture. */
-  public ITextureRegion getShieldTexture(BaseGlActivity glActivity, Empire empire) {
-    return getShieldTexture(glActivity, getShieldInfo(empire));
   }
 
   @Override

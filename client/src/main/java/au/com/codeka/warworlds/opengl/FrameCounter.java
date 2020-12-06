@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.client.opengl;
+package au.com.codeka.warworlds.opengl;
 
 /** Helper class for keep track of framerate and such. */
 public class FrameCounter {

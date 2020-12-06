@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.model;
 
-import org.andengine.entity.Entity;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -23,7 +21,7 @@ import au.com.codeka.warworlds.model.designeffects.WormholeDisruptorBuildingEffe
 public class Star extends BaseStar {
   private Float radarRange;
   private Float wormholeDisruptorRange;
-  private ArrayList<Entity> attachedEntities;
+ // private ArrayList<Entity> attachedEntities;
 
   public Star() {
   }
@@ -194,7 +192,7 @@ public class Star extends BaseStar {
     return radarRange;
   }
 
-
+/*
   public List<Entity> getAttachedEntities() {
     if (attachedEntities == null) {
       attachedEntities = new ArrayList<>();
@@ -204,7 +202,7 @@ public class Star extends BaseStar {
   public boolean hasAttachedEntities() {
     return attachedEntities != null && attachedEntities.size() > 0;
   }
-
+*/
   public String getCoordinateString() {
     int offsetX = (int)(mOffsetX / (float) Sector.SECTOR_SIZE * 1000.0f);
     if (mSectorX < 0) {
