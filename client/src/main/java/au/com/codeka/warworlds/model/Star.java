@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import au.com.codeka.common.model.BaseBuildRequest;
