@@ -390,7 +390,7 @@ public class StarfieldManager {
 
   /** Attach the empire labels and fleet counts to the given sprite container for the given star. */
   private void attachEmpireFleetIcons(SceneObject container, Star star) {
-    Map<Long, EmpireIconInfo> empires = new TreeMap<>();
+    Map<Integer, EmpireIconInfo> empires = new TreeMap<>();
     for (BaseColony colony : star.getColonies()) {
       if (colony.getEmpireKey() == null) {
         continue;
@@ -401,7 +401,7 @@ public class StarfieldManager {
         EmpireIconInfo iconInfo = empires.get(empire.getID());
         if (iconInfo == null) {
           iconInfo = new EmpireIconInfo(empire);
-          empires.put((long) empire.getID(), iconInfo);
+          empires.put(empire.getID(), iconInfo);
         }
         iconInfo.numColonies += 1;
       }
@@ -418,7 +418,7 @@ public class StarfieldManager {
         EmpireIconInfo iconInfo = empires.get(empire.getID());
         if (iconInfo == null) {
           iconInfo = new EmpireIconInfo(empire);
-          empires.put((long) empire.getID(), iconInfo);
+          empires.put(empire.getID(), iconInfo);
         }
         if (fleet.getDesignID().equals("fighter")) {
           iconInfo.numFighterShips += (int) Math.ceil(fleet.getNumShips());
@@ -429,7 +429,7 @@ public class StarfieldManager {
     }
 
     int i = 0;
-    for (Map.Entry<Long, EmpireIconInfo> entry : empires.entrySet()) {
+    for (Map.Entry<Integer, EmpireIconInfo> entry : empires.entrySet()) {
       EmpireIconInfo iconInfo = entry.getValue();
 
       Vector2 pt = new Vector2(0, 30.0f);
