@@ -230,13 +230,13 @@ public class StarfieldFragment extends BaseFragment {
     super.onStart();
     StarManager.eventBus.register(eventHandler);
     ShieldManager.eventBus.register(eventHandler);
- //   StarfieldSceneManager.eventBus.register(eventHandler);
+    requireMainActivity().getStarfieldManager().addTapListener(tapListener);
   }
 
   @Override
   public void onStop() {
     super.onStop();
-//    StarfieldSceneManager.eventBus.unregister(eventHandler);
+    requireMainActivity().getStarfieldManager().removeTapListener(tapListener);
     StarManager.eventBus.unregister(eventHandler);
     ShieldManager.eventBus.unregister(eventHandler);
   }
@@ -631,32 +631,18 @@ public class StarfieldFragment extends BaseFragment {
         });*/
       }
     }
-/*
-    @EventHandler
-    public void onStarSelected(final StarfieldSceneManager.StarSelectedEvent event) {
-      StarfieldActivity.this.onStarSelected(event.star);
+  };
+
+  private final StarfieldManager.TapListener tapListener = new StarfieldManager.TapListener() {
+    @Override
+    public void onStarTapped(@Nullable Star star) {
+      onStarSelected(star);
     }
 
-    @EventHandler
-    public void onFleetSelected(final StarfieldSceneManager.FleetSelectedEvent event) {
-      StarfieldActivity.this.onFleetSelected(event.fleet);
+    @Override
+    public void onFleetTapped(@Nullable Star star, @Nullable Fleet fleet) {
+      onFleetSelected(fleet);
     }
-
-    @EventHandler
-    public void onSceneUpdated(final StarfieldSceneManager.SceneUpdatedEvent event) {
-      if (starKeyToSelect != null) {
-        event.scene.selectStar(starKeyToSelect);
-      }
-      if (starToSelect != null) {
-        event.scene.selectStar(starToSelect.getKey());
-      }
-      if (fleetToSelect != null) {
-        event.scene.selectFleet(fleetToSelect.getKey());
-      }
-      starToSelect = null;
-      fleetToSelect = null;
-      starKeyToSelect = null;
-    }*/
   };
 
   private void onStarSelected(Star star) {

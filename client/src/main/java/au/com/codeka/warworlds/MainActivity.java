@@ -49,7 +49,6 @@ public class MainActivity extends BaseActivity {
     renderSurfaceView.create();
     starfieldManager = new StarfieldManager(renderSurfaceView);
     starfieldManager.create();
-
   }
 
   @Override
@@ -57,7 +56,6 @@ public class MainActivity extends BaseActivity {
     super.onStart();
 
     NavController navController = Navigation.findNavController(this, R.id.main_content);
-
 
     final SharedPreferences prefs = Util.getSharedPreferences();
     if (!prefs.getBoolean("WarmWelcome", false)) {
@@ -91,6 +89,10 @@ public class MainActivity extends BaseActivity {
 
     starfieldManager.destroy();
     starfieldManager = null;
+  }
+
+  public StarfieldManager getStarfieldManager() {
+    return starfieldManager;
   }
 
   private boolean onBlueStacks() {
