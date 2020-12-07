@@ -342,6 +342,8 @@ public class StarfieldManager {
 
   /** Called when a star is updated, we may need to update the sprite for it. */
   private void updateStar(Star star) {
+    boolean reselect = (selectedStar != null && selectedStar.getID() == star.getID());
+
     Star oldStar = null;
     SceneObject container = sceneObjects.get(star.getID());
     if (container == null) {
@@ -386,6 +388,10 @@ public class StarfieldManager {
 
     detachNonMovingFleets(oldStar, star);
     attachMovingFleets(star);
+
+    if (reselect) {
+      setSelectedStar(star);
+    }
   }
 
   /** Attach the empire labels and fleet counts to the given sprite container for the given star. */
@@ -487,7 +493,7 @@ public class StarfieldManager {
       container.setClipRadius(80.0f);
       container.setTapTargetRadius(80.0f);
       container.setTag(new SceneObjectInfo(star, fleet, destStar));
-      addSectorSceneObject(new Pair(star.getSectorX(), star.getSectorY()), container);
+      addSectorSceneObject(new Pair<>(star.getSectorX(), star.getSectorY()), container);
 
       Vector2 pos = getMovingFleetPosition(star, destStar, fleet);
       container.translate((float) pos.x, (float) -pos.y);
