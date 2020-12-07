@@ -96,7 +96,8 @@ public class WelcomeFragment extends BaseFragment {
 
     startGameButton.setOnClickListener(v -> {
       if (startGameIntent == null) {
-        NavHostFragment.findNavController(this).navigate(R.id.starfieldFragment);
+        NavHostFragment.findNavController(this).navigate(
+            WelcomeFragmentDirections.actionWelcomeFragmentToStarfieldFragment());
       } else {
         startActivity(startGameIntent);
       }

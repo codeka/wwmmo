@@ -70,14 +70,18 @@ public class MainActivity extends BaseActivity {
     NavigationUI.setupWithNavController((Toolbar) findViewById(R.id.toolbar), navController);
 
     navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+      log.info("DEANH DEANH DEANH onDestinationChangedListener, arguments=" + arguments);
       ActionBar actionBar = getSupportActionBar();
       if (actionBar == null) {
+        log.info("DEANH actionBar == null");
         return;
       }
 
       if (arguments != null && arguments.getBoolean("hideToolbar")) {
+        log.info("DEANH actionBar.hide()");
         actionBar.hide();
       } else {
+        log.info("DEANH actionBar.show()");
         actionBar.show();
       }
     });

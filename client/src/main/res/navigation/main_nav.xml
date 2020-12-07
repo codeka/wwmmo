@@ -16,8 +16,11 @@
                 android:id="@+id/action_welcomeFragment_to_realmSelectFragment"
                 app:destination="@id/realmSelectFragment" />
         <action
-                android:id="@+id/action_welcomeFragment_to_starfieldActivity"
-                app:destination="@id/starfieldFragment" />
+                android:id="@+id/action_welcomeFragment_to_starfieldFragment"
+                app:destination="@id/starfieldFragment"
+                app:launchSingleTop="true"
+                app:popUpTo="@id/main_nav"
+                app:popUpToInclusive="true" />
     </fragment>
     <fragment
             android:id="@+id/globalOptionsFragment"
