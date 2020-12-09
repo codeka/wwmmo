@@ -1,43 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        android:layout_height="match_parent"
+        tools:context="au.com.codeka.warworlds.MainActivity">
+    <androidx.drawerlayout.widget.DrawerLayout
+            android:id="@+id/drawer_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:visibility="gone"
-            tools:visibility="visible"/>
+            android:layout_height="match_parent">
 
-    <au.com.codeka.warworlds.opengl.RenderSurfaceView
-            android:id="@+id/render_surface"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/toolbar"
-            app:layout_constraintBottom_toBottomOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-    <au.com.codeka.warworlds.ctrl.SelectionView
-            android:id="@+id/selection"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:visibility="gone" />
+            <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
-    <androidx.fragment.app.FragmentContainerView
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            app:navGraph="@navigation/main_nav"
-            app:defaultNavHost="true"
-            android:id="@+id/main_content"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/toolbar"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            <au.com.codeka.warworlds.opengl.RenderSurfaceView
+                    android:id="@+id/render_surface"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintTop_toBottomOf="@id/toolbar"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <au.com.codeka.warworlds.ctrl.SelectionView
+                    android:id="@+id/selection"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:visibility="gone" />
+
+            <androidx.fragment.app.FragmentContainerView
+                    android:name="androidx.navigation.fragment.NavHostFragment"
+                    app:navGraph="@navigation/main_nav"
+                    app:defaultNavHost="true"
+                    android:id="@+id/main_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintTop_toBottomOf="@id/toolbar"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <RelativeLayout
+                android:id="@+id/drawer_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="40dp"
+                android:layout_gravity="start"
+                android:background="@drawable/left_pane_bg">
+
+            <EditText android:id="@+id/search_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_toStartOf="@+id/search_button"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch" />
+
+            <ImageButton android:id="@+id/search_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@android:drawable/ic_menu_search" />
+
+            <ListView android:id="@+id/search_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/search_button" />
+
+        </RelativeLayout>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+</FrameLayout>
