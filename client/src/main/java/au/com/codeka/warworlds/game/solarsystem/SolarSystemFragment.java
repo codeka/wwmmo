@@ -12,6 +12,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.navigation.fragment.NavHostFragment;
+
 import java.util.Locale;
 
 import au.com.codeka.RomanNumeralFormatter;
@@ -266,7 +268,11 @@ public class SolarSystemFragment extends BaseFragment {
     Intent intent;
     if (colony != null) {
       if (colony.getEmpireID() != null && colony.getEmpireID() == myEmpire.getID()) {
-        intent = new Intent(getActivity(), OwnedPlanetActivity.class);
+        Bundle args = new Bundle();
+        args.putInt("au.com.codeka.warworlds.StarID", starID);
+        args.putInt("au.com.codeka.warworlds.PlanetIndex", colony.getPlanetIndex());
+        NavHostFragment.findNavController(this).navigate(R.id.ownedPlanetFragment, args);
+        return;
       } else {
         intent = new Intent(getActivity(), EnemyPlanetActivity.class);
       }
