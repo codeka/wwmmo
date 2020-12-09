@@ -1,10 +1,7 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
-import java.util.Locale;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,14 +12,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
+import java.util.Locale;
+
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BasePlanet;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
@@ -32,7 +28,6 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
-import au.com.codeka.warworlds.game.build.BuildActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -43,9 +38,10 @@ import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSimulationQueue;
+import au.com.codeka.warworlds.ui.BaseFragment;
 
 /** This is a fragment which displays details about a single solar system. */
-public class SolarSystemFragment extends Fragment {
+public class SolarSystemFragment extends BaseFragment {
   private static final Log log = new Log("SolarSystemFragment");
   private SolarSystemSurfaceView solarSystemSurfaceView;
   private StarStorageView starStorageView;
@@ -122,7 +118,6 @@ public class SolarSystemFragment extends Fragment {
   public void onResume() {
     super.onResume();
     starID = requireArguments().getInt("au.com.codeka.warworlds.StarID");
-    log.info("DEANH DEANH DEANH starID=%d", starID);
     StarManager.eventBus.register(eventHandler);
     ShieldManager.eventBus.register(eventHandler);
 
@@ -221,6 +216,8 @@ public class SolarSystemFragment extends Fragment {
     this.star = star;
     this.planet = (Planet) planet;
     progressBar.setVisibility(View.GONE);
+
+    requireMainActivity().requireSupportActionBar().setTitle(star.getName());
 
     refresh();
 

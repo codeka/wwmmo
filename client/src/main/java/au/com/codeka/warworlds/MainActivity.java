@@ -21,6 +21,8 @@ import au.com.codeka.warworlds.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.ui.DrawerController;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * The main activity of the whole app. All our fragments are children of this.
  */
@@ -114,6 +116,10 @@ public class MainActivity extends BaseActivity {
 
   public StarfieldManager getStarfieldManager() {
     return starfieldManager;
+  }
+
+  public ActionBar requireSupportActionBar() {
+    return checkNotNull(getSupportActionBar());
   }
 
   private boolean onBlueStacks() {
