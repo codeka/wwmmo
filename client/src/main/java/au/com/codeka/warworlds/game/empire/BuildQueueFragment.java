@@ -31,7 +31,6 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.build.BuildAccelerateDialog;
 import au.com.codeka.warworlds.game.build.BuildStopConfirmDialog;
 import au.com.codeka.warworlds.game.empire.StarsFragment.StarsListAdapter;
-import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -80,24 +79,22 @@ public class BuildQueueFragment extends BaseFragment {
             }
         });
 
-        starsList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v,
-                    int groupPosition, long id) {
-                // if it doesn't have any builds, go to the star view
-                if (adapter.getChildrenCount(groupPosition) == 0) {
-                    Star star = (Star) adapter.getGroup(groupPosition);
-                    if (star == null) {
-                        // huh?
-                        return false;
-                    }
-
-                    Intent intent = new Intent(getActivity(), SolarSystemActivity.class);
-                    intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-                    startActivity(intent);
+        starsList.setOnGroupClickListener((parent1, v1, groupPosition, id) -> {
+            // if it doesn't have any builds, go to the star view
+            if (adapter.getChildrenCount(groupPosition) == 0) {
+                Star star = (Star) adapter.getGroup(groupPosition);
+                if (star == null) {
+                    // huh?
+                    return false;
                 }
-                return false;
+
+                /* TODO
+                Intent intent = new Intent(getActivity(), SolarSystemActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+                startActivity(intent);
+                 */
             }
+            return false;
         });
         starsList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override

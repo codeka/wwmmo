@@ -80,7 +80,8 @@ public class MainActivity extends BaseActivity {
         (Toolbar) findViewById(R.id.toolbar), navController, appBarConfiguration);
     NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-    drawerController = new DrawerController(navController, drawerLayout);
+    drawerController = new DrawerController(
+        navController, drawerLayout, findViewById(R.id.drawer_content));
     drawerController.start();
 
     navController.addOnDestinationChangedListener((controller, destination, arguments) -> {

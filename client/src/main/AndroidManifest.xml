@@ -63,7 +63,6 @@
     </activity>
 
     <activity android:name="au.com.codeka.warworlds.AccountsActivity" />
-    <activity android:name="au.com.codeka.warworlds.WarmWelcomeFragment" />
     <activity android:name="au.com.codeka.warworlds.EmpireSetupActivity" />
     <activity android:name="au.com.codeka.warworlds.EmpireResetActivity" />
     <activity android:name="au.com.codeka.warworlds.BlitzResetActivity" android:exported="true" />
@@ -85,12 +84,10 @@
     </activity>
     <activity android:name="au.com.codeka.warworlds.game.empire.EnemyEmpireActivity" />
     <activity android:name="au.com.codeka.warworlds.game.FleetMoveActivity" />
-    <activity android:name="au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity" />
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.EnemyPlanetActivity" />
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.EmptyPlanetActivity" />
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.OwnedPlanetActivity" />
     <activity android:name="au.com.codeka.warworlds.game.solarsystem.FleetActivity" />
-    <activity android:name="au.com.codeka.warworlds.game.starfield.StarfieldFragment" />
     <activity android:name="au.com.codeka.warworlds.game.alliance.AllianceActivity" />
     <activity
       android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsActivity"

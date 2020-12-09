@@ -39,7 +39,6 @@ import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -80,7 +79,7 @@ public class SitrepActivity extends BaseActivity {
           long id) {
         SituationReport sitrep = situationReportAdapter
             .getSituationReport(position);
-
+/* TODO
         Intent intent = new Intent(context, SolarSystemActivity.class);
         intent.putExtra("au.com.codeka.warworlds.StarKey", sitrep.getStarKey());
 
@@ -121,6 +120,7 @@ public class SitrepActivity extends BaseActivity {
         }
 
         startActivity(intent);
+*/
       }
     });
 
