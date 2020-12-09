@@ -8,8 +8,10 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import java.io.File;
@@ -67,21 +69,24 @@ public class MainActivity extends BaseActivity {
       navController.navigate(R.id.realmSelectFragment);
     }
 
-    NavigationUI.setupWithNavController((Toolbar) findViewById(R.id.toolbar), navController);
+    DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+    AppBarConfiguration appBarConfiguration =
+        new AppBarConfiguration.Builder(R.id.starfieldFragment, R.id.solarSystemFragment)
+            .setOpenableLayout(drawerLayout)
+            .build();
+    NavigationUI.setupWithNavController(
+        (Toolbar) findViewById(R.id.toolbar), navController, appBarConfiguration);
+    NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
     navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-      log.info("DEANH DEANH DEANH onDestinationChangedListener, arguments=" + arguments);
       ActionBar actionBar = getSupportActionBar();
       if (actionBar == null) {
-        log.info("DEANH actionBar == null");
         return;
       }
 
       if (arguments != null && arguments.getBoolean("hideToolbar")) {
-        log.info("DEANH actionBar.hide()");
         actionBar.hide();
       } else {
-        log.info("DEANH actionBar.show()");
         actionBar.show();
       }
     });

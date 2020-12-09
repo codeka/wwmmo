@@ -1,84 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <au.com.codeka.warworlds.ctrl.SelectionView
-        android:id="@+id/selection"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:visibility="gone" />
-
-    <au.com.codeka.warworlds.ctrl.MiniChatView
-        android:id="@+id/mini_chat"
-        android:layout_height="50dp"
-        android:layout_width="fill_parent"
-        android:layout_above="@+id/infobar"
-        android:layout_toLeftOf="@+id/bottom_pane" />
-
-    <au.com.codeka.warworlds.ctrl.InfobarView
-        android:id="@+id/infobar"
-        style="@style/BottomPane"
+<androidx.drawerlayout.widget.DrawerLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/bottom_pane"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true" />
+        android:layout_height="match_parent"
+        android:id="@+id/drawer_layout">
 
     <RelativeLayout
-        android:id="@+id/bottom_pane"
-        style="@style/RightPane"
-        android:layout_width="200dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:baselineAligned="false">
-
-        <au.com.codeka.warworlds.game.starfield.SelectionDetailsView
-            android:id="@+id/selection_details"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/bottom_buttons" />
+            android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:id="@+id/bottom_buttons"
+        <au.com.codeka.warworlds.ctrl.SelectionView
+            android:id="@+id/selection"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:visibility="gone" />
+
+        <au.com.codeka.warworlds.ctrl.MiniChatView
+            android:id="@+id/mini_chat"
+            android:layout_height="50dp"
+            android:layout_width="fill_parent"
+            android:layout_above="@+id/infobar"
+            android:layout_toLeftOf="@+id/bottom_pane" />
+
+        <au.com.codeka.warworlds.ctrl.InfobarView
+            android:id="@+id/infobar"
+            style="@style/BottomPane"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true" >
+            android:layout_toLeftOf="@+id/bottom_pane"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true" />
 
-            <Button
-                android:id="@+id/sitrep_btn"
-                style="@style/Button"
-                android:layout_width="92dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:text="Sit. Rep." />
+        <RelativeLayout
+            android:id="@+id/bottom_pane"
+            style="@style/RightPane"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:baselineAligned="false">
 
-            <Button
-                android:id="@+id/empire_btn"
-                style="@style/Button"
-                android:layout_width="92dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_below="@+id/sitrep_btn"
-                android:layout_alignParentLeft="true"
-                android:text="Empire" />
+            <au.com.codeka.warworlds.game.starfield.SelectionDetailsView
+                android:id="@+id/selection_details"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/bottom_buttons" />
 
-            <Button android:id="@+id/alliance_btn"
+            <RelativeLayout
+                android:id="@+id/bottom_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true" >
+
+                <Button
+                    android:id="@+id/sitrep_btn"
                     style="@style/Button"
                     android:layout_width="92dp"
                     android:layout_height="30dp"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="4dp"
-                    android:layout_marginTop="34dp"
                     android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
-                    android:text="Alliance" />
+                    android:layout_alignParentLeft="true"
+                    android:text="Sit. Rep." />
+
+                <Button
+                    android:id="@+id/empire_btn"
+                    style="@style/Button"
+                    android:layout_width="92dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_below="@+id/sitrep_btn"
+                    android:layout_alignParentLeft="true"
+                    android:text="Empire" />
+
+                <Button android:id="@+id/alliance_btn"
+                        style="@style/Button"
+                        android:layout_width="92dp"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_marginTop="34dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:text="Alliance" />
+            </RelativeLayout>
         </RelativeLayout>
+
     </RelativeLayout>
 
-</RelativeLayout>
+
+    <RelativeLayout android:id="@+id/drawer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginRight="40dp"
+            android:layout_gravity="start"
+            android:background="@drawable/left_pane_bg">
+
+        <EditText android:id="@+id/search_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_toLeftOf="@+id/search_button"
+                android:inputType="text"
+                android:imeOptions="actionSearch" />
+
+        <ImageButton android:id="@+id/search_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_alignParentRight="true"
+                android:src="@android:drawable/ic_menu_search" />
+
+        <ListView android:id="@+id/search_result"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/search_button" />
+
+    </RelativeLayout>
+
+</androidx.drawerlayout.widget.DrawerLayout>
