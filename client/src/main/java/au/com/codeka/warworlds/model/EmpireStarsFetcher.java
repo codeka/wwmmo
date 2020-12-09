@@ -42,10 +42,10 @@ public class EmpireStarsFetcher {
   private final Object indicesToFetchLock = new Object();
   private ArrayList<Integer> indicesToFetch;
   private Filter filter;
-  private String search;
+  @Nullable private String search;
   private int numStars;
 
-  public EmpireStarsFetcher(Filter filter, String search) {
+  public EmpireStarsFetcher(Filter filter, @Nullable String search) {
     this.filter = filter;
     this.search = search;
   }
@@ -110,7 +110,7 @@ public class EmpireStarsFetcher {
     return false;
   }
 
-  private Runnable starFetchRunnable = new Runnable() {
+  private final Runnable starFetchRunnable = new Runnable() {
     @Override
     public void run() {
       ArrayList<Integer> indices;
@@ -159,22 +159,19 @@ public class EmpireStarsFetcher {
   public void indexOf(int starID, final IndexOfCompleteHandler onCompleteHandler) {
     final StringBuilder url = new StringBuilder();
     url.append("empires/");
-    url.append(Integer.toString(EmpireManager.i.getEmpire().getID()));
+    url.append(EmpireManager.i.getEmpire().getID());
     url.append("/stars?indexof=");
     url.append(starID);
     appendFilterAndSearch(url);
     log.debug("Fetching: %s", url);
 
     RequestManager.i.sendRequest(new ApiRequest.Builder(url.toString(), "GET")
-        .completeCallback(new ApiRequest.CompleteCallback() {
-          @Override
-          public void onRequestComplete(ApiRequest request) {
-            int index = Integer.parseInt(request.bodyString());
-            if (index < 0) {
-              onCompleteHandler.onIndexOfComplete(null);
-            } else {
-              onCompleteHandler.onIndexOfComplete(index);
-            }
+        .completeCallback(request -> {
+          int index = Integer.parseInt(request.bodyString());
+          if (index < 0) {
+            onCompleteHandler.onIndexOfComplete(null);
+          } else {
+            onCompleteHandler.onIndexOfComplete(index);
           }
         }).build());
   }
@@ -186,18 +183,18 @@ public class EmpireStarsFetcher {
   private void fetchStars(Collection<Integer> indices) {
     final StringBuilder url = new StringBuilder();
     url.append("empires/");
-    url.append(Integer.toString(EmpireManager.i.getEmpire().getID()));
+    url.append(EmpireManager.i.getEmpire().getID());
     url.append("/stars?indices=");
     int lastIndex = -1;
     for (Integer index : indices) {
       if (lastIndex < 0 || lastIndex < (index - 1)) {
         if (lastIndex < 0) {
-          url.append(Integer.toString(index));
+          url.append(index);
           url.append("-");
         } else {
-          url.append(Integer.toString(lastIndex));
+          url.append(lastIndex);
           url.append(",");
-          url.append(Integer.toString(index));
+          url.append(index);
           url.append("-");
         }
       }
@@ -207,7 +204,7 @@ public class EmpireStarsFetcher {
     if (lastIndex >= numStars) {
       lastIndex = numStars + 4; // try to fetch a bit more
     }
-    url.append(Integer.toString(lastIndex));
+    url.append(lastIndex);
     appendFilterAndSearch(url);
     log.debug("Fetching: %s", url);
 
@@ -264,7 +261,7 @@ public class EmpireStarsFetcher {
   }
 
   public interface IndexOfCompleteHandler {
-    public void onIndexOfComplete(@Nullable Integer index);
+    void onIndexOfComplete(@Nullable Integer index);
   }
 
   public enum Filter {

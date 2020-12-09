@@ -110,7 +110,7 @@ public class WormholeFragment extends BaseFragment {
         }
 
         // This cast isn't great...
-        ((SolarSystemActivity) getActivity()).showStar(destStar.getID());
+//TODO        ((SolarSystemActivity) getActivity()).showStar(destStar.getID());
       }
     });
     viewDestinationBtn.setEnabled(false);

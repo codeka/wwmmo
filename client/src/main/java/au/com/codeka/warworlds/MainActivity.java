@@ -19,6 +19,7 @@ import java.io.File;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.game.starfield.StarfieldManager;
 import au.com.codeka.warworlds.opengl.RenderSurfaceView;
+import au.com.codeka.warworlds.ui.DrawerController;
 
 /**
  * The main activity of the whole app. All our fragments are children of this.
@@ -27,6 +28,7 @@ import au.com.codeka.warworlds.opengl.RenderSurfaceView;
 public class MainActivity extends BaseActivity {
   private static final Log log = new Log("MainActivity");
 
+  private DrawerController drawerController;
   private StarfieldManager starfieldManager;
 
   @Override
@@ -78,6 +80,9 @@ public class MainActivity extends BaseActivity {
         (Toolbar) findViewById(R.id.toolbar), navController, appBarConfiguration);
     NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
+    drawerController = new DrawerController(navController, drawerLayout);
+    drawerController.start();
+
     navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
       ActionBar actionBar = getSupportActionBar();
       if (actionBar == null) {
@@ -90,6 +95,12 @@ public class MainActivity extends BaseActivity {
         actionBar.show();
       }
     });
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    drawerController.stop();
   }
 
   @Override
