@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 
 import java.util.ArrayList;
@@ -46,12 +48,15 @@ public class DrawerController {
   private final int LAST_STARS_MAX_SIZE = 6;
 
   private final NavController navController;
+  private final DrawerLayout drawerLayout;
   private final SearchListAdapter searchListAdapter;
 
   private Integer waitingForStarID = null;
 
-  public DrawerController(NavController navController, ViewGroup drawerContent) {
+  public DrawerController(
+      NavController navController, DrawerLayout drawerLayout, ViewGroup drawerContent) {
     this.navController = navController;
+    this.drawerLayout = drawerLayout;
 
     final ListView searchList = drawerContent.findViewById(R.id.search_result);
     searchListAdapter = new SearchListAdapter(LayoutInflater.from(drawerContent.getContext()));
@@ -76,11 +81,17 @@ public class DrawerController {
 
     ImageButton searchBtn = drawerContent.findViewById(R.id.search_button);
     searchBtn.setOnClickListener(v -> performSearch(searchBox.getText().toString()));
+
+    drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+      @Override
+      public void onDrawerOpened(@NonNull View drawerView) {
+        searchListAdapter.onShow();
+      }
+    });
   }
 
   public void start() {
     StarManager.eventBus.register(eventHandler);
-    ServerGreeter.waitForHello(null, (success, greeting) -> performSearch(null));
   }
 
   public void stop() {
@@ -108,7 +119,7 @@ public class DrawerController {
       navController.navigate(R.id.solarSystemFragment, args);
     }
 
-    // TODO: close drawer
+    drawerLayout.close();
 
     synchronized (lastStars) {
       for (int i = 0; i < lastStars.size(); i++) {
@@ -156,6 +167,12 @@ public class DrawerController {
       this.fetcher.eventBus.register(eventHandler);
       this.fetcher.getStars(0, 20);
       notifyDataSetChanged();
+    }
+
+    public void onShow() {
+      if (fetcher == null) {
+        setEmpireStarsFetcher(new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Everything, null));
+      }
     }
 
     public EmpireStarsFetcher getStarsFetcher() {
