@@ -60,8 +60,16 @@
     </fragment>
     <fragment
             android:id="@+id/solarSystemFragment"
-            android:name="au.com.codeka.warworlds.game.solarsystem.SolarSystemFragment" />
+            android:name="au.com.codeka.warworlds.game.solarsystem.SolarSystemFragment" >
+        <action
+                android:id="@+id/action_solarSystemFragment_to_ownedPlanetFragment"
+                app:destination="@id/ownedPlanetFragment" />
+    </fragment>
     <fragment
             android:id="@+id/wormholeFragment"
             android:name="au.com.codeka.warworlds.game.wormhole.WormholeFragment" />
+    <fragment
+            android:id="@+id/ownedPlanetFragment"
+            android:name="au.com.codeka.warworlds.game.solarsystem.OwnedPlanetFragment"
+            android:label="OwnedPlanetFragment" />
 </navigation>
