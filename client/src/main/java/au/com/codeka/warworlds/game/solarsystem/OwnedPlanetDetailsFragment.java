@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -11,11 +12,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import java.util.Locale;
 
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
@@ -31,9 +32,10 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.ui.BaseFragment;
 
 /** A fragment that displays the details of a single "owned planet". */
-public class OwnedPlanetDetailsFragment extends Fragment {
+public class OwnedPlanetDetailsFragment extends BaseFragment {
   private int starID;
   private Star star;
   private Planet planet;
@@ -98,6 +100,11 @@ public class OwnedPlanetDetailsFragment extends Fragment {
   public void onStop() {
     super.onStop();
     StarManager.eventBus.unregister(eventHandler);
+  }
+
+  @Override
+  public void onAttach(@NonNull Context context) {
+    super.onAttach(context);
   }
 
   private final Object eventHandler = new Object() {

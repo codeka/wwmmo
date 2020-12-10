@@ -70,6 +70,5 @@
             android:name="au.com.codeka.warworlds.game.wormhole.WormholeFragment" />
     <fragment
             android:id="@+id/ownedPlanetFragment"
-            android:name="au.com.codeka.warworlds.game.solarsystem.OwnedPlanetFragment"
-            android:label="OwnedPlanetFragment" />
+            android:name="au.com.codeka.warworlds.game.solarsystem.OwnedPlanetFragment"/>
 </navigation>
