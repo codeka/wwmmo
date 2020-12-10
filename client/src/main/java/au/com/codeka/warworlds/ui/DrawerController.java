@@ -139,7 +139,7 @@ public class DrawerController {
   private final Object eventHandler = new Object() {
     @EventHandler
     public void onStarUpdated(Star star) {
-      if (star.getID() == waitingForStarID) {
+      if (waitingForStarID != null && star.getID() == waitingForStarID) {
         waitingForStarID = null;
         showStar(star.getID());
       }

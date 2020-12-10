@@ -62,13 +62,24 @@
             android:id="@+id/solarSystemFragment"
             android:name="au.com.codeka.warworlds.game.solarsystem.SolarSystemFragment" >
         <action
-                android:id="@+id/action_solarSystemFragment_to_ownedPlanetFragment"
-                app:destination="@id/ownedPlanetFragment" />
+                android:id="@+id/action_planetPager"
+                app:destination="@id/planetPagerFragment" />
     </fragment>
     <fragment
             android:id="@+id/wormholeFragment"
             android:name="au.com.codeka.warworlds.game.wormhole.WormholeFragment" />
     <fragment
-            android:id="@+id/ownedPlanetFragment"
-            android:name="au.com.codeka.warworlds.game.solarsystem.OwnedPlanetFragment"/>
+            android:id="@+id/planetPagerFragment"
+            android:name="au.com.codeka.warworlds.game.solarsystem.PlanetPagerFragment">
+        <argument android:name="starID" app:argType="integer" app:nullable="false" />
+        <argument android:name="planetIndex" app:argType="integer" app:nullable="false" />
+        <argument android:name="kind" app:argType="au.com.codeka.warworlds.game.solarsystem.PlanetPagerFragment$Kind" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ownedPlanetFragment"
+        android:name="au.com.codeka.warworlds.game.solarsystem.OwnedPlanetFragment">
+        <argument android:name="starID" app:argType="integer" app:nullable="false" />
+        <argument android:name="planetIndex" app:argType="integer" app:nullable="false" />
+    </fragment>
 </navigation>
