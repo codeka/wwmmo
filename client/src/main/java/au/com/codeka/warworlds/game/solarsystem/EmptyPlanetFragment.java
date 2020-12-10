@@ -1,16 +1,20 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.navigation.fragment.NavHostFragment;
+
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
-import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -18,39 +22,47 @@ import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.ui.BaseFragment;
 
-public class EmptyPlanetActivity extends BaseActivity {
+public class EmptyPlanetFragment extends BaseFragment {
   private Star star;
   private Planet planet;
 
+  private PlanetDetailsView planetDetailsView;
+
+  private EmptyPlanetFragmentArgs args;
+
+  @Nullable
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.planet_empty);
-
-    View rootView = findViewById(android.R.id.content);
-    ActivityBackgroundGenerator.setBackground(rootView);
-
-    Button colonizeBtn = (Button) findViewById(R.id.colonize_btn);
-    colonizeBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        onColonizeClick();
-      }
-    });
+  public View onCreateView(
+      @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    return inflater.inflate(R.layout.planet_empty, container, false);
   }
 
   @Override
-  public void onResumeFragments() {
-    super.onResumeFragments();
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
 
-    ServerGreeter.waitForHello(this, (success, greeting) -> {
+    args = EmptyPlanetFragmentArgs.fromBundle(requireArguments());
+
+    ActivityBackgroundGenerator.setBackground(view);
+    planetDetailsView = view.findViewById(R.id.planet_details);
+
+    Button colonizeBtn = (Button) view.findViewById(R.id.colonize_btn);
+    colonizeBtn.setOnClickListener(v -> onColonizeClick());
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+
+    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
       if (!success) {
-        startActivity(new Intent(EmptyPlanetActivity.this, WelcomeFragment.class));
+        // TODO: should we return errors?
       } else {
-        String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
         StarManager.eventBus.register(eventHandler);
-        Star star = StarManager.i.getStar(Integer.parseInt(starKey));
+        Star star = StarManager.i.getStar(args.getStarID());
         if (star != null) {
           refresh(star);
         }
@@ -76,13 +88,10 @@ public class EmptyPlanetActivity extends BaseActivity {
   };
 
   private void refresh(Star s) {
-    int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
-
     star = s;
-    planet = (Planet) star.getPlanets()[planetIndex - 1];
+    planet = (Planet) star.getPlanets()[args.getPlanetIndex() - 1];
 
-    PlanetDetailsView planetDetails = findViewById(R.id.planet_details);
-    planetDetails.setup(star, planet, null);
+    planetDetailsView.setup(star, planet, null);
   }
 
   private void onColonizeClick() {
@@ -104,12 +113,12 @@ public class EmptyPlanetActivity extends BaseActivity {
 
     if (!hasColonyShip) {
       // TODO: better errors...
-      StyledDialog dialog = new StyledDialog.Builder(this).setMessage(
+      StyledDialog dialog = new StyledDialog.Builder(requireContext()).setMessage(
           "You don't have a colony ship around this star, so you cannot colonize this planet.")
           .setPositiveButton("OK", null).create();
       dialog.show();
     }
 
-    empire.colonize(planet, colony -> finish());
+    empire.colonize(planet, colony -> NavHostFragment.findNavController(this).popBackStack());
   }
 }
