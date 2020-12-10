@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -151,10 +152,12 @@ public class OwnedPlanetFragment extends BaseFragment {
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
       super.setPrimaryItem(container, position, object);
-//      if (colonies != null && colonies.size() > position) {
-//        refreshColonyDetails(colonies.get(position));
-//      }
+
+      if (colonies != null && colonies.size() > position) {
+        requireMainActivity().requireSupportActionBar().setTitle(
+            String.format("%s %s", star.getName(),
+                RomanNumeralFormatter.format(colonies.get(position).getPlanetIndex())));
+      }
     }
   }
-
 }
