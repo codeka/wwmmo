@@ -17,8 +17,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.validation.constraints.Null;
+
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -35,7 +38,7 @@ import au.com.codeka.warworlds.ui.BaseFragment;
  */
 public class PlanetPagerFragment extends BaseFragment {
   private Star star;
-  private List<Colony> colonies;
+  private List<Integer> planetIndices;
   private ViewPager viewPager;
   private ColonyPagerAdapter colonyPagerAdapter;
 
@@ -102,24 +105,48 @@ public class PlanetPagerFragment extends BaseFragment {
     boolean dataSetChanged = (this.star == null);
     this.star = star;
 
-    colonies = new ArrayList<>();
+    PlanetPagerFragment.Kind kind = args.getKind();
+    planetIndices = new ArrayList<>();
     MyEmpire myEmpire = EmpireManager.i.getEmpire();
-    for (BaseColony c : star.getColonies()) {
-      if (c.getEmpireKey() != null && c.getEmpireKey().equals(myEmpire.getKey())) {
-        colonies.add((Colony) c);
+    if (kind == Kind.EmptyPlanets) {
+      for (BasePlanet p : star.getPlanets()) {
+        boolean hasColony = false;
+        for (BaseColony c : star.getColonies()) {
+          if (c.getPlanetIndex() == p.getIndex()) {
+            hasColony = true;
+          }
+        }
+        if (!hasColony) {
+          planetIndices.add(p.getIndex());
+        }
       }
     }
-    Collections.sort(colonies, (lhs, rhs) -> lhs.getPlanetIndex() - rhs.getPlanetIndex());
+    for (BaseColony c : star.getColonies()) {
+      switch(kind) {
+        case OwnedPlanets:
+          if (c.getEmpireKey() != null && c.getEmpireKey().equals(myEmpire.getKey())) {
+            planetIndices.add(c.getPlanetIndex());
+          }
+          break;
+        case EnemyPlanets:
+          if (c.getEmpireKey() == null || !c.getEmpireKey().equals(myEmpire.getKey())) {
+            planetIndices.add(c.getPlanetIndex());
+          }
+          break;
+      }
+    }
+
+    Collections.sort(planetIndices, (lhs, rhs) -> lhs - rhs);
     colonyPagerAdapter.notifyDataSetChanged();
 
     int initialPlanetIndex = args.getPlanetIndex();
     if (initialPlanetIndex < 0) {
-      initialPlanetIndex = colonies.get(0).getPlanetIndex();
+      initialPlanetIndex = planetIndices.get(0);
     }
 
     int colonyIndex = 0;
-    for (Colony colony : colonies) {
-      if (colony.getPlanetIndex() == initialPlanetIndex) {
+    for (Integer planetIndex : planetIndices) {
+      if (planetIndex == initialPlanetIndex) {
         break;
       }
       colonyIndex++;
@@ -140,18 +167,18 @@ public class PlanetPagerFragment extends BaseFragment {
       Fragment fragment;
       Bundle bundle;
 
-      switch(args.getKind()) {
-        case OwnedPlanets:
-          fragment = new OwnedPlanetFragment();
-          bundle = new OwnedPlanetFragmentArgs.Builder(
-                  star.getID(), colonies.get(i).getPlanetIndex())
-              .build().toBundle();
-          break;
-        default:
-          // TODO: implement?
-          fragment = new OwnedPlanetFragment();
-          bundle = null;
-          break;
+      MyEmpire myEmpire = EmpireManager.i.getEmpire();
+      int planetIndex = planetIndices.get(i);
+      Colony colony = findColony(planetIndex);
+      if (colony == null) {
+        fragment = new EmptyPlanetFragment();
+        bundle = new EmptyPlanetFragmentArgs.Builder(star.getID(), planetIndex).build().toBundle();
+      } else if (colony.getEmpireID() != null && colony.getEmpireID() == myEmpire.getID()) {
+        fragment = new OwnedPlanetFragment();
+        bundle = new OwnedPlanetFragmentArgs.Builder(star.getID(), planetIndex).build().toBundle();
+      } else {
+        fragment = new EnemyPlanetFragment();
+        bundle = new EnemyPlanetFragmentArgs.Builder(star.getID(), planetIndex).build().toBundle();
       }
 
       fragment.setArguments(bundle);
@@ -160,11 +187,11 @@ public class PlanetPagerFragment extends BaseFragment {
 
     @Override
     public int getCount() {
-      if (colonies == null) {
+      if (planetIndices == null) {
         return 0;
       }
 
-      return colonies.size();
+      return planetIndices.size();
     }
 
     @Override
@@ -176,11 +203,21 @@ public class PlanetPagerFragment extends BaseFragment {
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
       super.setPrimaryItem(container, position, object);
 
-      if (colonies != null && colonies.size() > position) {
+      if (planetIndices != null && planetIndices.size() > position) {
         requireMainActivity().requireSupportActionBar().setTitle(
             String.format("%s %s", star.getName(),
-                RomanNumeralFormatter.format(colonies.get(position).getPlanetIndex())));
+                RomanNumeralFormatter.format(planetIndices.get(position))));
       }
     }
+  }
+
+  @Nullable
+  private Colony findColony(int planetIndex) {
+    for (BaseColony c : star.getColonies()) {
+      if (c.getPlanetIndex() == planetIndex) {
+        return (Colony) c;
+      }
+    }
+    return null;
   }
 }

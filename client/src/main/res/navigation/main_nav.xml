@@ -82,4 +82,16 @@
         <argument android:name="starID" app:argType="integer" app:nullable="false" />
         <argument android:name="planetIndex" app:argType="integer" app:nullable="false" />
     </fragment>
+    <fragment
+            android:id="@+id/enemyPlanetFragment"
+            android:name="au.com.codeka.warworlds.game.solarsystem.EnemyPlanetFragment">
+        <argument android:name="starID" app:argType="integer" app:nullable="false" />
+        <argument android:name="planetIndex" app:argType="integer" app:nullable="false" />
+    </fragment>
+    <fragment
+            android:id="@+id/emptyPlanetFragment"
+            android:name="au.com.codeka.warworlds.game.solarsystem.EmptyPlanetFragment">
+        <argument android:name="starID" app:argType="integer" app:nullable="false" />
+        <argument android:name="planetIndex" app:argType="integer" app:nullable="false" />
+    </fragment>
 </navigation>

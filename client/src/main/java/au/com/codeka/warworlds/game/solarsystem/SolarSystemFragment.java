@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.Locale;
@@ -265,22 +266,20 @@ public class SolarSystemFragment extends BaseFragment {
     }
 
     MyEmpire myEmpire = EmpireManager.i.getEmpire();
-    Intent intent;
+    NavDirections dir;
     if (colony != null) {
       if (colony.getEmpireID() != null && colony.getEmpireID() == myEmpire.getID()) {
-        NavHostFragment.findNavController(this).navigate(
-            SolarSystemFragmentDirections.actionPlanetPager(
-                starID, colony.getPlanetIndex(), PlanetPagerFragment.Kind.OwnedPlanets));
-        return;
+        dir = SolarSystemFragmentDirections.actionPlanetPager(
+            starID, colony.getPlanetIndex(), PlanetPagerFragment.Kind.OwnedPlanets);
       } else {
-        intent = new Intent(getActivity(), EnemyPlanetActivity.class);
+        dir = SolarSystemFragmentDirections.actionPlanetPager(
+            starID, colony.getPlanetIndex(), PlanetPagerFragment.Kind.EnemyPlanets);
       }
     } else {
-      intent = new Intent(getActivity(), EmptyPlanetActivity.class);
+      dir = SolarSystemFragmentDirections.actionPlanetPager(
+          starID, planet.getIndex(), PlanetPagerFragment.Kind.EmptyPlanets);
     }
-    intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-    intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.getIndex());
-    startActivity(intent);
+    NavHostFragment.findNavController(this).navigate(dir);
   }
 
   private void refreshSelectedPlanet() {
