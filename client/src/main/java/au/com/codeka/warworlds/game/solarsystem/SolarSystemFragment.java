@@ -268,10 +268,9 @@ public class SolarSystemFragment extends BaseFragment {
     Intent intent;
     if (colony != null) {
       if (colony.getEmpireID() != null && colony.getEmpireID() == myEmpire.getID()) {
-        Bundle args = new Bundle();
-        args.putInt("au.com.codeka.warworlds.StarID", starID);
-        args.putInt("au.com.codeka.warworlds.PlanetIndex", colony.getPlanetIndex());
-        NavHostFragment.findNavController(this).navigate(R.id.ownedPlanetFragment, args);
+        NavHostFragment.findNavController(this).navigate(
+            SolarSystemFragmentDirections.actionPlanetPager(
+                starID, colony.getPlanetIndex(), PlanetPagerFragment.Kind.OwnedPlanets));
         return;
       } else {
         intent = new Intent(getActivity(), EnemyPlanetActivity.class);
