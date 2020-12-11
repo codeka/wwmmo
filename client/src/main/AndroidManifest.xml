@@ -83,7 +83,6 @@
     </activity>
     <activity android:name="au.com.codeka.warworlds.game.empire.EnemyEmpireActivity" />
     <activity android:name="au.com.codeka.warworlds.game.FleetMoveActivity" />
-    <activity android:name="au.com.codeka.warworlds.game.solarsystem.FleetActivity" />
     <activity android:name="au.com.codeka.warworlds.game.alliance.AllianceActivity" />
     <activity
       android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsActivity"

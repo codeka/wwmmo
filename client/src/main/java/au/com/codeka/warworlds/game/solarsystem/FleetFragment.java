@@ -1,18 +1,20 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.util.List;
 import java.util.TreeMap;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.FrameLayout;
-
-import androidx.fragment.app.FragmentManager;
-import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -24,21 +26,33 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.FleetManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.ui.BaseFragment;
 
-public class FleetActivity extends BaseActivity {
+public class FleetFragment extends BaseFragment {
   private Star star;
   private FleetList fleetList;
   private boolean firstRefresh = true;
 
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  private FleetFragmentArgs args;
 
-    fleetList = new FleetList(this);
+  @Nullable
+  @Override
+  public View onCreateView(
+      @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    fleetList = new FleetList(inflater.getContext());
     FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT);
-    addContentView(fleetList, lp);
+    fleetList.setLayoutParams(lp);
+    return fleetList;
+  }
+
+  @Override
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+
+    args = FleetFragmentArgs.fromBundle(requireArguments());
 
     fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
       @Override
@@ -48,10 +62,9 @@ public class FleetActivity extends BaseActivity {
 
       @Override
       public void onFleetSplit(Star star, Fleet fleet) {
-        FragmentManager fm = getSupportFragmentManager();
         FleetSplitDialog dialog = new FleetSplitDialog();
         dialog.setFleet(fleet);
-        dialog.show(fm, "");
+        dialog.show(getChildFragmentManager(), "");
       }
 
       @Override
@@ -61,16 +74,14 @@ public class FleetActivity extends BaseActivity {
 
       @Override
       public void onFleetMove(Star star, Fleet fleet) {
-        FleetMoveActivity.show(FleetActivity.this, fleet);
-        ;
+        FleetMoveActivity.show(requireActivity(), fleet);
       }
 
       @Override
       public void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets) {
-        FragmentManager fm = getSupportFragmentManager();
         FleetMergeDialog dialog = new FleetMergeDialog();
         dialog.setup(fleet, potentialFleets);
-        dialog.show(fm, "");
+        dialog.show(getChildFragmentManager(), "");
       }
 
       @Override
@@ -85,21 +96,17 @@ public class FleetActivity extends BaseActivity {
   }
 
   @Override
-  public void onResumeFragments() {
-    super.onResumeFragments();
+  public void onResume() {
+    super.onResume();
 
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeting greeting) {
-        if (!success) {
-          startActivity(new Intent(FleetActivity.this, WelcomeFragment.class));
-        } else {
-          StarManager.eventBus.register(eventHandler);
-          String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-          star = StarManager.i.getStar(Integer.parseInt(starKey));
-          if (star != null) {
-            refreshStarDetails();
-          }
+    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+      if (!success) {
+        startActivity(new Intent(requireContext(), WelcomeFragment.class));
+      } else {
+        StarManager.eventBus.register(eventHandler);
+        star = StarManager.i.getStar(args.getStarID());
+        if (star != null) {
+          refreshStarDetails();
         }
       }
     });
@@ -123,13 +130,16 @@ public class FleetActivity extends BaseActivity {
   };
 
   private void refreshStarDetails() {
-    TreeMap<String, Star> stars = new TreeMap<String, Star>();
+    requireMainActivity().requireSupportActionBar().setTitle(star.getName());
+    requireMainActivity().requireSupportActionBar().setSubtitle("Fleets");
+
+    TreeMap<String, Star> stars = new TreeMap<>();
     stars.put(star.getKey(), star);
     fleetList.refresh(star.getFleets(), stars);
 
-    String fleetKey = getIntent().getExtras().getString("au.com.codeka.warworlds.FleetKey");
-    if (firstRefresh && fleetKey != null) {
-      fleetList.selectFleet(fleetKey, true);
+    int fleetID = args.getFleetID();
+    if (firstRefresh && fleetID > 0) {
+      fleetList.selectFleet(fleetID, true);
       firstRefresh = false;
     }
   }

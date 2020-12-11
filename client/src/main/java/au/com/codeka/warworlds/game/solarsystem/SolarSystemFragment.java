@@ -107,10 +107,11 @@ public class SolarSystemFragment extends BaseFragment {
     emptyViewButton.setOnClickListener(v -> onViewColony());
 
     fleetList.setFleetSelectedHandler(fleet -> {
-      Intent intent = new Intent(getActivity(), FleetActivity.class);
-      intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-      intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
-      startActivity(intent);
+      NavHostFragment.findNavController(this).navigate(
+          R.id.fleetFragment,
+          new FleetFragmentArgs.Builder(star.getID())
+              .setFleetID(fleet.getID())
+              .build().toBundle());
     });
 
     return view;
