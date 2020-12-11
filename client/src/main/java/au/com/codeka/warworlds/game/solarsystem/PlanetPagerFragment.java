@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -204,9 +205,12 @@ public class PlanetPagerFragment extends BaseFragment {
       super.setPrimaryItem(container, position, object);
 
       if (planetIndices != null && planetIndices.size() > position) {
-        requireMainActivity().requireSupportActionBar().setTitle(
+        ActionBar actionBar = requireMainActivity().requireSupportActionBar();
+        actionBar.setTitle(
             String.format("%s %s", star.getName(),
                 RomanNumeralFormatter.format(planetIndices.get(position))));
+        actionBar.setSubtitle(null);
+        actionBar.setIcon(null);
       }
     }
   }
