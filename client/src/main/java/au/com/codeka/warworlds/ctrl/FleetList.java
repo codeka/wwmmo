@@ -97,18 +97,18 @@ public class FleetList extends FrameLayout {
       }
     }
     if (selectedFleet != null) {
-      selectFleet(selectedFleet.getKey(), false);
+      selectFleet(selectedFleet.getID(), false);
     } else {
-      selectFleet(null, false);
+      selectFleet(-1, false);
     }
 
     fleetListAdapter.setFleets(stars, this.fleets);
   }
 
-  public void selectFleet(String fleetKey, boolean recentre) {
+  public void selectFleet(int fleetID, boolean recentre) {
     selectedFleet = null;
     for (Fleet f : fleets) {
-      if (fleetKey != null && f.getKey().equals(fleetKey)) {
+      if (fleetID > 0 && f.getID() == fleetID) {
         selectedFleet = f;
       }
     }
@@ -145,7 +145,7 @@ public class FleetList extends FrameLayout {
       FleetListAdapter.ItemEntry entry =
           (FleetListAdapter.ItemEntry) fleetListAdapter.getItem(position);
       if (entry.type == FleetListAdapter.FLEET_ITEM_TYPE) {
-        selectFleet(((Fleet) entry.value).getKey(), false);
+        selectFleet(((Fleet) entry.value).getID(), false);
       }
     });
 

@@ -77,6 +77,9 @@
         <action
             android:id="@+id/action_planetPagerFragment_to_buildFragment"
             app:destination="@id/buildFragment" />
+        <action
+            android:id="@+id/action_planetPagerFragment_to_fleetFragment"
+            app:destination="@id/fleetFragment" />
     </fragment>
 
     <fragment
@@ -102,5 +105,11 @@
             android:name="au.com.codeka.warworlds.game.build.BuildFragment">
         <argument android:name="starID" app:argType="integer" app:nullable="false" />
         <argument android:name="planetIndex" app:argType="integer" app:nullable="false" />
+    </fragment>
+    <fragment
+            android:id="@+id/fleetFragment"
+            android:name="au.com.codeka.warworlds.game.solarsystem.FleetFragment">
+        <argument android:name="starID" app:argType="integer" app:nullable="false" />
+        <argument android:name="fleetID" app:argType="integer" android:defaultValue="-1" />
     </fragment>
 </navigation>
