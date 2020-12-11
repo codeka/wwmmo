@@ -20,18 +20,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseBuildRequest;
-import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.FeatureFlags;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.FleetListRow;
-import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.NotesDialog;
-import au.com.codeka.warworlds.game.build.BuildActivity.BaseTabFragment;
+import au.com.codeka.warworlds.game.build.BuildFragment.BaseTabFragment;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
@@ -45,6 +42,8 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class ShipsFragment extends BaseTabFragment {
+  private Star star;
+  private Colony colony;
   private ShipListAdapter shipListAdapter;
 
   @Override
@@ -53,7 +52,6 @@ public class ShipsFragment extends BaseTabFragment {
     View v = inflater.inflate(R.layout.build_ships_tab, container, false);
 
     shipListAdapter = new ShipListAdapter();
-    updateStar(getStar(), getColony());
 
     final ListView availableDesignsList = v.findViewById(R.id.ship_list);
     availableDesignsList.setAdapter(shipListAdapter);
@@ -62,8 +60,8 @@ public class ShipsFragment extends BaseTabFragment {
           (ShipListAdapter.ItemEntry) shipListAdapter.getItem(position);
       if (entry.fleet == null && entry.buildRequest == null) {
         BuildConfirmDialog dialog = new BuildConfirmDialog();
-        dialog.setup(entry.design, getStar(), getColony());
-        dialog.show(getActivity().getSupportFragmentManager(), "");
+        dialog.setup(entry.design, star, colony);
+        dialog.show(getChildFragmentManager(), "");
       } else if (entry.fleet != null && entry.buildRequest == null) {
         if (ShipDesign.Upgrade.getAvailableUpgrades(
             entry.fleet.getDesign(), entry.fleet, FeatureFlags.get()).isEmpty()) {
@@ -72,8 +70,8 @@ public class ShipsFragment extends BaseTabFragment {
         }
 
         ShipUpgradeDialog dialog = new ShipUpgradeDialog();
-        dialog.setup(getStar(), getColony(), entry.fleet);
-        dialog.show(getActivity().getSupportFragmentManager(), "");
+        dialog.setup(star, colony, entry.fleet);
+        dialog.show(getChildFragmentManager(), "");
       }
     });
 
@@ -98,7 +96,7 @@ public class ShipsFragment extends BaseTabFragment {
             }
           });
 
-      dialog.show(getActivity().getSupportFragmentManager(), "");
+      dialog.show(getChildFragmentManager(), "");
       return true;
     });
 
@@ -106,44 +104,11 @@ public class ShipsFragment extends BaseTabFragment {
   }
 
   @Override
-  public void onStart() {
-    super.onStart();
-    StarManager.eventBus.register(eventHandler);
-  }
+  protected void refresh(Star star, Colony colony) {
+    this.star = star;
+    this.colony = colony;
 
-  @Override
-  public void onStop() {
-    super.onStop();
-    StarManager.eventBus.unregister(eventHandler);
-  }
-
-  private final Object eventHandler = new Object() {
-    @EventHandler
-    public void onStarUpdated(Star s) {
-      if (!getStar().getKey().equals(s.getKey())) {
-        return;
-      }
-
-      // We can't guarantee that getColony() has been updated yet, but we only need the key
-      // and can update from that.
-      String colonyKey = getColony().getKey();
-      Colony colony = null;
-      for (BaseColony baseColony : s.getColonies()) {
-        if (baseColony.getKey().equals(colonyKey)) {
-          colony = (Colony) baseColony;
-          break;
-        }
-      }
-      if (colony == null) {
-        return;
-      }
-
-      updateStar(s, colony);
-    }
-  };
-
-  private void updateStar(Star star, Colony colony) {
-    ArrayList<Fleet> fleets = new ArrayList<Fleet>();
+    ArrayList<Fleet> fleets = new ArrayList<>();
     for (BaseFleet baseFleet : star.getFleets()) {
       if (baseFleet.getEmpireKey() != null
           && baseFleet.getEmpireKey().equals(EmpireManager.i.getEmpire().getKey())) {
@@ -151,7 +116,7 @@ public class ShipsFragment extends BaseTabFragment {
       }
     }
 
-    ArrayList<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
+    ArrayList<BuildRequest> buildRequests = new ArrayList<>();
     for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
       if (baseBuildRequest.getEmpireKey().equals(EmpireManager.i.getEmpire().getKey())
           && baseBuildRequest.getDesignKind() == DesignKind.SHIP) {
@@ -172,7 +137,7 @@ public class ShipsFragment extends BaseTabFragment {
 
     public void setShips(Map<String, Design> designs, ArrayList<Fleet> fleets,
         ArrayList<BuildRequest> buildRequests) {
-      entries = new ArrayList<ItemEntry>();
+      entries = new ArrayList<>();
 
       entries.add(new ItemEntry("New Ships"));
       for (Design design : designs.values()) {
@@ -258,7 +223,7 @@ public class ShipsFragment extends BaseTabFragment {
 
       View view = convertView;
       if (view == null) {
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
+        LayoutInflater inflater = (LayoutInflater) requireActivity().getSystemService(
             Context.LAYOUT_INFLATER_SERVICE);
         if (entry.heading != null) {
           view = new TextView(getActivity());
@@ -322,7 +287,7 @@ public class ShipsFragment extends BaseTabFragment {
             row2.setText("Available upgrades: " + upgrades);
           }
 
-          String requiredHtml = design.getDependenciesHtml(getColony());
+          String requiredHtml = design.getDependenciesHtml(colony);
           row3.setVisibility(View.VISIBLE);
           row3.setText(Html.fromHtml(requiredHtml));
         }
@@ -339,10 +304,10 @@ public class ShipsFragment extends BaseTabFragment {
         }
       } else {
         // new fleet
-        ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.building_row1);
-        TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-        TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+        ImageView icon = view.findViewById(R.id.building_icon);
+        LinearLayout row1 = view.findViewById(R.id.building_row1);
+        TextView row2 = view.findViewById(R.id.building_row2);
+        TextView row3 = view.findViewById(R.id.building_row3);
 
         view.findViewById(R.id.building_progress).setVisibility(View.GONE);
         view.findViewById(R.id.building_level).setVisibility(View.GONE);
@@ -355,7 +320,7 @@ public class ShipsFragment extends BaseTabFragment {
 
         row1.removeAllViews();
         FleetListRow.populateFleetNameRow(getActivity(), row1, null, design);
-        String requiredHtml = design.getDependenciesHtml(getColony());
+        String requiredHtml = design.getDependenciesHtml(colony);
         row2.setText(Html.fromHtml(requiredHtml));
 
         row3.setVisibility(View.GONE);

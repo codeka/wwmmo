@@ -12,13 +12,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.Locale;
 
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
@@ -26,7 +26,7 @@ import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.build.BuildActivity;
+import au.com.codeka.warworlds.game.build.BuildFragmentArgs;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
@@ -70,13 +70,10 @@ public class OwnedPlanetFragment extends BaseFragment {
         return; // shouldn't happen, the button should be hidden.
       }
 
-      Intent intent = new Intent(requireContext(), BuildActivity.class);
-      intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-
-      Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
-      colony.toProtocolBuffer(colony_pb);
-      intent.putExtra("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
-      startActivity(intent);
+      Bundle args =
+              new BuildFragmentArgs.Builder(star.getID(), colony.getPlanetIndex())
+                      .build().toBundle();
+      NavHostFragment.findNavController(this).navigate(R.id.buildFragment, args);
     });
 
     planetDetails = view.findViewById(R.id.planet_details);
