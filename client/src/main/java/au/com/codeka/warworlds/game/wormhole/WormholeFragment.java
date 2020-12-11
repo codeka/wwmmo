@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentManager;
+import androidx.navigation.fragment.NavHostFragment;
+
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
@@ -34,8 +36,10 @@ import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.ctrl.FleetListWormhole;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
-import au.com.codeka.warworlds.game.FleetMoveActivity;
+import au.com.codeka.warworlds.game.FleetMoveFragment;
+import au.com.codeka.warworlds.game.FleetMoveFragmentArgs;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.game.empire.FleetsFragment;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -148,7 +152,7 @@ public class WormholeFragment extends BaseFragment {
       }
     });
 
-    FleetListWormhole fleetList = (FleetListWormhole) contentView.findViewById(R.id.fleet_list);
+    FleetListWormhole fleetList = contentView.findViewById(R.id.fleet_list);
     fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
       @Override
       public void onFleetView(Star star, Fleet fleet) {
@@ -170,7 +174,10 @@ public class WormholeFragment extends BaseFragment {
 
       @Override
       public void onFleetMove(Star star, Fleet fleet) {
-        FleetMoveActivity.show(getActivity(), fleet);
+        NavHostFragment.findNavController(WormholeFragment.this).navigate(
+            R.id.fleetMoveFragment,
+            new FleetMoveFragmentArgs.Builder(star.getID(), fleet.getID())
+                .build().toBundle());
       }
 
       @Override

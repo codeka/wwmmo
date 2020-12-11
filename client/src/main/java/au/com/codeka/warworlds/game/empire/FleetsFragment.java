@@ -19,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentManager;
+import androidx.navigation.fragment.NavHostFragment;
+
 import au.com.codeka.common.NumberFormatter;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet;
@@ -29,8 +31,10 @@ import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.ctrl.FleetSelectionPanel;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
-import au.com.codeka.warworlds.game.FleetMoveActivity;
+import au.com.codeka.warworlds.game.FleetMoveFragment;
+import au.com.codeka.warworlds.game.FleetMoveFragmentArgs;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.game.solarsystem.FleetFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireStarsFetcher;
 import au.com.codeka.warworlds.model.Fleet;
@@ -103,7 +107,10 @@ public class FleetsFragment extends StarsFragment {
 
       @Override
       public void onFleetMove(Star star, Fleet fleet) {
-        FleetMoveActivity.show(getActivity(), fleet);
+        NavHostFragment.findNavController(FleetsFragment.this).navigate(
+            R.id.fleetMoveFragment,
+            new FleetMoveFragmentArgs.Builder(star.getID(), fleet.getID())
+                .build().toBundle());
       }
 
       @Override
