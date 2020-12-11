@@ -3,11 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <org.andengine.opengl.view.RenderSurfaceView
-        android:id="@+id/starfield"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
     <RelativeLayout
         android:id="@+id/bottom_pane"
         style="@style/BottomPane"
