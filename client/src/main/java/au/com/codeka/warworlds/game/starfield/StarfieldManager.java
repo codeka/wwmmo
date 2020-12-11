@@ -340,6 +340,13 @@ public class StarfieldManager {
     return sprite;
   }
 
+  /** Gets the world-position of the given star. This will depend on our current camera position. */
+  public Vector2 calculatePosition(Star star) {
+    return new Vector2(
+        (star.getSectorX() - centerSectorX) * 1024.0f + (star.getOffsetX() - 512.0f),
+        (star.getSectorY() - centerSectorY) * 1024.0f + (star.getOffsetY() - 512.0f));
+  }
+
   /** Called when a star is updated, we may need to update the sprite for it. */
   private void updateStar(Star star) {
     boolean reselect = (selectedStar != null && selectedStar.getID() == star.getID());
@@ -352,9 +359,8 @@ public class StarfieldManager {
       container.setTapTargetRadius(80.0f);
       addSectorSceneObject(new Pair<>(star.getSectorX(), star.getSectorY()), container);
 
-      float x = (star.getSectorX() - centerSectorX) * 1024.0f + (star.getOffsetX() - 512.0f);
-      float y = (star.getSectorY() - centerSectorY) * 1024.0f + (star.getOffsetY() - 512.0f);
-      container.translate(x, -y);
+      Vector2 pos = calculatePosition(star);
+      container.translate((float) pos.x, (float) -pos.y);
     } else {
       oldStar = ((SceneObjectInfo) container.getTag()).star;
 
@@ -568,31 +574,14 @@ public class StarfieldManager {
 
   /** Get the current position of the given moving fleet. */
   private Vector2 getMovingFleetPosition(Star star, Star destStar, Fleet fleet) {
-    Vector2 src = new Vector2(
-        (star.getSectorX() - centerSectorX) * 1024.0f + (star.getOffsetX() - 512.0f),
-        (star.getSectorY() - centerSectorY) * 1024.0f + (star.getOffsetY() - 512.0f));
-    Vector2 dest = new Vector2(
-        (destStar.getSectorX() - centerSectorX) * 1024.0f + (destStar.getOffsetX() - 512.0f),
-        (destStar.getSectorY() - centerSectorY) * 1024.0f + (destStar.getOffsetY() - 512.0f));
+    Vector2 src = calculatePosition(star);
+    Vector2 dest = calculatePosition(destStar);
 
     long totalTime = fleet.getEta().getMillis() - fleet.getStateStartTime().getMillis();
     long elapsedTime = System.currentTimeMillis() - fleet.getStateStartTime().getMillis();
-    double timeFraction = (float) elapsedTime / (float) totalTime;
+    float timeFraction = (float) elapsedTime / (float) totalTime;
 
-    // Subtract 100, we'll add 50 after because we want the fleet to start offset from the star and
-    // finish offset as well.
-    double distance = src.distanceTo(dest) - 100.0;
-    distance *= timeFraction;
-    distance += 50;
-    if (distance < 50.0) {
-      distance = 50.0;
-    }
-
-    dest.subtract(src);
-    dest.normalize();
-    dest.scale(distance);
-    dest.add(src);
-    return dest;
+    return Vector2.lerp(src, dest, timeFraction, dest);
   }
 
   private void createSectorBackground(long sectorX, long sectorY) {

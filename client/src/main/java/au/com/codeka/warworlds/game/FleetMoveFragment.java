@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +20,12 @@ import java.util.Locale;
 
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.Cash;
+import au.com.codeka.common.Log;
+import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.MainActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -36,6 +40,8 @@ import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.designeffects.EmptySpaceMoverShipEffect;
+import au.com.codeka.warworlds.opengl.SceneObject;
+import au.com.codeka.warworlds.opengl.Sprite;
 import au.com.codeka.warworlds.ui.BaseFragment;
 
 /**
@@ -43,12 +49,17 @@ import au.com.codeka.warworlds.ui.BaseFragment;
  * it like this...
  */
 public class FleetMoveFragment extends BaseFragment {
+  private static final Log log = new Log("FleetMoveFragment");
+
   private Star srcStar;
   private Star destStar;
   private Fleet fleet;
   private float estimatedCost;
   private StarfieldManager starfieldManager;
-//  private FleetIndicatorEntity fleetIndicatorEntity;
+  private Handler handler = new Handler();
+
+  private Sprite fleetIndicatorEntity;
+  private FleetIndicatorUpdater fleetIndicatorEntityRunnable;
 
   private Star markerStar;
 //  private RadiusIndicatorEntity tooCloseIndicatorEntity;
@@ -62,7 +73,6 @@ public class FleetMoveFragment extends BaseFragment {
   private FleetMoveFragmentArgs args;
 
   @Nullable
-  @org.jetbrains.annotations.Nullable
   @Override
   public View onCreateView(
       @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -83,70 +93,82 @@ public class FleetMoveFragment extends BaseFragment {
     moveBtn = view.findViewById(R.id.move_btn);
 
     srcStar = StarManager.i.getStar(args.getStarID());
-    if (srcStar != null) {
-//      starfield.scrollTo(srcStar);
-      fleet = (Fleet) srcStar.getFleet(args.getFleetID());
+    init();
 
-      refreshSelection();
-    }
-/*
-    starfield.setSceneCreatedHandler(new SectorSceneManager.SceneCreatedHandler() {
-      @Override
-      public void onSceneCreated(Scene scene) {
-        if (srcStar == null) {
-          return; // shouldn't happen yet, but just in case
-        }
-
-        Vector2 srcPoint = starfield.getSectorOffset(srcStar.getSectorX(), srcStar.getSectorY());
-        srcPoint.add(srcStar.getOffsetX(), Sector.SECTOR_SIZE - srcStar.getOffsetY());
-        fleetIndicatorEntity =
-            new FleetIndicatorEntity(starfield, srcPoint, fleet, getVertexBufferObjectManager());
-        scene.attachChild(fleetIndicatorEntity);
-
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            refreshSelection();
-          }
-        });
-      }
-    });
-*/
     Button cancelBtn = view.findViewById(R.id.cancel_btn);
     cancelBtn.setOnClickListener(v -> NavHostFragment.findNavController(this).popBackStack());
 
     Button moveBtn = view.findViewById(R.id.move_btn);
     moveBtn.setOnClickListener(v -> {
       if (destStar != null) {
-       // onMoveClick();
+        onMoveClick();
       }
     });
+  }
+
+  /**
+   * Called at various points during startup. We'll do nothing until all of the pre-requisites are
+   * met (i.e. attached to the activity, loaded the star, etc). Then we'll set ourselves up.
+   */
+  public void init() {
+    if (fleet != null) {
+      // If the fleet's non-null that means we've finished initializing.
+      return;
+    }
+
+    log.debug("init()");
+    if (starfieldManager == null) {
+      // Not attached to the activity yet.
+      log.debug("Not attached to main activity.");
+    }
+
+    if (srcStar == null) {
+      // Source star not loaded yet.
+      log.debug("Source star not loaded yet.");
+      return;
+    }
+
+    // We're done!
+    starfieldManager.warpTo(srcStar);
+    fleet = (Fleet) srcStar.getFleet(args.getFleetID());
+    fleetIndicatorEntity = starfieldManager.createFleetSprite(fleet);
+    fleetIndicatorEntityRunnable = new FleetIndicatorUpdater();
+    fleetIndicatorEntity.setDrawRunnable(fleetIndicatorEntityRunnable);
+    SceneObject sceneObject = starfieldManager.getStarSceneObject(srcStar.getID());
+    if (sceneObject != null) {
+      sceneObject.addChild(fleetIndicatorEntity);
+    }
+    // Start off hidden, until you select a star.
+    fleetIndicatorEntity.setAlpha(1.0f);
+    refreshSelection();
+
   }
 
   @Override
   public void onAttach(@NonNull @NotNull Context context) {
     super.onAttach(context);
-
     starfieldManager = requireMainActivity().getStarfieldManager();
-    if (srcStar != null) {
-      starfieldManager.warpTo(srcStar);
-    }
+    init();
+
+    starfieldManager.addTapListener(tapListener);
   }
 
   @Override
-  public void onResume() {
-    super.onResume();
-/*
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeter.ServerGreeting greeting) {
-        if (!success) {
-          return;
-        }
+  public void onDetach() {
+    super.onDetach();
 
+    starfieldManager.removeTapListener(tapListener);
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    if (fleetIndicatorEntity != null) {
+      SceneObject sceneObject = fleetIndicatorEntity.getParent();
+      if (sceneObject != null) {
+        sceneObject.removeChild(fleetIndicatorEntity);
       }
-    });
-*/
+    }
   }
 
   @Override
@@ -175,13 +197,7 @@ public class FleetMoveFragment extends BaseFragment {
       if (star.getID() == args.getStarID()) {
         if (srcStar == null) {
           srcStar = star;
-          if (starfieldManager != null) {
-            starfieldManager.warpTo(srcStar);
-          }
-        }
-
-        if (fleet == null) {
-          fleet = (Fleet) star.getFleet(args.getFleetID());
+          init();
         }
 
         refreshSelection();
@@ -255,26 +271,25 @@ public class FleetMoveFragment extends BaseFragment {
       return;
     }
 
-//  Vector2 srcPoint = starfield.getSectorOffset(srcStar.getSectorX(), srcStar.getSectorY());
-//  srcPoint.add(srcStar.getOffsetX(), Sector.SECTOR_SIZE - srcStar.getOffsetY());
+    Vector2 srcPoint = starfieldManager.calculatePosition(srcStar);
+    if (destStar == null) {
+      instructionsView.setVisibility(View.VISIBLE);
+      starDetailsView.setVisibility(View.GONE);
+      moveBtn.setEnabled(false);
 
-  if (destStar == null) {
-    instructionsView.setVisibility(View.VISIBLE);
-    starDetailsView.setVisibility(View.GONE);
-    moveBtn.setEnabled(false);
-//    fleetIndicatorEntity.setPoints(srcPoint, null);
-  } else {
-    instructionsView.setVisibility(View.GONE);
-    starDetailsView.setVisibility(View.VISIBLE);
-//    moveBtn.setEnabled(true);
+      fleetIndicatorEntityRunnable.reset(srcPoint, null);
+    } else {
+      instructionsView.setVisibility(View.GONE);
+      starDetailsView.setVisibility(View.VISIBLE);
+      fleetIndicatorEntity.setAlpha(1.0f);
+      moveBtn.setEnabled(true);
 
-//    Vector2 destPoint = starfield.getSectorOffset(destStar.getSectorX(), destStar.getSectorY());
-//    destPoint.add(destStar.getOffsetX(), Sector.SECTOR_SIZE - destStar.getOffsetY());
-//    fleetIndicatorEntity.setPoints(srcPoint, destPoint);
+      Vector2 destPoint = starfieldManager.calculatePosition(destStar);
+      fleetIndicatorEntityRunnable.reset(srcPoint, destPoint);
 
-    float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
-    ShipDesign design =
-        (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+      float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
+      ShipDesign design =
+          (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
 
     String leftDetails = String
         .format(Locale.ENGLISH, "<b>Star:</b> %s<br /><b>Distance:</b> %.2f pc",
@@ -395,117 +410,53 @@ public class FleetMoveFragment extends BaseFragment {
     }.execute();
   }
 
-    /**
-     * This entity is used to indicator where the fleet is going to go.
-     *//*
-  public class FleetIndicatorEntity extends Entity {
-    private StarfieldSceneManager starfield;
-    private Vector2 srcPoint;
-    private Vector2 destPoint;
-    private Fleet fleet;
-    private Sprite fleetSprite;
-    private float fractionComplete;
-
-    public FleetIndicatorEntity(StarfieldSceneManager starfield, Vector2 srcPoint, Fleet fleet,
-        VertexBufferObjectManager vertexBufferObjectManager) {
-      super(0.0f, 0.0f, 1.0f, 1.0f);
-      this.starfield = starfield;
-      this.srcPoint = srcPoint;
-      this.fleet = fleet;
-
-      // work out how far along the fleet has moved so we can draw the icon at the correct
-      // spot. Also, we'll draw the name of the empire, number of ships etc.
-      ShipDesign design =
-          (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, this.fleet.getDesignID());
-
-      ITextureRegion textureRegion = this.starfield.getSpriteTexture(design.getSpriteName());
-      float spriteWidth = textureRegion.getWidth();
-      float spriteHeight = textureRegion.getHeight();
-      float aspect = spriteWidth / spriteHeight;
-      if (spriteWidth > 40.0f) {
-        spriteWidth = 40.0f;
-        spriteHeight = 40.0f / aspect;
-      }
-      if (spriteHeight > 40.0f) {
-        spriteWidth = 40.0f * aspect;
-        spriteHeight = 40.0f;
-      }
-
-      fleetSprite = new Sprite(0.0f, 0.0f, spriteWidth, spriteHeight, textureRegion,
-          vertexBufferObjectManager);
-      attachChild(fleetSprite);
-
-      registerUpdateHandler(updateHandler);
+  private final StarfieldManager.TapListener tapListener = new StarfieldManager.TapListener() {
+    @Override
+    public void onStarTapped(@Nullable Star star) {
+      destStar = star;
+      refreshSelection();
     }
 
-    public void setPoints(Vector2 srcPoint, Vector2 destPoint) {
-      this.srcPoint = srcPoint;
-      this.destPoint = destPoint;
-      setup();
+    @Override
+    public void onFleetTapped(@Nullable Star star, @Nullable Fleet fleet) {
+      // Nothing to do.
+    }
+  };
+
+  private class FleetIndicatorUpdater implements Runnable {
+    private Vector2 src;
+    private Vector2 dest;
+    private final Vector2 pos;
+    private float fraction;
+
+    public FleetIndicatorUpdater() {
+      this.src = null;
+      this.dest = null;
+      this.pos = new Vector2();
+      this.fraction = 0.5f;
     }
 
-    public void setup() {
-      if (destPoint == null) {
-        fractionComplete = 0.0f;
-        fleetSprite.setRotation(0.0f);
-      } else {
-        fractionComplete = 0.5f;
-
-        Vector2 up = Vector2.pool.borrow().reset(1.0f, 0.0f);
-        Vector2 direction = Vector2.pool.borrow().reset(destPoint);
-        direction.subtract(srcPoint);
-        direction.normalize();
-        float angle = Vector2.angleBetweenCcw(up, direction);
-        Vector2.pool.release(direction);
-
-        fleetSprite.setRotation((float) (angle * 180.0f / Math.PI));
-      }
-
-      Vector2 location = getLocation((float) fractionComplete);
-      setPosition((float) location.x, (float) location.y);
-      Vector2.pool.release(location);
+    public void reset(Vector2 src, Vector2 dest) {
+      this.src = src;
+      this.dest = dest;
     }
 
-    private Vector2 getLocation(float fractionComplete) {
-      if (destPoint == null) {
-        return Vector2.pool.borrow().reset(srcPoint);
+    @Override
+    public void run() {
+      if (src == null) {
+        return;
       }
-      // we don't want to start the fleet over the top of the star, so we'll offset it a bit
-      double distance = srcPoint.distanceTo(destPoint) - 40.0f;
-      if (distance < 0) {
-        distance = 0;
+      if (dest == null) {
+        fleetIndicatorEntity.setTranslation(0.0f, 0.0f);
+        return;
       }
 
-      Vector2 direction = Vector2.pool.borrow().reset(destPoint);
-      direction.subtract(srcPoint);
-      direction.normalize();
-
-      Vector2 location = Vector2.pool.borrow().reset(direction);
-      location.scale(distance * fractionComplete);
-      location.add(srcPoint);
-
-      direction.scale(20.0f);
-      location.add(direction);
-
-      return location;
+      fraction += 0.01f; // TODO: * by elapsed time?
+      if (fraction > 0.9f) {
+        fraction = 0.1f;
+      }
+      Vector2.lerp(src, dest, fraction, pos);
+      fleetIndicatorEntity.setTranslation((float) pos.x - (float) src.x, -((float) pos.y - (float) src.y));
     }
-
-    private IUpdateHandler updateHandler = new IUpdateHandler() {
-      @Override
-      public void onUpdate(float dt) {
-        fractionComplete += dt / 2.0f;
-        while (fractionComplete > 1.0f) {
-          fractionComplete -= 1.0f;
-        }
-
-        Vector2 location = getLocation(fractionComplete);
-        setPosition((float) location.x, (float) location.y);
-        Vector2.pool.release(location);
-      }
-
-      @Override
-      public void reset() {
-      }
-    };
-  }*/
+  }
 }
