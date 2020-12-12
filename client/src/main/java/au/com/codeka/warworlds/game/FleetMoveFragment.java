@@ -26,7 +26,6 @@ import au.com.codeka.common.model.BaseSector;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.MainActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -41,6 +40,7 @@ import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.designeffects.EmptySpaceMoverShipEffect;
+import au.com.codeka.warworlds.opengl.DimensionResolver;
 import au.com.codeka.warworlds.opengl.DrawRunnable;
 import au.com.codeka.warworlds.opengl.SceneObject;
 import au.com.codeka.warworlds.opengl.Sprite;
@@ -60,8 +60,7 @@ public class FleetMoveFragment extends BaseFragment {
   private StarfieldManager starfieldManager;
   private Handler handler = new Handler();
 
-  private Sprite fleetIndicatorEntity;
-  private FleetIndicatorUpdater fleetIndicatorEntityRunnable;
+  private FleetMoveIndicatorSceneObject fleetMoveIndicatorSceneObject;
 
   private Star markerStar;
 //  private RadiusIndicatorEntity tooCloseIndicatorEntity;
@@ -133,17 +132,14 @@ public class FleetMoveFragment extends BaseFragment {
     // We're done!
     starfieldManager.warpTo(srcStar);
     fleet = (Fleet) srcStar.getFleet(args.getFleetID());
-    fleetIndicatorEntity = starfieldManager.createFleetSprite(fleet);
-    fleetIndicatorEntityRunnable = new FleetIndicatorUpdater();
-    fleetIndicatorEntity.setDrawRunnable(fleetIndicatorEntityRunnable);
+    fleetMoveIndicatorSceneObject =
+        new FleetMoveIndicatorSceneObject(starfieldManager, fleet);
     SceneObject sceneObject = starfieldManager.getStarSceneObject(srcStar.getID());
     if (sceneObject != null) {
-      sceneObject.addChild(fleetIndicatorEntity);
+      sceneObject.addChild(fleetMoveIndicatorSceneObject);
     }
     // Start off hidden, until you select a star.
-    fleetIndicatorEntity.setAlpha(1.0f);
     refreshSelection();
-
   }
 
   @Override
@@ -165,10 +161,10 @@ public class FleetMoveFragment extends BaseFragment {
   @Override
   public void onDestroy() {
     super.onDestroy();
-    if (fleetIndicatorEntity != null) {
-      SceneObject sceneObject = fleetIndicatorEntity.getParent();
+    if (fleetMoveIndicatorSceneObject != null) {
+      SceneObject sceneObject = fleetMoveIndicatorSceneObject.getParent();
       if (sceneObject != null) {
-        sceneObject.removeChild(fleetIndicatorEntity);
+        sceneObject.removeChild(fleetMoveIndicatorSceneObject);
       }
     }
   }
@@ -279,15 +275,14 @@ public class FleetMoveFragment extends BaseFragment {
       starDetailsView.setVisibility(View.GONE);
       moveBtn.setEnabled(false);
 
-      fleetIndicatorEntityRunnable.reset(srcPoint, null);
+      fleetMoveIndicatorSceneObject.reset(srcPoint, null);
     } else {
       instructionsView.setVisibility(View.GONE);
       starDetailsView.setVisibility(View.VISIBLE);
-      fleetIndicatorEntity.setAlpha(1.0f);
       moveBtn.setEnabled(true);
 
       Vector2 destPoint = starfieldManager.calculatePosition(destStar);
-      fleetIndicatorEntityRunnable.reset(srcPoint, destPoint);
+      fleetMoveIndicatorSceneObject.reset(srcPoint, destPoint);
 
       float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
       ShipDesign design =
@@ -425,18 +420,40 @@ public class FleetMoveFragment extends BaseFragment {
     }
   };
 
-  private class FleetIndicatorUpdater implements DrawRunnable {
+  private class FleetMoveIndicatorSceneObject extends SceneObject {
+    private final StarfieldManager starfieldManager;
+    private final Sprite sprite;
+    private final Vector2 pos;
+
     private Vector2 src;
     private Vector2 dest;
-    private final Vector2 pos;
     private float rotation;
     private float fraction;
 
-    public FleetIndicatorUpdater() {
-      this.src = null;
-      this.dest = null;
+    public FleetMoveIndicatorSceneObject(StarfieldManager starfieldManager, Fleet fleet) {
+      super(starfieldManager.getScene().getDimensionResolver());
+      this.starfieldManager = starfieldManager;
+      this.sprite = starfieldManager.createFleetSprite(fleet);
+      addChild(sprite);
       this.pos = new Vector2();
-      this.fraction = 0.5f;
+
+      setDrawRunnable(frameTime -> {
+        if (src == null) {
+          return;
+        }
+        if (dest == null) {
+          setTranslation(0.0f, 0.0f);
+          return;
+        }
+
+        fraction += frameTime;
+        if (fraction > 0.9f) {
+          fraction = 0.1f;
+        }
+        Vector2.lerp(src, dest, fraction, pos);
+        setTranslation((float)(pos.x - src.x), -(float)(pos.y - src.y));
+        sprite.setRotation(rotation, 0, 0, 1);
+      });
     }
 
     public void reset(Vector2 src, Vector2 dest) {
@@ -450,26 +467,6 @@ public class FleetMoveFragment extends BaseFragment {
       } else {
         rotation = 0f;
       }
-    }
-
-    @Override
-    public void run(float frameTime) {
-      if (src == null) {
-        return;
-      }
-      if (dest == null) {
-        fleetIndicatorEntity.setTranslation(0.0f, 0.0f);
-        return;
-      }
-
-      fraction += frameTime;
-      if (fraction > 0.9f) {
-        fraction = 0.1f;
-      }
-      Vector2.lerp(src, dest, fraction, pos);
-      fleetIndicatorEntity.setTranslation((
-          float) pos.x - (float) src.x, -((float) pos.y - (float) src.y));
-      fleetIndicatorEntity.setRotation(rotation, 0, 0, 1);
     }
   }
 }
