@@ -187,11 +187,11 @@ public class SceneObject {
   }
 
   public void setRotation(float radians, float x, float y, float z) {
-    float tx = matrix[12];
-    float ty = matrix[13];
+    float xPx = matrix[12];
+    float yPx = matrix[13];
     Matrix.setRotateM(matrix, 0, (float)(radians * 180.0f / Math.PI), x, y, z);
     Matrix.scaleM(matrix, 0, widthPx, heightPx, 1.0f);
-    setTranslation(tx, ty);
+    Matrix.translateM(matrix, 0, xPx / widthPx, yPx / heightPx, 0.0f);
   }
 
   public void draw(float[] viewProjMatrix, float frameTime) {

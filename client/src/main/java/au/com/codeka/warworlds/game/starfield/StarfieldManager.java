@@ -139,6 +139,10 @@ public class StarfieldManager {
     tapListeners.remove(tapListener);
   }
 
+  public Scene getScene() {
+    return scene;
+  }
+
   /** Gets the selected star (or null if no star is selected). */
   @Nullable
   public Star getSelectedStar() {
