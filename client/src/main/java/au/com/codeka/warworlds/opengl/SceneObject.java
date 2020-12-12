@@ -40,8 +40,10 @@ public class SceneObject {
   @Nullable private Float tapTargetRadius;
   private Object tag;
 
-  /** An optional {@link Runnable} that'll be called before this {@link SceneObject} is drawn. */
-  @Nullable private Runnable drawRunnable;
+  /**
+   * An optional {@link DrawRunnable} that'll be called before this {@link SceneObject} is drawn.
+   */
+  @Nullable private DrawRunnable drawRunnable;
 
   public SceneObject(DimensionResolver dimensionResolver) {
     this(dimensionResolver, null);
@@ -57,13 +59,13 @@ public class SceneObject {
   }
 
   /**
-   * Sets an optional draw {@link Runnable} that is called on the draw thread before this
+   * Sets an optional draw {@link DrawRunnable} that is called on the draw thread before this
    * {@link SceneObject} is drawn. You can use this to update the position, scale, etc of the
    * object just before it's drawn (useful for animation, etc).
    *
    * <p>You cannot modify the object heirarchy in this method (add children, remove children, etc)
    */
-  public void setDrawRunnable(@Nullable Runnable drawRunnable) {
+  public void setDrawRunnable(@Nullable DrawRunnable drawRunnable) {
     this.drawRunnable = drawRunnable;
   }
 
@@ -192,10 +194,10 @@ public class SceneObject {
     setTranslation(tx, ty);
   }
 
-  public void draw(float[] viewProjMatrix) {
-    Runnable localDrawRunnable = drawRunnable;
+  public void draw(float[] viewProjMatrix, float frameTime) {
+    DrawRunnable localDrawRunnable = drawRunnable;
     if (localDrawRunnable != null) {
-      localDrawRunnable.run();
+      localDrawRunnable.run(frameTime);
     }
 
     Matrix.multiplyMM(modelViewProjMatrix, 0, viewProjMatrix, 0, matrix, 0);
@@ -220,7 +222,7 @@ public class SceneObject {
     drawImpl(modelViewProjMatrix);
     if (children != null) {
       for (int i = 0; i < children.size(); i++) {
-        children.get(i).draw(modelViewProjMatrix);
+        children.get(i).draw(modelViewProjMatrix, frameTime);
       }
     }
   }

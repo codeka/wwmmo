@@ -123,7 +123,7 @@ public class RenderSurfaceView extends GLSurfaceView {
       Scene currScene = this.scene;
       if (currScene != null) {
         synchronized (currScene.lock) {
-          currScene.draw(camera);
+          currScene.draw(camera, frameCounter.getFrameTime());
         }
       }
     }
