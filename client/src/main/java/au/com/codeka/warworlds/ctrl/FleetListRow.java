@@ -24,6 +24,7 @@ import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -72,10 +73,8 @@ public class FleetListRow extends RelativeLayout {
     row2.removeAllViews();
     row3.removeAllViews();
 
-    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(
-        DesignKind.SHIP, fleet.getDesignID());
-    icon.setImageDrawable(new SpriteDrawable(
-        SpriteManager.i.getSprite(design.getSpriteName())));
+    ShipDesign design = fleet.getDesign();
+    DesignHelper.setDesignIcon(design, icon);
 
     populateFleetNameRow(context, row1, fleet, design);
     populateFleetStanceRow(context, row2, fleet);
@@ -139,8 +138,7 @@ public class FleetListRow extends RelativeLayout {
       addTextToRow(context, row, text, textSize);
       for (BaseFleetUpgrade fleetUpgrade : fleet.getUpgrades()) {
         ShipDesign.Upgrade upgrade = design.getUpgrade(fleetUpgrade.getUpgradeID());
-        Sprite sprite =
-            SpriteManager.i.getSprite(upgrade.getSpriteName());
+        Sprite sprite = SpriteManager.i.getSprite(upgrade.getSpriteName());
         addImageToRow(context, row, sprite, textSize);
         addTextToRow(context, row, bold(" " + upgrade.getFleetNameModifier() + " "), textSize);
       }

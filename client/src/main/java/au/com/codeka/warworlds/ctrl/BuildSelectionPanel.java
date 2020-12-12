@@ -19,6 +19,7 @@ import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
@@ -134,7 +135,7 @@ public class BuildSelectionPanel extends RelativeLayout {
         Design design = DesignManager.i.getDesign(buildRequest.getDesignKind(),
                 buildRequest.getDesignID());
 
-        icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+        DesignHelper.setDesignIcon(design, icon);
 
         if (buildRequest.getCount() == 1) {
             buildingName.setText(design.getDisplayName());

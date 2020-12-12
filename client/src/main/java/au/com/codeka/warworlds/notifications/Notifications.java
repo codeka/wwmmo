@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import android.annotation.SuppressLint;
@@ -21,6 +22,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -33,6 +35,7 @@ import androidx.core.app.TaskStackBuilder;
 import androidx.core.content.ContextCompat;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
@@ -41,9 +44,7 @@ import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.api.ApiRequest;
-import au.com.codeka.warworlds.api.RequestManager;
-import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
@@ -65,6 +66,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -318,7 +320,8 @@ public class Notifications {
     }
 
     Realm realm = RealmContext.i.getCurrentRealm();
-    inboxStyle.setBigContentTitle(String.format("%s: %d events", realm.getDisplayName(), num));
+    inboxStyle.setBigContentTitle(
+        String.format(Locale.US, "%s: %d events", realm.getDisplayName(), num));
     builder.setStyle(inboxStyle);
     builder.setNumber(num);
     builder.setLights(options.getLedColour(), 1000, 5000);
@@ -353,15 +356,14 @@ public class Notifications {
         Bitmap largeIcon = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(largeIcon);
 
-        Sprite designSprite = sitrep.getDesignSprite();
-        if (designSprite != null) {
+        Design design = sitrep.getDesign();
+        if (design != null) {
           Matrix matrix = new Matrix();
-          matrix.setScale((float) iconWidth / (float) designSprite.getWidth(),
-              (float) iconHeight / (float) designSprite.getHeight());
+          matrix.setScale((float) iconWidth / 64f, (float) iconHeight / 64f);
 
           canvas.save();
           canvas.setMatrix(matrix);
-          designSprite.draw(canvas);
+          canvas.drawBitmap(DesignHelper.load(design), matrix, new Paint());
           canvas.restore();
         }
 

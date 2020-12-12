@@ -27,6 +27,7 @@ import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.FeatureFlags;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.FleetListRow;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.game.NotesDialog;
 import au.com.codeka.warworlds.game.build.BuildFragment.BaseTabFragment;
 import au.com.codeka.warworlds.model.BuildManager;
@@ -36,10 +37,7 @@ import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.FleetManager;
-import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
-import au.com.codeka.warworlds.model.StarManager;
 
 public class ShipsFragment extends BaseTabFragment {
   private Star star;
@@ -252,7 +250,7 @@ public class ShipsFragment extends BaseTabFragment {
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP,
             (fleet != null ? fleet.getDesignID() : buildRequest.getDesignID()));
 
-        icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+        DesignHelper.setDesignIcon(design, icon);
 
         level.setVisibility(View.GONE);
         levelLabel.setVisibility(View.GONE);
@@ -315,8 +313,7 @@ public class ShipsFragment extends BaseTabFragment {
         view.findViewById(R.id.notes).setVisibility(View.GONE);
 
         ShipDesign design = entry.design;
-
-        icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+        DesignHelper.setDesignIcon(design, icon);
 
         row1.removeAllViews();
         FleetListRow.populateFleetNameRow(getActivity(), row1, null, design);

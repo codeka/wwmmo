@@ -1,64 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sprites>
   <sheet filename="spritesheets/sprites.png">
-    <sprite name="building.biosphere-1">
-      <rect location="43,0" size="25x24" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="building.hq">
-      <rect location="80,32" size="64x54" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="building.radar">
-      <rect location="141,91" size="23x20" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="building.research">
-      <rect location="53,29" size="24x28" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="building.shipyard">
-      <rect location="54,61" size="23x26" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="building.shield-1">
-      <rect location="93,0" size="26x30" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="building.silo">
-      <rect location="68,0" size="25x19" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="building.wormhole-disruptor">
-      <rect location="1,91" size="19x56" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="building.greenhouse">
-      <rect location="23,117" size="48x56" />
-      <direction>0,1</direction>
-    </sprite>
-
-    <sprite name="ship.colony">
-      <rect location="0,28" size="50x58" />
-      <direction>0,-1</direction>
-    </sprite>
-    <sprite name="ship.fighter">
-      <rect location="0,0" size="21x24" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="ship.scout">
-      <rect location="21,0" size="22x28" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="ship.troopcarrier">
-      <rect location="64,86" size="71x29" />
-      <direction>0,-1</direction>
-    </sprite>
-    <sprite name="ship.wormhole-generator">
-      <rect location="147,28" size="27x44" />
-      <direction>0,1</direction>
-    </sprite>
-
+ 
     <sprite name="upgrade.boost">
       <rect location="169,1" size="10x16" />
       <direction>0,1</direction>

@@ -24,6 +24,7 @@ import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;

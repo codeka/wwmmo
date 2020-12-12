@@ -31,13 +31,12 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.BuildEstimateView;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
-import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -146,7 +145,7 @@ public class BuildConfirmDialog extends DialogFragment {
     TextView descriptionTextView = view.findViewById(R.id.building_description);
 
     nameTextView.setText(design.getDisplayName());
-    iconImageView.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+    DesignHelper.setDesignIcon(design, iconImageView);
     descriptionTextView.setText(Html.fromHtml(design.getDescription()));
 
     View upgradeContainer = view.findViewById(R.id.upgrade_container);
