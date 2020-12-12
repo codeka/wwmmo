@@ -50,7 +50,7 @@ public class Scene {
     return rootObject;
   }
 
-  public void draw(Camera camera) {
-    rootObject.draw(camera.getViewProjMatrix());
+  public void draw(Camera camera, float frameTime) {
+    rootObject.draw(camera.getViewProjMatrix(), frameTime);
   }
 }

@@ -22,6 +22,7 @@ import au.com.codeka.BackgroundRunner;
 import au.com.codeka.Cash;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.model.BaseSector;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
@@ -40,6 +41,7 @@ import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.designeffects.EmptySpaceMoverShipEffect;
+import au.com.codeka.warworlds.opengl.DrawRunnable;
 import au.com.codeka.warworlds.opengl.SceneObject;
 import au.com.codeka.warworlds.opengl.Sprite;
 import au.com.codeka.warworlds.ui.BaseFragment;
@@ -423,10 +425,11 @@ public class FleetMoveFragment extends BaseFragment {
     }
   };
 
-  private class FleetIndicatorUpdater implements Runnable {
+  private class FleetIndicatorUpdater implements DrawRunnable {
     private Vector2 src;
     private Vector2 dest;
     private final Vector2 pos;
+    private float rotation;
     private float fraction;
 
     public FleetIndicatorUpdater() {
@@ -439,10 +442,18 @@ public class FleetMoveFragment extends BaseFragment {
     public void reset(Vector2 src, Vector2 dest) {
       this.src = src;
       this.dest = dest;
+
+      if (src != null && dest != null) {
+        Vector2 dir = BaseSector.directionBetween(srcStar, destStar);
+        dir.normalize();
+        rotation = Vector2.angleBetween(dir, new Vector2(0, -1));
+      } else {
+        rotation = 0f;
+      }
     }
 
     @Override
-    public void run() {
+    public void run(float frameTime) {
       if (src == null) {
         return;
       }
@@ -451,12 +462,14 @@ public class FleetMoveFragment extends BaseFragment {
         return;
       }
 
-      fraction += 0.01f; // TODO: * by elapsed time?
+      fraction += frameTime;
       if (fraction > 0.9f) {
         fraction = 0.1f;
       }
       Vector2.lerp(src, dest, fraction, pos);
-      fleetIndicatorEntity.setTranslation((float) pos.x - (float) src.x, -((float) pos.y - (float) src.y));
+      fleetIndicatorEntity.setTranslation((
+          float) pos.x - (float) src.x, -((float) pos.y - (float) src.y));
+      fleetIndicatorEntity.setRotation(rotation, 0, 0, 1);
     }
   }
 }
