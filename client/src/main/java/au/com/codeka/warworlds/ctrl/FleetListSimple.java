@@ -14,10 +14,9 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 
 public class FleetListSimple extends LinearLayout {
@@ -88,7 +87,7 @@ public class FleetListSimple extends LinearLayout {
     LinearLayout row1 = view.findViewById(R.id.ship_row1);
     LinearLayout row2 = view.findViewById(R.id.ship_row2);
 
-    icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+    DesignHelper.setDesignIcon(design, icon);
 
     row1.removeAllViews();
     row2.removeAllViews();

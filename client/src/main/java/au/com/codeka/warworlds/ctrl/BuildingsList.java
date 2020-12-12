@@ -29,13 +29,12 @@ import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
-import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -306,7 +305,7 @@ public class BuildingsList extends ListView {
                 BuildingDesign design = (BuildingDesign) DesignManager.i.getDesign(DesignKind.BUILDING,
                         (building != null ? building.getDesignID() : buildRequest.getDesignID()));
 
-                icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+                DesignHelper.setDesignIcon(design, icon);
 
                 int numUpgrades = design.getUpgrades().size();
 
@@ -369,8 +368,7 @@ public class BuildingsList extends ListView {
                 view.findViewById(R.id.notes).setVisibility(View.GONE);
 
                 BuildingDesign design = mEntries.get(position).design;
-
-                icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+                DesignHelper.setDesignIcon(design, icon);
 
                 row1.removeAllViews();
                 addTextToRow(mContext, row1, design.getDisplayName());

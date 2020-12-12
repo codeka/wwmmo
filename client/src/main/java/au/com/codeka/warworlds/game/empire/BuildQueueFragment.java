@@ -28,6 +28,7 @@ import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.BuildSelectionPanel;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.game.build.BuildAccelerateDialog;
 import au.com.codeka.warworlds.game.build.BuildStopConfirmDialog;
 import au.com.codeka.warworlds.game.empire.StarsFragment.StarsListAdapter;
@@ -39,7 +40,6 @@ import au.com.codeka.warworlds.model.EmpireStarsFetcher;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
@@ -274,9 +274,7 @@ public class BuildQueueFragment extends BaseFragment {
             BuildRequest buildRequest = (BuildRequest) getChild(star, index);
             Design design = DesignManager.i.getDesign(buildRequest.getDesignKind(),
                                                       buildRequest.getDesignID());
-
-            icon.setImageDrawable(new SpriteDrawable(
-                    SpriteManager.i.getSprite(design.getSpriteName())));
+            DesignHelper.setDesignIcon(design, icon);
 
             if (buildRequest.getExistingBuildingKey() != null) {
                 level.setText(Integer.toString(buildRequest.getExistingBuildingLevel()));

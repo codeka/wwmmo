@@ -232,7 +232,8 @@ public class SituationReport {
         return msg;
     }
 
-    public Sprite getDesignSprite() {
+    @Nullable
+    public Design getDesign() {
         String designID = null;
         DesignKind designKind = DesignKind.SHIP;
         if (mBuildCompleteRecord != null) {
@@ -250,8 +251,7 @@ public class SituationReport {
         }
 
         if (designID != null) {
-            Design design = DesignManager.i.getDesign(designKind, designID);
-            return SpriteManager.i.getSprite(design.getSpriteName());
+            return DesignManager.i.getDesign(designKind, designID);
         } else {
             return null;
         }

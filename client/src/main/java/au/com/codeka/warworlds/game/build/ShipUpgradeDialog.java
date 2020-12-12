@@ -35,13 +35,11 @@ import au.com.codeka.warworlds.FeatureFlags;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.BuildEstimateView;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.Sprite;
-import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -93,8 +91,7 @@ public class ShipUpgradeDialog extends DialogFragment {
         });
 
     ShipDesign design = fleet.getDesign();
-    Sprite sprite = SpriteManager.i.getSprite(design.getSpriteName());
-    fleetIcon.setImageDrawable(new SpriteDrawable(sprite));
+    DesignHelper.setDesignIcon(design, fleetIcon);
 
     fleetName.setText(String.format(Locale.ENGLISH, "%d × %s",
         (int) fleet.getNumShips(), design.getDisplayName()));
@@ -159,8 +156,7 @@ public class ShipUpgradeDialog extends DialogFragment {
       TextView upgradeName = view.findViewById(R.id.upgrade_name);
       TextView upgradeDescription = view.findViewById(R.id.upgrade_description);
 
-      upgradeIcon.setImageDrawable(
-          new SpriteDrawable(SpriteManager.i.getSprite(upgrade.getSpriteName())));
+      DesignHelper.setDesignIcon(upgrade, upgradeIcon);
       upgradeName.setText(upgrade.getDisplayName());
       upgradeDescription.setText(Html.fromHtml(upgrade.getDescription()));
 

@@ -29,6 +29,7 @@ import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
+import au.com.codeka.common.model.Design;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.notifications.Notifications;
@@ -522,9 +523,9 @@ public class SitrepActivity extends BaseActivity {
       reportContent.setText(msg);
       reportTitle.setText(sitrep.getTitle());
 
-      Sprite designSprite = sitrep.getDesignSprite();
-      if (designSprite != null) {
-        overlayIcon.setImageDrawable(new SpriteDrawable(designSprite));
+      Design design = sitrep.getDesign();
+      if (design != null) {
+        DesignHelper.setDesignIcon(design, overlayIcon);
       }
 
       return view;

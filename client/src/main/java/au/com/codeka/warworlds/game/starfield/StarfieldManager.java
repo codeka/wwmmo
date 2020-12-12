@@ -22,8 +22,11 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseSector;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -705,21 +708,8 @@ public class StarfieldManager {
   }
 
   private String getFleetTexture(Fleet fleet) {
-    switch (fleet.getDesignID()) {
-      case "colonyship":
-        return "sprites/colony.png";
-      case "scout":
-        return "sprites/scout.png";
-      case "fighter":
-        return "sprites/fighter.png";
-      case "troopcarrier":
-        return "sprites/troopcarrier.png";
-      case "wormhole-generator":
-        return "sprites/wormhole-generator.png";
-      default:
-        // Shouldn't happen, the rest are reserved for buildings.
-        return "sprites/hq.png";
-    }
+    ShipDesign design = fleet.getDesign();
+    return String.format("sprites/%s.png", design.getSpriteName());
   }
 
   private final Object eventListener = new Object() {

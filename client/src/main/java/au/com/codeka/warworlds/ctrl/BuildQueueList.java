@@ -35,6 +35,7 @@ import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.game.NotesDialog;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
@@ -199,7 +200,7 @@ public class BuildQueueList extends FrameLayout {
     Design design = DesignManager.i.getDesign(selectedBuildRequest.getDesignKind(),
         selectedBuildRequest.getDesignID());
 
-    icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+    DesignHelper.setDesignIcon(design, icon);
 
     if (selectedBuildRequest.getCount() == 1) {
       buildingName.setText(design.getDisplayName());

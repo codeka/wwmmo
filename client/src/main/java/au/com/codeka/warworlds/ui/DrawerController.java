@@ -24,7 +24,6 @@ import java.util.Locale;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
