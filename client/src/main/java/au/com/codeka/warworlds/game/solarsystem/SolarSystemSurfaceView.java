@@ -20,6 +20,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import au.com.codeka.common.Log;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
@@ -42,7 +43,6 @@ import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Sprite;
-import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
@@ -51,6 +51,7 @@ import au.com.codeka.warworlds.model.StarImageManager;
  * and representations of the fleets, etc.
  */
 public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
+  private static final Log log = new Log("SolarSystemSUrfaceView");
   private Context context;
   private Star star;
   private PlanetInfo[] planetInfos;
@@ -60,9 +61,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
   private CopyOnWriteArrayList<OnPlanetSelectedListener> planetSelectedListeners;
   private StarfieldBackgroundRenderer backgroundRenderer;
   private Matrix matrix;
-  private HashMap<String, DesignHelper.PendingAsyncLoad> designBitmaps = new HashMap<>();
+  private final HashMap<String, DesignHelper.PendingAsyncLoad> designBitmaps = new HashMap<>();
 
-  private Comparator<Building> mBuildingDesignComparator =
+  private final Comparator<Building> buildingDesignComparator =
       (lhs, rhs) -> lhs.getDesignID().compareTo(rhs.getDesignID());
 
   public SolarSystemSurfaceView(Context context, AttributeSet attrs) {
@@ -164,13 +165,18 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
               if (design.showInSolarSystem()) {
                 planetInfo.buildings.add((Building) building);
                 if (!designBitmaps.containsKey(design.getID())) {
-                  designBitmaps.put(design.getID(), DesignHelper.loadAsync(design, this::redraw));
+                  designBitmaps.put(
+                      design.getID(),
+                      DesignHelper.loadAsync(design, () -> {
+                        log.info("loaded a design");
+                        post(this::redraw);
+                      }));
                 }
               }
             }
 
             if (!planetInfo.buildings.isEmpty()) {
-              Collections.sort(planetInfo.buildings, mBuildingDesignComparator);
+              Collections.sort(planetInfo.buildings, buildingDesignComparator);
             }
           }
         }
@@ -222,9 +228,13 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     if (selectedPlanet != null && selectionView != null) {
       selectionView.setVisibility(View.VISIBLE);
 
-      RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) selectionView.getLayoutParams();
-      params.width = (int) ((((selectedPlanet.planet.getSize() - 10.0) / 8.0) + 4.0) * 10.0) + (int) (40 * getPixelScale());
-      params.height = params.width;
+      RelativeLayout.LayoutParams params =
+          (RelativeLayout.LayoutParams) selectionView.getLayoutParams();
+      int size =
+          (int) ((((selectedPlanet.planet.getSize() - 10.0) / 8.0) + 4.0) * 10.0)
+              + (int) (40 * getPixelScale());
+      params.width = size;
+      params.height = size;
       params.leftMargin = (int) (getLeft() + selectedPlanet.centre.x - (params.width / 2));
       params.topMargin = (int) (getTop() + selectedPlanet.centre.y - (params.height / 2));
       selectionView.setLayoutParams(params);
@@ -242,20 +252,20 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
   @Override
   protected void onAttachedToWindow() {
     super.onAttachedToWindow();
-    ShieldManager.eventBus.register(mEventHandler);
-    ImageManager.eventBus.register(mEventHandler);
+    ShieldManager.eventBus.register(eventHandler);
+    ImageManager.eventBus.register(eventHandler);
   }
 
   @Override
   public void onDetachedFromWindow() {
     super.onDetachedFromWindow();
 
-    ImageManager.eventBus.unregister(mEventHandler);
+    ImageManager.eventBus.unregister(eventHandler);
     if (backgroundRenderer != null) {
       backgroundRenderer.close();
       backgroundRenderer = null;
     }
-    ShieldManager.eventBus.unregister(mEventHandler);
+    ShieldManager.eventBus.unregister(eventHandler);
   }
 
   @Override
@@ -284,9 +294,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
       if (backgroundRenderer == null) {
         backgroundRenderer = new StarfieldBackgroundRenderer(new long[]{star.getKey().hashCode()});
       }
-      backgroundRenderer.drawBackground(canvas, 0, 0,
-          canvas.getWidth() / getPixelScale(),
-          canvas.getHeight() / getPixelScale());
+      backgroundRenderer.drawBackground(
+          canvas, 0, 0, getWidth() / getPixelScale(), getHeight() / getPixelScale());
 
       drawSun(canvas);
       drawPlanets(canvas);
@@ -312,16 +321,14 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
   }
 
   private void drawPlanets(Canvas canvas) {
-    for (int i = 0; i < planetInfos.length; i++) {
+    for (PlanetInfo info : planetInfos) {
       canvas.drawCircle(0, 0,
-          planetInfos[i].distanceFromSun, planetPaint);
+          info.distanceFromSun, planetPaint);
     }
 
     PlanetImageManager pim = PlanetImageManager.getInstance();
 
-    for (int i = 0; i < planetInfos.length; i++) {
-      final PlanetInfo planetInfo = planetInfos[i];
-
+    for (final PlanetInfo planetInfo : planetInfos) {
       Sprite sprite = pim.getSprite(planetInfo.planet);
       matrix.reset();
       matrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
@@ -339,6 +346,11 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         for (Building building : planetInfo.buildings) {
           BuildingDesign design = building.getDesign();
           DesignHelper.PendingAsyncLoad pendingLoad = designBitmaps.get(design.getID());
+          if (pendingLoad == null) {
+            // shouldn't happen.
+            continue;
+          }
+
           Bitmap bitmap = pendingLoad.bitmap;
           if (bitmap != null) {
             Vector2 pt = Vector2.pool.borrow().reset(0, -30.0f);
@@ -378,7 +390,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     }
   }
 
-  private Object mEventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onSpriteGenerated(ImageManager.SpriteGeneratedEvent event) {
       redraw();
@@ -455,6 +467,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
      * This is called when the user selects (by tapping it) a planet. By definition, only
      * one planet can be selected at a time.
      */
-    public abstract void onPlanetSelected(Planet planet);
+    void onPlanetSelected(Planet planet);
   }
 }

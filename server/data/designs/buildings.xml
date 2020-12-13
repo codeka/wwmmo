@@ -74,7 +74,7 @@
   </design>
   <design id="groundshield">
     <name>Ground Shield</name>
-    <sprite>building.shield-1</sprite>
+    <sprite>building.groundshield</sprite>
     <description><![CDATA[
       <p>The ground shield provide additional defence when an enemy lands a troop
       carrier. Your colony's base defence will be increased by 0.25 for each level
@@ -126,7 +126,7 @@
   </design>
   <design id="biosphere">
     <name>Biosphere</name>
-    <sprite>building.biosphere-1</sprite>
+    <sprite>building.biosphere</sprite>
     <description><![CDATA[
       <p>The Biosphere increases a planet's maximum population. Without a biosphere,
       a planet's maximum population is approximately equal to it's population
