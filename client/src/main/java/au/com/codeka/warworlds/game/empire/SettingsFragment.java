@@ -57,22 +57,12 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
   private static final Log log = new Log("SettingsFragment");
   private View view;
   private ImagePickerHelper imagePickerHelper;
+  private Bitmap pickedImage;
+
+  private static final int CHOOSE_IMAGE_RESULT_ID = 7406;
 
   private static final String PATREON_CLIENT_ID =
       "IiB6Hob1U-gh26y7kFXOFGXTyrxLjy1WyyAJ7x5R_ToXbhG-8KL-Q5mPfC1j7fED";
-
-  @Override
-  public void onStart() {
-    super.onStart();
-    imagePickerHelper = requireMainActivity().getImagePickerHelper();
-    ShieldManager.eventBus.register(eventHandler);
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    ShieldManager.eventBus.unregister(eventHandler);
-  }
 
   /**
    * Called when an empire's shield is updated, we'll have to refresh the list.
@@ -182,9 +172,23 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
                 onResetEmpireClick(dialog)).setNegativeButton("Cancel", null).create().show());
 
     imagePickerHelper = requireMainActivity().getImagePickerHelper();
+    imagePickerHelper.registerImagePickedHandler(CHOOSE_IMAGE_RESULT_ID, imagePickedHandler);
     loadShieldImage();
 
     return view;
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    imagePickerHelper = requireMainActivity().getImagePickerHelper();
+    ShieldManager.eventBus.register(eventHandler);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    ShieldManager.eventBus.unregister(eventHandler);
   }
 
   private void onRenameClick() {
@@ -251,12 +255,12 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
   }
 
   private void onShieldChangeClick() {
-    imagePickerHelper.chooseImage();
+    imagePickerHelper.chooseImage(CHOOSE_IMAGE_RESULT_ID);
   }
 
   private void onShieldSaveClick() {
     final Activity activity = getActivity();
-    final Bitmap bmp = imagePickerHelper.getImage();
+    final Bitmap bmp = pickedImage;
     if (bmp == null) {
       return;
     }
@@ -272,37 +276,33 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
         }
 
         if (isSuccess) {
-          EmpireManager.i.getEmpire().changeShieldImage(bmp, info, new RunnableArg<Boolean>() {
-            @Override
-            public void run(Boolean success) {
-              if (success) {
-                new StyledDialog.Builder(activity)
-                    .setMessage("Shield has been successfully changed.")
-                    .setPositiveButton("Close", null)
-                    .create().show();
+          EmpireManager.i.getEmpire().changeShieldImage(bmp, info, success -> {
+            if (success) {
+              new StyledDialog.Builder(activity)
+                  .setMessage("Shield has been successfully changed.")
+                  .setPositiveButton("Close", null)
+                  .create().show();
 
-                PurchaseManager.i.consume(info, (purchase, result1) -> {
-                  if (!result1.isSuccess()) {
-                    // TODO: revert?
-                    return;
-                  }
-                });
-              } else {
-                new StyledDialog.Builder(activity)
-                    .setMessage("An error has occurred changing your shield, but you can try again"
-                        + " without purchasing again. If it continues to not work, please file a"
-                        + " support request with dean@war-worlds.com, and your money will be"
-                        + " refunded.")
-                    .setPositiveButton("OK", null)
-                    .create().show();
-              }
+              PurchaseManager.i.consume(info, (purchase, result1) -> {
+                if (!result1.isSuccess()) {
+                  // TODO: revert?
+                  return;
+                }
+              });
+            } else {
+              new StyledDialog.Builder(activity)
+                  .setMessage("An error has occurred changing your shield, but you can try again"
+                      + " without purchasing again. If it continues to not work, please file a"
+                      + " support request with dean@war-worlds.com, and your money will be"
+                      + " refunded.")
+                  .setPositiveButton("OK", null)
+                  .create().show();
             }
           });
         }
       });
     } catch (IabException e) {
       log.error("Couldn't get SKU details!", e);
-      return;
     }
   }
 
@@ -340,8 +340,7 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
                 if (result.isFailure() && result.getResponse()
                     == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
                   // If they've already purchased a reset_empire, but not reclaimed it,
-                  // then we let them
-                  // through anyway.
+                  // then we let them through anyway.
                   isSuccess = true;
                 }
 
@@ -364,7 +363,6 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
               });
         } catch (IabException e) {
           log.error("Couldn't get SKU details!", e);
-          return;
         }
       }
     });
@@ -404,10 +402,9 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
   }
 
   private void loadShieldImage() {
-    Bitmap bmp = imagePickerHelper.getImage();
-    if (bmp != null) {
+    if (pickedImage != null) {
       log.info("Got an image from the image picker");
-      bmp = combineShieldImage(requireActivity(), bmp);
+      Bitmap bmp = combineShieldImage(requireActivity(), pickedImage);
 
       ImageView currentShield = view.findViewById(R.id.current_shield);
       currentShield.setImageBitmap(bmp);
@@ -416,11 +413,15 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
 
       // and now we can enable the 'save' button
       view.findViewById(R.id.save_btn).setEnabled(true);
-      ;
     } else {
       log.info("No image picked, loading as normal.");
     }
   }
+
+  private final ImagePickerHelper.ImagePickedHandler imagePickedHandler = (bitmap) -> {
+    pickedImage = bitmap;
+    loadShieldImage();
+  };
 
   /**
    * Combines the given image with the base shield image.
