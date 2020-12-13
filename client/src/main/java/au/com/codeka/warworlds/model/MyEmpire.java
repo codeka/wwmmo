@@ -257,24 +257,16 @@ public class MyEmpire extends Empire {
         .build();
 
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "PUT").body(pb)
-        .completeCallback(new ApiRequest.CompleteCallback() {
-          @Override
-          public void onRequestComplete(ApiRequest request) {
-            Messages.Empire empire_pb = request.body(Messages.Empire.class);
-            if (empire_pb == null) {
-              return;
-            }
-            mShieldLastUpdate =
-                new DateTime(empire_pb.getShieldImageLastUpdate() * 1000, DateTimeZone.UTC);
-            EmpireManager.eventBus.publish(MyEmpire.this);
-            onComplete.run(true);
+        .completeCallback(request -> {
+          Messages.Empire empire_pb = request.body(Messages.Empire.class);
+          if (empire_pb == null) {
+            return;
           }
-        }).errorCallback(new ApiRequest.ErrorCallback() {
-          @Override
-          public void onRequestError(ApiRequest request, Messages.GenericError error) {
-            onComplete.run(false);
-          }
-        }).build());
+          mShieldLastUpdate =
+              new DateTime(empire_pb.getShieldImageLastUpdate() * 1000, DateTimeZone.UTC);
+          EmpireManager.eventBus.publish(MyEmpire.this);
+          onComplete.run(true);
+        }).errorCallback((request, error) -> onComplete.run(false)).build());
   }
 
   public void resetEmpire(final String skuName, final Purchase purchaseInfo,
@@ -288,18 +280,8 @@ public class MyEmpire extends Empire {
 
     RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST")
         .body(pb.build())
-        .completeCallback(new ApiRequest.CompleteCallback() {
-          @Override
-          public void onRequestComplete(ApiRequest request) {
-            handler.onEmpireReset();
-          }
-        })
-        .errorCallback(new ApiRequest.ErrorCallback() {
-          @Override
-          public void onRequestError(ApiRequest request, Messages.GenericError error) {
-            handler.onResetFail(error.getErrorMessage());
-          }
-        }).build());
+        .completeCallback(request -> handler.onEmpireReset())
+        .errorCallback((request, error) -> handler.onResetFail(error.getErrorMessage())).build());
   }
 
   public interface ColonizeCompleteHandler {

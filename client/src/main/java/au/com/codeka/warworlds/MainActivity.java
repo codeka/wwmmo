@@ -12,6 +12,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
@@ -19,6 +20,7 @@ import java.io.File;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.game.starfield.StarfieldManager;
+import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.ui.DrawerController;
 
@@ -53,6 +55,8 @@ public class MainActivity extends BaseActivity {
     setContentView(R.layout.main_activity);
     setSupportActionBar(findViewById(R.id.toolbar));
 
+    imagePickerHelper = new ImagePickerHelper(this);
+
     RenderSurfaceView renderSurfaceView = findViewById(R.id.render_surface);
     renderSurfaceView.create();
     starfieldManager = new StarfieldManager(renderSurfaceView);
@@ -81,7 +85,7 @@ public class MainActivity extends BaseActivity {
             .setOpenableLayout(drawerLayout)
             .build();
     NavigationUI.setupWithNavController(
-        (Toolbar) findViewById(R.id.toolbar), navController, appBarConfiguration);
+        findViewById(R.id.toolbar), navController, appBarConfiguration);
     NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
     drawerController = new DrawerController(
@@ -120,9 +124,12 @@ public class MainActivity extends BaseActivity {
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (imagePickerHelper.onActivityResult(requestCode, resultCode, data)) {
       log.info("Image picker has returned a result.");
-      // TODO: return to whatever requested the image?
-//      getTabHost().setCurrentTabByTag("Settings");
-//      getTabManager().reloadTab();
+      // ImagePickerHelper should've called the correct callback...
+      return;
+    }
+
+    if (PurchaseManager.i.onActivityResult(requestCode, resultCode, data)) {
+
     }
 
     super.onActivityResult(requestCode, resultCode, data);

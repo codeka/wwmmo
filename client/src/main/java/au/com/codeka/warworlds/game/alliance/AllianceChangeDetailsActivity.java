@@ -136,7 +136,7 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
     }
   }
   private void onChooseImageClick() {
-    imagePickerHelper.chooseImage();
+    //imagePickerHelper.chooseImage();
   }
 
   private void onChangeImageClick() {

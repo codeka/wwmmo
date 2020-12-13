@@ -268,7 +268,7 @@ public class IabHelper {
     }
 
     return Messages.PurchaseInfo.newBuilder()
-        .setSku("rename_empire")
+        .setSku(skuName)
         .setToken(purchaseInfo.getToken())
         .setOrderId(purchaseInfo.getOrderId())
         .setPrice(sku.getPrice())
@@ -827,8 +827,7 @@ public class IabHelper {
 
   int querySkuDetails(Inventory inv, List<String> moreSkus) throws RemoteException, JSONException {
     logDebug("Querying SKU details.");
-    ArrayList<String> skuList = new ArrayList<String>();
-    skuList.addAll(inv.getAllOwnedSkus());
+    ArrayList<String> skuList = new ArrayList<>(inv.getAllOwnedSkus());
     if (moreSkus != null) skuList.addAll(moreSkus);
 
     if (skuList.size() == 0) {

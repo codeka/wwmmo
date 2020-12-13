@@ -25,7 +25,7 @@ public class Purchase {
     private String mOriginalJson;
     private String mOrderId;
     private String mPackageName;
-    private String mSku;
+    private String mSku; do this you need:
     private long mPurchaseTime;
     private int mPurchaseState;
     private String mDeveloperPayload;

@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
@@ -23,7 +22,7 @@ import au.com.codeka.warworlds.model.billing.IabResult;
 import au.com.codeka.warworlds.model.billing.Inventory;
 import au.com.codeka.warworlds.model.billing.Purchase;
 
-import static androidx.core.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class PurchaseManager {
   private static final Log log = new Log("PurchaseManager");
@@ -57,7 +56,7 @@ public class PurchaseManager {
   @Nullable private IabResult setupResult;
   @Nullable private Inventory inventory;
 
-  private Set<PendingPurchase> pendingPurchases = new HashSet<>();
+  private final Set<PendingPurchase> pendingPurchases = new HashSet<>();
 
   public void setup() {
     // try to load the inventory from SharedPreferences first, so that we don't have to wait
@@ -75,42 +74,37 @@ public class PurchaseManager {
       // ignore... for now
     }
 
+    log.info("Setting up purchases.");
     helper = new IabHelper(App.i, sPublicKey);
-    helper.enableDebugLogging(true, "In-AppBilling");
-    helper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-      @Override
-      public void onIabSetupFinished(IabResult result) {
-        setupResult = result;
-        if (setupResult.isSuccess()) {
-          helper.queryInventoryAsync(true, sAllSkus, new IabHelper.QueryInventoryFinishedListener() {
-            @Override
-            public void onQueryInventoryFinished(IabResult result, @Nullable Inventory inv) {
-              if (result.isSuccess()) {
-                inventory = checkNotNull(inv);
-                if (Util.isDebug()) {
-                  inventory.erasePurchase("remove_ads");
-                }
+    helper.enableDebugLogging(true, "wwmmo-Purchase");
+    helper.startSetup(result -> {
+      setupResult = result;
+      if (setupResult.isSuccess()) {
+        helper.queryInventoryAsync(true, sAllSkus, (result1, inv) -> {
+          if (result1.isSuccess()) {
+            inventory = checkNotNull(inv);
+            if (Util.isDebug()) {
+              inventory.erasePurchase("remove_ads");
+            }
 
-                try {
-                  SharedPreferences prefs = Util.getSharedPreferences();
-                  prefs.edit().putString("au.com.codeka.warworlds.PurchaseInventory", inv.toJson())
-                      .apply();
-                } catch (JSONException e) {
-                  // ignore... for now
-                }
+            try {
+              SharedPreferences prefs = Util.getSharedPreferences();
+              prefs.edit().putString("au.com.codeka.warworlds.PurchaseInventory", inv.toJson())
+                  .apply();
+            } catch (JSONException e) {
+              // ignore... for now
+            }
 
-                for (PendingPurchase pending : pendingPurchases) {
-                  try {
-                    launchPurchaseFlow(pending.activity, pending.sku, pending.listener);
-                  } catch(IabException e) {
-                    log.error("Error launching pending purchase.", e);
-                  }
-                }
-                pendingPurchases.clear();
+            for (PendingPurchase pending : pendingPurchases) {
+              try {
+                launchPurchaseFlow(pending.activity, pending.sku, pending.listener);
+              } catch(IabException e) {
+                log.error("Error launching pending purchase.", e);
               }
             }
-          });
-        }
+            pendingPurchases.clear();
+          }
+        });
       }
     });
   }
