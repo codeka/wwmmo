@@ -11,12 +11,13 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.fragment.app.DialogFragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import au.com.codeka.Clipboard;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.game.empire.EmpireActivity;
+import au.com.codeka.warworlds.game.empire.EmpireFragment;
 import au.com.codeka.warworlds.game.empire.EnemyEmpireActivity;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -55,20 +56,19 @@ public class ChatMessageDialog extends DialogFragment {
     });
 
     Button viewEmpireBtn = mView.findViewById(R.id.view_empire_btn);
-    viewEmpireBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (mEmpire.getKey().equals(EmpireManager.i.getEmpire().getKey())) {
-          Intent intent = new Intent(getActivity(), EmpireActivity.class);
-          startActivity(intent);
-        } else {
-          Intent intent = new Intent(getActivity(), EnemyEmpireActivity.class);
-          intent.putExtra("au.com.codeka.warworlds.EmpireKey", mEmpire.getKey());
-          getActivity().startActivity(intent);
-        }
-
-        dismiss();
+    viewEmpireBtn.setOnClickListener(v -> {
+      if (mEmpire.getKey().equals(EmpireManager.i.getEmpire().getKey())) {
+        Intent intent = new Intent(getActivity(), EmpireFragment.class);
+        startActivity(intent);
+      } else {
+        // TODO
+//        NavHostFragment.findNavController(this).navigate(R.id.empireFragment, TODO);
+//        Intent intent = new Intent(getActivity(), EnemyEmpireActivity.class);
+//        intent.putExtra("au.com.codeka.warworlds.EmpireKey", mEmpire.getKey());
+//        getActivity().startActivity(intent);
       }
+
+      dismiss();
     });
 
     Button blockBtn = mView.findViewById(R.id.block_btn);

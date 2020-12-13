@@ -4,6 +4,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 
+import androidx.fragment.app.Fragment;
+
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.EmpireStarsFetcher;
 import au.com.codeka.warworlds.model.Star;
@@ -12,7 +14,7 @@ import au.com.codeka.warworlds.model.Star;
  * This is the base fragment for fragments which shows lists of stars (so that would be the
  * colonies, fleets and build queue fragments).
  */
-public class StarsFragment extends BaseFragment {
+public class StarsFragment extends Fragment {
 
   /**
    * Base adapter class for our various tabs.
@@ -35,7 +37,7 @@ public class StarsFragment extends BaseFragment {
       notifyDataSetChanged();
     }
 
-    private Object eventHandler = new Object() {
+    private final Object eventHandler = new Object() {
       @EventHandler
       public void onStarsFetched(EmpireStarsFetcher.StarsFetchedEvent event) {
         notifyDataSetChanged();

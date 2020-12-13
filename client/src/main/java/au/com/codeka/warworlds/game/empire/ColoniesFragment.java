@@ -24,7 +24,6 @@ import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
@@ -57,54 +56,44 @@ public class ColoniesFragment extends StarsFragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     View v = inflater.inflate(R.layout.empire_colonies_tab, container, false);
-    ExpandableListView starsList = (ExpandableListView) v.findViewById(R.id.stars);
+    ExpandableListView starsList = v.findViewById(R.id.stars);
     adapter = new ColonyStarsListAdapter(inflater, fetcher);
     starsList.setAdapter(adapter);
 
-    starsList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-      @Override
-      public boolean onChildClick(ExpandableListView parent, View v,
-                                  int groupPosition, int childPosition, long id) {
-        Star star = (Star) adapter.getGroup(groupPosition);
-        Colony colony = (Colony) adapter.getChild(groupPosition, childPosition);
-        Planet planet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
-        // end this activity, go back to the starfield and navigate to the given colony
+    starsList.setOnChildClickListener((parent, v13, groupPosition, childPosition, id) -> {
+      Star star = (Star) adapter.getGroup(groupPosition);
+      Colony colony = (Colony) adapter.getChild(groupPosition, childPosition);
+      Planet planet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
+      // end this activity, go back to the starfield and navigate to the given colony
 
-        Intent intent = new Intent();
-        intent.putExtra("au.com.codeka.warworlds.Result",
-            EmpireActivity.EmpireActivityResult.NavigateToPlanet.getValue());
-        intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
-        intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
-        intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.getOffsetX());
-        intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.getOffsetY());
-        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-        intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.getIndex());
-        getActivity().setResult(EmpireActivity.RESULT_OK, intent);
-        getActivity().finish();
+      Intent intent = new Intent();
+      intent.putExtra("au.com.codeka.warworlds.Result",
+          EmpireFragment.EmpireActivityResult.NavigateToPlanet.getValue());
+      intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
+      intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
+      intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.getOffsetX());
+      intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.getOffsetY());
+      intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+      intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.getIndex());
 
-        return false;
-      }
+      // TODO: navigate to the correct thing
+//        getActivity().setResult(EmpireFragment.RESULT_OK, intent);
+//        getActivity().finish();
+
+      return false;
     });
 
     final EditText searchBox = v.findViewById(R.id.search_text);
-    searchBox.setOnEditorActionListener(new OnEditorActionListener() {
-      @Override
-      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-          performSearch(searchBox.getText().toString());
-          return true;
-        }
-        return false;
+    searchBox.setOnEditorActionListener((v1, actionId, event) -> {
+      if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+        performSearch(searchBox.getText().toString());
+        return true;
       }
+      return false;
     });
 
     ImageButton searchBtn = v.findViewById(R.id.search_button);
-    searchBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        performSearch(searchBox.getText().toString());
-      }
-    });
+    searchBtn.setOnClickListener(v12 -> performSearch(searchBox.getText().toString()));
 
     return v;
   }

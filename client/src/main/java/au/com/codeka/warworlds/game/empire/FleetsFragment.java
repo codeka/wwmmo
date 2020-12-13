@@ -33,6 +33,7 @@ import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveFragmentArgs;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.game.solarsystem.FleetFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireStarsFetcher;
 import au.com.codeka.warworlds.model.Fleet;
@@ -54,6 +55,8 @@ public class FleetsFragment extends StarsFragment {
   private Integer indexOfStarOfFleetToSelect;
   private Integer fleetToSelect;
 
+  @Nullable private EmpireFragmentArgs args;
+
   public FleetsFragment() {
     fetcher = new EmpireStarsFetcher(EmpireStarsFetcher.Filter.Fleets, null);
     fetcher.getStars(0, 20);
@@ -62,6 +65,10 @@ public class FleetsFragment extends StarsFragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
+    if (getArguments() != null) {
+      args = EmpireFragmentArgs.fromBundle(getArguments());
+    }
+
     View v = inflater.inflate(R.layout.empire_fleets_tab, container, false);
     starsList = v.findViewById(R.id.stars);
     adapter = new FleetsStarsListAdapter(inflater, fetcher);
@@ -73,15 +80,15 @@ public class FleetsFragment extends StarsFragment {
       public void onFleetView(Star star, Fleet fleet) {
         Intent intent = new Intent();
         intent.putExtra("au.com.codeka.warworlds.Result",
-            EmpireActivity.EmpireActivityResult.NavigateToFleet.getValue());
+            EmpireFragment.EmpireActivityResult.NavigateToFleet.getValue());
         intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
         intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
         intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.getOffsetX());
         intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.getOffsetY());
         intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
         intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
-        getActivity().setResult(EmpireActivity.RESULT_OK, intent);
-        getActivity().finish();
+        // TODO: navigate to the correct place?
+        NavHostFragment.findNavController(FleetsFragment.this).popBackStack();
       }
 
       @Override
@@ -92,10 +99,9 @@ public class FleetsFragment extends StarsFragment {
         fleet.toProtocolBuffer(fleet_pb);
         args.putByteArray("au.com.codeka.warworlds.Fleet", fleet_pb.build().toByteArray());
 
-        FragmentManager fm = getActivity().getSupportFragmentManager();
         FleetSplitDialog dialog = new FleetSplitDialog();
         dialog.setFleet(fleet);
-        dialog.show(fm, "");
+        dialog.show(getChildFragmentManager(), "");
       }
 
       @Override
@@ -125,45 +131,32 @@ public class FleetsFragment extends StarsFragment {
       }
     });
 
-    starsList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-      @Override
-      public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
-          int childPosition, long id) {
-        Star star = (Star) adapter.getGroup(groupPosition);
-        Fleet fleet = (Fleet) adapter.getChild(groupPosition, childPosition);
+    starsList.setOnChildClickListener((parent, v1, groupPosition, childPosition, id) -> {
+      Star star = (Star) adapter.getGroup(groupPosition);
+      Fleet fleet = (Fleet) adapter.getChild(groupPosition, childPosition);
 
-        fleetSelectionPanel.setSelectedFleet(star, fleet);
-        adapter.notifyDataSetChanged();
-        return false;
-      }
+      fleetSelectionPanel.setSelectedFleet(star, fleet);
+      adapter.notifyDataSetChanged();
+      return false;
     });
 
     final EditText searchBox = v.findViewById(R.id.search_text);
-    searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-      @Override
-      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-          performSearch(searchBox.getText().toString());
-          return true;
-        }
-        return false;
+    searchBox.setOnEditorActionListener((v12, actionId, event) -> {
+      if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+        performSearch(searchBox.getText().toString());
+        return true;
       }
+      return false;
     });
 
     ImageButton searchBtn = v.findViewById(R.id.search_button);
-    searchBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        performSearch(searchBox.getText().toString());
-      }
-    });
+    searchBtn.setOnClickListener(v13 -> performSearch(searchBox.getText().toString()));
 
-    Bundle arguments = getArguments();
-    if (arguments != null) {
-      int fleetID = arguments.getInt("au.com.codeka.warworlds.FleetID");
+    if (args != null) {
+      int fleetID = args.getFleetID();
       if (fleetID > 0) {
         fleetToSelect = fleetID;
-        starOfFleetToSelect = getArguments().getInt("au.com.codeka.warworlds.StarID");
+        starOfFleetToSelect = args.getStarID();
         attemptToSelectFleet();
       }
     }
@@ -200,13 +193,10 @@ public class FleetsFragment extends StarsFragment {
    * again later.
    */
   private void attemptToSelectFleet() {
-    fetcher.indexOf(starOfFleetToSelect, new EmpireStarsFetcher.IndexOfCompleteHandler() {
-      @Override
-      public void onIndexOfComplete(@Nullable Integer index) {
-        if (index != null) {
-          indexOfStarOfFleetToSelect = index;
-          maybeSelectFleet();
-        }
+    fetcher.indexOf(starOfFleetToSelect, index -> {
+      if (index != null) {
+        indexOfStarOfFleetToSelect = index;
+        maybeSelectFleet();
       }
     });
   }
@@ -284,11 +274,11 @@ public class FleetsFragment extends StarsFragment {
         view = inflater.inflate(R.layout.empire_fleet_list_star_row, parent, false);
       }
 
-      ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
-      TextView starName = (TextView) view.findViewById(R.id.star_name);
-      TextView starType = (TextView) view.findViewById(R.id.star_type);
-      TextView fightersTotal = (TextView) view.findViewById(R.id.fighters_total);
-      TextView nonFightersTotal = (TextView) view.findViewById(R.id.nonfighters_total);
+      ImageView starIcon = view.findViewById(R.id.star_icon);
+      TextView starName = view.findViewById(R.id.star_name);
+      TextView starType = view.findViewById(R.id.star_type);
+      TextView fightersTotal = view.findViewById(R.id.fighters_total);
+      TextView nonFightersTotal = view.findViewById(R.id.nonfighters_total);
 
       if (star == null) {
         starIcon.setImageBitmap(null);

@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,6 +33,7 @@ public class MainActivity extends BaseActivity {
 
   private DrawerController drawerController;
   private StarfieldManager starfieldManager;
+  private ImagePickerHelper imagePickerHelper;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -112,6 +114,22 @@ public class MainActivity extends BaseActivity {
 
     starfieldManager.destroy();
     starfieldManager = null;
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (imagePickerHelper.onActivityResult(requestCode, resultCode, data)) {
+      log.info("Image picker has returned a result.");
+      // TODO: return to whatever requested the image?
+//      getTabHost().setCurrentTabByTag("Settings");
+//      getTabManager().reloadTab();
+    }
+
+    super.onActivityResult(requestCode, resultCode, data);
+  }
+
+  public ImagePickerHelper getImagePickerHelper() {
+    return imagePickerHelper;
   }
 
   public StarfieldManager getStarfieldManager() {

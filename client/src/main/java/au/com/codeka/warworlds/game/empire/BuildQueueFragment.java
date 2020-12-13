@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.game.empire;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
@@ -14,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -45,7 +46,7 @@ import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 
 
-public class BuildQueueFragment extends BaseFragment {
+public class BuildQueueFragment extends Fragment {
     private BuildQueueStarsListAdapter adapter;
     private EmpireStarsFetcher fetcher;
     private BuildSelectionPanel buildSelectionPanel;

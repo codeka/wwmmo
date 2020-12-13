@@ -21,7 +21,7 @@ public abstract class TabFragmentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = inflater.inflate(getLayoutID(), container, false);
 
-        mTabHost = (TabHost) mRootView.findViewById(android.R.id.tabhost);
+        mTabHost = mRootView.findViewById(android.R.id.tabhost);
         mTabManager = new TabManager(mTabHost);
 
         createTabs();
