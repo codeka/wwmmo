@@ -116,6 +116,7 @@ public class StarfieldManager {
 
     camera.setCameraUpdateListener(cameraUpdateListener);
     gestureDetector.create();
+
 /*
     App.i.getTaskRunner().runTask(
         updateMovingFleetsRunnable,
@@ -268,7 +269,7 @@ public class StarfieldManager {
     for (long sy = sectorTop; sy <= sectorBottom; sy++) {
       for (long sx = sectorLeft; sx <= sectorRight; sx++) {
         if (sy < top || sy > bottom || sx < left || sx > right) {
-          removeSector(new Pair(sx, sy));
+          removeSector(new Pair<>(sx, sy));
         }
       }
     }

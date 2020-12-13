@@ -29,6 +29,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.ctrl.InfobarView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
@@ -87,10 +88,10 @@ public class StarfieldFragment extends BaseFragment {
     bottomPane = view.findViewById(R.id.bottom_pane);
     selectionDetailsView = (SelectionDetailsView) view.findViewById(R.id.selection_details);
 
-//    if (isPortrait()) {
-//      InfobarView infobar = (InfobarView) view.findViewById(R.id.infobar);
-//      infobar.hideEmpireName();
-//    }
+    if (isPortrait()) {
+      InfobarView infobarView = view.findViewById(R.id.infobar);
+      infobarView.hideEmpireName();
+    }
 
     // "Rename" button
     // "View" button
@@ -120,12 +121,12 @@ public class StarfieldFragment extends BaseFragment {
             dialog.show(getChildFragmentManager(), "");
           }
         }, star -> {
-          //starfield.scrollTo(star.getSectorX(), star.getSectorY(),
-          //    star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY())
-        } );
+          StarfieldManager starfieldManager = requireMainActivity().getStarfieldManager();
+          starfieldManager.warpTo(star);
+        });
 
-    view.findViewById(R.id.empire_btn).setOnClickListener((View.OnClickListener) v -> openEmpireActivity());
-    view.findViewById(R.id.sitrep_btn).setOnClickListener((View.OnClickListener) v -> openSitrepActivity());
+    view.findViewById(R.id.empire_btn).setOnClickListener(v -> openEmpireActivity());
+    view.findViewById(R.id.sitrep_btn).setOnClickListener(v -> openSitrepActivity());
 
     allianceBtn = view.findViewById(R.id.alliance_btn);
     allianceBtn.setOnClickListener(v -> onAllianceClick());
@@ -162,28 +163,11 @@ public class StarfieldFragment extends BaseFragment {
     hideBottomPane(true);
   }
 
-  private boolean processIntent() {/*
-    Intent intent = getIntent();
-    if (intent != null && intent.getExtras() != null) {
-      String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
-      if (starKey != null) {
-        long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
-        long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
-        int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
-        int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
-        starfield.scrollTo(sectorX, sectorY, offsetX, Sector.SECTOR_SIZE - offsetY);
-      }
-      setIntent(null);
-      return true;
-    }*/
-    return false;
-  }
-
   @Override
   public void onResume() {
     super.onResume();
     ServerGreeter.waitForHello(
-        requireActivity(), (ServerGreeter.HelloCompleteHandler) (success, greeting) -> {
+        requireActivity(), (success, greeting) -> {
       if (!success) {
         return;
       }
@@ -207,14 +191,10 @@ public class StarfieldFragment extends BaseFragment {
 
       BaseStar homeStar = myEmpire.getHomeStar();
 
-      boolean doNotNavigateToHomeStar = processIntent();
       if (homeStar != null && (
           StarfieldFragment.this.homeStar == null || !StarfieldFragment.this.homeStar.getKey()
           .equals(homeStar.getKey()))) {
         StarfieldFragment.this.homeStar = (Star) homeStar;
-        if (!doNotNavigateToHomeStar) {
-//          starfield.scrollTo(homeStar);
-        }
       }
     });
 
@@ -238,22 +218,6 @@ public class StarfieldFragment extends BaseFragment {
     requireMainActivity().getStarfieldManager().removeTapListener(tapListener);
     StarManager.eventBus.unregister(eventHandler);
     ShieldManager.eventBus.unregister(eventHandler);
-  }
-
-  @Override
-  public void onSaveInstanceState(Bundle state) {
-    super.onSaveInstanceState(state);
-    if (selectedStar != null) {
-      Messages.Star.Builder star_pb = Messages.Star.newBuilder();
-      selectedStar.toProtocolBuffer(star_pb);
-      state.putByteArray("au.com.codeka.warworlds.SelectedStar", star_pb.build().toByteArray());
-    }
-
-    if (selectedFleet != null) {
-      Messages.Fleet.Builder fleet_pb = Messages.Fleet.newBuilder();
-      selectedFleet.toProtocolBuffer(fleet_pb);
-      state.putByteArray("au.com.codeka.warworlds.SelectedFleet", fleet_pb.build().toByteArray());
-    }
   }
 
   public void openEmpireActivityAtFleet(Star star, Fleet fleet) {
@@ -292,24 +256,24 @@ public class StarfieldFragment extends BaseFragment {
 
   private void applyBottomPaneAnimation(boolean isOpen, boolean instant) {
     float dp;
-//    if (isPortrait()) {
+    if (isPortrait()) {
       if (isOpen) {
         dp = 180;
       } else {
         dp = 34;
       }
-//    } else {
-//      if (isOpen) {
-//        dp = 200;
-//      } else {
-//        dp = 100;
-//      }
-//    }
+    } else {
+      if (isOpen) {
+        dp = 200;
+      } else {
+        dp = 100;
+      }
+    }
 
     Resources r = getResources();
     float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
 
-//    if (isPortrait()) {
+    if (isPortrait()) {
       if (instant) {
         RelativeLayout.LayoutParams lp =
             (RelativeLayout.LayoutParams) bottomPane.getLayoutParams();
@@ -318,7 +282,7 @@ public class StarfieldFragment extends BaseFragment {
       } else {
         applyBottomPaneAnimationPortrait(px);
       }
-/*    } else {
+    } else {
       RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) allianceBtn.getLayoutParams();
       if (isOpen) {
         // NB: removeRule is not available until API level 17 :/
@@ -341,7 +305,7 @@ public class StarfieldFragment extends BaseFragment {
       } else {
         applyBottomPaneAnimationLandscape(px);
       }
-    }*/
+    }
   }
 
   private void applyBottomPaneAnimationLandscape(final float pxWidth) {
@@ -350,8 +314,8 @@ public class StarfieldFragment extends BaseFragment {
 
       @Override
       protected void applyTransformation(float interpolatedTime, Transformation t) {
-        final int newWidth = initialWidth + (int) ((pxWidth - initialWidth) * interpolatedTime);
-        bottomPane.getLayoutParams().width = newWidth;
+        bottomPane.getLayoutParams().width =
+            initialWidth + (int) ((pxWidth - initialWidth) * interpolatedTime);
         bottomPane.requestLayout();
       }
 
@@ -377,9 +341,8 @@ public class StarfieldFragment extends BaseFragment {
 
       @Override
       protected void applyTransformation(float interpolatedTime, Transformation t) {
-        final int newHeight =
+        bottomPane.getLayoutParams().height =
             initialHeight + (int) ((pxHeight - initialHeight) * interpolatedTime);
-        bottomPane.getLayoutParams().height = newHeight;
         bottomPane.requestLayout();
       }
 
@@ -412,7 +375,8 @@ public class StarfieldFragment extends BaseFragment {
   private void navigateToPlanet(StarType starType, long sectorX, long sectorY, int starID,
       int starOffsetX, int starOffsetY, int planetIndex, boolean scrollView) {
     if (scrollView) {
- //     starfield.scrollTo(sectorX, sectorY, starOffsetX, Sector.SECTOR_SIZE - starOffsetY);
+      StarfieldManager starfieldManager = requireMainActivity().getStarfieldManager();
+      starfieldManager.warpTo(sectorX, sectorY, starOffsetX, starOffsetY);
     }
 
     Bundle args = new Bundle();
@@ -450,18 +414,9 @@ public class StarfieldFragment extends BaseFragment {
     int offsetX = star.getOffsetX();
     int offsetY = star.getOffsetY();
 
-//    starfield
-//        .scrollTo(star.getSectorX(), star.getSectorY(), offsetX, Sector.SECTOR_SIZE - offsetY);
-
-//    if (starfield.getScene() == null) {
-//      // TODO: we should probably remember the fleet then navigate when the scene is ready.
-//      return;
-//    }
-//    if (fleet.getState() == Fleet.State.MOVING) {
-//      starfield.getScene().selectFleet(fleet.getKey());
- //   } else {
- //     starfield.getScene().selectStar(star.getKey());
- //   }
+    StarfieldManager starfieldManager = requireMainActivity().getStarfieldManager();
+    starfieldManager.warpTo(star);
+    starfieldManager.setSelectedFleet(star, (Fleet) fleet);
   }
 
   public void onRenameClick() {

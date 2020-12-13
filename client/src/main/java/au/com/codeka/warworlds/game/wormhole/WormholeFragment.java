@@ -97,55 +97,39 @@ public class WormholeFragment extends BaseFragment {
     });
 
     Button destinationBtn = contentView.findViewById(R.id.destination_btn);
-    destinationBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        startActivity(DestinationActivity.newStartIntent(getActivity(), star));
-      }
-    });
+    destinationBtn.setOnClickListener(
+        v -> startActivity(DestinationActivity.newStartIntent(getActivity(), star)));
 
     Button viewDestinationBtn = contentView.findViewById(R.id.view_destination_btn);
-    viewDestinationBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (destStar == null) {
-          return;
-        }
-
-        // This cast isn't great...
-//TODO        ((SolarSystemActivity) getActivity()).showStar(destStar.getID());
+    viewDestinationBtn.setOnClickListener(v -> {
+      if (destStar == null) {
+        return;
       }
+
+      // This cast isn't great...
+//TODO        ((SolarSystemActivity) getActivity()).showStar(destStar.getID());
     });
     viewDestinationBtn.setEnabled(false);
 
-    Button destroyBtn = (Button) contentView.findViewById(R.id.destroy_btn);
-    destroyBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        new StyledDialog.Builder(getActivity())
-            .setMessage("Are you sure you want to destroy this wormhole? Any ships at this wormhole, as well as ships that are inbound/outbound, will be destroyed!")
-            .setPositiveButton("Destroy", new DialogInterface.OnClickListener() {
-              @Override
-              public void onClick(DialogInterface dialog, int which) {
-                destroyWormhole();
-                dialog.dismiss();
-              }
-            }).setNegativeButton("Cancel", null).create().show();
-      }
-    });
+    Button destroyBtn = contentView.findViewById(R.id.destroy_btn);
+    destroyBtn.setOnClickListener(v -> new StyledDialog.Builder(getActivity())
+        .setMessage("Are you sure you want to destroy this wormhole? Any ships at this wormhole, " +
+            "as well as ships that are inbound/outbound, will be destroyed!")
+        .setPositiveButton("Destroy", (dialog, which) -> {
+          destroyWormhole();
+          dialog.dismiss();
+        }).setNegativeButton("Cancel", null).create().show());
 
     Button takeOverBtn = (Button) contentView.findViewById(R.id.takeover_btn);
     takeOverBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         new StyledDialog.Builder(getActivity())
-            .setMessage("Are you sure you want to take over this wormhole? You will become the new owner, and will be able to tune it to your alliance's wormholes.")
-            .setPositiveButton("Take over", new DialogInterface.OnClickListener() {
-              @Override
-              public void onClick(DialogInterface dialog, int which) {
-                takeOverWormhole();
-                dialog.dismiss();
-              }
+            .setMessage("Are you sure you want to take over this wormhole? You will become the " +
+                "new owner, and will be able to tune it to your alliance's wormholes.")
+            .setPositiveButton("Take over", (dialog, which) -> {
+              takeOverWormhole();
+              dialog.dismiss();
             })
             .setNegativeButton("Cancel", null)
             .create().show();
@@ -161,10 +145,9 @@ public class WormholeFragment extends BaseFragment {
 
       @Override
       public void onFleetSplit(Star star, Fleet fleet) {
-        FragmentManager fm = getActivity().getSupportFragmentManager();
         FleetSplitDialog dialog = new FleetSplitDialog();
         dialog.setFleet(fleet);
-        dialog.show(fm, "");
+        dialog.show(getChildFragmentManager(), "");
       }
 
       @Override
@@ -182,10 +165,9 @@ public class WormholeFragment extends BaseFragment {
 
       @Override
       public void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets) {
-        FragmentManager fm = getActivity().getSupportFragmentManager();
         FleetMergeDialog dialog = new FleetMergeDialog();
         dialog.setup(fleet, potentialFleets);
-        dialog.show(fm, "");
+        dialog.show(getChildFragmentManager(), "");
       }
 
       @Override
@@ -202,8 +184,8 @@ public class WormholeFragment extends BaseFragment {
     super.onResume();
 
     ServerGreeter.waitForHello(getActivity(),
-        (ServerGreeter.HelloCompleteHandler) (success, greeting) -> {
-          Bundle extras = getArguments();
+        (success, greeting) -> {
+          Bundle extras = requireArguments();
           int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
 
           star = StarManager.i.getStar(starID);
@@ -222,10 +204,10 @@ public class WormholeFragment extends BaseFragment {
     StarManager.eventBus.unregister(eventHandler);
   }
 
-  private Object eventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onStarFetched(Star s) {
-      Bundle extras = getArguments();
+      Bundle extras = requireArguments();
       int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
 
       if (s.getID() == starID) {
