@@ -35,7 +35,8 @@ import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
-import au.com.codeka.warworlds.game.empire.EmpireActivity;
+import au.com.codeka.warworlds.game.empire.EmpireFragment;
+import au.com.codeka.warworlds.game.empire.EmpireFragmentArgs;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -86,7 +87,7 @@ public class StarfieldFragment extends BaseFragment {
     super.onViewCreated(view, savedInstanceState);
 
     bottomPane = view.findViewById(R.id.bottom_pane);
-    selectionDetailsView = (SelectionDetailsView) view.findViewById(R.id.selection_details);
+    selectionDetailsView = view.findViewById(R.id.selection_details);
 
     if (isPortrait()) {
       InfobarView infobarView = view.findViewById(R.id.infobar);
@@ -221,15 +222,15 @@ public class StarfieldFragment extends BaseFragment {
   }
 
   public void openEmpireActivityAtFleet(Star star, Fleet fleet) {
-    Intent intent = new Intent(requireContext(), EmpireActivity.class);
-    intent.putExtra("au.com.codeka.warworlds.StarID", star.getID());
-    intent.putExtra("au.com.codeka.warworlds.FleetID", Integer.parseInt(fleet.getKey()));
-    startActivityForResult(intent, EMPIRE_REQUEST);
+    EmpireFragmentArgs args = new EmpireFragmentArgs.Builder()
+        .setStarID(star.getID())
+        .setFleetID(fleet.getID())
+        .build();
+    NavHostFragment.findNavController(this).navigate(R.id.empireFragment, args.toBundle());
   }
 
   public void openEmpireActivity() {
-    Intent intent = new Intent(requireContext(), EmpireActivity.class);
-    startActivityForResult(intent, EMPIRE_REQUEST);
+    NavHostFragment.findNavController(this).navigate(R.id.empireFragment);
   }
 
   public void openSitrepActivity() {

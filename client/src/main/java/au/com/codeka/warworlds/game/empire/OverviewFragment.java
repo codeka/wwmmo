@@ -18,6 +18,7 @@ import android.widget.TextView.OnEditorActionListener;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,7 +34,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
-public class OverviewFragment extends BaseFragment {
+public class OverviewFragment extends Fragment {
   private static final Log log = new Log("OverviewFragment");
   private View rootView;
   private EmpireRankRecyclerViewHelper empireRankListHelper;

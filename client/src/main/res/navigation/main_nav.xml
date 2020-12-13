@@ -57,6 +57,9 @@
         <action
                 android:id="@+id/action_starfieldFragment_to_wormholeFragment"
                 app:destination="@id/wormholeFragment" />
+        <action
+            android:id="@+id/action_starfieldFragment_to_empireFragment"
+            app:destination="@id/empireFragment" />
     </fragment>
     <fragment
             android:id="@+id/solarSystemFragment"
@@ -120,5 +123,12 @@
             android:name="au.com.codeka.warworlds.game.FleetMoveFragment">
         <argument android:name="starID" app:argType="integer" app:nullable="false" />
         <argument android:name="fleetID" app:argType="integer" app:nullable="false" />
+    </fragment>
+    <fragment
+            android:id="@+id/empireFragment"
+            android:name="au.com.codeka.warworlds.game.empire.EmpireFragment"
+            android:label="EmpireFragment">
+        <argument android:name="starID" app:argType="integer" android:defaultValue="-1" />
+        <argument android:name="fleetID" app:argType="integer" android:defaultValue="-1" />
     </fragment>
 </navigation>
