@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sprites>
   <sheet filename="spritesheets/sprites.png">
- 
+
     <sprite name="upgrade.boost">
       <rect location="169,1" size="10x16" />
       <direction>0,1</direction>
