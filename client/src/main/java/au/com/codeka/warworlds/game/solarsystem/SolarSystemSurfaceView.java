@@ -68,10 +68,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
   public SolarSystemSurfaceView(Context context, AttributeSet attrs) {
     super(context, attrs);
-    if (this.isInEditMode()) {
-      return;
-    }
-
     this.context = context;
     planetSelectedListeners = new CopyOnWriteArrayList<>();
 

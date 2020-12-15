@@ -1,160 +1,143 @@
 package au.com.codeka.warworlds.model;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.json.JSONException;
-
 import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.Context;
 
-import javax.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ConsumeParams;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
+import com.android.billingclient.api.SkuDetailsResponseListener;
+import com.google.common.collect.Lists;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseEmpire;
-import au.com.codeka.warworlds.App;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.Util;
-import au.com.codeka.warworlds.model.billing.IabException;
-import au.com.codeka.warworlds.model.billing.IabHelper;
-import au.com.codeka.warworlds.model.billing.IabResult;
-import au.com.codeka.warworlds.model.billing.Inventory;
-import au.com.codeka.warworlds.model.billing.Purchase;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-public class PurchaseManager {
+public class PurchaseManager implements PurchasesUpdatedListener {
   private static final Log log = new Log("PurchaseManager");
   public static PurchaseManager i = new PurchaseManager();
+
+  private boolean isSetupComplete = false;
+
+  public interface PurchaseHandler {
+    void onPurchaseComplete(BillingResult billingResult, Purchase purchase);
+  }
+
+  public interface ConsumeHandler {
+    void onPurchaseConsumed(BillingResult billingResult, Purchase purchase);
+  }
 
   private PurchaseManager() {
   }
 
-  // TODO: we should probably encrypt this some how...
-  private static String sPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuM1UqmzRXCwRr5" +
+  // TODO: we should probably encrypt this some how... it really only allows people to give us
+  // money though, so maybe not?
+  private static final String sPublicKey =
+      "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuM1UqmzRXCwRr5" +
       "qcjqvBd+YbktM8fJoG5XUuGbRWErDVvx9gZ4TYju3jts702F9axBIH7VqQ5ARFO+AFJvv/AFeHPpT21VQu0o+" +
       "cHMZCnnaQmCnGeZE6udHfwsRYGnu35ReReKg7hbSHEIJ6I24uIjLqMNar34sKYCCqaE6IxlbQxYjK508nwsaK" +
       "dlAKtgymQkRGgspbmj5UW4B72drUt2kWPdRNw3RBfZBthTjm/6fUkPIxFpV8Ec/5Ty/z6Vn+VglTyE8xYaxPd" +
       "q+5JjWgA8oiiBFItNppBYl3ojNS9kBsYYmHJM4UlkwRSrc8f3HIIiZFYva4OR/ms2fWJ/kDzQIDAQAB";
 
-  private static int REQUEST_CODE = 6732; // random big number that hopefully won't conflict
+  private BillingClient billingClient;
+  private final HashMap<String, PendingPurchase> pendingPurchases = new HashMap<>();
 
-  private static ArrayList<String> sAllSkus;
+  public void setup(Context context) {
+    isSetupComplete = false;
+    billingClient = BillingClient.newBuilder(context)
+        .setListener(this)
+        .enablePendingPurchases()
+        .build();
+    billingClient.startConnection(new BillingClientStateListener() {
+      @Override
+      public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+        log.info("onBillingSetupFinished: %s", billingResult);
 
-  {
-    sAllSkus = new ArrayList<>();
-    sAllSkus.add("star_rename");
-    sAllSkus.add("remove_ads");
-    sAllSkus.add("rename_empire");
-    sAllSkus.add("reset_empire_small");
-    sAllSkus.add("reset_empire_big");
-    sAllSkus.add("decorate_empire");
-  }
-
-  private IabHelper helper;
-  @Nullable private IabResult setupResult;
-  @Nullable private Inventory inventory;
-
-  private final Set<PendingPurchase> pendingPurchases = new HashSet<>();
-
-  public void setup() {
-    // try to load the inventory from SharedPreferences first, so that we don't have to wait
-    // on the play store...
-    try {
-      SharedPreferences prefs = Util.getSharedPreferences();
-      String json = prefs.getString("au.com.codeka.warworlds.PurchaseInventory", null);
-      if (json != null) {
-        inventory = Inventory.fromJson(json);
-        if (Util.isDebug()) {
-          inventory.erasePurchase("remove_ads");
+        for (PendingPurchase pending : pendingPurchases.values()) {
+          launchPurchaseFlow(pending.activity, pending.sku, pending.handler);
         }
+        isSetupComplete = true;
       }
-    } catch (JSONException e) {
-      // ignore... for now
-    }
 
-    log.info("Setting up purchases.");
-    helper = new IabHelper(App.i, sPublicKey);
-    helper.enableDebugLogging(true, "wwmmo-Purchase");
-    helper.startSetup(result -> {
-      setupResult = result;
-      if (setupResult.isSuccess()) {
-        helper.queryInventoryAsync(true, sAllSkus, (result1, inv) -> {
-          if (result1.isSuccess()) {
-            inventory = checkNotNull(inv);
-            if (Util.isDebug()) {
-              inventory.erasePurchase("remove_ads");
-            }
-
-            try {
-              SharedPreferences prefs = Util.getSharedPreferences();
-              prefs.edit().putString("au.com.codeka.warworlds.PurchaseInventory", inv.toJson())
-                  .apply();
-            } catch (JSONException e) {
-              // ignore... for now
-            }
-
-            for (PendingPurchase pending : pendingPurchases) {
-              try {
-                launchPurchaseFlow(pending.activity, pending.sku, pending.listener);
-              } catch(IabException e) {
-                log.error("Error launching pending purchase.", e);
-              }
-            }
-            pendingPurchases.clear();
-          }
-        });
+      @Override
+      public void onBillingServiceDisconnected() {
+        log.info("onBillingServiceDisconnected");
+        isSetupComplete = false;
       }
     });
   }
 
-  /**
-   * You must call this from any Activity where you call launchPurchaseFlow from.
-   */
-  public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
-    if (requestCode == REQUEST_CODE) {
-      helper.handleActivityResult(requestCode, resultCode, intent);
-      return true;
-    }
-
-    return false;
+  public void querySkus(List<String> skuNames, SkuDetailsResponseListener listener) {
+    SkuDetailsParams params = SkuDetailsParams.newBuilder()
+        .setSkusList(skuNames)
+        .setType(BillingClient.SkuType.INAPP)
+        .build();
+    billingClient.querySkuDetailsAsync(params, listener);
   }
 
-  public Inventory getInventory() throws IabException {
-    if (inventory != null) {
-      return inventory;
+  @Nullable
+  public Messages.PurchaseInfo toProtobuf(String sku, @Nullable Purchase purchase) {
+    if (purchase == null) {
+      return null;
     }
-    if (setupResult != null && !setupResult.isSuccess()) {
-      throw new IabException(setupResult);
-    }
-    return inventory;
+
+    return Messages.PurchaseInfo.newBuilder()
+        .setDeveloperPayload(purchase.getDeveloperPayload())
+        .setOrderId(purchase.getOrderId())
+        .setPrice("??")
+        .setSku(sku)
+        .setToken(purchase.getPurchaseToken())
+        .build();
   }
 
-  public void launchPurchaseFlow(
-      Activity activity,
-      String sku,
-      IabHelper.OnIabPurchaseFinishedListener listener) throws IabException {
+  @Override
+  public void onPurchasesUpdated(
+      @NonNull BillingResult billingResult, @Nullable List<Purchase> purchases) {
+    log.info(
+        "onPurchasesUpdated resultCode=%d debugMsg=%s", billingResult.getResponseCode(),
+        billingResult.getDebugMessage());
+    for (Purchase purchase : purchases) {
+      log.info("  purchase sku=%s %s", purchase.getSku(), purchase.toString());
+      PendingPurchase pendingPurchase = pendingPurchases.get(purchase.getSku());
+      if (pendingPurchase != null) {
+        pendingPurchase.handler.onPurchaseComplete(billingResult, purchase);
+      }
+    }
+  }
+
+  public void launchPurchaseFlow(Activity activity, String sku, PurchaseHandler handler) {
+    if (!isSetupComplete) {
+      waitForSetup(activity, sku, handler);
+    }
+
     if (EmpireManager.i.getEmpire().getPatreonLevel() == BaseEmpire.PatreonLevel.EMPIRE) {
       // If you're at the highest tier on Patreon, you get all purchases for free, so we'll just
       // ignore the purchase flow.
-      listener.onIabPurchaseFinished(
-          new IabResult(IabHelper.BILLING_RESPONSE_RESULT_OK, null), null);
+      handler.onPurchaseComplete(
+          BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build(),
+          null);
       return;
     }
 
-    if (setupResult == null) {
-      waitForSetup(activity, sku, listener);
-      return;
-    }
-
-    if (!setupResult.isSuccess()) {
-      throw new IabException(setupResult);
-    }
-
-    String skuName = Util.getProperties().getProperty("iap." + sku);
+    PendingPurchase pendingPurchase = new PendingPurchase(activity, sku, handler);
+    pendingPurchases.put(sku, pendingPurchase);
 
     // check if we already own it
+    /*
     Purchase purchase = checkNotNull(inventory).getPurchase(skuName);
     if (purchase != null) {
       log.debug("Already purchased a '%s', not purchasing again.", skuName);
@@ -162,18 +145,43 @@ public class PurchaseManager {
     } else {
       helper.launchPurchaseFlow(activity, skuName, REQUEST_CODE, listener);
     }
+    */
+
+    SkuDetailsParams params = SkuDetailsParams.newBuilder()
+        .setSkusList(Lists.newArrayList(sku))
+        .setType(BillingClient.SkuType.INAPP)
+        .build();
+    billingClient.querySkuDetailsAsync(params, (billingResult, skuDetailsList) -> {
+      log.info(
+          "querySkuDetails responseCode=%d debugMsg=%s",
+          billingResult.getResponseCode(),
+          billingResult.getDebugMessage());
+      if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+        // TODO: some kind of error, handle it.
+        return;
+      }
+      if (skuDetailsList == null) {
+        // Some other weird kind of error...
+        return;
+      }
+
+      SkuDetails skuDetails = skuDetailsList.get(0);
+      BillingFlowParams purchaseParams = BillingFlowParams.newBuilder()
+          .setSkuDetails(skuDetails)
+          .build();
+      billingClient.launchBillingFlow(activity, purchaseParams);
+    });
   }
 
-  private void waitForSetup(Activity activity, String sku,
-                            IabHelper.OnIabPurchaseFinishedListener listener) throws IabException {
-    if (setupResult != null) {
+  private void waitForSetup(Activity activity, String sku, PurchaseHandler listener) {
+    if (isSetupComplete) {
       launchPurchaseFlow(activity, sku, listener);
     }
 
-    pendingPurchases.add(new PendingPurchase(activity, sku, listener));
+    pendingPurchases.put(sku, new PendingPurchase(activity, sku, listener));
   }
 
-  public void consume(Purchase purchase, final IabHelper.OnConsumeFinishedListener listener) {
+  public void consume(Purchase purchase, final ConsumeHandler handler) {
     if (purchase == null) {
       if (EmpireManager.i.getEmpire().getPatreonLevel() != BaseEmpire.PatreonLevel.EMPIRE) {
         // This is an error!
@@ -181,40 +189,28 @@ public class PurchaseManager {
       return;
     }
 
-    helper.consumeAsync(purchase, new IabHelper.OnConsumeFinishedListener() {
-      @Override
-      public void onConsumeFinished(Purchase purchase, IabResult result) {
-        listener.onConsumeFinished(purchase, result);
-
-        // we'll want to refresh the inventory as well, now that we've consumed something
-        helper.queryInventoryAsync(true, sAllSkus, new IabHelper.QueryInventoryFinishedListener() {
-          @Override
-          public void onQueryInventoryFinished(IabResult result, Inventory inv) {
-            if (result.isSuccess()) {
-              inventory = inv;
-            }
-          }
-        });
-      }
+    ConsumeParams consumeParams = ConsumeParams.newBuilder()
+        .setPurchaseToken(purchase.getPurchaseToken())
+        .build();
+    billingClient.consumeAsync(consumeParams, (billingResult, purchaseToken) -> {
+      handler.onPurchaseConsumed(billingResult, purchase);
     });
   }
 
   public void close() {
-    if (helper != null)
-      helper.dispose();
-    helper = null;
+    billingClient.endConnection();
   }
 
   private static class PendingPurchase {
     public Activity activity;
     public String sku;
-    public IabHelper.OnIabPurchaseFinishedListener listener;
+    public PurchaseHandler handler;
 
     public PendingPurchase(
-        Activity activity, String sku, IabHelper.OnIabPurchaseFinishedListener listener) {
+        Activity activity, String sku, PurchaseHandler handler) {
       this.activity = activity;
       this.sku = sku;
-      this.listener = listener;
+      this.handler = handler;
     }
   }
 }

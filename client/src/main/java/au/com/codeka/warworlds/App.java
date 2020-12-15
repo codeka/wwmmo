@@ -1,15 +1,15 @@
 package au.com.codeka.warworlds;
 
-import androidx.multidex.MultiDexApplication;
+import android.app.Application;
 
 import com.google.firebase.FirebaseApp;
 
 import au.com.codeka.warworlds.notifications.NotificationManager;
 
-public class App extends MultiDexApplication {
+public class App extends Application {
   public static App i;
 
-  private NotificationManager notificationManager;
+  private final NotificationManager notificationManager;
 
   public App() {
     i = this;

@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.game;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
+
+import com.android.billingclient.api.Purchase;
+
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.model.PurchaseManager;
@@ -19,9 +21,6 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.billing.IabHelper;
-import au.com.codeka.warworlds.model.billing.IabResult;
-import au.com.codeka.warworlds.model.billing.Purchase;
 
 public class StarRenameDialog extends DialogFragment {
   private Purchase mPurchase;
@@ -57,12 +56,9 @@ public class StarRenameDialog extends DialogFragment {
 
     StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
     b.setView(mView);
-    b.setNeutralButton("Rename", new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        onRenameClicked();
-        dialog.dismiss();
-      }
+    b.setNeutralButton("Rename", (dialog, which) -> {
+      onRenameClicked();
+      dialog.dismiss();
     });
     return b.create();
   }
@@ -72,19 +68,9 @@ public class StarRenameDialog extends DialogFragment {
     final String newStarName = starNewName.getText().toString();
 
     StarManager.i.renameStar(mPurchase, mStar, newStarName,
-        new StarManager.StarRenameCompleteHandler() {
-          @Override
-          public void onStarRename(Star star, boolean successful, String errorMessage) {
-            PurchaseManager.i.consume(mPurchase, new IabHelper.OnConsumeFinishedListener() {
-              @Override
-              public void onConsumeFinished(Purchase purchase, IabResult result) {
-                if (!result.isSuccess()) {
-                  // TODO: revert?
-                  return;
-                }
-              }
-            });
-          }
-        });
+        (star, successful, errorMessage) ->
+            PurchaseManager.i.consume(mPurchase, (billingResult, purchase) -> {
+              // TODO: check result?
+            }));
   }
 }

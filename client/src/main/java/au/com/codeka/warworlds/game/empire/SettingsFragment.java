@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game.empire;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,6 +27,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsResponseListener;
+import com.google.common.collect.Lists;
+
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
@@ -35,7 +45,6 @@ import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
-import au.com.codeka.warworlds.RunnableArg;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.TabManager;
@@ -47,10 +56,6 @@ import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
-import au.com.codeka.warworlds.model.billing.IabException;
-import au.com.codeka.warworlds.model.billing.IabHelper;
-import au.com.codeka.warworlds.model.billing.Purchase;
-import au.com.codeka.warworlds.model.billing.SkuDetails;
 import au.com.codeka.warworlds.ui.BaseFragment;
 
 public class SettingsFragment extends BaseFragment implements TabManager.Reloadable {
@@ -111,35 +116,31 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
 
     btn.setOnClickListener(view -> onPatreonConnectClick());
 
-    try {
-      SkuDetails empireRenameSku = PurchaseManager.i.getInventory().getSkuDetails("rename_empire");
-      if (empireRenameSku != null) {
-        txt = view.findViewById(R.id.rename_desc);
-        txt.setText(String.format(Locale.ENGLISH,
-            txt.getText().toString(), empireRenameSku.getPrice()));
+    ArrayList<String> skus = Lists.newArrayList(
+        "rename_empire", "decorate_empire", "reset_empire_small", "reset_empire_big");
+    PurchaseManager.i.querySkus(skus, (billingResult, skuDetails) -> {
+      if (skuDetails == null) {
+        // TODO: handle errors?
+        return;
       }
 
-      SkuDetails decorateEmpireSku =
-          PurchaseManager.i.getInventory().getSkuDetails("decorate_empire");
-      if (decorateEmpireSku != null) {
-        txt = view.findViewById(R.id.custom_shield_desc);
-        txt.setText(Html.fromHtml(String.format(Locale.ENGLISH,
-            txt.getText().toString(), decorateEmpireSku.getPrice())));
-        txt.setMovementMethod(LinkMovementMethod.getInstance());
-      }
+      SkuDetails renameEmpireSku = skuDetails.get(0);
+      TextView textView = view.findViewById(R.id.rename_desc);
+      textView.setText(String.format(Locale.ENGLISH,
+          textView.getText().toString(), renameEmpireSku.getPrice()));
 
-      SkuDetails resetEmpireSmallSku = PurchaseManager.i.getInventory().getSkuDetails(
-          "reset_empire_small");
-      SkuDetails resetEmpireBigSku = PurchaseManager.i.getInventory().getSkuDetails(
-          "reset_empire_big");
-      if (resetEmpireBigSku != null && resetEmpireSmallSku != null) {
-        txt = view.findViewById(R.id.reset_desc);
-        txt.setText(String.format(Locale.ENGLISH, txt.getText().toString(),
-            resetEmpireSmallSku.getPrice(), resetEmpireBigSku.getPrice()));
-      }
-    } catch (IabException e) {
-      log.error("Couldn't get SKU details!", e);
-    }
+      SkuDetails decorateEmpireSku = skuDetails.get(1);
+      textView = view.findViewById(R.id.custom_shield_desc);
+      textView.setText(Html.fromHtml(String.format(Locale.ENGLISH,
+          textView.getText().toString(), decorateEmpireSku.getPrice())));
+      textView.setMovementMethod(LinkMovementMethod.getInstance());
+
+      SkuDetails resetEmpireSmallSku = skuDetails.get(2);
+      SkuDetails resetEmpireBigSku = skuDetails.get(3);
+      textView = view.findViewById(R.id.reset_desc);
+      textView.setText(String.format(Locale.ENGLISH, textView.getText().toString(),
+          resetEmpireSmallSku.getPrice(), resetEmpireBigSku.getPrice()));
+    });
 
     final EditText renameEdit = view.findViewById(R.id.rename);
     renameEdit.setText(myEmpire.getDisplayName());
@@ -203,43 +204,25 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
       return;
     }
 
-    try {
-      PurchaseManager.i.launchPurchaseFlow(getActivity(), "rename_empire", (result, info) -> {
-        boolean isSuccess = result.isSuccess();
-        if (result.isFailure() && result.getResponse()
-            == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
-          // If they've already purchased a rename_empire, but not reclaimed it, then we let them
-          // through anyway.
-          isSuccess = true;
-        }
+    PurchaseManager.i.launchPurchaseFlow(getActivity(), "rename_empire", (result, purchase) -> {
+      EmpireManager.i.getEmpire().rename(newName, purchase, success -> {
+        if (success) {
+          new StyledDialog.Builder(activity)
+              .setMessage("Empire name successfully changed to: \"" + newName + "\"")
+              .setPositiveButton("Close", null).create().show();
 
-        if (isSuccess) {
-          EmpireManager.i.getEmpire().rename(newName, info, success -> {
-            if (success) {
-              new StyledDialog.Builder(activity)
-                  .setMessage("Empire name successfully changed to: \"" + newName + "\"")
-                  .setPositiveButton("Close", null).create().show();
-
-              PurchaseManager.i.consume(info, (purchase, result1) -> {
-                if (!result1.isSuccess()) {
-                  // TODO: revert?
-                  return;
-                }
-              });
-            } else {
-              new StyledDialog.Builder(activity).setMessage(
-                  "An error has occurred changing your name, but you can try again"
-                      + " without purchasing again. If it continues to not work, please file a"
-                      + " support request with dean@war-worlds.com, and your money will be"
-                      + " refunded.").setPositiveButton("OK", null).create().show();
-            }
+          PurchaseManager.i.consume(purchase, (purchase2, result2) -> {
+            // TODO: check result maybe?
           });
+        } else {
+          new StyledDialog.Builder(activity).setMessage(
+              "An error has occurred changing your name, but you can try again"
+                  + " without purchasing again. If it continues to not work, please file a"
+                  + " support request with dean@war-worlds.com, and your money will be"
+                  + " refunded.").setPositiveButton("OK", null).create().show();
         }
       });
-    } catch (IabException e) {
-      log.error("Couldn't get SKU details!", e);
-      return;
-    }
+    });
   }
 
   private void onPatreonConnectClick() {
@@ -265,45 +248,28 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
       return;
     }
 
-    try {
-      PurchaseManager.i.launchPurchaseFlow(getActivity(), "decorate_empire", (result, info) -> {
-        boolean isSuccess = result.isSuccess();
-        if (result.isFailure() && result.getResponse()
-            == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
-          // If they've already purchased a rename_empire, but not reclaimed it, then we let them
-          // through anyway.
-          isSuccess = true;
-        }
+    PurchaseManager.i.launchPurchaseFlow(getActivity(), "decorate_empire", (result, purchase) -> {
+      EmpireManager.i.getEmpire().changeShieldImage(bmp, purchase, success -> {
+        if (success) {
+          new StyledDialog.Builder(activity)
+              .setMessage("Shield has been successfully changed.")
+              .setPositiveButton("Close", null)
+              .create().show();
 
-        if (isSuccess) {
-          EmpireManager.i.getEmpire().changeShieldImage(bmp, info, success -> {
-            if (success) {
-              new StyledDialog.Builder(activity)
-                  .setMessage("Shield has been successfully changed.")
-                  .setPositiveButton("Close", null)
-                  .create().show();
-
-              PurchaseManager.i.consume(info, (purchase, result1) -> {
-                if (!result1.isSuccess()) {
-                  // TODO: revert?
-                  return;
-                }
-              });
-            } else {
-              new StyledDialog.Builder(activity)
-                  .setMessage("An error has occurred changing your shield, but you can try again"
-                      + " without purchasing again. If it continues to not work, please file a"
-                      + " support request with dean@war-worlds.com, and your money will be"
-                      + " refunded.")
-                  .setPositiveButton("OK", null)
-                  .create().show();
-            }
+          PurchaseManager.i.consume(purchase, (purchase2, result2) -> {
+            // TODO: check result2?
           });
+        } else {
+          new StyledDialog.Builder(activity)
+              .setMessage("An error has occurred changing your shield, but you can try again"
+                  + " without purchasing again. If it continues to not work, please file a"
+                  + " support request with dean@war-worlds.com, and your money will be"
+                  + " refunded.")
+              .setPositiveButton("OK", null)
+              .create().show();
         }
       });
-    } catch (IabException e) {
-      log.error("Couldn't get SKU details!", e);
-    }
+    });
   }
 
   private void onResetEmpireClick(final DialogInterface dialog) {
@@ -333,37 +299,20 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
         }
 
         final String finalSkuName = skuName;
-        try {
-          PurchaseManager.i.launchPurchaseFlow(getActivity(), finalSkuName,
-              (result, info) -> {
-                boolean isSuccess = result.isSuccess();
-                if (result.isFailure() && result.getResponse()
-                    == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
-                  // If they've already purchased a reset_empire, but not reclaimed it,
-                  // then we let them through anyway.
-                  isSuccess = true;
-                }
+        PurchaseManager.i.launchPurchaseFlow(getActivity(), finalSkuName,
+            (result, purchase) -> {
+              doEmpireReset(finalSkuName, purchase, () -> {
+                dialog.dismiss();
 
-                if (isSuccess) {
-                  doEmpireReset(finalSkuName, info, () -> {
-                    dialog.dismiss();
+                new StyledDialog.Builder(activity)
+                    .setMessage("Your empire has been reset.")
+                    .setPositiveButton("Close", null).create().show();
 
-                    new StyledDialog.Builder(activity)
-                        .setMessage("Your empire has been reset.")
-                        .setPositiveButton("Close", null).create().show();
-
-                    PurchaseManager.i.consume(info, (purchase, result1) -> {
-                      if (!result1.isSuccess()) {
-                        // TODO: revert?
-                        return;
-                      }
-                    });
-                  });
-                }
+                PurchaseManager.i.consume(purchase, (purchase2, result2) -> {
+                  // TODO: check result2?
+                });
               });
-        } catch (IabException e) {
-          log.error("Couldn't get SKU details!", e);
-        }
+            });
       }
     });
   }

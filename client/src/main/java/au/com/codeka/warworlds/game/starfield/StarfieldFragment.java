@@ -16,8 +16,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsResponseListener;
+import com.google.common.collect.Lists;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 import java.util.Locale;
 
 import au.com.codeka.common.Log;
@@ -35,7 +43,6 @@ import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
-import au.com.codeka.warworlds.game.empire.EmpireFragment;
 import au.com.codeka.warworlds.game.empire.EmpireFragmentArgs;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -46,10 +53,6 @@ import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.ShieldManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.billing.IabException;
-import au.com.codeka.warworlds.model.billing.IabHelper;
-import au.com.codeka.warworlds.model.billing.Purchase;
-import au.com.codeka.warworlds.model.billing.SkuDetails;
 import au.com.codeka.warworlds.ui.BaseFragment;
 
 /**
@@ -412,9 +415,6 @@ public class StarfieldFragment extends BaseFragment {
   }
 
   public void navigateToFleet(Star star, BaseFleet fleet) {
-    int offsetX = star.getOffsetX();
-    int offsetY = star.getOffsetY();
-
     StarfieldManager starfieldManager = requireMainActivity().getStarfieldManager();
     starfieldManager.warpTo(star);
     starfieldManager.setSelectedFleet(star, (Fleet) fleet);
@@ -427,23 +427,22 @@ public class StarfieldFragment extends BaseFragment {
       return;
     }
 
-    SkuDetails starRenameSku;
-    try {
-      starRenameSku = PurchaseManager.i.getInventory().getSkuDetails("star_rename");
-    } catch (IabException e) {
-      log.error("Couldn't get SKU details!", e);
-      return;
-    }
+    PurchaseManager.i.querySkus(Lists.newArrayList("star_rename"), (billingResult, skuDetails) -> {
+      if (skuDetails == null) {
+        // TODO: handle error
+        return;
+      }
 
-    new StyledDialog.Builder(requireContext()).setMessage(String.format(Locale.ENGLISH,
-        "Renaming stars costs %s. If you wish to continue, you'll be directed " +
-            "to the Play Store where you can purchase a one-time code to rename this " +
-            "star. Are you sure you want to continue?", starRenameSku.getPrice()))
-        .setTitle("Rename Star").setNegativeButton("Cancel", null)
-        .setPositiveButton("Rename", (dialog, which) -> {
-          doRenameStar();
-          dialog.dismiss();
-        }).create().show();
+      new StyledDialog.Builder(requireContext()).setMessage(String.format(Locale.ENGLISH,
+          "Renaming stars costs %s. If you wish to continue, you'll be directed " +
+              "to the Play Store where you can purchase a one-time code to rename this " +
+              "star. Are you sure you want to continue?", skuDetails.get(0).getPrice()))
+          .setTitle("Rename Star").setNegativeButton("Cancel", null)
+          .setPositiveButton("Rename", (dialog, which) -> {
+            doRenameStar();
+            dialog.dismiss();
+          }).create().show();
+    });
   }
 
   public void doRenameStar() {
@@ -451,43 +450,22 @@ public class StarfieldFragment extends BaseFragment {
       return;
     }
 
-    try {
-      PurchaseManager.i
-          .launchPurchaseFlow(requireActivity(), "star_rename", (result, info) -> {
-            if (selectedStar == null) {
-              return;
-            }
+    PurchaseManager.i
+        .launchPurchaseFlow(requireActivity(), "star_rename", (result, purchase) -> {
+          if (selectedStar == null) {
+            return;
+          }
 
-            Purchase purchase = info;
-            boolean isSuccess = result.isSuccess();
-            if (result.isFailure()
-                && result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
-              // if they've already purchased a star-renamed, but not reclaimed it, then
-              // we let them through anyway.
-              log.debug("Already purchased a star-rename, we'll just show the popup.");
-              isSuccess = true;
-              try {
-                purchase = PurchaseManager.i.getInventory().getPurchase("star_rename");
-              } catch (IabException e) {
-                log.warning("Got an exception getting the purchase details.", e);
-              }
-            }
-
-            if (isSuccess) {
-              try {
-                showStarRenamePopup(purchase);
-              } catch (IllegalStateException e) {
-                // this can be called before the activity is resumed, so we just set a
-                // flag that'll cause us to pop up the dialog when the activity is resumed.
-                log.warning(
-                    "Got an error trying to show the popup, we'll try again in a second...");
-                starRenamePurchase = purchase;
-              }
-            }
-          });
-    } catch (IabException e) {
-      log.error("Couldn't get SKU details!", e);
-    }
+          try {
+            showStarRenamePopup(purchase);
+          } catch (IllegalStateException e) {
+            // this can be called before the activity is resumed, so we just set a
+            // flag that'll cause us to pop up the dialog when the activity is resumed.
+            log.warning(
+                "Got an error trying to show the popup, we'll try again in a second...");
+            starRenamePurchase = purchase;
+          }
+        });
   }
 
   private void showStarRenamePopup(Purchase purchase) {

@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import androidx.collection.LruCache;
 
+import com.android.billingclient.api.Purchase;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -20,8 +21,6 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.eventbus.EventBus;
-import au.com.codeka.warworlds.model.billing.IabHelper;
-import au.com.codeka.warworlds.model.billing.Purchase;
 
 public class StarManager extends BaseManager {
   private static final Log log = new Log("StarManager");
@@ -182,12 +181,12 @@ public class StarManager extends BaseManager {
       };
 
   public void renameStar(final Purchase purchase, final Star star, final String newName,
-      final StarRenameCompleteHandler onCompleteHandler) {
+                         final StarRenameCompleteHandler onCompleteHandler) {
     Messages.StarRenameRequest.Builder pb =
         Messages.StarRenameRequest.newBuilder().setStarKey(star.getKey())
             .setOldName(star.getName()).setNewName(newName);
     if (purchase != null) {
-      pb.setPurchaseInfo(IabHelper.toProtobuf(purchase.getSku(), purchase));
+      pb.setPurchaseInfo(PurchaseManager.i.toProtobuf(purchase.getSku(), purchase));
     }
 
     ApiRequest request =
