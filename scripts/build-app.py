@@ -6,7 +6,7 @@ import shutil
 import subprocess
 
 # Do the build
-os.system("cd " + str(common.rootPath) + " && " + common.gradleCmd + " --daemon :client:bundleRelease")
+#os.system("cd " + str(common.rootPath) + " && " + common.gradleCmd + " --daemon :client:bundleRelease")
 
 # Try to grab the version code from the manifest
 bundleTool = pathlib.Path(common.rootPath, "bundletool-all.jar")
@@ -16,3 +16,7 @@ versionCode = versionCode.decode("utf-8").strip()
 
 destPath = pathlib.Path(common.rootPath, "../deploy/client/wwmmo-1.0." + versionCode + ".aab")
 shutil.copyfile(common.aabPath, destPath)
+
+print("built APK: " + str(destPath.resolve()))
+print("Install with:")
+print("  java -jar " + str(bundleTool) + " build-apks --connected-device --bundle=" + str(destPath.resolve())
