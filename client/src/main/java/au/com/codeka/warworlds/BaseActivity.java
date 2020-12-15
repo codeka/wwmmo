@@ -131,11 +131,6 @@ public class BaseActivity extends AppCompatActivity {
     super.onPostResume();
   }
 
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-    PurchaseManager.i.onActivityResult(requestCode, resultCode, intent);
-  }
-
   /**
    * Helper function to determine whether we're in portrait orientation or not.
    */

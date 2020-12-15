@@ -3,8 +3,8 @@
   package="au.com.codeka.warworlds"
   android:installLocation="auto"
   android:largeHeap="@bool/largeHeap"
-  android:versionCode="1033"
-  android:versionName="1.0.1033">
+  android:versionCode="1037"
+  android:versionName="1.0.1037">
 
   <!-- We use OpenGL ES 2.0 -->
   <uses-feature
@@ -23,9 +23,6 @@
   <!-- Permission to retrieve the list of accounts in the Accounts Service - required because
        we need to enumerate the accounts so you can log on. -->
   <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-
-  <!-- Permission that allows us to access in-app billing -->
-  <uses-permission android:name="com.android.vending.BILLING" />
 
   <!-- Used to save screenshots we share via bugreport. -->
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

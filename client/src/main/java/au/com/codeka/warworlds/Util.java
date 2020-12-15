@@ -45,7 +45,7 @@ public class Util {
 
     SpriteManager.i.setup(context);
     DesignManager.setup(context);
-    PurchaseManager.i.setup();
+    PurchaseManager.i.setup(context);
     RealmManager.i.setup();
     RequestManager.i.setup(context);
 

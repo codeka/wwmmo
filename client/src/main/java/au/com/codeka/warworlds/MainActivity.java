@@ -128,10 +128,6 @@ public class MainActivity extends BaseActivity {
       return;
     }
 
-    if (PurchaseManager.i.onActivityResult(requestCode, resultCode, data)) {
-
-    }
-
     super.onActivityResult(requestCode, resultCode, data);
   }
 
