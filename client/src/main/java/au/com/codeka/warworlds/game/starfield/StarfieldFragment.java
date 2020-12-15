@@ -451,7 +451,7 @@ public class StarfieldFragment extends BaseFragment {
     }
 
     PurchaseManager.i
-        .launchPurchaseFlow(requireActivity(), "star_rename", (result, purchase) -> {
+        .launchPurchaseFlow(requireActivity(), "star_rename", (purchase) -> {
           if (selectedStar == null) {
             return;
           }

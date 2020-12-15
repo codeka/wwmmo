@@ -5,7 +5,7 @@ import shutil
 import subprocess
 
 # Do the build
-os.system("cd " + str(common.rootPath) + " && " + common.gradleCmd + " --daemon :client:bundleRelease")
+#os.system("cd " + str(common.rootPath) + " && " + common.gradleCmd + " --daemon :client:bundleRelease")
 
 # Try to grab the version code from the manifest
 bundleTool = pathlib.Path(common.rootPath, "bundletool-all.jar")

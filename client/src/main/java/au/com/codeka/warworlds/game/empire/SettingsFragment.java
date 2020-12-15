@@ -204,14 +204,14 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
       return;
     }
 
-    PurchaseManager.i.launchPurchaseFlow(getActivity(), "rename_empire", (result, purchase) -> {
+    PurchaseManager.i.launchPurchaseFlow(getActivity(), "rename_empire", (purchase) -> {
       EmpireManager.i.getEmpire().rename(newName, purchase, success -> {
         if (success) {
           new StyledDialog.Builder(activity)
               .setMessage("Empire name successfully changed to: \"" + newName + "\"")
               .setPositiveButton("Close", null).create().show();
 
-          PurchaseManager.i.consume(purchase, (purchase2, result2) -> {
+          PurchaseManager.i.consume(purchase, () -> {
             // TODO: check result maybe?
           });
         } else {
@@ -248,7 +248,7 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
       return;
     }
 
-    PurchaseManager.i.launchPurchaseFlow(getActivity(), "decorate_empire", (result, purchase) -> {
+    PurchaseManager.i.launchPurchaseFlow(getActivity(), "decorate_empire", (purchase) -> {
       EmpireManager.i.getEmpire().changeShieldImage(bmp, purchase, success -> {
         if (success) {
           new StyledDialog.Builder(activity)
@@ -256,7 +256,7 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
               .setPositiveButton("Close", null)
               .create().show();
 
-          PurchaseManager.i.consume(purchase, (purchase2, result2) -> {
+          PurchaseManager.i.consume(purchase, () -> {
             // TODO: check result2?
           });
         } else {
@@ -300,7 +300,7 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
 
         final String finalSkuName = skuName;
         PurchaseManager.i.launchPurchaseFlow(getActivity(), finalSkuName,
-            (result, purchase) -> {
+            (purchase) -> {
               doEmpireReset(finalSkuName, purchase, () -> {
                 dialog.dismiss();
 
@@ -308,7 +308,7 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
                     .setMessage("Your empire has been reset.")
                     .setPositiveButton("Close", null).create().show();
 
-                PurchaseManager.i.consume(purchase, (purchase2, result2) -> {
+                PurchaseManager.i.consume(purchase, () -> {
                   // TODO: check result2?
                 });
               });

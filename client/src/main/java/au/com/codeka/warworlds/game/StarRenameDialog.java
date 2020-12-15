@@ -23,39 +23,39 @@ import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class StarRenameDialog extends DialogFragment {
-  private Purchase mPurchase;
-  private View mView;
-  private Star mStar;
+  private Purchase purchase;
+  private View view;
+  private Star star;
 
   public void setPurchaseInfo(Purchase purchase) {
-    mPurchase = purchase;
+    this.purchase = purchase;
   }
 
   public void setStar(Star star) {
-    mStar = star;
+    this.star = star;
   }
 
   @SuppressLint("InflateParams")
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     LayoutInflater inflater = getActivity().getLayoutInflater();
-    mView = inflater.inflate(R.layout.star_rename_dlg, null);
+    view = inflater.inflate(R.layout.star_rename_dlg, null);
 
-    EditText starNewName = mView.findViewById(R.id.star_newname);
-    TextView starName = mView.findViewById(R.id.star_name);
-    ImageView starIcon = mView.findViewById(R.id.star_icon);
+    EditText starNewName = view.findViewById(R.id.star_newname);
+    TextView starName = view.findViewById(R.id.star_name);
+    ImageView starIcon = view.findViewById(R.id.star_icon);
 
-    starName.setText(mStar.getName());
-    starNewName.setText(mStar.getName());
+    starName.setText(star.getName());
+    starNewName.setText(star.getName());
 
-    int imageSize = (int) (mStar.getSize() * mStar.getStarType().getImageScale() * 2);
-    Sprite starSprite = StarImageManager.getInstance().getSprite(mStar, imageSize, true);
+    int imageSize = (int) (star.getSize() * star.getStarType().getImageScale() * 2);
+    Sprite starSprite = StarImageManager.getInstance().getSprite(star, imageSize, true);
     starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
     starNewName.requestFocus();
 
     StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
-    b.setView(mView);
+    b.setView(view);
     b.setNeutralButton("Rename", (dialog, which) -> {
       onRenameClicked();
       dialog.dismiss();
@@ -64,13 +64,10 @@ public class StarRenameDialog extends DialogFragment {
   }
 
   public void onRenameClicked() {
-    EditText starNewName = mView.findViewById(R.id.star_newname);
+    EditText starNewName = view.findViewById(R.id.star_newname);
     final String newStarName = starNewName.getText().toString();
 
-    StarManager.i.renameStar(mPurchase, mStar, newStarName,
-        (star, successful, errorMessage) ->
-            PurchaseManager.i.consume(mPurchase, (billingResult, purchase) -> {
-              // TODO: check result?
-            }));
+    StarManager.i.renameStar(purchase, star, newStarName,
+        (star, successful, errorMessage) -> PurchaseManager.i.consume(purchase, null));
   }
 }

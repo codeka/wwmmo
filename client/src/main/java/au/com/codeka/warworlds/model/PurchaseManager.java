@@ -18,14 +18,11 @@ import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.Util;
 
 public class PurchaseManager implements PurchasesUpdatedListener {
   private static final Log log = new Log("PurchaseManager");
@@ -33,28 +30,27 @@ public class PurchaseManager implements PurchasesUpdatedListener {
 
   private boolean isSetupComplete = false;
 
+  private BillingClient billingClient;
+
+  // A purchase that we have pending, may be null.
+  @Nullable private PendingPurchase pendingPurchase;
+
   public interface PurchaseHandler {
-    void onPurchaseComplete(BillingResult billingResult, Purchase purchase);
+    /**
+     * Called when a purchase completes successfully.
+     *
+     * @param purchase The completed purchase. May be null if we bypassed actually making the
+     *                 purchase (e.g. if you're a top-tier patron).
+     */
+    void onPurchaseComplete(@Nullable Purchase purchase);
   }
 
   public interface ConsumeHandler {
-    void onPurchaseConsumed(BillingResult billingResult, Purchase purchase);
+    void onPurchaseConsumed();
   }
 
   private PurchaseManager() {
   }
-
-  // TODO: we should probably encrypt this some how... it really only allows people to give us
-  // money though, so maybe not?
-  private static final String sPublicKey =
-      "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuM1UqmzRXCwRr5" +
-      "qcjqvBd+YbktM8fJoG5XUuGbRWErDVvx9gZ4TYju3jts702F9axBIH7VqQ5ARFO+AFJvv/AFeHPpT21VQu0o+" +
-      "cHMZCnnaQmCnGeZE6udHfwsRYGnu35ReReKg7hbSHEIJ6I24uIjLqMNar34sKYCCqaE6IxlbQxYjK508nwsaK" +
-      "dlAKtgymQkRGgspbmj5UW4B72drUt2kWPdRNw3RBfZBthTjm/6fUkPIxFpV8Ec/5Ty/z6Vn+VglTyE8xYaxPd" +
-      "q+5JjWgA8oiiBFItNppBYl3ojNS9kBsYYmHJM4UlkwRSrc8f3HIIiZFYva4OR/ms2fWJ/kDzQIDAQAB";
-
-  private BillingClient billingClient;
-  private final HashMap<String, PendingPurchase> pendingPurchases = new HashMap<>();
 
   public void setup(Context context) {
     isSetupComplete = false;
@@ -67,8 +63,9 @@ public class PurchaseManager implements PurchasesUpdatedListener {
       public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
         log.info("onBillingSetupFinished: %s", billingResult);
 
-        for (PendingPurchase pending : pendingPurchases.values()) {
-          launchPurchaseFlow(pending.activity, pending.sku, pending.handler);
+        if (pendingPurchase != null) {
+          launchPurchaseFlow(
+              pendingPurchase.activity, pendingPurchase.sku, pendingPurchase.handler);
         }
         isSetupComplete = true;
       }
@@ -110,33 +107,53 @@ public class PurchaseManager implements PurchasesUpdatedListener {
     log.info(
         "onPurchasesUpdated resultCode=%d debugMsg=%s", billingResult.getResponseCode(),
         billingResult.getDebugMessage());
+    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
+      // TODO: handle this case specially?
+      log.info("TODO: handle ITEM_ALREADY_OWNED better.");
+    }
+    // TODO: handle service disconnected, etc?
+    if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+      // TODO: have some kind of error handling?
+      return;
+    }
+
+    if (purchases == null) {
+      // TODO: this is also some kind of error.
+      return;
+    }
+
     for (Purchase purchase : purchases) {
       log.info("  purchase sku=%s %s", purchase.getSku(), purchase.toString());
-      PendingPurchase pendingPurchase = pendingPurchases.get(purchase.getSku());
-      if (pendingPurchase != null) {
-        pendingPurchase.handler.onPurchaseComplete(billingResult, purchase);
+      if (pendingPurchase != null && pendingPurchase.sku.equals(purchase.getSku())) {
+        pendingPurchase.handler.onPurchaseComplete(purchase);
+        pendingPurchase = null;
       }
     }
   }
 
   public void launchPurchaseFlow(Activity activity, String sku, PurchaseHandler handler) {
-    if (!isSetupComplete) {
-      waitForSetup(activity, sku, handler);
-    }
-
     if (EmpireManager.i.getEmpire().getPatreonLevel() == BaseEmpire.PatreonLevel.EMPIRE) {
       // If you're at the highest tier on Patreon, you get all purchases for free, so we'll just
       // ignore the purchase flow.
-      handler.onPurchaseComplete(
-          BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build(),
-          null);
+      handler.onPurchaseComplete(null);
       return;
     }
 
-    PendingPurchase pendingPurchase = new PendingPurchase(activity, sku, handler);
-    pendingPurchases.put(sku, pendingPurchase);
+    if (pendingPurchase != null) {
+      log.error("Cannot initiate another purchase while one is in progress.");
+      // TODO: is this really an error?
+      return;
+    }
+    pendingPurchase = new PendingPurchase(activity, sku, handler);
+    if (!isSetupComplete) {
+      // Just wait for setup, it'll automatically attempt to purchase the pending one.
+      log.info("Waiting for setup to complete before purchasing.");
+      return;
+    }
 
     // check if we already own it
+    Purchase.PurchasesResult alreadyOwned = billingClient.queryPurchases(sku);
+    log.info(" alreadyOwned: %d", alreadyOwned.getResponseCode());
     /*
     Purchase purchase = checkNotNull(inventory).getPurchase(skuName);
     if (purchase != null) {
@@ -173,15 +190,13 @@ public class PurchaseManager implements PurchasesUpdatedListener {
     });
   }
 
-  private void waitForSetup(Activity activity, String sku, PurchaseHandler listener) {
-    if (isSetupComplete) {
-      launchPurchaseFlow(activity, sku, listener);
-    }
-
-    pendingPurchases.put(sku, new PendingPurchase(activity, sku, listener));
-  }
-
-  public void consume(Purchase purchase, final ConsumeHandler handler) {
+  /**
+   * Consume the given {@link Purchase}.
+   *
+   * @param purchase The {@link Purchase} to consume.
+   * @param handler A callback that's called on successful consume. Can be null if you don't care.
+   */
+  public void consume(Purchase purchase, @Nullable final ConsumeHandler handler) {
     if (purchase == null) {
       if (EmpireManager.i.getEmpire().getPatreonLevel() != BaseEmpire.PatreonLevel.EMPIRE) {
         // This is an error!
@@ -193,7 +208,9 @@ public class PurchaseManager implements PurchasesUpdatedListener {
         .setPurchaseToken(purchase.getPurchaseToken())
         .build();
     billingClient.consumeAsync(consumeParams, (billingResult, purchaseToken) -> {
-      handler.onPurchaseConsumed(billingResult, purchase);
+      if (handler != null) {
+        handler.onPurchaseConsumed();
+      }
     });
   }
 
