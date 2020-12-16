@@ -249,6 +249,7 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
     }
 
     PurchaseManager.i.launchPurchaseFlow(getActivity(), "decorate_empire", (purchase) -> {
+      log.info("Purchase complete, changing shield image.");
       EmpireManager.i.getEmpire().changeShieldImage(bmp, purchase, success -> {
         if (success) {
           new StyledDialog.Builder(activity)
@@ -262,9 +263,9 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
         } else {
           new StyledDialog.Builder(activity)
               .setMessage("An error has occurred changing your shield, but you can try again"
-                  + " without purchasing again. If it continues to not work, please file a"
-                  + " support request with dean@war-worlds.com, and your money will be"
-                  + " refunded.")
+                  + " without purchasing again.\n\nMake sure the image is not too big. It should be"
+                  + " less than 1MB.\n\nIf it continues to not work, please file a support request"
+                  + " with dean@war-worlds.com, and I can manually apply it.")
               .setPositiveButton("OK", null)
               .create().show();
         }

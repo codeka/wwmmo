@@ -3,8 +3,8 @@
   package="au.com.codeka.warworlds"
   android:installLocation="auto"
   android:largeHeap="@bool/largeHeap"
-  android:versionCode="1040"
-  android:versionName="1.0.1040">
+  android:versionCode="1044"
+  android:versionName="1.0.1044">
 
   <!-- We use OpenGL ES 2.0 -->
   <uses-feature

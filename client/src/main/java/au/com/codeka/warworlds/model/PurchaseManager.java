@@ -152,17 +152,19 @@ public class PurchaseManager implements PurchasesUpdatedListener {
     }
 
     // check if we already own it
-    Purchase.PurchasesResult alreadyOwned = billingClient.queryPurchases(sku);
-    log.info(" alreadyOwned: %d", alreadyOwned.getResponseCode());
-    /*
-    Purchase purchase = checkNotNull(inventory).getPurchase(skuName);
-    if (purchase != null) {
-      log.debug("Already purchased a '%s', not purchasing again.", skuName);
-      listener.onIabPurchaseFinished(new IabResult(IabHelper.BILLING_RESPONSE_RESULT_OK, null), purchase);
-    } else {
-      helper.launchPurchaseFlow(activity, skuName, REQUEST_CODE, listener);
+    Purchase.PurchasesResult alreadyOwned =
+        billingClient.queryPurchases(BillingClient.SkuType.INAPP);
+    if (alreadyOwned.getPurchasesList() != null) {
+      for (Purchase purchase : alreadyOwned.getPurchasesList()) {
+        if (purchase.getSku().equals(sku)) {
+          log.info("Purchase already owned: %s", purchase);
+          pendingPurchase = null;
+          handler.onPurchaseComplete(purchase);
+          return;
+        }
+      }
     }
-    */
+    log.info("Fetching SKU details.");
 
     SkuDetailsParams params = SkuDetailsParams.newBuilder()
         .setSkusList(Lists.newArrayList(sku))
@@ -175,10 +177,12 @@ public class PurchaseManager implements PurchasesUpdatedListener {
           billingResult.getDebugMessage());
       if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
         // TODO: some kind of error, handle it.
+        pendingPurchase = null;
         return;
       }
       if (skuDetailsList == null) {
         // Some other weird kind of error...
+        pendingPurchase = null;
         return;
       }
 
