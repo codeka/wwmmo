@@ -127,7 +127,7 @@
     <fragment
             android:id="@+id/empireFragment"
             android:name="au.com.codeka.warworlds.game.empire.EmpireFragment"
-            android:label="EmpireFragment">
+            android:label="War Worlds">
         <argument android:name="starID" app:argType="integer" android:defaultValue="-1" />
         <argument android:name="fleetID" app:argType="integer" android:defaultValue="-1" />
     </fragment>

@@ -4,10 +4,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.log.Logger;
-import org.slf4j.helpers.MessageFormatter;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
@@ -19,7 +16,6 @@ import au.com.codeka.warworlds.server.data.SchemaUpdater;
 import au.com.codeka.warworlds.server.metrics.MetricsManager;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.monitor.RequestStatMonitor;
-import au.com.codeka.warworlds.server.utils.IniFileParser;
 
 /** Main entry-point for the server. */
 public class Runner {
