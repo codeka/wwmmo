@@ -1,546 +1,296 @@
 package au.com.codeka.warworlds.game.chat;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.EditText;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
-import au.com.codeka.common.model.BaseChatConversationParticipant;
-import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.AccountsActivity;
+import javax.annotation.Nonnull;
+
+import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ServerGreeter;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.model.Alliance;
-import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
-import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.EmpireShieldManager;
-import au.com.codeka.warworlds.model.ShieldManager;
+import au.com.codeka.warworlds.ui.BaseFragment;
 
-public class ChatFragment extends Fragment {
-  private ChatConversation conversation;
-  private ChatAdapter chatAdapter;
+public class ChatFragment extends BaseFragment {
+  private static final Log log = new Log("ChatFragment");
+
+  private ChatPagerAdapter chatPagerAdapter;
+  private ViewPager viewPager;
+  private List<ChatConversation> conversations;
   private Handler handler;
-  private boolean autoTranslate;
-  private ListView chatOutput;
-  private boolean noMoreChats;
-  private View headerContent;
-  private Button unreadCountBtn;
+  private boolean firstRefresh;
 
+  private EditText chatMsg;
+  private Button send;
+
+  @Nullable private ChatFragmentArgs args;
+
+  @Nullable
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    Bundle args = requireArguments();
-    conversation = ChatManager.i.getConversationByID(
-        args.getInt("au.com.codeka.warworlds.ConversationID"));
-    handler = new Handler();
-    autoTranslate = new GlobalOptions().autoTranslateChatMessages();
+  public View onCreateView(
+      @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    return inflater.inflate(R.layout.chat, container, false);
   }
 
   @Override
-  public View onCreateView(final LayoutInflater inflater, ViewGroup container,
-      Bundle savedInstanceState) {
-    View v = inflater.inflate(R.layout.chat_page, container, false);
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
 
-    FrameLayout header = v.findViewById(R.id.header);
-    if (conversation.getID() == 0) {
-      headerContent = inflater.inflate(R.layout.chat_header_global, header, false);
-      setupGlobalChatHeader(headerContent);
-    } else if (conversation.getID() < 0) {
-      headerContent = inflater.inflate(R.layout.chat_header_alliance, header, false);
-      setupAllianceChatHeader(headerContent);
-    } else {
-      headerContent = inflater.inflate(R.layout.chat_header_private, header, false);
-      setupPrivateChatHeader(headerContent);
-    }
-    header.addView(headerContent);
-
-    chatAdapter = new ChatAdapter();
-    chatOutput = v.findViewById(R.id.chat_output);
-    chatOutput.setAdapter(chatAdapter);
-
-    unreadCountBtn = v.findViewById(R.id.unread_btn);
-    if (unreadCountBtn != null) {
-      refreshUnreadCountButton();
-      unreadCountBtn.setOnClickListener(v1 -> {
-        // move to the first conversation with an unread message
-        ChatActivity activity = (ChatActivity) getActivity();
-        if (activity != null) {
-          activity.moveToFirstUnreadConversation();
-        }
-      });
+    if (getArguments() != null) {
+      args = ChatFragmentArgs.fromBundle(getArguments());
     }
 
-    chatOutput.setOnItemClickListener((parent, view, position, id) -> {
-      ChatAdapter.ItemEntry entry = (ChatAdapter.ItemEntry) chatAdapter.getItem(position);
-      if (entry.message == null) {
-        return;
-      }
-      Empire empire = EmpireManager.i.getEmpire(entry.message.getEmpireID());
-      if (empire == null) {
-        return;
-      }
+    chatPagerAdapter = new ChatPagerAdapter(getChildFragmentManager());
+    viewPager = view.findViewById(R.id.pager);
+    viewPager.setAdapter(chatPagerAdapter);
+    handler = new Handler();
+    firstRefresh = true;
 
-      ChatMessageDialog dialog = new ChatMessageDialog();
-      Bundle args = new Bundle();
-      args.putByteArray("au.com.codeka.warworlds.ChatMessage",
-          entry.message.toProtocolBuffer().toByteArray());
-      args.putByteArray("au.com.codeka.warworlds.Empire",
-          empire.toProtocolBuffer().toByteArray());
-      dialog.setArguments(args);
-      FragmentActivity activity = getActivity();
-      if (activity != null) {
-        dialog.show(activity.getSupportFragmentManager(), "");
+    chatMsg = view.findViewById(R.id.chat_text);
+    send = view.findViewById(R.id.chat_send);
+
+    final EditText chatMsg = view.findViewById(R.id.chat_text);
+    chatMsg.setOnEditorActionListener((v, actionId, event) -> {
+      if (actionId == EditorInfo.IME_NULL) {
+        sendCurrentChat();
+        return true;
       }
+      return false;
     });
 
-    View chatUnavailableContainer = v.findViewById(R.id.anon_chat_disabled_container);
-    if (Util.isAnonymous()) {
-      chatUnavailableContainer.setVisibility(View.VISIBLE);
+    Button send = view.findViewById(R.id.chat_send);
+    send.setOnClickListener(v -> sendCurrentChat());
+  }
 
-      Button signInBtn = v.findViewById(R.id.sign_in_btn);
-      signInBtn.setOnClickListener(v12 -> {
-        final Intent intent = new Intent(getContext(), AccountsActivity.class);
-        startActivity(intent);
-      });
+  @Override
+  public void onResume() {
+    super.onResume();
 
-      Button cancelBtn = v.findViewById(R.id.cancel_btn);
-      cancelBtn.setOnClickListener(v1 -> chatUnavailableContainer.setVisibility(View.GONE));
-    }
+    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+      refreshConversations();
 
-    return v;
+      if (firstRefresh) {
+        firstRefresh = false;
+
+        if (args != null) {
+          log.info("")
+          final int conversationID = args.getConversationID();
+          if (conversationID != 0) {
+            int position = 0;
+            for (; position < conversations.size(); position++) {
+              if (conversations.get(position).getID() == conversationID) {
+                break;
+              }
+            }
+            if (position < conversations.size()) {
+              final int finalPosition = position;
+              handler.post(() -> viewPager.setCurrentItem(finalPosition));
+            }
+          }
+
+          if (args.getEmpireID() > 0) {
+            handler.post(() -> ChatManager.i.startConversation(args.getEmpireID()));
+          }
+        }
+      }
+
+      // Anonymous users can't chat, so disable the controls for sending messages.
+      chatMsg.setEnabled(!Util.isAnonymous());
+      send.setEnabled(!Util.isAnonymous());
+    });
   }
 
   @Override
   public void onStart() {
     super.onStart();
     ChatManager.eventBus.register(eventHandler);
-    EmpireManager.eventBus.register(eventHandler);
-    ShieldManager.eventBus.register(eventHandler);
-    refreshMessages();
   }
 
   @Override
   public void onStop() {
     super.onStop();
-    ShieldManager.eventBus.unregister(eventHandler);
-    EmpireManager.eventBus.unregister(eventHandler);
     ChatManager.eventBus.unregister(eventHandler);
   }
 
-  private void refreshMessages() {
-    ArrayList<ChatMessage> allMessages = new ArrayList<>(conversation.getAllMessages());
-    chatAdapter.setMessages(allMessages);
+  public void moveToFirstUnreadConversation() {
+    for (int i = 0; i < conversations.size(); i++) {
+      if (conversations.get(i).getUnreadCount() > 0) {
+        viewPager.setCurrentItem(i);
+        break;
+      }
+    }
   }
 
-  private void fetchChatItems() {
-    conversation.fetchOlderMessages(msgs -> {
-      if (msgs.size() == 0) {
-        noMoreChats = true;
-      }
-
-      // get the current item at the top
-      refreshMessages();
-
-      // figure out which position the item we had before was at
-      int position = -1;
-      if (msgs.size() == 0) {
-        position = 0;
-      } else {
-        int lastMsgID = msgs.get(msgs.size() - 1).getID();
-        for (int i = 0; i < chatAdapter.getCount(); i++) {
-          ChatAdapter.ItemEntry thisEntry = (ChatAdapter.ItemEntry) chatAdapter.getItem(i);
-          if (thisEntry.message != null && thisEntry.message.getID() == lastMsgID) {
-            position = i;
-            break;
-          }
-        }
-      }
-
-      if (position >= 0) {
-        final int finalPosition = position;
-        handler.post(() -> chatOutput.setSelection(finalPosition));
-      }
-    });
-  }
-
-  private void appendMessage(final ChatMessage msg) {
-    chatAdapter.appendMessage(msg);
-  }
-
-  private Object eventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
-    public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
-      if (conversation.getID() < 0) {
-        setupAllianceChatHeader(headerContent);
-      }
-      chatAdapter.notifyDataSetChanged();
+    public void onConversationsRefreshed(ChatManager.ConversationsUpdatedEvent event) {
+      refreshConversations();
     }
 
     @EventHandler
-    public void onEmpireUpdated(Empire empire) {
-      chatAdapter.notifyDataSetChanged();
-    }
+    public void onConversationsRefreshed(ChatManager.ConversationStartedEvent event) {
+      refreshConversations();
 
-    @EventHandler
-    public void onMessageAdded(ChatManager.MessageAddedEvent event) {
-      if (event.conversation.getID() == conversation.getID()) {
-        appendMessage(event.msg);
-        refreshUnreadCountButton();
+      int index = conversations.indexOf(event.conversation);
+      if (index >= 0) {
+        viewPager.setCurrentItem(index);
       }
-    }
-
-    @EventHandler
-    public void onUnreadMessageCountUpdated(ChatManager.UnreadMessageCountUpdatedEvent event) {
-      refreshUnreadCountButton();
     }
   };
 
-  private class ChatAdapter extends BaseAdapter {
-    private ArrayList<ItemEntry> entries;
-
-    public ChatAdapter() {
-      entries = new ArrayList<>();
+  private void refreshConversations() {
+    conversations = ChatManager.i.getConversations();
+    // remove the recent conversation, we don't display it here
+    Iterator<ChatConversation> it = conversations.iterator();
+    while (it.hasNext()) {
+      ChatConversation conversation = it.next();
+      if (conversation.getID() < 0 &&
+          conversation.getID() != ChatManager.ALLIANCE_CONVERSATION_ID) {
+        it.remove();
+      }
+    }
+    if (EmpireManager.i.getEmpire().getAlliance() != null && conversations.size() > 1) {
+      // swap alliance and global around...
+      ChatConversation globalConversation = conversations.get(1);
+      conversations.set(1, conversations.get(0));
+      conversations.set(0, globalConversation);
     }
 
-    public void setMessages(ArrayList<ChatMessage> messages) {
-      entries.clear();
-      if (!noMoreChats) {
-        // we always add an empty entry to mark the end of the messages, well,
-        // unless there's no more chats left
-        entries.add(new ItemEntry());
-      }
+    chatPagerAdapter.refresh(conversations);
+  }
 
-      for (ChatMessage msg : messages) {
-        appendMessage(msg);
-      }
-      notifyDataSetChanged();
+  public static class ChatPagerAdapter extends FragmentStatePagerAdapter {
+    List<ChatConversation> conversations;
+    List<ChatConversationFragment> fragments;
+
+    ChatPagerAdapter(FragmentManager fm) {
+      super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+      conversations = new ArrayList<>();
+      fragments = new ArrayList<>();
     }
 
-    public void appendMessage(ChatMessage msg) {
-      boolean needsDateHeader = false;
-      if (entries.size() == 0) {
-        needsDateHeader = true;
-      } else if (entries.get(entries.size() - 1).message != null) {
-        DateTime lastDate = entries.get(entries.size() - 1).message.getDatePosted()
-            .withZone(DateTimeZone.getDefault());
-        DateTime thisDate = msg.getDatePosted().withZone(DateTimeZone.getDefault());
-
-        if (lastDate.getYear() != thisDate.getYear()
-            || lastDate.getDayOfYear() != thisDate.getDayOfYear()) {
-          needsDateHeader = true;
-        }
-      }
-
-      if (needsDateHeader) {
-        entries.add(new ItemEntry(msg.getDatePosted()));
-      }
-      entries.add(new ItemEntry(msg));
+    public void refresh(List<ChatConversation> conversations) {
+      this.conversations = conversations;
       notifyDataSetChanged();
     }
 
     @Override
-    public int getViewTypeCount() {
-      return 3;
+    @Nonnull
+    public Fragment getItem(int i) {
+      Fragment fragment = new ChatConversationFragment();
+      ChatConversationFragmentArgs args =
+          new ChatConversationFragmentArgs.Builder(conversations.get(i).getID()).build();
+      fragment.setArguments(args.toBundle());
+      return fragment;
     }
 
     @Override
-    public int getItemViewType(int position) {
-      ItemEntry entry = entries.get(position);
-      if (entry.message == null && entry.date == null) {
-        // 2 == "loading"
-        return 2;
-      }
-
-      if (entry.date != null) {
-        // 1 == "simple"
-        return 1;
-      }
-      if (entry.message.getAction() != null
-          && entry.message.getAction() != ChatMessage.MessageAction.Normal) {
-        return 1;
-      }
-      if (entry.message.getEmpireKey() == null) {
-        return 1;
-      }
-
-      // 0 == "normal"
-      return 0;
+    public int getItemPosition(@Nonnull Object item) {
+      return POSITION_NONE;
     }
 
     @Override
     public int getCount() {
-      return entries.size();
+      return conversations.size();
     }
 
     @Override
-    public Object getItem(int position) {
-      return entries.get(position);
+    public CharSequence getPageTitle(int position) {
+      ChatConversation conversation = conversations.get(position);
+      return String.format(Locale.ENGLISH, "Chat #%d", conversation.getID());
     }
 
     @Override
-    public long getItemId(int position) {
-      return position;
-    }
+    public void setPrimaryItem(@Nonnull ViewGroup container, int position, @Nonnull Object object) {
+      super.setPrimaryItem(container, position, object);
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-      ItemEntry entry = entries.get(position);
-      ChatMessage.MessageAction action = ChatMessage.MessageAction.Normal;
-      if (entry.message != null && entry.message.getAction() != null) {
-        action = entry.message.getAction();
-      }
-      View view = convertView;
-      if (view == null) {
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
-            Context.LAYOUT_INFLATER_SERVICE);
-
-        if (entry.date == null && entry.message == null) {
-          view = inflater.inflate(R.layout.chat_row_loading, parent, false);
-        } else if (entry.date != null || action != ChatMessage.MessageAction.Normal) {
-          view = inflater.inflate(R.layout.chat_row_simple, parent, false);
-        } else {
-          view = inflater.inflate(R.layout.chat_row, parent, false);
-        }
-      }
-
-      if (entry.date == null && entry.message == null) {
-        // this implies we're at the end of the list, fetch the next bunch
-        handler.post(ChatFragment.this::fetchChatItems);
-      } else if (entry.date != null) {
-        TextView message = view.findViewById(R.id.message);
-        message.setTextColor(Color.LTGRAY);
-        message.setGravity(Gravity.END);
-        message.setText(entry.date.toString("EE, dd MMM yyyy"));
-      } else if (action == ChatMessage.MessageAction.ErrorMessage) {
-        TextView message = view.findViewById(R.id.message);
-        message.setTextColor(Color.RED);
-        message.setGravity(Gravity.START);
-        message.setText(entry.message.getMessage());
-      } else if (action != ChatMessage.MessageAction.Normal) {
-        TextView message = view.findViewById(R.id.message);
-        message.setTextColor(Color.LTGRAY);
-        message.setGravity(Gravity.START);
-        Empire empire = null;
-        if (entry.message.getEmpireID() != null) {
-          empire = EmpireManager.i.getEmpire(entry.message.getEmpireID());
-        }
-        Empire otherEmpire =
-            EmpireManager.i.getEmpire(Integer.parseInt(entry.message.getMessage()));
-        if (action == ChatMessage.MessageAction.ParticipantAdded) {
-          if (empire != null && otherEmpire != null) {
-            String content = String.format(Locale.ENGLISH, "%s has added %s to the conversation.",
-                empire.getDisplayName(), otherEmpire.getDisplayName());
-            message.setText(Html.fromHtml("<i>" + content + "</i>"));
-          } else {
-            message.setText(Html.fromHtml("<i>An empire has been added to the conversation."));
-          }
-        } else if (action == ChatMessage.MessageAction.ParticipantLeft) {
-          if (empire != null && otherEmpire != null) {
-            String content = String.format(Locale.ENGLISH, "%s has left the conversation.",
-                otherEmpire.getDisplayName());
-            message.setText(Html.fromHtml("<i>" + content + "</i>"));
-          } else {
-            message.setText(Html.fromHtml("<i>An empire has left the conversation."));
-          }
-        }
-      } else if (entry.message.getEmpireKey() == null) {
-        ImageView empireIcon = view.findViewById(R.id.empire_icon);
-        TextView empireName = view.findViewById(R.id.empire_name);
-        TextView msgTime = view.findViewById(R.id.msg_time);
-        TextView message = view.findViewById(R.id.message);
-
-        empireName.setText("");
-        empireIcon.setImageBitmap(null);
-        msgTime.setText(
-            entry.message.getDatePosted().withZone(DateTimeZone.getDefault()).toString("h:mm a"));
-
-        String html = entry.message.format(true, true, false);
-        message.setText(Html.fromHtml("<font color=\"#00ffff\"><b>[SERVER]</b></font> " + html));
-
-        if (html.contains("<a ")) { // only if there's actually a link...
-          message.setMovementMethod(LinkMovementMethod.getInstance());
-        }
-      } else {
-        ImageView empireIcon = view.findViewById(R.id.empire_icon);
-        TextView empireName = view.findViewById(R.id.empire_name);
-        TextView msgTime = view.findViewById(R.id.msg_time);
-        TextView message = view.findViewById(R.id.message);
-
-        Empire empire = EmpireManager.i.getEmpire(entry.message.getEmpireID());
-        if (empire != null) {
-          Bitmap shield = EmpireShieldManager.i.getShield(getActivity(), empire);
-          empireName.setText(empire.getDisplayName());
-          empireIcon.setImageBitmap(shield);
-        } else {
-          empireIcon.setImageBitmap(null);
-          empireName.setText("");
-        }
-
-        msgTime.setText(
-            entry.message.getDatePosted().withZone(DateTimeZone.getDefault()).toString("h:mm a"));
-        String html = entry.message.format(conversation.getID() == 0, true, autoTranslate);
-        message.setText(Html.fromHtml(html));
-        if (html.contains("<a ")) { // only if there's actually a link...
-          message.setMovementMethod(LinkMovementMethod.getInstance());
-        }
-      }
-
-      return view;
-    }
-
-    private class ItemEntry {
-      public ChatMessage message;
-      public DateTime date;
-
-      public ItemEntry() {
-      }
-
-      public ItemEntry(ChatMessage message) {
-        this.message = message;
-      }
-
-      public ItemEntry(DateTime date) {
-        this.date = date;
-      }
+      ChatConversation conversation = conversations.get(position);
+      conversation.markAllRead();
     }
   }
 
-  private void setupGlobalChatHeader(View view) {
-    ImageButton settingsBtn = view.findViewById(R.id.settings_btn);
-    settingsBtn.setOnClickListener(v -> {
-      ChatGlobalSettingsDialog dialog = new ChatGlobalSettingsDialog();
-      FragmentActivity activity = getActivity();
-      if (activity != null) {
-        dialog.show(activity.getSupportFragmentManager(), "");
-      }
-    });
-
-    Button blockedBtn = view.findViewById(R.id.blocked_btn);
-    blockedBtn.setOnClickListener(
-        v -> startActivity(new Intent(getActivity(), BlockedEmpiresActivity.class)));
-
-    Button newGroupBtn = view.findViewById(R.id.new_group_btn);
-    newGroupBtn.setOnClickListener(
-        v -> ChatManager.i.startConversation(null));
-  }
-
-  private void setupAllianceChatHeader(View v) {
-    Alliance alliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
-    if (alliance == null) {
-      return; // should never happen...
-    }
-
-    TextView title = v.findViewById(R.id.title);
-    title.setText(alliance.getName());
-
-    ImageView allianceIcon = v.findViewById(R.id.alliance_icon);
-    allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(getActivity(), alliance));
-  }
-
-  private void setupPrivateChatHeader(View v) {
-    // remove our own ID from the list...
-    ArrayList<Integer> empireIDs = new ArrayList<>();
-    for (BaseChatConversationParticipant participant : conversation.getParticipants()) {
-      if (participant.getEmpireID() != EmpireManager.i.getEmpire().getID()) {
-        empireIDs.add(participant.getEmpireID());
-      }
-    }
-
-    final LinearLayout empireIconContainer =
-        v.findViewById(R.id.empire_icon_container);
-    final TextView empireName = v.findViewById(R.id.title);
-    final double pixelScale = getActivity().getResources().getDisplayMetrics().density;
-
-    ImageButton settingsBtn = v.findViewById(R.id.settings_btn);
-    settingsBtn.setOnClickListener(v1 -> {
-      ChatPrivateSettingsDialog dialog = new ChatPrivateSettingsDialog();
-      Bundle args = new Bundle();
-      Messages.ChatConversation.Builder chat_conversation_pb =
-          Messages.ChatConversation.newBuilder();
-      conversation.toProtocolBuffer(chat_conversation_pb);
-      args.putByteArray("au.com.codeka.warworlds.ChatConversation",
-          chat_conversation_pb.build().toByteArray());
-      dialog.setArguments(args);
-      dialog.show(getActivity().getSupportFragmentManager(), "");
-    });
-
-    if (empireIDs.size() == 0) {
-      empireName.setText("Empty Chat");
-    } else {
-      List<Empire> empires = EmpireManager.i.getEmpires(empireIDs);
-      Collections.sort(empires, (lhs, rhs) -> lhs.getDisplayName().compareTo(rhs.getDisplayName()));
-
-      StringBuilder sb = new StringBuilder();
-      for (Empire empire : empires) {
-        if (sb.length() > 0) {
-          sb.append(", ");
-        }
-        sb.append(empire.getDisplayName());
-
-        ImageView icon = new ImageView(getActivity());
-        icon.setLayoutParams(
-            new LinearLayout.LayoutParams((int) (32 * pixelScale), (int) (32 * pixelScale)));
-        icon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
-        empireIconContainer.addView(icon);
-      }
-      empireName.setText(sb.toString());
-    }
-  }
-
-  private static int getTotalUnreadCount() {
-    int numUnread = 0;
-    for (ChatConversation conversation : ChatManager.i.getConversations()) {
-      numUnread += conversation.getUnreadCount();
-    }
-    return numUnread;
-  }
-
-  private void refreshUnreadCountButton() {
-    if (unreadCountBtn == null) {
+  private void sendCurrentChat() {
+    if (chatMsg.getText().toString().equals("")) {
       return;
     }
 
-    int numUnread = getTotalUnreadCount();
+    String message = chatMsg.getText().toString();
 
-    if (numUnread > 0) {
-      unreadCountBtn.setVisibility(View.VISIBLE);
-      unreadCountBtn.setText(String.format(Locale.ENGLISH, "  %d  ", numUnread));
-    } else {
-      unreadCountBtn.setVisibility(View.GONE);
+    ChatMessage msg = new ChatMessage();
+    msg.setMessage(message);
+    msg.setEmpireID(EmpireManager.i.getEmpire().getID());
+
+    ChatConversation conversation = conversations.get(viewPager.getCurrentItem());
+    msg.setConversation(conversation);
+
+    // if this is our first chat after the update ...
+    if (!Util.getSharedPreferences().getBoolean(
+        "au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
+      // ... and this message is all in English ...
+      if (isEnglish(message)) {
+        // ... and they haven't already set the 'auto-translate' setting ...
+        if (!new GlobalOptions().autoTranslateChatMessages()) {
+          // ... then ask whether they want to enable auto-translate
+          showConfirmAutoTranslateDialog();
+        }
+      }
     }
+
+    chatMsg.setText("");
+    ChatManager.i.postMessage(msg);
+  }
+
+  private void showConfirmAutoTranslateDialog() {
+    Util.getSharedPreferences().edit()
+        .putBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", true)
+        .apply();
+
+    new StyledDialog.Builder(requireContext())
+        .setMessage("Do you want to enable auto-translation of chat message? If you enable this " +
+            "setting, then any chat messages that are not in English will be automatically " +
+            "translated to English for you.\r\n\r\nYou can adjust this setting later from the " +
+            "Options screen.")
+        .setTitle("Auto-translation")
+        .setPositiveButton(
+            "Enable", true, (dialog, which) -> new GlobalOptions().autoTranslateChatMessages(true))
+        .setNegativeButton("Don't Enable", null)
+        .create().show();
+  }
+
+  private static boolean isEnglish(String str) {
+    for (int i = 0; i < str.length(); i++) {
+      char ch = str.charAt(i);
+      if (ch > 0x80) {
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -16,16 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.common.collect.Lists;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 import java.util.Locale;
 
 import au.com.codeka.common.Log;
@@ -38,11 +32,13 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.InfobarView;
+import au.com.codeka.warworlds.ctrl.MiniChatView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
+import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
 import au.com.codeka.warworlds.game.empire.EmpireFragmentArgs;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -97,6 +93,15 @@ public class StarfieldFragment extends BaseFragment {
       infobarView.hideEmpireName();
     }
 
+    MiniChatView miniChatView = view.findViewById(R.id.mini_chat);
+    miniChatView.setup(conversationID -> {
+      ChatFragmentArgs args = new ChatFragmentArgs.Builder()
+          .setConversationID(conversationID)
+          .build();
+      NavHostFragment.findNavController(StarfieldFragment.this).navigate(
+          R.id.chatFragment, args.toBundle());
+    });
+
     // "Rename" button
     // "View" button
     // "Intel" button
@@ -113,7 +118,6 @@ public class StarfieldFragment extends BaseFragment {
           if (selectedStar == null) {
             return;
           }
-
 
           Bundle args = new Bundle();
           args.putInt("au.com.codeka.warworlds.StarID", selectedStar.getID());
