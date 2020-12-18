@@ -222,6 +222,11 @@ public abstract class SectorSceneManager implements IOnSceneTouchListener {
    */
   public void scrollTo(final long sectorX, final long sectorY, final float offsetX,
       final float offsetY) {
+    if (activity == null || activity.getEngine() == null) {
+      // TODO: if this happens, we should try again after the engine is created...
+      return;
+    }
+
     activity.getEngine().runOnUpdateThread(new Runnable() {
       @Override
       public void run() {
