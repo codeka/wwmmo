@@ -25,12 +25,15 @@ import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
+import au.com.codeka.warworlds.ctrl.MiniChatView;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.ctrl.StarStorageView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
+import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
+import au.com.codeka.warworlds.game.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -85,6 +88,15 @@ public class SolarSystemFragment extends BaseFragment {
     if (savedInstanceState != null) {
       isFirstRefresh = savedInstanceState.getBoolean("au.com.codeka.warworlds.IsFirstRefresh");
     }
+
+    MiniChatView miniChatView = view.findViewById(R.id.mini_chat);
+    miniChatView.setup(conversationID -> {
+      ChatFragmentArgs args = new ChatFragmentArgs.Builder()
+          .setConversationID(conversationID)
+          .build();
+      NavHostFragment.findNavController(SolarSystemFragment.this).navigate(
+          R.id.chatFragment, args.toBundle());
+    });
 
     solarSystemSurfaceView.addPlanetSelectedListener(
         planet -> {

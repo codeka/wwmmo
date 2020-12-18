@@ -15,10 +15,12 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.navigation.fragment.NavHostFragment;
+
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.chat.ChatActivity;
+import au.com.codeka.warworlds.game.chat.ChatFragment;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -29,18 +31,21 @@ import au.com.codeka.warworlds.model.EmpireManager;
  * This control displays the mini chat window, which displays recent chat messages on each screen.
  */
 public class MiniChatView extends RelativeLayout {
-  private Context context;
+  public interface Callback {
+    void onNavigateToChatFragment(Integer conversationID);
+  }
 
   private ScrollView scrollView;
   private LinearLayout msgsContainer;
   private Button unreadMsgCount;
   private boolean autoTranslate;
 
+  private Callback callback;
+
   private static final int MAX_ROWS = 10;
 
   public MiniChatView(Context context, AttributeSet attrs) {
     super(context, attrs);
-    this.context = context;
 
     if (this.isInEditMode()) {
       return;
@@ -57,34 +62,26 @@ public class MiniChatView extends RelativeLayout {
     unreadMsgCount = view.findViewById(R.id.unread_btn);
     refreshUnreadCountButton();
 
-    msgsContainer.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(MiniChatView.this.context, ChatActivity.class);
-        MiniChatView.this.context.startActivity(intent);
-      }
-    });
+    msgsContainer.setOnClickListener(v -> callback.onNavigateToChatFragment(-1));
     msgsContainer.setClickable(true);
 
-    unreadMsgCount.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        // move to the first conversation with an unread message
-        Intent intent = new Intent(MiniChatView.this.context, ChatActivity.class);
-
-        List<ChatConversation> conversations = ChatManager.i.getConversations();
-        for (int i = 0; i < conversations.size(); i++) {
-          if (conversations.get(i).getUnreadCount() > 0) {
-            intent.putExtra("au.com.codeka.warworlds.ConversationID",
-                conversations.get(i).getID());
-            break;
-          }
+    unreadMsgCount.setOnClickListener(v -> {
+      // move to the first conversation with an unread message
+      int conversationID = -1;
+      List<ChatConversation> conversations = ChatManager.i.getConversations();
+      for (int i = 0; i < conversations.size(); i++) {
+        if (conversations.get(i).getUnreadCount() > 0) {
+          conversationID = conversations.get(i).getID();
+          break;
         }
-
-        MiniChatView.this.context.startActivity(intent);
       }
-    });
 
+      callback.onNavigateToChatFragment(conversationID);
+    });
+  }
+
+  public void setup(Callback callback) {
+    this.callback = callback;
   }
 
   @Override
@@ -119,7 +116,7 @@ public class MiniChatView extends RelativeLayout {
   }
 
   private void appendMessage(final ChatMessage msg) {
-    TextView tv = new TextView(context);
+    TextView tv = new TextView(getContext());
     tv.setText(Html.fromHtml(msg.format(true, false, autoTranslate)));
     tv.setTag(msg);
 
@@ -132,12 +129,7 @@ public class MiniChatView extends RelativeLayout {
   }
 
   private void scrollToBottom() {
-    scrollView.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-      }
-    }, 1);
+    scrollView.postDelayed(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN), 1);
   }
 
   private static int getTotalUnreadCount() {
@@ -159,7 +151,7 @@ public class MiniChatView extends RelativeLayout {
     }
   }
 
-  private Object eventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onEmpireUpdated(Empire empire) {
       for (int i = 0; i < msgsContainer.getChildCount(); i++) {

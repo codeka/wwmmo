@@ -69,7 +69,6 @@
       android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsActivity"
       android:windowSoftInputMode="stateUnchanged" />
     <activity android:name="au.com.codeka.warworlds.game.alliance.AllianceDetailsActivity" />
-    <activity android:name="au.com.codeka.warworlds.game.chat.ChatActivity" />
     <activity android:name="au.com.codeka.warworlds.game.chat.BlockedEmpiresActivity" />
     <activity android:name="au.com.codeka.warworlds.game.wormhole.DestinationActivity" />
     <activity android:name="au.com.codeka.warworlds.game.SitrepActivity">
