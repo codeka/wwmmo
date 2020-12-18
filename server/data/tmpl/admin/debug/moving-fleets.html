@@ -1,6 +1,7 @@
 {% extends "admin/skeleton.html" %}
 {% block "title" %}Moving fleets{% end %}
 {% block "head" %}
+<script src="/realms/{{realm}}/js/time.js"></script>
 <script src="/realms/{{realm}}/js/empirestore.js"></script>
 <style>
 </style>
@@ -16,18 +17,21 @@
     <th># ships</th>
     <th>Source</th>
     <th>Destination</th>
+    <th>ETA</th>
     <th></th>
   </tr>
   {% for fleet in fleets %}
   <tr data-fleetid="{{fleet.key}}">
     <td>{{ fleet.key }}</td>
-    <td>{{ fleet.empireKey }}</td>
+    <td><div data-empireid="{{ fleet.empireKey }}"></div></td>
     <td>{{ fleet.design.getDisplayName() }}</td>
     <td>{{ fleet.numShips }}</td>
     <td>{{ fleet.starKey }}</td>
     <td>{{ fleet.destinationStarKey }}</td>
+    <td><time timestamp="{{ fleet.eta.millis / 1000 }}"></time></td>
     <td>
-      <a href="javascript:;" class="move-complete" title="Click to complete this fleet movement now.">Complete movement</a>
+      <a href="javascript:;" class="move-complete"
+         title="Click to complete this fleet movement now.">Complete movement</a>
     </td>
   </tr>
   {% end %}

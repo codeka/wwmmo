@@ -36,7 +36,7 @@ public class AdminEmpireDetailsHandler extends AdminHandler {
       int day = stat.getDay() - (year * 10000) - (month * 100);
       int hour = stat.getHour();
 
-      graphEntry.put("date", new DateTime(year, month + 1, day, hour, 0, 0));
+      graphEntry.put("date", new DateTime(year, month, day, hour, 0, 0));
       graphEntry.put("total", stat.getTotalRequests());
       graphEntry.put("empireRequests", 0);
       graphEntry.put("empireNotRateLimited", 0);
