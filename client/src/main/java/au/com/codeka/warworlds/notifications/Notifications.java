@@ -27,8 +27,11 @@ import android.os.Handler;
 import android.text.Html;
 import android.util.Base64;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.ContextCompat;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
@@ -58,8 +61,12 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.InvalidProtocolBufferException;
+
+import org.jetbrains.annotations.Nullable;
 
 public class Notifications {
   private static final Log log = new Log("Notifications");
@@ -202,16 +209,24 @@ public class Notifications {
   private static void displayNotification(final Context context,
       final Messages.SituationReport sitrep) {
     String starKey = sitrep.getStarKey();
-    Star star;
-    try {
-      star = Futures.getChecked(
-          StarManager.i.requireStar(
-              Integer.parseInt(starKey)), IOException.class, 10, TimeUnit.SECONDS);
-    } catch (IOException e) {
-      log.warning("Error getting star.", e);
-      return;
-    }
+    Futures.addCallback(
+        StarManager.i.requireStar(Integer.parseInt(starKey)), new FutureCallback<Star>() {
+          @Override
+          public void onSuccess(@Nullable Star star) {
+            if (star != null) {
+              displayNotification(context, star, sitrep);
+            }
+          }
 
+          @Override
+          public void onFailure(@NonNull Throwable t) {
+            log.error("Error fetching star, cannot show notification.", t);
+          }
+        }, ContextCompat.getMainExecutor(context));
+  }
+
+  private static void displayNotification(
+      final Context context, Star star, Messages.SituationReport sitrep) {
     NotificationDetails notification = new NotificationDetails();
     notification.sitrep = sitrep;
     notification.realm = RealmContext.i.getCurrentRealm();
