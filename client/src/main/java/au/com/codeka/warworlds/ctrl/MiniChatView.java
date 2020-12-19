@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.navigation.fragment.NavHostFragment;
 
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -132,23 +133,27 @@ public class MiniChatView extends RelativeLayout {
     scrollView.postDelayed(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN), 1);
   }
 
-  private static int getTotalUnreadCount() {
-    int numUnread = 0;
-    for (ChatConversation conversation : ChatManager.i.getConversations()) {
-      numUnread += conversation.getUnreadCount();
-    }
-    return numUnread;
-  }
-
   private void refreshUnreadCountButton() {
-    int numUnread = getTotalUnreadCount();
+    unreadMsgCount.setVisibility(View.GONE);
 
-    if (numUnread > 0) {
-      unreadMsgCount.setVisibility(View.VISIBLE);
-      unreadMsgCount.setText(String.format(Locale.ENGLISH, "  %d  ", numUnread));
-    } else {
-      unreadMsgCount.setVisibility(View.GONE);
-    }
+    new BackgroundRunner<Integer>() {
+      @Override
+      protected Integer doInBackground() {
+        int numUnread = 0;
+        for (ChatConversation conversation : ChatManager.i.getConversations()) {
+          numUnread += conversation.getUnreadCount();
+        }
+        return numUnread;
+      }
+
+      @Override
+      protected void onComplete(Integer numUnread) {
+        if (numUnread > 0) {
+          unreadMsgCount.setVisibility(View.VISIBLE);
+          unreadMsgCount.setText(String.format(Locale.ENGLISH, "  %d  ", numUnread));
+        }
+      }
+    }.execute();
   }
 
   private final Object eventHandler = new Object() {
