@@ -18,7 +18,7 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.game.empire.EnemyEmpireActivity;
+import au.com.codeka.warworlds.game.empire.EnemyEmpireFragment;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -73,7 +73,8 @@ public class PlanetListSimple extends LinearLayout {
                 public void onClick(View v) {
                     if (v.getTag() instanceof Integer) {
                         Integer empireID = (Integer) v.getTag();
-                        Intent intent = new Intent(mContext, EnemyEmpireActivity.class);
+                        // TODO: navigate to this thing
+                        Intent intent = new Intent(mContext, EnemyEmpireFragment.class);
                         intent.putExtra("au.com.codeka.warworlds.EmpireKey", empireID.toString());
                         mContext.startActivity(intent);
                     } else {

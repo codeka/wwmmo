@@ -1,10 +1,7 @@
 package au.com.codeka.warworlds.game.empire;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +11,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import au.com.codeka.common.Log;
@@ -41,6 +38,50 @@ public class OverviewFragment extends Fragment {
   private int rankType = R.id.battle_rank_7d;
 
   @Override
+  public View onCreateView(
+      @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    rootView = inflater.inflate(R.layout.empire_overview_tab, container, false);
+    final RecyclerView recyclerView = rootView.findViewById(R.id.empire_rankings);
+
+    final ProgressBar progress = rootView.findViewById(R.id.progress_bar);
+    progress.setVisibility(View.VISIBLE);
+
+    empireRankListHelper = new EmpireRankRecyclerViewHelper(recyclerView, rankCallbacks);
+
+    rootView.findViewById(R.id.popup_menu).setOnClickListener(view -> {
+      FragmentActivity activity = getActivity();
+      if (activity == null) {
+        return;
+      }
+      PopupMenu popupMenu = new PopupMenu(activity, rootView.findViewById(R.id.popup_menu));
+      popupMenu.setOnMenuItemClickListener(item -> {
+        // Change the rank type and then refresh.
+        rankType = item.getItemId();
+        recyclerView.setVisibility(View.GONE);
+        progress.setVisibility(View.VISIBLE);
+        empireRankListHelper.refresh();
+        return false;
+      });
+      popupMenu.inflate(R.menu.empire_rank_menu);
+      popupMenu.show();
+    });
+
+    TextView empireSearch = rootView.findViewById(R.id.empire_search);
+    empireSearch.setOnEditorActionListener((v, actionId, event) -> {
+      if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+        onEmpireSearch();
+        return true;
+      }
+      return false;
+    });
+
+    final Button searchBtn = rootView.findViewById(R.id.search_btn);
+    searchBtn.setOnClickListener(v -> onEmpireSearch());
+
+    return rootView;
+  }
+
+  @Override
   public void onStart() {
     super.onStart();
     ShieldManager.eventBus.register(eventHandler);
@@ -55,84 +96,8 @@ public class OverviewFragment extends Fragment {
     EmpireManager.eventBus.unregister(eventHandler);
   }
 
-  private Object eventHandler = new Object() {
-    @EventHandler
-    public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
-      MyEmpire empire = EmpireManager.i.getEmpire();
-
-      ImageView empireIcon = rootView.findViewById(R.id.empire_icon);
-      empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
-
-      ImageView allianceIcon = rootView.findViewById(R.id.alliance_icon);
-      if (empire.getAlliance() != null) {
-        allianceIcon.setImageBitmap(
-            AllianceShieldManager.i.getShield(getActivity(),
-            (Alliance) empire.getAlliance()));
-      }
-    }
-
-    @EventHandler
-    public void onEmpireUpdated(Empire empire) {
-      if (empire.getID() == EmpireManager.i.getEmpire().getID()) {
-        refresh();
-      }
-    }
-  };
-
-  @Override
-  public View onCreateView(
-      @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    rootView = inflater.inflate(R.layout.empire_overview_tab, container, false);
-    final RecyclerView recyclerView = rootView.findViewById(R.id.empire_rankings);
-
-    final ProgressBar progress = rootView.findViewById(R.id.progress_bar);
-    progress.setVisibility(View.VISIBLE);
-
-    empireRankListHelper = new EmpireRankRecyclerViewHelper(recyclerView, rankCallbacks);
-    refresh();
-
-    rootView.findViewById(R.id.popup_menu).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        FragmentActivity activity = getActivity();
-        if (activity == null) {
-          return;
-        }
-        PopupMenu popupMenu = new PopupMenu(activity, rootView.findViewById(R.id.popup_menu));
-        popupMenu.setOnMenuItemClickListener(item -> {
-          // Change the rank type and then refresh.
-          rankType = item.getItemId();
-          recyclerView.setVisibility(View.GONE);
-          progress.setVisibility(View.VISIBLE);
-          empireRankListHelper.refresh();
-          return false;
-        });
-        popupMenu.inflate(R.menu.empire_rank_menu);
-        popupMenu.show();
-      }
-    });
-
-    TextView empireSearch = rootView.findViewById(R.id.empire_search);
-    empireSearch.setOnEditorActionListener(new OnEditorActionListener() {
-      @Override
-      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-          onEmpireSearch();
-          return true;
-        }
-        return false;
-      }
-    });
-
-    final Button searchBtn = rootView.findViewById(R.id.search_btn);
-    searchBtn.setOnClickListener(v -> onEmpireSearch());
-
-    return rootView;
-  }
-
   private void refresh() {
     Empire empire = EmpireManager.i.getEmpire();
-    log.warning("REFRESHING: " + empire.getDisplayName());
 
     TextView empireName = rootView.findViewById(R.id.empire_name);
     ImageView empireIcon = rootView.findViewById(R.id.empire_icon);
@@ -174,16 +139,37 @@ public class OverviewFragment extends Fragment {
         });
   }
 
+  private final Object eventHandler = new Object() {
+    @EventHandler
+    public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
+      MyEmpire empire = EmpireManager.i.getEmpire();
+
+      ImageView empireIcon = rootView.findViewById(R.id.empire_icon);
+      empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
+
+      ImageView allianceIcon = rootView.findViewById(R.id.alliance_icon);
+      if (empire.getAlliance() != null) {
+        allianceIcon.setImageBitmap(
+            AllianceShieldManager.i.getShield(getActivity(),
+                (Alliance) empire.getAlliance()));
+      }
+    }
+
+    @EventHandler
+    public void onEmpireUpdated(Empire empire) {
+      if (empire.getID() == EmpireManager.i.getEmpire().getID()) {
+        refresh();
+      }
+    }
+  };
+
   private final EmpireRankRecyclerViewHelper.Callbacks rankCallbacks =
       new EmpireRankRecyclerViewHelper.Callbacks() {
     @Override
     public void onEmpireClick(Empire empire) {
-      Intent intent = new Intent(getActivity(), EnemyEmpireActivity.class);
-      intent.putExtra("au.com.codeka.warworlds.EmpireKey", empire.getKey());
-      Activity activity = getActivity();
-      if (activity != null) {
-        activity.startActivity(intent);
-      }
+      NavHostFragment.findNavController(OverviewFragment.this).navigate(
+          R.id.enemyEmpireFragment,
+          new EnemyEmpireFragmentArgs.Builder(empire.getID()).build().toBundle());
     }
 
     @Override
@@ -191,6 +177,7 @@ public class OverviewFragment extends Fragment {
         int startPosition,
         int count,
         final EmpireRankRecyclerViewHelper.RowsFetchCallback callback) {
+      log.info("EmpireRankRecyclerViewHelper fetchRows");
       final ProgressBar progress = rootView.findViewById(R.id.progress_bar);
       if (rankType == R.id.stars_rank) {
         EmpireManager.i.searchEmpiresByRank(startPosition + 1, startPosition + 1 + count,
