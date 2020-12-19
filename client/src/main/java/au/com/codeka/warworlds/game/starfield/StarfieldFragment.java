@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -19,6 +20,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.android.billingclient.api.Purchase;
 import com.google.common.collect.Lists;
 import com.google.protobuf.InvalidProtocolBufferException;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
@@ -67,11 +70,8 @@ public class StarfieldFragment extends BaseFragment {
 
   private Purchase starRenamePurchase;
 
-  private Star starToSelect;
-  private String starKeyToSelect;
-  private Fleet fleetToSelect;
+  @Nullable private StarfieldFragmentArgs args;
 
-  private static final int EMPIRE_REQUEST = 2;
   private static final int SITREP_REQUEST = 3;
 
   @Nullable
@@ -85,6 +85,10 @@ public class StarfieldFragment extends BaseFragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+
+    if (getArguments() != null) {
+      args = StarfieldFragmentArgs.fromBundle(requireArguments());
+    }
 
     bottomPane = view.findViewById(R.id.bottom_pane);
     selectionDetailsView = view.findViewById(R.id.selection_details);
@@ -140,35 +144,6 @@ public class StarfieldFragment extends BaseFragment {
     allianceBtn = view.findViewById(R.id.alliance_btn);
     allianceBtn.setOnClickListener(v -> onAllianceClick());
 
-    if (savedInstanceState != null) {
-      Star selectedStar = null;
-      Fleet selectedFleet = null;
-
-      try {
-        byte[] star_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedStar");
-        if (star_bytes != null) {
-          Messages.Star star_pb = Messages.Star.parseFrom(star_bytes);
-          selectedStar = new Star();
-          selectedStar.fromProtocolBuffer(star_pb);
-        }
-      } catch (InvalidProtocolBufferException ignore) {
-      }
-
-      try {
-        byte[] fleet_bytes =
-            savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedFleet");
-        if (fleet_bytes != null) {
-          Messages.Fleet fleet_pb = Messages.Fleet.parseFrom(fleet_bytes);
-          selectedFleet = new Fleet();
-          selectedFleet.fromProtocolBuffer(fleet_pb);
-        }
-      } catch (InvalidProtocolBufferException ignore) {
-      }
-
-      starToSelect = selectedStar;
-      fleetToSelect = selectedFleet;
-    }
-
     hideBottomPane(true);
   }
 
@@ -180,31 +155,26 @@ public class StarfieldFragment extends BaseFragment {
       if (!success) {
         return;
       }
-/*
-      if (starToSelect != null && starfield.getScene() != null) {
-        selectedStar = starToSelect;
-        starfield.getScene().selectStar(starToSelect.getKey());
-        starfield.scrollTo(starToSelect);
-        starToSelect = null;
-      }
-*//*
-      if (fleetToSelect != null && starfield.getScene() != null) {
-        starfield.getScene().selectFleet(fleetToSelect.getKey());
-        fleetToSelect = null;
-      }
-*/
+
       MyEmpire myEmpire = EmpireManager.i.getEmpire();
       if (myEmpire == null) {
         return;
       }
 
       BaseStar homeStar = myEmpire.getHomeStar();
-
       if (homeStar != null && (
           StarfieldFragment.this.homeStar == null || !StarfieldFragment.this.homeStar.getKey()
           .equals(homeStar.getKey()))) {
         StarfieldFragment.this.homeStar = (Star) homeStar;
       }
+
+      if (args != null && args.getStarCoord() != null) {
+        requireMainActivity().getStarfieldManager().warpTo(args.getStarCoord());
+      }
+
+      // Now that we've processed the arguments, don't do it again.
+      setArguments(null);
+      args = null;
     });
 
     if (starRenamePurchase != null) {

@@ -25,6 +25,7 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.alliance.KickRequestDialog;
 import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
+import au.com.codeka.warworlds.game.starfield.scene.StarCoord;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.Empire;
@@ -216,14 +217,8 @@ public class EnemyEmpireFragment extends BaseFragment {
     if (empire != null && empire.getHomeStar() != null) {
       BaseStar homeStar = empire.getHomeStar();
       NavHostFragment.findNavController(this).navigate(
-          EnemyEmpireFragmentDirections.actionEnemyEmpireFragmentToStarfieldFragment()/* TODO: args */);
-//      Intent intent = new Intent(requireContext(), StarfieldFragment.class);
-//      intent.putExtra("au.com.codeka.warworlds.StarKey", homeStar.getKey());
-//      intent.putExtra("au.com.codeka.warworlds.SectorX", homeStar.getSectorX());
-//      intent.putExtra("au.com.codeka.warworlds.SectorY", homeStar.getSectorY());
-//      intent.putExtra("au.com.codeka.warworlds.OffsetX", homeStar.getOffsetX());
-//      intent.putExtra("au.com.codeka.warworlds.OffsetY", homeStar.getOffsetY());
-//      startActivity(intent);
+          EnemyEmpireFragmentDirections.actionEnemyEmpireFragmentToStarfieldFragment()
+              .setStarCoord(StarCoord.from(homeStar)));
     }
   }
 

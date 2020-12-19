@@ -88,18 +88,21 @@ public class SectorManager extends BaseManager {
       }
 
       if (!missingSectors.isEmpty()) {
-        String url = "";
+        StringBuilder url = new StringBuilder();
         for (Pair<Long, Long> coord : missingSectors) {
           if (url.length() != 0) {
-            url += "%7C"; // Java doesn't like "|" for some reason (it's valid!!)
+            url.append("%7C"); // Java doesn't like "|" for some reason (it's valid!!)
           }
-          url += String.format("%d,%d", coord.one, coord.two);
+          url.append(String.format(Locale.US, "%d,%d", coord.one, coord.two));
         }
-        url = "sectors?coords=" + url;
 
-        ApiRequest request = new ApiRequest.Builder(url, "GET")
-            .completeCallback(request1 -> {
-              Messages.Sectors sectorsPb = request1.body(Messages.Sectors.class);
+        ApiRequest request = new ApiRequest.Builder("sectors?coords=" + url, "GET")
+            .completeCallback(r -> {
+              Messages.Sectors sectorsPb = r.body(Messages.Sectors.class);
+              if (sectorsPb == null) {
+                // TODO: handle error?
+                return;
+              }
               for (Messages.Sector sector_pb : sectorsPb.getSectorsList()) {
                 Sector sector = new Sector();
                 sector.fromProtocolBuffer(sector_pb);

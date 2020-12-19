@@ -51,6 +51,11 @@
             android:id="@+id/starfieldFragment"
             android:name="au.com.codeka.warworlds.game.starfield.StarfieldFragment"
             android:label="War Worlds" >
+        <argument
+            android:name="starCoord"
+            app:argType="au.com.codeka.warworlds.game.starfield.scene.StarCoord"
+            app:nullable="true"
+            android:defaultValue="@null" />
         <action
                 android:id="@+id/action_starfieldFragment_to_solarSystemFragment"
                 app:destination="@id/solarSystemFragment" />
