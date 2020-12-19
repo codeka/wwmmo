@@ -57,11 +57,15 @@
             app:nullable="true"
             android:defaultValue="@null" />
         <action
-                android:id="@+id/action_starfieldFragment_to_solarSystemFragment"
-                app:destination="@id/solarSystemFragment" />
+            android:id="@+id/action_starfieldFragment_to_solarSystemFragment"
+            app:destination="@id/solarSystemFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/starfieldFragment" />
         <action
-                android:id="@+id/action_starfieldFragment_to_wormholeFragment"
-                app:destination="@id/wormholeFragment" />
+            android:id="@+id/action_starfieldFragment_to_wormholeFragment"
+            app:destination="@id/wormholeFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/starfieldFragment" />
         <action
             android:id="@+id/action_starfieldFragment_to_empireFragment"
             app:destination="@id/empireFragment" />
@@ -71,14 +75,32 @@
     </fragment>
     <fragment
             android:id="@+id/solarSystemFragment"
-            android:name="au.com.codeka.warworlds.game.solarsystem.SolarSystemFragment" >
+            android:name="au.com.codeka.warworlds.game.solarsystem.SolarSystemFragment">
+        <argument android:name="starID" app:argType="integer" />
+        <argument android:name="planetIndex" app:argType="integer" android:defaultValue="-1" />
+        <argument android:name="showScoutReport" app:argType="boolean" android:defaultValue="false" />
+        <argument android:name="showCombatReport" app:argType="boolean" android:defaultValue="false" />
+        <argument android:name="combatReportID" app:argType="integer" android:defaultValue="-1" />
+
         <action
                 android:id="@+id/action_planetPager"
                 app:destination="@id/planetPagerFragment" />
+        <action
+            android:id="@id/action_starfieldFragment_to_solarSystemFragment"
+            app:destination="@id/solarSystemFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/starfieldFragment" />
+        <action
+            android:id="@id/action_starfieldFragment_to_wormholeFragment"
+            app:destination="@id/wormholeFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/starfieldFragment" />
     </fragment>
     <fragment
             android:id="@+id/wormholeFragment"
-            android:name="au.com.codeka.warworlds.game.wormhole.WormholeFragment" />
+            android:name="au.com.codeka.warworlds.game.wormhole.WormholeFragment">
+        <argument android:name="starID" app:argType="integer" />
+    </fragment>
     <fragment
             android:id="@+id/planetPagerFragment"
             android:name="au.com.codeka.warworlds.game.solarsystem.PlanetPagerFragment">

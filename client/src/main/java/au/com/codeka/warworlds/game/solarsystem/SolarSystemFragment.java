@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -57,10 +58,11 @@ public class SolarSystemFragment extends BaseFragment {
   private Colony colony;
   private boolean isFirstRefresh;
   private View view;
-  private int starID;
 
   // needs to be Object so we can do a version check before instantiating the class
   Object solarSystemSurfaceViewOnLayoutChangedListener;
+
+  private SolarSystemFragmentArgs args;
 
   public SolarSystemFragment() {
   }
@@ -72,6 +74,8 @@ public class SolarSystemFragment extends BaseFragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     view = inflater.inflate(R.layout.solarsystem, container, false);
+
+    args = SolarSystemFragmentArgs.fromBundle(requireArguments());
 
     solarSystemSurfaceView = view.findViewById(R.id.solarsystem_view);
     progressBar = view.findViewById(R.id.progress_bar);
@@ -133,11 +137,10 @@ public class SolarSystemFragment extends BaseFragment {
   @Override
   public void onResume() {
     super.onResume();
-    starID = requireArguments().getInt("au.com.codeka.warworlds.StarID");
     StarManager.eventBus.register(eventHandler);
     ShieldManager.eventBus.register(eventHandler);
 
-    star = StarManager.i.getStar(starID);
+    star = StarManager.i.getStar(args.getStarID());
     if (star != null) {
       onStarFetched(star);
     }
@@ -181,7 +184,7 @@ public class SolarSystemFragment extends BaseFragment {
   private Object eventHandler = new Object() {
     @EventHandler
     public void onStarUpdated(Star star) {
-      if (starID == star.getID()) {
+      if (args.getStarID() == star.getID()) {
         onStarFetched(star);
       }
     }
@@ -202,8 +205,7 @@ public class SolarSystemFragment extends BaseFragment {
     // whatever planet we have currently
     int selectedPlanetIndex;
     if (isFirstRefresh) {
-      Bundle extras = getArguments();
-      selectedPlanetIndex = extras.getInt("au.com.codeka.warworlds.PlanetIndex");
+      selectedPlanetIndex = args.getPlanetIndex();
     } else if (planet != null) {
       selectedPlanetIndex = planet.getIndex();
     } else {
@@ -238,25 +240,20 @@ public class SolarSystemFragment extends BaseFragment {
     refresh();
 
     if (this.planet == null) {
-      TextView planetNameTextView = (TextView) view.findViewById(R.id.planet_name);
+      TextView planetNameTextView = view.findViewById(R.id.planet_name);
       planetNameTextView.setText(this.star.getName());
     }
 
     if (isFirstRefresh) {
       isFirstRefresh = false;
-      Bundle extras = getArguments();
-      boolean showScoutReport = extras.getBoolean("au.com.codeka.warworlds.ShowScoutReport");
-      if (showScoutReport) {
+      if (args.getShowScoutReport()) {
         ScoutReportDialog dialog = new ScoutReportDialog();
         dialog.setStar(this.star);
-        dialog.show(getFragmentManager(), "");
-      }
-
-      String combatReportKey = extras.getString("au.com.codeka.warworlds.CombatReportKey");
-      if (!showScoutReport && combatReportKey != null) {
+        dialog.show(getChildFragmentManager(), "");
+      } else if (args.getShowCombatReport()) {
         CombatReportDialog dialog = new CombatReportDialog();
-        dialog.loadCombatReport(this.star, combatReportKey);
-        dialog.show(getFragmentManager(), "");
+        dialog.loadCombatReport(this.star, args.getCombatReportID());
+        dialog.show(getChildFragmentManager(), "");
       }
     }
   }
@@ -268,7 +265,7 @@ public class SolarSystemFragment extends BaseFragment {
   }
 
   @Override
-  public void onSaveInstanceState(Bundle state) {
+  public void onSaveInstanceState(@NonNull Bundle state) {
     super.onSaveInstanceState(state);
     state.putBoolean("au.com.codeka.warworlds.IsFirstRefresh", false);
   }
@@ -283,14 +280,14 @@ public class SolarSystemFragment extends BaseFragment {
     if (colony != null) {
       if (colony.getEmpireID() != null && colony.getEmpireID() == myEmpire.getID()) {
         dir = SolarSystemFragmentDirections.actionPlanetPager(
-            starID, colony.getPlanetIndex(), PlanetPagerFragment.Kind.OwnedPlanets);
+            args.getStarID(), colony.getPlanetIndex(), PlanetPagerFragment.Kind.OwnedPlanets);
       } else {
         dir = SolarSystemFragmentDirections.actionPlanetPager(
-            starID, colony.getPlanetIndex(), PlanetPagerFragment.Kind.EnemyPlanets);
+            args.getStarID(), colony.getPlanetIndex(), PlanetPagerFragment.Kind.EnemyPlanets);
       }
     } else {
       dir = SolarSystemFragmentDirections.actionPlanetPager(
-          starID, planet.getIndex(), PlanetPagerFragment.Kind.EmptyPlanets);
+          args.getStarID(), planet.getIndex(), PlanetPagerFragment.Kind.EmptyPlanets);
     }
     NavHostFragment.findNavController(this).navigate(dir);
   }

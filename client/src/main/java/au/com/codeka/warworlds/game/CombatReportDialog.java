@@ -36,9 +36,9 @@ public class CombatReportDialog extends DialogFragment {
     private ReportAdapter mReportAdapter;
     private SparseArray<Empire> mEmpires;
 
-    public void loadCombatReport(Star star, String combatReportKey) {
+    public void loadCombatReport(Star star, int combatReportID) {
         mStar = star;
-        mCombatReportKey = combatReportKey;
+        mCombatReportKey = Integer.toString(combatReportID);
 
         if (mEmpires == null) {
             mEmpires = new SparseArray<Empire>();

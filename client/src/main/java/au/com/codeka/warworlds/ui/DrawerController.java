@@ -17,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -25,6 +26,7 @@ import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.starfield.StarfieldFragmentDirections;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.EmpireStarsFetcher;
@@ -68,7 +70,6 @@ public class DrawerController {
       }
     });
 
-
     final EditText searchBox = drawerContent.findViewById(R.id.search_text);
     searchBox.setOnEditorActionListener((v, actionId, event) -> {
       if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -110,12 +111,13 @@ public class DrawerController {
       return;
     }
 
-    if (star.getStarType().getType() == BaseStar.Type.Wormhole) {
-      // TODO
+    BaseStar.StarType starType = star.getStarType();
+    if (starType.getType() == Star.Type.Wormhole) {
+      navController.navigate(
+          StarfieldFragmentDirections.actionStarfieldFragmentToWormholeFragment(starID));
     } else {
-      Bundle args = new Bundle();
-      args.putInt("au.com.codeka.warworlds.StarID", starID);
-      navController.navigate(R.id.solarSystemFragment, args);
+      navController.navigate(
+          StarfieldFragmentDirections.actionStarfieldFragmentToSolarSystemFragment(starID));
     }
 
     drawerLayout.close();
