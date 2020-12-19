@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.game.alliance;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import au.com.codeka.Cash;
 import au.com.codeka.common.TimeFormatter;
@@ -30,7 +30,8 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.empire.EnemyEmpireActivity;
+import au.com.codeka.warworlds.game.empire.EnemyEmpireFragment;
+import au.com.codeka.warworlds.game.empire.EnemyEmpireFragmentArgs;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
@@ -259,14 +260,13 @@ public class AllianceDetailsFragment extends Fragment implements TabManager.Relo
         return;
       }
 
-      Intent intent = new Intent(activity, EnemyEmpireActivity.class);
-      intent.putExtra("au.com.codeka.warworlds.EmpireKey", empire.getKey());
-
-      startActivity(intent);
+      NavHostFragment.findNavController(this).navigate(
+          R.id.enemyEmpireFragment,
+          new EnemyEmpireFragmentArgs.Builder(empire.getID()).build().toBundle());
     };
 
     for (Empire empire : empires) {
-      View view = layoutInflater.inflate(R.layout.alliance_empire_row, null);
+      View view = layoutInflater.inflate(R.layout.alliance_empire_row, parent, false);
       view.setTag(empire);
 
       ImageView empireIcon = view.findViewById(R.id.empire_icon);

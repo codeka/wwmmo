@@ -220,18 +220,18 @@ public class EmpireRankRecyclerViewHelper {
   private class BattleRankViewHolder extends RecyclerView.ViewHolder {
     private EmpireBattleRank battleRank;
 
-    private View itemView;
-    private TextView rankView;
-    private ImageView empireIcon;
-    private TextView empireName;
-    private TextView lastSeen;
-    private TextView totalPopulation;
-    private TextView totalStars;
-    private TextView totalColonies;
-    private TextView totalShips;
-    private TextView totalBuildings;
-    private TextView allianceName;
-    private ImageView allianceIcon;
+    private final View itemView;
+    private final TextView rankView;
+    private final ImageView empireIcon;
+    private final TextView empireName;
+    private final TextView lastSeen;
+    private final TextView totalPopulation;
+    private final TextView totalStars;
+    private final TextView totalColonies;
+    private final TextView totalShips;
+    private final TextView totalBuildings;
+    private final TextView allianceName;
+    private final ImageView allianceIcon;
 
     private BattleRankViewHolder(@NonNull View view){
       super(view);

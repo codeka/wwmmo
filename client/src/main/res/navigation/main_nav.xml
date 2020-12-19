@@ -133,6 +133,9 @@
             android:label="War Worlds">
         <argument android:name="starID" app:argType="integer" android:defaultValue="-1" />
         <argument android:name="fleetID" app:argType="integer" android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_empireFragment_to_enemyEmpireFragment"
+            app:destination="@id/enemyEmpireFragment" />
     </fragment>
     <fragment
             android:id="@+id/chatFragment"
@@ -144,5 +147,17 @@
         android:id="@+id/chatConversationFragment"
         android:name="au.com.codeka.warworlds.game.chat.ChatConversationFragment">
         <argument android:name="conversationID" app:argType="integer" />
+    </fragment>
+    <fragment
+            android:id="@+id/enemyEmpireFragment"
+            android:name="au.com.codeka.warworlds.game.empire.EnemyEmpireFragment">
+        <argument android:name="empireID" app:argType="integer" />
+        <action
+            android:id="@+id/action_enemyEmpireFragment_to_starfieldFragment"
+            app:destination="@id/starfieldFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/starfieldFragment"
+            app:popUpToInclusive="true" />
+
     </fragment>
 </navigation>
