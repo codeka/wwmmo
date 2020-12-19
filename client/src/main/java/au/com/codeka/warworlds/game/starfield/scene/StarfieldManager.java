@@ -226,10 +226,19 @@ public class StarfieldManager {
   public void warpTo(Star star) {
     warpTo(
         star.getSectorX(), star.getSectorY(),
-        star.getOffsetX() - 512.0f, star.getOffsetY() - 512.0f);
+        star.getOffsetX() - 512f, star.getOffsetY() - 512f);
+  }
+
+  public void warpTo(StarCoord starCoord) {
+    warpTo(
+        starCoord.getSectorX(), starCoord.getSectorY(),
+        starCoord.getOffsetX() - 512f, starCoord.getOffsetY() - 512f);
   }
 
   public void warpTo(long sectorX, long sectorY, float offsetX, float offsetY) {
+    // TODO: this is rather inefficient, we should keep sectors that still exist and just move them
+    removeAllSectors();
+
     centerSectorX = sectorX;
     centerSectorY = sectorY;
     sectorRadius = 1;
@@ -246,6 +255,10 @@ public class StarfieldManager {
   /**
    * This is called after we're connected to the server. If this is our first time being called,
    * we'll initialize the scene at the default viewport.
+   *
+   * <p>The advantage of doing it now, rather than when we move to the StarfieldFragment for the
+   * first time is we can get everything loaded and prepared while the welcome fragment is
+   * still showing.
    */
   public void onConnected() {
     if (initialized) {
@@ -651,6 +664,14 @@ public class StarfieldManager {
         sectorSceneObjects.put(sectorCoord, objects);
       }
       objects.add(obj);
+    }
+  }
+
+  private void removeAllSectors() {
+    for (long sy = sectorTop; sy <= sectorBottom; sy++) {
+      for (long sx = sectorLeft; sx <= sectorRight; sx++) {
+        removeSector(new Pair<>(sx, sy));
+      }
     }
   }
 
