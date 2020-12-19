@@ -100,7 +100,6 @@ public class ChatFragment extends BaseFragment {
         firstRefresh = false;
 
         if (args != null) {
-          log.info("")
           final int conversationID = args.getConversationID();
           if (conversationID != 0) {
             int position = 0;

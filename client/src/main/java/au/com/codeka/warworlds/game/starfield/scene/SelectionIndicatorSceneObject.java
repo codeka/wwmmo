@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game.starfield;
+package au.com.codeka.warworlds.game.starfield.scene;
 
 import au.com.codeka.common.Colour;
 import au.com.codeka.warworlds.opengl.DimensionResolver;
