@@ -43,6 +43,7 @@ import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
 import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
 import au.com.codeka.warworlds.game.empire.EmpireFragmentArgs;
+import au.com.codeka.warworlds.game.solarsystem.SolarSystemFragmentArgs;
 import au.com.codeka.warworlds.game.starfield.scene.StarfieldManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -124,9 +125,7 @@ public class StarfieldFragment extends BaseFragment {
             return;
           }
 
-          Bundle args = new Bundle();
-          args.putInt("au.com.codeka.warworlds.StarID", selectedStar.getID());
-          NavHostFragment.findNavController(this).navigate(R.id.solarSystemFragment, args);
+          navigateToPlanet(selectedStar, null, false);
         }, v -> {
           if (selectedStar != null) {
             ScoutReportDialog dialog = new ScoutReportDialog();
@@ -346,9 +345,9 @@ public class StarfieldFragment extends BaseFragment {
    * @param scrollView If {@code true}, we'll also scroll the current view so that given star is
    *                   centered on the given star.
    */
-  public void navigateToPlanet(Star star, Planet planet, boolean scrollView) {
+  public void navigateToPlanet(Star star, @Nullable Planet planet, boolean scrollView) {
     navigateToPlanet(star.getStarType(), star.getSectorX(), star.getSectorY(), star.getID(),
-        star.getOffsetX(), star.getOffsetY(), planet.getIndex(), scrollView);
+        star.getOffsetX(), star.getOffsetY(), planet == null ? -1 : planet.getIndex(), scrollView);
   }
 
   private void navigateToPlanet(StarType starType, long sectorX, long sectorY, int starID,
@@ -358,13 +357,13 @@ public class StarfieldFragment extends BaseFragment {
       starfieldManager.warpTo(sectorX, sectorY, starOffsetX, starOffsetY);
     }
 
-    Bundle args = new Bundle();
-    args.putInt("au.com.codeka.warworlds.StarID", starID);
-    args.putInt("au.com.codeka.warworlds.PlanetIndex", planetIndex);
     if (starType.getType() == Star.Type.Wormhole) {
-      NavHostFragment.findNavController(this).navigate(R.id.wormholeFragment, args);
+      NavHostFragment.findNavController(this).navigate(
+          StarfieldFragmentDirections.actionStarfieldFragmentToWormholeFragment(starID));
     } else {
-      NavHostFragment.findNavController(this).navigate(R.id.solarSystemFragment, args);
+      NavHostFragment.findNavController(this).navigate(
+          StarfieldFragmentDirections.actionStarfieldFragmentToSolarSystemFragment(starID)
+              .setPlanetIndex(planetIndex));
     }
   }
 
