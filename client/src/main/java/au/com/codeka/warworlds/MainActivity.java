@@ -8,19 +8,16 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import java.io.File;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.warworlds.game.starfield.StarfieldManager;
-import au.com.codeka.warworlds.model.PurchaseManager;
+import au.com.codeka.warworlds.game.starfield.scene.StarfieldManager;
 import au.com.codeka.warworlds.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.ui.DrawerController;
 

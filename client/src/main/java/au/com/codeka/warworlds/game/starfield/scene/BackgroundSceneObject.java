@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game.starfield;
+package au.com.codeka.warworlds.game.starfield.scene;
 
 
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ public class BackgroundSceneObject extends SceneObject {
   private final Sprite starfield;
   private final List<Sprite> gases;
   private float zoomAmount;
+  private Sprite tactical;
 
   public BackgroundSceneObject(Scene scene, long sectorX, long sectorY) {
     super(scene.getDimensionResolver());
@@ -64,6 +65,29 @@ public class BackgroundSceneObject extends SceneObject {
     for (Sprite gas : gases) {
       gas.setAlpha(bgAlpha);
     }
+
+    if (tactical == null && bgAlpha < 1.0f) {
+      ensureTacticalObject();
+    }
+    if (tactical != null) {
+      tactical.setAlpha(1.0f - bgAlpha);
+    }
   }
 
+  private void ensureTacticalObject() {
+    Scene scene = getScene();
+    if (scene == null) {
+      // We'll try again when we're attached.
+      return;
+    }
+    Sprite sprite = scene.createSprite(
+        new SpriteTemplate.Builder()
+            .shader(getScene().getSpriteShader())
+            .texture(TacticalTexture.create(sectorX, sectorY))
+            .build());
+
+    sprite.setSize(1024.0f, 1024.0f);
+    addChild(sprite);
+    tactical = sprite;
+  }
 }

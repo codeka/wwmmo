@@ -40,6 +40,7 @@ import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
 import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
 import au.com.codeka.warworlds.game.empire.EmpireFragmentArgs;
+import au.com.codeka.warworlds.game.starfield.scene.StarfieldManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;

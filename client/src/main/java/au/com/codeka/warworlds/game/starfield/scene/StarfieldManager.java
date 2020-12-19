@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game.starfield;
+package au.com.codeka.warworlds.game.starfield.scene;
 
 
 import android.content.Context;
@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.Vector2;
@@ -22,11 +23,11 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseSector;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.model.DesignManager;
+import au.com.codeka.warworlds.game.starfield.StarfieldFragment;
+import au.com.codeka.warworlds.game.starfield.StarfieldGestureDetector;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -197,8 +198,6 @@ public class StarfieldManager {
    * @param fleet The fleet.
    */
   public void setSelectedFleet(@Nullable Star star, @Nullable Fleet fleet) {
-//    Threads.checkOnThread(Threads.UI);
-
     log.debug("setSelectedFleet(%d %s, %d %sx%.1f)",
         star == null ? 0 : star.getID(),
         star == null ? "?" : star.getName(),
@@ -818,9 +817,18 @@ public class StarfieldManager {
       };
 
   private final Camera.CameraUpdateListener cameraUpdateListener
-      = (x, y, dx, dy) -> {
-    //App.i.getTaskRunner().runTask(() -> StarfieldManager.this.onCameraTranslate(x, y), Threads.BACKGROUND)
-    };
+      = (x, y, dx, dy) -> new BackgroundRunner<Void>() {
+        @Override
+        protected Void doInBackground() {
+          onCameraTranslate(x, y);
+          return null;
+        }
+
+        @Override
+        protected void onComplete(Void unused) {
+
+        }
+      }.execute();
 
   private static final class EmpireIconInfo {
     final Empire empire;

@@ -26,10 +26,10 @@ public class SpriteTemplate {
   private final FloatBuffer texCoordBuffer;
   private final ShortBuffer indexBuffer;
   private final SpriteShader shader;
-  private final BitmapTexture texture;
+  private final Texture texture;
 
   public SpriteTemplate(
-      SpriteShader shader, BitmapTexture texture, Vector2 uvTopLeft, Vector2 uvBottomRight) {
+      SpriteShader shader, Texture texture, Vector2 uvTopLeft, Vector2 uvBottomRight) {
     this.shader = shader;
     this.texture = texture;
 
@@ -85,7 +85,7 @@ public class SpriteTemplate {
 
   public static class Builder {
     private SpriteShader shader;
-    private BitmapTexture texture;
+    private Texture texture;
     private Vector2 uvTopLeft;
     private Vector2 uvBottomRight;
 
@@ -97,7 +97,7 @@ public class SpriteTemplate {
       return this;
     }
 
-    public Builder texture(BitmapTexture texture) {
+    public Builder texture(Texture texture) {
       this.texture = texture;
       return this;
     }
