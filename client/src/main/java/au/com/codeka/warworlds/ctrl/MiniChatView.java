@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.text.Html;
 import android.util.AttributeSet;
@@ -15,13 +14,11 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import androidx.navigation.fragment.NavHostFragment;
-
-import au.com.codeka.BackgroundRunner;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.chat.ChatFragment;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -136,24 +133,19 @@ public class MiniChatView extends RelativeLayout {
   private void refreshUnreadCountButton() {
     unreadMsgCount.setVisibility(View.GONE);
 
-    new BackgroundRunner<Integer>() {
-      @Override
-      protected Integer doInBackground() {
-        int numUnread = 0;
-        for (ChatConversation conversation : ChatManager.i.getConversations()) {
-          numUnread += conversation.getUnreadCount();
-        }
-        return numUnread;
+    App.i.getTaskRunner().runTask(() -> {
+      int numUnread = 0;
+      for (ChatConversation conversation : ChatManager.i.getConversations()) {
+        numUnread += conversation.getUnreadCount();
       }
-
-      @Override
-      protected void onComplete(Integer numUnread) {
-        if (numUnread > 0) {
-          unreadMsgCount.setVisibility(View.VISIBLE);
-          unreadMsgCount.setText(String.format(Locale.ENGLISH, "  %d  ", numUnread));
-        }
+      return numUnread;
+    }, Threads.BACKGROUND)
+    .then(numUnread -> {
+      if (numUnread > 0) {
+        unreadMsgCount.setVisibility(View.VISIBLE);
+        unreadMsgCount.setText(String.format(Locale.ENGLISH, "  %d  ", numUnread));
       }
-    }.execute();
+    }, Threads.UI);
   }
 
   private final Object eventHandler = new Object() {

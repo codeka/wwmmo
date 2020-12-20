@@ -1,11 +1,12 @@
 package au.com.codeka.warworlds.model;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.concurrency.Threads;
 
 public class FleetManager {
   private static final Log log = new Log("FleetManager");
@@ -15,33 +16,22 @@ public class FleetManager {
   }
 
   public void updateNotes(final Fleet fleet) {
-    new BackgroundRunner<Boolean>() {
-      @Override
-      protected Boolean doInBackground() {
-        try {
-          Messages.Fleet.Builder fleet_pb = Messages.Fleet.newBuilder()
-              .setKey(fleet.getKey())
-              .setEmpireKey(EmpireManager.i.getEmpire().getKey())
-              .setStarKey(fleet.getStarKey());
-          if (fleet.getNotes() != null) {
-            fleet_pb.setNotes(fleet.getNotes());
-          }
-
-          String url = String.format("stars/%s/fleets/%s", fleet.getStarKey(), fleet.getKey());
-          ApiClient.putProtoBuf(url, fleet_pb.build(), null);
-
-          return true;
-        } catch (Exception e) {
-          log.error("Error updating notes.", e);
-          return null;
+    App.i.getTaskRunner().runTask(() -> {
+      try {
+        Messages.Fleet.Builder fleet_pb = Messages.Fleet.newBuilder()
+            .setKey(fleet.getKey())
+            .setEmpireKey(EmpireManager.i.getEmpire().getKey())
+            .setStarKey(fleet.getStarKey());
+        if (fleet.getNotes() != null) {
+          fleet_pb.setNotes(fleet.getNotes());
         }
-      }
 
-      @Override
-      protected void onComplete(Boolean success) {
-        // do we need to refresh anything? I don't think so...
+        String url = String.format("stars/%s/fleets/%s", fleet.getStarKey(), fleet.getKey());
+        ApiClient.putProtoBuf(url, fleet_pb.build(), null);
+      } catch (Exception e) {
+        log.error("Error updating notes.", e);
       }
-    }.execute();
+    }, Threads.BACKGROUND);
   }
 
   public void boostFleet(final Fleet fleet, final FleetBoostedHandler handler) {
@@ -50,36 +40,27 @@ public class FleetManager {
       return;
     }
 
-    new BackgroundRunner<Boolean>() {
-      @Override
-      protected Boolean doInBackground() {
-        String url = String.format("stars/%s/fleets/%s/orders",
-            fleet.getStarKey(),
-            fleet.getKey());
-        Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
-            .setOrder(Messages.FleetOrder.FLEET_ORDER.BOOST)
-            .build();
+    App.i.getTaskRunner().runTask(() -> {
+      String url = String.format("stars/%s/fleets/%s/orders",
+          fleet.getStarKey(),
+          fleet.getKey());
+      Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
+          .setOrder(Messages.FleetOrder.FLEET_ORDER.BOOST)
+          .build();
 
-        try {
-          return ApiClient.postProtoBuf(url, fleetOrder);
-        } catch (ApiException e) {
-          // TODO: do something..?
-          return false;
+      try {
+        ApiClient.postProtoBuf(url, fleetOrder);
+
+        // the star this fleet is attached to needs to be refreshed...
+        StarManager.i.refreshStar(Integer.parseInt(fleet.getStarKey()));
+
+        if (handler != null) {
+          App.i.getTaskRunner().runTask(() -> handler.onFleetBoosted(fleet), Threads.UI);
         }
+      } catch (ApiException e) {
+        // TODO: do something..?
       }
-
-      @Override
-      protected void onComplete(Boolean success) {
-        if (success) {
-          // the star this fleet is attached to needs to be refreshed...
-          StarManager.i.refreshStar(Integer.parseInt(fleet.getStarKey()));
-
-          if (handler != null) {
-            handler.onFleetBoosted(fleet);
-          }
-        }
-      }
-    }.execute();
+    }, Threads.BACKGROUND);
   }
 
   public void enterWormhole(final Star star, final Fleet fleet, final FleetEnteredWormholeHandler handler) {
@@ -88,43 +69,28 @@ public class FleetManager {
       log.warning("Fleet state isn't IDLE, can't enter the wormhole.");
       return;
     }
-    log.info("HERE 1");
 
-    new BackgroundRunner<Boolean>() {
-      @Override
-      protected Boolean doInBackground() {
-        log.info("HERE 2");
-        String url = String.format("stars/%s/fleets/%s/orders", fleet.getStarKey(), fleet.getKey());
-        log.info(url);
-        Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
-            .setOrder(Messages.FleetOrder.FLEET_ORDER.ENTER_WORMHOLE)
-            .build();
-
-        try {
-          return ApiClient.postProtoBuf(url, fleetOrder);
-        } catch (ApiException e) {
-          // TODO: do something..?
-          return false;
+    App.i.getTaskRunner().runTask(() -> {
+      String url = String.format("stars/%s/fleets/%s/orders", fleet.getStarKey(), fleet.getKey());
+      log.info(url);
+      Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
+          .setOrder(Messages.FleetOrder.FLEET_ORDER.ENTER_WORMHOLE)
+          .build();
+      try {
+        ApiClient.postProtoBuf(url, fleetOrder);
+        // we need to refresh both this star and the destination star
+        if (star.getWormholeExtra() != null) {
+          StarManager.i.refreshStar(star.getWormholeExtra().getDestWormholeID());
         }
-      }
+        StarManager.i.refreshStar(star.getID());
 
-      @Override
-      protected void onComplete(Boolean success) {
-        if (success) {
-          // we need to refresh both this star and the destination star
-          if (star.getWormholeExtra() != null) {
-            StarManager.i.refreshStar(star.getWormholeExtra().getDestWormholeID());
-          }
-          StarManager.i.refreshStar(star.getID());
-
-          if (handler != null) {
-            handler.onFleetEnteredWormhole(fleet);
-          }
-        } else {
-          log.warning("Error entering wormhole.");
+        if (handler != null) {
+          App.i.getTaskRunner().runTask(() -> handler.onFleetEnteredWormhole(fleet), Threads.UI);
         }
+      } catch (ApiException e) {
+        // TODO: do something..?
       }
-    }.execute();
+    }, Threads.BACKGROUND);
   }
 
   public interface FleetBoostedHandler {

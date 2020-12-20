@@ -37,12 +37,11 @@ import java.util.Locale;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -216,74 +215,67 @@ public class WelcomeFragment extends BaseFragment {
   }
 
   private void refreshWelcomeMessage() {
-    new BackgroundRunner<Document>() {
-      @Override
-      protected Document doInBackground() {
-        String url = (String) Util.getProperties().get("welcome.rss");
-        try {
-          // we have to use the built-in one because our special version assume all requests go
-          // to the game server...
-          HttpClient httpClient = new DefaultHttpClient();
-          HttpGet get = new HttpGet(url);
-          get.addHeader(HTTP.USER_AGENT, "wwmmo/" + Util.getVersion());
-          HttpResponse response = httpClient.execute(new HttpGet(url));
-          if (response.getStatusLine().getStatusCode() == 200) {
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setValidating(false);
+    App.i.getTaskRunner().runTask(() -> {
+      String url = (String) Util.getProperties().get("welcome.rss");
+      try {
+        // we have to use the built-in one because our special version assume all requests go
+        // to the game server...
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpGet get = new HttpGet(url);
+        get.addHeader(HTTP.USER_AGENT, "wwmmo/" + Util.getVersion());
+        HttpResponse response = httpClient.execute(new HttpGet(url));
+        if (response.getStatusLine().getStatusCode() == 200) {
+          DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+          builderFactory.setValidating(false);
 
-            DocumentBuilder builder = builderFactory.newDocumentBuilder();
-            return builder.parse(response.getEntity().getContent());
-          }
-        } catch (Exception e) {
-          log.error("Error fetching MOTD.", e);
+          DocumentBuilder builder = builderFactory.newDocumentBuilder();
+          return builder.parse(response.getEntity().getContent());
         }
+      } catch (Exception e) {
+        log.error("Error fetching MOTD.", e);
+      }
+      return null;
+    }, Threads.BACKGROUND).then((Document rss) -> {
+      SimpleDateFormat inputFormat =
+          new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+      SimpleDateFormat outputFormat =
+          new SimpleDateFormat("dd MMM yyyy h:mm a", Locale.US);
 
-        return null;
+      StringBuilder motd = new StringBuilder();
+      if (rss != null) {
+        NodeList itemNodes = rss.getElementsByTagName("item");
+        for (int i = 0; i < itemNodes.getLength(); i++) {
+          Element itemElem = (Element) itemNodes.item(i);
+          String title = itemElem.getElementsByTagName("title").item(0).getTextContent();
+          String content = itemElem.getElementsByTagName("description").item(0).getTextContent();
+          String pubDate = itemElem.getElementsByTagName("pubDate").item(0).getTextContent();
+          String link = itemElem.getElementsByTagName("link").item(0).getTextContent();
+
+          try {
+            Date date = inputFormat.parse(pubDate);
+            motd.append("<h1>");
+            motd.append(outputFormat.format(date));
+            motd.append("</h1>");
+          } catch (ParseException e) {
+            // Shouldn't ever happen.
+          }
+
+          motd.append("<h2>");
+          motd.append(title);
+          motd.append("</h2>");
+          motd.append(content);
+          motd.append("<div style=\"text-align: right; border-bottom: dashed 1px #fff; "
+              + "padding-bottom: 4px;\">");
+          motd.append("<a href=\"");
+          motd.append(link);
+          motd.append("\">");
+          motd.append("View forum post");
+          motd.append("</a></div>");
+        }
       }
 
-      @Override
-      protected void onComplete(Document rss) {
-        SimpleDateFormat inputFormat =
-            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-        SimpleDateFormat outputFormat =
-            new SimpleDateFormat("dd MMM yyyy h:mm a", Locale.US);
-
-        StringBuilder motd = new StringBuilder();
-        if (rss != null) {
-          NodeList itemNodes = rss.getElementsByTagName("item");
-          for (int i = 0; i < itemNodes.getLength(); i++) {
-            Element itemElem = (Element) itemNodes.item(i);
-            String title = itemElem.getElementsByTagName("title").item(0).getTextContent();
-            String content = itemElem.getElementsByTagName("description").item(0).getTextContent();
-            String pubDate = itemElem.getElementsByTagName("pubDate").item(0).getTextContent();
-            String link = itemElem.getElementsByTagName("link").item(0).getTextContent();
-
-            try {
-              Date date = inputFormat.parse(pubDate);
-              motd.append("<h1>");
-              motd.append(outputFormat.format(date));
-              motd.append("</h1>");
-            } catch (ParseException e) {
-              // Shouldn't ever happen.
-            }
-
-            motd.append("<h2>");
-            motd.append(title);
-            motd.append("</h2>");
-            motd.append(content);
-            motd.append("<div style=\"text-align: right; border-bottom: dashed 1px #fff; "
-                + "padding-bottom: 4px;\">");
-            motd.append("<a href=\"");
-            motd.append(link);
-            motd.append("\">");
-            motd.append("View forum post");
-            motd.append("</a></div>");
-          }
-        }
-
-        motdView.loadHtml("html/skeleton.html", motd.toString());
-      }
-    }.execute();
+      motdView.loadHtml("html/skeleton.html", motd.toString());
+    }, Threads.UI);
   }
 
   @Override
@@ -293,7 +285,7 @@ public class WelcomeFragment extends BaseFragment {
     ShieldManager.eventBus.unregister(eventHandler);
   }
 
-  private Object eventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
       // if it's the same as our empire, we'll need to update the icon we're currently showing.

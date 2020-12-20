@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -16,14 +15,15 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.Locale;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.build.BuildFragmentArgs;
@@ -124,25 +124,18 @@ public class OwnedPlanetFragment extends BaseFragment {
             " do."))
         .setTitle("Abandon colony")
         .setPositiveButton("Abandon", (dialog, which) -> {
-          new BackgroundRunner<Void>() {
-            @Override
-            protected Void doInBackground() {
-              String url = String.format("stars/%s/colonies/%s/abandon",
-                  colony.getStarKey(), colony.getKey());
+          App.i.getTaskRunner().runTask(() -> {
+            String url = String.format("stars/%s/colonies/%s/abandon",
+                colony.getStarKey(), colony.getKey());
 
-              RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST").build());
-              return null;
-            }
-
-            @Override
-            protected void onComplete(Void unused) {
-              // notify the StarManager that this star has been updated
+            RequestManager.i.sendRequest(new ApiRequest.Builder(url, "POST").build());
+            App.i.getTaskRunner().runTask(() -> {
               StarManager.i.refreshStar(Integer.parseInt(colony.getStarKey()));
 
               // also finish the activity and go back to the solarsystem view.
               //TODO finish();
-            }
-          }.execute();
+            }, Threads.UI);
+          }, Threads.BACKGROUND);
 
           dialog.dismiss();;
         })

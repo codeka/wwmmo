@@ -12,12 +12,13 @@ import androidx.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.warworlds.App;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -53,17 +54,9 @@ class TacticalTexture extends Texture {
     this.sectorX = sectorX;
     this.sectorY = sectorY;
 
-    new BackgroundRunner<Bitmap>() {
-      @Override
-      protected Bitmap doInBackground() {
-        return createBitmap(sectorX, sectorY);
-      }
-
-      @Override
-      protected void onComplete(Bitmap bitmap) {
-        TacticalTexture.this.bitmap = bitmap;
-      }
-    }.execute();
+    App.i.getTaskRunner().runTask(() -> {
+      bitmap = createBitmap(sectorX, sectorY);
+    }, Threads.BACKGROUND);
   }
 
   public void close() {

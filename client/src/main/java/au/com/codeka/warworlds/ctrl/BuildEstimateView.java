@@ -8,11 +8,15 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import au.com.codeka.BackgroundRunner;
+
+import java.util.Locale;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.Simulation;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.Star;
@@ -62,51 +66,37 @@ public class BuildEstimateView extends FrameLayout {
             return;
         }
 
-        new BackgroundRunner<Boolean>() {
-            private BuildRequest buildRequest;
-            private EmpirePresence empire;
-            private Star starCopy;
+        App.i.getTaskRunner().runTask(() -> {
+            Star starCopy = (Star) star.clone();
+            BuildRequest buildRequest = br;
 
-            @Override
-            protected Boolean doInBackground() {
-                starCopy = (Star) star.clone();
-                buildRequest = br;
-
-                try {
-                    Simulation sim = new Simulation();
-                    sim.simulate(starCopy);
-                    starCopy.getBuildRequests().add(buildRequest);
-                    sim.simulate(starCopy);
-                } catch (Exception e) {
-                    log.error("Error simulating star.", e);
-                    // if we can't simulate, it's some kind of error...
-                    return false;
-                }
-
-                empire = (EmpirePresence) starCopy.getEmpire(br.getEmpireKey());
-                return true;
+            try {
+                Simulation sim = new Simulation();
+                sim.simulate(starCopy);
+                starCopy.getBuildRequests().add(buildRequest);
+                sim.simulate(starCopy);
+            } catch (Exception e) {
+                log.error("Error simulating star.", e);
+                // if we can't simulate, it's some kind of error...
+                return;
             }
 
-            @Override
-            protected void onComplete(Boolean success) {
-                if (success != null && success) {
-                    DateTime endTime = buildRequest.getEndTime();
-    
-                    EmpirePresence empirePresenceBefore = (EmpirePresence) star.getEmpire(br.getEmpireKey());
-                    float deltaMineralsPerHourBefore = 0;
-                    if (empirePresenceBefore != null) {
-                        deltaMineralsPerHourBefore = empirePresenceBefore.getDeltaMineralsPerHour();
-                    }
-                    float deltaMineralsPerHourAfter = empire.getDeltaMineralsPerHour();
+            EmpirePresence empire = (EmpirePresence) starCopy.getEmpire(br.getEmpireKey());
 
-                    timeToBuildText.setText(TimeFormatter.create().format(br.getStartTime(), endTime));
-                    mineralsToBuildText.setText(Html.fromHtml(
-                                                String.format("<font color=\"red\">%d</font>/hr",
-                                                        (int) (deltaMineralsPerHourAfter - deltaMineralsPerHourBefore))));
-                } else {
-                    timeToBuildText.setText("??");
-                    mineralsToBuildText.setText("??");
+            App.i.getTaskRunner().runTask(() -> {
+                DateTime endTime = buildRequest.getEndTime();
+
+                EmpirePresence empirePresenceBefore = (EmpirePresence) star.getEmpire(br.getEmpireKey());
+                float deltaMineralsPerHourBefore = 0;
+                if (empirePresenceBefore != null) {
+                    deltaMineralsPerHourBefore = empirePresenceBefore.getDeltaMineralsPerHour();
                 }
+                float deltaMineralsPerHourAfter = empire.getDeltaMineralsPerHour();
+
+                timeToBuildText.setText(TimeFormatter.create().format(br.getStartTime(), endTime));
+                mineralsToBuildText.setText(Html.fromHtml(
+                    String.format(Locale.US, "<font color=\"red\">%d</font>/hr",
+                        (int) (deltaMineralsPerHourAfter - deltaMineralsPerHourBefore))));
 
                 mRefreshRunning = false;
                 if (mNeedRefresh) {
@@ -115,8 +105,8 @@ public class BuildEstimateView extends FrameLayout {
                         mBuildEstimateRefreshRequiredHandler.onBuildEstimateRefreshRequired();
                     }
                 }
-            }
-        }.execute();
+            }, Threads.UI);
+        }, Threads.BACKGROUND);
     }
 
     public interface BuildEstimateRefreshRequiredHandler {

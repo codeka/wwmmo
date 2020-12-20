@@ -26,12 +26,14 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import au.com.codeka.BackgroundRunner;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BaseActivity;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.notifications.Notifications;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -277,113 +279,86 @@ public class SitrepActivity extends BaseActivity {
   }
 
   private void fetchReportItems(final FetchItemsCompleteHandler handler) {
-    new BackgroundRunner<List<SituationReport>>() {
-      private boolean mHasMore;
-
-      @Override
-      protected List<SituationReport> doInBackground() {
-        String url = "sit-reports";
-        if (starKey != null) {
-          url = String.format("stars/%s/sit-reports", starKey);
-        }
-        boolean hasQuery = false;
-        if (cursor != null) {
-          url += "?cursor=" + cursor;
-          hasQuery = true;
-        }
-        if (filter != null
-            && filter != Messages.SituationReportFilter.ShowAll) {
-          if (hasQuery) {
-            url += "&";
-          } else {
-            url += "?";
-          }
-          url += "filter=" + filter;
-          hasQuery = true;
-        }
-        if (showOldItems) {
-          if (hasQuery) {
-            url += "&";
-          } else {
-            url += "?";
-          }
-          url += "show-old-items=1";
-          hasQuery = true;
-        }
-        log.debug("Fetching: %s", url);
-
-        try {
-          Messages.SituationReports pb = ApiClient.getProtoBuf(url,
-              Messages.SituationReports.class);
-
-          ArrayList<SituationReport> items = new ArrayList<SituationReport>();
-          for (Messages.SituationReport srpb : pb.getSituationReportsList()) {
-            items.add(SituationReport.fromProtocolBuffer(srpb));
-          }
-
-          // grab the cursor we'll need to fetch the next batch
-          mHasMore = pb.hasCursor() && pb.getCursor() != null
-              && !pb.getCursor().equals("");
-          if (mHasMore) {
-            log.debug("Fetched %d items, cursor=%s",
-                pb.getSituationReportsCount(), pb.getCursor());
-            cursor = pb.getCursor();
-          } else {
-            log.debug("Fetched %d items, cursor=<null>",
-                pb.getSituationReportsCount());
-            cursor = null;
-          }
-
-          return items;
-        } catch (ApiException e) {
-          log.error("Error occured fetching situation reports.", e);
-          return null;
-        }
+    App.i.getTaskRunner().runTask(() -> {
+      String url = "sit-reports";
+      if (starKey != null) {
+        url = String.format("stars/%s/sit-reports", starKey);
       }
-
-      @Override
-      protected void onComplete(List<SituationReport> items) {
-        handler.onItemsFetched(items, mHasMore);
+      boolean hasQuery = false;
+      if (cursor != null) {
+        url += "?cursor=" + cursor;
+        hasQuery = true;
       }
-    }.execute();
+      if (filter != null
+          && filter != Messages.SituationReportFilter.ShowAll) {
+        if (hasQuery) {
+          url += "&";
+        } else {
+          url += "?";
+        }
+        url += "filter=" + filter;
+        hasQuery = true;
+      }
+      if (showOldItems) {
+        if (hasQuery) {
+          url += "&";
+        } else {
+          url += "?";
+        }
+        url += "show-old-items=1";
+        hasQuery = true;
+      }
+      log.debug("Fetching: %s", url);
+
+      try {
+        Messages.SituationReports pb = ApiClient.getProtoBuf(url,
+            Messages.SituationReports.class);
+
+        ArrayList<SituationReport> items = new ArrayList<>();
+        for (Messages.SituationReport srpb : pb.getSituationReportsList()) {
+          items.add(SituationReport.fromProtocolBuffer(srpb));
+        }
+
+        // grab the cursor we'll need to fetch the next batch
+        boolean hasMore = pb.hasCursor() && pb.getCursor() != null && !pb.getCursor().equals("");
+        if (hasMore) {
+          log.debug("Fetched %d items, cursor=%s", pb.getSituationReportsCount(), pb.getCursor());
+          cursor = pb.getCursor();
+        } else {
+          log.debug("Fetched %d items, cursor=<null>", pb.getSituationReportsCount());
+          cursor = null;
+        }
+
+        App.i.getTaskRunner().runTask(() -> handler.onItemsFetched(items, hasMore), Threads.UI);
+      } catch (ApiException e) {
+        log.error("Error occured fetching situation reports.", e);
+      }
+    }, Threads.BACKGROUND);
   }
 
   private void markAsRead() {
-    new BackgroundRunner<Boolean>() {
-      @Override
-      protected Boolean doInBackground() {
-        String url = "sit-reports/read";
+    App.i.getTaskRunner().runTask(() -> {
+      String url = "sit-reports/read";
 
-        try {
-          ApiClient.postProtoBuf(url, null, null);
-        } catch (ApiException e) {
-          log.error("Error occured fetching situation reports.", e);
-        }
-
-        return true;
+      try {
+        ApiClient.postProtoBuf(url, null, null);
+      } catch (ApiException e) {
+        log.error("Error occured fetching situation reports.", e);
       }
-
-      @Override
-      protected void onComplete(Boolean success) {
-        refreshReportItems();
-      }
-    }.execute();
+    }, Threads.BACKGROUND).then(this::refreshReportItems, Threads.UI);
   }
 
   private interface FetchItemsCompleteHandler {
-    public void onItemsFetched(List<SituationReport> items, boolean hasMore);
+    void onItemsFetched(List<SituationReport> items, boolean hasMore);
   }
 
   private void refresh() {
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeting greeting) {
-        if (!success) {
-          startActivity(new Intent(SitrepActivity.this, WelcomeFragment.class));
-        } else {
-          refreshReportItems();
-          refreshTitle();
-        }
+    ServerGreeter.waitForHello(this, (success, greeting) -> {
+      if (!success) {
+        startActivity(new Intent(SitrepActivity.this, WelcomeFragment.class));
+      } else {
+        refreshReportItems();
+        refreshTitle();
       }
     });
   }

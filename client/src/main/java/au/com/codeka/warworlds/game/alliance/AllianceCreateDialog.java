@@ -10,12 +10,13 @@ import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 public class AllianceCreateDialog extends DialogFragment {
@@ -42,31 +43,20 @@ public class AllianceCreateDialog extends DialogFragment {
     final Context context = getActivity();
     dismiss();
 
-    new BackgroundRunner<Boolean>() {
-      private String mErrorMsg;
+    App.i.getTaskRunner().runTask(() -> {
+      Messages.Alliance alliance_pb = Messages.Alliance.newBuilder()
+          .setName(allianceName)
+          .build();
 
-      @Override
-      protected Boolean doInBackground() {
-        Messages.Alliance alliance_pb = Messages.Alliance.newBuilder()
-            .setName(allianceName)
-            .build();
-
-        try {
-          return ApiClient.postProtoBuf("alliances", alliance_pb);
-        } catch (ApiException e) {
-          mErrorMsg = e.getServerErrorMessage();
-          return false;
-        }
+      try {
+        ApiClient.postProtoBuf("alliances", alliance_pb);
+        App.i.getTaskRunner().runTask((Runnable) EmpireManager.i::refreshEmpire, Threads.UI);
+      } catch (ApiException e) {
+        App.i.getTaskRunner().runTask(
+            () -> StyledDialog.showErrorMessage(context, e.getServerErrorMessage()),
+            Threads.UI);
       }
 
-      @Override
-      protected void onComplete(Boolean success) {
-        if (!success) {
-          StyledDialog.showErrorMessage(context, mErrorMsg);
-        } else {
-          EmpireManager.i.refreshEmpire();
-        }
-      }
-    }.execute();
+    }, Threads.BACKGROUND);
   }
 }

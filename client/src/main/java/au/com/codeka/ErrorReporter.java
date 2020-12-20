@@ -25,12 +25,14 @@ import android.widget.CheckBox;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 
@@ -112,46 +114,34 @@ public class ErrorReporter {
     }
 
     private void sendErrorReports(final String[] errorReportFiles) {
-      new BackgroundRunner<Boolean>() {
-        @Override
-        protected Boolean doInBackground() {
-          try {
-            log.debug("Sending %d error reports...", errorReportFiles.length);
-            Messages.ErrorReports.Builder error_reports_pb = Messages.ErrorReports.newBuilder();
-            for (String file : errorReportFiles) {
-              FileInputStream ins = null;
-              try {
-                ins = new FileInputStream(reportPath + file);
-                error_reports_pb.addReports(Messages.ErrorReport.parseFrom(ins));
-              } finally {
-                if (ins != null) {
-                  try {
-                    ins.close();
-                  } catch (IOException e) {
-                    // Ignore.
-                  }
+      App.i.getTaskRunner().runTask(() -> {
+        try {
+          log.debug("Sending %d error reports...", errorReportFiles.length);
+          Messages.ErrorReports.Builder error_reports_pb = Messages.ErrorReports.newBuilder();
+          for (String file : errorReportFiles) {
+            FileInputStream ins = null;
+            try {
+              ins = new FileInputStream(reportPath + file);
+              error_reports_pb.addReports(Messages.ErrorReport.parseFrom(ins));
+            } finally {
+              if (ins != null) {
+                try {
+                  ins.close();
+                } catch (IOException e) {
+                  // Ignore.
                 }
               }
             }
+          }
 
-            RequestManager.i.sendRequest(new ApiRequest.Builder("error-reports", "POST")
+          RequestManager.i.sendRequest(new ApiRequest.Builder("error-reports", "POST")
               .body(error_reports_pb.build())
               .build());
-          } catch (Exception e) {
-            log.error("Exception caught sending error reports.", e);
-            return false;
-          }
-
-          return true;
+          App.i.getTaskRunner().runTask(() -> clearErrorReports(errorReportFiles), Threads.UI);
+        } catch (Exception e) {
+          log.error("Exception caught sending error reports.", e);
         }
-
-        @Override
-        protected void onComplete(Boolean result) {
-          if (result) {
-            clearErrorReports(errorReportFiles);
-          }
-        }
-      }.execute();
+      }, Threads.BACKGROUND);
     }
 
     private void clearErrorReports(String[] errorReportFiles) {

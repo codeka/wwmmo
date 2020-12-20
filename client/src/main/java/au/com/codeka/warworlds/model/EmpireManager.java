@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -140,7 +141,7 @@ public class EmpireManager {
           continue;
         }
 
-        String url = String.format("empires/search?ids=%d", empireID);
+        String url = String.format(Locale.ENGLISH, "empires/search?ids=%d", empireID);
         RequestManager.i.sendRequest(new ApiRequest.Builder(url, "GET")
             .completeCallback(createSearchCompleteCallback(null))
             .errorCallback(refreshEmpiresErrorCallback)
@@ -150,12 +151,9 @@ public class EmpireManager {
   }
 
   private final ApiRequest.ErrorCallback refreshEmpiresErrorCallback =
-    new ApiRequest.ErrorCallback() {
-      @Override
-      public void onRequestError(ApiRequest request, Messages.GenericError error) {
+      (request, error) -> {
         // TODO: handle errors
-      }
-    };
+      };
 
   /**
    * Searches empires in the given rank range. This will always include the top three
@@ -203,63 +201,57 @@ public class EmpireManager {
 
   private ApiRequest.CompleteCallback createSearchCompleteCallback(
       @Nullable final SearchCompleteHandler handler) {
-    return new ApiRequest.CompleteCallback() {
-      @Override
-      public void onRequestComplete(ApiRequest request) {
-        List<Empire> empires = new ArrayList<>();
+    return request -> {
+      List<Empire> empires = new ArrayList<>();
 
-        Messages.Empires pbs = request.body(Messages.Empires.class);
-        if (pbs == null) {
-          return;
-        }
-        for (Messages.Empire pb : pbs.getEmpiresList()) {
-          Empire newEmpire = new Empire();
-          newEmpire.fromProtocolBuffer(pb);
-          empires.add(newEmpire);
+      Messages.Empires pbs = request.body(Messages.Empires.class);
+      if (pbs == null) {
+        return;
+      }
+      for (Messages.Empire pb : pbs.getEmpiresList()) {
+        Empire newEmpire = new Empire();
+        newEmpire.fromProtocolBuffer(pb);
+        empires.add(newEmpire);
 
-          if (myEmpire != null && pb.getKey().equals(myEmpire.getKey())) {
-            MyEmpire myEmpire = new MyEmpire();
-            myEmpire.fromProtocolBuffer(pb);
-            newEmpire = myEmpire;
-            if (EmpireManager.this.myEmpire.getAlliance() != null && myEmpire.getAlliance() == null) {
-              log.warning("Old myEmpire has an alliance, new myEmpire does not!!");
-            }
-            EmpireManager.this.myEmpire = myEmpire;
-          } else {
-            newEmpire.fromProtocolBuffer(pb);
-            empireCache.put(newEmpire.getID(), newEmpire);
+        if (myEmpire != null && pb.getKey().equals(myEmpire.getKey())) {
+          MyEmpire myEmpire = new MyEmpire();
+          myEmpire.fromProtocolBuffer(pb);
+          newEmpire = myEmpire;
+          if (EmpireManager.this.myEmpire.getAlliance() != null && myEmpire.getAlliance() == null) {
+            log.warning("Old myEmpire has an alliance, new myEmpire does not!!");
           }
-
+          EmpireManager.this.myEmpire = myEmpire;
+        } else {
+          newEmpire.fromProtocolBuffer(pb);
           empireCache.put(newEmpire.getID(), newEmpire);
-          eventBus.publish(newEmpire);
         }
 
-        if (handler != null) {
-          handler.onSearchComplete(empires);
-        }
+        empireCache.put(newEmpire.getID(), newEmpire);
+        eventBus.publish(newEmpire);
+      }
+
+      if (handler != null) {
+        handler.onSearchComplete(empires);
       }
     };
   }
 
   private ApiRequest.CompleteCallback createBattleRankCompleteCallback(
       final BattleRankCompleteHandler handler) {
-    return new ApiRequest.CompleteCallback() {
-      @Override
-      public void onRequestComplete(ApiRequest request) {
-        List<EmpireBattleRank> ranks = new ArrayList<>();
+    return request -> {
+      List<EmpireBattleRank> ranks = new ArrayList<>();
 
-        Messages.EmpireBattleRanks battleRanksPb = request.body(Messages.EmpireBattleRanks.class);
-        if (battleRanksPb == null) {
-          return;
-        }
-        for (Messages.EmpireBattleRank pb : battleRanksPb.getRanksList()) {
-          EmpireBattleRank battleRank = new EmpireBattleRank();
-          battleRank.fromProtocolBuffer(pb);
-          ranks.add(battleRank);
-        }
-
-        handler.onComplete(ranks);
+      Messages.EmpireBattleRanks battleRanksPb = request.body(Messages.EmpireBattleRanks.class);
+      if (battleRanksPb == null) {
+        return;
       }
+      for (Messages.EmpireBattleRank pb : battleRanksPb.getRanksList()) {
+        EmpireBattleRank battleRank = new EmpireBattleRank();
+        battleRank.fromProtocolBuffer(pb);
+        ranks.add(battleRank);
+      }
+
+      handler.onComplete(ranks);
     };
   }
 
