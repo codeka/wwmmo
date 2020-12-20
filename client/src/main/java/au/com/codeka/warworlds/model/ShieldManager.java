@@ -17,12 +17,13 @@ import android.graphics.Paint;
 import android.os.Build;
 
 import androidx.collection.LruCache;
-import au.com.codeka.BackgroundRunner;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.eventbus.EventBus;
 
 /**
@@ -37,11 +38,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
   private final LruCache<Integer, Bitmap> shields = new LruCache<Integer, Bitmap>(2 * 1024 * 1024) {
     @Override
     protected int sizeOf(Integer key, Bitmap value) {
-      if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
-        return value.getByteCount();
-      } else {
-        return value.getHeight() * value.getRowBytes();
-      }
+      return value.getByteCount();
     }
   };
 
@@ -149,17 +146,9 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
             final Bitmap bmp = request.bodyBitmap();
 
             // Save the image now.
-            new BackgroundRunner<Void>() {
-              @Override
-              protected Void doInBackground() {
-                saveCachedShieldImage(App.i, shieldInfo, addBadgeColor(bmp, shieldInfo));
-                return null;
-              }
-
-              @Override
-              protected void onComplete(Void aVoid) {
-              }
-            }.execute();
+            App.i.getTaskRunner().runTask(
+                () -> saveCachedShieldImage(App.i, shieldInfo, addBadgeColor(bmp, shieldInfo)),
+                Threads.BACKGROUND);
 
             shields.put(shieldInfo.id, bmp);
             // TODO: fix it

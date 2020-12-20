@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.Cash;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Vector2;
@@ -26,10 +25,12 @@ import au.com.codeka.common.model.BaseSector;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.starfield.scene.StarfieldManager;
 import au.com.codeka.warworlds.model.DesignManager;
@@ -357,52 +358,42 @@ public class FleetMoveFragment extends BaseFragment {
 
     EmpireManager.i.getEmpire().addCash(-estimatedCost);
 
-    new BackgroundRunner<Boolean>() {
-      private String mErrorMessage;
-
-      @Override
-      protected Boolean doInBackground() {
-        String url = String.format("stars/%s/fleets/%s/orders", fleet.getStarKey(), fleet.getKey());
-        Messages.FleetOrder.Builder builder =
-            Messages.FleetOrder.newBuilder().setOrder(Messages.FleetOrder.FLEET_ORDER.MOVE);
-        if (markerStar != null) {
-          builder.setSectorX(markerStar.getSectorX());
-          builder.setSectorY(markerStar.getSectorY());
-          builder.setOffsetX(markerStar.getOffsetX());
-          builder.setOffsetY(markerStar.getOffsetY());
-        } else {
-          builder.setStarKey(destStar.getKey());
-        }
-        try {
-          return ApiClient.postProtoBuf(url, builder.build());
-        } catch (ApiException e) {
-          mErrorMessage = e.getServerErrorMessage();
-          return false;
-        }
+    App.i.getTaskRunner().runTask(() -> {
+      String url = String.format("stars/%s/fleets/%s/orders", fleet.getStarKey(), fleet.getKey());
+      Messages.FleetOrder.Builder builder =
+          Messages.FleetOrder.newBuilder().setOrder(Messages.FleetOrder.FLEET_ORDER.MOVE);
+      if (markerStar != null) {
+        builder.setSectorX(markerStar.getSectorX());
+        builder.setSectorY(markerStar.getSectorY());
+        builder.setOffsetX(markerStar.getOffsetX());
+        builder.setOffsetY(markerStar.getOffsetY());
+      } else {
+        builder.setStarKey(destStar.getKey());
       }
+      try {
+        ApiClient.postProtoBuf(url, builder.build());
+        // the star this fleet is attached to needs to be refreshed...
+        StarManager.i.refreshStar(Integer.parseInt(fleet.getStarKey()));
 
-      @Override
-      protected void onComplete(Boolean success) {
-        if (!success) {
+        // the empire needs to be updated, too, since we'll have subtracted
+        // the cost of this move from your cash
+        EmpireManager.i.refreshEmpire(fleet.getEmpireID());
+
+        App.i.getTaskRunner().runTask(
+            () -> NavHostFragment.findNavController(FleetMoveFragment.this).popBackStack(),
+            Threads.UI);
+      } catch (ApiException e) {
+        App.i.getTaskRunner().runTask(() -> {
+          String errorMsg = e.getServerErrorMessage();
           StyledDialog dialog =
               new StyledDialog.Builder(requireContext()).setTitle("Could not move fleet")
-                  .setMessage(mErrorMessage
-                      == null ? "Unable to move fleet, reason unknown." : mErrorMessage)
+                  .setMessage(errorMsg == null ? "Unable to move fleet, reason unknown." : errorMsg)
                   .setPositiveButton("OK", null).create();
           dialog.show();
           moveBtn.setEnabled(true);
-        } else {
-          // the star this fleet is attached to needs to be refreshed...
-          StarManager.i.refreshStar(Integer.parseInt(fleet.getStarKey()));
-
-          // the empire needs to be updated, too, since we'll have subtracted
-          // the cost of this move from your cash
-          EmpireManager.i.refreshEmpire(fleet.getEmpireID());
-
-          NavHostFragment.findNavController(FleetMoveFragment.this).popBackStack();
-        }
+        }, Threads.UI);
       }
-    }.execute();
+    }, Threads.BACKGROUND);
   }
 
   private final StarfieldManager.TapListener tapListener = new StarfieldManager.TapListener() {

@@ -21,10 +21,10 @@ import com.google.common.base.Preconditions;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceShieldManager;
@@ -101,11 +101,10 @@ public class EmpireRankList extends ListView {
 
   private class RankListAdapter extends BaseAdapter {
     private ArrayList<ItemEntry> entries;
-    private BackgroundRunner<ArrayList<ItemEntry>> mEmpireFetcher;
-    private ArrayList<ItemEntry> mWaitingFetch;
+    private final ArrayList<ItemEntry> waitingFetch;
 
     public RankListAdapter() {
-      mWaitingFetch = new ArrayList<>();
+      waitingFetch = new ArrayList<>();
     }
 
     public void setEmpires(List<Empire> empires, boolean addGaps) {
@@ -311,44 +310,37 @@ public class EmpireRankList extends ListView {
     }
 
     private void scheduleEmpireFetch(ItemEntry entry) {
-      synchronized (this) {
-        mWaitingFetch.add(entry);
-        if (mEmpireFetcher == null) {
-          mEmpireFetcher = new BackgroundRunner<ArrayList<ItemEntry>>() {
-            @Override
-            protected ArrayList<ItemEntry> doInBackground() {
-              // wait 150ms to see if there's any more empires to fetch
-              try {
-                Thread.sleep(150);
-              } catch (InterruptedException e) {
-                // Ignore.
-              }
-
-              ArrayList<ItemEntry> toFetch;
-              synchronized (RankListAdapter.this) {
-                toFetch = mWaitingFetch;
-                mWaitingFetch = new ArrayList<>();
-              }
-
-              return toFetch;
-            }
-
-            @Override
-            protected void onComplete(final ArrayList<ItemEntry> toFetch) {
-              ArrayList<Integer> empireIDs = new ArrayList<>();
-              for (ItemEntry entry : toFetch) {
-                if (entry.getRank() != null) {
-                  empireIDs.add(entry.getRank().getEmpireID());
-                }
-              }
-
-              EmpireManager.i.refreshEmpires(empireIDs, false);
-
-              mEmpireFetcher = null;
-            }
-          };
-          mEmpireFetcher.execute();
+      synchronized (waitingFetch) {
+        waitingFetch.add(entry);
+        if (waitingFetch.size() > 1) {
+          return;
         }
+
+        App.i.getTaskRunner().runTask(() -> {
+          // wait 150ms to see if there's any more empires to fetch
+          try {
+            Thread.sleep(150);
+          } catch (InterruptedException e) {
+            // Ignore.
+          }
+
+          ArrayList<ItemEntry> toFetch;
+          synchronized (waitingFetch) {
+            toFetch = new ArrayList<>(waitingFetch);
+            waitingFetch.clear();
+          }
+
+          App.i.getTaskRunner().runTask(() -> {
+            ArrayList<Integer> empireIDs = new ArrayList<>();
+            for (ItemEntry ie : toFetch) {
+              if (ie.getRank() != null) {
+                empireIDs.add(ie.getRank().getEmpireID());
+              }
+            }
+
+            EmpireManager.i.refreshEmpires(empireIDs, false);
+          }, Threads.UI);
+        }, Threads.BACKGROUND);
       }
     }
 

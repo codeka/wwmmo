@@ -33,7 +33,6 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.ErrorReporter;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.safetynet.NonceBuilder;
@@ -41,13 +40,13 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
-import au.com.codeka.warworlds.notifications.Notifications;
 
 /**
  * This class is used to make sure we're said "Hello" to the server and that we've got our
@@ -57,7 +56,6 @@ public class ServerGreeter {
   private static final Log log = new Log("ServerGreeter");
   private static final ArrayList<HelloCompleteHandler> helloCompleteHandlers;
   private static final ArrayList<HelloWatcher> helloWatchers;
-  private static Handler handler;
   private static boolean helloStarted;
   private static boolean helloComplete;
   private static boolean helloSuccessful;
@@ -167,10 +165,6 @@ public class ServerGreeter {
       prefs.edit().putString("AccountName", accountName).apply();
     }
 
-    if (handler == null) {
-      handler = new Handler();
-    }
-
     // Whenever an accessibility service is enabled or disabled, we'll want to clear the hello so
     // that the server is able to verify that it's a supported/allowed service.
     AccessibilityServiceReporter.watchForChanges(activity, () -> {
@@ -187,204 +181,193 @@ public class ServerGreeter {
     SafetyNetClient client = SafetyNet.getClient(activity);
     Task<SafetyNetApi.AttestationResponse> task = client.attest(nonce, SAFETYNET_CLIENT_API_KEY);
 
-    new BackgroundRunner<String>() {
-      private boolean needsEmpireSetup;
-      private boolean errorOccurred;
-      private boolean needsReAuthenticate;
-      private boolean wasEmpireReset;
-      private GiveUpReason giveUpReason;
-      private String resetReason;
-      private String toastMessage;
-      private Intent intent;
+    App.i.getTaskRunner().runTask(() -> {
+      HelloResult res = new HelloResult();
 
-      @Override
-      protected String doInBackground() {
-        handler.post(() -> {
-          synchronized (helloWatchers) {
-            for (HelloWatcher watcher : helloWatchers) {
-              watcher.onAuthenticating();
-            }
-          }
-        });
-
-        // Check that you have a version of Google Play Services installed that we can use (in
-        // particular, for the SafetyNet API). Version 13.0 added support for restricted API keys,
-        // which we use, so make sure it's at least 13.0.
-        if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity, 13000000)
-            != ConnectionResult.SUCCESS) {
-          errorOccurred = true;
-          giveUpReason = GiveUpReason.GOOGLE_PLAY_SERVICES;
-          return "The version of Google Play Services you have needs to be updated.";
-        }
-
-        Realm realm = RealmContext.i.getCurrentRealm();
-        if (!realm.getAuthenticator().isAuthenticated()) {
-          try {
-            log.info("Not authenticated, re-authenticating.");
-            realm.getAuthenticator().authenticate(activity, realm);
-          } catch (ApiException e) {
-            errorOccurred = true;
-            // if it wasn't a network error, it probably means we need to re-auth.
-            needsReAuthenticate = !e.networkError();
-            if (e.getCause() instanceof UserRecoverableAuthException) {
-              intent = ((UserRecoverableAuthException) e.getCause()).getIntent();
-            }
-            if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
-              toastMessage = e.getServerErrorMessage();
-            }
-            return null;
+      App.i.getTaskRunner().runTask(() -> {
+        synchronized (helloWatchers) {
+          for (HelloWatcher watcher : helloWatchers) {
+            watcher.onAuthenticating();
           }
         }
+      }, Threads.UI);
 
-        // Schedule registration with FCM, which will update our device when we get the
-        // registration ID
-        App.i.getNotificationManager().setup();
-        String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey();
-        if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {
-          try {
-            deviceRegistrationKey = DeviceRegistrar.register();
-          } catch (ApiException e) {
-            errorOccurred = true;
-            // only re-authenticate for non-network related errors
-            needsReAuthenticate = !e.networkError();
-            if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
-              toastMessage = e.getServerErrorMessage();
-            }
-            return null;
-          }
-        }
-
-        handler.post(() -> {
-          synchronized (helloWatchers) {
-            for (HelloWatcher watcher : helloWatchers) {
-              watcher.onConnecting();
-            }
-          }
-        });
-
-        String safetyNetAttestationJwsResult;
-        try {
-          SafetyNetApi.AttestationResponse safetyNetAttestation = Tasks.await(task);
-          log.info("SafetyNet attestation: %s", safetyNetAttestation.getJwsResult());
-          safetyNetAttestationJwsResult = safetyNetAttestation.getJwsResult();
-        } catch (Exception e) {
-          // TODO: retry?
-          log.error("SafetyNet attestation error.", e);
-          safetyNetAttestationJwsResult = "ERROR:" + e.toString();
-        }
-
-        // say hello to the server
-        String message;
-        int memoryClass = ((ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE))
-            .getMemoryClass();
-        Messages.HelloRequest req =
-            Messages.HelloRequest.newBuilder()
-                .setDeviceBuild(Build.DISPLAY)
-                .setDeviceManufacturer(Build.MANUFACTURER)
-                .setDeviceModel(Build.MODEL)
-                .setDeviceVersion(Build.VERSION.RELEASE).setMemoryClass(memoryClass)
-                .setAllowInlineNotfications(false)
-                .setNoStarList(true)
-                .setAccessibilitySettingsInfo(AccessibilityServiceReporter.get(activity))
-                .setSafetynetJwsResult(safetyNetAttestationJwsResult)
-                .setSafetynetNonce(ByteString.copyFrom(nonce))
-                .build();
-
-        String url = "hello/" + deviceRegistrationKey;
-        ApiRequest request = new ApiRequest.Builder(url, "PUT").body(req).build();
-        RequestManager.i.sendRequestSync(request);
-        if (request.error() == null) {
-          Messages.HelloResponse resp = request.body(Messages.HelloResponse.class);
-          helloResponsePb = resp;
-          if (resp == null) {
-            errorOccurred = true;
-            return "Unknown error";
-          }
-
-          FeatureFlags.setup(helloResponsePb.getFeatureFlags());
-
-          if (resp.hasEmpire()) {
-            needsEmpireSetup = false;
-            MyEmpire myEmpire = new MyEmpire();
-            myEmpire.fromProtocolBuffer(resp.getEmpire());
-            EmpireManager.i.setup(myEmpire);
-          } else {
-            needsEmpireSetup = true;
-          }
-
-          if (resp.hasWasEmpireReset() && resp.getWasEmpireReset()) {
-            wasEmpireReset = true;
-            if (resp.hasEmpireResetReason() && resp.getEmpireResetReason().length() > 0) {
-              resetReason = resp.getEmpireResetReason();
-            }
-          }
-
-          if (resp.hasRequireGcmRegister() && resp.getRequireGcmRegister()) {
-            log.info("Re-registering for GCM...");
-            //GCMIntentService.register(activity);
-            // we can keep going, though...
-          }
-
-          BuildManager.i.setup(resp.getBuildingStatistics());
-
-          message = resp.getMotd().getMessage();
-          errorOccurred = false;
-        } else {
-          log.error("Error occurred in 'hello': %s", request.error().getErrorMessage());
-          giveUpReason = GiveUpReason.NONE;
-
-          @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-          Throwable exception = request.exception();
-          if (exception != null
-                && (exception.getCause() instanceof UserRecoverableAuthException)) {
-            message = "Authentication failed.";
-            errorOccurred = true;
-            needsReAuthenticate = true;
-            intent = ((UserRecoverableAuthException) exception.getCause()).getIntent();
-          } else if (exception != null) {
-            // if there's no status message, it likely means we were unable to connect
-            // (i.e. a network error) just keep retrying until it works.
-            message = "An error occurred talking to the server, check data connection.";
-            errorOccurred = true;
-            needsReAuthenticate = false;
-          } else if (request.error().getErrorCode()
-              == Messages.GenericError.ErrorCode.UpgradeRequired.getNumber()) {
-            message = request.error().getErrorMessage().replace("\\n", "\n");
-            giveUpReason = GiveUpReason.UPGRADE_REQUIRED;
-            errorOccurred = true;
-            needsReAuthenticate = false;
-          } else if (request.error().getErrorCode()
-              == Messages.GenericError.ErrorCode.AuthenticationError.getNumber()) {
-            // if it's an authentication problem, we'll want to re-authenticate
-            message = "Authentication failed.";
-            errorOccurred = true;
-            needsReAuthenticate = true;
-          } else if (request.error().getErrorCode()
-              == Messages.GenericError.ErrorCode.ClientDeviceRejected.getNumber()) {
-            // the client was rejected for some reason (e.g. auto-clicker installed, failed
-            // SafetyNet validation, etc).
-            message = request.error().getErrorMessage();
-            giveUpReason = GiveUpReason.CLIENT_REJECTED;
-            errorOccurred = true;
-            needsReAuthenticate = false;
-          } else {
-            // any other HTTP error, let's display that
-            message = "An unexpected error occurred:" + request.error().getErrorCode();
-            errorOccurred = true;
-            needsReAuthenticate = false;
-          }
-        }
-
-        return message;
+      // Check that you have a version of Google Play Services installed that we can use (in
+      // particular, for the SafetyNet API). Version 13.0 added support for restricted API keys,
+      // which we use, so make sure it's at least 13.0.
+      if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity, 13000000)
+          != ConnectionResult.SUCCESS) {
+        res.errorOccurred = true;
+        res.giveUpReason = GiveUpReason.GOOGLE_PLAY_SERVICES;
+        res.msg = "The version of Google Play Services you have needs to be updated.";
+        return res;
       }
 
-      @Override
-      protected void onComplete(String result) {
-        if (needsEmpireSetup) {
+      Realm realm = RealmContext.i.getCurrentRealm();
+      if (!realm.getAuthenticator().isAuthenticated()) {
+        try {
+          log.info("Not authenticated, re-authenticating.");
+          realm.getAuthenticator().authenticate(activity, realm);
+        } catch (ApiException e) {
+          res.errorOccurred = true;
+          // if it wasn't a network error, it probably means we need to re-auth.
+          res.needsReAuthenticate = !e.networkError();
+          if (e.getCause() instanceof UserRecoverableAuthException) {
+            res.intent = ((UserRecoverableAuthException) e.getCause()).getIntent();
+          }
+          if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
+            res.toastMessage = e.getServerErrorMessage();
+          }
+          return res;
+        }
+      }
+
+      // Schedule registration with FCM, which will update our device when we get the
+      // registration ID
+      App.i.getNotificationManager().setup();
+      String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey();
+      if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {
+        try {
+          deviceRegistrationKey = DeviceRegistrar.register();
+        } catch (ApiException e) {
+          res.errorOccurred = true;
+          // only re-authenticate for non-network related errors
+          res.needsReAuthenticate = !e.networkError();
+          if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
+            res.toastMessage = e.getServerErrorMessage();
+          }
+          return res;
+        }
+      }
+
+      App.i.getTaskRunner().runTask(() -> {
+        synchronized (helloWatchers) {
+          for (HelloWatcher watcher : helloWatchers) {
+            watcher.onConnecting();
+          }
+        }
+      }, Threads.UI);
+
+      String safetyNetAttestationJwsResult;
+      try {
+        SafetyNetApi.AttestationResponse safetyNetAttestation = Tasks.await(task);
+        log.info("SafetyNet attestation: %s", safetyNetAttestation.getJwsResult());
+        safetyNetAttestationJwsResult = safetyNetAttestation.getJwsResult();
+      } catch (Exception e) {
+        // TODO: retry?
+        log.error("SafetyNet attestation error.", e);
+        safetyNetAttestationJwsResult = "ERROR:" + e.toString();
+      }
+
+      // say hello to the server
+      int memoryClass = ((ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE))
+          .getMemoryClass();
+      Messages.HelloRequest req =
+          Messages.HelloRequest.newBuilder()
+              .setDeviceBuild(Build.DISPLAY)
+              .setDeviceManufacturer(Build.MANUFACTURER)
+              .setDeviceModel(Build.MODEL)
+              .setDeviceVersion(Build.VERSION.RELEASE).setMemoryClass(memoryClass)
+              .setAllowInlineNotfications(false)
+              .setNoStarList(true)
+              .setAccessibilitySettingsInfo(AccessibilityServiceReporter.get(activity))
+              .setSafetynetJwsResult(safetyNetAttestationJwsResult)
+              .setSafetynetNonce(ByteString.copyFrom(nonce))
+              .build();
+
+      String url = "hello/" + deviceRegistrationKey;
+      ApiRequest request = new ApiRequest.Builder(url, "PUT").body(req).build();
+      RequestManager.i.sendRequestSync(request);
+      if (request.error() == null) {
+        Messages.HelloResponse resp = request.body(Messages.HelloResponse.class);
+        helloResponsePb = resp;
+        if (resp == null) {
+          res.errorOccurred = true;
+          res.msg = "Unknown error";
+          return res;
+        }
+
+        FeatureFlags.setup(helloResponsePb.getFeatureFlags());
+
+        if (resp.hasEmpire()) {
+          res.needsEmpireSetup = false;
+          MyEmpire myEmpire = new MyEmpire();
+          myEmpire.fromProtocolBuffer(resp.getEmpire());
+          EmpireManager.i.setup(myEmpire);
+        } else {
+          res.needsEmpireSetup = true;
+        }
+
+        if (resp.hasWasEmpireReset() && resp.getWasEmpireReset()) {
+          res.wasEmpireReset = true;
+          if (resp.hasEmpireResetReason() && resp.getEmpireResetReason().length() > 0) {
+            res.resetReason = resp.getEmpireResetReason();
+          }
+        }
+
+        if (resp.hasRequireGcmRegister() && resp.getRequireGcmRegister()) {
+          log.info("Re-registering for GCM...");
+          //GCMIntentService.register(activity);
+          // we can keep going, though...
+        }
+
+        BuildManager.i.setup(resp.getBuildingStatistics());
+
+        res.msg = resp.getMotd().getMessage();
+        res.errorOccurred = false;
+      } else {
+        log.error("Error occurred in 'hello': %s", request.error().getErrorMessage());
+        res.giveUpReason = GiveUpReason.NONE;
+
+        @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+        Throwable exception = request.exception();
+        if (exception != null
+              && (exception.getCause() instanceof UserRecoverableAuthException)) {
+          res.msg = "Authentication failed.";
+          res.errorOccurred = true;
+          res.needsReAuthenticate = true;
+          res.intent = ((UserRecoverableAuthException) exception.getCause()).getIntent();
+        } else if (exception != null) {
+          // if there's no status message, it likely means we were unable to connect
+          // (i.e. a network error) just keep retrying until it works.
+          res.msg = "An error occurred talking to the server, check data connection.";
+          res.errorOccurred = true;
+          res.needsReAuthenticate = false;
+        } else if (request.error().getErrorCode()
+            == Messages.GenericError.ErrorCode.UpgradeRequired.getNumber()) {
+          res.msg = request.error().getErrorMessage().replace("\\n", "\n");
+          res.giveUpReason = GiveUpReason.UPGRADE_REQUIRED;
+          res.errorOccurred = true;
+          res.needsReAuthenticate = false;
+        } else if (request.error().getErrorCode()
+            == Messages.GenericError.ErrorCode.AuthenticationError.getNumber()) {
+          // if it's an authentication problem, we'll want to re-authenticate
+          res.msg = "Authentication failed.";
+          res.errorOccurred = true;
+          res.needsReAuthenticate = true;
+        } else if (request.error().getErrorCode()
+            == Messages.GenericError.ErrorCode.ClientDeviceRejected.getNumber()) {
+          // the client was rejected for some reason (e.g. auto-clicker installed, failed
+          // SafetyNet validation, etc).
+          res.msg = request.error().getErrorMessage();
+          res.giveUpReason = GiveUpReason.CLIENT_REJECTED;
+          res.errorOccurred = true;
+          res.needsReAuthenticate = false;
+        } else {
+          // any other HTTP error, let's display that
+          res.msg = "An unexpected error occurred:" + request.error().getErrorCode();
+          res.errorOccurred = true;
+          res.needsReAuthenticate = false;
+        }
+      }
+
+      return res;
+    }, Threads.BACKGROUND).then((res) -> {
+        if (res.needsEmpireSetup) {
           serverGreeting.mIntent = new Intent(activity, EmpireSetupActivity.class);
           helloComplete = true;
           helloSuccessful = true;
-        } else if (!errorOccurred) {
+        } else if (!res.errorOccurred) {
           Util.setup(activity);
           ChatManager.i.setup();
           App.i.getNotificationManager().startLongPoll();
@@ -397,15 +380,14 @@ public class ServerGreeter {
         } else /* errorOccurred */ {
           helloSuccessful = false;
 
-          if (toastMessage != null && toastMessage.length() > 0) {
-            Toast toast = Toast.makeText(App.i, toastMessage, Toast.LENGTH_LONG);
+          if (res.toastMessage != null && res.toastMessage.length() > 0) {
+            Toast toast = Toast.makeText(App.i, res.toastMessage, Toast.LENGTH_LONG);
             toast.show();
           }
 
-          if (needsReAuthenticate) {
+          if (res.needsReAuthenticate) {
             // if we need to re-authenticate, first forget the current credentials
             // the switch to the AccountsActivity.
-            final SharedPreferences prefs = Util.getSharedPreferences();
             String currAccountName = prefs.getString("AccountName", null);
             if (currAccountName != null && currAccountName.endsWith("@anon.war-worlds.com")) {
               log.error("Need to re-authenticate, but AccountName is anonymous, cannot re-auth.");
@@ -414,17 +396,17 @@ public class ServerGreeter {
               editor.remove("AccountName");
               editor.apply();
 
-              if (intent != null) {
-                serverGreeting.mIntent = intent;
+              if (res.intent != null) {
+                serverGreeting.mIntent = res.intent;
               } else {
                 serverGreeting.mIntent = new Intent(activity, AccountsActivity.class);
               }
             }
             helloComplete = true;
-          } else if (giveUpReason != GiveUpReason.NONE) {
+          } else if (res.giveUpReason != GiveUpReason.NONE) {
             synchronized (helloWatchers) {
               for (HelloWatcher watcher : helloWatchers) {
-                watcher.onFailed(result, giveUpReason);
+                watcher.onFailed(res.msg, res.giveUpReason);
               }
             }
             helloComplete = true;
@@ -432,33 +414,31 @@ public class ServerGreeter {
             // otherwise, just try again
             synchronized (helloWatchers) {
               for (HelloWatcher watcher : helloWatchers) {
-                watcher.onFailed(result, GiveUpReason.NONE);
+                watcher.onFailed(res.msg, GiveUpReason.NONE);
               }
             }
 
-            handler.postDelayed(new Runnable() {
-              @Override
-              public void run() {
-                synchronized (helloWatchers) {
-                  for (HelloWatcher watcher : helloWatchers) {
-                    watcher.onRetry(retries + 1);
-                  }
+            App.i.getTaskRunner().runTask(() -> {
+              synchronized (helloWatchers) {
+                for (HelloWatcher watcher : helloWatchers) {
+                  watcher.onRetry(retries + 1);
                 }
-
-                sayHello(activity, retries + 1);
               }
-            }, 3000);
+
+              sayHello(activity, retries + 1);
+            }, Threads.UI, 3000);
             helloComplete = false;
           }
         }
 
-        if (wasEmpireReset) {
-          if (resetReason != null && resetReason.equals("blitz")) {
+        if (res.wasEmpireReset) {
+          if (res.resetReason != null && res.resetReason.equals("blitz")) {
             serverGreeting.mIntent = new Intent(activity, BlitzResetActivity.class);
           } else {
             serverGreeting.mIntent = new Intent(activity, EmpireResetActivity.class);
-            if (resetReason != null) {
-              serverGreeting.mIntent.putExtra("au.com.codeka.warworlds.ResetReason", resetReason);
+            if (res.resetReason != null) {
+              serverGreeting.mIntent.putExtra(
+                  "au.com.codeka.warworlds.ResetReason", res.resetReason);
             }
           }
         }
@@ -466,7 +446,7 @@ public class ServerGreeter {
         if (helloComplete) {
           synchronized (helloCompleteHandlers) {
             for (HelloCompleteHandler handler : helloCompleteHandlers) {
-              handler.onHelloComplete(!errorOccurred, serverGreeting);
+              handler.onHelloComplete(!res.errorOccurred, serverGreeting);
             }
             helloCompleteHandlers.clear();
           }
@@ -477,8 +457,19 @@ public class ServerGreeter {
 
           ErrorReporter.register(activity);
         }
-      }
-    }.execute();
+      }, Threads.UI);
+  }
+
+  private static final class HelloResult {
+    public String msg;
+    public boolean needsEmpireSetup;
+    public boolean errorOccurred;
+    public boolean needsReAuthenticate;
+    public boolean wasEmpireReset;
+    public GiveUpReason giveUpReason;
+    public String resetReason;
+    public String toastMessage;
+    public Intent intent;
   }
 
   @SuppressLint({"NewApi"}) // StrictMode doesn't work on < 3.0 and some of the tests are even newer

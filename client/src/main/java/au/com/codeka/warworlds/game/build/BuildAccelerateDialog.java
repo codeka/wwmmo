@@ -16,15 +16,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.api.ApiRequest;
 import au.com.codeka.warworlds.api.RequestManager;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -93,7 +94,7 @@ public class BuildAccelerateDialog extends DialogFragment {
   @Override
   @NonNull
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    final Activity activity = checkNotNull(getActivity());
+    final Activity activity = requireActivity();
     LayoutInflater inflater = activity.getLayoutInflater();
     view = inflater.inflate(R.layout.build_accelerate_dlg, null);
 
@@ -122,12 +123,7 @@ public class BuildAccelerateDialog extends DialogFragment {
 
     return new StyledDialog.Builder(getActivity())
         .setView(view)
-        .setPositiveButton("Accelerate", new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            accelerateBuild();
-          }
-        })
+        .setPositiveButton("Accelerate", (dialog, which) -> accelerateBuild())
         .setNegativeButton("Cancel", null)
         .create();
   }
@@ -168,52 +164,44 @@ public class BuildAccelerateDialog extends DialogFragment {
     final Activity activity = getActivity();
     dismiss();
 
-    new BackgroundRunner<BuildRequest>() {
-      private String mErrorMsg;
+    App.i.getTaskRunner().runTask(() -> {
+      String url = "stars/" + star.getKey() + "/build/" + buildRequest.getKey() + "/accelerate";
+      url += "?amount=" + getAccelerateAmount();
 
-      @Override
-      protected BuildRequest doInBackground() {
-        String url = "stars/" + star.getKey() + "/build/" + buildRequest.getKey() + "/accelerate";
-        url += "?amount=" + getAccelerateAmount();
-
-        try {
-          ApiRequest request = new ApiRequest.Builder(url, "POST").body(null).build();
-          Response resp = RequestManager.i.sendRequestSync(request);
-          if (resp != null && !resp.isSuccessful()) {
-            throw new ApiException();
-          }
-
-          Messages.BuildRequest pb = request.body(Messages.BuildRequest.class);
-          if (pb == null) {
-            return null;
-          }
-
-          BuildRequest br = new BuildRequest();
-          br.fromProtocolBuffer(pb);
-          return br;
-        } catch (ApiException e) {
-          if (e.getServerErrorCode() > 0) {
-            mErrorMsg = e.getServerErrorMessage();
-          }
+      try {
+        ApiRequest request = new ApiRequest.Builder(url, "POST").body(null).build();
+        Response resp = RequestManager.i.sendRequestSync(request);
+        if (resp != null && !resp.isSuccessful()) {
+          throw new ApiException();
         }
 
-        return null;
-      }
+        Messages.BuildRequest pb = request.body(Messages.BuildRequest.class);
+        if (pb == null) {
+          return null;
+        }
 
-      @Override
-      protected void onComplete(BuildRequest buildRequest) {
-        log.debug("Accelerate complete, notifying StarManager to refresh star.");
-        // Tell the StarManager that this star has been updated.
-        StarManager.i.refreshStar(Integer.parseInt(star.getKey()));
-
-        if (mErrorMsg != null && activity != null) {
-          new StyledDialog.Builder(activity.getApplicationContext())
-              .setMessage(mErrorMsg)
-              .setTitle("Error accelerating")
-              .setNeutralButton("OK", null)
-              .create().show(false);
+        BuildRequest br = new BuildRequest();
+        br.fromProtocolBuffer(pb);
+        App.i.getTaskRunner().runTask(() -> {
+          log.debug("Accelerate complete, notifying StarManager to refresh star.");
+          // Tell the StarManager that this star has been updated.
+          StarManager.i.refreshStar(Integer.parseInt(star.getKey()));
+        }, Threads.UI);
+      } catch (ApiException e) {
+        if (e.getServerErrorCode() > 0) {
+          App.i.getTaskRunner().runTask(() -> {
+            if (activity != null) {
+              new StyledDialog.Builder(activity.getApplicationContext())
+                  .setMessage(e.getServerErrorMessage())
+                  .setTitle("Error accelerating")
+                  .setNeutralButton("OK", null)
+                  .create().show(false);
+            }
+          }, Threads.UI);
         }
       }
-    }.execute();
+
+      return null;
+    }, Threads.BACKGROUND);
   }
 }

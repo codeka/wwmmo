@@ -13,6 +13,8 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.concurrency.RunnableQueue;
+import au.com.codeka.warworlds.concurrency.Threads;
 
 /** GLSurfaceView upon which we do all of our rendering. */
 public class RenderSurfaceView extends GLSurfaceView {
@@ -71,8 +73,8 @@ public class RenderSurfaceView extends GLSurfaceView {
     private final TextureManager textureManager;
     private final Camera camera;
     @Nullable private Scene scene;
-    private RunnableQueue runnableQueue;
-    private FrameCounter frameCounter;
+    private final RunnableQueue runnableQueue;
+    private final FrameCounter frameCounter;
 
     public Renderer(Context context) {
       this.multiSampling = true;
@@ -99,7 +101,7 @@ public class RenderSurfaceView extends GLSurfaceView {
       GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       GLES20.glEnable(GLES20.GL_BLEND);
       GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-      //TODO Threads.GL.resetThread();
+      Threads.GL.resetThread();
     }
 
     @Override
@@ -111,7 +113,7 @@ public class RenderSurfaceView extends GLSurfaceView {
 
     @Override
     public void onDrawFrame(final GL10 ignored) {
-      //TODO Threads.GL.setThread(Thread.currentThread(), runnableQueue);
+      Threads.GL.setThread(Thread.currentThread(), runnableQueue);
       frameCounter.onFrame();
 
       // Empty the task queue

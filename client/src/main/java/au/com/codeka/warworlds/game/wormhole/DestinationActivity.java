@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,13 +19,15 @@ import java.util.Locale;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
-import au.com.codeka.BackgroundRunner;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.Empire;
@@ -112,33 +113,30 @@ public class DestinationActivity extends BaseActivity {
               startPosition,
               count,
               searchQuery,
-              new AllianceManager.FetchWormholesCompleteHandler() {
-                @Override
-                public void onWormholesFetched(List<Star> wormholes) {
-                  final View progressBar = findViewById(R.id.progress_bar);
-                  final RecyclerView wormholesList = findViewById(R.id.wormholes);
-                  final View noWormholesMsg = findViewById(R.id.no_wormholes_msg);
+              wormholes1 -> {
+                final View progressBar1 = findViewById(R.id.progress_bar);
+                final RecyclerView wormholesList = findViewById(R.id.wormholes);
+                final View noWormholesMsg1 = findViewById(R.id.no_wormholes_msg);
 
-                  // Remove the current wormhole, since obviously you can't tune to that.
-                  for (int i = 0; i < wormholes.size(); i++) {
-                    if (wormholes.get(i).getID() == getSrcWormhole().getID()) {
-                      wormholes.remove(i);
-                      break;
-                    }
+                // Remove the current wormhole, since obviously you can't tune to that.
+                for (int i = 0; i < wormholes1.size(); i++) {
+                  if (wormholes1.get(i).getID() == getSrcWormhole().getID()) {
+                    wormholes1.remove(i);
+                    break;
                   }
-
-                  progressBar.setVisibility(View.GONE);
-                  if (startPosition == 0 && wormholes.isEmpty()) {
-                    wormholesList.setVisibility(View.GONE);
-                    noWormholesMsg.setVisibility(View.VISIBLE);
-                  } else {
-                    wormholesList.setVisibility(View.VISIBLE);
-                    noWormholesMsg.setVisibility(View.GONE);
-                    tuneTime.setVisibility(View.VISIBLE);
-                  }
-
-                  callback.onRowsFetched(wormholes);
                 }
+
+                progressBar1.setVisibility(View.GONE);
+                if (startPosition == 0 && wormholes1.isEmpty()) {
+                  wormholesList.setVisibility(View.GONE);
+                  noWormholesMsg1.setVisibility(View.VISIBLE);
+                } else {
+                  wormholesList.setVisibility(View.VISIBLE);
+                  noWormholesMsg1.setVisibility(View.GONE);
+                  tuneTime.setVisibility(View.VISIBLE);
+                }
+
+                callback.onRowsFetched(wormholes1);
               });
         } else {
           // TODO: support wormholes in your own empire at least...
@@ -187,27 +185,14 @@ public class DestinationActivity extends BaseActivity {
       public void afterTextChanged(Editable s) {}
     });
 
-    findViewById(R.id.search_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-         searchQuery = search.getText().toString();
-         recyclerViewHelper.refresh();
-      }
+    findViewById(R.id.search_btn).setOnClickListener(view -> {
+       searchQuery = search.getText().toString();
+       recyclerViewHelper.refresh();
     });
 
-    findViewById(R.id.tune_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        onTuneClicked();
-      }
-    });
+    findViewById(R.id.tune_btn).setOnClickListener(view -> onTuneClicked());
 
-    findViewById(R.id.cancel_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        finish();
-      }
-    });
+    findViewById(R.id.cancel_btn).setOnClickListener(view -> finish());
 
     EmpireManager.eventBus.register(eventHandler);
   }
@@ -224,32 +209,27 @@ public class DestinationActivity extends BaseActivity {
       return;
     }
 
-    new BackgroundRunner<Star>() {
-      @Override
-      protected Star doInBackground() {
-        String url = "stars/" + getSrcWormhole().getKey() + "/wormhole/tune";
-        try {
-          Messages.WormholeTuneRequest request_pb = Messages.WormholeTuneRequest.newBuilder()
-              .setSrcStarId(Integer.parseInt(getSrcWormhole().getKey()))
-              .setDestStarId(Integer.parseInt(destWormhole.getKey())).build();
-          Messages.Star pb = ApiClient.postProtoBuf(url, request_pb, Messages.Star.class);
-          Star star = new Star();
-          star.fromProtocolBuffer(pb);
-          return star;
-        } catch (ApiException e) {
-          log.error("Error tuning.", e);
-          return null;
-        }
+    App.i.getTaskRunner().runTask(() -> {
+      String url = "stars/" + getSrcWormhole().getKey() + "/wormhole/tune";
+      try {
+        Messages.WormholeTuneRequest request_pb = Messages.WormholeTuneRequest.newBuilder()
+            .setSrcStarId(Integer.parseInt(getSrcWormhole().getKey()))
+            .setDestStarId(Integer.parseInt(destWormhole.getKey())).build();
+        Messages.Star pb = ApiClient.postProtoBuf(url, request_pb, Messages.Star.class);
+        Star star = new Star();
+        star.fromProtocolBuffer(pb);
+        return star;
+      } catch (ApiException e) {
+        log.error("Error tuning.", e);
+        return null;
       }
-
-      @Override
-      protected void onComplete(Star star) {
-        if (star != null) {
-          StarManager.i.notifyStarUpdated(star);
-          finish();
-        }
+    }, Threads.BACKGROUND)
+    .then((star) -> {
+      if (star != null) {
+        StarManager.i.notifyStarUpdated(star);
+        finish();
       }
-    }.execute();
+    }, Threads.UI);
   }
 
   private final Object eventHandler = new Object() {

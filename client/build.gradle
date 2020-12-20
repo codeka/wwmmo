@@ -3,6 +3,8 @@ import java.util.regex.Pattern
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 Properties props = new Properties()
 props.load(new FileInputStream(file('signing.properties')))
@@ -20,11 +22,11 @@ dependencies {
   implementation 'com.google.android.gms:play-services-auth:19.0.0'
   implementation 'com.google.android.gms:play-services-base:17.5.0'
   implementation 'com.google.android.gms:play-services-safetynet:17.0.0'
-  implementation 'com.google.android.material:material:1.3.0-alpha04'
+  implementation 'com.google.android.material:material:1.3.0-beta01'
   implementation 'com.google.code.gson:gson:2.8.6'
   implementation 'com.google.firebase:firebase-analytics'
   implementation platform('com.google.firebase:firebase-bom:26.1.0')
-  implementation "com.google.firebase:firebase-messaging:21.0.0"
+  implementation "com.google.firebase:firebase-messaging:21.0.1"
   implementation 'com.google.guava:guava:24.1-android'
   implementation 'com.google.protobuf:protobuf-java:3.12.2'
   implementation 'com.squareup.picasso:picasso:2.71828'

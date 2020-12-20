@@ -8,7 +8,6 @@ import java.util.TreeMap;
 import org.joda.time.DateTime;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,26 +19,24 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.fragment.app.FragmentManager;
 import androidx.navigation.fragment.NavHostFragment;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.ctrl.FleetListWormhole;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
-import au.com.codeka.warworlds.game.FleetMoveFragment;
 import au.com.codeka.warworlds.game.FleetMoveFragmentArgs;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
-import au.com.codeka.warworlds.game.empire.FleetsFragment;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -240,49 +237,38 @@ public class WormholeFragment extends BaseFragment {
     postDestroyOrTakeOverRequest("stars/" + star.getKey() + "/wormhole/take-over", false);
   }
 
+  private static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
+    throw (E) e;
+  }
+
   private void postDestroyOrTakeOverRequest(final String url, final boolean destroy) {
     final Activity activity = getActivity();
 
-    new BackgroundRunner<Boolean>() {
-      private String errorMessage;
-
-      @Override
-      protected Boolean doInBackground() {
-        try {
-          ApiClient.postProtoBuf(url, null);
-        } catch (ApiException e) {
-          errorMessage = e.getServerErrorMessage();
-          return false;
-        } catch (Exception e) {
-          log.error("Exception caught sending error reports.", e);
-          return false;
-        }
-
-        return true;
+    App.i.getTaskRunner().runTask(() -> {
+      try {
+        ApiClient.postProtoBuf(url, null);
+      } catch (ApiException e) {
+        sneakyThrow(e);
       }
+    }, Threads.BACKGROUND).then(() -> {
+      SectorManager.i.refreshSector(star.getSectorX(), star.getSectorY());
 
-      @Override
-      protected void onComplete(Boolean result) {
-        if (result) {
-          SectorManager.i.refreshSector(star.getSectorX(), star.getSectorY());
-
-          if (destroy) {
-            // if we've destroyed the star, exit back to the starfield.
-            activity.finish();
-          } else {
-            // otherwise, just refresh the star
-            StarManager.i.refreshStar(star.getID());
-          }
-        } else {
-          if (errorMessage != null) {
-            new StyledDialog.Builder(activity)
-                .setMessage(errorMessage)
-                .setPositiveButton("OK", null)
-                .create().show();
-          }
-        }
+      if (destroy) {
+        // if we've destroyed the star, exit back to the starfield.
+        NavHostFragment.findNavController(this).popBackStack();
+      } else {
+        // otherwise, just refresh the star
+        StarManager.i.refreshStar(star.getID());
       }
-    }.execute();
+    }, Threads.UI).error((ApiException e) -> {
+      String errorMessage = e.getServerErrorMessage();
+      if (errorMessage != null) {
+        new StyledDialog.Builder(activity)
+            .setMessage(errorMessage)
+            .setPositiveButton("OK", null)
+            .create().show();
+      }
+    }, Threads.UI);
   }
 
   private void refreshStar() {
@@ -401,29 +387,23 @@ public class WormholeFragment extends BaseFragment {
       status = disruptorStatusMap.get(wormholeId);
     }
     if (status == null || status.lastCheckTime.isBefore(DateTime.now().minusMinutes(5))) {
-      new BackgroundRunner<Boolean>() {
-        @Override
-        protected Boolean doInBackground() {
-          String url =
-              String.format(Locale.ENGLISH, "stars/%d/wormhole/disruptor-nearby", wormholeId);
-          try {
-            ApiClient.getString(url);
-            return true;
-          } catch (Exception e) {
-            return false;
-          }
+      App.i.getTaskRunner().runTask(() -> {
+        String url =
+            String.format(Locale.ENGLISH, "stars/%d/wormhole/disruptor-nearby", wormholeId);
+        try {
+          ApiClient.getString(url);
+          return true;
+        } catch (ApiException e) {
+          return false;
         }
-
-        @Override
-        protected void onComplete(Boolean found) {
-          synchronized (disruptorStatusMap) {
-            disruptorStatusMap.put(wormholeId, new DisruptorStatus(found));
-          }
-          if (found) {
-            disruptorNearbyCallback.run();
-          }
+      }, Threads.BACKGROUND).then((found) -> {
+        synchronized (disruptorStatusMap) {
+          disruptorStatusMap.put(wormholeId, new DisruptorStatus(found));
         }
-      }.execute();
+        if (found) {
+          disruptorNearbyCallback.run();
+        }
+      }, Threads.UI);
     } else if (status.nearby) {
       disruptorNearbyCallback.run();
     }

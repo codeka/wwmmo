@@ -14,8 +14,9 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.InputStream;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.App;
+import au.com.codeka.warworlds.concurrency.Threads;
 
 /** Represents a texture image. */
 public class BitmapTexture extends Texture {
@@ -69,24 +70,15 @@ public class BitmapTexture extends Texture {
         return;
       }
 
-      new BackgroundRunner<Bitmap>() {
-        @Override
-        protected Bitmap doInBackground() {
-          try {
-            log.info("Loading resource: %s", fileName);
-            InputStream ins = context.getAssets().open(fileName);
-            return BitmapFactory.decodeStream(ins);
-          } catch (IOException e) {
-            log.error("Error loading texture '%s'", fileName, e);
-            return null;
-          }
+      App.i.getTaskRunner().runTask(() -> {
+        try {
+          log.info("Loading resource: %s", fileName);
+          InputStream ins = context.getAssets().open(fileName);
+          bitmap = BitmapFactory.decodeStream(ins);
+        } catch (IOException e) {
+          log.error("Error loading texture '%s'", fileName, e);
         }
-
-        @Override
-        protected void onComplete(Bitmap bmp) {
-          bitmap = bmp;
-        }
-      }.execute();
+      }, Threads.BACKGROUND);
     }
 
     boolean isLoaded() {

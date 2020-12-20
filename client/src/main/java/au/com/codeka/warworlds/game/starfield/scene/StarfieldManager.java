@@ -14,7 +14,6 @@ import java.util.TreeMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.Vector2;
@@ -24,7 +23,9 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseSector;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.ShipDesign;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.ServerGreeter;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.game.starfield.StarfieldGestureDetector;
@@ -118,11 +119,10 @@ public class StarfieldManager {
     camera.setCameraUpdateListener(cameraUpdateListener);
     gestureDetector.create();
 
-/*
     App.i.getTaskRunner().runTask(
         updateMovingFleetsRunnable,
         Threads.UI,
-        UPDATE_MOVING_FLEETS_TIME_MS);*/
+        UPDATE_MOVING_FLEETS_TIME_MS);
 
     StarManager.eventBus.register(eventListener);
     SectorManager.eventBus.register(eventListener);
@@ -838,18 +838,8 @@ public class StarfieldManager {
       };
 
   private final Camera.CameraUpdateListener cameraUpdateListener
-      = (x, y, dx, dy) -> new BackgroundRunner<Void>() {
-        @Override
-        protected Void doInBackground() {
-          onCameraTranslate(x, y);
-          return null;
-        }
-
-        @Override
-        protected void onComplete(Void unused) {
-
-        }
-      }.execute();
+      = (x, y, dx, dy) -> App.i.getTaskRunner().runTask(
+          () -> onCameraTranslate(x, y), Threads.BACKGROUND);
 
   private static final class EmpireIconInfo {
     final Empire empire;

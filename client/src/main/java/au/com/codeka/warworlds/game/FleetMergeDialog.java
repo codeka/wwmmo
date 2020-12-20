@@ -5,24 +5,22 @@ import java.util.Collections;
 import java.util.List;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.ctrl.FleetListRow;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.StarManager;
@@ -137,32 +135,24 @@ public class FleetMergeDialog extends DialogFragment {
   private void doMerge() {
     dismiss();
 
-    new BackgroundRunner<Boolean>() {
-      @Override
-      protected Boolean doInBackground() {
-        String url = String.format("stars/%s/fleets/%s/orders",
-            fleet.getStarKey(),
-            fleet.getKey());
-        Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
-            .setOrder(Messages.FleetOrder.FLEET_ORDER.MERGE)
-            .setMergeFleetKey(selectedFleet.getKey())
-            .build();
+    App.i.getTaskRunner().runTask(() -> {
+      String url = String.format("stars/%s/fleets/%s/orders",
+          fleet.getStarKey(),
+          fleet.getKey());
+      Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
+          .setOrder(Messages.FleetOrder.FLEET_ORDER.MERGE)
+          .setMergeFleetKey(selectedFleet.getKey())
+          .build();
 
-        try {
-          return ApiClient.postProtoBuf(url, fleetOrder);
-        } catch (ApiException e) {
-          // TODO: do something..?
-          return false;
-        }
-      }
+      try {
+        ApiClient.postProtoBuf(url, fleetOrder);
 
-      @Override
-      protected void onComplete(Boolean success) {
         // the star this fleet is attached to needs to be refreshed...
         StarManager.i.refreshStar(Integer.parseInt(fleet.getStarKey()));
+      } catch (ApiException e) {
+        // TODO: do something..?
       }
-
-    }.execute();
+    }, Threads.BACKGROUND);
   }
 
   private void refreshFleets(ArrayList<Fleet> fleets) {

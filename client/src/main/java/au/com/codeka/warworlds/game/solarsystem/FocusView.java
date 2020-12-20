@@ -12,12 +12,13 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
@@ -219,30 +220,21 @@ public class FocusView extends FrameLayout {
     colony.setMiningFocus(getFocusMining());
     colony.setConstructionFocus(getFocusConstruction());
 
-    new BackgroundRunner<Void>() {
-      @Override
-      protected Void doInBackground() {
-        String url = String.format("stars/%s/colonies/%s",
-            colony.getStarKey(),
-            colony.getKey());
+    App.i.getTaskRunner().runTask(() -> {
+      String url = String.format("stars/%s/colonies/%s",
+          colony.getStarKey(),
+          colony.getKey());
 
-        Messages.Colony.Builder pb = Messages.Colony.newBuilder();
-        colony.toProtocolBuffer(pb);
-        try {
-          ApiClient.putProtoBuf(url, pb.build(), Messages.Colony.class);
-        } catch (ApiException e) {
-          log.error("Error updating colony!", e);
-        }
-
-        return null;
+      Messages.Colony.Builder pb = Messages.Colony.newBuilder();
+      colony.toProtocolBuffer(pb);
+      try {
+        ApiClient.putProtoBuf(url, pb.build(), Messages.Colony.class);
+        App.i.getTaskRunner().runTask(() ->
+            StarManager.i.refreshStar(Integer.parseInt(colony.getStarKey())), Threads.UI);
+      } catch (ApiException e) {
+        log.error("Error updating colony!", e);
       }
-
-      @Override
-      protected void onComplete(Void unused) {
-        // notify the StarManager that this star has been updated
-        StarManager.i.refreshStar(Integer.parseInt(colony.getStarKey()));
-      }
-    }.execute();
+    }, Threads.BACKGROUND);
   }
 
   private static String focusToString(float focus) {
