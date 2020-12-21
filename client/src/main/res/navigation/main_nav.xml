@@ -72,6 +72,9 @@
         <action
             android:id="@+id/action_starfieldFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_starfieldFragment_to_sitrepFragment"
+            app:destination="@id/sitrepFragment" />
     </fragment>
     <fragment
             android:id="@+id/solarSystemFragment"
@@ -186,5 +189,12 @@
             app:popUpTo="@id/starfieldFragment"
             app:popUpToInclusive="true" />
 
+    </fragment>
+    <fragment
+            android:id="@+id/sitrepFragment"
+            android:name="au.com.codeka.warworlds.game.SitrepFragment"
+            android:label="SitrepFragment">
+        <argument android:name="starID" app:argType="integer" android:defaultValue="-1" />
+        <argument android:name="realmID" app:argType="integer" android:defaultValue="-1" />
     </fragment>
 </navigation>

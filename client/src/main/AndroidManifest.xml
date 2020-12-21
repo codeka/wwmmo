@@ -70,11 +70,6 @@
     <activity android:name="au.com.codeka.warworlds.game.alliance.AllianceDetailsActivity" />
     <activity android:name="au.com.codeka.warworlds.game.chat.BlockedEmpiresActivity" />
     <activity android:name="au.com.codeka.warworlds.game.wormhole.DestinationActivity" />
-    <activity android:name="au.com.codeka.warworlds.game.SitrepActivity">
-      <meta-data
-        android:name="android.support.PARENT_ACTIVITY"
-        android:value="au.com.codeka.warworlds.game.starfield.StarfieldFragment" />
-    </activity>
 
     <service
             android:name=".notifications.NotificationMessagingService"

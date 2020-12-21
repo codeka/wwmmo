@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,12 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.navigation.fragment.NavHostFragment;
+
+import org.jetbrains.annotations.NotNull;
+
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.Design;
@@ -34,6 +41,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.concurrency.Threads;
+import au.com.codeka.warworlds.game.solarsystem.SolarSystemFragmentArgs;
 import au.com.codeka.warworlds.notifications.Notifications;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -53,81 +61,94 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.ui.BaseFragment;
 
-public class SitrepActivity extends BaseActivity {
+public class SitrepFragment extends BaseFragment {
   private static final Log log = new Log("SitrepActivity");
-  private Context context = this;
   private SituationReportAdapter situationReportAdapter;
-  private String starKey;
-  private Handler handler;
   private String cursor;
   private Messages.SituationReportFilter filter;
   private boolean showOldItems;
 
+  private TextView empireName;
+  private ImageView empireIcon;
+  private ProgressBar progressBar;
+  private ListView reportItems;
+
+
+  @Nullable private SitrepFragmentArgs args;
+
+  @Nullable
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.sitrep);
+  public View onCreateView(
+      @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    return inflater.inflate(R.layout.sitrep, container, false);
+  }
+
+  @Override
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+
+    if (getArguments() != null) {
+      args = SitrepFragmentArgs.fromBundle(requireArguments());
+    }
+
+    empireName = view.findViewById(R.id.empire_name);
+    empireIcon = view.findViewById(R.id.empire_icon);
+    progressBar = view.findViewById(R.id.progress_bar);
+    reportItems = view.findViewById(R.id.report_items);
 
     situationReportAdapter = new SituationReportAdapter();
 
-    starKey = getIntent().getStringExtra("au.com.codeka.warworlds.StarKey");
-    handler = new Handler();
-
-    final ListView reportItems = (ListView) findViewById(R.id.report_items);
+    final ListView reportItems = view.findViewById(R.id.report_items);
     reportItems.setAdapter(situationReportAdapter);
-    reportItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position,
-          long id) {
-        SituationReport sitrep = situationReportAdapter
-            .getSituationReport(position);
-/* TODO
-        Intent intent = new Intent(context, SolarSystemActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.StarKey", sitrep.getStarKey());
+    reportItems.setOnItemClickListener((parent, view1, position, id) -> {
+      SituationReport sitrep = situationReportAdapter.getSituationReport(position);
 
-        if (sitrep.getPlanetIndex() >= 0) {
-          intent.putExtra("au.com.codeka.warworlds.PlanetIndex",
-              sitrep.getPlanetIndex());
-        }
+      SolarSystemFragmentArgs.Builder argsBuilder =
+          new SolarSystemFragmentArgs.Builder(Integer.parseInt(sitrep.getStarKey()));
 
-        SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
-        if (mcr != null) {
-          if (mcr.getScoutReportKey() != null
-              && mcr.getScoutReportKey().length() > 0) {
-            // if there's a scout report, we'll want to show that
-            intent.putExtra("au.com.codeka.warworlds.ShowScoutReport", true);
-          }
-        }
-
-        String combatReportKey = null;
-        SituationReport.FleetUnderAttackRecord fuar = sitrep
-            .getFleetUnderAttackRecord();
-        if (fuar != null) {
-          combatReportKey = fuar.getCombatReportKey();
-        }
-        SituationReport.FleetDestroyedRecord fdr = sitrep
-            .getFleetDestroyedRecord();
-        if (fdr != null) {
-          combatReportKey = fdr.getCombatReportKey();
-        }
-        SituationReport.FleetVictoriousRecord fvr = sitrep
-            .getFleetVictoriousRecord();
-        if (fvr != null) {
-          combatReportKey = fvr.getCombatReportKey();
-        }
-
-        if (combatReportKey != null) {
-          intent.putExtra("au.com.codeka.warworlds.CombatReportKey",
-              combatReportKey);
-        }
-
-        startActivity(intent);
-*/
+      if (sitrep.getPlanetIndex() >= 0) {
+        argsBuilder.setPlanetIndex(sitrep.getPlanetIndex());
       }
+
+      SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
+      if (mcr != null) {
+        if (mcr.getScoutReportKey() != null
+            && mcr.getScoutReportKey().length() > 0) {
+          // if there's a scout report, we'll want to show that
+          argsBuilder.setShowScoutReport(true);
+        }
+      }
+
+      String combatReportKey = null;
+      SituationReport.FleetUnderAttackRecord fuar = sitrep
+          .getFleetUnderAttackRecord();
+      if (fuar != null) {
+        combatReportKey = fuar.getCombatReportKey();
+      }
+      SituationReport.FleetDestroyedRecord fdr = sitrep
+          .getFleetDestroyedRecord();
+      if (fdr != null) {
+        combatReportKey = fdr.getCombatReportKey();
+      }
+      SituationReport.FleetVictoriousRecord fvr = sitrep
+          .getFleetVictoriousRecord();
+      if (fvr != null) {
+        combatReportKey = fvr.getCombatReportKey();
+      }
+
+      if (combatReportKey != null) {
+        argsBuilder.setShowCombatReport(true)
+            .setCombatReportID(Integer.parseInt(combatReportKey));
+      }
+
+      NavHostFragment.findNavController(this).navigate(
+          R.id.solarSystemFragment, argsBuilder.build().toBundle());
     });
 
-    final Spinner filterSpinner = (Spinner) findViewById(R.id.filter);
+    final Spinner filterSpinner = view.findViewById(R.id.filter);
     filterSpinner.setAdapter(new FilterAdapter());
     filterSpinner
         .setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -144,64 +165,46 @@ public class SitrepActivity extends BaseActivity {
           }
         });
 
-    final Button markReadBtn = (Button) findViewById(R.id.mark_read);
-    if (starKey != null) {
+    final Button markReadBtn = view.findViewById(R.id.mark_read);
+    if (args != null && args.getStarID() > 0) {
       markReadBtn.setVisibility(View.GONE);
     } else {
-      markReadBtn.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          markAsRead();
-        }
-      });
+      markReadBtn.setOnClickListener(v -> markAsRead());
     }
 
-    final CheckBox showOldItemsChk = (CheckBox) findViewById(R.id.show_read);
-    showOldItemsChk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-          @Override
-          public void onCheckedChanged(CompoundButton buttonView,
-              boolean isChecked) {
-            showOldItems = showOldItemsChk.isChecked();
-            refreshReportItems();
-          }
-        });
-
-    int realmID = getIntent().getIntExtra("au.com.codeka.warworlds.RealmID", 0);
-    if (realmID != 0) {
-      RealmManager.i.selectRealm(realmID);
-    }
-  }
-
-  @Override
-  public void onResumeFragments() {
-    super.onResumeFragments();
-
-    ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-      @Override
-      public void onHelloComplete(boolean success, ServerGreeting greeting) {
-        if (!success) {
-          startActivity(new Intent(SitrepActivity.this, WelcomeFragment.class));
-        }
-        refresh();
-      }
+    final CheckBox showOldItemsChk = view.findViewById(R.id.show_read);
+    showOldItemsChk.setOnCheckedChangeListener((buttonView, isChecked) -> {
+      showOldItems = showOldItemsChk.isChecked();
+      refreshReportItems();
     });
+
+    if (args != null && args.getRealmID() > 0) {
+      RealmManager.i.selectRealm(args.getRealmID());
+    }
   }
 
   @Override
-  protected void onStart() {
+  public void onResume() {
+    super.onResume();
+
+    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> refresh());
+  }
+
+  @Override
+  public void onStart() {
     super.onStart();
-    ShieldManager.eventBus.register(mEventHandler);
-    StarManager.eventBus.register(mEventHandler);
+    ShieldManager.eventBus.register(eventHandler);
+    StarManager.eventBus.register(eventHandler);
   }
 
   @Override
-  protected void onStop() {
+  public void onStop() {
     super.onStop();
-    ShieldManager.eventBus.unregister(mEventHandler);
-    StarManager.eventBus.unregister(mEventHandler);
+    ShieldManager.eventBus.unregister(eventHandler);
+    StarManager.eventBus.unregister(eventHandler);
   }
 
-  private Object mEventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
       refreshTitle();
@@ -209,7 +212,7 @@ public class SitrepActivity extends BaseActivity {
 
     @EventHandler
     public void onStarUpdated(Star star) {
-      if (starKey != null && star.getID() == Integer.parseInt(starKey)) {
+      if (args != null && args.getStarID() > 0 && star.getID() == args.getStarID()) {
         refreshTitle();
       }
       situationReportAdapter.notifyDataSetChanged();
@@ -217,10 +220,8 @@ public class SitrepActivity extends BaseActivity {
   };
 
   private void refreshTitle() {
-    final TextView empireName = (TextView) findViewById(R.id.empire_name);
-    final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
 
-    if (starKey == null) {
+    if (args == null || args.getStarID() < 0) {
       // clear all our notifications
       Notifications.clearNotifications();
 
@@ -230,10 +231,10 @@ public class SitrepActivity extends BaseActivity {
         // TODO: add an "empire updated" listener here!
         empireName.setText(empire.getDisplayName());
         empireIcon
-            .setImageBitmap(EmpireShieldManager.i.getShield(this, empire));
+            .setImageBitmap(EmpireShieldManager.i.getShield(requireContext(), empire));
       }
     } else {
-      Star star = StarManager.i.getStar(Integer.parseInt(starKey));
+      Star star = StarManager.i.getStar(args.getStarID());
       if (star != null) {
         empireName.setText(star.getName());
         Sprite starSprite = StarImageManager.getInstance().getSprite(
@@ -245,44 +246,35 @@ public class SitrepActivity extends BaseActivity {
   }
 
   private void refreshReportItems() {
-    final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-    final ListView reportItems = (ListView) findViewById(R.id.report_items);
-
     progressBar.setVisibility(View.VISIBLE);
     reportItems.setVisibility(View.GONE);
 
     cursor = null;
-    fetchReportItems(new FetchItemsCompleteHandler() {
-      @Override
-      public void onItemsFetched(List<SituationReport> items, boolean hasMore) {
-        progressBar.setVisibility(View.GONE);
-        reportItems.setVisibility(View.VISIBLE);
+    fetchReportItems((items, hasMore) -> {
+      progressBar.setVisibility(View.GONE);
+      reportItems.setVisibility(View.VISIBLE);
 
-        situationReportAdapter.setItems(items, hasMore);
-      }
+      situationReportAdapter.setItems(items, hasMore);
     });
   }
 
   private void fetchNextReportItems() {
-    fetchReportItems(new FetchItemsCompleteHandler() {
-      @Override
-      public void onItemsFetched(List<SituationReport> items, boolean hasMore) {
-        if (items == null || items.size() == 0) {
-          // if there's no more, we set the cursor to null so the adapter knows
-          // there's no more
-          SitrepActivity.this.cursor = null;
-        }
-
-        situationReportAdapter.appendItems(items, hasMore);
+    fetchReportItems((items, hasMore) -> {
+      if (items == null || items.size() == 0) {
+        // if there's no more, we set the cursor to null so the adapter knows
+        // there's no more
+        SitrepFragment.this.cursor = null;
       }
+
+      situationReportAdapter.appendItems(items, hasMore);
     });
   }
 
   private void fetchReportItems(final FetchItemsCompleteHandler handler) {
     App.i.getTaskRunner().runTask(() -> {
       String url = "sit-reports";
-      if (starKey != null) {
-        url = String.format("stars/%s/sit-reports", starKey);
+      if (args != null && args.getStarID() > 0) {
+        url = String.format(Locale.ENGLISH, "stars/%d/sit-reports", args.getStarID());
       }
       boolean hasQuery = false;
       if (cursor != null) {
@@ -331,7 +323,7 @@ public class SitrepActivity extends BaseActivity {
 
         App.i.getTaskRunner().runTask(() -> handler.onItemsFetched(items, hasMore), Threads.UI);
       } catch (ApiException e) {
-        log.error("Error occured fetching situation reports.", e);
+        log.error("Error occurred fetching situation reports.", e);
       }
     }, Threads.BACKGROUND);
   }
@@ -353,13 +345,9 @@ public class SitrepActivity extends BaseActivity {
   }
 
   private void refresh() {
-    ServerGreeter.waitForHello(this, (success, greeting) -> {
-      if (!success) {
-        startActivity(new Intent(SitrepActivity.this, WelcomeFragment.class));
-      } else {
-        refreshReportItems();
-        refreshTitle();
-      }
+    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+      refreshReportItems();
+      refreshTitle();
     });
   }
 
@@ -452,7 +440,7 @@ public class SitrepActivity extends BaseActivity {
       View view = convertView;
 
       if (view == null) {
-        LayoutInflater inflater = (LayoutInflater) getSystemService(
+        LayoutInflater inflater = (LayoutInflater) requireContext().getSystemService(
             Context.LAYOUT_INFLATER_SERVICE);
         if (position < items.size()) {
           view = inflater.inflate(R.layout.sitrep_row, parent, false);
@@ -462,16 +450,8 @@ public class SitrepActivity extends BaseActivity {
       }
 
       if (position >= items.size()) {
-        // note: once this view comes into... view, we'll want to load the next
-        // lot of
-        // reports
-        handler.postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            fetchNextReportItems();
-          }
-        }, 100);
-
+        // note: once this view comes into... view, we'll want to load the next lot of reports.
+        App.i.getTaskRunner().runTask(SitrepFragment.this::fetchNextReportItems, Threads.UI, 100);
         return view;
       }
 
@@ -479,12 +459,11 @@ public class SitrepActivity extends BaseActivity {
       Star star = StarManager.i.getStar(Integer.parseInt(sitrep.getStarKey()));
       String msg = sitrep.getDescription(star);
 
-      TextView reportTitle = (TextView) view.findViewById(R.id.report_title);
-      TextView reportContent = (TextView) view
-          .findViewById(R.id.report_content);
-      TextView reportTime = (TextView) view.findViewById(R.id.report_time);
-      ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
-      ImageView overlayIcon = (ImageView) view.findViewById(R.id.overlay_icon);
+      TextView reportTitle = view.findViewById(R.id.report_title);
+      TextView reportContent = view.findViewById(R.id.report_content);
+      TextView reportTime = view.findViewById(R.id.report_time);
+      ImageView starIcon = view.findViewById(R.id.star_icon);
+      ImageView overlayIcon = view.findViewById(R.id.overlay_icon);
 
       if (star != null) {
         int imageSize = (int) (star.getSize() * star.getStarType().getImageScale() * 2);
@@ -565,13 +544,12 @@ public class SitrepActivity extends BaseActivity {
       return view;
     }
 
-    private TextView getCommonView(int position, View convertView,
-        ViewGroup parent) {
+    private TextView getCommonView(int position, View convertView, ViewGroup parent) {
       TextView view;
       if (convertView != null) {
         view = (TextView) convertView;
       } else {
-        view = new TextView(context);
+        view = new TextView(requireContext());
         view.setGravity(Gravity.CENTER_VERTICAL);
       }
 
