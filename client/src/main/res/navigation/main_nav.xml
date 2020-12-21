@@ -192,8 +192,7 @@
     </fragment>
     <fragment
             android:id="@+id/sitrepFragment"
-            android:name="au.com.codeka.warworlds.game.SitrepFragment"
-            android:label="SitrepFragment">
+            android:name="au.com.codeka.warworlds.game.SitrepFragment">
         <argument android:name="starID" app:argType="integer" android:defaultValue="-1" />
         <argument android:name="realmID" app:argType="integer" android:defaultValue="-1" />
     </fragment>
