@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +31,6 @@ import au.com.codeka.warworlds.ctrl.StarStorageView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
-import au.com.codeka.warworlds.game.SitrepFragment;
 import au.com.codeka.warworlds.game.SitrepFragmentArgs;
 import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
 import au.com.codeka.warworlds.model.Colony;

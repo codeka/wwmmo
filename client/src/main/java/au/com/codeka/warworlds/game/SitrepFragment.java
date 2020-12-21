@@ -1,14 +1,9 @@
 package au.com.codeka.warworlds.game;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -19,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -30,26 +24,25 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.navigation.fragment.NavHostFragment;
 
-import org.jetbrains.annotations.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
-import au.com.codeka.warworlds.BaseActivity;
-import au.com.codeka.warworlds.concurrency.Threads;
-import au.com.codeka.warworlds.game.solarsystem.SolarSystemFragmentArgs;
-import au.com.codeka.warworlds.notifications.Notifications;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
-import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.eventbus.EventHandler;
+import au.com.codeka.warworlds.game.solarsystem.SolarSystemFragmentArgs;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -61,6 +54,7 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.notifications.Notifications;
 import au.com.codeka.warworlds.ui.BaseFragment;
 
 public class SitrepFragment extends BaseFragment {
@@ -70,8 +64,6 @@ public class SitrepFragment extends BaseFragment {
   private Messages.SituationReportFilter filter;
   private boolean showOldItems;
 
-  private TextView empireName;
-  private ImageView empireIcon;
   private ProgressBar progressBar;
   private ListView reportItems;
 
@@ -94,8 +86,6 @@ public class SitrepFragment extends BaseFragment {
       args = SitrepFragmentArgs.fromBundle(requireArguments());
     }
 
-    empireName = view.findViewById(R.id.empire_name);
-    empireIcon = view.findViewById(R.id.empire_icon);
     progressBar = view.findViewById(R.id.progress_bar);
     reportItems = view.findViewById(R.id.report_items);
 
@@ -187,7 +177,9 @@ public class SitrepFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> refresh());
+    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+      refresh();
+    });
   }
 
   @Override
@@ -220,6 +212,8 @@ public class SitrepFragment extends BaseFragment {
   };
 
   private void refreshTitle() {
+    ActionBar actionBar = requireMainActivity().requireSupportActionBar();
+    actionBar.setSubtitle("Situation Report");
 
     if (args == null || args.getStarID() < 0) {
       // clear all our notifications
@@ -229,17 +223,18 @@ public class SitrepFragment extends BaseFragment {
 
       if (empire != null) {
         // TODO: add an "empire updated" listener here!
-        empireName.setText(empire.getDisplayName());
-        empireIcon
-            .setImageBitmap(EmpireShieldManager.i.getShield(requireContext(), empire));
+        actionBar.setTitle(empire.getDisplayName());
+        actionBar.setIcon(
+            new BitmapDrawable(
+                requireContext().getResources(),
+                EmpireShieldManager.i.getShield(requireContext(), empire)));
       }
     } else {
       Star star = StarManager.i.getStar(args.getStarID());
       if (star != null) {
-        empireName.setText(star.getName());
-        Sprite starSprite = StarImageManager.getInstance().getSprite(
-            star, empireIcon.getWidth(), true);
-        empireIcon.setImageDrawable(new SpriteDrawable(starSprite));
+        actionBar.setTitle(star.getName());
+        Sprite starSprite = StarImageManager.getInstance().getSprite(star, 64, true);
+        actionBar.setIcon(new SpriteDrawable(starSprite));
       }
     }
 
