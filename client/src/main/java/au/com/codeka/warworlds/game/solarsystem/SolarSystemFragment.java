@@ -32,9 +32,9 @@ import au.com.codeka.warworlds.ctrl.StarStorageView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
-import au.com.codeka.warworlds.game.SitrepActivity;
+import au.com.codeka.warworlds.game.SitrepFragment;
+import au.com.codeka.warworlds.game.SitrepFragmentArgs;
 import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
-import au.com.codeka.warworlds.game.starfield.StarfieldFragment;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -113,9 +113,9 @@ public class SolarSystemFragment extends BaseFragment {
         return; // can happen before the star loads
       }
 
-      Intent intent = new Intent(getActivity(), SitrepActivity.class);
-      intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-      startActivity(intent);
+      NavHostFragment.findNavController(this).navigate(
+          R.id.sitrepFragment,
+          new SitrepFragmentArgs.Builder().setStarID(star.getID()).build().toBundle());
     });
 
     planetViewButton.setOnClickListener(v -> onViewColony());

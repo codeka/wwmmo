@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -19,9 +18,6 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.android.billingclient.api.Purchase;
 import com.google.common.collect.Lists;
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
@@ -30,7 +26,6 @@ import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.BaseStar.StarType;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
@@ -38,12 +33,10 @@ import au.com.codeka.warworlds.ctrl.InfobarView;
 import au.com.codeka.warworlds.ctrl.MiniChatView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
-import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
 import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
 import au.com.codeka.warworlds.game.empire.EmpireFragmentArgs;
-import au.com.codeka.warworlds.game.solarsystem.SolarSystemFragmentArgs;
 import au.com.codeka.warworlds.game.starfield.scene.StarfieldManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -72,8 +65,6 @@ public class StarfieldFragment extends BaseFragment {
   private Purchase starRenamePurchase;
 
   @Nullable private StarfieldFragmentArgs args;
-
-  private static final int SITREP_REQUEST = 3;
 
   @Nullable
   @Override
@@ -211,8 +202,7 @@ public class StarfieldFragment extends BaseFragment {
   }
 
   public void openSitrepActivity() {
-    Intent intent = new Intent(requireContext(), SitrepActivity.class);
-    startActivityForResult(intent, SITREP_REQUEST);
+    NavHostFragment.findNavController(this).navigate(R.id.sitrepFragment);
   }
 
   public void onAllianceClick() {

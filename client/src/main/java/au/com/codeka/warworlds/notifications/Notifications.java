@@ -25,7 +25,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
 import android.text.Html;
 import android.util.Base64;
 
@@ -42,7 +41,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.game.DesignHelper;
-import au.com.codeka.warworlds.game.SitrepActivity;
+import au.com.codeka.warworlds.game.SitrepFragment;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -61,7 +60,6 @@ import au.com.codeka.warworlds.model.StarManager;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.squareup.picasso.Picasso;
 
 public class Notifications {
   private static final Log log = new Log("Notifications");
@@ -264,14 +262,19 @@ public class Notifications {
       List<NotificationDetails> notifications) {
     // we want to add the StarfieldActivity to the "back stack" of the situation report so that
     // when you press "back" from the sitrep you go to the starfield.
-    Intent intent = new Intent(context, SitrepActivity.class);
+
+    /*
+    TODO: we need to start the main activity if it's not already started...
+    Intent intent = new Intent(context, SitrepFragment.class);
     intent.putExtra("au.com.codeka.warworlds.RealmID", notifications.get(0).realm.getID());
     PendingIntent pendingIntent =
-        TaskStackBuilder.create(context).addParentStack(SitrepActivity.class).addNextIntent(intent)
+        TaskStackBuilder.create(context).addParentStack(SitrepFragment.class).addNextIntent(intent)
             .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+     */
+
 
     NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-    builder.setContentIntent(pendingIntent);
+//    builder.setContentIntent(pendingIntent);
     builder.setSmallIcon(R.drawable.status_icon);
     builder.setAutoCancel(true);
 
