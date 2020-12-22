@@ -364,7 +364,7 @@ public class ServerGreeter {
       return res;
     }, Threads.BACKGROUND).then((res) -> {
         if (res.needsEmpireSetup) {
-// TODO          serverGreeting.mIntent = new Intent(activity, EmpireSetupActivity.class);
+          serverGreeting.fragmentID = R.id.empireSetupFragment;
           helloComplete = true;
           helloSuccessful = true;
         } else if (!res.errorOccurred) {

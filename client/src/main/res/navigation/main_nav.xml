@@ -24,6 +24,9 @@
         <action
             android:id="@+id/action_welcomeFragment_to_accountsFragment"
             app:destination="@id/accountsFragment" />
+        <action
+            android:id="@+id/action_welcomeFragment_to_empireSetupFragment"
+            app:destination="@id/empireSetupFragment" />
     </fragment>
     <fragment
             android:id="@+id/globalOptionsFragment"
@@ -217,5 +220,15 @@
         android:id="@+id/blockedEmpiresFragment"
         android:name="au.com.codeka.warworlds.game.chat.BlockedEmpiresFragment"
         android:label="BlockedEmpiresFragment" />
+    <fragment
+        android:id="@+id/empireSetupFragment"
+        android:name="au.com.codeka.warworlds.EmpireSetupFragment"
+        android:label="EmpireSetupFragment" >
+        <action
+            android:id="@+id/action_empireSetupFragment_to_accountsFragment"
+            app:destination="@id/accountsFragment"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>
