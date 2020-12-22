@@ -80,7 +80,7 @@ public class BuildFragment extends BaseFragment {
   @Override
   public void onStart() {
     super.onStart();
-    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
       StarManager.eventBus.register(eventHandler);
       Star star = StarManager.i.getStar(args.getStarID());
       if (star != null) {

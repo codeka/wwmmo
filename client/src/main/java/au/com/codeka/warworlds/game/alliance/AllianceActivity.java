@@ -18,7 +18,7 @@ public class AllianceActivity extends TabFragmentActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
+/*TODO
     ServerGreeter.waitForHello(this, (success, greeting) -> {
       if (!success) {
         startActivity(new Intent(this, WelcomeFragment.class));
@@ -44,6 +44,7 @@ public class AllianceActivity extends TabFragmentActivity {
         }
       }
     });
+ */
   }
 
   @Override

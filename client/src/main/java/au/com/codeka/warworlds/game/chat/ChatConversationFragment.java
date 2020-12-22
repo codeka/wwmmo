@@ -137,9 +137,8 @@ public class ChatConversationFragment extends BaseFragment {
       chatUnavailableContainer.setVisibility(View.VISIBLE);
 
       Button signInBtn = v.findViewById(R.id.sign_in_btn);
-      signInBtn.setOnClickListener(v12 -> {
-        final Intent intent = new Intent(getContext(), AccountsFragment.class);
-        startActivity(intent);
+      signInBtn.setOnClickListener(v1 -> {
+        NavHostFragment.findNavController(this).navigate(R.id.accountsFragment);
       });
 
       Button cancelBtn = v.findViewById(R.id.cancel_btn);

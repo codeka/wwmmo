@@ -187,7 +187,7 @@ public class WormholeFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(getActivity(),
+    ServerGreeter.waitForHello(requireMainActivity(),
         (success, greeting) -> {
           Bundle extras = requireArguments();
           int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");

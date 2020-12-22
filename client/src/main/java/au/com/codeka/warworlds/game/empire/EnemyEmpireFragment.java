@@ -70,7 +70,7 @@ public class EnemyEmpireFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
       if (!success) {
         // TODO:??
       } else {

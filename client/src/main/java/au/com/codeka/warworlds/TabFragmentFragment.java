@@ -9,10 +9,12 @@ import android.widget.TabHost;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import au.com.codeka.warworlds.ui.BaseFragment;
+
 /**
  * Similar to TabFragmentActivity, but this one puts the tabs into a fragment.
  */
-public abstract class TabFragmentFragment extends Fragment {
+public abstract class TabFragmentFragment extends BaseFragment {
     private TabManager mTabManager;
     private TabHost mTabHost;
     private View mRootView;

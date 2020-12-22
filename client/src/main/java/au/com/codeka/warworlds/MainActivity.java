@@ -33,6 +33,7 @@ public class MainActivity extends BaseActivity {
   private DrawerController drawerController;
   private StarfieldManager starfieldManager;
   private ImagePickerHelper imagePickerHelper;
+  private NavController navController;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,7 +65,7 @@ public class MainActivity extends BaseActivity {
   protected void onStart() {
     super.onStart();
 
-    NavController navController = Navigation.findNavController(this, R.id.main_content);
+    navController = Navigation.findNavController(this, R.id.main_content);
 
     final SharedPreferences prefs = Util.getSharedPreferences();
     if (!prefs.getBoolean("WarmWelcome", false)) {
@@ -138,6 +139,10 @@ public class MainActivity extends BaseActivity {
 
   public ActionBar requireSupportActionBar() {
     return checkNotNull(getSupportActionBar());
+  }
+
+  public NavController getNavController() {
+    return navController;
   }
 
   private boolean onBlueStacks() {
