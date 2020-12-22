@@ -24,6 +24,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -95,7 +96,13 @@ public class WormholeFragment extends BaseFragment {
 
     Button destinationBtn = contentView.findViewById(R.id.destination_btn);
     destinationBtn.setOnClickListener(
-        v -> startActivity(DestinationActivity.newStartIntent(getActivity(), star)));
+        v -> {
+          Bundle args = new Bundle();
+          Messages.Star.Builder sb = Messages.Star.newBuilder();
+          star.toProtocolBuffer(sb);
+          args.putByteArray("srcWormhole", sb.build().toByteArray());
+          NavHostFragment.findNavController(this).navigate(R.id.destinationFragment, args);
+        });
 
     Button viewDestinationBtn = contentView.findViewById(R.id.view_destination_btn);
     viewDestinationBtn.setOnClickListener(v -> {

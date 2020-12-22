@@ -7,23 +7,25 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import java.util.List;
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.RecyclerView
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
-import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -38,14 +40,15 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.ui.BaseFragment;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-public class DestinationActivity extends BaseActivity {
+public class DestinationFragment extends BaseFragment {
   private static final Log log = new Log("DestinationActivity");
   private Star srcWormhole;
   private Star destWormhole;
   private DestinationRecyclerViewHelper recyclerViewHelper;
+
+  private EditText search;
 
   private int searchTextChangeCount;
   private boolean searchTextChangePosted;
@@ -54,19 +57,9 @@ public class DestinationActivity extends BaseActivity {
 
   @Nullable private String searchQuery;
 
-  /** Create an {@link Intent} needed to start this activity. */
-  public static Intent newStartIntent(Context context, Star srcWormhole) {
-    Messages.Star.Builder starBuilder = Messages.Star.newBuilder();
-    srcWormhole.toProtocolBuffer(starBuilder);
-
-    Intent intent = new Intent(context, DestinationActivity.class);
-    intent.putExtra("srcWormhole", starBuilder.build().toByteArray());
-    return intent;
-  }
-
   private Star getSrcWormhole() {
     if (srcWormhole == null) {
-      Bundle args = checkNotNull(getIntent().getExtras());
+      Bundle args = requireArguments();
       srcWormhole = new Star();
       try {
         Messages.Star starMsg = Messages.Star.parseFrom(args.getByteArray("srcWormhole"));
@@ -79,17 +72,23 @@ public class DestinationActivity extends BaseActivity {
     return srcWormhole;
   }
 
-  @SuppressLint("InflateParams")
+  @Nullable
   @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  public View onCreateView(
+      @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    return inflater.inflate(R.layout.wormhole_destination, container, false);
+  }
 
-    setContentView(R.layout.wormhole_destination);
+  @Override
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
 
-    final View progressBar = findViewById(R.id.progress_bar);
-    final RecyclerView wormholes = findViewById(R.id.wormholes);
-    final View noWormholesMsg = findViewById(R.id.no_wormholes_msg);
-    final TextView tuneTime = findViewById(R.id.tune_time);
+    final View progressBar = view.findViewById(R.id.progress_bar);
+    final RecyclerView wormholes = view.findViewById(R.id.wormholes);
+    final View noWormholesMsg = view.findViewById(R.id.no_wormholes_msg);
+    final TextView tuneTime = view.findViewById(R.id.tune_time);
+    search = view.findViewById(R.id.search);
 
     final MyEmpire myEmpire = EmpireManager.i.getEmpire();
     recyclerViewHelper = new DestinationRecyclerViewHelper(
@@ -99,7 +98,7 @@ public class DestinationActivity extends BaseActivity {
       @Override
       public void onWormholeClick(Star wormhole) {
         destWormhole = wormhole;
-        findViewById(R.id.tune_btn).setEnabled(true);
+        view.findViewById(R.id.tune_btn).setEnabled(true);
       }
 
       @Override
@@ -114,9 +113,9 @@ public class DestinationActivity extends BaseActivity {
               count,
               searchQuery,
               wormholes1 -> {
-                final View progressBar1 = findViewById(R.id.progress_bar);
-                final RecyclerView wormholesList = findViewById(R.id.wormholes);
-                final View noWormholesMsg1 = findViewById(R.id.no_wormholes_msg);
+                final View progressBar1 = view.findViewById(R.id.progress_bar);
+                final RecyclerView wormholesList = view.findViewById(R.id.wormholes);
+                final View noWormholesMsg1 = view.findViewById(R.id.no_wormholes_msg);
 
                 // Remove the current wormhole, since obviously you can't tune to that.
                 for (int i = 0; i < wormholes1.size(); i++) {
@@ -149,10 +148,10 @@ public class DestinationActivity extends BaseActivity {
     tuneTime.setVisibility(View.GONE);
     noWormholesMsg.setVisibility(View.GONE);
 
-    TextView starName = findViewById(R.id.star_name);
+    TextView starName = view.findViewById(R.id.star_name);
     starName.setText(getSrcWormhole().getName());
 
-    ImageView starIcon = findViewById(R.id.star_icon);
+    ImageView starIcon = view.findViewById(R.id.star_icon);
     Sprite starSprite = StarImageManager.getInstance().getSprite(getSrcWormhole(), 60, true);
     starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
@@ -167,7 +166,7 @@ public class DestinationActivity extends BaseActivity {
             tuneTimeHours,
             tuneTimeHours == 1 ? "" : "s"));
 
-    final EditText search = findViewById(R.id.search);
+    final EditText search = view.findViewById(R.id.search);
     search.addTextChangedListener(new TextWatcher() {
       @Override
       public void beforeTextChanged(CharSequence s, int start, int before, int count) {}
@@ -185,14 +184,15 @@ public class DestinationActivity extends BaseActivity {
       public void afterTextChanged(Editable s) {}
     });
 
-    findViewById(R.id.search_btn).setOnClickListener(view -> {
+    view.findViewById(R.id.search_btn).setOnClickListener(v -> {
        searchQuery = search.getText().toString();
        recyclerViewHelper.refresh();
     });
 
-    findViewById(R.id.tune_btn).setOnClickListener(view -> onTuneClicked());
+    view.findViewById(R.id.tune_btn).setOnClickListener(v -> onTuneClicked());
 
-    findViewById(R.id.cancel_btn).setOnClickListener(view -> finish());
+    view.findViewById(R.id.cancel_btn).setOnClickListener(
+        v -> NavHostFragment.findNavController(this).popBackStack());
 
     EmpireManager.eventBus.register(eventHandler);
   }
@@ -227,7 +227,7 @@ public class DestinationActivity extends BaseActivity {
     .then((star) -> {
       if (star != null) {
         StarManager.i.notifyStarUpdated(star);
-        finish();
+        NavHostFragment.findNavController(this).popBackStack();
       }
     }, Threads.UI);
   }
@@ -258,7 +258,6 @@ public class DestinationActivity extends BaseActivity {
 
     @Override
     public void run() {
-      final EditText search = findViewById(R.id.search);
       searchQuery = search.getText().toString();
       recyclerViewHelper.refresh();
 
