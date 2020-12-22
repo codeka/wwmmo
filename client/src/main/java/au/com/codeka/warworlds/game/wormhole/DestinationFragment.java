@@ -21,7 +21,7 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
