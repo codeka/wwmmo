@@ -30,8 +30,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.fragment.NavHostFragment;
 
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
@@ -216,7 +216,7 @@ public class ChatConversationFragment extends BaseFragment {
     chatAdapter.appendMessage(msg);
   }
 
-  private Object eventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onShieldUpdated(ShieldManager.ShieldUpdatedEvent event) {
       if (conversation.getID() < 0) {
@@ -466,7 +466,7 @@ public class ChatConversationFragment extends BaseFragment {
 
     Button blockedBtn = view.findViewById(R.id.blocked_btn);
     blockedBtn.setOnClickListener(
-        v -> startActivity(new Intent(getActivity(), BlockedEmpiresActivity.class)));
+        v -> NavHostFragment.findNavController(this).navigate(R.id.blockedEmpiresFragment));
 
     Button newGroupBtn = view.findViewById(R.id.new_group_btn);
     newGroupBtn.setOnClickListener(
