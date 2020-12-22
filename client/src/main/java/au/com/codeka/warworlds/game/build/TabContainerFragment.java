@@ -16,7 +16,7 @@ import au.com.codeka.warworlds.model.StarManager;
 public class TabContainerFragment extends TabFragmentFragment {
   @Override
   protected void createTabs() {
-    Activity activity = Preconditions.checkNotNull(requireActivity());
+    Activity activity = requireActivity();
     Bundle bundleArgs = requireArguments();
 
     getTabManager().addTab(

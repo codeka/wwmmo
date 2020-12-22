@@ -61,7 +61,6 @@
 
     <activity android:name="au.com.codeka.warworlds.EmpireResetActivity" />
     <activity android:name="au.com.codeka.warworlds.BlitzResetActivity" android:exported="true" />
-    <activity android:name="au.com.codeka.warworlds.game.alliance.AllianceActivity" />
     <activity
       android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsActivity"
       android:windowSoftInputMode="stateUnchanged" />

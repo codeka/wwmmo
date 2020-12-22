@@ -85,6 +85,9 @@
         <action
             android:id="@+id/action_starfieldFragment_to_sitrepFragment"
             app:destination="@id/sitrepFragment" />
+        <action
+            android:id="@+id/action_starfieldFragment_to_allianceFragment"
+            app:destination="@id/allianceFragment" />
     </fragment>
     <fragment
             android:id="@+id/solarSystemFragment"
@@ -230,5 +233,9 @@
             app:popUpTo="@id/welcomeFragment"
             app:popUpToInclusive="true" />
     </fragment>
+    <fragment
+        android:id="@+id/allianceFragment"
+        android:name="au.com.codeka.warworlds.game.alliance.AllianceFragment"
+        android:label="AllianceFragment" />
 
 </navigation>

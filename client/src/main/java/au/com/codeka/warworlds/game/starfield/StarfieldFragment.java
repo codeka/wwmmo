@@ -34,7 +34,7 @@ import au.com.codeka.warworlds.ctrl.MiniChatView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.StarRenameDialog;
-import au.com.codeka.warworlds.game.alliance.AllianceActivity;
+import au.com.codeka.warworlds.game.alliance.AllianceFragment;
 import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
 import au.com.codeka.warworlds.game.empire.EmpireFragmentArgs;
 import au.com.codeka.warworlds.game.starfield.scene.StarfieldManager;
@@ -206,8 +206,7 @@ public class StarfieldFragment extends BaseFragment {
   }
 
   public void onAllianceClick() {
-    Intent intent = new Intent(requireContext(), AllianceActivity.class);
-    startActivity(intent);
+    NavHostFragment.findNavController(this).navigate(R.id.allianceFragment);
   }
 
   public int getBottomPaneHeight() {
