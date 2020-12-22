@@ -25,6 +25,9 @@ public class StorageBuildingEffect extends BuildingEffect {
     Colony colony = (Colony) baseColony;
     for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
       EmpirePresence empirePresence = (EmpirePresence) baseEmpirePresence;
+      if (empirePresence == null || colony.getEmpireID() == null) {
+        return;
+      }
       if (empirePresence.getEmpireID() == colony.getEmpireID()) {
         empirePresence.setMaxGoods(empirePresence.getMaxGoods() + goods);
         empirePresence.setMaxMinerals(empirePresence.getMaxMinerals() + minerals);

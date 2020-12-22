@@ -64,11 +64,11 @@ public class PropagandizingCompleteEvent extends Event {
             invalidFleets.add(fleetID);
           }
         } catch (Exception e) {
-          log.error("Error processing fleet-move event!", e);
+          log.error("Error processing propagandizing-complete event!", e);
         }
       }
     } catch (Exception e) {
-      log.error("Error processing fleet-move event!", e);
+      log.error("Error processing propagandizing-complete event!", e);
     }
 
     for (Integer fleetID : invalidFleets) {
