@@ -66,7 +66,7 @@ public class EmpireSetupActivity extends BaseActivity {
   private void switchAccount() {
     SharedPreferences prefs = Util.getSharedPreferences();
     prefs.edit().putString("AccountName", null).apply();
-    startActivity(new Intent(this, AccountsActivity.class));
+    startActivity(new Intent(this, AccountsFragment.class));
     finish();
   }
 

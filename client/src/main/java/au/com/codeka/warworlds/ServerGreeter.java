@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Debug;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.StrictMode;
 import android.widget.Toast;
 
@@ -400,7 +399,7 @@ public class ServerGreeter {
               if (res.intent != null) {
                 serverGreeting.mIntent = res.intent;
               } else {
-                serverGreeting.mIntent = new Intent(activity, AccountsActivity.class);
+                serverGreeting.mIntent = new Intent(activity, AccountsFragment.class);
               }
             }
             helloComplete = true;
