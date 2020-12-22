@@ -103,6 +103,9 @@
             android:id="@+id/wormholeFragment"
             android:name="au.com.codeka.warworlds.game.wormhole.WormholeFragment">
         <argument android:name="starID" app:argType="integer" />
+        <action
+            android:id="@+id/action_wormholeFragment_to_destinationFragment"
+            app:destination="@id/destinationFragment" />
     </fragment>
     <fragment
             android:id="@+id/planetPagerFragment"
@@ -196,4 +199,8 @@
         <argument android:name="starID" app:argType="integer" android:defaultValue="-1" />
         <argument android:name="realmID" app:argType="integer" android:defaultValue="-1" />
     </fragment>
+    <fragment
+        android:id="@+id/destinationFragment"
+        android:name="au.com.codeka.warworlds.game.wormhole.DestinationFragment"
+        android:label="DestinationFragment" />
 </navigation>
