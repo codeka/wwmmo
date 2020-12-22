@@ -177,7 +177,7 @@ public class SitrepFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
       refresh();
     });
   }
@@ -340,7 +340,7 @@ public class SitrepFragment extends BaseFragment {
   }
 
   private void refresh() {
-    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
       refreshReportItems();
       refreshTitle();
     });

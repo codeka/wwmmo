@@ -111,11 +111,11 @@ public class ServerGreeter {
   /**
    * Wait for hello.
    *
-   * @param activity And {@link Activity} that we'll use as context. If you don't want to actually
+   * @param activity The {@link MainActivity} that we'll use as context. If you don't want to actually
    *                 start the hello process, you can pass null for this.
    * @param handler A callback that will be called when successfully connected to the server.
    */
-  public static void waitForHello(@Nullable Activity activity, HelloCompleteHandler handler) {
+  public static void waitForHello(@Nullable MainActivity activity, HelloCompleteHandler handler) {
     if (helloComplete) {
       log.debug("Already said 'hello', not saying it again...");
       handler.onHelloComplete(helloSuccessful, serverGreeting);
@@ -133,7 +133,7 @@ public class ServerGreeter {
     }
   }
 
-  private static void sayHello(@NonNull final Activity activity, final int retries) {
+  private static void sayHello(@NonNull final MainActivity activity, final int retries) {
     Util.setup(activity);
     log.debug("Saying 'hello'...");
 
@@ -363,7 +363,7 @@ public class ServerGreeter {
       return res;
     }, Threads.BACKGROUND).then((res) -> {
         if (res.needsEmpireSetup) {
-          serverGreeting.mIntent = new Intent(activity, EmpireSetupActivity.class);
+// TODO          serverGreeting.mIntent = new Intent(activity, EmpireSetupActivity.class);
           helloComplete = true;
           helloSuccessful = true;
         } else if (!res.errorOccurred) {
@@ -396,9 +396,9 @@ public class ServerGreeter {
               editor.apply();
 
               if (res.intent != null) {
-                serverGreeting.mIntent = res.intent;
+                serverGreeting.intent = res.intent;
               } else {
-                serverGreeting.mIntent = new Intent(activity, AccountsFragment.class);
+                serverGreeting.fragmentID = R.id.accountsFragment;
               }
             }
             helloComplete = true;
@@ -432,12 +432,12 @@ public class ServerGreeter {
 
         if (res.wasEmpireReset) {
           if (res.resetReason != null && res.resetReason.equals("blitz")) {
-            serverGreeting.mIntent = new Intent(activity, BlitzResetActivity.class);
+// TODO            serverGreeting.mIntent = new Intent(activity, BlitzResetActivity.class);
           } else {
-            serverGreeting.mIntent = new Intent(activity, EmpireResetActivity.class);
+// TODO            serverGreeting.mIntent = new Intent(activity, EmpireResetActivity.class);
             if (res.resetReason != null) {
-              serverGreeting.mIntent.putExtra(
-                  "au.com.codeka.warworlds.ResetReason", res.resetReason);
+// TODO              serverGreeting.mIntent.putExtra(
+//                  "au.com.codeka.warworlds.ResetReason", res.resetReason);
             }
           }
         }
@@ -450,8 +450,11 @@ public class ServerGreeter {
             helloCompleteHandlers.clear();
           }
 
-          if (serverGreeting.mIntent != null) {
-            activity.startActivity(serverGreeting.mIntent);
+          if (serverGreeting.fragmentID > 0) {
+            activity.getNavController().navigate(serverGreeting.fragmentID);
+          }
+          if (serverGreeting.intent != null) {
+            activity.startActivity(serverGreeting.intent);
           }
 
           ErrorReporter.register(activity);
@@ -531,10 +534,15 @@ public class ServerGreeter {
   }
 
   public static class ServerGreeting {
-    private Intent mIntent;
+    private Intent intent;
+    private int fragmentID;
+
+    public int getFragmentID() {
+      return fragmentID;
+    }
 
     public Intent getIntent() {
-      return mIntent;
+      return intent;
     }
   }
 

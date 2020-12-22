@@ -145,7 +145,7 @@ public class WelcomeFragment extends BaseFragment {
 
     ShieldManager.eventBus.register(eventHandler);
 
-    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
       if (success) {
         // we'll display a bit of debugging info along with the 'connected' message
         long maxMemoryBytes = Runtime.getRuntime().maxMemory();
@@ -188,8 +188,7 @@ public class WelcomeFragment extends BaseFragment {
   }
 
   private void onReauthClick() {
-    final Intent intent = new Intent(requireContext(), AccountsFragment.class);
-    startActivity(intent);
+    NavHostFragment.findNavController(this).navigate(R.id.accountsFragment);
   }
 
   private void maybeShowSignInPrompt() {

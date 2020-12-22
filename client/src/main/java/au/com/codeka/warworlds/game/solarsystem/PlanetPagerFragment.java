@@ -78,7 +78,7 @@ public class PlanetPagerFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
       if (!success) {
         // TODO: is this still a thing?
       } else {

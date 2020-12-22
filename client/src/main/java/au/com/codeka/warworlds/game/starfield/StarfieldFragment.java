@@ -141,7 +141,7 @@ public class StarfieldFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
     ServerGreeter.waitForHello(
-        requireActivity(), (success, greeting) -> {
+        requireMainActivity(), (success, greeting) -> {
       if (!success) {
         return;
       }

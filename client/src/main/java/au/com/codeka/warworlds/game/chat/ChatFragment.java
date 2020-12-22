@@ -93,7 +93,7 @@ public class ChatFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
       refreshConversations();
 
       if (firstRefresh) {

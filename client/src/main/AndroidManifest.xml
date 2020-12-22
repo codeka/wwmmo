@@ -59,7 +59,6 @@
       </intent-filter>
     </activity>
 
-    <activity android:name="au.com.codeka.warworlds.AccountsFragment" />
     <activity android:name="au.com.codeka.warworlds.EmpireSetupActivity" />
     <activity android:name="au.com.codeka.warworlds.EmpireResetActivity" />
     <activity android:name="au.com.codeka.warworlds.BlitzResetActivity" android:exported="true" />

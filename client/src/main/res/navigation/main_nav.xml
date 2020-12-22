@@ -21,6 +21,9 @@
                 app:launchSingleTop="true"
                 app:popUpTo="@id/main_nav"
                 app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_welcomeFragment_to_accountsFragment"
+            app:destination="@id/accountsFragment" />
     </fragment>
     <fragment
             android:id="@+id/globalOptionsFragment"
@@ -35,6 +38,10 @@
                 android:id="@+id/action_realmSelectFragment_to_welcomeFragment"
                 app:destination="@id/welcomeFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/accountsFragment"
+        android:name="au.com.codeka.warworlds.AccountsFragment"
+        android:label="Sign In" />
     <fragment
             android:id="@+id/warmWelcomeFragment"
             android:name="au.com.codeka.warworlds.WarmWelcomeFragment"
@@ -210,4 +217,5 @@
         android:id="@+id/blockedEmpiresFragment"
         android:name="au.com.codeka.warworlds.game.chat.BlockedEmpiresFragment"
         android:label="BlockedEmpiresFragment" />
+
 </navigation>

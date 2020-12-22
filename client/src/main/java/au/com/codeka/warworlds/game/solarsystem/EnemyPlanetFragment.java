@@ -101,7 +101,7 @@ public class EnemyPlanetFragment extends BaseFragment {
     ShieldManager.eventBus.register(eventHandler);
     StarManager.eventBus.register(eventHandler);
 
-    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
       if (!success) {
         // TODO: should we ever fail?
         NavHostFragment.findNavController(this).navigate(R.id.welcomeFragment);

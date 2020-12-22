@@ -84,7 +84,7 @@ public class EmpireFragment extends TabFragmentFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireActivity(), (success, greeting) -> {
+    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
       if (!success) {
         startActivity(new Intent(requireContext(), WelcomeFragment.class));
         return;

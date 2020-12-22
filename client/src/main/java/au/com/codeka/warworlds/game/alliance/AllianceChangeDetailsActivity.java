@@ -56,7 +56,7 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
   @Override
   public void onResumeFragments() {
     super.onResumeFragments();
-
+/*TODO
     ServerGreeter.waitForHello(this, (success, greeting) -> {
       if (!success) {
         startActivity(new Intent(AllianceChangeDetailsActivity.this, WelcomeFragment.class));
@@ -64,6 +64,7 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
         fullRefresh();
       }
     });
+*/
   }
 
   @Override
