@@ -175,6 +175,9 @@
             android:name="au.com.codeka.warworlds.game.chat.ChatFragment">
         <argument android:name="conversationID" app:argType="integer" android:defaultValue="0" />
         <argument android:name="empireID" app:argType="integer" android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_chatFragment_to_blockedEmpiresFragment"
+            app:destination="@id/blockedEmpiresFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatConversationFragment"
@@ -203,4 +206,8 @@
         android:id="@+id/destinationFragment"
         android:name="au.com.codeka.warworlds.game.wormhole.DestinationFragment"
         android:label="DestinationFragment" />
+    <fragment
+        android:id="@+id/blockedEmpiresFragment"
+        android:name="au.com.codeka.warworlds.game.chat.BlockedEmpiresFragment"
+        android:label="BlockedEmpiresFragment" />
 </navigation>

@@ -68,7 +68,6 @@
       android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsActivity"
       android:windowSoftInputMode="stateUnchanged" />
     <activity android:name="au.com.codeka.warworlds.game.alliance.AllianceDetailsActivity" />
-    <activity android:name="au.com.codeka.warworlds.game.chat.BlockedEmpiresActivity" />
 
     <service
             android:name=".notifications.NotificationMessagingService"
