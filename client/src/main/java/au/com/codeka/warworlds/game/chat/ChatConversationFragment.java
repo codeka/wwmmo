@@ -35,7 +35,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.AccountsActivity;
+import au.com.codeka.warworlds.AccountsFragment;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.Util;
@@ -138,7 +138,7 @@ public class ChatConversationFragment extends BaseFragment {
 
       Button signInBtn = v.findViewById(R.id.sign_in_btn);
       signInBtn.setOnClickListener(v12 -> {
-        final Intent intent = new Intent(getContext(), AccountsActivity.class);
+        final Intent intent = new Intent(getContext(), AccountsFragment.class);
         startActivity(intent);
       });
 

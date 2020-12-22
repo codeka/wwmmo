@@ -188,7 +188,7 @@ public class WelcomeFragment extends BaseFragment {
   }
 
   private void onReauthClick() {
-    final Intent intent = new Intent(requireContext(), AccountsActivity.class);
+    final Intent intent = new Intent(requireContext(), AccountsFragment.class);
     startActivity(intent);
   }
 
